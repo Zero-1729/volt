@@ -1,5 +1,11 @@
 #import "AppDelegate.h"
 
+// Warn: 'RCTBridge required dispatch_sync to load RCTDevLoadingView...'
+// Hanlde above React-native warn (fix 1/2)
+#if RCT_DEV
+#import <React/RCTDevLoadingView.h>
+#endif
+
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
@@ -31,7 +37,17 @@ static void InitializeFlipper(UIApplication *application) {
   InitializeFlipper(application);
 #endif
 
-  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  // React-Native dev warn fix (2/2)
+  NSURL *jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.js" fallbackResource:nil];
+  RCTBridge *bridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
+                                              moduleProvider:nil
+                                               launchOptions:launchOptions];
+
+  #if RCT_DEV
+   [bridge moduleForClass:[RCTDevLoadingView class]];
+  #endif
+
+  // RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"volt"
                                             initialProperties:nil];
