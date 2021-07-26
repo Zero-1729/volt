@@ -1,2 +1,3 @@
-# volt
- A Bitcoin wallet
+# Volt
+
+A Bitcoin wallet
