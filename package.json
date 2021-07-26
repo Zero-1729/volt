@@ -21,6 +21,8 @@
     "@remobile/react-native-qrcode-local-image": "^1.0.4",
     "assert": "^2.0.0",
     "detox": "^18.19.0",
+    "electrum-client": "github:BlueWallet/rn-electrum-client#99c75385f99e82b87fbfed2abfb2cccd322fe3e9",
+    "electrum-mnemonic": "^2.0.0",
     "react": "17.0.1",
     "react-native": "0.64.2",
     "react-native-camera": "^4.0.0",
