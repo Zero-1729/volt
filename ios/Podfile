@@ -12,6 +12,8 @@ target 'volt' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+
   target 'voltTests' do
     inherit! :complete
     # Pods for testing
