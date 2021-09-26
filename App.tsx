@@ -42,14 +42,28 @@ const App = () => {
                     barStyle={isDarkMode ? 'light-content' : 'dark-content'}
                 />
 
-                <View style={tailwind('w-5/6 h-10 absolute top-14 items-center flex-row justify-between')}>
+                <View
+                    style={tailwind(
+                        'w-5/6 h-10 absolute top-14 items-center flex-row justify-between',
+                    )}>
                     <TouchableOpacity>
-                        <Dots width={32} fill={svgFill} style={tailwind('-ml-1')} />
+                        <Dots
+                            width={32}
+                            fill={svgFill}
+                            style={tailwind('-ml-1')}
+                        />
                     </TouchableOpacity>
-                    
-                    <View style={tailwind('flex-row justify-between items-center -mr-1')}>
+
+                    <View
+                        style={tailwind(
+                            'flex-row justify-between items-center -mr-1',
+                        )}>
                         <TouchableOpacity>
-                            <Bell width={22} fill={svgFill} style={tailwind('mr-2')} />
+                            <Bell
+                                width={22}
+                                fill={svgFill}
+                                style={tailwind('mr-2')}
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity>
                             <Add width={30} fill={svgFill} />
