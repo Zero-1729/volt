@@ -76,6 +76,8 @@
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.4.0",
     "react-native-secure-key-store": "^2.0.9",
+    "react-native-svg": "^12.1.1",
+    "react-native-svg-transformer": "^0.14.3",
     "react-native-tooltip": "^5.2.0",
     "react-test-render": "^1.1.2",
     "readable-stream": "^2.3.7",
