@@ -159,7 +159,6 @@ const App = () => {
                             </View>
                         </View>
                     </View>
-                </View>
 
                     <Text
                         style={[
