@@ -132,7 +132,14 @@ const App = () => {
                                         AltDarkText,
                                     ]}>
                                     Supports the Satoshi Symbol (
-                                    <Text style={[styles.SatSymbol, tailwind('text-sm')]}>S</Text>)
+                                    <Text
+                                        style={[
+                                            styles.SatSymbol,
+                                            tailwind('text-sm'),
+                                        ]}>
+                                        S
+                                    </Text>
+                                    )
                                 </Text>
                             </TouchableOpacity>
                         </View>
