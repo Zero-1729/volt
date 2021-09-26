@@ -53,10 +53,10 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Roboto Bold.ttf</string>
+		<string>Roboto Medium.ttf</string>
 		<string>Roboto.ttf</string>
-		<string>RobotoBold.ttf</string>
-		<string>RobotoMedium.ttf</string>
-		<string>SatoshiSymbol.ttf</string>
+		<string>Satoshi Symbol.ttf</string>
 	</array>
 </dict>
 </plist>
