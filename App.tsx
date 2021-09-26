@@ -1,6 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
+import Github from './assets/svg/repo-forked-24.svg';
+import Dots from './assets/svg/kebab-horizontal-24.svg';
+import Bell from './assets/svg/bell-fill-24.svg';
+import Add from './assets/svg/plus-32.svg';
+
 import {
     StatusBar,
     StyleSheet,
@@ -28,12 +33,30 @@ const App = () => {
         color: isDarkMode ? 'white' : 'black',
     };
 
+    const svgFill = isDarkMode ? 'white' : 'black';
+
     return (
         <SafeAreaProvider>
             <View style={root}>
                 <StatusBar
                     barStyle={isDarkMode ? 'light-content' : 'dark-content'}
                 />
+
+                <View style={tailwind('w-5/6 h-10 absolute top-14 items-center flex-row justify-between')}>
+                    <TouchableOpacity>
+                        <Dots width={32} fill={svgFill} style={tailwind('-ml-1')} />
+                    </TouchableOpacity>
+                    
+                    <View style={tailwind('flex-row justify-between items-center -mr-1')}>
+                        <TouchableOpacity>
+                            <Bell width={22} fill={svgFill} style={tailwind('mr-2')} />
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Add width={30} fill={svgFill} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
                 <View
                     style={[
                         tailwind(
@@ -49,12 +72,20 @@ const App = () => {
                         ]}>
                         Volt
                     </Text>
-                    <Text style={[styles.RegulatText, DarkText]}>
-                        Built with Open Technologies.
-                    </Text>
+
                     <View
                         style={tailwind(
-                            'bg-blue-200 px-4 py-2 rounded-full mb-6 mt-8',
+                            'justify-center items-center flex-row',
+                        )}>
+                        <Github fill={svgFill} style={tailwind('mr-2')} />
+                        <Text style={[styles.RegulatText, DarkText]}>
+                            Built with Open Technologies
+                        </Text>
+                    </View>
+
+                    <View
+                        style={tailwind(
+                            'bg-blue-200 px-4 py-2 rounded-full mb-6 mt-4',
                         )}>
                         <TouchableOpacity
                             style={tailwind('items-center flex-row')}>
