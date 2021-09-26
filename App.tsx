@@ -35,6 +35,14 @@ const App = () => {
 
     const svgFill = isDarkMode ? 'white' : 'black';
 
+    const bgFill = {
+        backgroundColor: isDarkMode ? 'white' : 'black',
+    };
+
+    const AltDarkText = {
+        color: isDarkMode ? 'black' : 'white',
+    };
+
     return (
         <SafeAreaProvider>
             <View style={root}>
@@ -71,47 +79,63 @@ const App = () => {
                     </View>
                 </View>
 
-                <View
-                    style={[
-                        tailwind(
-                            'w-5/6 h-52 bg-gray-100 p-6 items-center justify-center rounded-md',
-                        ),
-                        altGray,
-                    ]}>
-                    <Text
+                <View style={tailwind('w-5/6 h-52 relative items-center')}>
+                    <View
+                        style={tailwind(
+                            'w-11/12 h-full absolute -bottom-2 rounded-md bg-purple-500 z-20 opacity-60',
+                        )}
+                    />
+
+                    <View
+                        style={tailwind(
+                            'w-5/6 h-full absolute -bottom-4 rounded-md bg-blue-500 opacity-60',
+                        )}
+                    />
+
+                    <View
                         style={[
-                            styles.BoldText,
-                            tailwind('text-4xl mb-2'),
-                            DarkText,
+                            tailwind(
+                                'w-full h-52 bg-gray-100 p-6 items-center justify-center rounded-md z-30',
+                            ),
+                            altGray,
                         ]}>
-                        Volt
-                    </Text>
-
-                    <View
-                        style={tailwind(
-                            'justify-center items-center flex-row',
-                        )}>
-                        <Github fill={svgFill} style={tailwind('mr-2')} />
-                        <Text style={[styles.RegulatText, DarkText]}>
-                            Built with Open Technologies
+                        <Text
+                            style={[
+                                styles.BoldText,
+                                tailwind('text-4xl mb-2'),
+                                DarkText,
+                            ]}>
+                            Volt
                         </Text>
-                    </View>
 
-                    <View
-                        style={tailwind(
-                            'bg-blue-200 px-4 py-2 rounded-full mb-6 mt-4',
-                        )}>
-                        <TouchableOpacity
-                            style={tailwind('items-center flex-row')}>
-                            <Text
-                                style={[
-                                    styles.MediumText,
-                                    tailwind('text-xs'),
-                                ]}>
-                                Supports the Satoshi Symbol (
-                                <Text style={styles.SatSymbol}>S</Text>)
+                        <View
+                            style={tailwind(
+                                'justify-center items-center flex-row',
+                            )}>
+                            <Github fill={svgFill} style={tailwind('mr-2')} />
+                            <Text style={[styles.RegulatText, DarkText]}>
+                                Built with Open Technologies
                             </Text>
-                        </TouchableOpacity>
+                        </View>
+
+                        <View
+                            style={[
+                                tailwind('px-4 py-2 rounded-full mb-6 mt-4'),
+                                bgFill,
+                            ]}>
+                            <TouchableOpacity
+                                style={tailwind('items-center flex-row')}>
+                                <Text
+                                    style={[
+                                        styles.MediumText,
+                                        tailwind('text-xs'),
+                                        AltDarkText,
+                                    ]}>
+                                    Supports the Satoshi Symbol (
+                                    <Text style={[styles.SatSymbol, tailwind('text-sm')]}>S</Text>)
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
