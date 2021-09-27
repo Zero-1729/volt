@@ -125,7 +125,7 @@ const App = () => {
                                     fill={svgFill}
                                     style={tailwind('mr-2')}
                                 />
-                                <Text style={[styles.RegulatText, DarkText]}>
+                                <Text style={[styles.RegularText, DarkText]}>
                                     Built with Open Technologies
                                 </Text>
                             </View>
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    RegulatText: {
+    RegularText: {
         fontFamily: 'Roboto',
     },
     MediumText: {
