@@ -12,9 +12,14 @@ import {
     TouchableOpacity,
     useColorScheme,
     View,
+    Platform,
 } from 'react-native';
 
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import {
+    SafeAreaProvider,
+    SafeAreaView,
+    initialWindowMetrics,
+} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
 
@@ -42,6 +47,13 @@ const App = () => {
 
     const AltDarkText = {
         color: isDarkMode ? 'black' : 'white',
+    };
+
+    // Get native platform insets to adjust bottom styling
+    const insets = initialWindowMetrics.insets;
+
+    const bottomPadding = {
+        bottom: Platform.OS === 'ios' ? insets.bottom - 18 : insets.bottom + 20,
     };
 
     return (
@@ -163,7 +175,8 @@ const App = () => {
                         style={[
                             styles.MediumText,
                             DarkText,
-                            tailwind('absolute bottom-8'),
+                            tailwind('absolute'),
+                            bottomPadding,
                         ]}>
                         MIT License
                     </Text>
