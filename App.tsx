@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
 import Github from './assets/svg/repo-forked-24.svg';
