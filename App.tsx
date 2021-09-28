@@ -53,7 +53,12 @@ const App = () => {
     const insets = initialWindowMetrics.insets;
 
     const bottomPadding = {
-        bottom: Platform.OS === 'ios' ? insets.bottom - 18 : insets.bottom + 20,
+        bottom:
+            Platform.OS === 'ios'
+                ? insets.bottom - 18
+                : insets.bottom > 15
+                ? insets.bottom - 20 // Android with default 3 buttons
+                : insets.bottom + 20, // Android with IOS-like bottom
     };
 
     return (
