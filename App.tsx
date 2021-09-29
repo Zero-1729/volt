@@ -6,12 +6,11 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {NavigationContainer} from '@react-navigation/native';
 
+import SplashScreen from 'react-native-splash-screen';
+
 import 'react-native-gesture-handler';
 
 import InitScreen from './Navigation';
-import SplashScreen from 'react-native-splash-screen';
-
-import tailwind from 'tailwind-rn';
 
 const App = () => {
     useEffect(() => {
@@ -20,8 +19,12 @@ const App = () => {
 
     const isDarkMode = useColorScheme() === 'dark';
 
+    const DarkBackground = {
+        backgroundColor: isDarkMode ? 'black' : 'white',
+    };
+
     return (
-        <SafeAreaProvider>
+        <SafeAreaProvider style={DarkBackground}>
             <View style={[styles.container]}>
                 <StatusBar
                     barStyle={isDarkMode ? 'light-content' : 'dark-content'}
