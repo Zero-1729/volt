@@ -60,7 +60,7 @@ const Settings = () => {
                 <View style={tailwind('w-full h-full items-center')}>
                     <View style={tailwind('w-5/6 mt-4 mb-12')}>
                         <TouchableOpacity
-                            style={tailwind('items-center flex-row')}
+                            style={tailwind('items-center flex-row -ml-1')}
                             onPress={() => {
                                 navigation.goBack();
                             }}>
