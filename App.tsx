@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 
 import {StatusBar, StyleSheet, useColorScheme, View} from 'react-native';
 
