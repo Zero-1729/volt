@@ -6,18 +6,35 @@ import {
     useColorScheme,
     Linking,
     TouchableOpacity,
+    Platform,
 } from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {
+    SafeAreaView,
+    initialWindowMetrics,
+} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
-import Check from './../../assets/svg/check-circle-24.svg';
+import Right from './../../assets/svg/chevron-right-24.svg';
 
 const Settings = () => {
+    const navigation = useNavigation();
+
+    const insets = initialWindowMetrics.insets;
+
+    const bottomPadding = {
+        bottom:
+            Platform.OS === 'ios'
+                ? insets.bottom - 18
+                : insets.bottom > 16
+                ? insets.bottom - 20 // Android with default 3 buttons
+                : insets.bottom + 20, // Android with IOS-like bottom
+    };
+
     const isDarkMode = useColorScheme() === 'dark';
 
     const DarkBackground = {
@@ -46,9 +63,7 @@ const Settings = () => {
 
     const DarkSVGFill = isDarkMode ? 'white' : 'black';
 
-    const disabled = true;
-
-    const navigation = useNavigation();
+    const DarkGraySVGFill = isDarkMode ? '#676767' : '#B1B1B1';
 
     return (
         <SafeAreaView style={DarkBackground}>
@@ -58,7 +73,7 @@ const Settings = () => {
                     DarkBackground,
                 ]}>
                 <View style={tailwind('w-full h-full items-center')}>
-                    <View style={tailwind('w-5/6 mt-4 mb-12')}>
+                    <View style={tailwind('w-5/6 mt-4 mb-16')}>
                         <TouchableOpacity
                             style={tailwind('items-center flex-row -ml-1')}
                             onPress={() => {
@@ -94,112 +109,186 @@ const Settings = () => {
                         />
                     </View>
 
-                    <View style={[tailwind('w-5/6 mb-8')]}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
-                                ),
-                            ]}>
-                            <Text
+                    <View style={[tailwind('w-5/6')]}>
+                        <TouchableOpacity onPress={() => {}}>
+                            <View
                                 style={[
-                                    tailwind('text-sm'),
-                                    styles.MediumText,
-                                    DarkText,
+                                    tailwind(
+                                        'items-center flex-row justify-between mt-2 mb-6',
+                                    ),
                                 ]}>
-                                Currency
-                            </Text>
-
-                            <TouchableOpacity onPress={() => {}}>
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
                                         styles.MediumText,
-                                        DarkGrayedText,
+                                        DarkText,
                                     ]}>
-                                    USD
+                                    Currency
                                 </Text>
-                            </TouchableOpacity>
-                        </View>
 
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
-                                ),
-                            ]}>
-                            <Text
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'flex-row items-center justify-between',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-xs mr-4'),
+                                            styles.MediumText,
+                                            DarkGrayedText,
+                                        ]}>
+                                        USD
+                                    </Text>
+                                    <Right
+                                        width={16}
+                                        stroke={DarkGraySVGFill}
+                                        fill={DarkGraySVGFill}
+                                        style={[]}
+                                    />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {}}>
+                            <View
                                 style={[
-                                    tailwind('text-sm'),
-                                    styles.MediumText,
-                                    DarkText,
+                                    tailwind(
+                                        'items-center flex-row justify-between mt-2 mb-6',
+                                    ),
                                 ]}>
-                                Language
-                            </Text>
-
-                            <TouchableOpacity onPress={() => {}}>
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
                                         styles.MediumText,
-                                        DarkGrayedText,
+                                        DarkText,
                                     ]}>
-                                    English
+                                    Language
                                 </Text>
-                            </TouchableOpacity>
-                        </View>
 
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
-                                ),
-                            ]}>
-                            <Text
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'flex-row items-center justify-between',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-xs mr-4'),
+                                            styles.MediumText,
+                                            DarkGrayedText,
+                                        ]}>
+                                        English
+                                    </Text>
+                                    <Right
+                                        width={16}
+                                        stroke={DarkGraySVGFill}
+                                        fill={DarkGraySVGFill}
+                                    />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {}}>
+                            <View
                                 style={[
-                                    tailwind('text-sm'),
-                                    styles.MediumText,
-                                    DarkText,
+                                    tailwind(
+                                        'items-center flex-row justify-between mt-2 mb-6',
+                                    ),
                                 ]}>
-                                Theme
-                            </Text>
-
-                            <TouchableOpacity onPress={() => {}}>
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
                                         styles.MediumText,
-                                        DarkGrayedText,
+                                        DarkText,
                                     ]}>
-                                    System Preference
+                                    Wallet
                                 </Text>
-                            </TouchableOpacity>
-                        </View>
 
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
-                                ),
-                            ]}>
-                            <Text
+                                <Right
+                                    width={16}
+                                    stroke={DarkGraySVGFill}
+                                    fill={DarkGraySVGFill}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {}}>
+                            <View
                                 style={[
-                                    tailwind('text-sm'),
-                                    styles.MediumText,
-                                    DarkText,
+                                    tailwind(
+                                        'items-center flex-row justify-between mt-2 mb-6',
+                                    ),
                                 ]}>
-                                Enable Biometrics
-                            </Text>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        styles.MediumText,
+                                        DarkText,
+                                    ]}>
+                                    Security
+                                </Text>
 
-                            <TouchableOpacity onPress={() => {}}>
-                                <Check fill={DarkSVGFill} style={DarkSVGFill} />
-                            </TouchableOpacity>
-                        </View>
+                                <Right
+                                    width={16}
+                                    stroke={DarkGraySVGFill}
+                                    fill={DarkGraySVGFill}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {}}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'items-center flex-row justify-between mt-2 mb-6',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        styles.MediumText,
+                                        DarkText,
+                                    ]}>
+                                    Network
+                                </Text>
+
+                                <Right
+                                    width={16}
+                                    stroke={DarkGraySVGFill}
+                                    fill={DarkGraySVGFill}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {}}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'items-center flex-row justify-between mt-2 mb-6',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        styles.MediumText,
+                                        DarkText,
+                                    ]}>
+                                    Tools
+                                </Text>
+
+                                <Right
+                                    width={16}
+                                    stroke={DarkGraySVGFill}
+                                    fill={DarkGraySVGFill}
+                                />
+                            </View>
+                        </TouchableOpacity>
 
                         <View
                             style={[
                                 tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
+                                    'items-center flex-row justify-between mt-2',
                                 ),
                             ]}>
                             <TouchableOpacity
@@ -217,81 +306,16 @@ const Settings = () => {
                             </TouchableOpacity>
                         </View>
                     </View>
-
-                    <View
-                        style={tailwind(
-                            'justify-center w-full items-center mb-6',
-                        )}>
-                        <Text
-                            style={[
-                                tailwind('text-lg w-5/6'),
-                                styles.BoldText,
-                                DarkText,
-                            ]}>
-                            Advanced
-                        </Text>
-                    </View>
-
-                    <View style={[tailwind('w-5/6')]}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    styles.MediumText,
-                                    DarkText,
-                                ]}>
-                                Enable Advanced Mode
-                            </Text>
-
-                            <TouchableOpacity onPress={() => {}}>
-                                {!disabled && (
-                                    <Check
-                                        fill={DarkSVGFill}
-                                        style={DarkSVGFill}
-                                    />
-                                )}
-                            </TouchableOpacity>
-                        </View>
-
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    styles.MediumText,
-                                    DarkText,
-                                ]}>
-                                Hide Balances
-                            </Text>
-
-                            <TouchableOpacity onPress={() => {}}>
-                                {!disabled && (
-                                    <Check
-                                        fill={DarkSVGFill}
-                                        style={DarkSVGFill}
-                                    />
-                                )}
-                            </TouchableOpacity>
-                        </View>
-                    </View>
                 </View>
 
                 <TouchableOpacity onPress={() => {}}>
                     <View
                         style={[
                             tailwind(
-                                'self-center p-3 px-12 rounded-md absolute bottom-12',
+                                'self-center p-3 px-12 rounded-md absolute',
                             ),
                             DarkObject,
+                            bottomPadding,
                         ]}>
                         <Text
                             style={[
