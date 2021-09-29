@@ -204,7 +204,7 @@ const Settings = () => {
                             ]}>
                             <TouchableOpacity
                                 onPress={() => {
-                                    Linking.openSettings;
+                                    Linking.openSettings();
                                 }}>
                                 <Text
                                     style={[
