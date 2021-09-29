@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Github from './assets/svg/repo-forked-24.svg';
 import Dots from './assets/svg/kebab-horizontal-24.svg';
@@ -21,9 +21,15 @@ import {
     initialWindowMetrics,
 } from 'react-native-safe-area-context';
 
+import SplashScreen from 'react-native-splash-screen';
+
 import tailwind from 'tailwind-rn';
 
 const App = () => {
+    useEffect(() => {
+        SplashScreen.hide();
+    });
+
     const isDarkMode = useColorScheme() === 'dark';
 
     const root = {
