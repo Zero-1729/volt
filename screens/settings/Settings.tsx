@@ -62,7 +62,7 @@ const Settings = () => {
                         <TouchableOpacity
                             style={tailwind('items-center flex-row')}
                             onPress={() => {
-                                navigation.navigate('Home');
+                                navigation.goBack();
                             }}>
                             <Back style={tailwind('mr-2')} fill={DarkSVGFill} />
                             <Text
