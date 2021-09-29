@@ -32,6 +32,10 @@ const Settings = () => {
         color: isDarkMode ? 'black' : 'white',
     };
 
+    const DarkBar = {
+        backgroundColor: isDarkMode ? '#313131' : '#F3F3F3',
+    };
+
     const DarkGrayedText = {
         color: isDarkMode ? '#676767' : '#B1B1B1',
     };
@@ -86,10 +90,7 @@ const Settings = () => {
                         </Text>
 
                         <View
-                            style={[
-                                tailwind('w-full bg-gray-200'),
-                                {height: 2},
-                            ]}
+                            style={[tailwind('w-full'), {height: 2}, DarkBar]}
                         />
                     </View>
 
