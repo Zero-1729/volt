@@ -33,7 +33,7 @@ const Settings = () => {
     };
 
     const DarkBar = {
-        backgroundColor: isDarkMode ? '#313131' : '#F3F3F3',
+        backgroundColor: isDarkMode ? '#1b1b1b' : '#F3F3F3',
     };
 
     const DarkGrayedText = {
