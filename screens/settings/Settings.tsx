@@ -54,7 +54,7 @@ const Settings = () => {
                     DarkBackground,
                 ]}>
                 <View style={tailwind('w-full h-full items-center')}>
-                    <View style={tailwind('w-5/6 mt-6 mb-12')}>
+                    <View style={tailwind('w-5/6 mt-4 mb-12')}>
                         <TouchableOpacity
                             style={tailwind('items-center flex-row')}
                             onPress={() => {
