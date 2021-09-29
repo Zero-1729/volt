@@ -4,6 +4,7 @@ import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 
 import Home from './screens/Home';
 import Apps from './screens/Apps';
+import Settings from './screens/settings/Settings';
 
 const InitScreenStack = createNativeStackNavigator();
 const initScreen = () => (
@@ -16,6 +17,11 @@ const initScreen = () => (
         <InitScreenStack.Screen
             name="Apps"
             component={Apps}
+            options={{headerShown: false, replaceAnimation: 'push'}}
+        />
+        <InitScreenStack.Screen
+            name="Settings"
+            component={Settings}
             options={{headerShown: false, replaceAnimation: 'push'}}
         />
     </InitScreenStack.Navigator>
