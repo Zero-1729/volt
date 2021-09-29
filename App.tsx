@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import {StatusBar, StyleSheet, useColorScheme, View} from 'react-native';
 
@@ -9,8 +9,15 @@ import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
 
 import InitScreen from './Navigation';
+import SplashScreen from 'react-native-splash-screen';
+
+import tailwind from 'tailwind-rn';
 
 const App = () => {
+    useEffect(() => {
+        SplashScreen.hide();
+    });
+
     const isDarkMode = useColorScheme() === 'dark';
 
     return (
