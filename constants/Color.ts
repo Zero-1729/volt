@@ -3,6 +3,7 @@ const Color = (currentTheme: String) => {
     let isDarkMode = currentTheme === 'dark';
 
     return {
+        isDarkMode: isDarkMode,
         SVG: {
             Default: isDarkMode ? 'white' : 'black',
             GrayFill: isDarkMode ? '#676767' : '#B1B1B1',
