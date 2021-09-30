@@ -1,11 +1,5 @@
 import React from 'react';
 
-import Dots from './../assets/svg/kebab-horizontal-24.svg';
-import Bell from './../assets/svg/bell-fill-24.svg';
-import Add from './../assets/svg/plus-32.svg';
-
-import Clock from './../assets/svg/clock-24.svg';
-
 import {
     Platform,
     StyleSheet,
@@ -20,6 +14,12 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 
 import tailwind from 'tailwind-rn';
+
+import Dots from './../assets/svg/kebab-horizontal-24.svg';
+import Bell from './../assets/svg/bell-fill-24.svg';
+import Add from './../assets/svg/plus-32.svg';
+
+import Clock from './../assets/svg/clock-24.svg';
 
 const Home = () => {
     const isDarkMode = useColorScheme() === 'dark';
