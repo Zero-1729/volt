@@ -21,9 +21,12 @@ import Add from './../assets/svg/plus-32.svg';
 
 import Clock from './../assets/svg/clock-24.svg';
 
+import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 const Home = () => {
+    const ColorScheme = Color(useColorScheme);
+
     const isDarkMode = useColorScheme() === 'dark';
 
     const altGray = {
@@ -77,7 +80,6 @@ const Home = () => {
             <View
                 style={[
                     tailwind('h-full items-center justify-start relative'),
-                    DarkBackground,
                 ]}>
                 <View
                     style={[
@@ -87,7 +89,7 @@ const Home = () => {
                         topPlatformOffset,
                     ]}>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('Settings')}>
+                        onPress={() => navigation.navigate('SettingsRoot')}>
                         <Dots
                             width={32}
                             fill={svgFill}
@@ -245,6 +247,8 @@ const Home = () => {
     );
 };
 
+export default Home;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -252,5 +256,3 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
-
-export default Home;

@@ -19,13 +19,10 @@ import BitrefillLogo from './../assets/svg/bitrefill.svg';
 import ChangellyLogo from './../assets/svg/changelly.svg';
 
 import Font from '../constants/Font';
+import Color from '../constants/Color';
 
 const Apps = () => {
-    const isDarkMode = useColorScheme() === 'dark';
-
-    const DarkText = {
-        color: isDarkMode ? 'white' : 'black',
-    };
+    const ColorScheme = Color(useColorScheme());
 
     // Apps
     const Services = [
@@ -120,9 +117,9 @@ const Apps = () => {
                     ]}>
                     <Text
                         style={[
-                            DarkText,
                             tailwind('text-2xl'),
                             Font.MediumText,
+                            {color: ColorScheme.Text.Default},
                         ]}>
                         Apps
                     </Text>
@@ -140,6 +137,6 @@ const Apps = () => {
     );
 };
 
-const styles = StyleSheet.create({});
-
 export default Apps;
+
+const styles = StyleSheet.create({});
