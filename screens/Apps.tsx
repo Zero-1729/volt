@@ -7,6 +7,7 @@ import {
     useColorScheme,
     View,
     Linking,
+    TouchableOpacity,
 } from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -16,7 +17,8 @@ import tailwind from 'tailwind-rn';
 import CoinprofileLogo from './../assets/svg/coinprofile.svg';
 import BitrefillLogo from './../assets/svg/bitrefill.svg';
 import ChangellyLogo from './../assets/svg/changelly.svg';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+
+import Font from '../constants/Font';
 
 const Apps = () => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -73,7 +75,10 @@ const Apps = () => {
             /* We'll eventually use WebView to have all the interaction in-App
             It would be even better if the services had APIs we could just wrap a UI over to make a lot more smooth UX-wise */
 
-            <TouchableOpacity onPress={() => {Linking.openURL(item.url)}}>
+            <TouchableOpacity
+                onPress={() => {
+                    Linking.openURL(item.url);
+                }}>
                 <View
                     key={item.key}
                     style={[
@@ -85,14 +90,14 @@ const Apps = () => {
                     <View style={[tailwind('flex h-5/6 w-5/6 justify-around')]}>
                         <Text
                             style={[
-                                styles.BoldText,
+                                Font.BoldText,
                                 tailwind('text-xl text-white'),
                             ]}>
                             {item.title}
                         </Text>
                         <Text
                             style={[
-                                styles.MediumText,
+                                Font.MediumText,
                                 tailwind('text-xs'),
                                 item.textHue,
                             ]}>
@@ -117,7 +122,7 @@ const Apps = () => {
                         style={[
                             DarkText,
                             tailwind('text-2xl'),
-                            styles.MediumText,
+                            Font.MediumText,
                         ]}>
                         Apps
                     </Text>
@@ -135,19 +140,6 @@ const Apps = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    RegularText: {
-        fontFamily: 'Roboto',
-    },
-    MediumText: {
-        fontFamily: 'Roboto Medium',
-    },
-    BoldText: {
-        fontFamily: 'Roboto Bold',
-    },
-    SatSymbol: {
-        fontFamily: 'Satoshi Symbol',
-    },
-});
+const styles = StyleSheet.create({});
 
 export default Apps;
