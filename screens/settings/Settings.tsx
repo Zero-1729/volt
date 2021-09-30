@@ -6,74 +6,36 @@ import {
     useColorScheme,
     Linking,
     TouchableOpacity,
-    Platform,
 } from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
-import {
-    SafeAreaView,
-    initialWindowMetrics,
-} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
+import NativeBottomPadding from '../../constants/NativeBottomPadding';
+
 import Font from '../../constants/Font';
+import Color from '../../constants/Color';
 
 const Settings = () => {
     const navigation = useNavigation();
 
-    const insets = initialWindowMetrics.insets;
+    const ColorScheme = Color(useColorScheme());
 
-    const bottomPadding = {
-        bottom:
-            Platform.OS === 'ios'
-                ? insets.bottom - 18
-                : insets.bottom > 16
-                ? insets.bottom - 20 // Android with default 3 buttons
-                : insets.bottom + 20, // Android with IOS-like bottom
+    const HeadingBar = {
+        height: 2,
+        backgroundColor: ColorScheme.HeadingBar,
     };
-
-    const isDarkMode = useColorScheme() === 'dark';
-
-    const DarkBackground = {
-        backgroundColor: isDarkMode ? 'black' : 'white',
-    };
-
-    const DarkText = {
-        color: isDarkMode ? 'white' : 'black',
-    };
-
-    const AltDarkText = {
-        color: isDarkMode ? 'black' : 'white',
-    };
-
-    const DarkBar = {
-        backgroundColor: isDarkMode ? '#1b1b1b' : '#F3F3F3',
-    };
-
-    const DarkGrayedText = {
-        color: isDarkMode ? '#676767' : '#B1B1B1',
-    };
-
-    const DarkObject = {
-        backgroundColor: isDarkMode ? 'white' : 'black',
-    };
-
-    const DarkSVGFill = isDarkMode ? 'white' : 'black';
-
-    const DarkGraySVGFill = isDarkMode ? '#676767' : '#B1B1B1';
 
     return (
-        <SafeAreaView style={DarkBackground}>
+        <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
             <View
-                style={[
-                    tailwind('w-full h-full justify-start items-center'),
-                    DarkBackground,
-                ]}>
+                style={[tailwind('w-full h-full justify-start items-center')]}>
                 <View style={tailwind('w-full h-full items-center')}>
                     <View style={tailwind('w-5/6 mt-4 mb-16')}>
                         <TouchableOpacity
@@ -81,11 +43,14 @@ const Settings = () => {
                             onPress={() => {
                                 navigation.goBack();
                             }}>
-                            <Back style={tailwind('mr-2')} fill={DarkSVGFill} />
+                            <Back
+                                style={tailwind('mr-2')}
+                                fill={ColorScheme.SVG.Default}
+                            />
                             <Text
                                 style={[
                                     tailwind('text-sm'),
-                                    DarkText,
+                                    {color: ColorScheme.Text.Default},
                                     Font.BoldText,
                                 ]}>
                                 Back
@@ -101,18 +66,19 @@ const Settings = () => {
                             style={[
                                 tailwind('text-2xl mb-4 w-5/6'),
                                 Font.MediumText,
-                                DarkText,
+                                {color: ColorScheme.Text.Default},
                             ]}>
                             Settings
                         </Text>
 
-                        <View
-                            style={[tailwind('w-full'), {height: 2}, DarkBar]}
-                        />
+                        <View style={[tailwind('w-full'), HeadingBar]} />
                     </View>
 
                     <View style={[tailwind('w-5/6')]}>
-                        <TouchableOpacity onPress={() => {}}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                navigation.navigate('Currency');
+                            }}>
                             <View
                                 style={[
                                     tailwind(
@@ -123,7 +89,7 @@ const Settings = () => {
                                     style={[
                                         tailwind('text-sm'),
                                         Font.MediumText,
-                                        DarkText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Currency
                                 </Text>
@@ -138,21 +104,27 @@ const Settings = () => {
                                         style={[
                                             tailwind('text-xs mr-4'),
                                             Font.MediumText,
-                                            DarkGrayedText,
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
                                         ]}>
                                         USD
                                     </Text>
                                     <Right
                                         width={16}
-                                        stroke={DarkGraySVGFill}
-                                        fill={DarkGraySVGFill}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
                                         style={[]}
                                     />
                                 </View>
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => {}}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                navigation.navigate('Language');
+                            }}>
                             <View
                                 style={[
                                     tailwind(
@@ -163,7 +135,7 @@ const Settings = () => {
                                     style={[
                                         tailwind('text-sm'),
                                         Font.MediumText,
-                                        DarkText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Language
                                 </Text>
@@ -178,14 +150,17 @@ const Settings = () => {
                                         style={[
                                             tailwind('text-xs mr-4'),
                                             Font.MediumText,
-                                            DarkGrayedText,
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
                                         ]}>
                                         English
                                     </Text>
                                     <Right
                                         width={16}
-                                        stroke={DarkGraySVGFill}
-                                        fill={DarkGraySVGFill}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
                                     />
                                 </View>
                             </View>
@@ -202,15 +177,15 @@ const Settings = () => {
                                     style={[
                                         tailwind('text-sm'),
                                         Font.MediumText,
-                                        DarkText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Wallet
                                 </Text>
 
                                 <Right
                                     width={16}
-                                    stroke={DarkGraySVGFill}
-                                    fill={DarkGraySVGFill}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
                                 />
                             </View>
                         </TouchableOpacity>
@@ -226,15 +201,15 @@ const Settings = () => {
                                     style={[
                                         tailwind('text-sm'),
                                         Font.MediumText,
-                                        DarkText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Security
                                 </Text>
 
                                 <Right
                                     width={16}
-                                    stroke={DarkGraySVGFill}
-                                    fill={DarkGraySVGFill}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
                                 />
                             </View>
                         </TouchableOpacity>
@@ -250,15 +225,15 @@ const Settings = () => {
                                     style={[
                                         tailwind('text-sm'),
                                         Font.MediumText,
-                                        DarkText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Network
                                 </Text>
 
                                 <Right
                                     width={16}
-                                    stroke={DarkGraySVGFill}
-                                    fill={DarkGraySVGFill}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
                                 />
                             </View>
                         </TouchableOpacity>
@@ -274,15 +249,15 @@ const Settings = () => {
                                     style={[
                                         tailwind('text-sm'),
                                         Font.MediumText,
-                                        DarkText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Tools
                                 </Text>
 
                                 <Right
                                     width={16}
-                                    stroke={DarkGraySVGFill}
-                                    fill={DarkGraySVGFill}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
                                 />
                             </View>
                         </TouchableOpacity>
@@ -301,7 +276,7 @@ const Settings = () => {
                                     style={[
                                         tailwind('text-sm'),
                                         Font.MediumText,
-                                        DarkText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     System Preferences
                                 </Text>
@@ -310,20 +285,23 @@ const Settings = () => {
                     </View>
                 </View>
 
-                <TouchableOpacity onPress={() => {}}>
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('About');
+                    }}>
                     <View
                         style={[
                             tailwind(
                                 'self-center p-3 px-12 rounded-md absolute',
                             ),
-                            DarkObject,
-                            bottomPadding,
+                            {backgroundColor: ColorScheme.Background.Inverted},
+                            NativeBottomPadding,
                         ]}>
                         <Text
                             style={[
                                 tailwind('text-sm'),
                                 Font.MediumText,
-                                AltDarkText,
+                                {color: ColorScheme.Text.Alt},
                             ]}>
                             About
                         </Text>
