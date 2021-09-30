@@ -21,6 +21,8 @@ import tailwind from 'tailwind-rn';
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
+import Font from '../../constants/Font';
+
 const Settings = () => {
     const navigation = useNavigation();
 
@@ -84,7 +86,7 @@ const Settings = () => {
                                 style={[
                                     tailwind('text-sm'),
                                     DarkText,
-                                    styles.BoldText,
+                                    Font.BoldText,
                                 ]}>
                                 Back
                             </Text>
@@ -98,7 +100,7 @@ const Settings = () => {
                         <Text
                             style={[
                                 tailwind('text-2xl mb-4 w-5/6'),
-                                styles.MediumText,
+                                Font.MediumText,
                                 DarkText,
                             ]}>
                             Settings
@@ -120,7 +122,7 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
-                                        styles.MediumText,
+                                        Font.MediumText,
                                         DarkText,
                                     ]}>
                                     Currency
@@ -135,7 +137,7 @@ const Settings = () => {
                                     <Text
                                         style={[
                                             tailwind('text-xs mr-4'),
-                                            styles.MediumText,
+                                            Font.MediumText,
                                             DarkGrayedText,
                                         ]}>
                                         USD
@@ -160,7 +162,7 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
-                                        styles.MediumText,
+                                        Font.MediumText,
                                         DarkText,
                                     ]}>
                                     Language
@@ -175,7 +177,7 @@ const Settings = () => {
                                     <Text
                                         style={[
                                             tailwind('text-xs mr-4'),
-                                            styles.MediumText,
+                                            Font.MediumText,
                                             DarkGrayedText,
                                         ]}>
                                         English
@@ -199,7 +201,7 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
-                                        styles.MediumText,
+                                        Font.MediumText,
                                         DarkText,
                                     ]}>
                                     Wallet
@@ -223,7 +225,7 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
-                                        styles.MediumText,
+                                        Font.MediumText,
                                         DarkText,
                                     ]}>
                                     Security
@@ -247,7 +249,7 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
-                                        styles.MediumText,
+                                        Font.MediumText,
                                         DarkText,
                                     ]}>
                                     Network
@@ -271,7 +273,7 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
-                                        styles.MediumText,
+                                        Font.MediumText,
                                         DarkText,
                                     ]}>
                                     Tools
@@ -298,7 +300,7 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
-                                        styles.MediumText,
+                                        Font.MediumText,
                                         DarkText,
                                     ]}>
                                     System Preferences
@@ -320,7 +322,7 @@ const Settings = () => {
                         <Text
                             style={[
                                 tailwind('text-sm'),
-                                styles.MediumText,
+                                Font.MediumText,
                                 AltDarkText,
                             ]}>
                             About
@@ -334,17 +336,4 @@ const Settings = () => {
 
 export default Settings;
 
-const styles = StyleSheet.create({
-    RegularText: {
-        fontFamily: 'Roboto',
-    },
-    MediumText: {
-        fontFamily: 'Roboto Medium',
-    },
-    BoldText: {
-        fontFamily: 'Roboto Bold',
-    },
-    SatSymbol: {
-        fontFamily: 'Satoshi Symbol',
-    },
-});
+const styles = StyleSheet.create({});

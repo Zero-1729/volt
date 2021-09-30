@@ -21,6 +21,8 @@ import Add from './../assets/svg/plus-32.svg';
 
 import Clock from './../assets/svg/clock-24.svg';
 
+import Font from '../constants/Font';
+
 const Home = () => {
     const isDarkMode = useColorScheme() === 'dark';
 
@@ -125,7 +127,7 @@ const Home = () => {
                                 style={[
                                     tailwind('text-base mb-2'),
                                     DarkText,
-                                    styles.MediumText,
+                                    Font.MediumText,
                                 ]}>
                                 Total Balance
                             </Text>
@@ -133,7 +135,7 @@ const Home = () => {
                             <Text
                                 style={[
                                     tailwind('text-3xl'),
-                                    styles.MediumText,
+                                    Font.MediumText,
                                     DarkText,
                                 ]}>
                                 -
@@ -164,7 +166,7 @@ const Home = () => {
                                             'text-lg w-full text-left mb-4',
                                         ),
                                         DarkText,
-                                        styles.BoldText,
+                                        Font.BoldText,
                                     ]}>
                                     Add new wallet
                                 </Text>
@@ -174,7 +176,7 @@ const Home = () => {
                                             'text-xs w-full text-left mb-4',
                                         ),
                                         DarkDescText,
-                                        styles.RegularText,
+                                        Font.RegularText,
                                     ]}>
                                     Click ‘add’ button below or ‘+’ icon above
                                     to create a new wallet
@@ -195,7 +197,7 @@ const Home = () => {
                                             style={[
                                                 tailwind('text-xs'),
                                                 AltDarkText,
-                                                styles.BoldText,
+                                                Font.BoldText,
                                             ]}>
                                             Add
                                         </Text>
@@ -210,7 +212,7 @@ const Home = () => {
                             style={[
                                 tailwind('mb-4'),
                                 DarkGrayText,
-                                styles.MediumText,
+                                Font.MediumText,
                             ]}>
                             Latest Transactions
                         </Text>
@@ -229,7 +231,7 @@ const Home = () => {
                             <Text
                                 style={[
                                     tailwind('w-3/5 text-center'),
-                                    styles.MediumText,
+                                    Font.MediumText,
                                     DarkGreyText,
                                 ]}>
                                 A list of all latest transactions will be
@@ -248,18 +250,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    RegularText: {
-        fontFamily: 'Roboto',
-    },
-    MediumText: {
-        fontFamily: 'Roboto Medium',
-    },
-    BoldText: {
-        fontFamily: 'Roboto Bold',
-    },
-    SatSymbol: {
-        fontFamily: 'Satoshi Symbol',
     },
 });
 
