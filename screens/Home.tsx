@@ -25,49 +25,21 @@ import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 const Home = () => {
-    const ColorScheme = Color(useColorScheme);
-
-    const isDarkMode = useColorScheme() === 'dark';
+    const ColorScheme = Color(useColorScheme());
 
     const altGray = {
-        backgroundColor: isDarkMode ? '#2C2C2C' : '#ededed',
-    };
-
-    const DarkText = {
-        color: isDarkMode ? 'white' : 'black',
+        backgroundColor: ColorScheme.isDarkMode ? '#2C2C2C' : '#ededed',
     };
 
     const DarkGrayText = {
-        color: isDarkMode ? '#B8B8B8' : '#656565',
+        color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
     };
 
     const DarkGreyText = {
-        color: isDarkMode ? '#4b4b4b' : '#DADADA',
+        color: ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA',
     };
 
-    const svgGrayFill = isDarkMode ? '#4b4b4b' : '#DADADA';
-
-    const DarkBackground = {
-        backgroundColor: isDarkMode ? 'black' : 'white',
-    };
-
-    const DarkGrayCard = {
-        backgroundColor: '#B5B5B5',
-    };
-
-    const DarkDescText = {
-        color: isDarkMode ? '#828282' : '#606060',
-    };
-
-    const svgFill = isDarkMode ? 'white' : 'black';
-
-    const bgFill = {
-        backgroundColor: isDarkMode ? 'white' : 'black',
-    };
-
-    const AltDarkText = {
-        color: isDarkMode ? 'black' : 'white',
-    };
+    const svgGrayFill = ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA';
 
     const topPlatformOffset = {
         marginTop: Platform.OS === 'android' ? 12 : 0,
@@ -76,7 +48,7 @@ const Home = () => {
     const navigation = useNavigation();
 
     return (
-        <SafeAreaView style={DarkBackground}>
+        <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
             <View
                 style={[
                     tailwind('h-full items-center justify-start relative'),
@@ -92,7 +64,7 @@ const Home = () => {
                         onPress={() => navigation.navigate('SettingsRoot')}>
                         <Dots
                             width={32}
-                            fill={svgFill}
+                            fill={ColorScheme.SVG.Default}
                             style={tailwind('-ml-1')}
                         />
                     </TouchableOpacity>
@@ -104,12 +76,12 @@ const Home = () => {
                         <TouchableOpacity>
                             <Bell
                                 width={22}
-                                fill={svgFill}
+                                fill={ColorScheme.SVG.Default}
                                 style={tailwind('mr-4')}
                             />
                         </TouchableOpacity>
                         <TouchableOpacity>
-                            <Add width={30} fill={svgFill} />
+                            <Add width={30} fill={ColorScheme.SVG.Default} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -128,8 +100,8 @@ const Home = () => {
                             <Text
                                 style={[
                                     tailwind('text-base mb-2'),
-                                    DarkText,
                                     Font.MediumText,
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
                                 Total Balance
                             </Text>
@@ -138,7 +110,7 @@ const Home = () => {
                                 style={[
                                     tailwind('text-3xl'),
                                     Font.MediumText,
-                                    DarkText,
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
                                 -
                             </Text>
@@ -153,7 +125,7 @@ const Home = () => {
                                     tailwind(
                                         'w-11/12 h-full absolute -bottom-2 rounded-md z-20 opacity-60',
                                     ),
-                                    DarkGrayCard,
+                                    styles.DarkGrayCard,
                                 ]}
                             />
 
@@ -167,8 +139,8 @@ const Home = () => {
                                         tailwind(
                                             'text-lg w-full text-left mb-4',
                                         ),
-                                        DarkText,
                                         Font.BoldText,
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Add new wallet
                                 </Text>
@@ -177,34 +149,37 @@ const Home = () => {
                                         tailwind(
                                             'text-xs w-full text-left mb-4',
                                         ),
-                                        DarkDescText,
                                         Font.RegularText,
+                                        {color: ColorScheme.Text.DescText},
                                     ]}>
                                     Click ‘add’ button below or ‘+’ icon above
                                     to create a new wallet
                                 </Text>
 
-                                <View
-                                    style={[
-                                        tailwind(
-                                            'px-4 py-2 w-2/6 rounded-md mb-6 mt-4 items-center',
-                                        ),
-                                        bgFill,
-                                    ]}>
-                                    <TouchableOpacity
-                                        style={tailwind(
-                                            'items-center flex-row',
-                                        )}>
+                                <TouchableOpacity
+                                    style={tailwind('items-center flex-row')}
+                                    onPress={() => {}}>
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'px-4 py-2 w-2/6 rounded-md mb-6 mt-4 items-center',
+                                            ),
+                                            {
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Inverted,
+                                            },
+                                        ]}>
                                         <Text
                                             style={[
                                                 tailwind('text-xs'),
-                                                AltDarkText,
                                                 Font.BoldText,
+                                                {color: ColorScheme.Text.Alt},
                                             ]}>
                                             Add
                                         </Text>
-                                    </TouchableOpacity>
-                                </View>
+                                    </View>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
@@ -254,5 +229,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    DarkGrayCard: {
+        backgroundColor: '#B5B5B5',
     },
 });
