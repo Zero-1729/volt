@@ -107,7 +107,7 @@ const Currency = () => {
                                 Font.MediumText,
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Language
+                            Currency
                         </Text>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
