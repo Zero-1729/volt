@@ -12,22 +12,25 @@ import 'react-native-gesture-handler';
 
 import InitScreen from './Navigation';
 
+import Color from './constants/Color';
+
 const App = () => {
     useEffect(() => {
         SplashScreen.hide();
     });
 
-    const isDarkMode = useColorScheme() === 'dark';
-
-    const DarkBackground = {
-        backgroundColor: isDarkMode ? 'black' : 'white',
-    };
+    const ColorScheme = Color(useColorScheme());
 
     return (
-        <SafeAreaProvider style={DarkBackground}>
+        <SafeAreaProvider
+            style={{backgroundColor: ColorScheme.Background.Primary}}>
             <View style={[styles.container]}>
                 <StatusBar
-                    barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                    barStyle={
+                        ColorScheme.isDarkMode
+                            ? 'light-content'
+                            : 'dark-content'
+                    }
                 />
 
                 <NavigationContainer>
@@ -41,15 +44,6 @@ const App = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    RegularText: {
-        fontFamily: 'Roboto',
-    },
-    MediumText: {
-        fontFamily: 'Roboto Medium',
-    },
-    BoldText: {
-        fontFamily: 'Roboto Bold',
     },
 });
 
