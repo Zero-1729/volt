@@ -11,4 +11,4 @@ export default {
     SatSymbol: {
         fontFamily: 'Satoshi Symbol',
     },
-};
+} as const;
