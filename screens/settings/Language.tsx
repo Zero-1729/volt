@@ -71,8 +71,9 @@ const Language = () => {
     };
 
     return (
-        <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+        <SafeAreaView
+            style={[{backgroundColor: ColorScheme.Background.Primary}]}>
+            <View style={[tailwind('w-full h-full')]}>
                 <View
                     style={[
                         tailwind('w-full h-full mt-4 items-center'),
@@ -114,7 +115,7 @@ const Language = () => {
                     </View>
 
                     <FlatList
-                        style={[tailwind('w-full'), styles.Flexed]}
+                        style={[tailwind('w-full')]}
                         data={languages}
                         renderItem={renderItem}
                         keyExtractor={item => item.code}

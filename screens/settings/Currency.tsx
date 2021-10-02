@@ -72,7 +72,7 @@ const Currency = () => {
 
     return (
         <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View style={[tailwind('w-full h-full')]}>
                 <View
                     style={[
                         tailwind('w-full h-full mt-4 items-center'),
@@ -114,7 +114,7 @@ const Currency = () => {
                     </View>
 
                     <FlatList
-                        style={[tailwind('w-full'), styles.Flexed]}
+                        style={tailwind('w-full')}
                         data={currency}
                         renderItem={renderItem}
                         keyExtractor={item => item.locale}
