@@ -18,60 +18,36 @@ import Release from './screens/settings/Release';
 const SettingsStack = createNativeStackNavigator();
 const SettingsRoot = () => {
     return (
-        <SettingsStack.Navigator initialRouteName="Settings">
-            <SettingsStack.Screen
-                name="Settings"
-                component={Settings}
-                options={{headerShown: false, replaceAnimation: 'push'}}
-            />
-            <SettingsStack.Screen
-                name="Language"
-                component={Language}
-                options={{headerShown: false, replaceAnimation: 'push'}}
-            />
-            <SettingsStack.Screen
-                name="Currency"
-                component={Currency}
-                options={{headerShown: false, replaceAnimation: 'push'}}
-            />
-            <SettingsStack.Screen
-                name="About"
-                component={About}
-                options={{headerShown: false, replaceAnimation: 'push'}}
-            />
-            <SettingsStack.Screen
-                name="License"
-                component={License}
-                options={{headerShown: false, replaceAnimation: 'push'}}
-            />
-            <SettingsStack.Screen
-                name="Release"
-                component={Release}
-                options={{headerShown: false, replaceAnimation: 'push'}}
-            />
+        <SettingsStack.Navigator screenOptions={{headerShown: false}}>
+            <SettingsStack.Screen name="Settings" component={Settings} />
+            <SettingsStack.Screen name="Language" component={Language} />
+            <SettingsStack.Screen name="Currency" component={Currency} />
+            <SettingsStack.Screen name="About" component={About} />
+            <SettingsStack.Screen name="License" component={License} />
+            <SettingsStack.Screen name="Release" component={Release} />
         </SettingsStack.Navigator>
     );
 };
 
 const InitScreenStack = createNativeStackNavigator();
-const initScreen = () => (
-    <InitScreenStack.Navigator initialRouteName="Home">
-        <InitScreenStack.Screen
-            name="Home"
-            component={Home}
-            options={{headerShown: false}}
-        />
-        <InitScreenStack.Screen
-            name="Apps"
-            component={Apps}
-            options={{headerShown: false, replaceAnimation: 'push'}}
-        />
-        <InitScreenStack.Screen
-            name="SettingsRoot"
-            component={SettingsRoot}
-            options={{headerShown: false, replaceAnimation: 'push'}}
-        />
-    </InitScreenStack.Navigator>
-);
+const initScreen = () => {
+    return (
+        <InitScreenStack.Navigator
+            initialRouteName="Home"
+            screenOptions={{headerShown: false}}>
+            <InitScreenStack.Screen name="Home" component={Home} />
+            <InitScreenStack.Screen
+                name="Apps"
+                component={Apps}
+                options={{replaceAnimation: 'push'}}
+            />
+            <InitScreenStack.Screen
+                name="SettingsRoot"
+                component={SettingsRoot}
+                options={{replaceAnimation: 'push'}}
+            />
+        </InitScreenStack.Navigator>
+    );
+};
 
 export default initScreen;
