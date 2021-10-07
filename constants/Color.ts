@@ -4,6 +4,11 @@ const Color = (currentTheme: String) => {
 
     return {
         isDarkMode: isDarkMode,
+        NavigatorTheme: {
+            colors: {
+                background: isDarkMode ? 'black' : 'white',
+            },
+        },
         SVG: {
             Default: isDarkMode ? 'white' : 'black',
             GrayFill: isDarkMode ? '#676767' : '#B1B1B1',

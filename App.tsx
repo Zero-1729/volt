@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 
-import {StatusBar, StyleSheet, useColorScheme, View} from 'react-native';
+import {StatusBar, StyleSheet, useColorScheme} from 'react-native';
 
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
@@ -22,30 +22,21 @@ const App = () => {
     const ColorScheme = Color(useColorScheme());
 
     return (
-        <SafeAreaProvider>
+        <SafeAreaProvider
+            style={{backgroundColor: ColorScheme.Background.Primary}}>
             <StatusBar
                 barStyle={
                     ColorScheme.isDarkMode ? 'light-content' : 'dark-content'
                 }
             />
 
-            <View
-                style={[
-                    {backgroundColor: ColorScheme.Background.Primary},
-                    styles.container,
-                ]}>
-                <NavigationContainer>
-                    <InitScreen />
-                </NavigationContainer>
-            </View>
+            <NavigationContainer theme={ColorScheme.NavigatorTheme}>
+                <InitScreen />
+            </NavigationContainer>
         </SafeAreaProvider>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-});
+const styles = StyleSheet.create({});
 
 export default App;
