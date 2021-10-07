@@ -22,17 +22,18 @@ const App = () => {
     const ColorScheme = Color(useColorScheme());
 
     return (
-        <SafeAreaProvider
-            style={{backgroundColor: ColorScheme.Background.Primary}}>
-            <View style={[styles.container]}>
-                <StatusBar
-                    barStyle={
-                        ColorScheme.isDarkMode
-                            ? 'light-content'
-                            : 'dark-content'
-                    }
-                />
+        <SafeAreaProvider>
+            <StatusBar
+                barStyle={
+                    ColorScheme.isDarkMode ? 'light-content' : 'dark-content'
+                }
+            />
 
+            <View
+                style={[
+                    {backgroundColor: ColorScheme.Background.Primary},
+                    styles.container,
+                ]}>
                 <NavigationContainer>
                     <InitScreen />
                 </NavigationContainer>
