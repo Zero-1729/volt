@@ -20,8 +20,8 @@ const SettingsRoot = () => {
     return (
         <SettingsStack.Navigator screenOptions={{headerShown: false}}>
             <SettingsStack.Screen name="Settings" component={Settings} />
-            <SettingsStack.Screen name="Language" component={Language} />
             <SettingsStack.Screen name="Currency" component={Currency} />
+            <SettingsStack.Screen name="Language" component={Language} />
             <SettingsStack.Screen name="About" component={About} />
             <SettingsStack.Screen name="License" component={License} />
             <SettingsStack.Screen name="Release" component={Release} />
