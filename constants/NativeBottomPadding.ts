@@ -9,6 +9,6 @@ export default {
         Platform.OS === 'ios'
             ? insets.bottom - 18
             : insets.bottom > 16
-            ? insets.bottom - 20 // Android with default 3 buttons
-            : insets.bottom + 20, // Android with IOS-like bottom
+            ? insets.bottom - 22 // Android with default 3 buttons
+            : insets.bottom + 26, // Android with IOS-like bottom
 } as const;
