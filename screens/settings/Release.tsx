@@ -42,8 +42,12 @@ const Release = () => {
     };
 
     return (
-        <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
-            <View style={tailwind('w-5/6 self-center mt-4 mb-6')}>
+        <SafeAreaView>
+            <View
+                style={[
+                    tailwind('w-5/6 self-center mt-4 mb-6'),
+                    {backgroundColor: ColorScheme.Background.Primary},
+                ]}>
                 <TouchableOpacity
                     style={tailwind('items-center flex-row -ml-1')}
                     onPress={() => {

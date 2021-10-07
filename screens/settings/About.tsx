@@ -33,8 +33,12 @@ const About = () => {
     const ColorScheme = Color(useColorScheme());
 
     return (
-        <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
-            <View style={tailwind('h-full justify-start items-center')}>
+        <SafeAreaView>
+            <View
+                style={[
+                    tailwind('h-full justify-start items-center'),
+                    {backgroundColor: ColorScheme.Background.Primary},
+                ]}>
                 <View style={tailwind('w-5/6 mt-4 mb-16')}>
                     <TouchableOpacity
                         style={tailwind('items-center flex-row -ml-1')}

@@ -71,8 +71,12 @@ const Currency = () => {
     };
 
     return (
-        <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
-            <View style={[tailwind('w-full h-full')]}>
+        <SafeAreaView>
+            <View
+                style={[
+                    tailwind('w-full h-full'),
+                    {backgroundColor: ColorScheme.Background.Primary},
+                ]}>
                 <View
                     style={[
                         tailwind('w-full h-full mt-4 items-center'),

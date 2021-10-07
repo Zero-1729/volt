@@ -109,7 +109,11 @@ const Apps = () => {
 
     return (
         <SafeAreaView>
-            <View style={[tailwind('h-full items-center')]}>
+            <View
+                style={[
+                    tailwind('h-full items-center'),
+                    {backgroundColor: ColorScheme.Background.Primary},
+                ]}>
                 {/* Top bar */}
                 <View
                     style={[

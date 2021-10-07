@@ -48,10 +48,11 @@ const Home = () => {
     const navigation = useNavigation();
 
     return (
-        <SafeAreaView style={{backgroundColor: ColorScheme.Background.Primary}}>
+        <SafeAreaView>
             <View
                 style={[
                     tailwind('h-full items-center justify-start relative'),
+                    {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View
                     style={[
