@@ -17,7 +17,7 @@ import tailwind from 'tailwind-rn';
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
-import NativeBottomPadding from '../../constants/NativeBottomPadding';
+import NativeBottomPadding from '../../constants/NativeWindowMetrics';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
