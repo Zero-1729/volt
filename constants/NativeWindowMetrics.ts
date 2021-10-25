@@ -3,8 +3,12 @@ import {Platform} from 'react-native';
 import {initialWindowMetrics} from 'react-native-safe-area-context';
 
 const insets = initialWindowMetrics.insets;
+const frame = initialWindowMetrics.frame;
 
 export default {
+    width: frame.width,
+    left: insets.left,
+    right: insets.right,
     bottom:
         Platform.OS === 'ios'
             ? insets.bottom - 18
