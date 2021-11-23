@@ -12,6 +12,7 @@ const Color = (currentTheme: String) => {
         SVG: {
             Default: isDarkMode ? 'white' : 'black',
             GrayFill: isDarkMode ? '#676767' : '#B1B1B1',
+            Inverted: isDarkMode ? 'black' : 'white',
         },
         Background: {
             Primary: isDarkMode ? 'black' : 'white',
