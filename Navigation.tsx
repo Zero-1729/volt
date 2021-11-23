@@ -1,13 +1,22 @@
 import React from 'react';
 
+import {View, useColorScheme} from 'react-native';
+
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
+import tailwind from 'tailwind-rn';
+
 import HomeIcon from './assets/svg/home-fill-24.svg';
 import DashboardIcon from './assets/svg/dashboard.svg';
+import QRIcon from './assets/svg/scan.svg';
 
 import Home from './screens/Home';
 import Apps from './screens/Apps';
+
+// QR Code Scan screen
+import Scan from './screens/Scan';
 
 // Main app settings screens
 import Settings from './screens/settings/Settings';
@@ -37,11 +46,22 @@ const SettingsRoot = () => {
     );
 };
 
+const ScanStack = createNativeStackNavigator();
+const ScanRoot = () => {
+    return (
+        <ScanStack.Navigator screenOptions={{headerShown: false}}>
+            <ScanRoot.Screen name="Scan" component={Scan} />
+        </ScanStack.Navigator>
+    );
+};
+
 const HomeTabStack = createBottomTabNavigator();
 const HomeTabs = () => {
+    const ColorScheme = Color(useColorScheme());
+
     return (
         <HomeTabStack.Navigator
-            screenOptions={{headerShown: false}}
+            initialRouteName="HomeScreen"
             tabBarOptions={{
                 showLabel: false,
                 style: {
@@ -50,8 +70,8 @@ const HomeTabs = () => {
                     margin: 0,
                     paddingTop: 0,
                     paddingBottom: 0,
-                    left: NativeMetrics.width / 3, // 64,
-                    right: NativeMetrics.width / 3, // 64,
+                    left: NativeMetrics.width / 6, // 65,
+                    right: NativeMetrics.width / 6, // 65,
                     width: 'auto',
                     backgroundColor: 'transparent',
                     borderRadius: 50,
@@ -67,10 +87,30 @@ const HomeTabs = () => {
                         <HomeIcon
                             fill={
                                 focused
-                                    ? Color().SVG.Default
-                                    : Color().SVG.GrayFill
+                                    ? ColorScheme.SVG.Default
+                                    : ColorScheme.SVG.GrayFill
                             }
                         />
+                    ),
+                }}
+            />
+            <HomeTabStack.Screen
+                name="Scan"
+                component={Scan}
+                options={{
+                    tabBarIcon: () => (
+                        <View
+                            style={[
+                                tailwind(
+                                    'rounded-full w-12 h-12 items-center justify-center',
+                                ),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Inverted,
+                                },
+                            ]}>
+                            <QRIcon fill={ColorScheme.SVG.Inverted} />
+                        </View>
                     ),
                 }}
             />
@@ -83,8 +123,8 @@ const HomeTabs = () => {
                         <DashboardIcon
                             fill={
                                 !focused
-                                    ? Color().SVG.GrayFill
-                                    : Color().SVG.Default
+                                    ? ColorScheme.SVG.GrayFill
+                                    : ColorScheme.SVG.Default
                             }
                         />
                     ),
@@ -103,6 +143,7 @@ const initScreen = () => {
                 name="SettingsRoot"
                 component={SettingsRoot}
             />
+            <InitScreenStack.Screen name="ScanQR" component={Scan} />
         </InitScreenStack.Navigator>
     );
 };
