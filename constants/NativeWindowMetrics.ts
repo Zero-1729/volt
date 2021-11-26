@@ -2,17 +2,30 @@ import {Platform} from 'react-native';
 
 import {initialWindowMetrics} from 'react-native-safe-area-context';
 
-const insets = initialWindowMetrics.insets;
-const frame = initialWindowMetrics.frame;
+const Insets = initialWindowMetrics.insets;
+const Frame = initialWindowMetrics.frame;
+
+/* General Insets
+
+    IOS -> 34
+    Android -> ~15.14
+
+*/
+
+const BottomOffset =
+    Platform.OS === 'ios'
+        ? Insets.bottom - 18 // IOS -> 16
+        : Insets.bottom > 16 //
+        ? Insets.bottom - 22 // Android with default 3 buttons; Android -> -6.86
+        : Insets.bottom + 26; // Android with IOS-like bottom; Android -> 41.14
 
 export default {
-    width: frame.width,
-    left: insets.left,
-    right: insets.right,
-    bottom:
+    width: Frame.width,
+    left: Insets.left,
+    right: Insets.right,
+    bottom: BottomOffset,
+    navBottom:
         Platform.OS === 'ios'
-            ? insets.bottom - 18
-            : insets.bottom > 16
-            ? insets.bottom - 22 // Android with default 3 buttons
-            : insets.bottom + 26, // Android with IOS-like bottom
+            ? BottomOffset * 3 // 48
+            : BottomOffset * 1.25, // -8.575 or 51.425
 } as const;

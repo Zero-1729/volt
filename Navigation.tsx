@@ -66,7 +66,7 @@ const HomeTabs = () => {
                 showLabel: false,
                 style: {
                     position: 'absolute',
-                    bottom: NativeMetrics.bottom * 3, // 60,
+                    bottom: NativeMetrics.navBottom,
                     margin: 0,
                     paddingTop: 0,
                     paddingBottom: 0,
