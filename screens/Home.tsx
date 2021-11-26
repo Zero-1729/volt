@@ -198,7 +198,7 @@ const Home = () => {
                         <View
                             style={[
                                 tailwind(
-                                    'flex justify-around text-justify h-5/6 items-center justify-center',
+                                    'flex justify-around text-justify h-4/6 items-center justify-center',
                                 ),
                             ]}>
                             <Clock
