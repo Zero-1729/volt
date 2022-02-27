@@ -85,26 +85,27 @@ const Import = () => {
                             coming from another wallet.
                         </Text>
 
-                        <TouchableOpacity
-                            style={tailwind('items-end')}
-                            onPress={() => {
-                                navigation.navigate('WalletRoot');
-                            }}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'px-4 py-1 bg-black rounded-sm mt-4',
-                                    ),
-                                ]}>
-                                <Text
+                        <View style={[tailwind('items-end')]}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate('WalletRoot');
+                                }}>
+                                <View
                                     style={[
-                                        tailwind('text-xs text-white'),
-                                        Font.BoldText,
+                                        tailwind(
+                                            'px-4 py-1 bg-black rounded-sm mt-4',
+                                        ),
                                     ]}>
-                                    Restore
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
+                                    <Text
+                                        style={[
+                                            tailwind('text-xs text-white'),
+                                            Font.BoldText,
+                                        ]}>
+                                        Restore
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     <View
@@ -134,26 +135,27 @@ const Import = () => {
                             existing wallet.
                         </Text>
 
-                        <TouchableOpacity
-                            style={tailwind('items-end')}
-                            onPress={() => {
-                                navigation.navigate('WalletRoot');
-                            }}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'px-4 py-1 bg-black rounded-sm mt-4',
-                                    ),
-                                ]}>
-                                <Text
+                        <View style={[tailwind('items-end')]}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate('WalletRoot');
+                                }}>
+                                <View
                                     style={[
-                                        tailwind('text-xs text-white'),
-                                        Font.BoldText,
+                                        tailwind(
+                                            'px-4 py-1 bg-black rounded-sm mt-4',
+                                        ),
                                     ]}>
-                                    Create
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
+                                    <Text
+                                        style={[
+                                            tailwind('text-xs text-white'),
+                                            Font.BoldText,
+                                        ]}>
+                                        Create
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     <View style={[tailwind('mt-6 flex-row')]}>
