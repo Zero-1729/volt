@@ -29,6 +29,9 @@ const Color = (currentTheme: String) => {
             LightGreyText: isDarkMode ? '#4b4b4b' : '#DADADA',
             DescText: isDarkMode ? '#828282' : '#606060',
         },
+        MiscCardColor: {
+            ImportAltCard: isDarkMode ? '#2c2c2c' : 'white',
+        },
     };
 };
 
