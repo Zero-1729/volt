@@ -81,7 +81,8 @@ const Home = () => {
                                 style={tailwind('mr-4')}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('WalletRoot')}>
                             <Add width={30} fill={ColorScheme.SVG.Default} />
                         </TouchableOpacity>
                     </View>
@@ -159,7 +160,9 @@ const Home = () => {
 
                                 <TouchableOpacity
                                     style={tailwind('items-center flex-row')}
-                                    onPress={() => {}}>
+                                    onPress={() => {
+                                        navigation.navigate('WalletRoot');
+                                    }}>
                                     <View
                                         style={[
                                             tailwind(
