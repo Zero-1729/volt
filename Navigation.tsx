@@ -13,6 +13,7 @@ import DashboardIcon from './assets/svg/dashboard.svg';
 import QRIcon from './assets/svg/scan.svg';
 
 import Home from './screens/Home';
+import Import from './screens/wallet/Import';
 import Apps from './screens/Apps';
 
 // QR Code Scan screen
@@ -52,6 +53,15 @@ const ScanRoot = () => {
         <ScanStack.Navigator screenOptions={{headerShown: false}}>
             <ScanRoot.Screen name="Scan" component={Scan} />
         </ScanStack.Navigator>
+    );
+};
+
+const WalletStack = createNativeStackNavigator();
+const WalletRoot = () => {
+    return (
+        <WalletStack.Navigator screenOptions={{headerShown: false}}>
+            <WalletStack.Screen name="Import" component={Import} />
+        </WalletStack.Navigator>
     );
 };
 
@@ -139,6 +149,7 @@ const initScreen = () => {
     return (
         <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
             <InitScreenStack.Screen name="Home" component={HomeTabs} />
+            <InitScreenStack.Screen name="WalletRoot" component={WalletRoot} />
             <InitScreenStack.Screen
                 name="SettingsRoot"
                 component={SettingsRoot}
