@@ -24,6 +24,7 @@ export default {
     left: Insets.left,
     right: Insets.right,
     bottom: BottomOffset,
+    bottomButtonOffset: BottomOffset + 32,
     navBottom:
         Platform.OS === 'ios'
             ? BottomOffset * 3 // 48
