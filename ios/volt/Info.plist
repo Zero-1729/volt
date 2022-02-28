@@ -38,7 +38,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>${PRODUCT_NAME} needs access to the camera to scan QR Codes</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto Bold.ttf</string>
