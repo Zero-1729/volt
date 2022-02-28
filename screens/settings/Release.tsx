@@ -14,7 +14,7 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-import Notes from './../../data/release-notes';
+import Notes from './../../data/release-notes.json';
 
 const Release = () => {
     const ColorScheme = Color(useColorScheme());
