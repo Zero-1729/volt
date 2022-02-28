@@ -1,11 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-    StyleSheet,
-    Text,
-    View,
-    useColorScheme,
-    TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
 import React from 'react';
 
@@ -14,6 +8,8 @@ import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
+
+import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import InfoIcon from './../../assets/svg/info-16.svg';
@@ -34,7 +30,7 @@ const Import = () => {
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View style={tailwind('w-5/6 mt-4 mb-16')}>
-                    <TouchableOpacity
+                    <PlainButton
                         style={tailwind('items-center flex-row -ml-1')}
                         onPress={() => {
                             navigation.goBack();
@@ -51,7 +47,7 @@ const Import = () => {
                             ]}>
                             Back
                         </Text>
-                    </TouchableOpacity>
+                    </PlainButton>
 
                     <View style={[tailwind('mt-20')]}>
                         <Text
@@ -86,7 +82,7 @@ const Import = () => {
                         </Text>
 
                         <View style={[tailwind('items-end')]}>
-                            <TouchableOpacity
+                            <PlainButton
                                 onPress={() => {
                                     navigation.navigate('RestoreActions');
                                 }}>
@@ -104,7 +100,7 @@ const Import = () => {
                                         Restore
                                     </Text>
                                 </View>
-                            </TouchableOpacity>
+                            </PlainButton>
                         </View>
                     </View>
 
@@ -136,7 +132,7 @@ const Import = () => {
                         </Text>
 
                         <View style={[tailwind('items-end')]}>
-                            <TouchableOpacity
+                            <PlainButton
                                 onPress={() => {
                                     navigation.navigate('CreateActions');
                                 }}>
