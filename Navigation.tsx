@@ -2,7 +2,6 @@ import React from 'react';
 
 import {View, useColorScheme} from 'react-native';
 
-import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
@@ -13,7 +12,11 @@ import DashboardIcon from './assets/svg/dashboard.svg';
 import QRIcon from './assets/svg/scan.svg';
 
 import Home from './screens/Home';
+
+// Wallet screens
 import Import from './screens/wallet/Import';
+import RestoreActions from './screens/wallet/RestoreActions';
+
 import Apps from './screens/Apps';
 
 // QR Code Scan screen
@@ -61,6 +64,7 @@ const WalletRoot = () => {
     return (
         <WalletStack.Navigator screenOptions={{headerShown: false}}>
             <WalletStack.Screen name="Import" component={Import} />
+            <WalletStack.Screen name="RestoreActions" component={RestoreActions} />
         </WalletStack.Navigator>
     );
 };
