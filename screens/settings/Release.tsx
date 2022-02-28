@@ -1,18 +1,13 @@
 import React from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    FlatList,
-    useColorScheme,
-    TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation} from '@react-navigation/core';
 
 import tailwind from 'tailwind-rn';
+
+import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 
@@ -48,7 +43,7 @@ const Release = () => {
                     tailwind('w-5/6 self-center mt-4 mb-6'),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
-                <TouchableOpacity
+                <PlainButton
                     style={tailwind('items-center flex-row -ml-1')}
                     onPress={() => {
                         navigation.goBack();
@@ -65,7 +60,7 @@ const Release = () => {
                         ]}>
                         About
                     </Text>
-                </TouchableOpacity>
+                </PlainButton>
             </View>
 
             <View

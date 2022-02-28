@@ -1,13 +1,6 @@
 import React, {useState} from 'react';
 
-import {
-    StyleSheet,
-    Text,
-    View,
-    FlatList,
-    useColorScheme,
-    TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
 import currency from '../../models/currency';
 
@@ -16,6 +9,8 @@ import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
+
+import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Check from './../../assets/svg/check-circle-24.svg';
@@ -37,7 +32,7 @@ const Currency = () => {
 
     const renderItem = ({item, index}) => {
         return (
-            <TouchableOpacity
+            <PlainButton
                 onPress={() => {
                     setCurrency(item.short);
                 }}>
@@ -66,7 +61,7 @@ const Currency = () => {
                         )}
                     </View>
                 </View>
-            </TouchableOpacity>
+            </PlainButton>
         );
     };
 
@@ -83,7 +78,7 @@ const Currency = () => {
                         styles.Flexed,
                     ]}>
                     <View style={tailwind('w-5/6 mb-16')}>
-                        <TouchableOpacity
+                        <PlainButton
                             style={tailwind('items-center flex-row -ml-1')}
                             onPress={() => {
                                 navigation.goBack();
@@ -100,7 +95,7 @@ const Currency = () => {
                                 ]}>
                                 Settings
                             </Text>
-                        </TouchableOpacity>
+                        </PlainButton>
                     </View>
 
                     <View

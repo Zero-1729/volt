@@ -1,13 +1,6 @@
 import React from 'react';
 
-import {
-    Platform,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    useColorScheme,
-    View,
-} from 'react-native';
+import {Platform, StyleSheet, Text, useColorScheme, View} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -23,6 +16,7 @@ import Clock from './../assets/svg/clock-24.svg';
 
 import Color from '../constants/Color';
 import Font from '../constants/Font';
+import {PaddedButton, PlainButton} from '../components/button';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
@@ -61,30 +55,30 @@ const Home = () => {
                         ),
                         topPlatformOffset,
                     ]}>
-                    <TouchableOpacity
+                    <PlainButton
                         onPress={() => navigation.navigate('SettingsRoot')}>
                         <Dots
                             width={32}
                             fill={ColorScheme.SVG.Default}
                             style={tailwind('-ml-1')}
                         />
-                    </TouchableOpacity>
+                    </PlainButton>
 
                     <View
                         style={tailwind(
                             'flex-row justify-between items-center -mr-1',
                         )}>
-                        <TouchableOpacity>
+                        <PlainButton>
                             <Bell
                                 width={22}
                                 fill={ColorScheme.SVG.Default}
                                 style={tailwind('mr-4')}
                             />
-                        </TouchableOpacity>
-                        <TouchableOpacity
+                        </PlainButton>
+                        <PlainButton
                             onPress={() => navigation.navigate('WalletRoot')}>
                             <Add width={30} fill={ColorScheme.SVG.Default} />
-                        </TouchableOpacity>
+                        </PlainButton>
                     </View>
                 </View>
 
@@ -158,32 +152,16 @@ const Home = () => {
                                     to create a new wallet
                                 </Text>
 
-                                <TouchableOpacity
-                                    style={tailwind('items-center flex-row')}
+                                <PaddedButton
                                     onPress={() => {
                                         navigation.navigate('WalletRoot');
-                                    }}>
-                                    <View
-                                        style={[
-                                            tailwind(
-                                                'px-4 py-2 w-2/6 rounded-md mb-6 mt-4 items-center',
-                                            ),
-                                            {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Inverted,
-                                            },
-                                        ]}>
-                                        <Text
-                                            style={[
-                                                tailwind('text-xs'),
-                                                Font.BoldText,
-                                                {color: ColorScheme.Text.Alt},
-                                            ]}>
-                                            Add
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
+                                    }}
+                                    title={'Add'}
+                                    color={ColorScheme.Text.Alt}
+                                    backgroundColor={
+                                        ColorScheme.Background.Inverted
+                                    }
+                                />
                             </View>
                         </View>
                     </View>

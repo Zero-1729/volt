@@ -1,13 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 
-import {
-    useColorScheme,
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity,
-} from 'react-native';
+import {useColorScheme, StyleSheet, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
@@ -15,6 +9,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
 
+import {PlainButton} from '../../components/button';
 import {TextMultiInput} from '../../components/input';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
@@ -52,7 +47,7 @@ const ImportAction = () => {
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View style={[tailwind('w-5/6 mt-4')]}>
-                    <TouchableOpacity
+                    <PlainButton
                         style={tailwind('items-center flex-row -ml-1')}
                         onPress={() => {
                             navigation.goBack();
@@ -69,9 +64,9 @@ const ImportAction = () => {
                             ]}>
                             Back
                         </Text>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <Text style={[tailwind('font-bold text-2xl mt-20')]}>
+                    <Text
                         Import Wallet
                     </Text>
                     <Text
@@ -94,16 +89,16 @@ const ImportAction = () => {
                         />
 
                         <View style={[tailwind('absolute right-4 bottom-4')]}>
-                            <TouchableOpacity>
+                            <PlainButton>
                                 <Folder
                                     width={22}
                                     fill={ColorScheme.SVG.Default}
                                 />
-                            </TouchableOpacity>
+                            </PlainButton>
                         </View>
                     </View>
 
-                    <TouchableOpacity disabled={importText.trim().length === 0}>
+                    <PlainButton disabled={importText.trim().length === 0}>
                         <View
                             style={[
                                 tailwind('mt-8 rounded items-center'),
@@ -127,7 +122,7 @@ const ImportAction = () => {
                                 Continue
                             </Text>
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
                 </View>
             </View>
         </SafeAreaView>

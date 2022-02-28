@@ -1,18 +1,13 @@
 import React from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    useColorScheme,
-    Linking,
-    TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
+
+import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
@@ -40,7 +35,7 @@ const Settings = () => {
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View style={tailwind('w-5/6 mt-4 mb-16')}>
-                    <TouchableOpacity
+                    <PlainButton
                         style={tailwind('items-center flex-row -ml-1')}
                         onPress={() => {
                             navigation.goBack();
@@ -57,7 +52,7 @@ const Settings = () => {
                             ]}>
                             Back
                         </Text>
-                    </TouchableOpacity>
+                    </PlainButton>
                 </View>
 
                 <View
@@ -75,7 +70,7 @@ const Settings = () => {
                 </View>
 
                 <View style={[tailwind('w-5/6')]}>
-                    <TouchableOpacity
+                    <PlainButton
                         onPress={() => {
                             navigation.navigate('Currency');
                         }}>
@@ -118,9 +113,9 @@ const Settings = () => {
                                 />
                             </View>
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <TouchableOpacity
+                    <PlainButton
                         onPress={() => {
                             navigation.navigate('Language');
                         }}>
@@ -162,9 +157,9 @@ const Settings = () => {
                                 />
                             </View>
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <TouchableOpacity onPress={() => {}}>
+                    <PlainButton onPress={() => {}}>
                         <View
                             style={[
                                 tailwind(
@@ -186,9 +181,9 @@ const Settings = () => {
                                 fill={ColorScheme.SVG.GrayFill}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <TouchableOpacity onPress={() => {}}>
+                    <PlainButton onPress={() => {}}>
                         <View
                             style={[
                                 tailwind(
@@ -210,9 +205,9 @@ const Settings = () => {
                                 fill={ColorScheme.SVG.GrayFill}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <TouchableOpacity onPress={() => {}}>
+                    <PlainButton onPress={() => {}}>
                         <View
                             style={[
                                 tailwind(
@@ -234,9 +229,9 @@ const Settings = () => {
                                 fill={ColorScheme.SVG.GrayFill}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <TouchableOpacity onPress={() => {}}>
+                    <PlainButton onPress={() => {}}>
                         <View
                             style={[
                                 tailwind(
@@ -258,7 +253,7 @@ const Settings = () => {
                                 fill={ColorScheme.SVG.GrayFill}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
                     <View
                         style={[
@@ -266,7 +261,7 @@ const Settings = () => {
                                 'items-center flex-row justify-between mt-2',
                             ),
                         ]}>
-                        <TouchableOpacity
+                        <PlainButton
                             onPress={() => {
                                 Linking.openSettings();
                             }}>
@@ -278,11 +273,11 @@ const Settings = () => {
                                 ]}>
                                 System Preferences
                             </Text>
-                        </TouchableOpacity>
+                        </PlainButton>
                     </View>
                 </View>
 
-                <TouchableOpacity
+                <PlainButton
                     style={[
                         tailwind('items-center justify-center absolute'),
                         NativeBottomPadding,
@@ -307,7 +302,7 @@ const Settings = () => {
                             About
                         </Text>
                     </View>
-                </TouchableOpacity>
+                </PlainButton>
             </View>
         </SafeAreaView>
     );

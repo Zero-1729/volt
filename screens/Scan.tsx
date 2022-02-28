@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
 
-import {TouchableOpacity, Text, View, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {RNCamera} from 'react-native-camera';
 import {SafeAreaView} from 'react-native-safe-area-context';
+
 import tailwind from 'tailwind-rn';
+
+import {PlainButton} from '../components/button';
 
 import Close from './../assets/svg/x-circle-fill-24.svg';
 
@@ -56,11 +59,11 @@ const Scan = () => {
                         onStatusChange={handleCameraStatChange}
                     />
                 )}
-                <TouchableOpacity
+                <PlainButton
                     onPress={closeScreen}
                     style={[tailwind('absolute right-8 top-8')]}>
                     <Close fill={'white'} />
-                </TouchableOpacity>
+                </PlainButton>
             </View>
         </SafeAreaView>
     );

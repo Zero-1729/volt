@@ -7,12 +7,13 @@ import {
     useColorScheme,
     View,
     Linking,
-    TouchableOpacity,
 } from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
+
+import { PlainButton } from '../components/button';
 
 import CoinprofileLogo from './../assets/svg/coinprofile.svg';
 import BitrefillLogo from './../assets/svg/bitrefill.svg';
@@ -72,7 +73,7 @@ const Apps = () => {
             /* We'll eventually use WebView to have all the interaction in-App
             It would be even better if the services had APIs we could just wrap a UI over to make a lot more smooth UX-wise */
 
-            <TouchableOpacity
+            <PlainButton
                 onPress={() => {
                     Linking.openURL(item.url);
                 }}>
@@ -103,7 +104,7 @@ const Apps = () => {
                     </View>
                     <item.icon />
                 </View>
-            </TouchableOpacity>
+            </PlainButton>
         );
     };
 

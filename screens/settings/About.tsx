@@ -1,19 +1,14 @@
 import React from 'react';
 
-import {
-    StyleSheet,
-    Text,
-    View,
-    useColorScheme,
-    TouchableOpacity,
-    Linking,
-} from 'react-native';
+import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
+
+import {PlainButton} from '../../components/button';
 
 import NativeBottomPadding from '../../constants/NativeWindowMetrics';
 
@@ -40,7 +35,7 @@ const About = () => {
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View style={tailwind('w-5/6 mt-4 mb-16')}>
-                    <TouchableOpacity
+                    <PlainButton
                         style={tailwind('items-center flex-row -ml-1')}
                         onPress={() => {
                             navigation.goBack();
@@ -57,7 +52,7 @@ const About = () => {
                             ]}>
                             Settings
                         </Text>
-                    </TouchableOpacity>
+                    </PlainButton>
                 </View>
 
                 <View
@@ -106,7 +101,7 @@ const About = () => {
                 </View>
 
                 <View style={tailwind('w-5/6')}>
-                    <TouchableOpacity
+                    <PlainButton
                         onPress={() => {
                             navigation.navigate('Release');
                         }}>
@@ -132,9 +127,9 @@ const About = () => {
                                 style={[]}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <TouchableOpacity
+                    <PlainButton
                         onPress={() => {
                             navigation.navigate('License');
                         }}>
@@ -160,7 +155,7 @@ const About = () => {
                                 style={[]}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
                 </View>
 
                 <View
@@ -168,7 +163,7 @@ const About = () => {
                         tailwind('w-full absolute items-center justify-center'),
                         NativeBottomPadding,
                     ]}>
-                    <TouchableOpacity
+                    <PlainButton
                         onPress={() => {
                             Linking.openURL(
                                 'https://github.com/Zero-1729/volt/',
@@ -189,9 +184,9 @@ const About = () => {
                                 Volt Source Code
                             </Text>
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
 
-                    <TouchableOpacity
+                    <PlainButton
                         onPress={() => {
                             Linking.openURL(
                                 'https://github.com/Zero-1729/volt/issues/',
@@ -212,7 +207,7 @@ const About = () => {
                                 Report Issue or Bug(s)
                             </Text>
                         </View>
-                    </TouchableOpacity>
+                    </PlainButton>
                 </View>
             </View>
         </SafeAreaView>
