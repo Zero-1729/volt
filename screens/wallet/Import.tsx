@@ -89,7 +89,7 @@ const Import = () => {
                                 <View
                                     style={[
                                         tailwind(
-                                            'px-4 py-1 bg-black rounded-sm mt-4',
+                                            'px-4 py-2 bg-black rounded-sm mt-4',
                                         ),
                                     ]}>
                                     <Text
@@ -139,7 +139,7 @@ const Import = () => {
                                 <View
                                     style={[
                                         tailwind(
-                                            'px-4 py-1 bg-black rounded-sm mt-4',
+                                            'px-4 py-2 bg-black rounded-sm mt-4',
                                         ),
                                     ]}>
                                     <Text
@@ -150,7 +150,7 @@ const Import = () => {
                                         Create
                                     </Text>
                                 </View>
-                            </TouchableOpacity>
+                            </PlainButton>
                         </View>
                     </View>
 
