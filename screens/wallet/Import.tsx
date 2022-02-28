@@ -138,7 +138,7 @@ const Import = () => {
                         <View style={[tailwind('items-end')]}>
                             <TouchableOpacity
                                 onPress={() => {
-                                    navigation.navigate('WalletRoot');
+                                    navigation.navigate('CreateActions');
                                 }}>
                                 <View
                                     style={[
