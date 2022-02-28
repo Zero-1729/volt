@@ -67,7 +67,11 @@ const ImportAction = () => {
                     </PlainButton>
 
                     <Text
-                        Import Wallet
+                        style={[
+                            tailwind('font-bold text-2xl mt-20'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        Restore Wallet
                     </Text>
                     <Text
                         style={[
@@ -84,8 +88,10 @@ const ImportAction = () => {
                         ]}>
                         <TextMultiInput
                             placeholder={importInstructions}
+                            placeholderTextColor={ColorScheme.Text.GrayedText}
                             onChangeText={setImportText}
                             onBlur={onBlur}
+                            color={ColorScheme.Text.Default}
                         />
 
                         <View style={[tailwind('absolute right-4 bottom-4')]}>
