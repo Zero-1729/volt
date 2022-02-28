@@ -41,9 +41,9 @@ const Import = () => {
                         />
                         <Text
                             style={[
-                                tailwind('text-sm'),
+                                tailwind('text-sm font-medium'),
                                 {color: ColorScheme.Text.Default},
-                                Font.BoldText,
+                                Font.RobotoText,
                             ]}>
                             Back
                         </Text>
@@ -94,8 +94,10 @@ const Import = () => {
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind('text-xs text-white'),
-                                            Font.BoldText,
+                                            tailwind(
+                                                'text-xs text-white font-medium',
+                                            ),
+                                            Font.RobotoText,
                                         ]}>
                                         Restore
                                     </Text>
@@ -144,8 +146,10 @@ const Import = () => {
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind('text-xs text-white'),
-                                            Font.BoldText,
+                                            tailwind(
+                                                'text-xs text-white font-medium',
+                                            ),
+                                            Font.RobotoText,
                                         ]}>
                                         Create
                                     </Text>

@@ -13,13 +13,14 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
 
-import { PlainButton } from '../components/button';
+import {PlainButton} from '../components/button';
+
+import Font from '../constants/Font';
 
 import CoinprofileLogo from './../assets/svg/coinprofile.svg';
 import BitrefillLogo from './../assets/svg/bitrefill.svg';
 import ChangellyLogo from './../assets/svg/changelly.svg';
 
-import Font from '../constants/Font';
 import Color from '../constants/Color';
 
 const Apps = () => {
@@ -88,17 +89,12 @@ const Apps = () => {
                     <View style={[tailwind('flex h-5/6 w-5/6 justify-around')]}>
                         <Text
                             style={[
-                                Font.BoldText,
-                                tailwind('text-xl text-white'),
+                                tailwind('text-xl text-white font-medium'),
+                                Font.RobotoText,
                             ]}>
                             {item.title}
                         </Text>
-                        <Text
-                            style={[
-                                Font.MediumText,
-                                tailwind('text-xs'),
-                                item.textHue,
-                            ]}>
+                        <Text style={[tailwind('text-xs'), item.textHue]}>
                             {item.desc}
                         </Text>
                     </View>
@@ -122,9 +118,9 @@ const Apps = () => {
                     ]}>
                     <Text
                         style={[
-                            tailwind('text-2xl'),
-                            Font.MediumText,
+                            tailwind('text-2xl font-medium'),
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         Apps
                     </Text>

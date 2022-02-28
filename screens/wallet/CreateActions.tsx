@@ -56,9 +56,9 @@ const ImportAction = () => {
                         />
                         <Text
                             style={[
-                                tailwind('text-sm'),
+                                tailwind('text-sm font-medium'),
                                 {color: ColorScheme.Text.Default},
-                                Font.BoldText,
+                                Font.RobotoText,
                             ]}>
                             Back
                         </Text>

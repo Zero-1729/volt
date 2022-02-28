@@ -32,8 +32,8 @@ const License = () => {
                 <Text
                     style={[
                         tailwind('text-xs'),
-                        Font.RegularText,
                         {color: ColorScheme.Text.Default},
+                        Font.RobotoText,
                     ]}>
                     {item}
                 </Text>
@@ -59,9 +59,9 @@ const License = () => {
                     />
                     <Text
                         style={[
-                            tailwind('text-sm'),
-                            Font.BoldText,
+                            tailwind('text-sm font-medium'),
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         About
                     </Text>

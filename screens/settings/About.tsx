@@ -46,9 +46,9 @@ const About = () => {
                         />
                         <Text
                             style={[
-                                tailwind('text-sm'),
-                                Font.BoldText,
+                                tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
                             ]}>
                             Settings
                         </Text>
@@ -59,9 +59,9 @@ const About = () => {
                     style={tailwind('justify-center w-full items-center mb-8')}>
                     <Text
                         style={[
-                            tailwind('text-2xl mb-4 w-5/6'),
-                            Font.MediumText,
+                            tailwind('text-2xl mb-4 w-5/6 font-medium'),
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         About
                     </Text>
@@ -93,8 +93,8 @@ const About = () => {
                     <Text
                         style={[
                             tailwind('w-3/6 text-sm self-center text-center'),
-                            Font.MediumText,
                             {color: ColorScheme.Text.AltGray},
+                            Font.RobotoText,
                         ]}>
                         Built with Open Source technologies
                     </Text>
@@ -113,9 +113,9 @@ const About = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Release Notes
                             </Text>
@@ -141,9 +141,9 @@ const About = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 License
                             </Text>
@@ -177,9 +177,9 @@ const About = () => {
                             />
                             <Text
                                 style={[
-                                    tailwind('text-xs'),
-                                    Font.MediumText,
+                                    tailwind('text-xs font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Volt Source Code
                             </Text>
@@ -200,9 +200,9 @@ const About = () => {
                             />
                             <Text
                                 style={[
-                                    tailwind('text-xs'),
-                                    Font.MediumText,
+                                    tailwind('text-xs font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Report Issue or Bug(s)
                             </Text>

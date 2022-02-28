@@ -46,8 +46,8 @@ const Currency = () => {
                     <Text
                         style={[
                             tailwind('text-sm'),
-                            Font.RegularText,
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         {`${item.short} (${item.symbol})`}
                     </Text>
@@ -89,9 +89,9 @@ const Currency = () => {
                             />
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.BoldText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Settings
                             </Text>
@@ -102,9 +102,9 @@ const Currency = () => {
                         style={tailwind('justify-center w-full items-center')}>
                         <Text
                             style={[
-                                tailwind('text-2xl mb-4 w-5/6'),
-                                Font.MediumText,
+                                tailwind('text-2xl mb-4 w-5/6 font-medium'),
                                 {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
                             ]}>
                             Currency
                         </Text>

@@ -46,9 +46,9 @@ const Settings = () => {
                         />
                         <Text
                             style={[
-                                tailwind('text-sm'),
+                                tailwind('text-sm font-medium'),
                                 {color: ColorScheme.Text.Default},
-                                Font.BoldText,
+                                Font.RobotoText,
                             ]}>
                             Back
                         </Text>
@@ -59,9 +59,9 @@ const Settings = () => {
                     style={tailwind('justify-center w-full items-center mb-6')}>
                     <Text
                         style={[
-                            tailwind('text-2xl mb-4 w-5/6'),
-                            Font.MediumText,
+                            tailwind('text-2xl mb-4 w-5/6 font-medium'),
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         Settings
                     </Text>
@@ -82,9 +82,9 @@ const Settings = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Currency
                             </Text>
@@ -98,10 +98,10 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-xs mr-4'),
-                                        Font.MediumText,
                                         {
                                             color: ColorScheme.Text.GrayedText,
                                         },
+                                        Font.RobotoText,
                                     ]}>
                                     USD
                                 </Text>
@@ -127,9 +127,9 @@ const Settings = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Language
                             </Text>
@@ -143,10 +143,10 @@ const Settings = () => {
                                 <Text
                                     style={[
                                         tailwind('text-xs mr-4'),
-                                        Font.MediumText,
                                         {
                                             color: ColorScheme.Text.GrayedText,
                                         },
+                                        Font.RobotoText,
                                     ]}>
                                     English
                                 </Text>
@@ -168,9 +168,9 @@ const Settings = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Wallet
                             </Text>
@@ -192,9 +192,9 @@ const Settings = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Security
                             </Text>
@@ -216,9 +216,9 @@ const Settings = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Network
                             </Text>
@@ -240,9 +240,9 @@ const Settings = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Tools
                             </Text>
@@ -267,9 +267,9 @@ const Settings = () => {
                             }}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    Font.MediumText,
+                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 System Preferences
                             </Text>
@@ -295,9 +295,9 @@ const Settings = () => {
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-sm'),
-                                Font.MediumText,
+                                tailwind('text-sm font-medium'),
                                 {color: ColorScheme.Text.Alt},
+                                Font.RobotoText,
                             ]}>
                             About
                         </Text>

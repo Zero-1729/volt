@@ -95,18 +95,18 @@ const Home = () => {
                             )}>
                             <Text
                                 style={[
-                                    tailwind('text-base mb-2'),
-                                    Font.MediumText,
+                                    tailwind('text-base mb-2 font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 Total Balance
                             </Text>
 
                             <Text
                                 style={[
-                                    tailwind('text-3xl'),
-                                    Font.MediumText,
+                                    tailwind('text-3xl font-medium'),
                                     {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
                                 ]}>
                                 -
                             </Text>
@@ -133,10 +133,10 @@ const Home = () => {
                                 <Text
                                     style={[
                                         tailwind(
-                                            'text-lg w-full text-left mb-4',
+                                            'text-lg w-full text-left mb-4 font-medium',
                                         ),
-                                        Font.BoldText,
                                         {color: ColorScheme.Text.Default},
+                                        Font.RobotoText,
                                     ]}>
                                     Add new wallet
                                 </Text>
@@ -145,8 +145,8 @@ const Home = () => {
                                         tailwind(
                                             'text-xs w-full text-left mb-4',
                                         ),
-                                        Font.RegularText,
                                         {color: ColorScheme.Text.DescText},
+                                        Font.RobotoText,
                                     ]}>
                                     Click ‘add’ button below or ‘+’ icon above
                                     to create a new wallet
@@ -169,9 +169,9 @@ const Home = () => {
                     <View style={[tailwind('w-full h-1/2')]}>
                         <Text
                             style={[
-                                tailwind('mb-4'),
+                                tailwind('mb-4 font-medium'),
                                 DarkGrayText,
-                                Font.MediumText,
+                                Font.RobotoText,
                             ]}>
                             Latest Transactions
                         </Text>
@@ -190,8 +190,8 @@ const Home = () => {
                             <Text
                                 style={[
                                     tailwind('w-3/5 text-center'),
-                                    Font.MediumText,
                                     DarkGreyText,
+                                    Font.RobotoText,
                                 ]}>
                                 A list of all latest transactions will be
                                 display

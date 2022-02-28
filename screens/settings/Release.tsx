@@ -28,7 +28,7 @@ const Release = () => {
                     style={[
                         tailwind('text-xs text-justify'),
                         {color: ColorScheme.Text.Default},
-                        Font.RegularText,
+                        Font.RobotoText,
                     ]}>
                     - {item}
                 </Text>
@@ -54,9 +54,9 @@ const Release = () => {
                     />
                     <Text
                         style={[
-                            tailwind('text-sm'),
-                            Font.BoldText,
+                            tailwind('text-sm font-medium'),
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         About
                     </Text>
@@ -71,9 +71,9 @@ const Release = () => {
                 <View style={tailwind('w-5/6 mt-6')}>
                     <Text
                         style={[
-                            tailwind('text-xl'),
-                            Font.BoldText,
+                            tailwind('text-xl font-medium'),
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         Release Notes
                     </Text>
