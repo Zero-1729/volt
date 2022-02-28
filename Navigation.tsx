@@ -16,6 +16,7 @@ import Home from './screens/Home';
 // Wallet screens
 import Import from './screens/wallet/Import';
 import RestoreActions from './screens/wallet/RestoreActions';
+import CreateActions from './screens/wallet/CreateActions';
 
 import Apps from './screens/Apps';
 
@@ -64,7 +65,14 @@ const WalletRoot = () => {
     return (
         <WalletStack.Navigator screenOptions={{headerShown: false}}>
             <WalletStack.Screen name="Import" component={Import} />
-            <WalletStack.Screen name="RestoreActions" component={RestoreActions} />
+            <WalletStack.Screen
+                name="RestoreActions"
+                component={RestoreActions}
+            />
+            <WalletStack.Screen
+                name="CreateActions"
+                component={CreateActions}
+            />
         </WalletStack.Navigator>
     );
 };
