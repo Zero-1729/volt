@@ -18,7 +18,7 @@ export const TextMultiInput = props => {
             selectTextOnFocus={false}
             {...props}
             style={[
-                tailwind('py-8 px-4 rounded text-sm text-xs h-48'),
+                tailwind('py-8 px-4 rounded text-xs h-48'),
                 {textAlignVertical: 'top'},
             ]}
         />
