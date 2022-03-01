@@ -12,7 +12,6 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		751269475926430A84779DBA /* Roboto Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F42AD492F5F2479F8398173E /* Roboto Bold.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		81D42615D6F20339458508FC /* libPods-volt-voltTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8191B4C539305B3E111A637D /* libPods-volt-voltTests.a */; };
 		B804148D582525DFA2D57220 /* libPods-volt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5313A282B61E3F650EC2DF1 /* libPods-volt.a */; };
@@ -264,7 +263,6 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				751269475926430A84779DBA /* Roboto Bold.ttf in Resources */,
 				C0F581AB7CD54A04972EE16B /* Roboto Medium.ttf in Resources */,
 				BCAD8E97BA6E4BC38488B0AE /* Roboto.ttf in Resources */,
 				026861AC9E124F3289F46F25 /* Satoshi Symbol.ttf in Resources */,
