@@ -13,7 +13,6 @@ import {PlainButton} from '../../components/button';
 import {TextMultiInput} from '../../components/input';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
-import Folder from './../../assets/svg/file-directory-fill-24.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
@@ -24,6 +23,20 @@ const ImportAction = () => {
     const ColorScheme = Color(useColorScheme());
 
     const [importText, setImportText] = useState('');
+
+    const handleFolderCallback = data => {
+        console.log(data);
+    };
+
+    const handleFolderError = e => {
+        // Handle when any error in the folder action is reported
+        console.error(e);
+    };
+
+    const handleFolderCancel = e => {
+        // Handle when user cancels folder action
+        console.log(e);
+    };
 
     const onBlur = () => {
         const valueWithSingleWhitespace = importText.replace(
@@ -69,41 +82,34 @@ const ImportAction = () => {
 
                     <Text
                         style={[
-                            tailwind('font-bold text-2xl mt-20'),
+                            tailwind('font-medium text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
+                            Font.RobotoText,
                         ]}>
                         Restore Wallet
                     </Text>
                     <Text
                         style={[
-                            tailwind('text-sm mt-2'),
+                            tailwind('text-sm mt-2 mb-8'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
                         Enter backup material
                     </Text>
 
-                    <View
-                        style={[
-                            tailwind('mt-10 border-gray-400 px-4'),
-                            {borderWidth: 1, borderRadius: 6},
-                        ]}>
-                        <TextMultiInput
-                            placeholder={importInstructions}
-                            placeholderTextColor={ColorScheme.Text.GrayedText}
-                            onChangeText={setImportText}
-                            onBlur={onBlur}
-                            color={ColorScheme.Text.Default}
-                        />
-
-                        <View style={[tailwind('absolute right-4 bottom-4')]}>
-                            <PlainButton>
-                                <Folder
-                                    width={22}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </PlainButton>
-                        </View>
-                    </View>
+                    <TextMultiInput
+                        placeholder={importInstructions}
+                        placeholderTextColor={ColorScheme.Text.GrayedText}
+                        onChangeText={setImportText}
+                        onBlur={onBlur}
+                        color={ColorScheme.Text.Default}
+                        borderColor={ColorScheme.Text.LightGreyText}
+                        showFolder={true}
+                        showScanIcon={true}
+                        folderColor={'red'}
+                        onSuccess={handleFolderCallback}
+                        onError={handleFolderError}
+                        onCancel={handleFolderCancel}
+                    />
 
                     <PlainButton disabled={importText.trim().length === 0}>
                         <View
