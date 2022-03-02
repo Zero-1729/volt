@@ -76,8 +76,8 @@ const Import = () => {
                         </Text>
 
                         <Text style={[tailwind('mt-4 text-white text-xs')]}>
-                            Import wallet from BIP39 seed (and an optional
-                            passphrase) or other methods. Use this if you are
+                            Import wallet from BIP39 seed and an optional
+                            passphrase or other methods. Use this if you are
                             coming from another wallet.
                         </Text>
 
@@ -128,8 +128,8 @@ const Import = () => {
                                 tailwind('mt-4 text-xs'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            Create a new wallet with a fresh BIP39 seed (and an
-                            optional passphrase). Use this if you have no
+                            Create a new wallet with a fresh BIP39 seed and an
+                            optional passphrase. Use this if you have no
                             existing wallet.
                         </Text>
 
