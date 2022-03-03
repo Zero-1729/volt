@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import {TextInput, Platform, View} from 'react-native';
+import {
+    TextInput,
+    Platform,
+    View,
+    Text,
+    Switch,
+    useColorScheme,
+} from 'react-native';
 
 import tailwind from 'tailwind-rn';
 
@@ -11,6 +18,9 @@ import {PlainButton} from './button';
 
 import Folder from './../assets/svg/file-directory-fill-24.svg';
 import Scan from './../assets/svg/scan.svg';
+import Font from '../constants/Font';
+
+import Color from '../constants/Color';
 
 export const TextSingleInput = props => {
     return (
@@ -30,6 +40,8 @@ export const TextSingleInput = props => {
 };
 
 export const TextMultiInput = props => {
+    const ColorScheme = Color(useColorScheme());
+
     return (
         <View
             style={[
@@ -107,6 +119,40 @@ export const TextMultiInput = props => {
                             fill={props.showFolder ? 'gray' : props.folderColor}
                         />
                     </PlainButton>
+                </View>
+            ) : (
+                <></>
+            )}
+
+            {props.showTestnetToggle ? (
+                <View
+                    style={[
+                        tailwind(
+                            'left-4 bottom-3 absolute items-center flex-row',
+                        ),
+                    ]}>
+                    <Switch
+                        style={[
+                            tailwind('-ml-2 relative'),
+                            {transform: [{scaleX: 0.6}, {scaleY: 0.6}]},
+                        ]}
+                        trackColor={{false: '#767577', true: '#2771f0'}}
+                        thumbColor="#ffffff"
+                        value={props.isEnabled}
+                        onValueChange={props.toggleSwitch}
+                    />
+                    <Text
+                        style={[
+                            tailwind('text-white text-sm'),
+                            {
+                                fontWeight: props.isEnabled ? 'bold' : 'normal',
+                                opacity: props.isEnabled ? 0.8 : 0.2,
+                                color: ColorScheme.Text.Default,
+                            },
+                            Font.RobotoText,
+                        ]}>
+                        Testnet
+                    </Text>
                 </View>
             ) : (
                 <></>
