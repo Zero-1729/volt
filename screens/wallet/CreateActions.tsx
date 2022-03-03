@@ -77,7 +77,7 @@ const ImportAction = () => {
                             tailwind('text-sm mt-2'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
-                        New wallet defaults to SegWit (bech32)
+                        Defaults to SegWit (bech32)
                     </Text>
 
                     <View
