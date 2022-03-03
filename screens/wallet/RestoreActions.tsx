@@ -23,6 +23,7 @@ const ImportAction = () => {
     const ColorScheme = Color(useColorScheme());
 
     const [importText, setImportText] = useState('');
+    const [enableTestnet, setTestnet] = useState(true);
 
     const handleFolderCallback = data => {
         console.log(data);
@@ -106,6 +107,9 @@ const ImportAction = () => {
                         showFolder={true}
                         showScanIcon={true}
                         folderColor={'red'}
+                        showTestnetToggle={true} // Should only be in advanced mode
+                        isEnabled={enableTestnet}
+                        toggleSwitch={setTestnet}
                         onSuccess={handleFolderCallback}
                         onError={handleFolderError}
                         onCancel={handleFolderCancel}
