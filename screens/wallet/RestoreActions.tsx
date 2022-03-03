@@ -51,7 +51,7 @@ const ImportAction = () => {
     };
 
     const importInstructions =
-        'Enter one of the following:\n\n- 12-24 word seed\n- Xpub/Zpub (watch-only)\n- Xpriv/Zpriv\n- PrivateKey (WIF)';
+        'Enter one of the following:\n\n- 12-24 word seed\n- Xpriv/Zpriv\n- PrivateKey (WIF)';
 
     return (
         <SafeAreaView>
