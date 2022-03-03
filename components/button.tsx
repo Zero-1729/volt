@@ -22,7 +22,7 @@ export const PaddedButton = props => {
                 ]}>
                 <Text
                     style={[
-                        tailwind('text-xs font-bold'),
+                        tailwind('text-xs font-medium'),
                         {color: props.color},
                     ]}>
                     {props.title}
