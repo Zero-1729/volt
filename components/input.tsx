@@ -137,7 +137,7 @@ export const TextMultiInput = props => {
                             {transform: [{scaleX: 0.6}, {scaleY: 0.6}]},
                         ]}
                         trackColor={{false: '#767577', true: '#2771f0'}}
-                        thumbColor="#ffffff"
+                        thumbColor={props.isEnabled ? '#ffffff' : '#ffffffce'}
                         value={props.isEnabled}
                         onValueChange={props.toggleSwitch}
                     />
