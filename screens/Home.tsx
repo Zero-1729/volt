@@ -16,14 +16,16 @@ import Clock from './../assets/svg/clock-24.svg';
 
 import Color from '../constants/Color';
 import Font from '../constants/Font';
-import {PaddedButton, PlainButton} from '../components/button';
+
+import {PlainButton} from '../components/button';
+import {EmptyCard, BaseCard} from '../components/card';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
 
-    const altGray = {
-        backgroundColor: ColorScheme.isDarkMode ? '#2C2C2C' : '#ededed',
-    };
+    const isWalletInit = false; // Should be from async store
+    // List of created wallets from async store
+    const wallets = [];
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -112,58 +114,17 @@ const Home = () => {
                             </Text>
                         </View>
 
-                        <View
-                            style={tailwind(
-                                'w-full h-48 relative items-center',
-                            )}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'w-11/12 h-full absolute -bottom-2 rounded-md z-20 opacity-60',
-                                    ),
-                                    styles.DarkGrayCard,
-                                ]}
+                        {/** Create a vertical scroll carousel for 'BaseCard */}
+                        {isWalletInit ? (
+                            <BaseCard
+                                isWatchOnly={true}
+                                label={'Vacation Wallet'}
+                                walletBalance={2600043}
+                                walletType={'Segwit (native-bech32)'}
                             />
-
-                            <View
-                                style={[
-                                    tailwind('w-full h-48 p-6 rounded-md z-30'),
-                                    altGray,
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-lg w-full text-left mb-4 font-medium',
-                                        ),
-                                        {color: ColorScheme.Text.Default},
-                                        Font.RobotoText,
-                                    ]}>
-                                    Add new wallet
-                                </Text>
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-xs w-full text-left mb-4',
-                                        ),
-                                        {color: ColorScheme.Text.DescText},
-                                        Font.RobotoText,
-                                    ]}>
-                                    Click ‘add’ button below or ‘+’ icon above
-                                    to create a new wallet
-                                </Text>
-
-                                <PaddedButton
-                                    onPress={() => {
-                                        navigation.navigate('WalletRoot');
-                                    }}
-                                    title={'Add'}
-                                    color={ColorScheme.Text.Alt}
-                                    backgroundColor={
-                                        ColorScheme.Background.Inverted
-                                    }
-                                />
-                            </View>
-                        </View>
+                        ) : (
+                            <EmptyCard />
+                        )}
                     </View>
 
                     <View style={[tailwind('w-full h-1/2')]}>
@@ -206,13 +167,4 @@ const Home = () => {
 
 export default Home;
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    DarkGrayCard: {
-        backgroundColor: '#B5B5B5',
-    },
-});
+const styles = StyleSheet.create({});
