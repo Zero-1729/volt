@@ -45,7 +45,7 @@ export const TextMultiInput = props => {
     return (
         <View
             style={[
-                tailwind('rounded pt-6 pb-10 px-8 h-52'),
+                tailwind('rounded pt-4 pb-10 px-5 h-52'),
                 {
                     borderWidth: 2,
                     borderColor: props.borderColor
@@ -134,7 +134,12 @@ export const TextMultiInput = props => {
                     <Switch
                         style={[
                             tailwind('-ml-2 relative'),
-                            {transform: [{scaleX: 0.6}, {scaleY: 0.6}]},
+                            {
+                                transform: [
+                                    {scaleX: Platform.OS === 'ios' ? 0.6 : 0.8},
+                                    {scaleY: Platform.OS === 'ios' ? 0.6 : 0.8},
+                                ],
+                            },
                         ]}
                         trackColor={{false: '#767577', true: '#2771f0'}}
                         thumbColor={props.isEnabled ? '#ffffff' : '#8e8e8e'}
@@ -145,8 +150,8 @@ export const TextMultiInput = props => {
                         style={[
                             tailwind('text-white text-sm'),
                             {
-                                fontWeight: props.isEnabled ? 'bold' : 'normal',
-                                opacity: props.isEnabled ? 0.8 : 0.2,
+                                fontWeight: props.isEnabled ? '600' : 'normal',
+                                opacity: props.isEnabled ? 1 : 0.2,
                                 color: ColorScheme.Text.Default,
                             },
                             Font.RobotoText,
