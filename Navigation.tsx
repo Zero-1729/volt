@@ -84,22 +84,25 @@ const HomeTabs = () => {
     return (
         <HomeTabStack.Navigator
             initialRouteName="HomeScreen"
-            tabBarOptions={{
-                showLabel: false,
-                style: {
-                    position: 'absolute',
-                    bottom: NativeMetrics.navBottom,
-                    margin: 0,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                    left: NativeMetrics.width / 6, // 65,
-                    right: NativeMetrics.width / 6, // 65,
-                    width: 'auto',
-                    backgroundColor: 'transparent',
-                    borderRadius: 50,
-                    borderTopColor: 'transparent',
-                    elevation: 0,
-                },
+            screenOptions={{
+                headerShown: false,
+                tabBarShowLabel: false,
+                tabBarStyle: [
+                    {
+                        position: 'absolute',
+                        bottom: NativeMetrics.navBottom,
+                        margin: 0,
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                        left: NativeMetrics.width / 6, // 65,
+                        right: NativeMetrics.width / 6, // 65,
+                        width: 'auto',
+                        backgroundColor: 'transparent',
+                        borderRadius: 50,
+                        borderTopColor: 'transparent',
+                        elevation: 0,
+                    },
+                ],
             }}>
             <HomeTabStack.Screen
                 name="HomeScreen"
