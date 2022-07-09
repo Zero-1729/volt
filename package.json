@@ -64,6 +64,7 @@
     "react-native-eject": "^0.1.2",
     "react-native-fingerprint-scanner": "^6.0.0",
     "react-native-gesture-handler": "^1.10.3",
+    "react-native-gradle-plugin": "^0.0.7",
     "react-native-haptic-feedback": "^1.11.0",
     "react-native-image-picker": "^4.0.6",
     "react-native-modal": "^12.0.2",
