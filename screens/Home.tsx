@@ -4,7 +4,7 @@ import {Platform, StyleSheet, Text, useColorScheme, View} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import tailwind from 'tailwind-rn';
 
@@ -58,7 +58,11 @@ const Home = () => {
                         topPlatformOffset,
                     ]}>
                     <PlainButton
-                        onPress={() => navigation.navigate('SettingsRoot')}>
+                        onPress={() =>
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'SettingsRoot'}),
+                            )
+                        }>
                         <Dots
                             width={32}
                             fill={ColorScheme.SVG.Default}
@@ -78,7 +82,13 @@ const Home = () => {
                             />
                         </PlainButton>
                         <PlainButton
-                            onPress={() => navigation.navigate('WalletRoot')}>
+                            onPress={() =>
+                                navigation.dispatch(
+                                    CommonActions.navigate({
+                                        name: 'WalletRoot',
+                                    }),
+                                )
+                            }>
                             <Add width={30} fill={ColorScheme.SVG.Default} />
                         </PlainButton>
                     </View>

@@ -1,7 +1,7 @@
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import React from 'react';
 
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import tailwind from 'tailwind-rn';
 
@@ -46,13 +46,15 @@ export const EmptyCard = () => {
                         {color: ColorScheme.Text.DescText},
                         Font.RobotoText,
                     ]}>
-                    Click ‘add’ button below or ‘+’ icon above to create a new
+                    Click 'add' button below or '+' icon above to create a new
                     wallet
                 </Text>
 
                 <PaddedButton
                     onPress={() => {
-                        navigation.navigate('WalletRoot');
+                        navigation.dispatch(
+                            CommonActions.navigate({name: 'WalletRoot'}),
+                        );
                     }}
                     title={'Add'}
                     color={ColorScheme.Text.Alt}

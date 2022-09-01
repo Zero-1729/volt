@@ -1,6 +1,8 @@
 import React from 'react';
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
+import {CommonActions} from '@react-navigation/native';
+
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -72,7 +74,9 @@ const Settings = () => {
                 <View style={[tailwind('w-5/6')]}>
                     <PlainButton
                         onPress={() => {
-                            navigation.navigate('Currency');
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'Currency'}),
+                            );
                         }}>
                         <View
                             style={[
@@ -117,7 +121,9 @@ const Settings = () => {
 
                     <PlainButton
                         onPress={() => {
-                            navigation.navigate('Language');
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'Language'}),
+                            );
                         }}>
                         <View
                             style={[
@@ -283,7 +289,9 @@ const Settings = () => {
                         NativeBottomPadding,
                     ]}
                     onPress={() => {
-                        navigation.navigate('About');
+                        navigation.dispatch(
+                            CommonActions.navigate({name: 'About'}),
+                        );
                     }}>
                     <View
                         style={[

@@ -2,6 +2,8 @@ import React from 'react';
 
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
+import {CommonActions} from '@react-navigation/native';
+
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -103,7 +105,9 @@ const About = () => {
                 <View style={tailwind('w-5/6')}>
                     <PlainButton
                         onPress={() => {
-                            navigation.navigate('Release');
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'Release'}),
+                            );
                         }}>
                         <View
                             style={[
@@ -131,7 +135,9 @@ const About = () => {
 
                     <PlainButton
                         onPress={() => {
-                            navigation.navigate('License');
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'License'}),
+                            );
                         }}>
                         <View
                             style={[

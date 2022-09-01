@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
+import {CommonActions} from '@react-navigation/native';
+
 import React from 'react';
 
 import {useNavigation} from '@react-navigation/core';
@@ -84,7 +86,11 @@ const Import = () => {
                         <View style={[tailwind('items-end')]}>
                             <PlainButton
                                 onPress={() => {
-                                    navigation.navigate('RestoreActions');
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'RestoreActions',
+                                        }),
+                                    );
                                 }}>
                                 <View
                                     style={[
@@ -136,7 +142,11 @@ const Import = () => {
                         <View style={[tailwind('items-end')]}>
                             <PlainButton
                                 onPress={() => {
-                                    navigation.navigate('CreateActions');
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'CreateActions',
+                                        }),
+                                    );
                                 }}>
                                 <View
                                     style={[
