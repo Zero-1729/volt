@@ -143,7 +143,6 @@ const HomeTabs = () => {
                 name="Apps"
                 component={Apps}
                 options={{
-                    replaceAnimation: 'push',
                     tabBarIcon: ({focused}) => (
                         <DashboardIcon
                             fill={
