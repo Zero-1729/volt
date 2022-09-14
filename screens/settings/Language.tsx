@@ -30,7 +30,12 @@ const Language = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const renderItem = ({item, index}) => {
+    type LanguageType = {
+        name: string;
+        code: string;
+    };
+
+    const renderItem = ({item, index}: {item: LanguageType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
