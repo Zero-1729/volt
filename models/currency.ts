@@ -1,4 +1,4 @@
-export default [
+export const Currencies = [
     {
         short: 'USD',
         locale: 'en_US',
@@ -229,4 +229,10 @@ export default [
         locale: 'xag',
         symbol: 'XAG',
     },
-] as const;
+];
+
+export type CurrencyType = {
+    short: string;
+    locale: string;
+    symbol: string;
+};

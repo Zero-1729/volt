@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
-import currency from '../../models/currency';
+import {Currencies, CurrencyType} from '../../models/currency';
 
 import {useNavigation} from '@react-navigation/core';
 
@@ -30,7 +30,7 @@ const Currency = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const renderItem = ({item, index}) => {
+    const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
@@ -114,7 +114,7 @@ const Currency = () => {
 
                     <FlatList
                         style={tailwind('w-full')}
-                        data={currency}
+                        data={Currencies}
                         renderItem={renderItem}
                         keyExtractor={item => item.locale}
                         initialNumToRender={25}
