@@ -4,7 +4,7 @@ import {StatusBar, StyleSheet, useColorScheme} from 'react-native';
 
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 
 import SplashScreen from 'react-native-splash-screen';
 
@@ -21,6 +21,16 @@ const App = () => {
 
     const ColorScheme = Color(useColorScheme());
 
+    let Theme = {
+        dark: ColorScheme.isDarkMode,
+        colors: {
+            // Spread the colors from the default theme
+            // and include the custom Navigator theme colors
+            ...DefaultTheme.colors,
+            ...ColorScheme.NavigatorTheme.colors,
+        },
+    };
+
     return (
         <SafeAreaProvider
             style={{backgroundColor: ColorScheme.Background.Primary}}>
@@ -30,7 +40,7 @@ const App = () => {
                 }
             />
 
-            <NavigationContainer theme={ColorScheme.NavigatorTheme}>
+            <NavigationContainer theme={Theme}>
                 <InitScreen />
             </NavigationContainer>
         </SafeAreaProvider>

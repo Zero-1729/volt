@@ -1,5 +1,5 @@
 /* Little helper that takes in the current theme and returns the appropriate color */
-const Color = (currentTheme: String) => {
+const Color = (currentTheme: ColorThemeType) => {
     let isDarkMode = currentTheme === 'dark';
 
     return {
@@ -34,5 +34,7 @@ const Color = (currentTheme: String) => {
         },
     };
 };
+
+type ColorThemeType = string | unknown;
 
 export default Color;
