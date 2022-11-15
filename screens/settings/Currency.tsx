@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
-import {Currencies, CurrencyType} from '../../models/currency';
+import {Currencies, CurrencyType} from '../../constants/Currency';
 
 import {useNavigation} from '@react-navigation/core';
 
