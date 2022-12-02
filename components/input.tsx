@@ -16,13 +16,15 @@ import DocumentPicker from 'react-native-document-picker';
 
 import {PlainButton} from './button';
 
+import {TextInputProps, TextLongInputProps} from '../types/props';
+
 import Folder from './../assets/svg/file-directory-fill-24.svg';
 import Scan from './../assets/svg/scan.svg';
 import Font from '../constants/Font';
 
 import Color from '../constants/Color';
 
-export const TextSingleInput = props => {
+export const TextSingleInput = (props: TextInputProps) => {
     return (
         <TextInput
             underlineColorAndroid="transparent"
@@ -39,7 +41,7 @@ export const TextSingleInput = props => {
     );
 };
 
-export const TextMultiInput = props => {
+export const TextMultiInput = (props: TextLongInputProps) => {
     const ColorScheme = Color(useColorScheme());
 
     return (

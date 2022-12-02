@@ -6,11 +6,13 @@ import tailwind from 'tailwind-rn';
 
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
-export const PlainButton = props => {
+import {BaseProps, ButtonProps} from '../types/props';
+
+export const PlainButton = (props: BaseProps) => {
     return <TouchableOpacity {...props} />;
 };
 
-export const PaddedButton = props => {
+export const PaddedButton = (props: ButtonProps) => {
     return (
         <TouchableOpacity style={tailwind('items-center flex-row')} {...props}>
             <View
@@ -32,7 +34,7 @@ export const PaddedButton = props => {
     );
 };
 
-export const LongBottomButton = props => {
+export const LongBottomButton = (props: ButtonProps) => {
     return (
         <TouchableOpacity
             {...props}
