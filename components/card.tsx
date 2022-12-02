@@ -7,6 +7,8 @@ import tailwind from 'tailwind-rn';
 
 import {PlainButton, PaddedButton} from './button';
 
+import {WalletCardProps} from '../types/props';
+
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
@@ -65,7 +67,7 @@ export const EmptyCard = () => {
     );
 };
 
-export const BaseCard = props => {
+export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
 
     const altGray = {
