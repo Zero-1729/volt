@@ -51,7 +51,7 @@ It is expected to commits pre-fixed with one of the following areas or component
 - `docs` - Changes to the repo docs
 - `build` - Changes to the native Android or IOS folders (`./ios` and `./andoird`) and config files
 - `deps` - Changes to dependencies (e.g., `package.json` or `package-lock.json`)
-- `type` - Changes to Typescript typings
+- `ts` - Changes to Typescript typings
 - `nav` - Changes to the App Navigation
 - `test` - General and Unit Tests
 - `const` - Changes to `constants`, files in `./constants/*`
