@@ -230,9 +230,3 @@ export const Currencies = [
         symbol: 'XAG',
     },
 ];
-
-export type CurrencyType = {
-    short: string;
-    locale: string;
-    symbol: string;
-};

@@ -2,8 +2,6 @@ import React, {useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
-import {Currencies, CurrencyType} from '../../constants/Currency';
-
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -17,6 +15,10 @@ import Check from './../../assets/svg/check-circle-24.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
+
+import {Currencies} from '../../constants/Currency';
+
+import {CurrencyType} from '../../types/currency';
 
 const Currency = () => {
     const navigation = useNavigation();
