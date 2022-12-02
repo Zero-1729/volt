@@ -21,7 +21,7 @@ const Release = () => {
 
     const navigation = useNavigation();
 
-    const renderItem = ({item}) => {
+    const renderItem = ({item}: {item: string | string[]}) => {
         return (
             <View style={tailwind('mb-2')}>
                 <Text

@@ -26,7 +26,7 @@ const License = () => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const renderItem = ({item}) => {
+    const renderItem = ({item}: {item: string | string[]}) => {
         return (
             <View style={tailwind('mb-4')}>
                 <Text

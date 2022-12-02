@@ -25,16 +25,16 @@ const ImportAction = () => {
     const [importText, setImportText] = useState('');
     const [enableTestnet, setTestnet] = useState(true);
 
-    const handleFolderCallback = data => {
+    const handleFolderCallback = (data: any) => {
         console.log(data);
     };
 
-    const handleFolderError = e => {
+    const handleFolderError = (e: Error) => {
         // Handle when any error in the folder action is reported
         console.error(e);
     };
 
-    const handleFolderCancel = e => {
+    const handleFolderCancel = (e: Error) => {
         // Handle when user cancels folder action
         console.log(e);
     };
