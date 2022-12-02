@@ -55,7 +55,7 @@ const ScanStack = createNativeStackNavigator();
 const ScanRoot = () => {
     return (
         <ScanStack.Navigator screenOptions={{headerShown: false}}>
-            <ScanRoot.Screen name="Scan" component={Scan} />
+            <ScanStack.Screen name="Scan" component={Scan} />
         </ScanStack.Navigator>
     );
 };
@@ -168,7 +168,7 @@ const initScreen = () => {
                 name="SettingsRoot"
                 component={SettingsRoot}
             />
-            <InitScreenStack.Screen name="ScanQR" component={Scan} />
+            <InitScreenStack.Screen name="ScanQR" component={ScanRoot} />
         </InitScreenStack.Navigator>
     );
 };
