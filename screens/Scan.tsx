@@ -1,7 +1,11 @@
-import React, {useState} from 'react';
+import React, {SetStateAction, useState} from 'react';
 
 import {Text, View, StyleSheet} from 'react-native';
-import {useNavigation, useIsFocused} from '@react-navigation/native';
+import {
+    useNavigation,
+    useIsFocused,
+    CommonActions,
+} from '@react-navigation/native';
 import {RNCamera} from 'react-native-camera';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -19,14 +23,21 @@ const Scan = () => {
     const isFocused = useIsFocused();
     const navigation = useNavigation();
 
-    const handleCameraStatChange = event => {
+    interface CamEventType extends Event {
+        camStatus: SetStateAction<RNCamera.Constants.CameraStatus>;
+    }
+
+    const handleCameraStatChange = (event: CamEventType) => {
         setCamStatus(event.camStatus);
     };
 
-    const onQRCodeRead = qr => {
+    const onQRCodeRead = (qr: {data: string}) => {
+        setIsLoading(true);
         // We are simply interested in the following props 'data', 'rawData', and 'type' (i.e. 'QR_CODE')
         // TODO: handle actual decoding logic here; return to screen that called this.
-        navigation.goBack();
+        setIsLoading(false);
+
+        navigation.dispatch(CommonActions.navigate({name: 'Home'}));
     };
 
     const closeScreen = () => {
@@ -44,7 +55,7 @@ const Scan = () => {
                 {(isFocused && camStatus) !==
                     RNCamera.Constants.CameraStatus.NOT_AUTHORIZED && (
                     <RNCamera
-                        autoFocus
+                        autoFocus={'on'}
                         captureAudio={false}
                         androidCameraPermissionOptions={{
                             title: 'Bitcoin QR Scan',
