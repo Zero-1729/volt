@@ -18,14 +18,30 @@ import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
-import {EmptyCard, BaseCard} from '../components/card';
+import {EmptyCard, WalletCard} from '../components/card';
+
+import {BaseWalletType} from '../types/wallet';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
 
     const isWalletInit = false; // Should be from async store
+
     // List of created wallets from async store
-    const wallets = [];
+    const wallets: Array<BaseWalletType> = [
+        {
+            name: 'Dummy Wallet',
+            balance: 2600043,
+            UTXOs: [],
+            isWatchOnly: true,
+            descriptor: '',
+            type: 'Segwit (native-bech32)',
+            address: 'bc1q9x30z7rz52c97jwc2j79w76y7l3ny54nlvd4ew',
+            birthday: new Date(),
+        },
+    ];
+
+    const defaultWallet = wallets[0];
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -126,11 +142,11 @@ const Home = () => {
 
                         {/** Create a vertical scroll carousel for 'BaseCard */}
                         {isWalletInit ? (
-                            <BaseCard
-                                isWatchOnly={true}
-                                label={'Vacation Wallet'}
-                                walletBalance={2600043}
-                                walletType={'Segwit (native-bech32)'}
+                            <WalletCard
+                                isWatchOnly={defaultWallet.isWatchOnly}
+                                label={defaultWallet.name}
+                                walletBalance={defaultWallet.balance}
+                                walletType={defaultWallet.type}
                             />
                         ) : (
                             <EmptyCard />
