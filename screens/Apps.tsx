@@ -15,6 +15,8 @@ import tailwind from 'tailwind-rn';
 
 import {PlainButton} from '../components/button';
 
+import {AppCard} from '../types/props';
+
 import Font from '../constants/Font';
 
 import CoinprofileLogo from './../assets/svg/coinprofile.svg';
@@ -29,11 +31,11 @@ const Apps = () => {
     // Apps
     const Services = [
         {
-            key: '1',
+            key: 1,
             title: 'Coinprofile',
-            desc: 'Send Bitcoin to NGN Bank Accounts',
+            description: 'Send Bitcoin to NGN Bank Accounts',
             icon: CoinprofileLogo,
-            mainBG: {
+            color: {
                 backgroundColor: '#00B3E4',
             },
             textHue: {
@@ -42,11 +44,11 @@ const Apps = () => {
             url: 'https://coinprofile.co',
         },
         {
-            key: '2',
+            key: 2,
             title: 'Bitrefill',
-            desc: 'Buy Giftcards with your Bitcoin',
+            description: 'Buy Giftcards with your Bitcoin',
             icon: BitrefillLogo,
-            mainBG: {
+            color: {
                 backgroundColor: '#2E70B7',
             },
             textHue: {
@@ -55,11 +57,11 @@ const Apps = () => {
             url: 'https://bitrefill.com',
         },
         {
-            key: '3',
+            key: 3,
             title: 'Changelly',
-            desc: 'Swap Bitcoin for other Crypto',
+            description: 'Swap Bitcoin for other Crypto',
             icon: ChangellyLogo,
-            mainBG: {
+            color: {
                 backgroundColor: '#2D3A34',
             },
             textHue: {
@@ -69,7 +71,7 @@ const Apps = () => {
         },
     ];
 
-    const renderItem = ({item}) => {
+    const renderItem = ({item}: {item: AppCard}) => {
         return (
             /* We'll eventually use WebView to have all the interaction in-App
             It would be even better if the services had APIs we could just wrap a UI over to make a lot more smooth UX-wise */
@@ -84,7 +86,7 @@ const Apps = () => {
                         tailwind(
                             'bg-blue-600 w-full h-28 rounded-md items-center justify-center flex-row p-6 mb-4',
                         ),
-                        item.mainBG,
+                        item.color,
                     ]}>
                     <View style={[tailwind('flex h-5/6 w-5/6 justify-around')]}>
                         <Text
@@ -95,7 +97,7 @@ const Apps = () => {
                             {item.title}
                         </Text>
                         <Text style={[tailwind('text-xs'), item.textHue]}>
-                            {item.desc}
+                            {item.description}
                         </Text>
                     </View>
                     <item.icon />
@@ -131,7 +133,7 @@ const Apps = () => {
                     style={tailwind('w-5/6')}
                     data={Services}
                     renderItem={renderItem}
-                    keyExtractor={item => item.key}
+                    keyExtractor={item => item.key.toString()}
                 />
             </View>
         </SafeAreaView>
