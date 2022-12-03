@@ -50,7 +50,7 @@ It is expected to commits pre-fixed with one of the following areas or component
 - `style` - Changes to app styling (including inline styling in `.tsx` files)
 - `docs` - Changes to the repo docs
 - `build` - Changes to the native Android or IOS folders (`./ios` and `./andoird`) and config files
-- `deps` - Changes to dependencies (e.g., `package.json` or `package-lock.json`)
+- `deps` - Changes to dependencies (e.g., `yarn.lock`, `package-lock.json` or `package.json`)
 - `ts` - Changes to Typescript typings
 - `nav` - Changes to the App Navigation
 - `test` - General and Unit Tests
