@@ -1,12 +1,10 @@
-import React, {SetStateAction, useState} from 'react';
+import React, {useState} from 'react';
 
-import {Text, View, StyleSheet} from 'react-native';
-import {
-    useNavigation,
-    useIsFocused,
-    CommonActions,
-} from '@react-navigation/native';
-import {RNCamera} from 'react-native-camera';
+import {Text, View, StyleSheet, useColorScheme} from 'react-native';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
+
+import {useCameraDevices, Camera} from 'react-native-vision-camera';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
@@ -14,67 +12,62 @@ import tailwind from 'tailwind-rn';
 import {PlainButton} from '../components/button';
 
 import Close from './../assets/svg/x-circle-fill-24.svg';
+import Color from '../constants/Color';
+
+const LoadingView = () => {
+    const ColorScheme = Color(useColorScheme());
+
+    return (
+        <SafeAreaView
+            style={[
+                styles.flexed,
+                {backgroundColor: ColorScheme.Background.Primary},
+                tailwind('justify-center items-center'),
+            ]}>
+            <Text
+                style={[
+                    {color: ColorScheme.Text.DescText},
+                    tailwind('text-sm'),
+                ]}>
+                Loading...
+            </Text>
+        </SafeAreaView>
+    );
+};
 
 const Scan = () => {
-    const [camStatus, setCamStatus] = useState(
-        RNCamera.Constants.CameraStatus.PENDING_AUTHORIZATION,
-    );
     const [isLoading, setIsLoading] = useState(false);
+    const [grantedPermission, setGrantedPermission] = useState(false);
+
+    // Note, IOS simulator does not support the camera,
+    // so you need a physical device to test.
+    const devices = useCameraDevices();
+    const camera = devices.back;
+
     const isFocused = useIsFocused();
     const navigation = useNavigation();
-
-    interface CamEventType extends Event {
-        camStatus: SetStateAction<RNCamera.Constants.CameraStatus>;
-    }
-
-    const handleCameraStatChange = (event: CamEventType) => {
-        setCamStatus(event.camStatus);
-    };
-
-    const onQRCodeRead = (qr: {data: string}) => {
-        setIsLoading(true);
-        // We are simply interested in the following props 'data', 'rawData', and 'type' (i.e. 'QR_CODE')
-        // TODO: handle actual decoding logic here; return to screen that called this.
-        setIsLoading(false);
-
-        navigation.dispatch(CommonActions.navigate({name: 'Home'}));
-    };
 
     const closeScreen = () => {
         // TODO: future proof navigation; return to screen that called this.
         navigation.goBack();
     };
 
-    return isLoading ? (
-        <SafeAreaView style={[styles.flexed, tailwind('bg-white')]}>
-            <Text>Loading</Text>
-        </SafeAreaView>
-    ) : (
-        <SafeAreaView style={styles.flexed}>
-            <View style={styles.flexed}>
-                {(isFocused && camStatus) !==
-                    RNCamera.Constants.CameraStatus.NOT_AUTHORIZED && (
-                    <RNCamera
-                        autoFocus={'on'}
-                        captureAudio={false}
-                        androidCameraPermissionOptions={{
-                            title: 'Bitcoin QR Scan',
-                            message:
-                                'You need to enable camera permissions to scan QR Code',
-                            buttonPositive: 'Ok',
-                            buttonNegative: 'Cancel',
-                        }}
-                        style={styles.flexed}
-                        onBarCodeRead={onQRCodeRead}
-                        barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
-                        onStatusChange={handleCameraStatChange}
-                    />
-                )}
+    // Display loading view if loading, camera is not ready,
+    // or if permission is not granted.
+    // TODO: add a permission denied screen.
+    if (isLoading || camera === undefined || !grantedPermission) {
+        return <LoadingView />;
+    }
+
+    return (
+        <SafeAreaView>
+            <View>
                 <PlainButton
                     onPress={closeScreen}
                     style={[tailwind('absolute right-8 top-8')]}>
                     <Close fill={'white'} />
                 </PlainButton>
+                <Camera device={camera} isActive={isFocused} />
             </View>
         </SafeAreaView>
     );
