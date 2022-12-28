@@ -5,7 +5,7 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import tailwind from 'tailwind-rn';
 
-import {PlainButton, PaddedButton} from './button';
+import {PlainButton, Button} from './button';
 
 import {WalletCardProps} from '../types/props';
 
@@ -52,7 +52,7 @@ export const EmptyCard = () => {
                     wallet
                 </Text>
 
-                <PaddedButton
+                <Button
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({name: 'WalletRoot'}),
