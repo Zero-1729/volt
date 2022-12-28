@@ -1,9 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 
-import {useCameraDevices, Camera} from 'react-native-vision-camera';
+import {
+    useCameraDevices,
+    Camera,
+    CameraPermissionStatus,
+} from 'react-native-vision-camera';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -73,16 +77,21 @@ const openSettings = () => {
 
 const Scan = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [grantedPermission, setGrantedPermission] = useState(false);
+    const [grantedPermission, setGrantedPermission] =
+        useState<CameraPermissionStatus>('not-determined');
+
+    // Update permission state when permission changes.
+    const updatePermissions = useCallback(async () => {
+        const status = await Camera.requestCameraPermission();
+
+        setGrantedPermission(status);
+    }, []);
 
     useEffect(() => {
-        (async () => {
-            // Update value with actual device system state
-            await Camera.requestCameraPermission().then(arg => {
-                setGrantedPermission(arg === 'authorized');
-            });
-        })();
-    }, [grantedPermission]);
+        if (grantedPermission === 'not-determined') {
+            updatePermissions();
+        }
+    }, [grantedPermission, updatePermissions]);
 
     // Note, IOS simulator does not support the camera,
     // so you need a physical device to test.
@@ -97,16 +106,18 @@ const Scan = () => {
         navigation.goBack();
     };
 
-    // Display loading view if loading, camera is not ready,
-    // or if permission is not granted.
-    if (!grantedPermission) {
+    // Display if permission is not granted,
+    // then, request permission if not determined.
+    if (grantedPermission === 'denied') {
         return <RequestPermView />;
     }
 
+     // Display loading or camera unavailable; handle differently
     if (isLoading || camera === undefined) {
         return <LoadingView props={camera} />;
     }
 
+     // Display Camera view if camera available
     return (
         <SafeAreaView style={[styles.flexed]}>
             <View style={styles.flexed}>
