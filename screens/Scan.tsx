@@ -9,7 +9,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
 
-import {PlainButton} from '../components/button';
+import {LongButton, PlainButton} from '../components/button';
 
 import Close from './../assets/svg/x-circle-fill-24.svg';
 import Color from '../constants/Color';
@@ -35,7 +35,33 @@ const LoadingView = (props: any) => {
         </SafeAreaView>
     );
 };
+
+const RequestPermView = () => {
+    const ColorScheme = Color(useColorScheme());
+
+    return (
+        <SafeAreaView
+            style={[
+                styles.flexed,
+                {backgroundColor: ColorScheme.Background.Primary},
+                tailwind('justify-center items-center'),
+            ]}>
+            <Text
+                style={[
+                    {color: ColorScheme.Text.Default},
+                    tailwind('text-sm text-center mb-6'),
+                ]}>
+                Camera Permission Denied
             </Text>
+            <LongButton
+                style={[
+                    {color: ColorScheme.Text.DescText},
+                    tailwind('text-sm text-center'),
+                ]}
+                backgroundColor={ColorScheme.Background.Inverted}
+                textColor={ColorScheme.Text.Alt}
+                title={'Open Settings'}
+            />
         </SafeAreaView>
     );
 };
@@ -68,6 +94,10 @@ const Scan = () => {
 
     // Display loading view if loading, camera is not ready,
     // or if permission is not granted.
+    if (!grantedPermission) {
+        return <RequestPermView />;
+    }
+
     if (isLoading || camera === undefined) {
         return <LoadingView props={camera} />;
     }
