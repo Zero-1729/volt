@@ -14,7 +14,7 @@ import {PlainButton} from '../components/button';
 import Close from './../assets/svg/x-circle-fill-24.svg';
 import Color from '../constants/Color';
 
-const LoadingView = () => {
+const LoadingView = (props: any) => {
     const ColorScheme = Color(useColorScheme());
 
     return (
@@ -27,9 +27,14 @@ const LoadingView = () => {
             <Text
                 style={[
                     {color: ColorScheme.Text.DescText},
-                    tailwind('text-sm'),
+                    tailwind('text-sm text-center'),
                 ]}>
-                Loading...
+                {/* Only show loading if actually loading */}
+                {!props.camera ? 'Camera is not available' : 'Loading...'}
+            </Text>
+        </SafeAreaView>
+    );
+};
             </Text>
         </SafeAreaView>
     );
@@ -54,9 +59,8 @@ const Scan = () => {
 
     // Display loading view if loading, camera is not ready,
     // or if permission is not granted.
-    // TODO: add a permission denied screen.
-    if (isLoading || camera === undefined || !grantedPermission) {
-        return <LoadingView />;
+    if (isLoading || camera === undefined) {
+        return <LoadingView props={camera} />;
     }
 
     return (
