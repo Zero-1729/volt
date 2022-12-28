@@ -108,14 +108,18 @@ const Scan = () => {
     }
 
     return (
-        <SafeAreaView>
-            <View>
+        <SafeAreaView style={[styles.flexed]}>
+            <View style={styles.flexed}>
+                <Camera
+                    style={[styles.flexed]}
+                    device={camera}
+                    isActive={isFocused}
+                />
                 <PlainButton
                     onPress={closeScreen}
                     style={[tailwind('absolute right-8 top-8')]}>
                     <Close fill={'white'} />
                 </PlainButton>
-                <Camera device={camera} isActive={isFocused} />
             </View>
         </SafeAreaView>
     );
