@@ -12,7 +12,7 @@ export const PlainButton = (props: BaseProps) => {
     return <TouchableOpacity {...props} />;
 };
 
-export const PaddedButton = (props: ButtonProps) => {
+export const Button = (props: ButtonProps) => {
     return (
         <TouchableOpacity style={tailwind('items-center flex-row')} {...props}>
             <View
@@ -26,6 +26,31 @@ export const PaddedButton = (props: ButtonProps) => {
                     style={[
                         tailwind('text-xs font-medium'),
                         {color: props.color},
+                    ]}>
+                    {props.title}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    );
+};
+
+export const LongButton = (props: ButtonProps) => {
+    return (
+        <TouchableOpacity
+            {...props}
+            style={[
+                tailwind('w-5/6 rounded items-center'),
+                {
+                    backgroundColor: props.backgroundColor,
+                },
+            ]}>
+            <View style={[tailwind('w-full self-center items-center')]}>
+                <Text
+                    style={[
+                        tailwind('px-4 py-4 font-medium'),
+                        {
+                            color: props.textColor,
+                        },
                     ]}>
                     {props.title}
                 </Text>
