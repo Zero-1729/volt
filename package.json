@@ -76,6 +76,7 @@
     "react-native-privacy-snapshot": "^1.0.0",
     "react-native-prompt-android": "^1.1.0",
     "react-native-quick-actions": "^0.3.13",
+    "react-native-reanimated": "^2.13.0",
     "react-native-remote-svg": "^2.0.6",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.14.1",
@@ -93,6 +94,7 @@
     "tailwind-rn": "^3.0.1",
     "url": "^0.11.0",
     "util": "^0.12.4",
+    "vision-camera-code-scanner": "^0.2.0",
     "wif": "^2.0.6"
   },
   "devDependencies": {
