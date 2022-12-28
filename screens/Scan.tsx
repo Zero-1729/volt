@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {Text, View, StyleSheet, useColorScheme} from 'react-native';
+import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 
 import {useCameraDevices, Camera} from 'react-native-vision-camera';
@@ -58,12 +58,17 @@ const RequestPermView = () => {
                     {color: ColorScheme.Text.DescText},
                     tailwind('text-sm text-center'),
                 ]}
+                onPress={openSettings}
                 backgroundColor={ColorScheme.Background.Inverted}
                 textColor={ColorScheme.Text.Alt}
                 title={'Open Settings'}
             />
         </SafeAreaView>
     );
+};
+
+const openSettings = () => {
+    Linking.openSettings();
 };
 
 const Scan = () => {
