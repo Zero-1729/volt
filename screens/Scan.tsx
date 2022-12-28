@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Text, View, StyleSheet, useColorScheme} from 'react-native';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
@@ -43,6 +43,15 @@ const LoadingView = (props: any) => {
 const Scan = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [grantedPermission, setGrantedPermission] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            // Update value with actual device system state
+            await Camera.requestCameraPermission().then(arg => {
+                setGrantedPermission(arg === 'authorized');
+            });
+        })();
+    }, [grantedPermission]);
 
     // Note, IOS simulator does not support the camera,
     // so you need a physical device to test.
