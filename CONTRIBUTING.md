@@ -44,7 +44,7 @@ Avoid including `@` in commit messages. If another author made your changes, inc
 
 It is expected to commits pre-fixed with one of the following areas or components they affect:
 
-- `app` - Changes to the main app file (`./App.tsx`)
+- `app` - Changes to the main app file(s) (i.e. `./App.tsx`, `./index.js`)
 -  `screen` - Changes to a screen (files in `./screens/*`)
 - `assets` - Changes to app assets such as fonts (files in `./assets/*`)
 - `style` - Changes to app styling (including inline styling in `.tsx` files)
