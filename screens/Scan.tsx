@@ -7,6 +7,7 @@ import {
     useCameraDevices,
     Camera,
     CameraPermissionStatus,
+    useFrameProcessor,
 } from 'react-native-vision-camera';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -76,9 +77,17 @@ const openSettings = () => {
 };
 
 const Scan = () => {
+    const isFocused = useIsFocused();
+    const navigation = useNavigation();
+
     const [isLoading, setIsLoading] = useState(false);
     const [grantedPermission, setGrantedPermission] =
         useState<CameraPermissionStatus>('not-determined');
+
+    const closeScreen = () => {
+        // TODO: future proof navigation; return to screen that called this.
+        navigation.goBack();
+    };
 
     // Update permission state when permission changes.
     const updatePermissions = useCallback(async () => {
@@ -87,24 +96,23 @@ const Scan = () => {
         setGrantedPermission(status);
     }, []);
 
+    // Note, IOS simulator does not support the camera,
+    // so you need a physical device to test.
+    const devices = useCameraDevices();
+    const camera = devices.back;
+
     useEffect(() => {
         if (grantedPermission === 'not-determined') {
             updatePermissions();
         }
     }, [grantedPermission, updatePermissions]);
 
-    // Note, IOS simulator does not support the camera,
-    // so you need a physical device to test.
-    const devices = useCameraDevices();
-    const camera = devices.back;
+    const frameProcessor = useFrameProcessor(frame => {
+        'worklet';
 
-    const isFocused = useIsFocused();
-    const navigation = useNavigation();
-
-    const closeScreen = () => {
-        // TODO: future proof navigation; return to screen that called this.
-        navigation.goBack();
-    };
+        // TODO: Scan frame for QR Code
+        console.log('frame: ', frame);
+    }, []);
 
     // Display if permission is not granted,
     // then, request permission if not determined.
@@ -112,12 +120,12 @@ const Scan = () => {
         return <RequestPermView />;
     }
 
-     // Display loading or camera unavailable; handle differently
+    // Display loading or camera unavailable; handle differently
     if (isLoading || camera === undefined) {
         return <LoadingView props={camera} />;
     }
 
-     // Display Camera view if camera available
+    // Display Camera view if camera available
     return (
         <SafeAreaView style={[styles.flexed]}>
             <View style={styles.flexed}>
@@ -125,6 +133,8 @@ const Scan = () => {
                     style={[styles.flexed]}
                     device={camera}
                     isActive={isFocused}
+                    frameProcessor={frameProcessor}
+                    frameProcessorFps={1}
                 />
                 <PlainButton
                     onPress={closeScreen}
