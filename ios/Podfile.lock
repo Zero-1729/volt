@@ -476,7 +476,7 @@ PODS:
   - RNSVG (12.5.0):
     - React-Core
   - SocketRocket (0.6.0)
-  - vision-camera-code-scanner (0.2.0):
+  - vision-camera-code-scanner (0.2.1):
     - GoogleMLKit/BarcodeScanning
     - React-Core
   - VisionCamera (2.15.2):
@@ -561,7 +561,7 @@ DEPENDENCIES:
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
-  - vision-camera-code-scanner (from `../node_modules/vision-camera-code-scanner`)
+  - vision-camera-code-scanner (from `../node_modules/vision-camera-code-scanner-fix-55`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -699,7 +699,7 @@ EXTERNAL SOURCES:
   RNSVG:
     :path: "../node_modules/react-native-svg"
   vision-camera-code-scanner:
-    :path: "../node_modules/vision-camera-code-scanner"
+    :path: "../node_modules/vision-camera-code-scanner-fix-55"
   VisionCamera:
     :path: "../node_modules/react-native-vision-camera"
   Yoga:
@@ -784,7 +784,7 @@ SPEC CHECKSUMS:
   RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
   RNSVG: 6adc5c52d2488a476248413064b7f2832e639057
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
-  vision-camera-code-scanner: dda884a7f3ec8243a2a6d6489b91860648371bca
+  vision-camera-code-scanner: ea4c16d84f9715db8b33c7591a4db99e278e2d4b
   VisionCamera: 83cc8ae355bb52a6cfbd59a357efc54efe88370c
   Yoga: 0b84a956f7393ef1f37f3bb213c516184e4a689d
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
