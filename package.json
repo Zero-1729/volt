@@ -58,7 +58,6 @@
     "prop-types": "^15.7.2",
     "react": "^18.0.0",
     "react-native": "^0.69.1",
-    "react-native-camera": "github:Zero-1729/react-native-camera#1ec85c98c41accb0b82179c163b7cc025e407429",
     "react-native-default-preference": "^1.4.3",
     "react-native-device-info": "^8.1.4",
     "react-native-document-picker": "^5.2.0",
