@@ -35,7 +35,9 @@ const LoadingView = (props: any) => {
                     tailwind('text-sm text-center'),
                 ]}>
                 {/* Only show loading if actually loading */}
-                {!props.camera ? 'Camera is not available' : 'Loading...'}
+                {props.camera === undefined
+                    ? 'Camera is not available'
+                    : 'Loading'}
             </Text>
         </SafeAreaView>
     );
@@ -122,7 +124,7 @@ const Scan = () => {
 
     // Display loading or camera unavailable; handle differently
     if (isLoading || camera === undefined) {
-        return <LoadingView props={camera} />;
+        return <LoadingView camera={camera} />;
     }
 
     // Display Camera view if camera available
