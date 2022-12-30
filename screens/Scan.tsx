@@ -16,7 +16,13 @@ import {
     useFrameProcessor,
 } from 'react-native-vision-camera';
 
-import {BarcodeFormat, scanBarcodes, Barcode} from 'vision-camera-code-scanner';
+// Revert to base package when require cycle is fixed:
+// see https://github.com/rodgomesc/vision-camera-code-scanner/issues/55
+import {
+    BarcodeFormat,
+    scanBarcodes,
+    Barcode,
+} from 'vision-camera-code-scanner-fix-55';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
