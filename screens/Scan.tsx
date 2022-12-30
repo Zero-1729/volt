@@ -1,7 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
 import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
-import {useNavigation, useIsFocused} from '@react-navigation/native';
+import {
+    useNavigation,
+    useIsFocused,
+    CommonActions,
+} from '@react-navigation/native';
+
+import {runOnJS} from 'react-native-reanimated';
 
 import {
     useCameraDevices,
@@ -9,6 +15,8 @@ import {
     CameraPermissionStatus,
     useFrameProcessor,
 } from 'react-native-vision-camera';
+
+import {BarcodeFormat, scanBarcodes, Barcode} from 'vision-camera-code-scanner';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -87,9 +95,28 @@ const Scan = () => {
         useState<CameraPermissionStatus>('not-determined');
 
     const closeScreen = () => {
-        // TODO: future proof navigation; return to screen that called this.
-        navigation.goBack();
+        navigation.dispatch(CommonActions.goBack());
     };
+
+    const onQRDetected = useCallback(
+        async (data: Barcode[]) => {
+            // TODO: Handle only first item detected
+            for (let qr of data) {
+                console.log(`[Scanner] Detected QR Raw Data: ${qr.rawValue}`);
+            }
+
+            // Head back home after attempted scan
+            // TODO: Gracefully return with scanned data
+            // Ideally, we'd head to a wallet screen with scanned data
+            runOnJS(navigation.dispatch)(
+                CommonActions.navigate({
+                    name: 'HomeScreen',
+                    params: {QR: data},
+                }),
+            );
+        },
+        [navigation],
+    );
 
     // Update permission state when permission changes.
     const updatePermissions = useCallback(async () => {
@@ -104,17 +131,26 @@ const Scan = () => {
     const camera = devices.back;
 
     useEffect(() => {
+        // Update permission setting if not determined.
         if (grantedPermission === 'not-determined') {
             updatePermissions();
         }
     }, [grantedPermission, updatePermissions]);
 
-    const frameProcessor = useFrameProcessor(frame => {
-        'worklet';
+    const frameProcessor = useFrameProcessor(
+        frame => {
+            'worklet';
 
-        // TODO: Scan frame for QR Code
-        console.log('frame: ', frame);
-    }, []);
+            const digestedFrame = scanBarcodes(frame, [BarcodeFormat.QR_CODE]);
+
+            // Only attempt to handle QR if any detected in-frame
+            if (digestedFrame.length > 0) {
+                // Pass detected QR to processing function
+                runOnJS(onQRDetected)(digestedFrame);
+            }
+        },
+        [onQRDetected],
+    );
 
     // Display if permission is not granted,
     // then, request permission if not determined.
