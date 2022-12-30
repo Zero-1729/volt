@@ -286,7 +286,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-    compile project(':react-native-secure-key-store')
 }
 
 if (isNewArchitectureEnabled()) {
