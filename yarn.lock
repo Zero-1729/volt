@@ -9078,10 +9078,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vision-camera-code-scanner@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/vision-camera-code-scanner/-/vision-camera-code-scanner-0.2.0.tgz#8adc0694319a17f6a95f6dfacc02ab7ac29b4742"
-  integrity sha512-H5hVkXfbIcGdg9YlhuS8Y/xDX5e32Vo6eK5FyDQsE9AGVjlqEHMmSLHZg7BX8UUm4ADmiAZc8wzc4n8TUqGr0g==
+vision-camera-code-scanner-fix-55@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/vision-camera-code-scanner-fix-55/-/vision-camera-code-scanner-fix-55-0.2.1.tgz#e939f9b45c0afa4bd8bd82df294b866a0d3ae953"
+  integrity sha512-k35zggQwQa0b59wyk90hqVVg+wPCzSnggxviE/+5qjrYvpq96YJtn2HbJ4+AZlFRTbI0T+zOlIlhIdb+WUG/TA==
 
 vlq@^1.0.0:
   version "1.0.1"
