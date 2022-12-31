@@ -9,10 +9,9 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
 
-import {PlainButton} from '../../components/button';
+import {PlainButton, LongBottomButton} from '../../components/button';
 
 import {TextSingleInput} from '../../components/input';
-import {LongBottomButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 
