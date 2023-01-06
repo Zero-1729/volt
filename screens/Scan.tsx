@@ -205,9 +205,32 @@ const Scan = () => {
                 />
                 <PlainButton
                     onPress={closeScreen}
-                    style={[tailwind('absolute right-8 top-8')]}>
+                    style={[tailwind('absolute right-8 top-5 z-10')]}>
                     <Close fill={'white'} />
                 </PlainButton>
+
+                {/* TODO: Reduce focus frame to middle of screen */}
+                {/* Screen header */}
+                <View
+                    style={[
+                        tailwind(
+                            'absolute top-0 h-16 w-full bg-black opacity-70 items-center justify-center',
+                        ),
+                        styles.flexed,
+                    ]}>
+                    <Text style={[tailwind('font-bold text-lg text-white')]}>
+                        Scan QR
+                    </Text>
+                </View>
+
+                {/* Screen footer */}
+                <View
+                    style={[
+                        tailwind(
+                            'absolute bottom-0 h-36 w-full bg-black opacity-70',
+                        ),
+                    ]}
+                />
             </View>
         </SafeAreaView>
     );
