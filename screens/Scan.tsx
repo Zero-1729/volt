@@ -14,6 +14,7 @@ import {
     Camera,
     CameraPermissionStatus,
     useFrameProcessor,
+    CameraRuntimeError,
 } from 'react-native-vision-camera';
 
 // Revert to base package when require cycle is fixed:
@@ -103,6 +104,13 @@ const Scan = () => {
     const [grantedPermission, setGrantedPermission] =
         useState<CameraPermissionStatus>('not-determined');
     const [isCamAvailable, setCamAvailable] = useState<boolean | null>(null);
+
+    const onError = useCallback(async (error: CameraRuntimeError) => {
+        // TODO: Push to handle in UI, maybe as modal or something similar
+        console.error(
+            `[Scanner] Camera Error: (${error.code}) ${error.message}`,
+        );
+    }, []);
 
     const onQRDetected = useCallback(
         async (data: Barcode[]) => {
@@ -202,6 +210,7 @@ const Scan = () => {
                     isActive={isFocused}
                     frameProcessor={frameProcessor}
                     frameProcessorFps={1}
+                    onError={onError}
                 />
                 <PlainButton
                     onPress={closeScreen}
