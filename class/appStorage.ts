@@ -2,13 +2,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNSecureKeyStore, {ACCESSIBLE} from 'react-native-secure-key-store';
 import {setGenericPassword, getGenericPassword} from 'react-native-keychain';
 import {open} from 'realm';
-import {randomBytes} from './rng';
+import {randBytes} from './rng';
 
 export class AppStorage {
     constructor() {}
     setItem = async (key: string, value: string, sensitive: boolean) => {
         //set generic password for keychain
-        const buf = await randomBytes(64);
+        const buf = await randBytes(64);
         const passwordKey = buf.toString('hex');
 
         if (sensitive) {

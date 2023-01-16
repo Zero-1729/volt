@@ -3,15 +3,16 @@
  * into one place to try and prevent mistakes when touching the crypto code.
  */
 
-import crypto from 'crypto';
+//import * from 'crypto-js';
+import Crypto from 'crypto';
 /**
  * Generate cryptographically secure random bytes using native api.
  * @param  {number}   size      The number of bytes of randomness
  * @return {Promise.<Buffer>}   The random bytes
  */
-export async function randomBytes(size: number): Promise<Buffer> {
+export async function randBytes(size: number): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-        crypto.randomBytes(size, (err, data) => {
+        Crypto.randomBytes(size, (err, data) => {
             if (err) {
                 reject(err);
             } else {
