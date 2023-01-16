@@ -227,7 +227,7 @@ const Scan = () => {
                         ),
                         styles.flexed,
                     ]}>
-                    <Text style={[tailwind('font-bold text-lg text-white')]}>
+                    <Text style={[tailwind('text-lg text-white')]}>
                         Scan QR
                     </Text>
                 </View>
@@ -236,7 +236,7 @@ const Scan = () => {
                 <View
                     style={[
                         tailwind(
-                            'absolute bottom-0 h-36 w-full bg-black opacity-70',
+                            'absolute bottom-0 h-28 w-full bg-black opacity-70',
                         ),
                     ]}
                 />
