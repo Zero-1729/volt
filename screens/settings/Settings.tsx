@@ -33,6 +33,7 @@ const Settings = () => {
     };
 
     const [currency, setDefaultCurrency] = useState('USD');
+    const [language, setDefaultLanguage] = useState('en');
 
     const retrieveSetting = async (item: string) => {
         try {
@@ -55,7 +56,13 @@ const Settings = () => {
                 setDefaultCurrency(value);
             }
         });
-    }, [currency]);
+
+        retrieveSetting('defaultLanguage').then(value => {
+            if (value) {
+                setDefaultLanguage(value);
+            }
+        });
+    }, [currency, language]);
 
     return (
         <SafeAreaView>
@@ -182,7 +189,7 @@ const Settings = () => {
                                         },
                                         Font.RobotoText,
                                     ]}>
-                                    English
+                                    {language}
                                 </Text>
                                 <Right
                                     width={16}
