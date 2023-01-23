@@ -82,7 +82,7 @@ const Currency = () => {
         return (
             <PlainButton
                 onPress={() => {
-                    setCurrency(item.short);
+                    updateCurrency(item.short);
                 }}>
                 <View
                     style={[
@@ -158,6 +158,24 @@ const Currency = () => {
                         </Text>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
+                    </View>
+
+                    {/* Highlight current select currency here */}
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full h-12 self-center items-center flex-row justify-between',
+                            ),
+                            {backgroundColor: ColorScheme.Background.Secondary},
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm pl-8 font-bold'),
+                                {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
+                            ]}>
+                            Selected: {selectedCurrency}
+                        </Text>
                     </View>
 
                     <FlatList
