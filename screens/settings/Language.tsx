@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import languages from '../../loc/languages';
 
@@ -21,8 +23,6 @@ import Color from '../../constants/Color';
 const Language = () => {
     const navigation = useNavigation();
 
-    const [selectedLang, setLang] = useState('en');
-
     const ColorScheme = Color(useColorScheme());
 
     const HeadingBar = {
@@ -35,11 +35,56 @@ const Language = () => {
         code: string;
     };
 
+    const [defaultLanguage, setDefaultLanguage] = useState('en');
+
+    // Retrieve the stored current language value
+    const getDefaultLanguage = async (item: string) => {
+        try {
+            const value = await AsyncStorage.getItem(item);
+
+            if (value !== null) {
+                return value;
+            }
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Language setting) Error loading data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the Async stored language value
+    const updateDefaultLanguage = async (item: string, value: string) => {
+        try {
+            await AsyncStorage.setItem(item, value);
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Language settings) Error saving data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the language value
+    const updateLanguage = useCallback(async (value: string) => {
+        setDefaultLanguage(value);
+        updateDefaultLanguage('defaultLanguage', value);
+    }, []);
+
+    /// Load and set current language value data
+    useEffect(() => {
+        getDefaultLanguage('language').then(language => {
+            if (language) {
+                setDefaultLanguage(language);
+            }
+        });
+    });
+
     const renderItem = ({item, index}: {item: LanguageType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    setLang(item.code);
+                    updateLanguage(item.code);
                 }}>
                 <View
                     style={[
@@ -61,7 +106,7 @@ const Language = () => {
                         style={[
                             tailwind('flex-row items-center justify-between'),
                         ]}>
-                        {selectedLang === item.code && (
+                        {defaultLanguage === item.code && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
                     </View>
@@ -115,6 +160,24 @@ const Language = () => {
                         </Text>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
+                    </View>
+
+                    {/* Highlight current select language here */}
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full h-12 self-center items-center flex-row justify-between',
+                            ),
+                            {backgroundColor: ColorScheme.Background.Secondary},
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm pl-8 font-bold'),
+                                {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
+                            ]}>
+                            Selected: {defaultLanguage}
+                        </Text>
                     </View>
 
                     <FlatList
