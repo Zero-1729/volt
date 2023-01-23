@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
@@ -22,6 +22,8 @@ import {Currencies} from '../../constants/Currency';
 
 import {CurrencyType} from '../../types/currency';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Currency = () => {
     const navigation = useNavigation();
 
@@ -33,6 +35,48 @@ const Currency = () => {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
     };
+
+    // Retrieve the stored current currency value
+    const getDefaultCurrency = async (item: string) => {
+        try {
+            const value = await AsyncStorage.getItem(item);
+            if (value !== null) {
+                return value;
+            }
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Currency setting) Error loading data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the Async stored currency value
+    const updateDefaultCurrency = async (item: string, value: string) => {
+        try {
+            await AsyncStorage.setItem(item, value);
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Currency settings) Error saving data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the currency value state
+    const updateCurrency = useCallback(async (currency: string) => {
+        setCurrency(currency);
+        updateDefaultCurrency('defaultCurrency', currency);
+    }, []);
+
+    // Load and set current currency value data
+    useEffect(() => {
+        getDefaultCurrency('defaultCurrency').then(currency => {
+            if (currency) {
+                setCurrency(currency);
+            }
+        });
+    }, []);
 
     const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
