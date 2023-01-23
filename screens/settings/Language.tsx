@@ -73,7 +73,7 @@ const Language = () => {
 
     /// Load and set current language value data
     useEffect(() => {
-        getDefaultLanguage('language').then(language => {
+        getDefaultLanguage('defaultLanguage').then(language => {
             if (language) {
                 setDefaultLanguage(language);
             }
