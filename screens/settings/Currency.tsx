@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
+import {CommonActions} from '@react-navigation/native';
+
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -83,7 +85,7 @@ const Currency = () => {
                         <PlainButton
                             style={tailwind('items-center flex-row -ml-1')}
                             onPress={() => {
-                                navigation.goBack();
+                                navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
                                 style={tailwind('mr-2')}
