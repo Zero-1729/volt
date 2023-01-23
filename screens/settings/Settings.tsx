@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
@@ -8,6 +9,8 @@ import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {PlainButton} from '../../components/button';
 
@@ -28,6 +31,31 @@ const Settings = () => {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
     };
+
+    const [currency, setDefaultCurrency] = useState('USD');
+
+    const retrieveSetting = async (item: string) => {
+        try {
+            const value = await AsyncStorage.getItem(item);
+
+            if (value !== null) {
+                return value;
+            }
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Main settings) Error loading data: ',
+                e,
+            );
+        }
+    };
+
+    useEffect(() => {
+        retrieveSetting('defaultCurrency').then(value => {
+            if (value) {
+                setDefaultCurrency(value);
+            }
+        });
+    }, [currency]);
 
     return (
         <SafeAreaView>
@@ -107,7 +135,7 @@ const Settings = () => {
                                         },
                                         Font.RobotoText,
                                     ]}>
-                                    USD
+                                    {currency}
                                 </Text>
                                 <Right
                                     width={16}
