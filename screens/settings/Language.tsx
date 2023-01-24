@@ -49,7 +49,7 @@ const Language = () => {
         JSON.stringify(defaultLanguage),
     );
 
-    // Retrieve the stored current language value
+    // Retrieve the stored current language value ('appLanguage')
     const getAppLanguage = async (item: string) => {
         try {
             const value = await AsyncStorage.getItem(item);
@@ -84,22 +84,20 @@ const Language = () => {
         }
     };
 
-    // Update the language value
+    // Update the language value state and AsyncStore
     const updateLanguage = useCallback(async (languageObject: LanguageType) => {
         // Using state fn, so must stringify updated language object
         setAppLanguage(JSON.stringify(languageObject));
         updateAppLanguage('appLanguage', languageObject);
     }, []);
 
-    /// Load and set current language value data
+    // Load and set current language value data
     useEffect(() => {
-        getAppLanguage('appLanguage').then(
-            (languageObject: LanguageType) => {
-                if (languageObject) {
-                    setAppLanguage(JSON.stringify(languageObject));
-                }
-            },
-        );
+        getAppLanguage('appLanguage').then((languageObject: LanguageType) => {
+            if (languageObject) {
+                setAppLanguage(JSON.stringify(languageObject));
+            }
+        });
     });
 
     const renderItem = ({item, index}: {item: LanguageType; index: number}) => {
