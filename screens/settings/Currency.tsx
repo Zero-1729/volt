@@ -20,8 +20,6 @@ import Color from '../../constants/Color';
 
 import {Currencies} from '../../constants/Currency';
 
-import {CurrencyType} from '../../types/currency';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Currency = () => {
@@ -36,8 +34,13 @@ const Currency = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    // Retrieve the stored current currency value
-    const getDefaultCurrency = async (item: string) => {
+    type CurrencyType = {
+        short: string;
+        symbol: string;
+        locale: string;
+    };
+
+    const getFiatCurrency = async (item: string) => {
         try {
             const value = await AsyncStorage.getItem(item);
             if (value !== null) {
