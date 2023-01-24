@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
@@ -94,21 +95,7 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row items-center justify-between',
-                                    ),
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-xs mr-4'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                        Font.RobotoText,
-                                    ]}>
-                                    USD
-                                </Text>
+                                style={[tailwind('flex-row justify-between')]}>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}
@@ -141,21 +128,7 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row items-center justify-between',
-                                    ),
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-xs mr-4'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                        Font.RobotoText,
-                                    ]}>
-                                    English
-                                </Text>
+                                style={[tailwind('flex-row justify-between')]}>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}

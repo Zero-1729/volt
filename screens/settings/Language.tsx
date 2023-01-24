@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import languages from '../../loc/languages';
 
@@ -21,8 +23,6 @@ import Color from '../../constants/Color';
 const Language = () => {
     const navigation = useNavigation();
 
-    const [selectedLang, setLang] = useState('en');
-
     const ColorScheme = Color(useColorScheme());
 
     const HeadingBar = {
@@ -33,13 +33,78 @@ const Language = () => {
     type LanguageType = {
         name: string;
         code: string;
+        dir: string;
     };
+
+    // The default App language
+    const defaultLanguage: LanguageType = {
+        name: 'English',
+        code: 'en',
+        dir: 'LTR',
+    };
+
+    // State only accepts string values,
+    // so we need to stringify the language object
+    const [appLanguage, setAppLanguage] = useState(
+        JSON.stringify(defaultLanguage),
+    );
+
+    // Retrieve the stored current language value ('appLanguage')
+    const getAppLanguage = async (item: string) => {
+        try {
+            const value = await AsyncStorage.getItem(item);
+
+            // Check that value exists then
+            // parse and return the language object
+            if (value !== null) {
+                return JSON.parse(value);
+            }
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Language setting) Error loading data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the Async stored language value
+    const updateAppLanguage = async (
+        item: string,
+        languageObject: LanguageType,
+    ) => {
+        try {
+            // We need to stringify the language object
+            // as AsyncStore data must be string not an object
+            await AsyncStorage.setItem(item, JSON.stringify(languageObject));
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Language settings) Error saving data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the language value state and AsyncStore
+    const updateLanguage = useCallback(async (languageObject: LanguageType) => {
+        // Using state fn, so must stringify updated language object
+        setAppLanguage(JSON.stringify(languageObject));
+        updateAppLanguage('appLanguage', languageObject);
+    }, []);
+
+    // Load and set current language value data
+    useEffect(() => {
+        getAppLanguage('appLanguage').then((languageObject: LanguageType) => {
+            if (languageObject) {
+                setAppLanguage(JSON.stringify(languageObject));
+            }
+        });
+    });
 
     const renderItem = ({item, index}: {item: LanguageType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    setLang(item.code);
+                    updateLanguage(item);
                 }}>
                 <View
                     style={[
@@ -61,7 +126,7 @@ const Language = () => {
                         style={[
                             tailwind('flex-row items-center justify-between'),
                         ]}>
-                        {selectedLang === item.code && (
+                        {JSON.parse(appLanguage).code === item.code && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
                     </View>
@@ -115,6 +180,26 @@ const Language = () => {
                         </Text>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
+                    </View>
+
+                    {/* Highlight current select language here */}
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full h-12 self-center items-center flex-row justify-between',
+                            ),
+                            {backgroundColor: ColorScheme.Background.Secondary},
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm pl-8 font-bold'),
+                                {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
+                            ]}>
+                            {/* We simply parse the language object */}
+                            {/* and display the language name meta for user context */}
+                            Selected: {JSON.parse(appLanguage).name}
+                        </Text>
                     </View>
 
                     <FlatList

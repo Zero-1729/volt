@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
+
+import {CommonActions} from '@react-navigation/native';
 
 import {useNavigation} from '@react-navigation/core';
 
@@ -18,12 +20,10 @@ import Color from '../../constants/Color';
 
 import {Currencies} from '../../constants/Currency';
 
-import {CurrencyType} from '../../types/currency';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Currency = () => {
     const navigation = useNavigation();
-
-    const [selectedCurrency, setCurrency] = useState('USD');
 
     const ColorScheme = Color(useColorScheme());
 
@@ -32,11 +32,81 @@ const Currency = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
+    type CurrencyType = {
+        short: string;
+        symbol: string;
+        locale: string;
+    };
+
+    // The default App fiat currency
+    const defaultFiatCurrency: CurrencyType = {
+        short: 'USD',
+        symbol: '$',
+        locale: 'en-US',
+    };
+
+    // State only accepts string values,
+    // so we need to stringify the currency object
+    const [fiatCurrency, setCurrency] = useState(
+        JSON.stringify(defaultFiatCurrency),
+    );
+
+    // Retrieve the stored current currency value ('fiatCurrency')
+    const getFiatCurrency = async (item: string) => {
+        try {
+            const value = await AsyncStorage.getItem(item);
+
+            // Check that value exists then
+            // parse and return the currency object
+            if (value !== null) {
+                return JSON.parse(value);
+            }
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Currency setting) Error loading data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the Async stored currency value
+    const updateFiatCurrency = async (
+        item: string,
+        currencyObject: CurrencyType,
+    ) => {
+        try {
+            // We need to stringify the currency object
+            // as AsyncStore data must be string not an object
+            await AsyncStorage.setItem(item, JSON.stringify(currencyObject));
+        } catch (e) {
+            console.error(
+                '[AsyncStorage] (Currency settings) Error saving data: ',
+                e,
+            );
+        }
+    };
+
+    // Update the currency value state and AsyncStore
+    const updateCurrency = useCallback(async (currencyObject: CurrencyType) => {
+        // Using state fn, so must stringify updated currency object
+        setCurrency(JSON.stringify(currencyObject));
+        updateFiatCurrency('fiatCurrency', currencyObject);
+    }, []);
+
+    // Load and set current currency value data
+    useEffect(() => {
+        getFiatCurrency('fiatCurrency').then((currencyObject: CurrencyType) => {
+            if (currencyObject) {
+                setCurrency(JSON.stringify(currencyObject));
+            }
+        });
+    }, []);
+
     const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    setCurrency(item.short);
+                    updateCurrency(item);
                 }}>
                 <View
                     style={[
@@ -58,7 +128,7 @@ const Currency = () => {
                         style={[
                             tailwind('flex-row items-center justify-between'),
                         ]}>
-                        {selectedCurrency === item.short && (
+                        {JSON.parse(fiatCurrency).short === item.short && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
                     </View>
@@ -83,7 +153,7 @@ const Currency = () => {
                         <PlainButton
                             style={tailwind('items-center flex-row -ml-1')}
                             onPress={() => {
-                                navigation.goBack();
+                                navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
                                 style={tailwind('mr-2')}
@@ -112,6 +182,27 @@ const Currency = () => {
                         </Text>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
+                    </View>
+
+                    {/* Highlight current select currency here */}
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full h-12 self-center items-center flex-row justify-between',
+                            ),
+                            {backgroundColor: ColorScheme.Background.Secondary},
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm pl-8 font-bold'),
+                                {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
+                            ]}>
+                            Selected:{' '}
+                            {`${JSON.parse(fiatCurrency).short} (${
+                                JSON.parse(fiatCurrency).symbol
+                            })`}
+                        </Text>
                     </View>
 
                     <FlatList
