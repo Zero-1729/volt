@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
@@ -9,8 +9,6 @@ import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {PlainButton} from '../../components/button';
 
@@ -31,38 +29,6 @@ const Settings = () => {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
     };
-
-    const [currency, setDefaultCurrency] = useState('USD');
-    const [language, setDefaultLanguage] = useState('en');
-
-    const retrieveSetting = async (item: string) => {
-        try {
-            const value = await AsyncStorage.getItem(item);
-
-            if (value !== null) {
-                return value;
-            }
-        } catch (e) {
-            console.error(
-                '[AsyncStorage] (Main settings) Error loading data: ',
-                e,
-            );
-        }
-    };
-
-    useEffect(() => {
-        retrieveSetting('defaultCurrency').then(value => {
-            if (value) {
-                setDefaultCurrency(value);
-            }
-        });
-
-        retrieveSetting('defaultLanguage').then(value => {
-            if (value) {
-                setDefaultLanguage(value);
-            }
-        });
-    }, [currency, language]);
 
     return (
         <SafeAreaView>
@@ -129,21 +95,7 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row items-center justify-between',
-                                    ),
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-xs mr-4'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                        Font.RobotoText,
-                                    ]}>
-                                    {currency}
-                                </Text>
+                                style={[tailwind('flex-row justify-between')]}>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}
@@ -176,21 +128,7 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row items-center justify-between',
-                                    ),
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-xs mr-4'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                        Font.RobotoText,
-                                    ]}>
-                                    {language}
-                                </Text>
+                                style={[tailwind('flex-row justify-between')]}>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}
