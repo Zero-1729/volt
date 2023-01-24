@@ -25,8 +25,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Currency = () => {
     const navigation = useNavigation();
 
-    const [selectedCurrency, setCurrency] = useState('USD');
-
     const ColorScheme = Color(useColorScheme());
 
     const HeadingBar = {
@@ -40,11 +38,28 @@ const Currency = () => {
         locale: string;
     };
 
+    // The default App fiat currency
+    const defaultFiatCurrency: CurrencyType = {
+        short: 'USD',
+        symbol: '$',
+        locale: 'en-US',
+    };
+
+    // State only accepts string values,
+    // so we need to stringify the currency object
+    const [fiatCurrency, setCurrency] = useState(
+        JSON.stringify(defaultFiatCurrency),
+    );
+
+    // Retrieve the stored current currency value ('fiatCurrency')
     const getFiatCurrency = async (item: string) => {
         try {
             const value = await AsyncStorage.getItem(item);
+
+            // Check that value exists then
+            // parse and return the currency object
             if (value !== null) {
-                return value;
+                return JSON.parse(value);
             }
         } catch (e) {
             console.error(
@@ -55,9 +70,14 @@ const Currency = () => {
     };
 
     // Update the Async stored currency value
-    const updateDefaultCurrency = async (item: string, value: string) => {
+    const updateFiatCurrency = async (
+        item: string,
+        currencyObject: CurrencyType,
+    ) => {
         try {
-            await AsyncStorage.setItem(item, value);
+            // We need to stringify the currency object
+            // as AsyncStore data must be string not an object
+            await AsyncStorage.setItem(item, JSON.stringify(currencyObject));
         } catch (e) {
             console.error(
                 '[AsyncStorage] (Currency settings) Error saving data: ',
@@ -66,17 +86,18 @@ const Currency = () => {
         }
     };
 
-    // Update the currency value state
-    const updateCurrency = useCallback(async (currency: string) => {
-        setCurrency(currency);
-        updateDefaultCurrency('defaultCurrency', currency);
+    // Update the currency value state and AsyncStore
+    const updateCurrency = useCallback(async (currencyObject: CurrencyType) => {
+        // Using state fn, so must stringify updated currency object
+        setCurrency(JSON.stringify(currencyObject));
+        updateFiatCurrency('fiatCurrency', currencyObject);
     }, []);
 
     // Load and set current currency value data
     useEffect(() => {
-        getDefaultCurrency('defaultCurrency').then(currency => {
-            if (currency) {
-                setCurrency(currency);
+        getFiatCurrency('fiatCurrency').then((currencyObject: CurrencyType) => {
+            if (currencyObject) {
+                setCurrency(JSON.stringify(currencyObject));
             }
         });
     }, []);
@@ -85,7 +106,7 @@ const Currency = () => {
         return (
             <PlainButton
                 onPress={() => {
-                    updateCurrency(item.short);
+                    updateCurrency(item);
                 }}>
                 <View
                     style={[
@@ -107,7 +128,7 @@ const Currency = () => {
                         style={[
                             tailwind('flex-row items-center justify-between'),
                         ]}>
-                        {selectedCurrency === item.short && (
+                        {JSON.parse(fiatCurrency).short === item.short && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
                     </View>
@@ -177,7 +198,10 @@ const Currency = () => {
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Selected: {selectedCurrency}
+                            Selected:{' '}
+                            {`${JSON.parse(fiatCurrency).short} (${
+                                JSON.parse(fiatCurrency).symbol
+                            })`}
                         </Text>
                     </View>
 
