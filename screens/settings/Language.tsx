@@ -33,17 +33,31 @@ const Language = () => {
     type LanguageType = {
         name: string;
         code: string;
+        dir: string;
     };
 
-    const [defaultLanguage, setDefaultLanguage] = useState('en');
+    // The default App language
+    const BaseLanguage: LanguageType = {
+        name: 'English',
+        code: 'en',
+        dir: 'LTR',
+    };
+
+    // State only accepts string values,
+    // so we need to stringify the language object
+    const [defaultLanguage, setDefaultLanguage] = useState(
+        JSON.stringify(BaseLanguage),
+    );
 
     // Retrieve the stored current language value
     const getDefaultLanguage = async (item: string) => {
         try {
             const value = await AsyncStorage.getItem(item);
 
+            // Check that value exists then
+            // parse and return the language object
             if (value !== null) {
-                return value;
+                return JSON.parse(value);
             }
         } catch (e) {
             console.error(
@@ -54,9 +68,14 @@ const Language = () => {
     };
 
     // Update the Async stored language value
-    const updateDefaultLanguage = async (item: string, value: string) => {
+    const updateDefaultLanguage = async (
+        item: string,
+        languageObject: LanguageType,
+    ) => {
         try {
-            await AsyncStorage.setItem(item, value);
+            // We need to stringify the language object
+            // as AsyncStore data must be string not an object
+            await AsyncStorage.setItem(item, JSON.stringify(languageObject));
         } catch (e) {
             console.error(
                 '[AsyncStorage] (Language settings) Error saving data: ',
@@ -66,25 +85,28 @@ const Language = () => {
     };
 
     // Update the language value
-    const updateLanguage = useCallback(async (value: string) => {
-        setDefaultLanguage(value);
-        updateDefaultLanguage('defaultLanguage', value);
+    const updateLanguage = useCallback(async (languageObject: LanguageType) => {
+        // Using state fn, so must stringify updated language object
+        setDefaultLanguage(JSON.stringify(languageObject));
+        updateDefaultLanguage('defaultLanguage', languageObject);
     }, []);
 
     /// Load and set current language value data
     useEffect(() => {
-        getDefaultLanguage('defaultLanguage').then(language => {
-            if (language) {
-                setDefaultLanguage(language);
-            }
-        });
+        getDefaultLanguage('defaultLanguage').then(
+            (languageObject: LanguageType) => {
+                if (languageObject) {
+                    setDefaultLanguage(JSON.stringify(languageObject));
+                }
+            },
+        );
     });
 
     const renderItem = ({item, index}: {item: LanguageType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    updateLanguage(item.code);
+                    updateLanguage(item);
                 }}>
                 <View
                     style={[
@@ -106,7 +128,7 @@ const Language = () => {
                         style={[
                             tailwind('flex-row items-center justify-between'),
                         ]}>
-                        {defaultLanguage === item.code && (
+                        {JSON.parse(defaultLanguage).code === item.code && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
                     </View>
@@ -176,7 +198,9 @@ const Language = () => {
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Selected: {defaultLanguage}
+                            {/* We simply parse the language object */}
+                            {/* and display the language name meta for user context */}
+                            Selected: {JSON.parse(defaultLanguage).name}
                         </Text>
                     </View>
 
