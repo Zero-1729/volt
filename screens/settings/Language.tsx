@@ -37,7 +37,7 @@ const Language = () => {
     };
 
     // The default App language
-    const BaseLanguage: LanguageType = {
+    const defaultLanguage: LanguageType = {
         name: 'English',
         code: 'en',
         dir: 'LTR',
@@ -45,12 +45,12 @@ const Language = () => {
 
     // State only accepts string values,
     // so we need to stringify the language object
-    const [defaultLanguage, setDefaultLanguage] = useState(
-        JSON.stringify(BaseLanguage),
+    const [appLanguage, setAppLanguage] = useState(
+        JSON.stringify(defaultLanguage),
     );
 
     // Retrieve the stored current language value
-    const getDefaultLanguage = async (item: string) => {
+    const getAppLanguage = async (item: string) => {
         try {
             const value = await AsyncStorage.getItem(item);
 
@@ -68,7 +68,7 @@ const Language = () => {
     };
 
     // Update the Async stored language value
-    const updateDefaultLanguage = async (
+    const updateAppLanguage = async (
         item: string,
         languageObject: LanguageType,
     ) => {
@@ -87,16 +87,16 @@ const Language = () => {
     // Update the language value
     const updateLanguage = useCallback(async (languageObject: LanguageType) => {
         // Using state fn, so must stringify updated language object
-        setDefaultLanguage(JSON.stringify(languageObject));
-        updateDefaultLanguage('defaultLanguage', languageObject);
+        setAppLanguage(JSON.stringify(languageObject));
+        updateAppLanguage('appLanguage', languageObject);
     }, []);
 
     /// Load and set current language value data
     useEffect(() => {
-        getDefaultLanguage('defaultLanguage').then(
+        getAppLanguage('appLanguage').then(
             (languageObject: LanguageType) => {
                 if (languageObject) {
-                    setDefaultLanguage(JSON.stringify(languageObject));
+                    setAppLanguage(JSON.stringify(languageObject));
                 }
             },
         );
@@ -128,7 +128,7 @@ const Language = () => {
                         style={[
                             tailwind('flex-row items-center justify-between'),
                         ]}>
-                        {JSON.parse(defaultLanguage).code === item.code && (
+                        {JSON.parse(appLanguage).code === item.code && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
                     </View>
@@ -200,7 +200,7 @@ const Language = () => {
                             ]}>
                             {/* We simply parse the language object */}
                             {/* and display the language name meta for user context */}
-                            Selected: {JSON.parse(defaultLanguage).name}
+                            Selected: {JSON.parse(appLanguage).name}
                         </Text>
                     </View>
 
