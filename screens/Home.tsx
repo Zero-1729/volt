@@ -69,11 +69,12 @@ const Home = () => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 h-10 mb-3 items-center flex-row justify-between',
+                            'w-5/6 h-12 mb-3 items-center flex-row justify-between',
                         ),
                         topPlatformOffset,
                     ]}>
                     <PlainButton
+                        style={[tailwind('z-50')]}
                         onPress={() =>
                             navigation.dispatch(
                                 CommonActions.navigate({name: 'SettingsRoot'}),
@@ -88,7 +89,21 @@ const Home = () => {
 
                     <View
                         style={tailwind(
-                            'flex-row justify-between items-center -mr-1',
+                            'flex items-center z-0 left-0 right-0 absolute justify-center',
+                        )}>
+                        <Text
+                            style={[
+                                tailwind('text-base font-medium'),
+                                {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
+                            ]}>
+                            Total Balance
+                        </Text>
+                    </View>
+
+                    <View
+                        style={tailwind(
+                            'flex-row justify-between items-center z-50 -mr-1',
                         )}>
                         <PlainButton>
                             <Bell
@@ -117,28 +132,14 @@ const Home = () => {
                                 'h-2/5 w-full mb-16 items-center justify-between',
                             ),
                         ]}>
-                        <View
-                            style={tailwind(
-                                'items-center mb-6 justify-around',
-                            )}>
-                            <Text
-                                style={[
-                                    tailwind('text-base mb-2 font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
-                                Total Balance
-                            </Text>
-
-                            <Text
-                                style={[
-                                    tailwind('text-3xl font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
-                                -
-                            </Text>
-                        </View>
+                        <Text
+                            style={[
+                                tailwind('text-3xl font-medium'),
+                                {color: ColorScheme.Text.Default},
+                                Font.RobotoText,
+                            ]}>
+                            <View style={[tailwind('font-bold')]} />-
+                        </Text>
 
                         {/** Create a vertical scroll carousel for 'BaseCard */}
                         {isWalletInit ? (
