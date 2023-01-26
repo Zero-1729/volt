@@ -186,7 +186,12 @@ const Settings = () => {
                         </View>
                     </PlainButton>
 
-                    <PlainButton onPress={() => {}}>
+                    <PlainButton
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'Network'}),
+                            );
+                        }}>
                         <View
                             style={[
                                 tailwind(
