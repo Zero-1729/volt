@@ -25,6 +25,8 @@ import {
     Barcode,
 } from 'vision-camera-code-scanner-fix-55';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
@@ -97,6 +99,11 @@ const Scan = () => {
     const isFocused = useIsFocused();
     const navigation = useNavigation();
 
+    const RNHapticFeedbackOptions = {
+        enableVibrateFallback: true,
+        ignoreAndroidSystemSettings: false,
+    };
+
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
     // Else, we'll cut it out and let Camera View take over
@@ -118,6 +125,12 @@ const Scan = () => {
             for (let qr of data) {
                 console.log(`[Scanner] Detected QR Raw Data: ${qr.rawValue}`);
             }
+
+            // To highlight the successful scan, we'll trigger a success haptic
+            RNHapticFeedback.trigger(
+                'notificationSuccess',
+                RNHapticFeedbackOptions,
+            );
 
             // Head back home after attempted scan
             // TODO: Gracefully return with scanned data
