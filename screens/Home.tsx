@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Platform, StyleSheet, Text, useColorScheme, View} from 'react-native';
 
@@ -7,6 +7,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import tailwind from 'tailwind-rn';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Dots from './../assets/svg/kebab-horizontal-24.svg';
 import Bell from './../assets/svg/bell-fill-24.svg';
@@ -40,6 +42,9 @@ const Home = () => {
             birthday: new Date(),
         },
     ];
+
+    // Whether the App is still new and has no wallets
+    const [IsWalletInitialized, setWalletInitialized] = useState(null);
 
     const defaultWallet = wallets[0];
 
@@ -86,28 +91,35 @@ const Home = () => {
                         />
                     </PlainButton>
 
-                    <View
-                        style={tailwind(
-                            'flex-row justify-between items-center -mr-1',
-                        )}>
-                        <PlainButton>
-                            <Bell
-                                width={22}
-                                fill={ColorScheme.SVG.Default}
-                                style={tailwind('mr-4')}
-                            />
-                        </PlainButton>
-                        <PlainButton
-                            onPress={() =>
-                                navigation.dispatch(
-                                    CommonActions.navigate({
-                                        name: 'WalletRoot',
-                                    }),
-                                )
-                            }>
-                            <Add width={30} fill={ColorScheme.SVG.Default} />
-                        </PlainButton>
-                    </View>
+                    {IsWalletInitialized ? (
+                        <View
+                            style={tailwind(
+                                'flex-row justify-between items-center -mr-1',
+                            )}>
+                            <PlainButton>
+                                <Bell
+                                    width={22}
+                                    fill={ColorScheme.SVG.Default}
+                                    style={tailwind('mr-4')}
+                                />
+                            </PlainButton>
+                            <PlainButton
+                                onPress={() =>
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'WalletRoot',
+                                        }),
+                                    )
+                                }>
+                                <Add
+                                    width={30}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </PlainButton>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </View>
 
                 <View style={[tailwind('w-5/6 justify-around h-5/6')]}>
