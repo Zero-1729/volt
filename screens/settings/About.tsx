@@ -9,6 +9,8 @@ import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+
 import tailwind from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
@@ -29,6 +31,11 @@ const About = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const RNHapticFeedbackOptions = {
+        enableVibrateFallback: true,
+        ignoreAndroidSystemSettings: false,
+    };
 
     return (
         <SafeAreaView>
@@ -174,6 +181,11 @@ const About = () => {
                     ]}>
                     <PlainButton
                         onPress={() => {
+                            RNHapticFeedback.trigger(
+                                'impactLight',
+                                RNHapticFeedbackOptions,
+                            );
+
                             Linking.openURL(
                                 'https://github.com/Zero-1729/volt/',
                             );
@@ -197,6 +209,11 @@ const About = () => {
 
                     <PlainButton
                         onPress={() => {
+                            RNHapticFeedback.trigger(
+                                'impactLight',
+                                RNHapticFeedbackOptions,
+                            );
+
                             Linking.openURL(
                                 'https://github.com/Zero-1729/volt/issues/',
                             );
