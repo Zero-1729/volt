@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
@@ -17,7 +18,7 @@ import NativeBottomPadding from '../../constants/NativeWindowMetrics';
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 import Github from './../../assets/svg/mark-github-24.svg';
-import Squirel from './../../assets/svg/squirrel-24.svg';
+import Squirrel from './../../assets/svg/squirrel-24.svg';
 import VoltLogo from './../../assets/svg/volt-logo.svg';
 import VoltText from './../../assets/svg/volt-text.svg';
 
@@ -71,8 +72,10 @@ const About = () => {
                     <View
                         style={[
                             tailwind('w-full'),
-                            {height: 2},
-                            {backgroundColor: ColorScheme.HeadingBar},
+                            {
+                                height: 2,
+                                backgroundColor: ColorScheme.HeadingBar,
+                            },
                         ]}
                     />
                 </View>
@@ -199,7 +202,7 @@ const About = () => {
                             );
                         }}>
                         <View style={tailwind('flex-row items-center')}>
-                            <Squirel
+                            <Squirrel
                                 width={32}
                                 fill={ColorScheme.SVG.Default}
                                 style={tailwind('mr-2')}
