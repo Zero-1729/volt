@@ -178,7 +178,7 @@ const About = () => {
                                 'https://github.com/Zero-1729/volt/',
                             );
                         }}>
-                        <View style={tailwind('flex-row items-center mb-6')}>
+                        <View style={tailwind('flex-row items-center mb-8')}>
                             <Github
                                 width={32}
                                 fill={ColorScheme.SVG.Default}
