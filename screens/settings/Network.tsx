@@ -145,15 +145,28 @@ const Network = () => {
                                     Connect to Testnet
                                 </Text>
                                 <Checkbox
-                                    fillColor={ColorScheme.Background.Secondary}
+                                    fillColor={
+                                        ColorScheme.Background.CheckBoxFilled
+                                    }
                                     unfillColor={
-                                        ColorScheme.Background.Secondary
+                                        ColorScheme.Background.CheckBoxUnfilled
                                     }
                                     size={18}
                                     isChecked={IsTestnet}
-                                    style={tailwind(
-                                        'flex-row absolute -right-4',
-                                    )}
+                                    iconStyle={{
+                                        borderWidth: 1,
+                                        borderRadius: 2,
+                                    }}
+                                    innerIconStyle={{
+                                        borderWidth: 1,
+                                        borderColor:
+                                            ColorScheme.Background
+                                                .CheckBoxOutline,
+                                        borderRadius: 2,
+                                    }}
+                                    style={[
+                                        tailwind('flex-row absolute -right-4'),
+                                    ]}
                                     onPress={() => {
                                         RNHapticFeedback.trigger(
                                             'rigid',
