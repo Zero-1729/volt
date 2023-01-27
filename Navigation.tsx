@@ -28,6 +28,7 @@ import Settings from './screens/settings/Settings';
 
 import Language from './screens/settings/Language';
 import Currency from './screens/settings/Currency';
+import Network from './screens/settings/Network';
 
 import About from './screens/settings/About';
 import License from './screens/settings/License';
@@ -44,6 +45,7 @@ const SettingsRoot = () => {
             <SettingsStack.Screen name="Settings" component={Settings} />
             <SettingsStack.Screen name="Currency" component={Currency} />
             <SettingsStack.Screen name="Language" component={Language} />
+            <SettingsStack.Screen name="Network" component={Network} />
             <SettingsStack.Screen name="About" component={About} />
             <SettingsStack.Screen name="License" component={License} />
             <SettingsStack.Screen name="Release" component={Release} />
