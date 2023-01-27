@@ -19,7 +19,7 @@ import InfoIcon from './../../assets/svg/info-16.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const Import = () => {
+const Add = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -184,7 +184,7 @@ const Import = () => {
     );
 };
 
-export default Import;
+export default Add;
 
 const styles = StyleSheet.create({
     cardShadow: {

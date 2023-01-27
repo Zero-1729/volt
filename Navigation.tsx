@@ -14,7 +14,7 @@ import QRIcon from './assets/svg/scan.svg';
 import Home from './screens/Home';
 
 // Wallet screens
-import Import from './screens/wallet/Import';
+import Add from './screens/wallet/Add';
 import RestoreActions from './screens/wallet/RestoreActions';
 import CreateActions from './screens/wallet/CreateActions';
 
@@ -66,7 +66,7 @@ const WalletStack = createNativeStackNavigator();
 const WalletRoot = () => {
     return (
         <WalletStack.Navigator screenOptions={{headerShown: false}}>
-            <WalletStack.Screen name="Import" component={Import} />
+            <WalletStack.Screen name="Add" component={Add} />
             <WalletStack.Screen
                 name="RestoreActions"
                 component={RestoreActions}

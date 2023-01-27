@@ -18,7 +18,7 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const ImportAction = () => {
+const CreateAction = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -111,6 +111,6 @@ const ImportAction = () => {
     );
 };
 
-export default ImportAction;
+export default CreateAction;
 
 const styles = StyleSheet.create({});
