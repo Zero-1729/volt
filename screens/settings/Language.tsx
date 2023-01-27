@@ -78,8 +78,7 @@ const Language = () => {
             await AsyncStorage.setItem(item, JSON.stringify(languageObject));
         } catch (e) {
             console.error(
-                '[AsyncStorage] (Language settings) Error saving data: ',
-                e,
+                `[AsyncStorage] (Language settings) Error saving data: ${e}`,
             );
         }
     };

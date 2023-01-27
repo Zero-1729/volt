@@ -63,8 +63,7 @@ const Currency = () => {
             }
         } catch (e) {
             console.error(
-                '[AsyncStorage] (Currency setting) Error loading data: ',
-                e,
+                `[AsyncStorage] (Currency setting) Error loading data: ${e}`,
             );
         }
     };
