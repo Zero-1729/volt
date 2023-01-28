@@ -7,6 +7,10 @@ import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import Crypto from 'crypto';
+
 import tailwind from 'tailwind-rn';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
@@ -24,6 +28,18 @@ const CreateAction = () => {
     const ColorScheme = Color(useColorScheme());
 
     const [newWalletName, setNewWalletName] = useState('');
+
+    const generateWalletId = async () => {
+        // Generates a new wallet ID and stores it in AsyncStorage
+        // ID format: '139baf24-0049-416b-91d7-4b59966fbd3e'
+        const walletID = Crypto.randomUUID();
+
+        try {
+            await AsyncStorage.setItem('currentWalletID', walletID);
+        } catch (e) {
+            console.error(`[AsyncStorage] Error setting new wallet ID: ${e}`);
+        }
+    };
 
     const onBlur = () => {
         const valueWithSingleWhitespace = newWalletName.replace(
