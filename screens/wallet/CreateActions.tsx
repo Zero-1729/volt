@@ -5,6 +5,8 @@ import {useColorScheme, StyleSheet, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
+import {CommonActions} from '@react-navigation/native';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -50,6 +52,13 @@ const CreateAction = () => {
 
         // Generate and set a new wallet ID
         generateWalletId();
+
+        // Navigate to the wallet screen
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'Home',
+            }),
+        );
     };
 
     const onBlur = () => {
@@ -121,6 +130,9 @@ const CreateAction = () => {
                 </View>
 
                 <LongBottomButton
+                    onPress={() => {
+                        updateWalletName(newWalletName);
+                    }}
                     title={'Continue'}
                     textColor={
                         newWalletName.trim().length > 0
