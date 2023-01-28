@@ -151,30 +151,6 @@ const Settings = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Wallet
-                            </Text>
-
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
-                        </View>
-                    </PlainButton>
-
-                    <PlainButton onPress={() => {}}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-6',
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
                                 Security
                             </Text>
 
@@ -215,34 +191,10 @@ const Settings = () => {
                         </View>
                     </PlainButton>
 
-                    <PlainButton onPress={() => {}}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-6',
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
-                                Tools
-                            </Text>
-
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
-                        </View>
-                    </PlainButton>
-
                     <View
                         style={[
                             tailwind(
-                                'items-center flex-row justify-between mt-2',
+                                'items-center flex-row justify-between mt-4',
                             ),
                         ]}>
                         <PlainButton
