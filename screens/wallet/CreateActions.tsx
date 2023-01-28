@@ -23,15 +23,15 @@ const CreateAction = () => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const [walletName, setWalletName] = useState('');
+    const [newWalletName, setNewWalletName] = useState('');
 
     const onBlur = () => {
-        const valueWithSingleWhitespace = walletName.replace(
+        const valueWithSingleWhitespace = newWalletName.replace(
             /^\s+|\s+$|\s+(?=\s)/g,
             '',
         );
 
-        setWalletName(valueWithSingleWhitespace);
+        setNewWalletName(valueWithSingleWhitespace);
 
         return valueWithSingleWhitespace;
     };
@@ -86,7 +86,7 @@ const CreateAction = () => {
                         ]}>
                         <TextSingleInput
                             placeholder={'Enter Wallet name'}
-                            onChangeText={setWalletName}
+                            onChangeText={setNewWalletName}
                             onBlur={onBlur}
                             color={ColorScheme.Text.Default}
                         />
@@ -96,12 +96,12 @@ const CreateAction = () => {
                 <LongBottomButton
                     title={'Continue'}
                     textColor={
-                        walletName.trim().length > 0
+                        newWalletName.trim().length > 0
                             ? ColorScheme.Text.Alt
                             : ColorScheme.Text.GrayedText
                     }
                     backgroundColor={
-                        walletName.trim().length > 0
+                        newWalletName.trim().length > 0
                             ? ColorScheme.Background.Inverted
                             : ColorScheme.Background.Secondary
                     }
