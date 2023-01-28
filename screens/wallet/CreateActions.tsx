@@ -73,10 +73,10 @@ const CreateAction = () => {
 
                     <Text
                         style={[
-                            tailwind('text-sm mt-2'),
+                            tailwind('text-xs mt-2'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
-                        Defaults to SegWit (bech32)
+                        Defaults to SegWit Native (address starts with 'bc1')
                     </Text>
 
                     <View
