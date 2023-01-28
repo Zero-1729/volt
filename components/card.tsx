@@ -36,7 +36,7 @@ export const EmptyCard = () => {
                 style={[tailwind('w-full h-48 p-6 rounded-md z-30'), altGray]}>
                 <Text
                     style={[
-                        tailwind('text-lg w-full text-left mb-4 font-medium'),
+                        tailwind('text-lg w-full text-left mb-2 font-medium'),
                         {color: ColorScheme.Text.Default},
                         Font.RobotoText,
                     ]}>
@@ -44,15 +44,15 @@ export const EmptyCard = () => {
                 </Text>
                 <Text
                     style={[
-                        tailwind('text-xs w-full text-left mb-4'),
+                        tailwind('text-xs w-full text-left'),
                         {color: ColorScheme.Text.DescText},
                         Font.RobotoText,
                     ]}>
-                    Click 'add' button below or '+' icon above to create a new
-                    wallet
+                    Click the 'add' button to create a new wallet
                 </Text>
 
                 <Button
+                    style={[tailwind('absolute bottom-0 left-6 w-full')]}
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({name: 'WalletRoot'}),
