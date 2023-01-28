@@ -41,6 +41,17 @@ const CreateAction = () => {
         }
     };
 
+    const updateWalletName = async (walletName: string) => {
+        try {
+            await AsyncStorage.setItem('currentWalletName', walletName);
+        } catch (e) {
+            console.error(`[AsyncStorage] Error setting new wallet name: ${e}`);
+        }
+
+        // Generate and set a new wallet ID
+        generateWalletId();
+    };
+
     const onBlur = () => {
         const valueWithSingleWhitespace = newWalletName.replace(
             /^\s+|\s+$|\s+(?=\s)/g,
