@@ -12,6 +12,8 @@ import {WalletCardProps} from '../types/props';
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
+import {addCommas} from '../modules/transform';
+
 export const EmptyCard = () => {
     const navigation = useNavigation();
 
@@ -127,7 +129,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View style={[tailwind('flex-row items-center')]}>
                         <Text
                             style={[
-                                tailwind('text-4xl mr-2 pt-2'),
+                                tailwind('text-3xl mr-2 pt-2'),
                                 {color: ColorScheme.Text.Default},
                                 Font.SatSymbol,
                             ]}>
@@ -136,11 +138,11 @@ export const WalletCard = (props: WalletCardProps) => {
 
                         <Text
                             style={[
-                                tailwind('text-4xl pt-1 self-center'),
+                                tailwind('text-3xl pt-1 self-center'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            {props.walletBalance}
+                            {addCommas(props.walletBalance)}
                         </Text>
                     </View>
                 </PlainButton>
