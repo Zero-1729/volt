@@ -22,6 +22,8 @@ import Font from '../constants/Font';
 import {PlainButton} from '../components/button';
 import {EmptyCard, WalletCard} from '../components/card';
 
+import {addCommas} from '../modules/transform';
+
 import {BaseWalletType} from '../types/wallet';
 
 const Home = () => {
@@ -42,6 +44,12 @@ const Home = () => {
             birthday: new Date(),
         },
     ];
+
+    // add the total balances of the wallets
+    const totalBalance = wallets.reduce(
+        (accumulator, currentValue) => accumulator + currentValue.balance,
+        0,
+    );
 
     // Whether the App is still new and has no wallets
     const [IsWalletInitialized, setWalletInitialized] = useState(null);
@@ -148,7 +156,7 @@ const Home = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                -
+                                {addCommas(totalBalance)}
                             </Text>
                         </View>
 
