@@ -63,7 +63,10 @@ const Wallet = () => {
     const setHide = async (value: Boolean) => {
         try {
             // Must transform value to string before saving in AsyncStore
-            await AsyncStorage.setItem('hideBalance', JSON.stringify(value));
+            await AsyncStorage.setItem(
+                'isBalanceHidden',
+                JSON.stringify(value),
+            );
 
             // State already in Boolean, so no need to transform
             setHideBalance(value);
@@ -74,9 +77,9 @@ const Wallet = () => {
         }
     };
 
-    // Load the current value of 'hideBalance' on mount
+    // Load the current value of 'isBalanceHidden' on mount
     useEffect(() => {
-        getHideTotalWalletBalance('hideBalance');
+        getHideTotalWalletBalance('isBalanceHidden');
     }, [hideBalance]);
 
     return (
