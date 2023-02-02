@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 
 import {useColorScheme, StyleSheet, Text, View} from 'react-native';
 
@@ -9,7 +9,7 @@ import {CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AppStorageContext} from '../../class/storageContext';
 
 import Crypto from 'crypto';
 
@@ -29,29 +29,32 @@ const CreateAction = () => {
 
     const ColorScheme = Color(useColorScheme());
 
+    const {isWalletInitialized, setWalletInitialized, setCurrentWalletName} =
+        useContext(AppStorageContext);
+
     const [newWalletName, setNewWalletName] = useState('');
 
     const generateWalletId = async () => {
         // Generates a new wallet ID and stores it in AsyncStorage
         // ID format: '139baf24-0049-416b-91d7-4b59966fbd3e'
-        const walletID = Crypto.randomUUID();
-
-        try {
-            await AsyncStorage.setItem('currentWalletID', walletID);
-        } catch (e) {
-            console.error(`[AsyncStorage] Error setting new wallet ID: ${e}`);
-        }
+        // const walletID = Crypto.randomUUID();
+        // try {
+        //     await AsyncStorage.setItem('currentWalletID', walletID);
+        // } catch (e) {
+        //     console.error(`[AsyncStorage] Error setting new wallet ID: ${e}`);
+        // }
     };
 
     const updateWalletName = async (walletName: string) => {
-        try {
-            await AsyncStorage.setItem('currentWalletName', walletName);
-        } catch (e) {
-            console.error(`[AsyncStorage] Error setting new wallet name: ${e}`);
-        }
+        setCurrentWalletName(walletName);
 
         // Generate and set a new wallet ID
-        generateWalletId();
+        // generateWalletId();
+
+        // Indicate that the wallet has been created
+        if (!isWalletInitialized) {
+            setWalletInitialized(true);
+        }
 
         // Navigate to the wallet screen
         navigation.dispatch(
