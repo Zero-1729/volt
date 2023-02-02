@@ -27,10 +27,16 @@ export const AppStorageProvider = ({children}) => {
     // States and async storage get and setters
     const [appLanguage, _setAppLanguage] = useState(defaultAppLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(defaultFiatCurrency);
+    // Will change to false once app in Beta version
+    const [hideTotalBalance, _setTotalBalanceHidden] = useState(false);
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
         useAsyncStorage('appFiatCurrency');
+    const {
+        getItem: _getTotalBalanceHidden,
+        setItem: _updateTotalBalanceHidden,
+    } = useAsyncStorage('hideTotalBalance');
 
     // Create functions for getting, setting, and other manipulation of data
     const setAppLanguage = useCallback(
@@ -61,6 +67,20 @@ export const AppStorageProvider = ({children}) => {
         [_setFiatCurrency, _updateFiatCurrency],
     );
 
+    const setTotalBalanceHidden = useCallback(
+        async (hide: boolean) => {
+            try {
+                _setTotalBalanceHidden(hide);
+                _updateTotalBalanceHidden(JSON.stringify(hide));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Hide Total balance setting) Error loading data: ${e}`,
+                );
+            }
+        },
+        [_setTotalBalanceHidden, _updateTotalBalanceHidden],
+    );
+
     // Add effects
     useEffect(() => {
         _getAppLanguage();
@@ -68,6 +88,10 @@ export const AppStorageProvider = ({children}) => {
 
     useEffect(() => {
         _getFiatCurrency();
+    });
+
+    useEffect(() => {
+        _getTotalBalanceHidden();
     });
 
     // Return provider
@@ -78,6 +102,8 @@ export const AppStorageProvider = ({children}) => {
                 setAppLanguage,
                 appFiatCurrency,
                 setAppFiatCurrency,
+                hideTotalBalance,
+                setTotalBalanceHidden,
             }}>
             {children}
         </AppStorageContext.Provider>
