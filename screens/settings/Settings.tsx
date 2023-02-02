@@ -252,8 +252,11 @@ const Settings = () => {
 
                 {isDevMode ? (
                     <PlainButton
+                        disabled={!IsWalletInitialized}
                         onPress={() => {
-                            resetAppData();
+                            if (IsWalletInitialized) {
+                                resetAppData();
+                            }
                         }}
                         style={[tailwind('absolute bottom-20 items-center')]}>
                         <Text
