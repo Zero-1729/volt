@@ -29,6 +29,7 @@ export const AppStorageProvider = ({children}) => {
     const [appFiatCurrency, _setFiatCurrency] = useState(defaultFiatCurrency);
     // Will change to false once app in Beta version
     const [hideTotalBalance, _setTotalBalanceHidden] = useState(false);
+    const [IsWalletInitialized, _setWalletInitialized] = useState(false);
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -37,6 +38,8 @@ export const AppStorageProvider = ({children}) => {
         getItem: _getTotalBalanceHidden,
         setItem: _updateTotalBalanceHidden,
     } = useAsyncStorage('hideTotalBalance');
+    const {getItem: _getWalletInitialized, setItem: _updateWalletInitialized} =
+        useAsyncStorage('isWalletInitialized');
 
     // Create functions for getting, setting, and other manipulation of data
     const setAppLanguage = useCallback(
@@ -81,6 +84,20 @@ export const AppStorageProvider = ({children}) => {
         [_setTotalBalanceHidden, _updateTotalBalanceHidden],
     );
 
+    const setWalletInitialized = useCallback(
+        async (initialized: boolean) => {
+            try {
+                _setWalletInitialized(initialized);
+                _updateWalletInitialized(JSON.stringify(initialized));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Wallet initialized setting) Error loading data: ${e}`,
+                );
+            }
+        },
+        [_updateWalletInitialized, _setWalletInitialized],
+    );
+
     // Add effects
     useEffect(() => {
         _getAppLanguage();
@@ -94,6 +111,10 @@ export const AppStorageProvider = ({children}) => {
         _getTotalBalanceHidden();
     });
 
+    useEffect(() => {
+        _getWalletInitialized();
+    });
+
     // Return provider
     return (
         <AppStorageContext.Provider
@@ -104,6 +125,8 @@ export const AppStorageProvider = ({children}) => {
                 setAppFiatCurrency,
                 hideTotalBalance,
                 setTotalBalanceHidden,
+                IsWalletInitialized,
+                setWalletInitialized,
             }}>
             {children}
         </AppStorageContext.Provider>
