@@ -31,14 +31,14 @@ const Home = () => {
 
     const navigation = useNavigation();
 
-    const {hideTotalBalance, IsWalletInitialized} =
+    const {hideTotalBalance, IsWalletInitialized, currentWalletName} =
         useContext(AppStorageContext);
 
     // List of created wallets from DB store
     // Load all wallets from DB on startup
     const wallets: Array<BaseWalletType> = [
         {
-            name: 'Dummy Wallet',
+            name: currentWalletName,
             balance: 2600043,
             UTXOs: [],
             isWatchOnly: true,
