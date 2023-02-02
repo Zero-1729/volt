@@ -168,6 +168,21 @@ export const AppStorageProvider = ({children}) => {
         }
     };
 
+    // Resets app data
+    const resetAppData = useCallback(async () => {
+        try {
+            await setAppLanguage(defaultAppLanguage);
+            await setAppFiatCurrency(defaultFiatCurrency);
+            await setTotalBalanceHidden(false);
+            await setWalletInitialized(false);
+            await setCurrentWalletName('');
+        } catch (e) {
+            console.error(
+                `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
+            );
+        }
+    }, []);
+
     // Add effects
     // Load settings from disk on app start
     useEffect(() => {
@@ -204,6 +219,7 @@ export const AppStorageProvider = ({children}) => {
                 setWalletInitialized,
                 currentWalletName,
                 setCurrentWalletName,
+                resetAppData,
             }}>
             {children}
         </AppStorageContext.Provider>
