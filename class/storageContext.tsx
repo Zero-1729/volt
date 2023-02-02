@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // Import all data for use with Realm
 // Include all data intended to use for context throughout App lifecycle
 // export common reffed data in screens
@@ -25,12 +26,14 @@ export const AppStorageProvider = ({children}) => {
     };
 
     // States and async storage get and setters
+    // |> States and async storage get and setters
     const [appLanguage, _setAppLanguage] = useState(defaultAppLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(defaultFiatCurrency);
     // Will change to false once app in Beta version
     const [hideTotalBalance, _setTotalBalanceHidden] = useState(false);
     const [IsWalletInitialized, _setWalletInitialized] = useState(false);
     const [currentWalletName, _setCurrentWalletName] = useState('');
+
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -44,12 +47,12 @@ export const AppStorageProvider = ({children}) => {
     const {getItem: _getCurrentWalletName, setItem: _updateCurrentWalletName} =
         useAsyncStorage('currentWalletName');
 
-    // Create functions for getting, setting, and other manipulation of data
+    // |> Create functions for getting, setting, and other data manipulation
     const setAppLanguage = useCallback(
         async (languageObject: LanguageType) => {
             try {
-                _setAppLanguage(languageObject);
-                _updateAppLanguage(JSON.stringify(languageObject));
+                await _setAppLanguage(languageObject);
+                await _updateAppLanguage(JSON.stringify(languageObject));
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Language setting) Error loading data: ${e} [${languageObject}]`,
@@ -58,6 +61,16 @@ export const AppStorageProvider = ({children}) => {
         },
         [_setAppLanguage, _updateAppLanguage],
     );
+
+    const _loadAppLanguage = async () => {
+        const lang = await _getAppLanguage();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (lang !== null) {
+            _setAppLanguage(JSON.parse(lang));
+        }
+    };
 
     const setAppFiatCurrency = useCallback(
         async (currency: CurrencyType) => {
@@ -73,6 +86,16 @@ export const AppStorageProvider = ({children}) => {
         [_setFiatCurrency, _updateFiatCurrency],
     );
 
+    const _loadFiatCurrency = async () => {
+        const fiat = await _getFiatCurrency();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (fiat !== null) {
+            _setFiatCurrency(JSON.parse(fiat));
+        }
+    };
+
     const setTotalBalanceHidden = useCallback(
         async (hide: boolean) => {
             try {
@@ -86,6 +109,16 @@ export const AppStorageProvider = ({children}) => {
         },
         [_setTotalBalanceHidden, _updateTotalBalanceHidden],
     );
+
+    const _loadTotalBalanceHidden = async () => {
+        const isHidden = await _getTotalBalanceHidden();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (isHidden !== null) {
+            _setTotalBalanceHidden(JSON.parse(isHidden));
+        }
+    };
 
     const setWalletInitialized = useCallback(
         async (initialized: boolean) => {
@@ -101,11 +134,21 @@ export const AppStorageProvider = ({children}) => {
         [_updateWalletInitialized, _setWalletInitialized],
     );
 
+    const _loadWalletInitialized = async () => {
+        const init = await _getWalletInitialized();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (init !== null) {
+            _setWalletInitialized(JSON.parse(init));
+        }
+    };
+
     const setCurrentWalletName = useCallback(
         async (walletName: string) => {
             try {
                 _setCurrentWalletName(walletName);
-                _updateCurrentWalletName(JSON.stringify(walletName));
+                _updateCurrentWalletName(walletName);
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Current wallet name setting) Error loading data: ${e}`,
@@ -115,26 +158,37 @@ export const AppStorageProvider = ({children}) => {
         [_updateCurrentWalletName, _setCurrentWalletName],
     );
 
+    const _loadCurrentWalletName = async () => {
+        const name = await _getCurrentWalletName();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (name !== null) {
+            _setCurrentWalletName(name);
+        }
+    };
+
     // Add effects
+    // Load settings from disk on app start
     useEffect(() => {
-        _getAppLanguage();
-    });
+        _loadAppLanguage();
+    }, []);
 
     useEffect(() => {
-        _getFiatCurrency();
-    });
+        _loadFiatCurrency();
+    }, []);
 
     useEffect(() => {
-        _getTotalBalanceHidden();
-    });
+        _loadTotalBalanceHidden();
+    }, []);
 
     useEffect(() => {
-        _getWalletInitialized();
-    });
+        _loadWalletInitialized();
+    }, []);
 
     useEffect(() => {
-        _getCurrentWalletName();
-    });
+        _loadCurrentWalletName();
+    }, []);
 
     // Return provider
     return (
