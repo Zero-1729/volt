@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 
 import {Platform, StyleSheet, Text, useColorScheme, View} from 'react-native';
 
@@ -8,7 +8,7 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import tailwind from 'tailwind-rn';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AppStorageContext} from '../class/storageContext';
 
 import Dots from './../assets/svg/kebab-horizontal-24.svg';
 import Bell from './../assets/svg/bell-fill-24.svg';
@@ -29,9 +29,13 @@ import {BaseWalletType} from '../types/wallet';
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
 
-    const isWalletInit = false; // Should be from async store
+    const navigation = useNavigation();
 
-    // List of created wallets from async store
+    const {hideTotalBalance, IsWalletInitialized} =
+        useContext(AppStorageContext);
+
+    // List of created wallets from DB store
+    // Load all wallets from DB on startup
     const wallets: Array<BaseWalletType> = [
         {
             name: 'Dummy Wallet',
@@ -51,9 +55,6 @@ const Home = () => {
         0,
     );
 
-    // Whether the App is still new and has no wallets
-    const [IsWalletInitialized, setWalletInitialized] = useState(null);
-
     const defaultWallet = wallets[0];
 
     const DarkGrayText = {
@@ -69,8 +70,6 @@ const Home = () => {
     const topPlatformOffset = {
         marginTop: Platform.OS === 'android' ? 12 : 0,
     };
-
-    const navigation = useNavigation();
 
     return (
         <SafeAreaView>
@@ -139,7 +138,7 @@ const Home = () => {
                         ]}>
                         <View
                             style={tailwind(
-                                'items-center mb-6 justify-around',
+                                'items-center mb-6 justify-around w-full',
                             )}>
                             <Text
                                 style={[
@@ -150,23 +149,50 @@ const Home = () => {
                                 Total Balance
                             </Text>
 
-                            <Text
-                                style={[
-                                    tailwind('text-3xl font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
-                                {addCommas(totalBalance)}
-                            </Text>
+                            {!IsWalletInitialized ? (
+                                <Text>-</Text>
+                            ) : (
+                                <>
+                                    {!hideTotalBalance ? (
+                                        <Text
+                                            style={[
+                                                tailwind(
+                                                    'text-3xl font-medium',
+                                                ),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                                Font.RobotoText,
+                                            ]}>
+                                            {addCommas(totalBalance)}
+                                        </Text>
+                                    ) : (
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'rounded-sm w-3/4 h-8 flex-row items-center',
+                                                ),
+                                                {
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Greyed,
+                                                },
+                                            ]}
+                                        />
+                                    )}
+                                </>
+                            )}
                         </View>
 
                         {/** Create a vertical scroll carousel for 'BaseCard */}
-                        {isWalletInit ? (
+                        {IsWalletInitialized ? (
                             <WalletCard
                                 isWatchOnly={defaultWallet.isWatchOnly}
                                 label={defaultWallet.name}
                                 walletBalance={defaultWallet.balance}
                                 walletType={defaultWallet.type}
+                                hideBalance={hideTotalBalance}
                             />
                         ) : (
                             <EmptyCard />
