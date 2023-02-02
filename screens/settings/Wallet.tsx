@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
@@ -9,13 +9,13 @@ import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import Checkbox from 'react-native-bouncy-checkbox';
 
 import tailwind from 'tailwind-rn';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import {PlainButton} from '../../components/button';
 
@@ -39,48 +39,8 @@ const Wallet = () => {
         ignoreAndroidSystemSettings: false,
     };
 
-    // Will change to false once app in Beta version
-    const [hideBalance, setHideBalance] = useState(false);
-
-    // Retrieve whether app connect to Testnet or Mainnet
-    const getHideTotalWalletBalance = async (item: string) => {
-        try {
-            const value = await AsyncStorage.getItem(item);
-
-            // We only want to set the state if the value exists
-            // Need to convert value back to Boolean
-            if (value !== null) {
-                setHideBalance(JSON.parse(value));
-            }
-        } catch (e) {
-            console.error(
-                `[AsyncStorage] (Wallet settings) Error saving data: ${e}`,
-            );
-        }
-    };
-
-    // Set whether app connect to Testnet or not
-    const setHide = async (value: Boolean) => {
-        try {
-            // Must transform value to string before saving in AsyncStore
-            await AsyncStorage.setItem(
-                'isBalanceHidden',
-                JSON.stringify(value),
-            );
-
-            // State already in Boolean, so no need to transform
-            setHideBalance(value);
-        } catch (e) {
-            console.error(
-                `[AsyncStorage] (Wallet settings) Error saving data: ${e}`,
-            );
-        }
-    };
-
-    // Load the current value of 'isBalanceHidden' on mount
-    useEffect(() => {
-        getHideTotalWalletBalance('isBalanceHidden');
-    }, [hideBalance]);
+    const {hideTotalBalance, setTotalBalanceHidden} =
+        useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -155,7 +115,7 @@ const Wallet = () => {
                                         ColorScheme.Background.CheckBoxUnfilled
                                     }
                                     size={18}
-                                    isChecked={hideBalance}
+                                    isChecked={hideTotalBalance}
                                     iconStyle={{
                                         borderWidth: 1,
                                         borderRadius: 2,
@@ -176,7 +136,9 @@ const Wallet = () => {
                                             RNHapticFeedbackOptions,
                                         );
 
-                                        setHide(!hideBalance);
+                                        setTotalBalanceHidden(
+                                            !hideTotalBalance,
+                                        );
                                     }}
                                     disableBuiltInState={true}
                                 />
