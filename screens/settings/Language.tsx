@@ -1,16 +1,18 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import languages from '../../loc/languages';
+
+import {LanguageType} from '../../types/settings';
 
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import tailwind from 'tailwind-rn';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import {PlainButton} from '../../components/button';
 
@@ -30,80 +32,14 @@ const Language = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    type LanguageType = {
-        name: string;
-        code: string;
-        dir: string;
-    };
-
-    // The default App language
-    const defaultLanguage: LanguageType = {
-        name: 'English',
-        code: 'en',
-        dir: 'LTR',
-    };
-
-    // State only accepts string values,
-    // so we need to stringify the language object
-    const [appLanguage, setAppLanguage] = useState(
-        JSON.stringify(defaultLanguage),
-    );
-
-    // Retrieve the stored current language value ('appLanguage')
-    const getAppLanguage = async (item: string) => {
-        try {
-            const value = await AsyncStorage.getItem(item);
-
-            // Check that value exists then
-            // parse and return the language object
-            if (value !== null) {
-                return JSON.parse(value);
-            }
-        } catch (e) {
-            console.error(
-                '[AsyncStorage] (Language setting) Error loading data: ',
-                e,
-            );
-        }
-    };
-
-    // Update the Async stored language value
-    const updateAppLanguage = async (
-        item: string,
-        languageObject: LanguageType,
-    ) => {
-        try {
-            // We need to stringify the language object
-            // as AsyncStore data must be string not an object
-            await AsyncStorage.setItem(item, JSON.stringify(languageObject));
-        } catch (e) {
-            console.error(
-                `[AsyncStorage] (Language settings) Error saving data: ${e}`,
-            );
-        }
-    };
-
-    // Update the language value state and AsyncStore
-    const updateLanguage = useCallback(async (languageObject: LanguageType) => {
-        // Using state fn, so must stringify updated language object
-        setAppLanguage(JSON.stringify(languageObject));
-        updateAppLanguage('appLanguage', languageObject);
-    }, []);
-
-    // Load and set current language value data
-    useEffect(() => {
-        getAppLanguage('appLanguage').then((languageObject: LanguageType) => {
-            if (languageObject) {
-                setAppLanguage(JSON.stringify(languageObject));
-            }
-        });
-    });
+    // Retrieved from general App context provider
+    const {appLanguage, setAppLanguage} = useContext(AppStorageContext);
 
     const renderItem = ({item, index}: {item: LanguageType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    updateLanguage(item);
+                    setAppLanguage(item);
                 }}>
                 <View
                     style={[
@@ -125,7 +61,7 @@ const Language = () => {
                         style={[
                             tailwind('flex-row items-center justify-between'),
                         ]}>
-                        {JSON.parse(appLanguage).code === item.code && (
+                        {appLanguage.code === item.code && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
                     </View>
@@ -197,7 +133,7 @@ const Language = () => {
                             ]}>
                             {/* We simply parse the language object */}
                             {/* and display the language name meta for user context */}
-                            Selected: {JSON.parse(appLanguage).name}
+                            Selected: {appLanguage.name}
                         </Text>
                     </View>
 
