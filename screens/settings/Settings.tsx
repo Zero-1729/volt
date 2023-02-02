@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
@@ -7,6 +7,8 @@ import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import tailwind from 'tailwind-rn';
 
@@ -29,6 +31,8 @@ const Settings = () => {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
     };
+
+    const {appLanguage, appFiatCurrency} = useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -95,7 +99,18 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[tailwind('flex-row justify-between')]}>
+                                style={[
+                                    tailwind(
+                                        'flex-row justify-between items-center',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-xs mr-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {`${appFiatCurrency.short} (${appFiatCurrency.symbol})`}
+                                </Text>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}
@@ -128,7 +143,18 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[tailwind('flex-row justify-between')]}>
+                                style={[
+                                    tailwind(
+                                        'flex-row justify-between items-center',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-xs mr-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {appLanguage.name}
+                                </Text>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}
