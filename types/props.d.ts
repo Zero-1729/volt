@@ -47,6 +47,7 @@ type WalletCardProps = CardProps & {
     walletBalance: number;
     walletType: string;
     isWatchOnly: boolean;
+    hideBalance: boolean;
 };
 
 // Base Text Input Prop Type (for reuse)
