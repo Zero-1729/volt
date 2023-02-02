@@ -121,31 +121,45 @@ export const WalletCard = (props: WalletCardProps) => {
                     {props.walletType}
                 </Text>
 
-                <PlainButton
-                    style={[tailwind('absolute bottom-8 left-6')]}
-                    onPress={() => {
-                        /* Toggle between sats/BTC/currency */
-                    }}>
-                    <View style={[tailwind('flex-row items-center')]}>
-                        <Text
-                            style={[
-                                tailwind('text-3xl mr-2 pt-2'),
-                                {color: ColorScheme.Text.Default},
-                                Font.SatSymbol,
-                            ]}>
-                            S
-                        </Text>
+                {!props.hideBalance ? (
+                    <PlainButton
+                        style={[tailwind('absolute bottom-8 left-6')]}
+                        onPress={() => {
+                            /* Toggle between sats/BTC/currency */
+                        }}>
+                        <View style={[tailwind('flex-row items-center')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-3xl mr-2 pt-2'),
+                                    {color: ColorScheme.Text.Default},
+                                    Font.SatSymbol,
+                                ]}>
+                                S
+                            </Text>
 
-                        <Text
-                            style={[
-                                tailwind('text-3xl pt-1 self-center'),
-                                {color: ColorScheme.Text.Default},
-                                Font.RobotoText,
-                            ]}>
-                            {addCommas(props.walletBalance)}
-                        </Text>
-                    </View>
-                </PlainButton>
+                            <Text
+                                style={[
+                                    tailwind('text-3xl pt-1 self-center'),
+                                    {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
+                                ]}>
+                                {addCommas(props.walletBalance)}
+                            </Text>
+                        </View>
+                    </PlainButton>
+                ) : (
+                    <View
+                        style={[
+                            tailwind(
+                                'absolute bottom-8 left-6 rounded-sm flex-row items-center w-full h-12',
+                            ),
+                            {
+                                backgroundColor:
+                                    ColorScheme.Background.CardGreyed,
+                            },
+                        ]}
+                    />
+                )}
             </View>
         </View>
     );
