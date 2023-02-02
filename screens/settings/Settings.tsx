@@ -164,7 +164,12 @@ const Settings = () => {
                         </View>
                     </PlainButton>
 
-                    <PlainButton onPress={() => {}}>
+                    <PlainButton
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'Security'}),
+                            );
+                        }}>
                         <View
                             style={[
                                 tailwind(
@@ -207,35 +212,6 @@ const Settings = () => {
                                     Font.RobotoText,
                                 ]}>
                                 Network
-                            </Text>
-
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
-                        </View>
-                    </PlainButton>
-
-                    <PlainButton
-                        onPress={() => {
-                            navigation.dispatch(
-                                CommonActions.navigate({name: 'Wallet'}),
-                            );
-                        }}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-6',
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
-                                Wallet
                             </Text>
 
                             <Right

@@ -24,7 +24,7 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const Wallet = () => {
+const Security = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -83,7 +83,7 @@ const Wallet = () => {
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Wallet
+                            Security
                         </Text>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
@@ -149,9 +149,9 @@ const Wallet = () => {
                                     tailwind('text-xs'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                Conceal the total wallet balance displayed on
+                                Conceal the total and current wallet balances
                                 {'\n'}
-                                the home page.
+                                displayed on the home page.
                             </Text>
                         </View>
                     </View>
@@ -161,7 +161,7 @@ const Wallet = () => {
     );
 };
 
-export default Wallet;
+export default Security;
 
 const styles = StyleSheet.create({
     PaddedTop: {
