@@ -32,7 +32,13 @@ const Settings = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {appLanguage, appFiatCurrency} = useContext(AppStorageContext);
+    const {
+        appLanguage,
+        appFiatCurrency,
+        resetAppData,
+        isDevMode,
+        IsWalletInitialized,
+    } = useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -243,6 +249,27 @@ const Settings = () => {
                         </PlainButton>
                     </View>
                 </View>
+
+                {isDevMode ? (
+                    <PlainButton
+                        onPress={() => {
+                            resetAppData();
+                        }}
+                        style={[tailwind('absolute bottom-20 items-center')]}>
+                        <Text
+                            style={[
+                                tailwind(
+                                    `text-sm w-full font-bold ${
+                                        !IsWalletInitialized ? 'opacity-20' : ''
+                                    } text-red-600`,
+                                ),
+                            ]}>
+                            Reset Data
+                        </Text>
+                    </PlainButton>
+                ) : (
+                    <></>
+                )}
 
                 <PlainButton
                     style={[

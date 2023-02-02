@@ -25,7 +25,8 @@ export const AppStorageProvider = ({children}) => {
         locale: 'en-US',
     };
 
-    // States and async storage get and setters
+    const isDevMode = __DEV__;
+
     // |> States and async storage get and setters
     const [appLanguage, _setAppLanguage] = useState(defaultAppLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(defaultFiatCurrency);
@@ -220,6 +221,7 @@ export const AppStorageProvider = ({children}) => {
                 currentWalletName,
                 setCurrentWalletName,
                 resetAppData,
+                isDevMode,
             }}>
             {children}
         </AppStorageContext.Provider>
