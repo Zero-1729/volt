@@ -21,6 +21,8 @@ const Color = (currentTheme: ColorThemeType) => {
             CheckBoxFilled: isDarkMode ? 'black' : 'black',
             CheckBoxOutline: isDarkMode ? 'white' : 'black',
             CheckBoxUnfilled: isDarkMode ? 'black' : 'white',
+            Greyed: isDarkMode ? '#202020' : '#E5E5E5',
+            CardGreyed: isDarkMode ? '#3f3f3f' : '#D5D5D5',
         },
         HeadingBar: isDarkMode ? '#1b1b1b' : '#F3F3F3',
         Text: {
