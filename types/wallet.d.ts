@@ -23,6 +23,12 @@ type UTXOType = {
     flagged: boolean; // Whether flagged by user to avoid spending, i.e. dust
 };
 
+// Wallet Unit Type
+type Unit = {
+    name: string; // Unit name
+    symbol: string; // Unit symbol '₿' or 'sats' (see https://satsymbol.com/)
+};
+
 // Base Net Configs
 type NetworkConfigType = {
     name: string; // Mainnet, Testnet, etc.
