@@ -34,22 +34,8 @@ const CreateAction = () => {
 
     const [newWalletName, setNewWalletName] = useState('');
 
-    const generateWalletId = async () => {
-        // Generates a new wallet ID and stores it in AsyncStorage
-        // ID format: '139baf24-0049-416b-91d7-4b59966fbd3e'
-        // const walletID = Crypto.randomUUID();
-        // try {
-        //     await AsyncStorage.setItem('currentWalletID', walletID);
-        // } catch (e) {
-        //     console.error(`[AsyncStorage] Error setting new wallet ID: ${e}`);
-        // }
-    };
-
     const updateWalletName = async (walletName: string) => {
         setCurrentWalletName(walletName);
-
-        // Generate and set a new wallet ID
-        // generateWalletId();
 
         // Indicate that the wallet has been created
         if (!isWalletInitialized) {
