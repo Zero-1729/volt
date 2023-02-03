@@ -11,8 +11,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import Crypto from 'crypto';
-
 import tailwind from 'tailwind-rn';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
