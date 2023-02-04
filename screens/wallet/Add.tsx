@@ -83,7 +83,7 @@ const Add = () => {
                                 tailwind('font-bold mt-2'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            New Wallet
+                            New
                         </Text>
 
                         <Text
@@ -130,7 +130,7 @@ const Add = () => {
                             {backgroundColor: '#8b8b8b'},
                         ]}>
                         <Text style={[tailwind('font-bold mt-2 text-white')]}>
-                            Restore Wallet
+                            Restore
                         </Text>
 
                         <Text style={[tailwind('mt-4 text-white text-xs')]}>
