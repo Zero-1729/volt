@@ -7,6 +7,8 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 
+import {BaseWallet} from './wallet/base';
+
 // Note: context 'value' will default to '{}' if no Provider is found
 export const AppStorageContext = createContext({});
 export const AppStorageProvider = ({children}) => {
@@ -33,7 +35,8 @@ export const AppStorageProvider = ({children}) => {
     // Will change to false once app in Beta version
     const [hideTotalBalance, _setTotalBalanceHidden] = useState(false);
     const [IsWalletInitialized, _setWalletInitialized] = useState(false);
-    const [currentWalletName, _setCurrentWalletName] = useState('');
+    const [wallets, _setWallets] = useState<BaseWallet[]>([]);
+    const [currentWalletID, _setCurrentWalletID] = useState('');
 
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
@@ -45,8 +48,8 @@ export const AppStorageProvider = ({children}) => {
     } = useAsyncStorage('hideTotalBalance');
     const {getItem: _getWalletInitialized, setItem: _updateWalletInitialized} =
         useAsyncStorage('isWalletInitialized');
-    const {getItem: _getCurrentWalletName, setItem: _updateCurrentWalletName} =
-        useAsyncStorage('currentWalletName');
+    const {getItem: _getWallets, setItem: _updateWallets} =
+        useAsyncStorage('wallets');
 
     // |> Create functions for getting, setting, and other data manipulation
     const setAppLanguage = useCallback(
@@ -145,29 +148,47 @@ export const AppStorageProvider = ({children}) => {
         }
     };
 
-    const setCurrentWalletName = useCallback(
-        async (walletName: string) => {
+    const _loadWallets = async () => {
+        const savedWallets = await _getWallets();
+
+        if (savedWallets !== null) {
+            _setWallets(JSON.parse(savedWallets));
+        }
+    };
+
+    const addWallet = useCallback(
+        async (
+            name: string,
+            isWatchOnly: boolean,
+            type: string,
+            secret: string,
+            descriptor?: string,
+            network: string = 'tesnet',
+        ) => {
             try {
-                _setCurrentWalletName(walletName);
-                _updateCurrentWalletName(walletName);
+                const newWallet = new BaseWallet(
+                    name,
+                    isWatchOnly,
+                    type,
+                    secret,
+                    descriptor,
+                    network,
+                );
+
+                _setCurrentWalletID(newWallet.id);
+
+                const tmp = wallets ? [...wallets, newWallet] : [newWallet];
+
+                _setWallets(tmp);
+                _updateWallets(JSON.stringify(tmp));
             } catch (e) {
                 console.error(
-                    `[AsyncStorage] (Current wallet name setting) Error loading data: ${e}`,
+                    `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
                 );
             }
         },
-        [_updateCurrentWalletName, _setCurrentWalletName],
+        [wallets, _updateWallets, _setWallets],
     );
-
-    const _loadCurrentWalletName = async () => {
-        const name = await _getCurrentWalletName();
-
-        // Only update setting if a value already exists
-        // ...otherwise, use default
-        if (name !== null) {
-            _setCurrentWalletName(name);
-        }
-    };
 
     // Resets app data
     const resetAppData = useCallback(async () => {
@@ -176,7 +197,6 @@ export const AppStorageProvider = ({children}) => {
             await setAppFiatCurrency(defaultFiatCurrency);
             await setTotalBalanceHidden(false);
             await setWalletInitialized(false);
-            await setCurrentWalletName('');
         } catch (e) {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
@@ -203,7 +223,7 @@ export const AppStorageProvider = ({children}) => {
     }, []);
 
     useEffect(() => {
-        _loadCurrentWalletName();
+        _loadWallets();
     }, []);
 
     // Return provider
@@ -218,10 +238,11 @@ export const AppStorageProvider = ({children}) => {
                 setTotalBalanceHidden,
                 IsWalletInitialized,
                 setWalletInitialized,
-                currentWalletName,
-                setCurrentWalletName,
                 resetAppData,
                 isDevMode,
+                wallets,
+                addWallet,
+                currentWalletID,
             }}>
             {children}
         </AppStorageContext.Provider>
