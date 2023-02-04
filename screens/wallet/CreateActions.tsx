@@ -27,17 +27,22 @@ const CreateAction = () => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const {isWalletInitialized, setWalletInitialized, setCurrentWalletName} =
+    const {isWalletInitialized, setWalletInitialized, addWallet} =
         useContext(AppStorageContext);
 
     const [newWalletName, setNewWalletName] = useState('');
 
     const updateWalletName = async (walletName: string) => {
-        setCurrentWalletName(walletName);
-
         // Indicate that the wallet has been created
         if (!isWalletInitialized) {
             setWalletInitialized(true);
+        }
+
+        try {
+            // Default wallet type is Segwit bech32
+            addWallet(walletName, false, 'bech32', '');
+        } catch (e) {
+            console.error(`[CreateAction] Error adding wallet: [${e}]`);
         }
 
         // Navigate to the wallet screen
