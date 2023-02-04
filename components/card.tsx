@@ -79,41 +79,31 @@ export const EmptyCard = () => {
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
 
-    const altGray = {
-        backgroundColor: ColorScheme.isDarkMode ? '#2C2C2C' : '#ededed',
-    };
-
     return (
         <View style={tailwind('w-full h-48 relative items-center')}>
-            {props.isWatchOnly ? (
-                <View style={[tailwind('absolute top-7 right-6 z-40')]}>
-                    <Text
-                        style={[
-                            tailwind('text-xs font-medium'),
-                            {color: ColorScheme.Text.GrayText},
-                            Font.RobotoText,
-                        ]}>
-                        Watch-only
-                    </Text>
-                </View>
-            ) : (
-                <></>
-            )}
-
             <View
-                style={[tailwind('w-full h-48 p-6 rounded-md z-30'), altGray]}>
+                style={[
+                    tailwind('w-full h-48 rounded-md z-50'),
+                    {
+                        backgroundColor:
+                            ColorScheme.WalletColors[props.walletType],
+                    },
+                ]}>
                 <Text
+                    numberOfLines={1}
+                    ellipsizeMode="middle"
                     style={[
-                        tailwind('text-xl w-full text-left font-medium mb-1'),
-                        {color: ColorScheme.Text.Default},
+                        tailwind(
+                            'px-6 pt-6 text-2xl w-full text-left font-medium mb-1 text-white',
+                        ),
                         Font.RobotoText,
                     ]}>
                     {props.label}
                 </Text>
                 <Text
                     style={[
-                        tailwind('text-sm w-full text-left'),
-                        {color: ColorScheme.Text.DescText},
+                        tailwind('pl-6 text-sm w-full text-left'),
+                        {color: ColorScheme.Text.AltGray},
                         Font.RobotoText,
                     ]}>
                     {WalletTypes[props.walletType]}
@@ -121,15 +111,17 @@ export const WalletCard = (props: WalletCardProps) => {
 
                 {!props.hideBalance ? (
                     <PlainButton
-                        style={[tailwind('absolute bottom-8 left-6')]}
-                        onPress={() => {
-                            /* Toggle between sats/BTC/currency */
-                        }}>
+                        style={[
+                            tailwind(
+                                `absolute ${
+                                    props.isWatchOnly ? 'bottom-11' : 'bottom-8'
+                                } left-6`,
+                            ),
+                        ]}>
                         <View style={[tailwind('flex-row items-center')]}>
                             <Text
                                 style={[
-                                    tailwind('text-3xl mr-2 pt-2'),
-                                    {color: ColorScheme.Text.Default},
+                                    tailwind('text-3xl mr-2 pt-2 text-white'),
                                     Font.SatSymbol,
                                 ]}>
                                 S
@@ -137,8 +129,9 @@ export const WalletCard = (props: WalletCardProps) => {
 
                             <Text
                                 style={[
-                                    tailwind('text-3xl pt-1 self-center'),
-                                    {color: ColorScheme.Text.Default},
+                                    tailwind(
+                                        'text-3xl pt-1 self-center text-white',
+                                    ),
                                     Font.RobotoText,
                                 ]}>
                                 {addCommas(props.walletBalance)}
@@ -149,14 +142,29 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                'absolute bottom-8 left-6 rounded-sm flex-row items-center w-full h-12',
+                                'absolute bottom-7 rounded-sm flex-row self-center w-5/6 h-12 opacity-20 bg-black',
                             ),
-                            {
-                                backgroundColor:
-                                    ColorScheme.Background.CardGreyed,
-                            },
                         ]}
                     />
+                )}
+
+                {props.isWatchOnly ? (
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full bg-white py-2 rounded-b-md absolute bottom-0 self-center opacity-40',
+                            ),
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-xs self-end font-medium mr-6'),
+                                Font.RobotoText,
+                            ]}>
+                            Watch-only
+                        </Text>
+                    </View>
+                ) : (
+                    <></>
                 )}
             </View>
         </View>
