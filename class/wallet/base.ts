@@ -54,7 +54,7 @@ export class BaseWallet {
         this.name = name; // Wallet name
 
         this.isWatchOnly = isWatchOnly; // Whether wallet is watch only
-        this.type = WalletTypes[type]; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
+        this.type = type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
         this.addresses = []; // List of addresses
         this.address = ''; // Temporarily generated receiving address

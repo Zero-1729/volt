@@ -14,6 +14,13 @@ import Color from '../constants/Color';
 
 import {addCommas} from '../modules/transform';
 
+const WalletTypes: {[index: string]: string} = {
+    bech32: 'Segwit Native',
+    Legacy: 'Legacy',
+    Segwit: 'Segwit (P2SH)',
+    Taproot: 'Taproot',
+};
+
 export const EmptyCard = () => {
     const navigation = useNavigation();
 
@@ -109,7 +116,7 @@ export const WalletCard = (props: WalletCardProps) => {
                         {color: ColorScheme.Text.DescText},
                         Font.RobotoText,
                     ]}>
-                    {props.walletType}
+                    {WalletTypes[props.walletType]}
                 </Text>
 
                 {!props.hideBalance ? (
