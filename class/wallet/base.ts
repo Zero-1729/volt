@@ -74,7 +74,7 @@ export class BaseWallet {
         this.hasBackedUp = false; // Whether user has backed up seed
 
         this.MasterFingerprint = ''; // Wallet master fingerprint
-        this.secret = secret; // private key or recovery phrase
+        this.secret = !isWatchOnly ? secret : ''; // private key or recovery phrase
         this.isBIP39 = false; // Whether wallet has a 'BIP39' seed
     }
 
