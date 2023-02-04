@@ -89,12 +89,10 @@ const Security = () => {
                         <View style={[tailwind('w-full'), HeadingBar]} />
                     </View>
 
-                    {/*  */}
                     <View
                         style={tailwind(
                             'justify-center w-full items-center flex-row mt-8 mb-8',
                         )}>
-                        {/*  */}
                         <View style={tailwind('w-5/6')}>
                             <View
                                 style={tailwind(
