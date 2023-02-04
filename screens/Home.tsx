@@ -31,31 +31,15 @@ const Home = () => {
 
     const navigation = useNavigation();
 
-    const {hideTotalBalance, IsWalletInitialized, currentWalletName} =
+    const {IsWalletInitialized, wallets, hideTotalBalance, appFiatCurrency} =
         useContext(AppStorageContext);
-
-    // List of created wallets from DB store
-    // Load all wallets from DB on startup
-    const wallets: Array<BaseWalletType> = [
-        {
-            name: currentWalletName,
-            balance: 2600043,
-            UTXOs: [],
-            isWatchOnly: false,
-            descriptor: '',
-            type: 'Segwit (bech32)',
-            address: 'bc1q9x30z7rz52c97jwc2j79w76y7l3ny54nlvd4ew',
-            birthday: new Date(),
-        },
-    ];
 
     // add the total balances of the wallets
     const totalBalance = wallets.reduce(
-        (accumulator, currentValue) => accumulator + currentValue.balance,
+        (accumulator: number, currentValue: BaseWalletType) =>
+            accumulator + currentValue.balance,
         0,
     );
-
-    const defaultWallet = wallets[0];
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
