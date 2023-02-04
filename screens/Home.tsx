@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
 
 import {Platform, StyleSheet, Text, useColorScheme, View} from 'react-native';
@@ -5,6 +6,8 @@ import {Platform, StyleSheet, Text, useColorScheme, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
+
+import {FlatList} from 'react-native-gesture-handler';
 
 import tailwind from 'tailwind-rn';
 
@@ -55,6 +58,20 @@ const Home = () => {
         marginTop: Platform.OS === 'android' ? 12 : 0,
     };
 
+    const renderCard = ({item}: {item: BaseWalletType}) => {
+        return (
+            <View style={[tailwind('w-full absolute -top-24')]}>
+                <WalletCard
+                    isWatchOnly={item.isWatchOnly}
+                    label={item.name}
+                    walletBalance={item.balance}
+                    walletType={item.type}
+                    hideBalance={hideTotalBalance}
+                />
+            </View>
+        );
+    };
+
     return (
         <SafeAreaView>
             <View
@@ -65,7 +82,7 @@ const Home = () => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 h-10 mb-3 items-center flex-row justify-between',
+                            'w-5/6 h-10 items-center flex-row justify-between',
                         ),
                         topPlatformOffset,
                     ]}>
@@ -113,30 +130,30 @@ const Home = () => {
                     )}
                 </View>
 
-                <View style={[tailwind('w-5/6 justify-around h-5/6')]}>
+                <View style={[tailwind('w-5/6 h-full justify-around')]}>
                     <View
                         style={[
                             tailwind(
-                                'h-2/5 w-full mb-16 items-center justify-between',
+                                `w-full items-center justify-between ${
+                                    !IsWalletInitialized ? 'mb-4' : ''
+                                }`,
                             ),
                         ]}>
                         <View
-                            style={tailwind(
-                                'items-center mb-6 justify-around w-full',
-                            )}>
-                            <Text
-                                style={[
-                                    tailwind('text-base mb-2 font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
-                                Total Balance
-                            </Text>
-
-                            {!IsWalletInitialized ? (
-                                <Text>-</Text>
-                            ) : (
+                            style={tailwind('justify-around w-full mt-2 mb-4')}>
+                            {IsWalletInitialized ? (
                                 <>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                'text-base font-medium mb-1',
+                                            ),
+                                            {color: ColorScheme.Text.Default},
+                                            Font.RobotoText,
+                                        ]}>
+                                        Total Balance
+                                    </Text>
+
                                     {!hideTotalBalance ? (
                                         <Text
                                             style={[
@@ -149,13 +166,15 @@ const Home = () => {
                                                 },
                                                 Font.RobotoText,
                                             ]}>
-                                            {addCommas(totalBalance)}
+                                            {`${
+                                                appFiatCurrency.symbol
+                                            } ${addCommas(totalBalance)}`}
                                         </Text>
                                     ) : (
                                         <View
                                             style={[
                                                 tailwind(
-                                                    'rounded-sm w-3/4 h-8 flex-row items-center',
+                                                    'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row items-center',
                                                 ),
                                                 {
                                                     backgroundColor:
@@ -166,24 +185,40 @@ const Home = () => {
                                         />
                                     )}
                                 </>
+                            ) : (
+                                <></>
                             )}
                         </View>
 
                         {/** Create a vertical scroll carousel for 'BaseCard */}
                         {IsWalletInitialized ? (
-                            <WalletCard
-                                isWatchOnly={defaultWallet.isWatchOnly}
-                                label={defaultWallet.name}
-                                walletBalance={defaultWallet.balance}
-                                walletType={defaultWallet.type}
-                                hideBalance={hideTotalBalance}
+                            <FlatList
+                                style={[tailwind('w-full h-48')]}
+                                data={wallets}
+                                renderItem={renderCard}
+                                keyExtractor={item => item.id}
+                                initialNumToRender={10}
+                                contentContainerStyle={[
+                                    tailwind('flex justify-center'),
+                                    {flex: 1},
+                                ]}
+                                contentInsetAdjustmentBehavior="automatic"
+                                inverted
+                                showsVerticalScrollIndicator
                             />
                         ) : (
                             <EmptyCard />
                         )}
                     </View>
 
-                    <View style={[tailwind('w-full h-1/2')]}>
+                    <View
+                        style={[
+                            tailwind(
+                                `w-full ${
+                                    IsWalletInitialized ? 'h-3/5' : 'h-4/6'
+                                } mt-4`,
+                            ),
+                        ]}>
                         <Text
                             style={[
                                 tailwind('mb-4 font-medium'),
@@ -223,4 +258,8 @@ const Home = () => {
 
 export default Home;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    DarkGrayCard: {
+        backgroundColor: '#B5B5B5',
+    },
+});
