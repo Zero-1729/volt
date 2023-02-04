@@ -78,15 +78,6 @@ export const WalletCard = (props: WalletCardProps) => {
 
     return (
         <View style={tailwind('w-full h-48 relative items-center')}>
-            <View
-                style={[
-                    tailwind(
-                        'w-11/12 h-full absolute -bottom-2 rounded-md z-20 opacity-60',
-                    ),
-                    styles.DarkGrayCard,
-                ]}
-            />
-
             {props.isWatchOnly ? (
                 <View style={[tailwind('absolute top-7 right-6 z-40')]}>
                     <Text
