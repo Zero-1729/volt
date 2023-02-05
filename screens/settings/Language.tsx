@@ -10,6 +10,8 @@ import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+
 import tailwind from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -32,6 +34,11 @@ const Language = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
+    const RNHapticFeedbackOptions = {
+        enableVibrateFallback: true,
+        ignoreAndroidSystemSettings: false,
+    };
+
     // Retrieved from general App context provider
     const {appLanguage, setAppLanguage} = useContext(AppStorageContext);
 
@@ -39,6 +46,8 @@ const Language = () => {
         return (
             <PlainButton
                 onPress={() => {
+                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
+
                     setAppLanguage(item);
                 }}>
                 <View

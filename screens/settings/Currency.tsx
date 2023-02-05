@@ -8,6 +8,8 @@ import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+
 import tailwind from 'tailwind-rn';
 
 import {CurrencyType} from '../../types/settings';
@@ -34,12 +36,19 @@ const Currency = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
+    const RNHapticFeedbackOptions = {
+        enableVibrateFallback: true,
+        ignoreAndroidSystemSettings: false,
+    };
+
     const {appFiatCurrency, setAppFiatCurrency} = useContext(AppStorageContext);
 
     const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
+                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
+
                     setAppFiatCurrency(item);
                 }}>
                 <View
