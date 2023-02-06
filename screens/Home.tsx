@@ -67,6 +67,7 @@ const Home = () => {
                     walletBalance={item.balance}
                     walletType={item.type}
                     hideBalance={hideTotalBalance}
+                    unit={item.units}
                 />
             </View>
         );
