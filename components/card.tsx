@@ -86,6 +86,8 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const {useSatSymbol} = useContext(AppStorageContext);
 
+    const satSeparator = ' ';
+
     const toggleUnit = () => {
         if (unit.name === 'BTC') {
             setUnit({name: 'sats', symbol: 'S'});
