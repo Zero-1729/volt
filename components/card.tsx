@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React from 'react';
+import React, {useContext, useState} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -7,7 +7,10 @@ import tailwind from 'tailwind-rn';
 
 import {PlainButton, Button} from './button';
 
+import {AppStorageContext} from '../class/storageContext';
+
 import {WalletCardProps} from '../types/props';
+import {Unit} from '../types/wallet';
 
 import Font from '../constants/Font';
 import Color from '../constants/Color';
@@ -78,6 +81,10 @@ export const EmptyCard = () => {
 
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
+
+    const [unit, setUnit] = useState<Unit>(props.unit);
+
+    const {useSatSymbol} = useContext(AppStorageContext);
 
     return (
         <View style={tailwind('w-full h-48 relative items-center')}>
