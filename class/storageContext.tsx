@@ -236,6 +236,7 @@ export const AppStorageProvider = ({children}) => {
             await setAppFiatCurrency(defaultFiatCurrency);
             await setTotalBalanceHidden(false);
             await setWalletInitialized(false);
+            await setWallets([]);
         } catch (e) {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
