@@ -118,7 +118,7 @@ export const WalletCard = (props: WalletCardProps) => {
                                 } left-6`,
                             ),
                         ]}>
-                        <View style={[tailwind('flex-row items-center')]}>
+                        <View style={[tailwind('flex-row items-center mr-6')]}>
                             <Text
                                 style={[
                                     tailwind('text-3xl mr-2 pt-2 text-white'),
