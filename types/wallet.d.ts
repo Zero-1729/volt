@@ -40,7 +40,7 @@ type UTXOType = {
 
 // Wallet Unit Type
 type Unit = {
-    name: string; // Unit name
+    name: string; // Unit name, 'sats' or 'BTC'
     symbol: string; // Unit symbol '₿' or 'sats' (see https://satsymbol.com/)
 };
 
