@@ -32,6 +32,7 @@ export const AppStorageProvider = ({children}) => {
     // |> States and async storage get and setters
     const [appLanguage, _setAppLanguage] = useState(defaultAppLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(defaultFiatCurrency);
+    const [useSatSymbol, _setSatSymbol] = useState(true);
     // Will change to false once app in Beta version
     const [hideTotalBalance, _setTotalBalanceHidden] = useState(false);
     const [IsWalletInitialized, _setWalletInitialized] = useState(false);
@@ -42,6 +43,8 @@ export const AppStorageProvider = ({children}) => {
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
         useAsyncStorage('appFiatCurrency');
+    const {getItem: _getUseSatSymbol, setItem: _updateUseSatSymbol} =
+        useAsyncStorage('useSatSymbol');
     const {
         getItem: _getTotalBalanceHidden,
         setItem: _updateTotalBalanceHidden,
@@ -100,6 +103,28 @@ export const AppStorageProvider = ({children}) => {
         }
     };
 
+    const setSatSymbol = useCallback(
+        async (useSat: boolean) => {
+            try {
+                _setSatSymbol(useSat);
+                _updateUseSatSymbol(JSON.stringify(useSat));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Use sat symbol setting) Error loading data: ${e}`,
+                );
+            }
+        },
+        [_updateUseSatSymbol, _setSatSymbol],
+    );
+
+    const _loadUseSatSymbol = async () => {
+        const useSatSym = await _getUseSatSymbol();
+
+        if (useSatSym !== null) {
+            _setSatSymbol(JSON.parse(useSatSym));
+        }
+    };
+
     const setTotalBalanceHidden = useCallback(
         async (hide: boolean) => {
             try {
@@ -155,6 +180,20 @@ export const AppStorageProvider = ({children}) => {
             _setWallets(JSON.parse(savedWallets));
         }
     };
+
+    const setWallets = useCallback(
+        async (value: BaseWallet[]) => {
+            try {
+                _setWallets(value);
+                _updateWallets(JSON.stringify(value));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Wallets setting) Error setting data: ${e}`,
+                );
+            }
+        },
+        [_setWallets, _updateWallets],
+    );
 
     const addWallet = useCallback(
         async (
@@ -215,6 +254,10 @@ export const AppStorageProvider = ({children}) => {
     }, []);
 
     useEffect(() => {
+        _loadUseSatSymbol();
+    }, []);
+
+    useEffect(() => {
         _loadTotalBalanceHidden();
     }, []);
 
@@ -234,6 +277,8 @@ export const AppStorageProvider = ({children}) => {
                 setAppLanguage,
                 appFiatCurrency,
                 setAppFiatCurrency,
+                useSatSymbol,
+                setSatSymbol,
                 hideTotalBalance,
                 setTotalBalanceHidden,
                 IsWalletInitialized,
