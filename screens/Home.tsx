@@ -25,7 +25,7 @@ import Font from '../constants/Font';
 import {PlainButton} from '../components/button';
 import {EmptyCard, WalletCard} from '../components/card';
 
-import {addCommas} from '../modules/transform';
+import {normalizeFiat} from '../modules/transform';
 
 import {BaseWalletType} from '../types/wallet';
 
@@ -169,7 +169,10 @@ const Home = () => {
                                             ]}>
                                             {`${
                                                 appFiatCurrency.symbol
-                                            } ${addCommas(totalBalance)}`}
+                                            } ${normalizeFiat(
+                                                totalBalance,
+                                                23_400.13,
+                                            )}`}
                                         </Text>
                                     ) : (
                                         <View
