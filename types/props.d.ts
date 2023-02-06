@@ -2,6 +2,8 @@
 import React from 'react';
 import {SvgProps} from 'react-native-svg';
 
+import {Unit} from './wallet';
+
 // Base Prop Type
 type BaseProps = {
     children?: React.ReactNode;
@@ -48,6 +50,7 @@ type WalletCardProps = CardProps & {
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
+    unit: Unit;
 };
 
 // Base Text Input Prop Type (for reuse)
