@@ -15,7 +15,7 @@ import {Unit} from '../types/wallet';
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
-import {addCommas} from '../modules/transform';
+import {addCommas, normalizeBTC} from '../modules/transform';
 
 const WalletTypes: {[index: string]: string} = {
     bech32: 'Segwit Native',
@@ -137,26 +137,43 @@ export const WalletCard = (props: WalletCardProps) => {
                             ),
                         ]}>
                         <View style={[tailwind('flex-row items-center mr-6')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-3xl mr-2 pt-2 text-white'),
-                                    Font.SatSymbol,
-                                ]}>
-                                S
-                            </Text>
+                            {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
+                            {useSatSymbol || unit.name === 'BTC' ? (
+                                <Text
+                                    style={[
+                                        tailwind('text-3xl mr-2 text-white'),
+                                        Font.SatSymbol,
+                                    ]}>
+                                    {unit.name === 'sats' ? 'S' : unit.symbol}
+                                </Text>
+                            ) : (
+                                <></>
+                            )}
 
                             <Text
                                 style={[
-                                    tailwind(
-                                        'text-3xl pt-1 self-center text-white',
-                                    ),
+                                    tailwind('text-2xl text-white mr-6'),
                                     Font.RobotoText,
                                 ]}>
-                                {addCommas(props.walletBalance)}
+                                {addCommas(
+                                    unit.name === 'sats'
+                                        ? props.walletBalance.toString()
+                                        : normalizeBTC(props.walletBalance),
+                                    satSeparator,
+                                )}{' '}
+                                {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
+                                {unit.name === 'sats' && !useSatSymbol ? (
+                                    <Text style={[tailwind('text-lg')]}>
+                                        sats
+                                    </Text>
+                                ) : (
+                                    ''
+                                )}
                             </Text>
                         </View>
                     </PlainButton>
                 ) : (
+                    /* Empty view to keep the card height consistent  */
                     <View
                         style={[
                             tailwind(
