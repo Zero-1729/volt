@@ -86,6 +86,14 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const {useSatSymbol} = useContext(AppStorageContext);
 
+    const toggleUnit = () => {
+        if (unit.name === 'BTC') {
+            setUnit({name: 'sats', symbol: 'S'});
+        } else {
+            setUnit({name: 'BTC', symbol: '₿'});
+        }
+    };
+
     return (
         <View style={tailwind('w-full h-48 relative items-center')}>
             <View
@@ -118,6 +126,7 @@ export const WalletCard = (props: WalletCardProps) => {
 
                 {!props.hideBalance ? (
                     <PlainButton
+                        onPress={toggleUnit}
                         style={[
                             tailwind(
                                 `absolute ${
