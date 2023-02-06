@@ -202,7 +202,7 @@ const Settings = () => {
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
-                                CommonActions.navigate({name: 'Network'}),
+                                CommonActions.navigate({name: 'Wallet'}),
                             );
                         }}>
                         <View
@@ -217,7 +217,7 @@ const Settings = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Network
+                                Wallet
                             </Text>
 
                             <Right
