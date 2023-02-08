@@ -6,7 +6,9 @@ export const _getBTCfromSats = (sats: number) => {
     return sats / 100_000_000;
 };
 
-export const normalizeSats = (sats: number) => {};
+export const normalizeSats = (sats: number) => {
+    // TODO: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
+};
 
 export const normalizeBTC = (sats: number) => {
     // TODO: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
