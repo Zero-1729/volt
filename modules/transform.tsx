@@ -26,6 +26,21 @@ export const fromSatsToFiat = (sats: number, rate: number) => {
     return BTC * rate;
 };
 
+const formatFiatUnit = (fiat: number) => {
+    const RATE = 1000;
+    const UNITS = ['', '', 'M', 'B', 'T', 'Q'];
+    const DECIMAL = 2;
+    const EXP = Math.floor(Math.log(fiat) / Math.log(RATE));
+
+    // Avoid Zero Division
+    const p = fiat !== 0 ? fiat / Math.pow(RATE, EXP) : 0;
+
+    const val = parseFloat(p).toFixed(DECIMAL);
+    const unit = UNITS[EXP] || UNITS[1];
+
+    return `${val} ${unit}`;
+};
+
 export const normalizeFiat = (sats: number, rate: number) => {
     // Get BTC to fiat value first
     // Then get fiat equivalent formatted accordingly
@@ -35,5 +50,6 @@ export const normalizeFiat = (sats: number, rate: number) => {
         return addCommas(fiat.toFixed(8));
     }
 
-    return addCommas(fiat.toFixed(2));
+    // TODO: make amount in range of 100,000 (i.e. 6 digit characters) and 2 decimal points
+    return addCommas(formatFiatUnit(fiat));
 };
