@@ -53,13 +53,19 @@ const formatFiatUnit = (fiat: number) => {
 
 export const normalizeFiat = (sats: number, rate: number) => {
     // Get BTC to fiat value first
-    // Then get fiat equivalent formatted accordingly
     const fiat = fromSatsToFiat(sats, rate);
 
+    // If below a cent, let's attempt to display that
+    // 'Bullishly' speaking, Bitcoin will 'always' be worth more than a cent
     if (fiat < 0.01) {
-        return addCommas(fiat.toFixed(8));
+        // Return spaced value only in range of eight decimals (sub-cent)
+        // Otherwise, assume zero (insignificant balance)
+        return fiat < 0.00000001
+            ? fiat.toFixed(2)
+            : addCommas(fiat.toFixed(8), ' ');
     }
 
-    // TODO: make amount in range of 100,000 (i.e. 6 digit characters) and 2 decimal points
+    // Amount in range of 100,000,000.00
+    // (i.e. 14 digit characters)
     return addCommas(formatFiatUnit(fiat));
 };
