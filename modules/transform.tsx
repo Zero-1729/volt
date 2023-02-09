@@ -30,17 +30,25 @@ export const fromSatsToFiat = (sats: number, rate: number) => {
 
 const formatFiatUnit = (fiat: number) => {
     const RATE = 1000;
-    const UNITS = ['', '', 'M', 'B', 'T', 'Q'];
+    // Screen can handle units for thousand and million
+    // so we only snip to 'xxx.xx' when value is in Billion, Trillion, etc.
+    const UNITS = ['', 'k', 'M', 'B', 'T', 'Q'];
     const DECIMAL = 2;
     const EXP = Math.floor(Math.log(fiat) / Math.log(RATE));
+    const Limit = 1_000_000_000; // The displayable value limit (i.e. < 1B)
 
-    // Avoid Zero Division
-    const p = fiat !== 0 ? fiat / Math.pow(RATE, EXP) : 0;
+    if (fiat > Limit) {
+        // Avoid Zero Division
+        const p = fiat !== 0 ? fiat / Math.pow(RATE, EXP) : 0;
+        const val = parseFloat(p.toString()).toFixed(DECIMAL);
+        const unit = UNITS[EXP] || UNITS[1];
 
-    const val = parseFloat(p).toFixed(DECIMAL);
-    const unit = UNITS[EXP] || UNITS[1];
+        // Return formatted value with units
+        return `${val} ${unit}`;
+    }
 
-    return `${val} ${unit}`;
+    // Return value as is, if below a billion
+    return fiat.toFixed(2);
 };
 
 export const normalizeFiat = (sats: number, rate: number) => {
