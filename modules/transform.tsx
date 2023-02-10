@@ -9,8 +9,27 @@ export const _getBTCfromSats = (sats: number) => {
     return sats / SATS_TO_BTC_RATE;
 };
 
-export const normalizeSats = (sats: number) => {
-    // TODO: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
+export const formatSats = (sats: number) => {
+    // REM: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
+    if (sats < 0) {
+        // Limit display to milisats
+        // Anything lower is assumed to be an approximation
+        // ... to zero
+        if (sats < 0.00_000_000_001) {
+            return `~${sats.toFixed(12)}`;
+        }
+
+        // Display in range of eight decimals (sub-sats)
+        return addCommas(sats.toFixed(8), SEPARATOR);
+    }
+
+    // If billions range of sats
+    // We display with units
+    if (sats > SATS_TO_BTC_RATE) {
+        return formatWithUnits(sats);
+    }
+
+    return addCommas(sats.toString(), SEPARATOR);
 };
 
 export const formatBTC = (sats: number) => {
