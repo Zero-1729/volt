@@ -1,9 +1,10 @@
+const SATS_TO_BTC_RATE = 100_000_000;
 export const addCommas = (num: string, separator: string = ',') => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 };
 
 export const _getBTCfromSats = (sats: number) => {
-    return sats / 100_000_000;
+    return sats / SATS_TO_BTC_RATE;
 };
 
 export const normalizeSats = (sats: number) => {
@@ -46,7 +47,7 @@ const formatWithUnits = (value: number) => {
 
 export const normalizeFiat = (sats: number, rate: number) => {
     // Get BTC to fiat value first
-    const fiat = fromSatsToFiat(sats, rate);
+    const fiat = _getBTCfromSats(sats) * rate;
 
     // If below a cent, let's attempt to display that
     // 'Bullishly' speaking, Bitcoin will 'always' be worth more than a cent
