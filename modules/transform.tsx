@@ -37,14 +37,16 @@ export const formatBTC = (sats: number) => {
     const BTC = _getBTCfromSats(sats);
 
     // If below whole BTC, let's attempt to display that
-    // in range of eight decimals (sats)
-    // However, if balance sub-sat, indicate approximation
-    // in range of eight decimals (sats)
+    // in range of 11 decimals (msats)
+    // However, if balance sub-msats,
+    // indicate approximation with '~0.00'
     if (BTC < 0.1) {
-        return `${BTC < 0.00_000_001 ? '~' : ''} ${addCommas(
-            BTC.toFixed(8),
-            SEPARATOR,
-        )}`;
+        if (BTC < 0.00_000_000_001) {
+            return `~${BTC.toFixed(2)}`;
+        }
+
+        // Limit it to 1 sat - 1 milisats (11 decimals)
+        return addCommas(BTC.toFixed(11), SEPARATOR);
     }
 
     return addCommas(BTC.toString(), SEPARATOR);
