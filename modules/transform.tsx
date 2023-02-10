@@ -11,15 +11,15 @@ export const _getBTCfromSats = (sats: number) => {
 
 export const formatSats = (sats: number) => {
     // REM: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
-    if (sats < 0) {
-        // Limit display to milisats
+    if (sats < 0.1) {
+        // Limit display to eight decimals
         // Anything lower is assumed to be an approximation
         // ... to zero
-        if (sats < 0.00_000_000_001) {
-            return `~${sats.toFixed(12)}`;
+        if (sats < 0.00_000_001) {
+            return `~${sats.toFixed(2)}`;
         }
 
-        // Display in range of eight decimals (sub-sats)
+        // Display in range of eight decimals (sats)
         return addCommas(sats.toFixed(8), SEPARATOR);
     }
 
@@ -29,6 +29,7 @@ export const formatSats = (sats: number) => {
         return formatWithUnits(sats);
     }
 
+    // Strip trailing zeros
     return addCommas(sats.toString(), SEPARATOR);
 };
 
