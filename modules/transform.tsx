@@ -13,12 +13,19 @@ export const normalizeSats = (sats: number) => {
     // TODO: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
 };
 
-export const normalizeBTC = (sats: number) => {
-    // TODO: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
+export const formatBTC = (sats: number) => {
+    // REM: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
     const BTC = _getBTCfromSats(sats);
 
-    if (BTC < 0.000_000_01) {
-        return BTC.toFixed(8).toString();
+    // If below whole BTC, let's attempt to display that
+    // in range of eight decimals (sats)
+    // However, if balance sub-sat, indicate approximation
+    // in range of eight decimals (sats)
+    if (BTC < 0.1) {
+        return `${BTC < 0.00_000_001 ? '~' : ''} ${addCommas(
+            BTC.toFixed(8),
+            SEPARATOR,
+        )}`;
     }
 
     return addCommas(BTC.toString(), SEPARATOR);
