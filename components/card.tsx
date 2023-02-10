@@ -15,7 +15,7 @@ import {Unit} from '../types/wallet';
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
-import {addCommas, normalizeBTC} from '../modules/transform';
+import {formatSats, formatBTC} from '../modules/transform';
 
 const WalletTypes: {[index: string]: string} = {
     bech32: 'Segwit Native',
@@ -85,8 +85,6 @@ export const WalletCard = (props: WalletCardProps) => {
     const [unit, setUnit] = useState<Unit>(props.unit);
 
     const {useSatSymbol} = useContext(AppStorageContext);
-
-    const satSeparator = ' ';
 
     const toggleUnit = () => {
         if (unit.name === 'BTC') {
@@ -161,12 +159,9 @@ export const WalletCard = (props: WalletCardProps) => {
                                     tailwind('text-2xl text-white'),
                                     Font.RobotoText,
                                 ]}>
-                                {addCommas(
-                                    unit.name === 'sats'
-                                        ? props.walletBalance.toString()
-                                        : normalizeBTC(props.walletBalance),
-                                    satSeparator,
-                                )}{' '}
+                                {unit.name === 'sats'
+                                    ? formatSats(props.walletBalance)
+                                    : formatBTC(props.walletBalance)}{' '}
                                 {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
                                 {unit.name === 'sats' && !useSatSymbol ? (
                                     <Text style={[tailwind('text-lg')]}>
