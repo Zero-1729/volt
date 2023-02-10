@@ -1,4 +1,6 @@
 const SATS_TO_BTC_RATE = 100_000_000;
+const SEPARATOR = ' ';
+
 export const addCommas = (num: string, separator: string = ',') => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 };
