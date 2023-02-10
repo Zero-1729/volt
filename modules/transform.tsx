@@ -21,7 +21,7 @@ export const normalizeBTC = (sats: number) => {
         return BTC.toFixed(8).toString();
     }
 
-    return BTC.toString();
+    return addCommas(BTC.toString(), SEPARATOR);
 };
 
 const formatWithUnits = (value: number) => {
