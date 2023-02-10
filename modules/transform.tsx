@@ -60,5 +60,5 @@ export const normalizeFiat = (sats: number, rate: number) => {
 
     // Amount in range of 100,000,000.00
     // (i.e. 14 digit characters)
-    return addCommas(formatFiatUnit(fiat));
+    return addCommas(formatWithUnits(fiat));
 };
