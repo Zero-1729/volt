@@ -81,4 +81,8 @@ export class BaseWallet {
     private _generateID() {
         return Crypto.randomUUID();
     }
+
+    public updateBalance(sats: number) {
+        this.balance = sats;
+    }
 }

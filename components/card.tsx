@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React from 'react';
+import React, {useContext, useState} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -7,12 +7,15 @@ import tailwind from 'tailwind-rn';
 
 import {PlainButton, Button} from './button';
 
+import {AppStorageContext} from '../class/storageContext';
+
 import {WalletCardProps} from '../types/props';
+import {Unit} from '../types/wallet';
 
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
-import {addCommas} from '../modules/transform';
+import {formatSats, formatBTC} from '../modules/transform';
 
 const WalletTypes: {[index: string]: string} = {
     bech32: 'Segwit Native',
@@ -79,11 +82,23 @@ export const EmptyCard = () => {
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
 
+    const [unit, setUnit] = useState<Unit>(props.unit);
+
+    const {useSatSymbol} = useContext(AppStorageContext);
+
+    const toggleUnit = () => {
+        if (unit.name === 'BTC') {
+            setUnit({name: 'sats', symbol: 'S'});
+        } else {
+            setUnit({name: 'BTC', symbol: '₿'});
+        }
+    };
+
     return (
         <View style={tailwind('w-full h-48 relative items-center')}>
             <View
                 style={[
-                    tailwind('w-full h-48 rounded-md z-50'),
+                    tailwind('w-full h-48 rounded-md z-50 px-6'),
                     {
                         backgroundColor:
                             ColorScheme.WalletColors[props.walletType],
@@ -94,7 +109,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     ellipsizeMode="middle"
                     style={[
                         tailwind(
-                            'px-6 pt-6 text-2xl w-full text-left font-medium mb-1 text-white',
+                            'pt-6 text-2xl w-full text-left font-medium mb-1 text-white',
                         ),
                         Font.RobotoText,
                     ]}>
@@ -102,7 +117,7 @@ export const WalletCard = (props: WalletCardProps) => {
                 </Text>
                 <Text
                     style={[
-                        tailwind('pl-6 text-sm w-full text-left'),
+                        tailwind('text-sm w-full text-left'),
                         {color: ColorScheme.Text.AltGray},
                         Font.RobotoText,
                     ]}>
@@ -111,34 +126,55 @@ export const WalletCard = (props: WalletCardProps) => {
 
                 {!props.hideBalance ? (
                     <PlainButton
+                        onPress={toggleUnit}
                         style={[
                             tailwind(
                                 `absolute ${
                                     props.isWatchOnly ? 'bottom-11' : 'bottom-8'
-                                } left-6`,
+                                }`,
                             ),
                         ]}>
-                        <View style={[tailwind('flex-row items-center mr-6')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-3xl mr-2 pt-2 text-white'),
-                                    Font.SatSymbol,
-                                ]}>
-                                S
-                            </Text>
+                        <View
+                            style={[
+                                tailwind(
+                                    'flex-row mx-6 items-center self-start',
+                                ),
+                            ]}>
+                            {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
+                            {useSatSymbol || unit.name === 'BTC' ? (
+                                <Text
+                                    style={[
+                                        tailwind('text-2xl mr-2 text-white'),
+                                        Font.SatSymbol,
+                                    ]}>
+                                    {unit.name === 'sats' ? 'S' : unit.symbol}
+                                </Text>
+                            ) : (
+                                <></>
+                            )}
 
                             <Text
+                                numberOfLines={1}
                                 style={[
-                                    tailwind(
-                                        'text-3xl pt-1 self-center text-white',
-                                    ),
+                                    tailwind('text-2xl text-white'),
                                     Font.RobotoText,
                                 ]}>
-                                {addCommas(props.walletBalance)}
+                                {unit.name === 'sats'
+                                    ? formatSats(props.walletBalance)
+                                    : formatBTC(props.walletBalance)}{' '}
+                                {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
+                                {unit.name === 'sats' && !useSatSymbol ? (
+                                    <Text style={[tailwind('text-lg')]}>
+                                        sats
+                                    </Text>
+                                ) : (
+                                    ''
+                                )}
                             </Text>
                         </View>
                     </PlainButton>
                 ) : (
+                    /* Empty view to keep the card height consistent  */
                     <View
                         style={[
                             tailwind(

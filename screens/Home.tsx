@@ -25,7 +25,7 @@ import Font from '../constants/Font';
 import {PlainButton} from '../components/button';
 import {EmptyCard, WalletCard} from '../components/card';
 
-import {addCommas} from '../modules/transform';
+import {normalizeFiat} from '../modules/transform';
 
 import {BaseWalletType} from '../types/wallet';
 
@@ -43,6 +43,8 @@ const Home = () => {
             accumulator + currentValue.balance,
         0,
     );
+
+    const fiatUSDRate = 23_000;
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -67,6 +69,7 @@ const Home = () => {
                     walletBalance={item.balance}
                     walletType={item.type}
                     hideBalance={hideTotalBalance}
+                    unit={item.units}
                 />
             </View>
         );
@@ -168,7 +171,10 @@ const Home = () => {
                                             ]}>
                                             {`${
                                                 appFiatCurrency.symbol
-                                            } ${addCommas(totalBalance)}`}
+                                            } ${normalizeFiat(
+                                                totalBalance,
+                                                fiatUSDRate,
+                                            )}`}
                                         </Text>
                                     ) : (
                                         <View
