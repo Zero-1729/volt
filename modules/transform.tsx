@@ -54,11 +54,9 @@ export const normalizeFiat = (sats: number, rate: number) => {
     // If below a cent, let's attempt to display that
     // 'Bullishly' speaking, Bitcoin will 'always' be worth more than a cent
     if (fiat < 0.01) {
-        // Return spaced value only in range of eight decimals (sub-cent)
-        // Otherwise, assume zero (insignificant balance)
-        return fiat < 0.00000001
-            ? fiat.toFixed(2)
-            : addCommas(fiat.toFixed(8), ' ');
+        // We just let them know it's less than a cent
+        // So approximately a zero (insignificant)
+        return `~${fiat.toFixed(2)}`;
     }
 
     // Amount in range of 100,000,000.00
