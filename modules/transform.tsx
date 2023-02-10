@@ -11,7 +11,7 @@ export const _getBTCfromSats = (sats: number) => {
 
 export const formatSats = (sats: number) => {
     // REM: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
-    if (sats < 0.1) {
+    if (sats < 0.1 && sats !== 0) {
         // Limit display to eight decimals
         // Anything lower is assumed to be an approximation
         // ... to zero
@@ -41,7 +41,7 @@ export const formatBTC = (sats: number) => {
     // in range of 11 decimals (msats)
     // However, if balance sub-msats,
     // indicate approximation with '~0.00'
-    if (BTC < 0.1) {
+    if (BTC < 0.1 && BTC !== 0) {
         if (BTC < 0.00_000_000_001) {
             return `~${BTC.toFixed(2)}`;
         }
@@ -82,7 +82,7 @@ export const normalizeFiat = (sats: number, rate: number) => {
 
     // If below a cent, let's attempt to display that
     // 'Bullishly' speaking, Bitcoin will 'always' be worth more than a cent
-    if (fiat < 0.01) {
+    if (fiat < 0.01 && fiat !== 0) {
         // We just let them know it's less than a cent
         // So approximately a zero (insignificant)
         return `~${fiat.toFixed(2)}`;
