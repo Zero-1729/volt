@@ -19,7 +19,7 @@ import InfoIcon from './../../assets/svg/info-16.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const Import = () => {
+const Add = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -64,54 +64,11 @@ const Import = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.GrayText},
                             ]}>
-                            Select a method to add a new wallet
+                            Create a new wallet or restore from a backup
                         </Text>
                     </View>
 
-                    <View
-                        style={[
-                            tailwind('mt-10 rounded-md p-5'),
-                            {backgroundColor: '#8b8b8b'},
-                        ]}>
-                        <Text style={[tailwind('font-bold mt-2 text-white')]}>
-                            Import Wallet
-                        </Text>
-
-                        <Text style={[tailwind('mt-4 text-white text-xs')]}>
-                            Import wallet from BIP39 seed and an optional
-                            passphrase or other methods. Use this if you are
-                            coming from another wallet.
-                        </Text>
-
-                        <View style={[tailwind('items-end')]}>
-                            <PlainButton
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'RestoreActions',
-                                        }),
-                                    );
-                                }}>
-                                <View
-                                    style={[
-                                        tailwind(
-                                            'px-4 py-2 bg-black rounded-sm mt-4',
-                                        ),
-                                    ]}>
-                                    <Text
-                                        style={[
-                                            tailwind(
-                                                'text-xs text-white font-medium',
-                                            ),
-                                            Font.RobotoText,
-                                        ]}>
-                                        Restore
-                                    </Text>
-                                </View>
-                            </PlainButton>
-                        </View>
-                    </View>
-
+                    {/* Create a new Wallet */}
                     <View
                         style={[
                             tailwind('mt-6 rounded-md p-5 flex'),
@@ -126,7 +83,7 @@ const Import = () => {
                                 tailwind('font-bold mt-2'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            New Wallet
+                            New
                         </Text>
 
                         <Text
@@ -134,9 +91,7 @@ const Import = () => {
                                 tailwind('mt-4 text-xs'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            Create a new wallet with a fresh BIP39 seed and an
-                            optional passphrase. Use this if you have no
-                            existing wallet.
+                            Create a new wallet with a new seed.
                         </Text>
 
                         <View style={[tailwind('items-end')]}>
@@ -168,7 +123,52 @@ const Import = () => {
                         </View>
                     </View>
 
-                    <View style={[tailwind('mt-6 flex-row')]}>
+                    {/* Import an existing Wallet */}
+                    <View
+                        style={[
+                            tailwind('mt-8 rounded-md p-5'),
+                            {backgroundColor: '#8b8b8b'},
+                        ]}>
+                        <Text style={[tailwind('font-bold mt-2 text-white')]}>
+                            Restore
+                        </Text>
+
+                        <Text style={[tailwind('mt-4 text-white text-xs')]}>
+                            Import wallet from seed or other material.
+                            {'\n'}Select if you want to import an existing
+                            wallet.
+                        </Text>
+
+                        <View style={[tailwind('items-end')]}>
+                            <PlainButton
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'RestoreActions',
+                                        }),
+                                    );
+                                }}>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'px-4 py-2 bg-black rounded-sm mt-4',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                'text-xs text-white font-medium',
+                                            ),
+                                            Font.RobotoText,
+                                        ]}>
+                                        Import
+                                    </Text>
+                                </View>
+                            </PlainButton>
+                        </View>
+                    </View>
+
+                    <View style={[tailwind('mt-8 flex-row')]}>
                         <InfoIcon width={30} fill={ColorScheme.SVG.Default} />
                         <Text
                             style={[
@@ -184,7 +184,7 @@ const Import = () => {
     );
 };
 
-export default Import;
+export default Add;
 
 const styles = StyleSheet.create({
     cardShadow: {

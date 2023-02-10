@@ -1,14 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import {
-    TextInput,
-    Platform,
-    View,
-    Text,
-    Switch,
-    useColorScheme,
-} from 'react-native';
+import {TextInput, Platform, View} from 'react-native';
 
 import tailwind from 'tailwind-rn';
 
@@ -20,9 +13,6 @@ import {TextInputProps, TextLongInputProps} from '../types/props';
 
 import Folder from './../assets/svg/file-directory-fill-24.svg';
 import Scan from './../assets/svg/scan.svg';
-import Font from '../constants/Font';
-
-import Color from '../constants/Color';
 
 export const TextSingleInput = (props: TextInputProps) => {
     return (
@@ -42,8 +32,6 @@ export const TextSingleInput = (props: TextInputProps) => {
 };
 
 export const TextMultiInput = (props: TextLongInputProps) => {
-    const ColorScheme = Color(useColorScheme());
-
     return (
         <View
             style={[
@@ -84,10 +72,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         ),
                     ]}>
                     <PlainButton onPress={() => {}}>
-                        <Scan
-                            width={22}
-                            fill={props.showFolder ? 'gray' : props.folderColor}
-                        />
+                        <Scan width={22} fill={'gray'} />
                     </PlainButton>
                 </View>
             ) : (
@@ -121,45 +106,6 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                             fill={props.showFolder ? 'gray' : props.folderColor}
                         />
                     </PlainButton>
-                </View>
-            ) : (
-                <></>
-            )}
-
-            {props.showTestnetToggle ? (
-                <View
-                    style={[
-                        tailwind(
-                            'left-4 bottom-3 absolute items-center flex-row',
-                        ),
-                    ]}>
-                    <Switch
-                        style={[
-                            tailwind('-ml-2 relative'),
-                            {
-                                transform: [
-                                    {scaleX: Platform.OS === 'ios' ? 0.6 : 0.8},
-                                    {scaleY: Platform.OS === 'ios' ? 0.6 : 0.8},
-                                ],
-                            },
-                        ]}
-                        trackColor={{false: '#767577', true: '#2771f0'}}
-                        thumbColor={props.isEnabled ? '#ffffff' : '#8e8e8e'}
-                        value={props.isEnabled}
-                        onValueChange={props.toggleSwitch}
-                    />
-                    <Text
-                        style={[
-                            tailwind('text-white text-sm'),
-                            {
-                                fontWeight: props.isEnabled ? '600' : 'normal',
-                                opacity: props.isEnabled ? 1 : 0.2,
-                                color: ColorScheme.Text.Default,
-                            },
-                            Font.RobotoText,
-                        ]}>
-                        Testnet
-                    </Text>
                 </View>
             ) : (
                 <></>

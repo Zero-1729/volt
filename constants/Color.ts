@@ -2,7 +2,7 @@
 const Color = (currentTheme: ColorThemeType) => {
     let isDarkMode = currentTheme === 'dark';
 
-    return {
+    const colors: {[index: string]: any} = {
         isDarkMode: isDarkMode,
         NavigatorTheme: {
             colors: {
@@ -21,6 +21,8 @@ const Color = (currentTheme: ColorThemeType) => {
             CheckBoxFilled: isDarkMode ? 'black' : 'black',
             CheckBoxOutline: isDarkMode ? 'white' : 'black',
             CheckBoxUnfilled: isDarkMode ? 'black' : 'white',
+            Greyed: isDarkMode ? '#202020' : '#E5E5E5',
+            CardGreyed: isDarkMode ? '#3f3f3f' : '#D5D5D5',
         },
         HeadingBar: isDarkMode ? '#1b1b1b' : '#F3F3F3',
         Text: {
@@ -35,7 +37,16 @@ const Color = (currentTheme: ColorThemeType) => {
         MiscCardColor: {
             ImportAltCard: isDarkMode ? '#2c2c2c' : 'white',
         },
+        // Get index using WalletType
+        WalletColors: {
+            bech32: '#5c0931', // Burgundy
+            Legacy: '#1E90FF', // Dodgerblue
+            Segwit: '#008000', // Green
+            Taproot: '#800080', // Purple
+        },
     };
+
+    return colors;
 };
 
 type ColorThemeType = string | unknown;

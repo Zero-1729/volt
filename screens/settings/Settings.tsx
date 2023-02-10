@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
 
@@ -7,6 +7,8 @@ import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import tailwind from 'tailwind-rn';
 
@@ -29,6 +31,14 @@ const Settings = () => {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
     };
+
+    const {
+        appLanguage,
+        appFiatCurrency,
+        resetAppData,
+        isDevMode,
+        IsWalletInitialized,
+    } = useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -95,7 +105,18 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[tailwind('flex-row justify-between')]}>
+                                style={[
+                                    tailwind(
+                                        'flex-row justify-between items-center',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-xs mr-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {`${appFiatCurrency.short} (${appFiatCurrency.symbol})`}
+                                </Text>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}
@@ -128,7 +149,18 @@ const Settings = () => {
                             </Text>
 
                             <View
-                                style={[tailwind('flex-row justify-between')]}>
+                                style={[
+                                    tailwind(
+                                        'flex-row justify-between items-center',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-xs mr-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {appLanguage.name}
+                                </Text>
                                 <Right
                                     width={16}
                                     stroke={ColorScheme.SVG.GrayFill}
@@ -138,7 +170,12 @@ const Settings = () => {
                         </View>
                     </PlainButton>
 
-                    <PlainButton onPress={() => {}}>
+                    <PlainButton
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'Security'}),
+                            );
+                        }}>
                         <View
                             style={[
                                 tailwind(
@@ -165,7 +202,7 @@ const Settings = () => {
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
-                                CommonActions.navigate({name: 'Network'}),
+                                CommonActions.navigate({name: 'Wallet'}),
                             );
                         }}>
                         <View
@@ -180,7 +217,7 @@ const Settings = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Network
+                                Wallet
                             </Text>
 
                             <Right
@@ -212,6 +249,30 @@ const Settings = () => {
                         </PlainButton>
                     </View>
                 </View>
+
+                {isDevMode ? (
+                    <PlainButton
+                        disabled={!IsWalletInitialized}
+                        onPress={() => {
+                            if (IsWalletInitialized) {
+                                resetAppData();
+                            }
+                        }}
+                        style={[tailwind('absolute bottom-20 items-center')]}>
+                        <Text
+                            style={[
+                                tailwind(
+                                    `text-sm w-full font-bold ${
+                                        !IsWalletInitialized ? 'opacity-20' : ''
+                                    } text-red-600`,
+                                ),
+                            ]}>
+                            Reset Data
+                        </Text>
+                    </PlainButton>
+                ) : (
+                    <></>
+                )}
 
                 <PlainButton
                     style={[

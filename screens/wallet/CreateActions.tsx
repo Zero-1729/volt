@@ -1,11 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 
 import {useColorScheme, StyleSheet, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
+import {CommonActions} from '@react-navigation/native';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import tailwind from 'tailwind-rn';
 
@@ -18,20 +22,44 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const ImportAction = () => {
+const CreateAction = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
 
-    const [walletName, setWalletName] = useState('');
+    const {isWalletInitialized, setWalletInitialized, addWallet} =
+        useContext(AppStorageContext);
+
+    const [newWalletName, setNewWalletName] = useState('');
+
+    const updateWalletName = async (walletName: string) => {
+        // Indicate that the wallet has been created
+        if (!isWalletInitialized) {
+            setWalletInitialized(true);
+        }
+
+        try {
+            // Default wallet type is Segwit bech32
+            addWallet(walletName, false, 'bech32', '');
+        } catch (e) {
+            console.error(`[CreateAction] Error adding wallet: [${e}]`);
+        }
+
+        // Navigate to the wallet screen
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'Home',
+            }),
+        );
+    };
 
     const onBlur = () => {
-        const valueWithSingleWhitespace = walletName.replace(
+        const valueWithSingleWhitespace = newWalletName.replace(
             /^\s+|\s+$|\s+(?=\s)/g,
             '',
         );
 
-        setWalletName(valueWithSingleWhitespace);
+        setNewWalletName(valueWithSingleWhitespace);
 
         return valueWithSingleWhitespace;
     };
@@ -73,10 +101,10 @@ const ImportAction = () => {
 
                     <Text
                         style={[
-                            tailwind('text-sm mt-2'),
+                            tailwind('text-xs mt-2'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
-                        Defaults to SegWit (bech32)
+                        Defaults to SegWit Native (address starts with 'bc1')
                     </Text>
 
                     <View
@@ -86,7 +114,7 @@ const ImportAction = () => {
                         ]}>
                         <TextSingleInput
                             placeholder={'Enter Wallet name'}
-                            onChangeText={setWalletName}
+                            onChangeText={setNewWalletName}
                             onBlur={onBlur}
                             color={ColorScheme.Text.Default}
                         />
@@ -94,14 +122,17 @@ const ImportAction = () => {
                 </View>
 
                 <LongBottomButton
+                    onPress={() => {
+                        updateWalletName(newWalletName);
+                    }}
                     title={'Continue'}
                     textColor={
-                        walletName.trim().length > 0
+                        newWalletName.trim().length > 0
                             ? ColorScheme.Text.Alt
                             : ColorScheme.Text.GrayedText
                     }
                     backgroundColor={
-                        walletName.trim().length > 0
+                        newWalletName.trim().length > 0
                             ? ColorScheme.Background.Inverted
                             : ColorScheme.Background.Secondary
                     }
@@ -111,6 +142,6 @@ const ImportAction = () => {
     );
 };
 
-export default ImportAction;
+export default CreateAction;
 
 const styles = StyleSheet.create({});
