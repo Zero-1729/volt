@@ -10,7 +10,7 @@ export const _getBTCfromSats = (sats: number) => {
 };
 
 export const formatSats = (sats: number) => {
-    // REM: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
+    // REM: Based on: https://bitcoin.design/guide/designing-products/units-and-symbols/
     if (sats < 0.1 && sats !== 0) {
         // Limit display to eight decimals
         // Anything lower is assumed to be an approximation
@@ -34,7 +34,7 @@ export const formatSats = (sats: number) => {
 };
 
 export const formatBTC = (sats: number) => {
-    // REM: adopt spec described here: https://bitcoin.design/guide/designing-products/units-and-symbols/
+    // REM: Based on: https://bitcoin.design/guide/designing-products/units-and-symbols/
     const BTC = _getBTCfromSats(sats);
 
     // If below whole BTC, let's attempt to display that
