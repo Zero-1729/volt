@@ -1,17 +1,6 @@
 import Crypto from 'crypto';
 import {Unit, UTXOType} from './../../types/wallet';
 
-const Units = {
-    BTC: {
-        name: 'BTC',
-        symbol: '₿',
-    },
-    SATS: {
-        name: 'sats',
-        symbol: 'sats',
-    },
-};
-
 export class BaseWallet {
     id: string;
 
@@ -61,7 +50,10 @@ export class BaseWallet {
         this.descriptor = descriptor ? descriptor : '';
         this.birthday = Date(); // Timestamp of wallet creation
 
-        this.units = Units.SATS; // Which unit to display wallet balance in
+        this.units = {
+            name: 'sats',
+            symbol: 'sats',
+        }; // Default unit to display wallet balance is sats
 
         this.balance = 0; // By default the balance is in sats
         this.syncedBalance = 0; // Last balance synced from node
