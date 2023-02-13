@@ -38,11 +38,6 @@ public class MainApplication extends Application implements ReactApplication {
       protected boolean isNewArchEnabled() {
         return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
       }
-
-      @Override
-      protected Boolean isHermesEnabled() {
-        return BuildConfig.IS_HERMES_ENABLED;
-      }
     };
 
   @Override
@@ -56,6 +51,8 @@ public class MainApplication extends Application implements ReactApplication {
     SoLoader.init(this, /* native exopackage */ false);
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
+      // and load the native entry point for this app.
+      ReactFeatureFlags.useTurboModules = true;
       DefaultNewArchitectureEntryPoint.load();
     }
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
