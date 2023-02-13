@@ -1,16 +1,16 @@
 // All reuseable Props and Base Types for RN and App
-import React from 'react';
+import React, {PropsWithChildren} from 'react';
+
 import {SvgProps} from 'react-native-svg';
 
 import {Unit} from './wallet';
 
 // Base Prop Type
-type BaseProps = {
-    children?: React.ReactNode;
+type BaseProps = PropsWithChildren<{
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     onPress?: () => void;
     disabled?: boolean;
-};
+}>;
 
 type AppCard = BaseProps & {
     key: React.Key;
