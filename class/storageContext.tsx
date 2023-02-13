@@ -198,7 +198,6 @@ export const AppStorageProvider = ({children}) => {
     const addWallet = useCallback(
         async (
             name: string,
-            isWatchOnly: boolean,
             type: string,
             secret: string,
             descriptor?: string,
@@ -207,7 +206,6 @@ export const AppStorageProvider = ({children}) => {
             try {
                 const newWallet = new BaseWallet(
                     name,
-                    isWatchOnly,
                     type,
                     secret,
                     descriptor,

@@ -2,25 +2,25 @@ import Crypto from 'crypto';
 import {Unit, UTXOType} from './../../types/wallet';
 
 export class BaseWallet {
-    id: string;
+    public id: string;
 
-    name: string;
-    isWatchOnly: boolean;
-    type: string;
+    public name: string;
+    readonly isWatchOnly: boolean;
+    readonly type: string;
 
-    descriptor: string;
-    birthday: string | Date;
-    secret: string;
+    readonly descriptor: string;
+    readonly birthday: string | Date;
+    readonly secret: string;
 
-    MasterFingerprint: string;
-    isBIP39: boolean;
+    readonly MasterFingerprint: string;
+    readonly isBIP39: boolean;
 
     balance: number;
 
-    UTXOs: UTXOType[];
+    private UTXOs: UTXOType[];
 
-    addresses: Array<string>;
-    address: string;
+    private addresses: Array<string>;
+    private address: string;
 
     syncedBalance: number;
     lastSynced: number;
@@ -33,16 +33,15 @@ export class BaseWallet {
 
     constructor(
         name: string,
-        isWatchOnly: boolean,
         type: string,
         secret: string,
         descriptor?: string,
         network?: string,
+        isWatchOnly?: boolean,
     ) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = name; // Wallet name
 
-        this.isWatchOnly = isWatchOnly; // Whether wallet is watch only
         this.type = type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
         this.addresses = []; // List of addresses
@@ -68,9 +67,11 @@ export class BaseWallet {
         this.MasterFingerprint = ''; // Wallet master fingerprint
         this.secret = !isWatchOnly ? secret : ''; // private key or recovery phrase
         this.isBIP39 = false; // Whether wallet has a 'BIP39' seed
+
+        this.isWatchOnly = !this.secret; // Whether wallet is watch only
     }
 
-    private _generateID() {
+    private _generateID(): string {
         return Crypto.randomUUID();
     }
 
