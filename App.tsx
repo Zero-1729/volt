@@ -38,6 +38,7 @@ const App = () => {
                 barStyle={
                     ColorScheme.isDarkMode ? 'light-content' : 'dark-content'
                 }
+                backgroundColor={ColorScheme.Background.Primary}
             />
 
             <NavigationContainer theme={Theme}>
@@ -46,7 +47,5 @@ const App = () => {
         </SafeAreaProvider>
     );
 };
-
-const styles = StyleSheet.create({});
 
 export default App;
