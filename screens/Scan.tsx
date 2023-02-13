@@ -29,7 +29,7 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {LongButton, PlainButton} from '../components/button';
 
@@ -38,6 +38,8 @@ import Color from '../constants/Color';
 
 const LoadingView = (props: any): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     return (
         <SafeAreaView
@@ -62,6 +64,8 @@ const LoadingView = (props: any): JSX.Element => {
 
 const RequestPermView = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     return (
         <SafeAreaView
@@ -96,6 +100,8 @@ const openSettings = () => {
 };
 
 const Scan = (): JSX.Element => {
+    const tailwind = useTailwind();
+
     const isFocused = useIsFocused();
     const navigation = useNavigation();
 

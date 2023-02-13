@@ -13,7 +13,7 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import Checkbox from 'react-native-bouncy-checkbox';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
 
@@ -28,6 +28,8 @@ const Wallet = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const HeadingBar = {
         height: 2,

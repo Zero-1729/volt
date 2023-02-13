@@ -11,7 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
 
@@ -26,6 +26,8 @@ const CreateAction = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const {isWalletInitialized, setWalletInitialized, addWallet} =
         useContext(AppStorageContext);

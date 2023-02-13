@@ -9,7 +9,7 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {FlatList} from 'react-native-gesture-handler';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -31,6 +31,8 @@ import {BaseWalletType} from '../types/wallet';
 
 const Home = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const navigation = useNavigation();
 

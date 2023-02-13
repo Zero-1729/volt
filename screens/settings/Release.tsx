@@ -5,7 +5,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation} from '@react-navigation/core';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
 
@@ -18,6 +18,8 @@ import Notes from './../../data/release-notes.json';
 
 const Release = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const navigation = useNavigation();
 

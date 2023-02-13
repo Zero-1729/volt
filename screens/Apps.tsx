@@ -4,7 +4,7 @@ import {FlatList, Text, useColorScheme, View, Linking} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../components/button';
 
@@ -20,6 +20,8 @@ import Color from '../constants/Color';
 
 const Apps = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     // Apps
     const Services = [

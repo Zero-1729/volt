@@ -2,7 +2,7 @@ import React from 'react';
 
 import {TouchableOpacity, View, Text} from 'react-native';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
@@ -13,6 +13,8 @@ export const PlainButton = (props: BaseProps) => {
 };
 
 export const Button = (props: ButtonProps): JSX.Element => {
+    const tailwind = useTailwind();
+
     return (
         <TouchableOpacity style={tailwind('items-center flex-row')} {...props}>
             <View
@@ -35,6 +37,8 @@ export const Button = (props: ButtonProps): JSX.Element => {
 };
 
 export const LongButton = (props: ButtonProps): JSX.Element => {
+    const tailwind = useTailwind();
+
     return (
         <TouchableOpacity
             {...props}
@@ -60,6 +64,8 @@ export const LongButton = (props: ButtonProps): JSX.Element => {
 };
 
 export const LongBottomButton = (props: ButtonProps): JSX.Element => {
+    const tailwind = useTailwind();
+
     return (
         <TouchableOpacity
             {...props}
