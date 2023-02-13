@@ -19,7 +19,7 @@ import InfoIcon from './../../assets/svg/info-16.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const Add = () => {
+const Add = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());

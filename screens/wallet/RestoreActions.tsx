@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 
-import {useColorScheme, StyleSheet, Text, View} from 'react-native';
+import {useColorScheme, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
@@ -17,7 +17,7 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const ImportAction = () => {
+const ImportAction = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -142,5 +142,3 @@ const ImportAction = () => {
 };
 
 export default ImportAction;
-
-const styles = StyleSheet.create({});

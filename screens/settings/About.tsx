@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
+import {Text, View, useColorScheme, Linking} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -27,7 +27,7 @@ import VoltText from './../../assets/svg/volt-text.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const About = () => {
+const About = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -241,5 +241,3 @@ const About = () => {
 };
 
 export default About;
-
-const styles = StyleSheet.create({});

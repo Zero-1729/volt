@@ -24,7 +24,7 @@ import {AppStorageContext} from '../../class/storageContext';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const Wallet = () => {
+const Wallet = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());

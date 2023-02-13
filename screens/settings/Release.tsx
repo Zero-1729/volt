@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
+import {Text, View, FlatList, useColorScheme} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -16,7 +16,7 @@ import Color from '../../constants/Color';
 
 import Notes from './../../data/release-notes.json';
 
-const Release = () => {
+const Release = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -91,5 +91,3 @@ const Release = () => {
 };
 
 export default Release;
-
-const styles = StyleSheet.create({});

@@ -26,7 +26,7 @@ import Color from '../../constants/Color';
 
 import {Currencies} from '../../constants/Currency';
 
-const Currency = () => {
+const Currency = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());

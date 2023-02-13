@@ -14,7 +14,7 @@ import {TextInputProps, TextLongInputProps} from '../types/props';
 import Folder from './../assets/svg/file-directory-fill-24.svg';
 import Scan from './../assets/svg/scan.svg';
 
-export const TextSingleInput = (props: TextInputProps) => {
+export const TextSingleInput = (props: TextInputProps): JSX.Element => {
     return (
         <TextInput
             underlineColorAndroid="transparent"
@@ -31,7 +31,7 @@ export const TextSingleInput = (props: TextInputProps) => {
     );
 };
 
-export const TextMultiInput = (props: TextLongInputProps) => {
+export const TextMultiInput = (props: TextLongInputProps): JSX.Element => {
     return (
         <View
             style={[

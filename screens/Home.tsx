@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
 
-import {Platform, StyleSheet, Text, useColorScheme, View} from 'react-native';
+import {Platform, Text, useColorScheme, View} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -29,7 +29,7 @@ import {normalizeFiat} from '../modules/transform';
 
 import {BaseWalletType} from '../types/wallet';
 
-const Home = () => {
+const Home = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -263,9 +263,3 @@ const Home = () => {
 };
 
 export default Home;
-
-const styles = StyleSheet.create({
-    DarkGrayCard: {
-        backgroundColor: '#B5B5B5',
-    },
-});

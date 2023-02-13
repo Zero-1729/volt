@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 
-import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
+import {Text, View, useColorScheme, Linking} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -22,7 +22,7 @@ import NativeBottomPadding from '../../constants/NativeWindowMetrics';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const Settings = () => {
+const Settings = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -308,5 +308,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
-const styles = StyleSheet.create({});

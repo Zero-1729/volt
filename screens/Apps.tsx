@@ -1,13 +1,6 @@
 import React from 'react';
 
-import {
-    StyleSheet,
-    FlatList,
-    Text,
-    useColorScheme,
-    View,
-    Linking,
-} from 'react-native';
+import {FlatList, Text, useColorScheme, View, Linking} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -25,7 +18,7 @@ import ChangellyLogo from './../assets/svg/changelly.svg';
 
 import Color from '../constants/Color';
 
-const Apps = () => {
+const Apps = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
 
     // Apps
@@ -141,5 +134,3 @@ const Apps = () => {
 };
 
 export default Apps;
-
-const styles = StyleSheet.create({});

@@ -24,7 +24,7 @@ const WalletTypes: {[index: string]: string} = {
     Taproot: 'Taproot',
 };
 
-export const EmptyCard = () => {
+export const EmptyCard = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -79,7 +79,7 @@ export const EmptyCard = () => {
     );
 };
 
-export const WalletCard = (props: WalletCardProps) => {
+export const WalletCard = (props: WalletCardProps): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
 
     const [unit, setUnit] = useState<Unit>(props.unit);

@@ -12,7 +12,7 @@ export const PlainButton = (props: BaseProps) => {
     return <TouchableOpacity {...props} />;
 };
 
-export const Button = (props: ButtonProps) => {
+export const Button = (props: ButtonProps): JSX.Element => {
     return (
         <TouchableOpacity style={tailwind('items-center flex-row')} {...props}>
             <View
@@ -34,7 +34,7 @@ export const Button = (props: ButtonProps) => {
     );
 };
 
-export const LongButton = (props: ButtonProps) => {
+export const LongButton = (props: ButtonProps): JSX.Element => {
     return (
         <TouchableOpacity
             {...props}
@@ -59,7 +59,7 @@ export const LongButton = (props: ButtonProps) => {
     );
 };
 
-export const LongBottomButton = (props: ButtonProps) => {
+export const LongBottomButton = (props: ButtonProps): JSX.Element => {
     return (
         <TouchableOpacity
             {...props}

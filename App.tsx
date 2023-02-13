@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 
-import {StatusBar, StyleSheet, useColorScheme} from 'react-native';
+import {StatusBar, useColorScheme} from 'react-native';
 
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
@@ -14,7 +14,7 @@ import InitScreen from './Navigation';
 
 import Color from './constants/Color';
 
-const App = () => {
+function App(): JSX.Element {
     useEffect(() => {
         SplashScreen.hide();
     });
@@ -45,8 +45,6 @@ const App = () => {
             </NavigationContainer>
         </SafeAreaProvider>
     );
-};
-
-const styles = StyleSheet.create({});
+}
 
 export default App;

@@ -36,7 +36,7 @@ import {LongButton, PlainButton} from '../components/button';
 import Close from './../assets/svg/x-circle-fill-24.svg';
 import Color from '../constants/Color';
 
-const LoadingView = (props: any) => {
+const LoadingView = (props: any): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
 
     return (
@@ -60,7 +60,7 @@ const LoadingView = (props: any) => {
     );
 };
 
-const RequestPermView = () => {
+const RequestPermView = (): JSX.Element => {
     const ColorScheme = Color(useColorScheme());
 
     return (
@@ -95,7 +95,7 @@ const openSettings = () => {
     Linking.openSettings();
 };
 
-const Scan = () => {
+const Scan = (): JSX.Element => {
     const isFocused = useIsFocused();
     const navigation = useNavigation();
 
@@ -142,7 +142,7 @@ const Scan = () => {
                 }),
             );
         },
-        [navigation],
+        [RNHapticFeedbackOptions, navigation.dispatch],
     );
 
     const closeScreen = () => {

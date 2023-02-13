@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-    StyleSheet,
     Text,
     View,
     FlatList,
@@ -21,7 +20,7 @@ import Color from '../../constants/Color';
 
 import LICENSE from './../../data/LICENSE.json';
 
-const License = () => {
+const License = (): JSX.Element => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -87,5 +86,3 @@ const License = () => {
 };
 
 export default License;
-
-const styles = StyleSheet.create({});
