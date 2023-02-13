@@ -84,7 +84,6 @@
     "react-native-tooltip": "^5.2.0",
     "react-native-vision-camera": "^2.15.2",
     "readable-stream": "^2.3.7",
-    "realm": "^10.19.3",
     "rn-nodeify": "^10.3.0",
     "scryptsy": "^2.1.0",
     "tailwind-rn": "^3.0.1",
