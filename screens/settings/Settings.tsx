@@ -1,6 +1,13 @@
 import React, {useContext} from 'react';
 
-import {StyleSheet, Text, View, useColorScheme, Linking} from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    View,
+    useColorScheme,
+    Linking,
+    Platform,
+} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -30,6 +37,12 @@ const Settings = () => {
     const HeadingBar = {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
+    };
+
+    const device = Platform.OS;
+    const bottomOffset: {[index: string]: number} = {
+        ios: NativeBottomPadding.navBottom + 32,
+        android: NativeBottomPadding.navBottom + 56,
     };
 
     const {
@@ -258,7 +271,10 @@ const Settings = () => {
                                 resetAppData();
                             }
                         }}
-                        style={[tailwind('absolute bottom-20 items-center')]}>
+                        style={[
+                            tailwind('absolute items-center'),
+                            {bottom: bottomOffset[device]},
+                        ]}>
                         <Text
                             style={[
                                 tailwind(
