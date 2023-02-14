@@ -194,7 +194,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                'left-0 bg-white w-full py-1 rounded-tr-md absolute bottom-0 self-center opacity-40',
+                                'left-0 bg-white w-full py-1 rounded-bl-md rounded-tr-md absolute bottom-0 self-center opacity-40',
                             ),
                         ]}>
                         <Text
