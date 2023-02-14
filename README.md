@@ -14,12 +14,33 @@ Clone the repo locally and install the required npm dependencies:
 ```sh
 $ git clone https://github.com/Zero-1729/volt
 cd volt
-npm install
+yarn install
 ```
 
 To run the wallet locally on, and build for, Android or IOS you'll need [Android Studio](https://developer.android.com/studio/) and [Xcode](https://developer.apple.com/xcode/resources/) installed, respectively. 
 
-## Running on Android (Virtual) Device
+## Development
+
+To run the wallet locally on your system, run the following in the project root (`volt/`):
+
+> This will start the Metro Bundler, which is the tool responsible for bundling the app's JavaScript code and assets into a single file that can be run on the device.
+
+```sh
+$ yarn run start
+```
+
+### Note on Tailwind
+
+Due to the way Tailwind works, you'll need to run the following command to build the Tailwind CSS file:
+
+> This builds the Tailwind styles in watch mode. You'll need to run this command in a separate terminal window to keep the Tailwind styles updated before running the app.
+
+```sh
+$ yarn run dev:tailwind
+```
+
+
+### Running on Android (Virtual) Device
 
 - Download and run the latest (stable) version of Android Studio.
 - Launch Android Studio, and Open the project's android folder (`volt/android`).
@@ -32,22 +53,24 @@ After setting up the virtual device, run the following in the project root (`vol
 > The command builds the app and installs it on the virtual device or a connected Android device (if detected). Once launched, the app would take time loading the dependencies. 
 
 ```sh
-$ npm run android
+$ yarn run android
 ```
 
-## Running on IOS
+### Running on IOS
 
 To run the app using XCode's IOS emulator, you'll need to install the CocoaPod dependencies:
 
 ```sh
 $ cd ios
-$ npm pod install
+$ yarn pod install
 ```
 
 After installing the dependencies, to launch the app on the IOS emulator you'll need to navigate to the project root (`volt`) and run:
 
+> Note: If you have issues running the command above, you can also open Xcode and open the `ios/volt.xcworkspace` file and build/run the app from there.
+
 ```sh
-npm run ios
+yarn run ios
 ```
 
 # Responsible Disclosure
