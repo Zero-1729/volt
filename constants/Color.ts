@@ -40,9 +40,9 @@ const Color = (currentTheme: ColorThemeType) => {
         // Get index using WalletType
         WalletColors: {
             bech32: '#5c0931', // Burgundy
-            Legacy: '#1E90FF', // Dodgerblue
-            Segwit: '#008000', // Green
-            Taproot: '#800080', // Purple
+            legacy: '#1E90FF', // Dodgerblue
+            p2sh: '#008000', // Green
+            taproot: '#800080', // Purple
         },
     };
 
