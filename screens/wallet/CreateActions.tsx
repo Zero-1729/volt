@@ -160,6 +160,26 @@ const CreateAction = () => {
 
                             {/* Dropdown */}
                             <DropDownPicker
+                                style={[
+                                    tailwind('rounded-md'),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Secondary,
+                                        borderColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}
+                                containerStyle={[tailwind('mt-4')]}
+                                labelStyle={{color: ColorScheme.Text.Default}}
+                                dropDownContainerStyle={{
+                                    borderColor: ColorScheme.Background.Greyed,
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                }}
+                                listItemLabelStyle={{
+                                    color: ColorScheme.Text.DescText,
+                                }}
+                                arrowIconStyle={{borderColor: 'dodgerblue'}}
                                 open={open}
                                 value={account}
                                 items={accounts}
