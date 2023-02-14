@@ -27,7 +27,7 @@ import {EmptyCard, WalletCard} from '../components/card';
 
 import {normalizeFiat} from '../modules/transform';
 
-import {BaseWalletType} from '../types/wallet';
+import {BaseWallet} from '../class/wallet/base';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
@@ -41,7 +41,7 @@ const Home = () => {
 
     // add the total balances of the wallets
     const totalBalance = wallets.reduce(
-        (accumulator: number, currentValue: BaseWalletType) =>
+        (accumulator: number, currentValue: BaseWallet) =>
             accumulator + currentValue.balance,
         0,
     );
@@ -62,7 +62,7 @@ const Home = () => {
         marginTop: Platform.OS === 'android' ? 12 : 0,
     };
 
-    const renderCard = ({item}: {item: BaseWalletType}) => {
+    const renderCard = ({item}: {item: BaseWallet}) => {
         return (
             <View style={[tailwind('w-full absolute -top-24')]}>
                 <WalletCard
