@@ -339,7 +339,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 setSatSymbol,
                 hideTotalBalance,
                 setTotalBalanceHidden,
-                IsWalletInitialized,
+                isWalletInitialized,
                 setWalletInitialized,
                 resetAppData,
                 isDevMode,
