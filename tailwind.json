@@ -437,6 +437,11 @@
 			"borderTopRightRadius": 6
 		}
 	},
+	"rounded-bl-md": {
+		"style": {
+			"borderBottomLeftRadius": 6
+		}
+	},
 	"border-gray-400": {
 		"style": {
 			"--tw-border-opacity": 1,

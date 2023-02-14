@@ -339,6 +339,10 @@
   border-top-right-radius: 0.375rem
 }
 
+.rounded-bl-md {
+  border-bottom-left-radius: 0.375rem
+}
+
 .border-gray-400 {
   --tw-border-opacity: 1;
   border-color: rgb(156 163 175 / var(--tw-border-opacity))
