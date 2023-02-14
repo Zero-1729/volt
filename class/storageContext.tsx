@@ -200,16 +200,16 @@ export const AppStorageProvider = ({children}) => {
             name: string,
             type: string,
             secret: string,
-            descriptor?: string,
             network: string = 'tesnet',
+            descriptor?: string,
         ) => {
             try {
                 const newWallet = new BaseWallet(
                     name,
                     type,
                     secret,
-                    descriptor,
                     network,
+                    descriptor,
                 );
 
                 _setCurrentWalletID(newWallet.id);
