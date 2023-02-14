@@ -18,10 +18,9 @@ import Color from '../constants/Color';
 import {formatSats, formatBTC} from '../modules/transform';
 
 const WalletTypes: {[index: string]: string} = {
-    bech32: 'Segwit Native',
-    Legacy: 'Legacy',
-    Segwit: 'Segwit (P2SH)',
-    Taproot: 'Taproot',
+    bech32: 'Native Segwit (Bech32)',
+    legacy: 'Legacy (P2PKH)',
+    p2sh: 'Segwit (P2SH)',
 };
 
 export const EmptyCard = () => {
