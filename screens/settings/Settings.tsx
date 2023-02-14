@@ -45,7 +45,7 @@ const Settings = () => {
         appFiatCurrency,
         resetAppData,
         isDevMode,
-        IsWalletInitialized,
+        isWalletInitialized,
     } = useContext(AppStorageContext);
 
     return (
@@ -260,9 +260,9 @@ const Settings = () => {
 
                 {isDevMode ? (
                     <PlainButton
-                        disabled={!IsWalletInitialized}
+                        disabled={!isWalletInitialized}
                         onPress={() => {
-                            if (IsWalletInitialized) {
+                            if (isWalletInitialized) {
                                 resetAppData();
                             }
                         }}
@@ -274,7 +274,7 @@ const Settings = () => {
                             style={[
                                 tailwind(
                                     `text-sm w-full font-bold ${
-                                        !IsWalletInitialized ? 'opacity-20' : ''
+                                        !isWalletInitialized ? 'opacity-20' : ''
                                     } text-red-600`,
                                 ),
                             ]}>

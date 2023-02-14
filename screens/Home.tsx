@@ -36,7 +36,7 @@ const Home = () => {
 
     const navigation = useNavigation();
 
-    const {IsWalletInitialized, wallets, hideTotalBalance, appFiatCurrency} =
+    const {isWalletInitialized, wallets, hideTotalBalance, appFiatCurrency} =
         useContext(AppStorageContext);
 
     // add the total balances of the wallets
@@ -104,7 +104,7 @@ const Home = () => {
                         />
                     </PlainButton>
 
-                    {IsWalletInitialized ? (
+                    {isWalletInitialized ? (
                         <View
                             style={tailwind(
                                 'flex-row justify-between items-center -mr-1',
@@ -140,13 +140,13 @@ const Home = () => {
                         style={[
                             tailwind(
                                 `w-full items-center justify-between ${
-                                    !IsWalletInitialized ? 'mb-4' : ''
+                                    !isWalletInitialized ? 'mb-4' : ''
                                 }`,
                             ),
                         ]}>
                         <View
                             style={tailwind('justify-around w-full mt-2 mb-4')}>
-                            {IsWalletInitialized ? (
+                            {isWalletInitialized ? (
                                 <>
                                     <Text
                                         style={[
@@ -199,7 +199,7 @@ const Home = () => {
                         </View>
 
                         {/** Create a vertical scroll carousel for 'BaseCard */}
-                        {IsWalletInitialized ? (
+                        {isWalletInitialized ? (
                             <FlatList
                                 style={[tailwind('w-full h-48')]}
                                 data={wallets}
@@ -223,7 +223,7 @@ const Home = () => {
                         style={[
                             tailwind(
                                 `w-full ${
-                                    IsWalletInitialized ? 'h-3/5' : 'h-4/6'
+                                    isWalletInitialized ? 'h-3/5' : 'h-4/6'
                                 } mt-4`,
                             ),
                         ]}>
