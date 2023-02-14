@@ -42,7 +42,8 @@ const CreateAction = () => {
 
         try {
             // Default wallet type is Segwit bech32
-            addWallet(walletName, false, 'bech32', '');
+            // Connects to testnet
+            addWallet(walletName, 'bech32', '');
         } catch (e) {
             console.error(`[CreateAction] Error adding wallet: [${e}]`);
         }
