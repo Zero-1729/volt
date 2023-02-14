@@ -130,7 +130,9 @@ const CreateAction = () => {
                             tailwind('text-xs mt-2'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
-                        Defaults to SegWit Native (address starts with 'bc1')
+                        {isAdvancedMode
+                            ? accountInfo[account]
+                            : "Defaults to SegWit Native (address starts with 'bc1...')"}
                     </Text>
 
                     <View
