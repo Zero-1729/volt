@@ -9,6 +9,8 @@ import {CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import DropDownPicker from 'react-native-dropdown-picker';
+
 import {AppStorageContext} from '../../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
@@ -38,7 +40,24 @@ const CreateAction = () => {
 
     const [newWalletName, setNewWalletName] = useState('');
 
-    const updateWalletName = async (walletName: string) => {
+    const [open, setOpen] = useState(false);
+    const [account, setAccount] = useState('bech32'); // Default to segwit
+    const [accounts, setAccounts] = useState([
+        {
+            value: 'bech32',
+            label: 'Native SegWit (BIP84)',
+        },
+        {value: 'p2sh', label: 'Segwit Wrapped (BIP49)'},
+        {value: 'legacy', label: 'Legacy (BIP44)'},
+    ]);
+
+    const accountInfo: {[index: string]: string} = {
+        bech32: 'Add a new Native SegWit Bech32 wallet (bc1...)',
+        p2sh: 'Add a new Segwit Wrapped P2SH wallet (3...)',
+        legacy: 'Add a new Legacy P2PKH wallet (1...)',
+    };
+
+    const updateWalletName = async (walletName: string, type: string) => {
         // Indicate that the wallet has been created
         if (!isWalletInitialized) {
             setWalletInitialized(true);
@@ -47,7 +66,7 @@ const CreateAction = () => {
         try {
             // Default wallet type is Segwit bech32
             // Connects to testnet
-            addWallet(walletName, 'bech32', '');
+            addWallet(walletName, type, '');
         } catch (e) {
             console.error(`[CreateAction] Error adding wallet: [${e}]`);
         }
@@ -138,6 +157,14 @@ const CreateAction = () => {
                             </Text>
 
                             {/* Dropdown */}
+                            <DropDownPicker
+                                open={open}
+                                value={account}
+                                items={accounts}
+                                setOpen={setOpen}
+                                setValue={setAccount}
+                                setItems={setAccounts}
+                            />
                         </View>
                     ) : (
                         <></>
@@ -146,7 +173,7 @@ const CreateAction = () => {
 
                 <LongBottomButton
                     onPress={() => {
-                        updateWalletName(newWalletName);
+                        updateWalletName(newWalletName, account);
                     }}
                     title={'Continue'}
                     textColor={
