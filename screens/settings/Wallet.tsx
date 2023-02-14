@@ -41,7 +41,8 @@ const Wallet = () => {
         ignoreAndroidSystemSettings: false,
     };
 
-    const {useSatSymbol, setSatSymbol} = useContext(AppStorageContext);
+    const {useSatSymbol, setSatSymbol, isAdvancedMode, setIsAdvancedMode} =
+        useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -89,9 +90,10 @@ const Wallet = () => {
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
 
+                        {/* Use Sats Symbol */}
                         <View
                             style={tailwind(
-                                'justify-center w-full items-center flex-row mt-8 mb-8',
+                                'justify-center w-full items-center flex-row mt-8 mb-10',
                             )}>
                             <View style={tailwind('w-5/6')}>
                                 <View
@@ -153,6 +155,76 @@ const Wallet = () => {
                                         Display the sat symbol (
                                         <Text style={[Font.SatSymbol]}>S</Text>){' '}
                                         for wallet{'\n'}balance in satoshis.
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        {/* Toggle advanced mode */}
+                        <View
+                            style={tailwind(
+                                'justify-center w-full items-center flex-row',
+                            )}>
+                            <View style={tailwind('w-5/6')}>
+                                <View
+                                    style={tailwind(
+                                        'w-full flex-row items-center mb-2',
+                                    )}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-medium'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        Advanced Mode
+                                    </Text>
+                                    <Checkbox
+                                        fillColor={
+                                            ColorScheme.Background
+                                                .CheckBoxFilled
+                                        }
+                                        unfillColor={
+                                            ColorScheme.Background
+                                                .CheckBoxUnfilled
+                                        }
+                                        size={18}
+                                        isChecked={isAdvancedMode}
+                                        iconStyle={{
+                                            borderWidth: 1,
+                                            borderRadius: 2,
+                                        }}
+                                        innerIconStyle={{
+                                            borderWidth: 1,
+                                            borderColor:
+                                                ColorScheme.Background
+                                                    .CheckBoxOutline,
+                                            borderRadius: 2,
+                                        }}
+                                        style={[
+                                            tailwind(
+                                                'flex-row absolute -right-4',
+                                            ),
+                                        ]}
+                                        onPress={() => {
+                                            RNHapticFeedback.trigger(
+                                                'rigid',
+                                                RNHapticFeedbackOptions,
+                                            );
+
+                                            setIsAdvancedMode(!isAdvancedMode);
+                                        }}
+                                        disableBuiltInState={true}
+                                    />
+                                </View>
+
+                                <View style={tailwind('w-full')}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-xs'),
+                                            {color: ColorScheme.Text.DescText},
+                                        ]}>
+                                        Expose more advanced options. Only turn
+                                        {'\n'}
+                                        this on if you know what you are doing.
                                     </Text>
                                 </View>
                             </View>
