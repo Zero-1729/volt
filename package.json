@@ -60,6 +60,7 @@
     "react-native-default-preference": "^1.4.3",
     "react-native-device-info": "^8.1.4",
     "react-native-document-picker": "^5.2.0",
+    "react-native-dropdown-picker": "^5.4.4",
     "react-native-eject": "^0.1.2",
     "react-native-fingerprint-scanner": "^6.0.0",
     "react-native-gesture-handler": "^2.6.0",
