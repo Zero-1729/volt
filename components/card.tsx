@@ -17,10 +17,10 @@ import Color from '../constants/Color';
 
 import {formatSats, formatBTC} from '../modules/transform';
 
-const WalletTypes: {[index: string]: string} = {
-    bech32: 'Native Segwit (Bech32)',
-    legacy: 'Legacy (P2PKH)',
-    p2sh: 'Segwit (P2SH)',
+const WalletTypes: {[index: string]: string[]} = {
+    bech32: ['Native Segwit', 'Bech32'],
+    legacy: ['Legacy', 'P2PKH'],
+    p2sh: ['Segwit', 'P2SH'],
 };
 
 export const EmptyCard = () => {
@@ -87,7 +87,7 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const [unit, setUnit] = useState<Unit>(props.unit);
 
-    const {useSatSymbol} = useContext(AppStorageContext);
+    const {useSatSymbol, isAdvancedMode} = useContext(AppStorageContext);
 
     const toggleUnit = () => {
         if (unit.name === 'BTC') {
@@ -130,7 +130,11 @@ export const WalletCard = (props: WalletCardProps) => {
                             tailwind('text-xs text-white font-bold px-2 py-1'),
                             Font.RobotoText,
                         ]}>
-                        {WalletTypes[props.walletType]}
+                        {`${WalletTypes[props.walletType][0]}${
+                            isAdvancedMode
+                                ? ' (' + WalletTypes[props.walletType][1] + ')'
+                                : ''
+                        }`}
                     </Text>
                 </View>
 
