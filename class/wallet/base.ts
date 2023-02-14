@@ -1,4 +1,5 @@
 import Crypto from 'crypto';
+
 import {Unit, UTXOType} from './../../types/wallet';
 
 export class BaseWallet {
@@ -12,7 +13,7 @@ export class BaseWallet {
     readonly birthday: string | Date;
     readonly secret: string;
 
-    readonly MasterFingerprint: string;
+    readonly masterFingerprint: string;
     readonly isBIP39: boolean;
 
     balance: number;
@@ -64,7 +65,7 @@ export class BaseWallet {
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
 
-        this.MasterFingerprint = ''; // Wallet master fingerprint
+        this.masterFingerprint = ''; // Wallet master fingerprint
         this.secret = !isWatchOnly ? secret : ''; // private key or recovery phrase
         this.isBIP39 = false; // Whether wallet has a 'BIP39' seed
 
