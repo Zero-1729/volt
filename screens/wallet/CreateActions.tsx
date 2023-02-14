@@ -29,8 +29,12 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {isWalletInitialized, setWalletInitialized, addWallet} =
-        useContext(AppStorageContext);
+    const {
+        isWalletInitialized,
+        setWalletInitialized,
+        addWallet,
+        isAdvancedMode,
+    } = useContext(AppStorageContext);
 
     const [newWalletName, setNewWalletName] = useState('');
 
@@ -122,6 +126,22 @@ const CreateAction = () => {
                             color={ColorScheme.Text.Default}
                         />
                     </View>
+
+                    {isAdvancedMode ? (
+                        <View style={[tailwind('mt-8')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                Select Account Type
+                            </Text>
+
+                            {/* Dropdown */}
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </View>
 
                 <LongBottomButton
