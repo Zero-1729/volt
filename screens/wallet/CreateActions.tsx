@@ -9,6 +9,8 @@ import {CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import DropDownPicker from 'react-native-dropdown-picker';
+
 import {AppStorageContext} from '../../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
@@ -18,6 +20,9 @@ import {PlainButton, LongBottomButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
+import ArrowUp from './../../assets/svg/chevron-up-16.svg';
+import ArrowDown from './../../assets/svg/chevron-down-16.svg';
+import Tick from './../../assets/svg/check-16.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
@@ -29,12 +34,33 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {isWalletInitialized, setWalletInitialized, addWallet} =
-        useContext(AppStorageContext);
+    const {
+        isWalletInitialized,
+        setWalletInitialized,
+        addWallet,
+        isAdvancedMode,
+    } = useContext(AppStorageContext);
 
     const [newWalletName, setNewWalletName] = useState('');
 
-    const updateWalletName = async (walletName: string) => {
+    const [open, setOpen] = useState(false);
+    const [account, setAccount] = useState('bech32'); // Default to segwit
+    const [accounts, setAccounts] = useState([
+        {
+            value: 'bech32',
+            label: 'Native SegWit (BIP84)',
+        },
+        {value: 'p2sh', label: 'Segwit Wrapped (BIP49)'},
+        {value: 'legacy', label: 'Legacy (BIP44)'},
+    ]);
+
+    const accountInfo: {[index: string]: string} = {
+        bech32: 'Native SegWit Bech32 wallet (bc1...)',
+        p2sh: 'Segwit Wrapped P2SH wallet (3...)',
+        legacy: 'Legacy P2PKH wallet (1...)',
+    };
+
+    const updateWalletName = async (walletName: string, type: string) => {
         // Indicate that the wallet has been created
         if (!isWalletInitialized) {
             setWalletInitialized(true);
@@ -43,7 +69,7 @@ const CreateAction = () => {
         try {
             // Default wallet type is Segwit bech32
             // Connects to testnet
-            addWallet(walletName, 'bech32', '');
+            addWallet(walletName, type, '');
         } catch (e) {
             console.error(`[CreateAction] Error adding wallet: [${e}]`);
         }
@@ -107,7 +133,9 @@ const CreateAction = () => {
                             tailwind('text-xs mt-2'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
-                        Defaults to SegWit Native (address starts with 'bc1')
+                        {isAdvancedMode
+                            ? accountInfo[account]
+                            : "Defaults to SegWit Native (address starts with 'bc1...')"}
                     </Text>
 
                     <View
@@ -122,11 +150,63 @@ const CreateAction = () => {
                             color={ColorScheme.Text.Default}
                         />
                     </View>
+
+                    {isAdvancedMode ? (
+                        <View style={[tailwind('mt-8')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                Select Account Type
+                            </Text>
+
+                            {/* Dropdown */}
+                            <DropDownPicker
+                                style={[
+                                    tailwind('rounded-md'),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Secondary,
+                                        borderColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}
+                                containerStyle={[tailwind('mt-4')]}
+                                labelStyle={{color: ColorScheme.Text.Default}}
+                                dropDownContainerStyle={{
+                                    borderColor: ColorScheme.Background.Greyed,
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                }}
+                                listItemLabelStyle={{
+                                    color: ColorScheme.Text.DescText,
+                                }}
+                                ArrowUpIconComponent={() => (
+                                    <ArrowUp fill={ColorScheme.SVG.Default} />
+                                )}
+                                ArrowDownIconComponent={() => (
+                                    <ArrowDown fill={ColorScheme.SVG.Default} />
+                                )}
+                                TickIconComponent={() => (
+                                    <Tick fill={ColorScheme.SVG.Default} />
+                                )}
+                                open={open}
+                                value={account}
+                                items={accounts}
+                                setOpen={setOpen}
+                                setValue={setAccount}
+                                setItems={setAccounts}
+                            />
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </View>
 
                 <LongBottomButton
                     onPress={() => {
-                        updateWalletName(newWalletName);
+                        updateWalletName(newWalletName, account);
                     }}
                     title={'Continue'}
                     textColor={

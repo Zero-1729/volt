@@ -29,6 +29,7 @@ type defaultContextType = {
     useSatSymbol: boolean;
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
+    isAdvancedMode: boolean;
     wallets: BaseWallet[];
     currentWalletID: string;
     isDevMode: boolean;
@@ -37,6 +38,7 @@ type defaultContextType = {
     setSatSymbol: (useSatSymbol: boolean) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setWalletInitialized: (isWalletInitialized: boolean) => void;
+    setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     addWallet: (
         name: string,
         type: string,
@@ -65,11 +67,13 @@ const defaultContext: defaultContextType = {
     useSatSymbol: false,
     hideTotalBalance: false,
     isWalletInitialized: false,
+    isAdvancedMode: false,
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     setSatSymbol: () => {},
     setTotalBalanceHidden: () => {},
     setWalletInitialized: () => {},
+    setIsAdvancedMode: () => {},
     addWallet: () => {},
     resetAppData: () => {},
 };
@@ -97,6 +101,9 @@ export const AppStorageProvider = ({children}: Props) => {
     const [currentWalletID, _setCurrentWalletID] = useState(
         defaultContext.currentWalletID,
     );
+    const [isAdvancedMode, _setAdvancedMode] = useState(
+        defaultContext.isAdvancedMode,
+    );
 
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
@@ -112,6 +119,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('isWalletInitialized');
     const {getItem: _getWallets, setItem: _updateWallets} =
         useAsyncStorage('wallets');
+    const {getItem: _getIsAdvancedMode, setItem: _updateIsAdvancedMode} =
+        useAsyncStorage('isAdvancedMode');
 
     // |> Create functions for getting, setting, and other data manipulation
     const setAppLanguage = useCallback(
@@ -232,6 +241,30 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
+    const setIsAdvancedMode = useCallback(
+        async (advanced: boolean) => {
+            try {
+                _setAdvancedMode(advanced);
+                _updateIsAdvancedMode(JSON.stringify(advanced));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Advanced mode setting) Error loading data: ${e}`,
+                );
+            }
+        },
+        [_setAdvancedMode, _updateIsAdvancedMode],
+    );
+
+    const _loadIsAdvancedMode = async () => {
+        const advanced = await _getIsAdvancedMode();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (advanced !== null) {
+            _setAdvancedMode(JSON.parse(advanced));
+        }
+    };
+
     const _loadWallets = async () => {
         const savedWallets = await _getWallets();
 
@@ -324,6 +357,10 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
+        _loadIsAdvancedMode();
+    }, []);
+
+    useEffect(() => {
         _loadWallets();
     }, []);
 
@@ -346,6 +383,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 wallets,
                 addWallet,
                 currentWalletID,
+                isAdvancedMode,
+                setIsAdvancedMode,
             }}>
             {children}
         </AppStorageContext.Provider>
