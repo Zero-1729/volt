@@ -89,6 +89,21 @@
 			"top": 20
 		}
 	},
+	"bottom-12": {
+		"style": {
+			"bottom": 48
+		}
+	},
+	"bottom-10": {
+		"style": {
+			"bottom": 40
+		}
+	},
+	"bottom-11": {
+		"style": {
+			"bottom": 44
+		}
+	},
 	"z-10": {
 		"style": {
 			"zIndex": 10

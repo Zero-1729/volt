@@ -70,6 +70,18 @@
   top: 1.25rem
 }
 
+.bottom-12 {
+  bottom: 3rem
+}
+
+.bottom-10 {
+  bottom: 2.5rem
+}
+
+.bottom-11 {
+  bottom: 2.75rem
+}
+
 .z-10 {
   z-index: 10
 }

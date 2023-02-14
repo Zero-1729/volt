@@ -182,9 +182,9 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                `absolute left-6 bottom-7 rounded-sm flex-row self-center ${
-                                    props.isWatchOnly ? 'w-3/5' : 'w-full'
-                                } h-10 opacity-20 bg-black`,
+                                `absolute left-6 ${
+                                    props.isWatchOnly ? 'bottom-11' : 'bottom-7'
+                                } rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black`,
                             ),
                         ]}
                     />
