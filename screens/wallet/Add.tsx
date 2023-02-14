@@ -1,15 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
+import React, {useContext} from 'react';
+
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
-
-import React from 'react';
 
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import {PlainButton} from '../../components/button';
 
@@ -25,6 +27,8 @@ const Add = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {isAdvancedMode} = useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -128,7 +132,7 @@ const Add = () => {
                     {/* Import an existing Wallet */}
                     <View
                         style={[
-                            tailwind('mt-8 rounded-md p-5'),
+                            tailwind('mt-6 rounded-md p-5'),
                             {backgroundColor: '#8b8b8b'},
                         ]}>
                         <Text style={[tailwind('font-bold mt-2 text-white')]}>
@@ -170,16 +174,23 @@ const Add = () => {
                         </View>
                     </View>
 
-                    <View style={[tailwind('mt-8 flex-row')]}>
-                        <InfoIcon width={30} fill={ColorScheme.SVG.Default} />
-                        <Text
-                            style={[
-                                tailwind('text-xs'),
-                                {color: ColorScheme.Text.GrayText},
-                            ]}>
-                            Supported HD account types: BIP44, BIP46, BIP84
-                        </Text>
-                    </View>
+                    {isAdvancedMode ? (
+                        <View style={[tailwind('mt-6 flex-row')]}>
+                            <InfoIcon
+                                width={30}
+                                fill={ColorScheme.SVG.Default}
+                            />
+                            <Text
+                                style={[
+                                    tailwind('text-xs'),
+                                    {color: ColorScheme.Text.GrayText},
+                                ]}>
+                                Supported HD account types: BIP44, BIP46, BIP84
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </View>
             </View>
         </SafeAreaView>
