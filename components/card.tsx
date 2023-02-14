@@ -112,7 +112,9 @@ export const WalletCard = (props: WalletCardProps) => {
                     ellipsizeMode="middle"
                     style={[
                         tailwind(
-                            'pt-4 text-2xl w-full text-left mb-1 font-medium text-white',
+                            `pt-4 ${
+                                props.isWatchOnly ? '' : 'mt-1'
+                            } text-2xl w-full text-left font-medium text-white`,
                         ),
                         Font.RobotoText,
                     ]}>
@@ -144,7 +146,7 @@ export const WalletCard = (props: WalletCardProps) => {
                         style={[
                             tailwind(
                                 `absolute ${
-                                    props.isWatchOnly ? 'bottom-9' : 'bottom-8'
+                                    props.isWatchOnly ? 'bottom-9' : 'bottom-6'
                                 }`,
                             ),
                         ]}>

@@ -119,6 +119,11 @@
 			"top": 56
 		}
 	},
+	"bottom-6": {
+		"style": {
+			"bottom": 24
+		}
+	},
 	"z-10": {
 		"style": {
 			"zIndex": 10

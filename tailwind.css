@@ -94,6 +94,10 @@
   top: 3.5rem
 }
 
+.bottom-6 {
+  bottom: 1.5rem
+}
+
 .z-10 {
   z-index: 10
 }
