@@ -52,9 +52,9 @@ const CreateAction = () => {
     ]);
 
     const accountInfo: {[index: string]: string} = {
-        bech32: 'Add a new Native SegWit Bech32 wallet (bc1...)',
-        p2sh: 'Add a new Segwit Wrapped P2SH wallet (3...)',
-        legacy: 'Add a new Legacy P2PKH wallet (1...)',
+        bech32: 'Native SegWit Bech32 wallet (bc1...)',
+        p2sh: 'Segwit Wrapped P2SH wallet (3...)',
+        legacy: 'Legacy P2PKH wallet (1...)',
     };
 
     const updateWalletName = async (walletName: string, type: string) => {
