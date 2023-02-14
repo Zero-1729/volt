@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-    StyleSheet,
     Text,
     View,
     FlatList,
@@ -12,7 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation} from '@react-navigation/core';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 
@@ -25,6 +24,8 @@ const License = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const renderItem = ({item}: {item: string | string[]}) => {
         return (
@@ -87,5 +88,3 @@ const License = () => {
 };
 
 export default License;
-
-const styles = StyleSheet.create({});

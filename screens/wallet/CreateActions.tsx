@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
 
-import {useColorScheme, StyleSheet, Text, View} from 'react-native';
+import {useColorScheme, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
@@ -11,7 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
 
@@ -26,6 +26,8 @@ const CreateAction = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const {isWalletInitialized, setWalletInitialized, addWallet} =
         useContext(AppStorageContext);
@@ -143,5 +145,3 @@ const CreateAction = () => {
 };
 
 export default CreateAction;
-
-const styles = StyleSheet.create({});

@@ -1,13 +1,6 @@
 import React, {useContext} from 'react';
 
-import {
-    StyleSheet,
-    Text,
-    View,
-    useColorScheme,
-    Linking,
-    Platform,
-} from 'react-native';
+import {Text, View, useColorScheme, Linking, Platform} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -17,7 +10,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
 
@@ -33,6 +26,8 @@ const Settings = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const HeadingBar = {
         height: 2,
@@ -324,5 +319,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
-const styles = StyleSheet.create({});

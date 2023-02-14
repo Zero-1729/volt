@@ -3,7 +3,7 @@ import React from 'react';
 
 import {TextInput, Platform, View} from 'react-native';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import DocumentPicker from 'react-native-document-picker';
 
@@ -15,6 +15,8 @@ import Folder from './../assets/svg/file-directory-fill-24.svg';
 import Scan from './../assets/svg/scan.svg';
 
 export const TextSingleInput = (props: TextInputProps) => {
+    const tailwind = useTailwind();
+
     return (
         <TextInput
             underlineColorAndroid="transparent"
@@ -32,6 +34,8 @@ export const TextSingleInput = (props: TextInputProps) => {
 };
 
 export const TextMultiInput = (props: TextLongInputProps) => {
+    const tailwind = useTailwind();
+
     return (
         <View
             style={[

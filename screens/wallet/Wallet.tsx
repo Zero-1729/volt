@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import React from 'react';
 
 const Wallet = () => {
@@ -8,5 +8,3 @@ const Wallet = () => {
 };
 
 export default Wallet;
-
-const styles = StyleSheet.create({});

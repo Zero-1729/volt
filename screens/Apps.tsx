@@ -1,17 +1,10 @@
 import React from 'react';
 
-import {
-    StyleSheet,
-    FlatList,
-    Text,
-    useColorScheme,
-    View,
-    Linking,
-} from 'react-native';
+import {FlatList, Text, useColorScheme, View, Linking} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../components/button';
 
@@ -27,6 +20,8 @@ import Color from '../constants/Color';
 
 const Apps = () => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     // Apps
     const Services = [
@@ -141,5 +136,3 @@ const Apps = () => {
 };
 
 export default Apps;
-
-const styles = StyleSheet.create({});

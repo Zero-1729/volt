@@ -7,12 +7,17 @@ import 'react-native-reanimated';
 import {name as appName} from './app.json';
 import {AppStorageProvider} from './class/storageContext';
 
+import {TailwindProvider} from 'tailwind-rn';
+import utilities from './tailwind.json';
+
 import App from './App';
 
 const AppWithStorage = () => {
     return (
         <AppStorageProvider>
-            <App />
+            <TailwindProvider utilities={utilities}>
+                <App />
+            </TailwindProvider>
         </AppStorageProvider>
     );
 };

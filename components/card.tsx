@@ -3,7 +3,7 @@ import React, {useContext, useState} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton, Button} from './button';
 
@@ -28,6 +28,8 @@ export const EmptyCard = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const altGray = {
         backgroundColor: ColorScheme.isDarkMode ? '#2C2C2C' : '#ededed',
@@ -81,6 +83,8 @@ export const EmptyCard = () => {
 
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const [unit, setUnit] = useState<Unit>(props.unit);
 
