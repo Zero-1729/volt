@@ -289,8 +289,8 @@ export const AppStorageProvider = ({children}: Props) => {
     // Resets app data
     const resetAppData = useCallback(async () => {
         try {
-            await setAppLanguage(defaultAppLanguage);
-            await setAppFiatCurrency(defaultFiatCurrency);
+            await setAppLanguage(defaultContext.appLanguage);
+            await setAppFiatCurrency(defaultContext.appFiatCurrency);
             await setTotalBalanceHidden(false);
             await setWalletInitialized(false);
             await setWallets([]);
