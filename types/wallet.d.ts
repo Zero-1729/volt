@@ -1,33 +1,5 @@
-// All Base Types for App
+// All Base Wallet-related Types for App
 import 'react';
-
-// App Types
-// Base Wallet Type
-type BaseWalletType = {
-    id: string; // Wallet ID
-    name: string; // Wallet user defined name
-    balance: number; // Wallet balance in sats
-    UTXOs: UTXO[]; // List of wallet UTXOs
-    isWatchOnly: boolean; // Is wallet watch only
-    descriptor: string; // Wallet descriptor
-    type: string; // Wallet address Type (Segwit, Bech32, Taproot, Legacy, etc.)
-    address: string; // temporarily hold an address generated for receiving
-    descriptor: string; // Wallet Descriptor (see: https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md)
-    birthday: string | Date; // Wallet creation date
-    secret: string; // Wallet secret (mnemonic, xpub, etc.)
-    masterFingerprint: string; // Wallet master fingerprint
-    isBIP39: boolean; // Is wallet BIP39
-    balance: number; // Wallet balance in sats
-    UTXOSs: UTXOType[]; // List of wallet UTXOs
-    addresses: Array<string>; // List of wallet addresses
-    address: string; // Temporarily generated receiving address
-    syncedBalance: number; // Last balance synced from node
-    lastSynced: number; // Timestamp of last wallet sync
-    units: Unit; // Which unit to display wallet balance in
-    network: string; // Can have 'mainnet', 'testnet', or 'signet' wallets
-    hardwareWalletEnabled: boolean;
-    hasBackedUp: boolean; // Whether user has backed up seed
-};
 
 // UTXO Type
 type UTXOType = {
