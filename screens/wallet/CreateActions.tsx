@@ -20,6 +20,9 @@ import {PlainButton, LongBottomButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
+import ArrowUp from './../../assets/svg/chevron-up-16.svg';
+import ArrowDown from './../../assets/svg/chevron-down-16.svg';
+import Tick from './../../assets/svg/check-16.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
@@ -179,7 +182,15 @@ const CreateAction = () => {
                                 listItemLabelStyle={{
                                     color: ColorScheme.Text.DescText,
                                 }}
-                                arrowIconStyle={{borderColor: 'dodgerblue'}}
+                                ArrowUpIconComponent={() => (
+                                    <ArrowUp fill={ColorScheme.SVG.Default} />
+                                )}
+                                ArrowDownIconComponent={() => (
+                                    <ArrowDown fill={ColorScheme.SVG.Default} />
+                                )}
+                                TickIconComponent={() => (
+                                    <Tick fill={ColorScheme.SVG.Default} />
+                                )}
                                 open={open}
                                 value={account}
                                 items={accounts}
