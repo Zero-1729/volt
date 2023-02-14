@@ -3,7 +3,6 @@
  * into one place to try and prevent mistakes when touching the crypto code.
  */
 
-//import * from 'crypto-js';
 import Crypto from 'crypto';
 /**
  * Generate cryptographically secure random bytes using native api.
