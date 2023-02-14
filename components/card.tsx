@@ -194,12 +194,12 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                'right-0 bg-white py-2 rounded-tl-md rounded-br-md absolute bottom-0 self-center opacity-40',
+                                'left-0 bg-white w-full py-1 rounded-tr-md absolute bottom-0 self-center opacity-40',
                             ),
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-xs self-end px-6 font-medium'),
+                                tailwind('text-xs self-end pr-4 font-medium'),
                                 Font.RobotoText,
                             ]}>
                             Watch-only
