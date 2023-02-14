@@ -134,7 +134,7 @@ export const WalletCard = (props: WalletCardProps) => {
                         style={[
                             tailwind(
                                 `absolute ${
-                                    props.isWatchOnly ? 'bottom-11' : 'bottom-8'
+                                    props.isWatchOnly ? 'bottom-9' : 'bottom-8'
                                 }`,
                             ),
                         ]}>
