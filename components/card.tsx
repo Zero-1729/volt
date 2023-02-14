@@ -112,20 +112,27 @@ export const WalletCard = (props: WalletCardProps) => {
                     ellipsizeMode="middle"
                     style={[
                         tailwind(
-                            'pt-6 text-2xl w-full text-left font-medium mb-1 text-white',
+                            'pt-4 text-2xl w-full text-left mb-1 font-medium text-white',
                         ),
                         Font.RobotoText,
                     ]}>
                     {props.label}
                 </Text>
-                <Text
+
+                <View
                     style={[
-                        tailwind('text-sm w-full text-left'),
-                        {color: ColorScheme.Text.AltGray},
-                        Font.RobotoText,
+                        tailwind(
+                            'bg-black absolute left-6 top-14 rounded-sm opacity-30',
+                        ),
                     ]}>
-                    {WalletTypes[props.walletType]}
-                </Text>
+                    <Text
+                        style={[
+                            tailwind('text-xs text-white font-bold px-2 py-1'),
+                            Font.RobotoText,
+                        ]}>
+                        {WalletTypes[props.walletType]}
+                    </Text>
+                </View>
 
                 {!props.hideBalance ? (
                     <PlainButton
