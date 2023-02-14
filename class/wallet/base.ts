@@ -4,8 +4,8 @@ import {Unit, UTXOType} from './../../types/wallet';
 
 export class BaseWallet {
     public id: string;
-
     public name: string;
+
     readonly isWatchOnly: boolean;
     readonly type: string;
 
@@ -18,10 +18,10 @@ export class BaseWallet {
 
     balance: number;
 
-    private UTXOs: UTXOType[];
+    protected UTXOs: UTXOType[];
 
-    private addresses: Array<string>;
-    private address: string;
+    protected addresses: Array<string>;
+    protected address: string;
 
     syncedBalance: number;
     lastSynced: number;
@@ -72,7 +72,7 @@ export class BaseWallet {
         this.isWatchOnly = !this.secret; // Whether wallet is watch only
     }
 
-    private _generateID(): string {
+    protected _generateID(): string {
         return Crypto.randomUUID();
     }
 
