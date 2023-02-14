@@ -2,42 +2,101 @@
 // Import all data for use with Realm
 // Include all data intended to use for context throughout App lifecycle
 // export common reffed data in screens
-import React, {createContext, useState, useEffect, useCallback} from 'react';
+import React, {
+    createContext,
+    useState,
+    useEffect,
+    useCallback,
+    PropsWithChildren,
+} from 'react';
+
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 
 import {BaseWallet} from './wallet/base';
 
-// Note: context 'value' will default to '{}' if no Provider is found
-export const AppStorageContext = createContext({});
-export const AppStorageProvider = ({children}) => {
-    // Defaults
-    // The app's default language
-    const defaultAppLanguage: LanguageType = {
+// App context props type
+type Props = PropsWithChildren<{}>;
+
+// App defaults
+const isDevMode = __DEV__;
+
+// Default context type
+type defaultContextType = {
+    appLanguage: LanguageType;
+    appFiatCurrency: CurrencyType;
+    useSatSymbol: boolean;
+    hideTotalBalance: boolean;
+    isWalletInitialized: boolean;
+    wallets: BaseWallet[];
+    currentWalletID: string;
+    isDevMode: boolean;
+    setAppLanguage: (languageObject: LanguageType) => void;
+    setAppFiatCurrency: (currencyObject: CurrencyType) => void;
+    setSatSymbol: (useSatSymbol: boolean) => void;
+    setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
+    setWalletInitialized: (isWalletInitialized: boolean) => void;
+    addWallet: (
+        name: string,
+        type: string,
+        secret: string,
+        network?: string,
+        descriptor?: string,
+    ) => void;
+    resetAppData: () => void;
+};
+
+// Default app context values
+const defaultContext: defaultContextType = {
+    appLanguage: {
         name: 'English',
         code: 'en',
         dir: 'LTR',
-    };
-
-    // The app default fiat currency for BTC balance price
-    const defaultFiatCurrency: CurrencyType = {
+    },
+    appFiatCurrency: {
         short: 'USD',
         symbol: '$',
         locale: 'en-US',
-    };
+    },
+    wallets: [],
+    currentWalletID: '',
+    isDevMode: false,
+    useSatSymbol: false,
+    hideTotalBalance: false,
+    isWalletInitialized: false,
+    setAppLanguage: () => {},
+    setAppFiatCurrency: () => {},
+    setSatSymbol: () => {},
+    setTotalBalanceHidden: () => {},
+    setWalletInitialized: () => {},
+    addWallet: () => {},
+    resetAppData: () => {},
+};
 
-    const isDevMode = __DEV__;
-
+// Note: context 'value' will default to 'defaultContext' if no Provider is found
+export const AppStorageContext =
+    createContext<defaultContextType>(defaultContext);
+export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
-    const [appLanguage, _setAppLanguage] = useState(defaultAppLanguage);
-    const [appFiatCurrency, _setFiatCurrency] = useState(defaultFiatCurrency);
-    const [useSatSymbol, _setSatSymbol] = useState(true);
+    const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
+    const [appFiatCurrency, _setFiatCurrency] = useState(
+        defaultContext.appFiatCurrency,
+    );
+    const [useSatSymbol, _setSatSymbol] = useState(defaultContext.useSatSymbol);
     // Will change to false once app in Beta version
-    const [hideTotalBalance, _setTotalBalanceHidden] = useState(false);
-    const [IsWalletInitialized, _setWalletInitialized] = useState(false);
-    const [wallets, _setWallets] = useState<BaseWallet[]>([]);
-    const [currentWalletID, _setCurrentWalletID] = useState('');
+    const [hideTotalBalance, _setTotalBalanceHidden] = useState(
+        defaultContext.hideTotalBalance,
+    );
+    const [isWalletInitialized, _setWalletInitialized] = useState(
+        defaultContext.isWalletInitialized,
+    );
+    const [wallets, _setWallets] = useState<BaseWallet[]>(
+        defaultContext.wallets,
+    );
+    const [currentWalletID, _setCurrentWalletID] = useState(
+        defaultContext.currentWalletID,
+    );
 
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
