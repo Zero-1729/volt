@@ -1,13 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 
-import {useColorScheme, StyleSheet, Text, View} from 'react-native';
+import {useColorScheme, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
 import {TextMultiInput} from '../../components/input';
@@ -22,6 +22,8 @@ const ImportAction = () => {
 
     const ColorScheme = Color(useColorScheme());
 
+    const tailwind = useTailwind();
+
     const [importText, setImportText] = useState('');
 
     const handleFolderCallback = (data: any) => {
@@ -35,7 +37,7 @@ const ImportAction = () => {
 
     const handleFolderCancel = (e: Error) => {
         // Handle when user cancels folder action
-        console.log(e);
+        console.error(e);
     };
 
     const onBlur = () => {
@@ -142,5 +144,3 @@ const ImportAction = () => {
 };
 
 export default ImportAction;
-
-const styles = StyleSheet.create({});

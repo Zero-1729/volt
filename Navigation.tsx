@@ -5,7 +5,7 @@ import {View, useColorScheme} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import HomeIcon from './assets/svg/home-fill-24.svg';
 import DashboardIcon from './assets/svg/dashboard.svg';
@@ -84,6 +84,8 @@ const WalletRoot = () => {
 const HomeTabStack = createBottomTabNavigator();
 const HomeTabs = () => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     return (
         <HomeTabStack.Navigator

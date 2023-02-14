@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useCallback, useEffect, useState} from 'react';
 
 import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
@@ -29,7 +30,7 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {LongButton, PlainButton} from '../components/button';
 
@@ -38,6 +39,8 @@ import Color from '../constants/Color';
 
 const LoadingView = (props: any) => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     return (
         <SafeAreaView
@@ -62,6 +65,8 @@ const LoadingView = (props: any) => {
 
 const RequestPermView = () => {
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     return (
         <SafeAreaView
@@ -99,6 +104,8 @@ const Scan = () => {
     const isFocused = useIsFocused();
     const navigation = useNavigation();
 
+    const tailwind = useTailwind();
+
     const RNHapticFeedbackOptions = {
         enableVibrateFallback: true,
         ignoreAndroidSystemSettings: false,
@@ -119,31 +126,28 @@ const Scan = () => {
         );
     }, []);
 
-    const onQRDetected = useCallback(
-        async (data: Barcode[]) => {
-            // TODO: Handle only first item detected
-            for (let qr of data) {
-                console.log(`[Scanner] Detected QR Raw Data: ${qr.rawValue}`);
-            }
+    const onQRDetected = useCallback(async (data: Barcode[]) => {
+        // TODO: Handle only first item detected
+        for (let qr of data) {
+            console.log(`[Scanner] Detected QR Raw Data: ${qr.rawValue}`);
+        }
 
-            // To highlight the successful scan, we'll trigger a success haptic
-            RNHapticFeedback.trigger(
-                'notificationSuccess',
-                RNHapticFeedbackOptions,
-            );
+        // To highlight the successful scan, we'll trigger a success haptic
+        RNHapticFeedback.trigger(
+            'notificationSuccess',
+            RNHapticFeedbackOptions,
+        );
 
-            // Head back home after attempted scan
-            // TODO: Gracefully return with scanned data
-            // Ideally, we'd head to a wallet screen with scanned data
-            runOnJS(navigation.dispatch)(
-                CommonActions.navigate({
-                    name: 'HomeScreen',
-                    params: {QR: data},
-                }),
-            );
-        },
-        [navigation],
-    );
+        // Head back home after attempted scan
+        // TODO: Gracefully return with scanned data
+        // Ideally, we'd head to a wallet screen with scanned data
+        runOnJS(navigation.dispatch)(
+            CommonActions.navigate({
+                name: 'HomeScreen',
+                params: {QR: data},
+            }),
+        );
+    }, []);
 
     const closeScreen = () => {
         navigation.dispatch(CommonActions.goBack());

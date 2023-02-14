@@ -11,7 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
-import tailwind from 'tailwind-rn';
+import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
 
@@ -31,6 +31,8 @@ const About = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+
+    const tailwind = useTailwind();
 
     const RNHapticFeedbackOptions = {
         enableVibrateFallback: true,
@@ -241,5 +243,3 @@ const About = () => {
 };
 
 export default About;
-
-const styles = StyleSheet.create({});
