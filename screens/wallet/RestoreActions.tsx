@@ -1,11 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -25,6 +27,8 @@ const ImportAction = () => {
     const tailwind = useTailwind();
 
     const [importText, setImportText] = useState('');
+
+    const {isAdvancedMode} = useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
         console.log(data);
@@ -51,8 +55,9 @@ const ImportAction = () => {
         return valueWithSingleWhitespace;
     };
 
-    const importInstructions =
-        'Enter one of the following:\n\n- 12-24 word seed\n- Xpriv/Zpriv\n- PrivateKey (WIF)';
+    const importInstructions = isAdvancedMode
+        ? 'Enter one of the following:\n\n- 12 - 24 word seed\n- Xpriv/Zpriv\n- PrivateKey (WIF)\n- Wallet Descriptor (e.g. pkh(...))'
+        : 'Enter your 12 - 24 word seed';
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
