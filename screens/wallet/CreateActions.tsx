@@ -94,13 +94,13 @@ const CreateAction = () => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView edges={['bottom', 'right', 'left']}>
             <View
                 style={[
                     tailwind('w-full h-full items-center'),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
-                <View style={[tailwind('w-5/6 mt-4')]}>
+                <View style={[tailwind('w-5/6 mt-8')]}>
                     <PlainButton
                         style={tailwind('items-center flex-row -ml-1')}
                         onPress={() => {

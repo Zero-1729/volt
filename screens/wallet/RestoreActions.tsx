@@ -55,14 +55,14 @@ const ImportAction = () => {
         'Enter one of the following:\n\n- 12-24 word seed\n- Xpriv/Zpriv\n- PrivateKey (WIF)';
 
     return (
-        <SafeAreaView>
+        <SafeAreaView edges={['bottom', 'right', 'left']}>
             <View
                 style={[
                     tailwind('w-full h-full items-center'),
                     {backgroundColor: ColorScheme.Background.Primary},
                     Font.RobotoText,
                 ]}>
-                <View style={[tailwind('w-5/6 mt-4')]}>
+                <View style={[tailwind('w-5/6 mt-8')]}>
                     <PlainButton
                         style={tailwind('items-center flex-row -ml-1')}
                         onPress={() => {
