@@ -79,4 +79,8 @@ export class BaseWallet {
     public updateBalance(sats: number) {
         this.balance = sats;
     }
+
+    public updateName(text: string) {
+        this.name = text;
+    }
 }
