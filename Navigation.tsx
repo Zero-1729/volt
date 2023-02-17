@@ -11,17 +11,17 @@ import HomeIcon from './assets/svg/home-fill-24.svg';
 import DashboardIcon from './assets/svg/dashboard.svg';
 import QRIcon from './assets/svg/scan.svg';
 
-import Home from './screens/Home';
+import Home from './screens/tabs/Home';
 
 // Wallet screens
 import Add from './screens/wallet/Add';
 import RestoreActions from './screens/wallet/RestoreActions';
 import CreateActions from './screens/wallet/CreateActions';
 
-import Apps from './screens/Apps';
+import Apps from './screens/tabs/Apps';
 
 // QR Code Scan screen
-import Scan from './screens/Scan';
+import Scan from './screens/tabs/Scan';
 
 // Main app settings screens
 import Settings from './screens/settings/Settings';
