@@ -433,22 +433,10 @@
 			"backgroundColor": "rgb(37 99 235 / var(--tw-bg-opacity))"
 		}
 	},
-	"bg-blue-800": {
-		"style": {
-			"--tw-bg-opacity": 1,
-			"backgroundColor": "rgb(30 64 175 / var(--tw-bg-opacity))"
-		}
-	},
 	"bg-white": {
 		"style": {
 			"--tw-bg-opacity": 1,
 			"backgroundColor": "rgb(255 255 255 / var(--tw-bg-opacity))"
-		}
-	},
-	"bg-pink-300": {
-		"style": {
-			"--tw-bg-opacity": 1,
-			"backgroundColor": "rgb(249 168 212 / var(--tw-bg-opacity))"
 		}
 	},
 	"p-3": {
