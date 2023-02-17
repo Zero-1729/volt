@@ -11,23 +11,23 @@ import {FlatList} from 'react-native-gesture-handler';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {AppStorageContext} from '../class/storageContext';
+import {AppStorageContext} from '../../class/storageContext';
 
-import Dots from './../assets/svg/kebab-horizontal-24.svg';
-import Bell from './../assets/svg/bell-fill-24.svg';
-import Add from './../assets/svg/plus-32.svg';
+import Dots from '../../assets/svg/kebab-horizontal-24.svg'; // './../assets/svg/kebab-horizontal-24.svg';
+import Bell from '../../assets/svg/bell-fill-24.svg';
+import Add from '../../assets/svg/plus-32.svg';
 
-import Clock from './../assets/svg/clock-24.svg';
+import Clock from '../../assets/svg/clock-24.svg';
 
-import Color from '../constants/Color';
-import Font from '../constants/Font';
+import Color from '../../constants/Color';
+import Font from '../../constants/Font';
 
-import {PlainButton} from '../components/button';
-import {EmptyCard, WalletCard} from '../components/card';
+import {PlainButton} from '../../components/button';
+import {EmptyCard, WalletCard} from '../../components/card';
 
-import {normalizeFiat} from '../modules/transform';
+import {normalizeFiat} from '../../modules/transform';
 
-import {BaseWallet} from '../class/wallet/base';
+import {BaseWallet} from '../../class/wallet/base';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());

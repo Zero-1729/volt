@@ -6,17 +6,17 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {PlainButton} from '../components/button';
+import {PlainButton} from '../../components/button';
 
-import {AppCard} from '../types/props';
+import {AppCard} from '../../types/props';
 
-import Font from '../constants/Font';
+import Font from '../../constants/Font';
 
-import CoinprofileLogo from './../assets/svg/coinprofile.svg';
-import BitrefillLogo from './../assets/svg/bitrefill.svg';
-import ChangellyLogo from './../assets/svg/changelly.svg';
+import CoinprofileLogo from '../../assets/svg/coinprofile.svg';
+import BitrefillLogo from '../../assets/svg/bitrefill.svg';
+import ChangellyLogo from '../../assets/svg/changelly.svg';
 
-import Color from '../constants/Color';
+import Color from '../../constants/Color';
 
 const Apps = () => {
     const ColorScheme = Color(useColorScheme());
