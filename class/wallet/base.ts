@@ -52,7 +52,7 @@ export class BaseWallet {
 
         this.units = {
             name: 'sats',
-            symbol: 'sats',
+            symbol: 's',
         }; // Default unit to display wallet balance is sats
 
         this.balance = 0; // By default the balance is in sats

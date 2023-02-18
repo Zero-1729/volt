@@ -91,7 +91,7 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const toggleUnit = () => {
         if (unit.name === 'BTC') {
-            setUnit({name: 'sats', symbol: 'S'});
+            setUnit({name: 'sats', symbol: 's'});
         } else {
             setUnit({name: 'BTC', symbol: '₿'});
         }
