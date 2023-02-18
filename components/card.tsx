@@ -89,6 +89,11 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const {useSatSymbol, isAdvancedMode} = useContext(AppStorageContext);
 
+    const balance =
+        unit.name === 'sats'
+            ? formatSats(props.walletBalance)
+            : formatBTC(props.walletBalance);
+
     const toggleUnit = () => {
         if (unit.name === 'BTC') {
             setUnit({name: 'sats', symbol: 's'});
@@ -150,43 +155,48 @@ export const WalletCard = (props: WalletCardProps) => {
                                 }`,
                             ),
                         ]}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'flex-row mx-6 items-center self-start',
-                                ),
-                            ]}>
+                        <View style={[tailwind('flex-row items-center mx-6')]}>
                             {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
                             {useSatSymbol || unit.name === 'BTC' ? (
                                 <Text
+                                    numberOfLines={1}
                                     style={[
-                                        tailwind('text-2xl mr-2 text-white'),
+                                        tailwind(
+                                            'text-3xl self-baseline mr-2 text-white',
+                                        ),
                                         Font.SatSymbol,
                                     ]}>
-                                    {unit.name === 'sats' ? 'S' : unit.symbol}
+                                    {unit.symbol}
                                 </Text>
                             ) : (
                                 <></>
                             )}
 
+                            {/* Display balance in sats or BTC */}
                             <Text
                                 numberOfLines={1}
                                 style={[
-                                    tailwind('text-2xl text-white'),
-                                    Font.RobotoText,
+                                    tailwind(
+                                        'text-3xl text-white self-baseline',
+                                    ),
                                 ]}>
-                                {unit.name === 'sats'
-                                    ? formatSats(props.walletBalance)
-                                    : formatBTC(props.walletBalance)}{' '}
-                                {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
-                                {unit.name === 'sats' && !useSatSymbol ? (
-                                    <Text style={[tailwind('text-lg')]}>
-                                        sats
-                                    </Text>
-                                ) : (
-                                    ''
-                                )}
+                                {balance}
                             </Text>
+
+                            {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
+                            {!useSatSymbol && unit.name === 'sats' ? (
+                                <Text
+                                    style={[
+                                        tailwind(
+                                            'text-xl self-baseline text-white',
+                                        ),
+                                    ]}>
+                                    {' '}
+                                    sats
+                                </Text>
+                            ) : (
+                                <></>
+                            )}
                         </View>
                     </PlainButton>
                 ) : (
