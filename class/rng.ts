@@ -9,7 +9,7 @@ import Crypto from 'crypto';
  * @param  {number}   size      The number of bytes of randomness
  * @return {Promise.<Buffer>}   The random bytes
  */
-export async function randBytes(size: number): Promise<Buffer> {
+export const randBytes = async (size: number): Promise<Buffer> => {
     return new Promise((resolve, reject) => {
         Crypto.randomBytes(size, (err, data) => {
             if (err) {
@@ -19,4 +19,4 @@ export async function randBytes(size: number): Promise<Buffer> {
             }
         });
     });
-}
+};
