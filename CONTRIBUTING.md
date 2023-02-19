@@ -58,7 +58,7 @@ It is expected to commits pre-fixed with one of the following areas or component
 - `comp` - Changes to `components`, files in `./components/*`
 - `mod` - Changes to app `modules`, files in `./modules/*`
 - `class` - Changes to app `classes`, files in `./classes/*`
-- `misc` - Miscellaneous changes
+- `misc` & `fix` - Miscellaneous changes and code fixes
 
 For example, if your change affects the ios build folders `./ios`, your commit message can be: `build: rebuilt ios dir files with RN69`.
 
