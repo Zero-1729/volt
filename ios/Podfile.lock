@@ -359,7 +359,7 @@ PODS:
   - React-jsinspector (0.70.7)
   - React-logger (0.70.7):
     - glog
-  - react-native-document-picker (5.3.0):
+  - react-native-document-picker (5.2.0):
     - React-Core
   - react-native-fingerprint-scanner (6.0.0):
     - React
@@ -446,6 +446,8 @@ PODS:
     - React-jsi (= 0.70.7)
     - React-logger (= 0.70.7)
     - React-perflogger (= 0.70.7)
+  - RealmJS (11.3.1):
+    - React
   - RNCAsyncStorage (1.17.11):
     - React-Core
   - RNCClipboard (1.11.1):
@@ -574,6 +576,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - RealmJS (from `../node_modules/realm`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
@@ -702,6 +705,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RealmJS:
+    :path: "../node_modules/realm"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -781,7 +786,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: e95cdd036e7947ddf87f3049319ac3064deb76b5
   React-jsinspector: 1c34fea1868136ecde647bc11fae9266d4143693
   React-logger: e9f407f9fdf3f3ce7749ae6f88affe63e8446019
-  react-native-document-picker: 226068006be4c52f8ef7f32d855ee025a12e9e64
+  react-native-document-picker: f1b5398801b332c77bc62ae0eae2116f49bdff26
   react-native-fingerprint-scanner: ac6656f18c8e45a7459302b84da41a44ad96dbbe
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
   react-native-quick-crypto: a903ff39ac8fea78bb9d37cccc5cc0596afc9670
@@ -800,6 +805,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: eb7837d55b87c7a4ead3ab7632ad70dca87c65dc
   React-runtimeexecutor: 7cec9ed92ebde8309902530bb566819645c84ee5
   ReactCommon: 0253d197eaa7f6689dcd3e7d5360449ab93e10df
+  RealmJS: 43fc7bfb83229c8a2755cb34f71f769c97b7b581
   RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
   RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
   RNCPushNotificationIOS: 87b8d16d3ede4532745e05b03c42cff33a36cc45
