@@ -31,17 +31,17 @@ const ImportAction = () => {
     const {isAdvancedMode} = useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
-        console.log(data);
+        console.info(`[Success] Document Picker: ${data.uri}`);
     };
 
     const handleFolderError = (e: Error) => {
         // Handle when any error in the folder action is reported
-        console.error(e);
+        console.error(`[Error] Document Picker: ${e.message}`);
     };
 
     const handleFolderCancel = (e: Error) => {
         // Handle when user cancels folder action
-        console.error(e);
+        console.warn(`[Warn] Document Picker: ${e.message}`);
     };
 
     const onBlur = () => {
