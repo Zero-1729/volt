@@ -87,7 +87,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 <View style={[tailwind('absolute right-4 bottom-4')]}>
                     <PlainButton
                         onPress={() => {
-                            DocumentPicker.pickSingle({
+                            DocumentPicker.pick({
                                 type: [
                                     DocumentPicker.types.allFiles,
                                     DocumentPicker.types.pdf,
