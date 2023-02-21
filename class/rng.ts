@@ -3,20 +3,47 @@
  * into one place to try and prevent mistakes when touching the crypto code.
  */
 
-import Crypto from 'crypto';
+import Crypto from 'react-native-quick-crypto';
+
 /**
- * Generate cryptographically secure random bytes using native api.
- * @param  {number}   size      The number of bytes of randomness
- * @return {Promise.<Buffer>}   The random bytes
+ * Convert an ArrayBuffer to a hex string
+ * @param  {ArrayBuffer} buffer The buffer to convert
+ * @return {string}             The hex string
+ *
+ * @example
+ * const hexString = bufferToHex(new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]).buffer);
+ * console.log(hexString);
+ * // '00010203040506070809'
  */
-export const randBytes = async (size: number): Promise<Buffer> => {
+export const bufferToHex = (buffer: ArrayBuffer): string => {
+    const byteArray = new Uint8Array(buffer);
+    let hexString = '';
+
+    for (let i = 0; i < byteArray.byteLength; i++) {
+        hexString += ('0' + byteArray[i].toString(16)).slice(-2);
+    }
+    return hexString;
+};
+
+/**
+ * Generate cryptographically secure random bytes using RNQC.
+ * @param  {number}   size      The number of bytes of randomness
+ * @return {Promise.<ArrayBuffer>}   The random bytes
+ */
+export const randBytes = async (size: number): Promise<ArrayBuffer> => {
     return new Promise((resolve, reject) => {
-        Crypto.randomBytes(size, (err, data) => {
-            if (err) {
-                reject(err);
+        Crypto.randomBytes(size, (error, buffer) => {
+            if (error || !buffer) {
+                reject(error);
             } else {
-                resolve(data);
+                resolve(buffer);
             }
         });
     });
+};
+
+// Return generated random bytes as a hex string
+export const randBytesHex = async (size: number): Promise<string> => {
+    const buffer = await randBytes(size);
+    return bufferToHex(buffer);
 };
