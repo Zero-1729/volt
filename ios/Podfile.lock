@@ -365,6 +365,8 @@ PODS:
     - React
   - react-native-image-picker (4.10.3):
     - React-Core
+  - react-native-quick-base64 (2.0.5):
+    - React-Core
   - react-native-quick-crypto (0.5.0):
     - OpenSSL-Universal
     - React
@@ -560,6 +562,7 @@ DEPENDENCIES:
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-quick-crypto (from `../node_modules/react-native-quick-crypto`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-secure-key-store (from `../node_modules/react-native-secure-key-store`)
@@ -673,6 +676,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-quick-base64:
+    :path: "../node_modules/react-native-quick-base64"
   react-native-quick-crypto:
     :path: "../node_modules/react-native-quick-crypto"
   react-native-safe-area-context:
@@ -789,6 +794,7 @@ SPEC CHECKSUMS:
   react-native-document-picker: f1b5398801b332c77bc62ae0eae2116f49bdff26
   react-native-fingerprint-scanner: ac6656f18c8e45a7459302b84da41a44ad96dbbe
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
+  react-native-quick-base64: e657e9197e61b60a9dec49807843052b830da254
   react-native-quick-crypto: a903ff39ac8fea78bb9d37cccc5cc0596afc9670
   react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
   react-native-secure-key-store: 910e6df6bc33cb790aba6ee24bc7818df1fe5898

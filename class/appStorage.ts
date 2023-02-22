@@ -4,14 +4,14 @@ import {setGenericPassword, getGenericPassword} from 'react-native-keychain';
 
 import {open} from 'realm';
 
-import {randBytes} from './rng';
+import {randBytesHex} from './rng';
 
 export class AppStorage {
     constructor() {}
 
     setItem = async (key: string, value: string, sensitive: boolean) => {
-        //set generic password for keychain
-        const buf = await randBytes(64);
+        // set generic password for keychain
+        const passwordKey = await randBytesHex(64);
         const passwordKey = buf.toString('hex');
 
         if (sensitive) {
@@ -19,15 +19,17 @@ export class AppStorage {
                 service: key,
             });
 
-            //save to RNSecureKeyStore
+            // save to RNSecureKeyStore
             await AsyncStorage.setItem(key, passwordKey);
             await RNSecureKeyStore.set(passwordKey, value, {
                 accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
             });
         } else {
             await AsyncStorage.setItem(key, passwordKey);
-            //save to realm
+
+            // save to realm
             let realm = await this._openRealm();
+
             realm.write(() => {
                 realm.create('AppStorage', {passwordKey, value});
             });
