@@ -208,6 +208,7 @@ const CreateAction = () => {
                     onPress={() => {
                         updateWalletName(newWalletName, account);
                     }}
+                    disabled={newWalletName.trim().length === 0}
                     title={'Continue'}
                     textColor={
                         newWalletName.trim().length > 0
