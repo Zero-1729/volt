@@ -22,6 +22,7 @@ export const bufferToHex = (buffer: ArrayBuffer): string => {
     for (let i = 0; i < byteArray.byteLength; i++) {
         hexString += ('0' + byteArray[i].toString(16)).slice(-2);
     }
+
     return hexString;
 };
 
@@ -31,15 +32,27 @@ export const bufferToHex = (buffer: ArrayBuffer): string => {
  * @return {Promise.<ArrayBuffer>}   The random bytes
  */
 export const randBytes = async (size: number): Promise<ArrayBuffer> => {
-    return new Promise((resolve, reject) => {
-        Crypto.randomBytes(size, (error, buffer) => {
-            if (error || !buffer) {
-                reject(error);
-            } else {
-                resolve(buffer);
-            }
+    if (size < 1) {
+        throw new Error(
+            '[Crypto - RandBytes] Requested size must be greater than zero',
+        );
+    } else {
+        return new Promise((resolve, reject) => {
+            Crypto.randomBytes(size, (error, buffer) => {
+                if (error) {
+                    reject(error);
+                } else if (!buffer) {
+                    reject(
+                        new Error(
+                            '[Crypto - RandBytes] No buffer was returned',
+                        ),
+                    );
+                } else {
+                    resolve(buffer);
+                }
+            });
         });
-    });
+    }
 };
 
 // Return generated random bytes as a hex string
