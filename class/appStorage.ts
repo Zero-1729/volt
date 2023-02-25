@@ -12,7 +12,6 @@ export class AppStorage {
     setItem = async (key: string, value: string, sensitive: boolean) => {
         // set generic password for keychain
         const passwordKey = await randBytesHex(64);
-        const passwordKey = buf.toString('hex');
 
         if (sensitive) {
             await setGenericPassword(key, passwordKey, {
