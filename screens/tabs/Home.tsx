@@ -72,6 +72,13 @@ const Home = () => {
                     walletType={item.type}
                     hideBalance={hideTotalBalance}
                     unit={item.units}
+                    onPress={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'Wallet',
+                            }),
+                        );
+                    }}
                 />
             </View>
         );
