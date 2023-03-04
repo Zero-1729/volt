@@ -13,7 +13,7 @@ import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import Dots from '../../assets/svg/kebab-horizontal-24.svg'; // './../assets/svg/kebab-horizontal-24.svg';
+import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Bell from '../../assets/svg/bell-fill-24.svg';
 import Add from '../../assets/svg/plus-32.svg';
 
