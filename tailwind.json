@@ -99,6 +99,41 @@
 			"top": 20
 		}
 	},
+	"right-6": {
+		"style": {
+			"right": 24
+		}
+	},
+	"top-2": {
+		"style": {
+			"top": 8
+		}
+	},
+	"top-6": {
+		"style": {
+			"top": 24
+		}
+	},
+	"right-3": {
+		"style": {
+			"right": 12
+		}
+	},
+	"top-3": {
+		"style": {
+			"top": 12
+		}
+	},
+	"left-3": {
+		"style": {
+			"left": 12
+		}
+	},
+	"top-4": {
+		"style": {
+			"top": 16
+		}
+	},
 	"z-10": {
 		"style": {
 			"zIndex": 10
@@ -123,6 +158,12 @@
 		"style": {
 			"marginLeft": 24,
 			"marginRight": 24
+		}
+	},
+	"my-2": {
+		"style": {
+			"marginTop": 8,
+			"marginBottom": 8
 		}
 	},
 	"-ml-1": {
@@ -225,6 +266,16 @@
 			"marginTop": 32
 		}
 	},
+	"ml-2": {
+		"style": {
+			"marginLeft": 8
+		}
+	},
+	"ml-4": {
+		"style": {
+			"marginLeft": 16
+		}
+	},
 	"flex": {
 		"style": {
 			"display": "flex"
@@ -285,6 +336,16 @@
 			"height": "100%"
 		}
 	},
+	"h-fit": {
+		"style": {
+			"height": "fit-content"
+		}
+	},
+	"h-auto": {
+		"style": {
+			"height": "auto"
+		}
+	},
 	"w-11/12": {
 		"style": {
 			"width": "91.666667%"
@@ -320,6 +381,16 @@
 			"width": "100%"
 		}
 	},
+	"w-24": {
+		"style": {
+			"width": 96
+		}
+	},
+	"w-32": {
+		"style": {
+			"width": 128
+		}
+	},
 	"flex-row": {
 		"style": {
 			"flexDirection": "row"
@@ -353,6 +424,11 @@
 	"justify-around": {
 		"style": {
 			"justifyContent": "space-around"
+		}
+	},
+	"justify-evenly": {
+		"style": {
+			"justifyContent": "space-evenly"
 		}
 	},
 	"self-end": {
@@ -402,6 +478,28 @@
 			"borderBottomLeftRadius": 2
 		}
 	},
+	"rounded-xl": {
+		"style": {
+			"borderTopLeftRadius": 12,
+			"borderTopRightRadius": 12,
+			"borderBottomRightRadius": 12,
+			"borderBottomLeftRadius": 12
+		}
+	},
+	"rounded-lg": {
+		"style": {
+			"borderTopLeftRadius": 8,
+			"borderTopRightRadius": 8,
+			"borderBottomRightRadius": 8,
+			"borderBottomLeftRadius": 8
+		}
+	},
+	"rounded-l": {
+		"style": {
+			"borderTopLeftRadius": 4,
+			"borderBottomLeftRadius": 4
+		}
+	},
 	"rounded-bl-md": {
 		"style": {
 			"borderBottomLeftRadius": 6
@@ -439,6 +537,12 @@
 			"backgroundColor": "rgb(255 255 255 / var(--tw-bg-opacity))"
 		}
 	},
+	"bg-blue-800": {
+		"style": {
+			"--tw-bg-opacity": 1,
+			"backgroundColor": "rgb(30 64 175 / var(--tw-bg-opacity))"
+		}
+	},
 	"p-3": {
 		"style": {
 			"paddingTop": 12,
@@ -461,6 +565,14 @@
 			"paddingRight": 24,
 			"paddingBottom": 24,
 			"paddingLeft": 24
+		}
+	},
+	"p-4": {
+		"style": {
+			"paddingTop": 16,
+			"paddingRight": 16,
+			"paddingBottom": 16,
+			"paddingLeft": 16
 		}
 	},
 	"px-12": {

@@ -78,6 +78,34 @@
   top: 1.25rem
 }
 
+.right-6 {
+  right: 1.5rem
+}
+
+.top-2 {
+  top: 0.5rem
+}
+
+.top-6 {
+  top: 1.5rem
+}
+
+.right-3 {
+  right: 0.75rem
+}
+
+.top-3 {
+  top: 0.75rem
+}
+
+.left-3 {
+  left: 0.75rem
+}
+
+.top-4 {
+  top: 1rem
+}
+
 .z-10 {
   z-index: 10
 }
@@ -97,6 +125,11 @@
 .mx-6 {
   margin-left: 1.5rem;
   margin-right: 1.5rem
+}
+
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem
 }
 
 .-ml-1 {
@@ -179,6 +212,14 @@
   margin-top: 2rem
 }
 
+.ml-2 {
+  margin-left: 0.5rem
+}
+
+.ml-4 {
+  margin-left: 1rem
+}
+
 .flex {
   display: flex
 }
@@ -227,6 +268,14 @@
   height: 100%
 }
 
+.h-fit {
+  height: fit-content
+}
+
+.h-auto {
+  height: auto
+}
+
 .w-11\/12 {
   width: 91.666667%
 }
@@ -253,6 +302,14 @@
 
 .w-full {
   width: 100%
+}
+
+.w-24 {
+  width: 6rem
+}
+
+.w-32 {
+  width: 8rem
 }
 
 .flex-row {
@@ -283,6 +340,10 @@
   justify-content: space-around
 }
 
+.justify-evenly {
+  justify-content: space-evenly
+}
+
 .self-end {
   align-self: flex-end
 }
@@ -309,6 +370,19 @@
 
 .rounded-sm {
   border-radius: 0.125rem
+}
+
+.rounded-xl {
+  border-radius: 0.75rem
+}
+
+.rounded-lg {
+  border-radius: 0.5rem
+}
+
+.rounded-l {
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem
 }
 
 .rounded-bl-md {
@@ -339,6 +413,11 @@
   background-color: rgb(255 255 255 / var(--tw-bg-opacity))
 }
 
+.bg-blue-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 64 175 / var(--tw-bg-opacity))
+}
+
 .p-3 {
   padding: 0.75rem
 }
@@ -349,6 +428,10 @@
 
 .p-6 {
   padding: 1.5rem
+}
+
+.p-4 {
+  padding: 1rem
 }
 
 .px-12 {
