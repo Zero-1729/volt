@@ -50,6 +50,7 @@ type WalletCardProps = CardProps & {
     isWatchOnly: boolean;
     hideBalance: boolean;
     unit: Unit;
+    navCallback?: () => void;
 };
 
 // Base Text Input Prop Type (for reuse)
