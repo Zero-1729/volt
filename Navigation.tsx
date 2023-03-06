@@ -17,6 +17,7 @@ import Home from './screens/tabs/Home';
 import Add from './screens/wallet/Add';
 import RestoreActions from './screens/wallet/RestoreActions';
 import CreateActions from './screens/wallet/CreateActions';
+import WalletViewScreen from './screens/wallet/Wallet';
 
 import Apps from './screens/tabs/Apps';
 
@@ -69,6 +70,10 @@ const WalletRoot = () => {
     return (
         <WalletStack.Navigator screenOptions={{headerShown: false}}>
             <WalletStack.Screen name="Add" component={Add} />
+            <WalletStack.Screen
+                name="WalletView"
+                component={WalletViewScreen}
+            />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen
