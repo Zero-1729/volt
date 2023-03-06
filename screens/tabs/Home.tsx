@@ -72,10 +72,10 @@ const Home = () => {
                     walletType={item.type}
                     hideBalance={hideTotalBalance}
                     unit={item.units}
-                    onPress={() => {
+                    navCallback={() => {
                         navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'Wallet',
+                            CommonActions.navigate('WalletRoot', {
+                                screen: 'WalletView',
                             }),
                         );
                     }}
