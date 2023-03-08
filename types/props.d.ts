@@ -9,6 +9,7 @@ type BaseProps = PropsWithChildren<{
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     onPress?: () => void;
     disabled?: boolean;
+    activeOpacity?: number;
 }>;
 
 type AppCard = BaseProps & {
