@@ -43,10 +43,7 @@ const Wallet = () => {
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
-                            <Back
-                                style={tailwind('mr-2')}
-                                fill={ColorScheme.SVG.Default}
-                            />
+                            <Back style={tailwind('mr-2')} fill={'white'} />
                             <Text style={[tailwind('text-white font-bold')]}>
                                 Back
                             </Text>
