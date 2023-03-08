@@ -51,7 +51,15 @@ const Wallet = () => {
                                 Back
                             </Text>
                         </PlainButton>
-                        <PlainButton style={[tailwind('right-6')]}>
+                        <PlainButton
+                            style={[tailwind('right-6')]}
+                            onPress={() => {
+                                navigation.dispatch(
+                                    CommonActions.navigate({
+                                        name: 'WalletInfo',
+                                    }),
+                                );
+                            }}>
                             <Dots width={32} fill={'white'} />
                         </PlainButton>
                     </View>
