@@ -108,7 +108,8 @@ export const WalletCard = (props: WalletCardProps) => {
                 if (props.navCallback) {
                     props.navCallback();
                 }
-            }}>
+            }}
+            activeOpacity={1}>
             <View style={tailwind('w-full h-48 relative items-center')}>
                 <View
                     style={[
