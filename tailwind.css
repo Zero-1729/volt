@@ -191,6 +191,18 @@
   margin-top: 2rem
 }
 
+.mt-12 {
+  margin-top: 3rem
+}
+
+.mr-8 {
+  margin-right: 2rem
+}
+
+.mr-16 {
+  margin-right: 4rem
+}
+
 .flex {
   display: flex
 }
@@ -287,6 +299,10 @@
   justify-content: flex-start
 }
 
+.justify-end {
+  justify-content: flex-end
+}
+
 .justify-center {
   justify-content: center
 }
@@ -372,6 +388,21 @@
 .bg-pink-300 {
   --tw-bg-opacity: 1;
   background-color: rgb(249 168 212 / var(--tw-bg-opacity))
+}
+
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity))
+}
+
+.bg-pink-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(251 207 232 / var(--tw-bg-opacity))
+}
+
+.bg-pink-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 114 182 / var(--tw-bg-opacity))
 }
 
 .p-3 {
