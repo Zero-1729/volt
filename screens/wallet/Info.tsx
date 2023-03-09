@@ -1,23 +1,30 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useContext} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
-
 import {TextSingleInput} from '../../components/input';
 
 import {useTailwind} from 'tailwind-rn';
+
 import Color from '../../constants/Color';
 
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
+import {AppStorageContext} from '../../class/storageContext';
 const Info = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    // Get advacned mode flag, current wallet ID and wallet data
+    const {isAdvancedMode, currentWalletID, getWalletData} =
+        useContext(AppStorageContext);
+
+    const walletData = getWalletData(currentWalletID);
 
     const HeadingBar = {
         height: 2,
@@ -27,8 +34,10 @@ const Info = () => {
     // TODO: grab from Wallet store data
     const walletPath = "m/44'/0'/0'/0/0";
     const walletType = 'SegWit (Bech32)';
-    const walletFingerprint = 'de2fd7e8';
+    const walletTypeName =
+    const walletFingerprint = walletData.masterFingerprint;
     const walletName = 'Wallet Name';
+    const walletDescriptor = walletData.descriptor;
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -49,7 +58,7 @@ const Info = () => {
                             tailwind('text-white font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        {walletName}
+                        Back
                     </Text>
                 </PlainButton>
 
@@ -162,7 +171,7 @@ const Info = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            pkh(02e96fe52ef0e22d2f131dd425ce1893073a3c6ad20e8cac36726393dfb4856a4c)
+                            {walletDescriptor}
                         </Text>
                     </PlainButton>
                 </View>
