@@ -107,9 +107,9 @@ const Wallet = () => {
 
                         {/* Balance component */}
                         <Balance
-                            walletBalance={walletData.balance}
-                            unit={walletData.units}
+                            id={currentWalletID}
                             BalanceFontSize={'text-4xl'}
+                            fiatRate={fiatRate}
                         />
                     </View>
 
