@@ -88,6 +88,9 @@ const Info = () => {
                                 {borderWidth: 1, borderRadius: 6},
                             ]}>
                             <TextSingleInput
+                                placeholderTextColor={
+                                    ColorScheme.Text.GrayedText
+                                }
                                 shavedHeight={true}
                                 placeholder={walletName}
                                 onChangeText={setTmpName}
