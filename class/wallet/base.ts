@@ -1,5 +1,7 @@
 import Crypto from 'crypto';
 
+import {generateMnemonic} from '../../modules/bip39';
+
 import {Unit, UTXOType} from './../../types/wallet';
 
 export const WalletTypeNames: {[index: string]: string[]} = {
@@ -23,7 +25,7 @@ export class BaseWallet {
 
     readonly descriptor: string;
     readonly birthday: string | Date;
-    readonly secret: string;
+    secret: string;
 
     readonly masterFingerprint: string;
     readonly isBIP39: boolean;
@@ -49,7 +51,7 @@ export class BaseWallet {
     constructor(
         name: string,
         type: string,
-        secret: string,
+        secret?: string,
         descriptor?: string,
         network?: string,
     ) {
@@ -82,7 +84,7 @@ export class BaseWallet {
 
         // TODO: fetch from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
-        this.secret = secret ? secret : ''; // private key or recovery phrase
+        this.secret = secret ? secret : generateMnemonic(); // private key or recovery phrase
         this.isBIP39 = false; // Whether wallet has a 'BIP39' seed
 
         this.isWatchOnly = !this.secret; // Whether wallet is watch only
