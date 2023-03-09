@@ -27,7 +27,7 @@ export class BaseWallet {
     readonly birthday: string | Date;
     secret: string;
 
-    readonly masterFingerprint: string;
+    masterFingerprint: string;
     readonly isBIP39: boolean;
 
     balance: number;
@@ -100,5 +100,9 @@ export class BaseWallet {
 
     public updateName(text: string) {
         this.name = text;
+    }
+
+    _setFingerprint(fingerprint: string) {
+        this.masterFingerprint = fingerprint;
     }
 }
