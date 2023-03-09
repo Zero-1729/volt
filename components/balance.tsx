@@ -11,6 +11,8 @@ import Font from '../constants/Font';
 
 import {formatSats, formatBTC} from '../modules/transform';
 
+import {normalizeFiat} from '../modules/transform';
+
 import {BalanceProps} from '../types/props';
 
 export const Balance = (props: BalanceProps) => {
@@ -19,6 +21,9 @@ export const Balance = (props: BalanceProps) => {
     const {
         useSatSymbol,
         hideTotalBalance,
+        updateWalletUnit,
+        getWalletData,
+        appFiatCurrency,
     } = useContext(AppStorageContext);
 
     const walletData = getWalletData(props.id);
@@ -38,10 +43,22 @@ export const Balance = (props: BalanceProps) => {
         }
     };
 
-    const balance =
-        unit.name === 'sats'
-            ? formatSats(props.walletBalance)
-            : formatBTC(props.walletBalance);
+    const isBitcoinUnit = walletData.units.name === 'BTC' || walletData.units.name === 'sats';
+    const hideFiat = props.disableFiat && !isBitcoinUnit;
+
+    const getBalance = () => {
+        if (walletData.units.name === 'sats' || hideFiat) {
+            return formatSats(walletData.balance);
+        }
+
+        if (walletData.units.name === 'BTC') {
+            return formatBTC(walletData.balance);
+        }
+
+        if (props.fiatRate && !props.disableFiat) {
+            return normalizeFiat(walletData.balance, props.fiatRate);
+        }
+    };
 
     return (
         <View>
@@ -61,6 +78,9 @@ export const Balance = (props: BalanceProps) => {
                                         } self-baseline mr-2 text-white`,
                                     ),
                                     walletData.units.name === 'sats' ||
+                                    props.disableFiat
+                                        ? Font.SatSymbol
+                                        : {},
                                 ]}>
                                 {walletData.units.symbol}
                             </Text>
@@ -80,7 +100,7 @@ export const Balance = (props: BalanceProps) => {
                                     } text-white self-baseline`,
                                 ),
                             ]}>
-                            {balance}
+                            {getBalance()}
                         </Text>
 
                         {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
