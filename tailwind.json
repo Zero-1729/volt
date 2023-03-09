@@ -34,11 +34,6 @@
 			"bottom": 0
 		}
 	},
-	"bottom-11": {
-		"style": {
-			"bottom": 44
-		}
-	},
 	"bottom-2": {
 		"style": {
 			"bottom": 8
@@ -57,11 +52,6 @@
 	"bottom-6": {
 		"style": {
 			"bottom": 24
-		}
-	},
-	"bottom-7": {
-		"style": {
-			"bottom": 28
 		}
 	},
 	"bottom-9": {
@@ -645,6 +635,12 @@
 		"style": {
 			"fontSize": 30,
 			"lineHeight": 36
+		}
+	},
+	"text-4xl": {
+		"style": {
+			"fontSize": 36,
+			"lineHeight": 40
 		}
 	},
 	"text-base": {
