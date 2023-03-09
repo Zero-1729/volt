@@ -79,15 +79,29 @@ const Wallet = () => {
                         </PlainButton>
                     </View>
 
+                    {/* Watch-only */}
+                    {walletData.isWatchOnly ? (
+                        <View style={[tailwind('absolute top-12 right-6')]}>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-sm ml-2 p-1 self-center text-black font-bold bg-white rounded-sm opacity-40',
+                                    ),
+                                ]}>
+                                Watch-only
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
+
                     {/* Balance */}
                     <View
                         style={[
                             tailwind('absolute self-center w-5/6 bottom-28'),
                         ]}>
                         <Text
-                            style={[
-                                tailwind('text-sm text-white opacity-60 mb-1'),
-                            ]}>
+                            style={[tailwind('text-sm text-white opacity-60')]}>
                             Balance
                         </Text>
 
