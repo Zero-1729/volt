@@ -71,6 +71,7 @@ const Home = () => {
         return (
             <View style={[tailwind('w-full absolute -top-24')]}>
                 <WalletCard
+                    id={item.id}
                     isWatchOnly={item.isWatchOnly}
                     label={item.name}
                     walletBalance={item.balance}
