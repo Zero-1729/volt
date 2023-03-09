@@ -292,16 +292,16 @@ export const AppStorageProvider = ({children}: Props) => {
             name: string,
             type: string,
             secret: string,
-            network: string = 'tesnet',
             descriptor?: string,
+            network: string = 'tesnet',
         ) => {
             try {
                 const newWallet = new BaseWallet(
                     name,
                     type,
                     secret,
-                    network,
                     descriptor,
+                    network,
                 );
 
                 _setCurrentWalletID(newWallet.id);
