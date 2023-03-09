@@ -2849,6 +2849,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"adm-zip@npm:^0.5.9":
+  version: 0.5.10
+  resolution: "adm-zip@npm:0.5.10"
+  checksum: 07ed91cf6423bf5dca4ee63977bc7635e91b8d21829c00829d48dce4c6932e1b19e6cfcbe44f1931c956e68795ae97183fc775913883fa48ce88a1ac11fb2034
+  languageName: node
+  linkType: hard
+
 "agent-base@npm:6, agent-base@npm:^6.0.2":
   version: 6.0.2
   resolution: "agent-base@npm:6.0.2"
@@ -3464,6 +3471,20 @@ __metadata:
   dependencies:
     tweetnacl: ^0.14.3
   checksum: 4edfc9fe7d07019609ccf797a2af28351736e9d012c8402a07120c4453a3b789a15f2ee1530dc49eee8f7eb9379331a8dd4b3766042b9e502f74a68e7f662291
+  languageName: node
+  linkType: hard
+
+"bdk-rn@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "bdk-rn@npm:0.1.1"
+  dependencies:
+    adm-zip: ^0.5.9
+    is_js: ^0.9.0
+    request: ^2.88.2
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 8b3a9e59fc674aed95dda3753352ad6658fdbe5347e63217e0b0be3e208079f189ffc2dd8eea476f621d77f0920357b7014327cfd7b59193e8b8caea1c324705
   languageName: node
   linkType: hard
 
@@ -7622,6 +7643,13 @@ __metadata:
   dependencies:
     is-docker: ^2.0.0
   checksum: 20849846ae414997d290b75e16868e5261e86ff5047f104027026fd61d8b5a9b0b3ade16239f35e1a067b3c7cc02f70183cb661010ed16f4b6c7c93dad1b19d8
+  languageName: node
+  linkType: hard
+
+"is_js@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "is_js@npm:0.9.0"
+  checksum: bf7f0fc52187eda1ca597da0a20b85c4828b9bca5f08c5f2f6dd64d437384bdc9628674c78cee510f9600050871f7d783738d35dc6f5fe80e2a8848be5fbdce9
   languageName: node
   linkType: hard
 
@@ -11948,7 +11976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"request@npm:^2.88.0":
+"request@npm:^2.88.0, request@npm:^2.88.2":
   version: 2.88.2
   resolution: "request@npm:2.88.2"
   dependencies:
@@ -14033,6 +14061,7 @@ __metadata:
     babel-jest: ^26.6.3
     babel-plugin-module-resolver: ^5.0.0
     base-x: ^3.0.8
+    bdk-rn: ^0.1.1
     bech32: ^1.1.4
     bip21: ^2.0.3
     bip32-utils: ^0.11.1

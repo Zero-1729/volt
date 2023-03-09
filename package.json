@@ -29,6 +29,7 @@
     "@remobile/react-native-qrcode-local-image": "github:Zero-1729/react-native-qrcode-local-image#b1077073c13cdd6d8e17da77c61d9ea4de075ecb",
     "assert": "^2.0.0",
     "base-x": "^3.0.8",
+    "bdk-rn": "^0.1.1",
     "bech32": "^1.1.4",
     "bip21": "^2.0.3",
     "bip32-utils": "^0.11.1",
