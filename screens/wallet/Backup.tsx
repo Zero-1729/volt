@@ -52,7 +52,11 @@ const Backup = () => {
                                 'w-full justify-between absolute top-6 flex-row',
                             ),
                         ]}>
-                        <Text style={[tailwind('text-2xl font-bold')]}>
+                        <Text
+                            style={[
+                                tailwind('text-2xl font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
                             Backup Material
                         </Text>
                         <PlainButton
@@ -66,7 +70,11 @@ const Backup = () => {
                     {/* Display wallet name */}
                     <View
                         style={[tailwind('flex-row self-center -mt-16 mb-1')]}>
-                        <Text style={[tailwind('text-2xl font-bold mr-2')]}>
+                        <Text
+                            style={[
+                                tailwind('text-2xl font-bold mr-2'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
                             Wallet Name:
                         </Text>
                         <Text
@@ -79,7 +87,11 @@ const Backup = () => {
                     </View>
 
                     {/* Display wallet type */}
-                    <Text style={[tailwind('text-lg self-center mb-6')]}>
+                    <Text
+                        style={[
+                            tailwind('text-lg self-center mb-6'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
                         {walletTypeName}
                     </Text>
 
@@ -96,6 +108,7 @@ const Backup = () => {
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
+                                    color: ColorScheme.Text.Default,
                                 },
                             ]}>
                             <Text
@@ -116,7 +129,11 @@ const Backup = () => {
                             tailwind('absolute flex-row justify-center w-full'),
                             {bottom: NativeWindowMetrics.bottom},
                         ]}>
-                        <Text style={[tailwind('items-center justify-center')]}>
+                        <Text
+                            style={[
+                                tailwind('items-center justify-center'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
                             <Text style={[tailwind('font-bold ml-4')]}>
                                 WARNING:{' '}
                             </Text>
