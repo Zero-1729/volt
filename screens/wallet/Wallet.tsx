@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -14,16 +14,26 @@ import Box from '../../assets/svg/inbox-24.svg';
 
 import {PlainButton} from '../../components/button';
 
+import {AppStorageContext} from '../../class/storageContext';
+
 const Wallet = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
+    // Get current wallet ID and wallet data
+    const {currentWalletID, getWalletData} = useContext(AppStorageContext);
+
+    // Get current wallet data
+    const walletData = getWalletData(currentWalletID);
+
     // Get card color from wallet type
-    const CardColor = ColorScheme.WalletColors.bech32;
+    const CardColor = ColorScheme.WalletColors[walletData.type];
 
     // TODO: Fetch transactions from wallet
     const transactions = [];
+
+    const walletName = walletData.name;
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
@@ -49,7 +59,7 @@ const Wallet = () => {
                             }}>
                             <Back style={tailwind('mr-2')} fill={'white'} />
                             <Text style={[tailwind('text-white font-bold')]}>
-                                Back
+                                {walletName}
                             </Text>
                         </PlainButton>
                         <PlainButton
