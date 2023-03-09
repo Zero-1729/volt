@@ -23,6 +23,7 @@ const Color = (currentTheme: ColorThemeType) => {
             CheckBoxUnfilled: isDarkMode ? 'black' : 'white',
             Greyed: isDarkMode ? '#202020' : '#E5E5E5',
             CardGreyed: isDarkMode ? '#3f3f3f' : '#D5D5D5',
+            Alert: isDarkMode ? '#ff4545' : '#E5E5E5',
         },
         HeadingBar: isDarkMode ? '#1b1b1b' : '#F3F3F3',
         Text: {
@@ -33,6 +34,7 @@ const Color = (currentTheme: ColorThemeType) => {
             GrayText: isDarkMode ? '#B8B8B8' : '#656565',
             LightGreyText: isDarkMode ? '#4b4b4b' : '#DADADA',
             DescText: isDarkMode ? '#828282' : '#606060',
+            Alert: isDarkMode ? 'white' : 'red',
         },
         MiscCardColor: {
             ImportAltCard: isDarkMode ? '#2c2c2c' : 'white',
