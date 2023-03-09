@@ -90,6 +90,22 @@
   top: 1.25rem
 }
 
+.bottom-16 {
+  bottom: 4rem
+}
+
+.top-6 {
+  top: 1.5rem
+}
+
+.right-0 {
+  right: 0px
+}
+
+.bottom-12 {
+  bottom: 3rem
+}
+
 .z-10 {
   z-index: 10
 }
@@ -211,6 +227,30 @@
   margin-top: 2rem
 }
 
+.mt-16 {
+  margin-top: 4rem
+}
+
+.mr-1 {
+  margin-right: 0.25rem
+}
+
+.ml-1 {
+  margin-left: 0.25rem
+}
+
+.ml-4 {
+  margin-left: 1rem
+}
+
+.-mt-12 {
+  margin-top: -3rem
+}
+
+.-mt-16 {
+  margin-top: -4rem
+}
+
 .flex {
   display: flex
 }
@@ -269,6 +309,10 @@
 
 .h-full {
   height: 100%
+}
+
+.h-56 {
+  height: 14rem
 }
 
 .w-11\/12 {
@@ -400,6 +444,16 @@
   background-color: rgb(255 255 255 / var(--tw-bg-opacity))
 }
 
+.bg-blue-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 64 175 / var(--tw-bg-opacity))
+}
+
+.bg-pink-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 168 212 / var(--tw-bg-opacity))
+}
+
 .p-1 {
   padding: 0.25rem
 }
@@ -418,6 +472,10 @@
 
 .p-6 {
   padding: 1.5rem
+}
+
+.p-2 {
+  padding: 0.5rem
 }
 
 .px-12 {
