@@ -48,6 +48,7 @@ type defaultContextType = {
     ) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
+    getWalletData: (id: string) => BaseWallet;
 };
 
 // Default app context values
@@ -78,6 +79,9 @@ const defaultContext: defaultContextType = {
     addWallet: () => {},
     resetAppData: () => {},
     setCurrentWalletID: () => {},
+    getWalletData: () => {
+        return new BaseWallet('test wallet', 'bech32', '');
+    }, // Function grabs wallet data through a fetch by index via ids
 };
 
 // Note: context 'value' will default to 'defaultContext' if no Provider is found
@@ -123,6 +127,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('wallets');
     const {getItem: _getIsAdvancedMode, setItem: _updateIsAdvancedMode} =
         useAsyncStorage('isAdvancedMode');
+    const {getItem: _getCurrentWalletID, setItem: _updateCurrentWalletID} =
+        useAsyncStorage('currentWalletID');
 
     // |> Create functions for getting, setting, and other data manipulation
     const setAppLanguage = useCallback(
@@ -288,6 +294,13 @@ export const AppStorageProvider = ({children}: Props) => {
             _setCurrentWalletID(JSON.parse(walletID));
         }
     };
+
+    const getWalletData = (id: string): BaseWallet => {
+        const index = wallets.findIndex(wallet => wallet.id === id);
+
+        return wallets[index];
+    };
+
     const _loadWallets = async () => {
         const savedWallets = await _getWallets();
 
@@ -414,6 +427,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 setCurrentWalletID,
                 isAdvancedMode,
                 setIsAdvancedMode,
+                getWalletData,
             }}>
             {children}
         </AppStorageContext.Provider>
