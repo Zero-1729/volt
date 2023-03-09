@@ -23,7 +23,7 @@ export class BaseWallet {
     readonly isWatchOnly: boolean;
     readonly type: string;
 
-    readonly descriptor: string;
+    descriptor: string;
     readonly birthday: string | Date;
     secret: string;
 
@@ -104,5 +104,9 @@ export class BaseWallet {
 
     _setFingerprint(fingerprint: string) {
         this.masterFingerprint = fingerprint;
+    }
+
+    _setDescriptor(descriptor: string) {
+        this.descriptor = descriptor;
     }
 }
