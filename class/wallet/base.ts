@@ -60,7 +60,7 @@ export class BaseWallet {
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = network ? network : 'mainnet'; // Can have 'mainnet', 'testnet', or 'signet' wallets
 
-        this.UTXOs = []; // Set of wallet transactions
+        this.UTXOs = []; // Set of wallet UTXOs
 
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
