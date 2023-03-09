@@ -16,6 +16,8 @@ import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
 
+import {Balance} from '../../components/balance';
+
 const Wallet = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
@@ -81,12 +83,18 @@ const Wallet = () => {
                             tailwind('absolute self-center w-5/6 bottom-28'),
                         ]}>
                         <Text
-                            style={[tailwind('text-sm text-white opacity-60')]}>
+                            style={[
+                                tailwind('text-sm text-white opacity-60 mb-1'),
+                            ]}>
                             Balance
                         </Text>
-                        <Text style={[tailwind('text-3xl text-white')]}>
-                            0 Sats
-                        </Text>
+
+                        {/* Balance component */}
+                        <Balance
+                            walletBalance={walletData.balance}
+                            unit={walletData.units}
+                            BalanceFontSize={'text-4xl'}
+                        />
                     </View>
 
                     {/* Send and receive */}
