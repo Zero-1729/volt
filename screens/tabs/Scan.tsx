@@ -2,11 +2,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
 import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
-import {
-    useNavigation,
-    useIsFocused,
-    CommonActions,
-} from '@react-navigation/native';
+import {useIsFocused, CommonActions} from '@react-navigation/native';
 
 import {runOnJS} from 'react-native-reanimated';
 
@@ -100,9 +96,8 @@ const openSettings = () => {
     Linking.openSettings();
 };
 
-const Scan = () => {
+const Scan = ({navigation, route}) => {
     const isFocused = useIsFocused();
-    const navigation = useNavigation();
 
     const tailwind = useTailwind();
 
@@ -150,7 +145,15 @@ const Scan = () => {
     }, []);
 
     const closeScreen = () => {
-        navigation.dispatch(CommonActions.goBack());
+        // If from Wallet, go back to Wallet
+        if (route.params?.key === 'Wallet') {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {screen: 'WalletView'}),
+            );
+        } else {
+            // Otherwise, go back to Home
+            navigation.dispatch(CommonActions.goBack());
+        }
     };
 
     // Update permission state when permission changes.

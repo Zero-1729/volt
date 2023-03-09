@@ -57,7 +57,9 @@ const Wallet = () => {
                         <PlainButton
                             style={[tailwind('items-center flex-row left-6')]}
                             onPress={() => {
-                                navigation.dispatch(CommonActions.goBack());
+                                navigation.dispatch(
+                                    CommonActions.navigate('HomeScreen'),
+                                );
                             }}>
                             <Back style={tailwind('mr-2')} fill={'white'} />
                             <Text style={[tailwind('text-white font-bold')]}>
@@ -152,7 +154,18 @@ const Wallet = () => {
                                         ColorScheme.Background.Primary,
                                 },
                             ]}>
-                            <PlainButton>
+                            <PlainButton
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'Scan',
+                                            params: {
+                                                walletID: currentWalletID,
+                                                key: 'Wallet',
+                                            },
+                                        }),
+                                    );
+                                }}>
                                 <Scan
                                     width={32}
                                     fill={ColorScheme.SVG.Default}
