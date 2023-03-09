@@ -54,6 +54,14 @@ type WalletCardProps = CardProps & {
     navCallback?: () => void;
 };
 
+type BalanceProps = BaseProps & {
+    walletBalance: number;
+    unit: Unit;
+    // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
+    BalanceFontSize?: string;
+    SatsFontSize?: string;
+};
+
 // Base Text Input Prop Type (for reuse)
 type TextInputProps = BaseProps & {
     color: string;
