@@ -81,6 +81,7 @@ const Info = () => {
                                 {borderWidth: 1, borderRadius: 6},
                             ]}>
                             <TextSingleInput
+                                shavedHeight={true}
                                 placeholder={walletName}
                                 onChangeText={() => {}}
                                 onBlur={() => {}}
