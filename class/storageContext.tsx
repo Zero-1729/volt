@@ -40,6 +40,7 @@ type defaultContextType = {
     setWalletInitialized: (isWalletInitialized: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     renameWallet: (id: string, newName: string) => void;
+    deleteWallet: (id: string) => void;
     addWallet: (
         name: string,
         type: string,
@@ -79,6 +80,7 @@ const defaultContext: defaultContextType = {
     setIsAdvancedMode: () => {},
     addWallet: () => {},
     renameWallet: () => {},
+    deleteWallet: () => {},
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
@@ -325,6 +327,24 @@ export const AppStorageProvider = ({children}: Props) => {
         [_setWallets, _updateWallets],
     );
 
+    const deleteWallet = useCallback(
+        async (id: string) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            const tmp = [...wallets];
+            tmp.splice(index, 1);
+
+            // Assuming the user has deleted the last wallet
+            // Reset wallet init flag
+            if (tmp.length === 0) {
+                setWalletInitialized(false);
+            }
+
+            setWallets(tmp);
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const renameWallet = useCallback(
         async (id: string, newName: string) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
@@ -444,6 +464,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 setIsAdvancedMode,
                 getWalletData,
                 renameWallet,
+                deleteWallet,
             }}>
             {children}
         </AppStorageContext.Provider>
