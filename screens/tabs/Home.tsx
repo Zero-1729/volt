@@ -36,8 +36,13 @@ const Home = () => {
 
     const navigation = useNavigation();
 
-    const {isWalletInitialized, wallets, hideTotalBalance, appFiatCurrency} =
-        useContext(AppStorageContext);
+    const {
+        isWalletInitialized,
+        wallets,
+        hideTotalBalance,
+        appFiatCurrency,
+        setCurrentWalletID,
+    } = useContext(AppStorageContext);
 
     // add the total balances of the wallets
     const totalBalance = wallets.reduce(
@@ -72,6 +77,16 @@ const Home = () => {
                     walletType={item.type}
                     hideBalance={hideTotalBalance}
                     unit={item.units}
+                    navCallback={() => {
+                        // Set the current wallet ID
+                        setCurrentWalletID(item.id);
+
+                        navigation.dispatch(
+                            CommonActions.navigate('WalletRoot', {
+                                screen: 'WalletView',
+                            }),
+                        );
+                    }}
                 />
             </View>
         );

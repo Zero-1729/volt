@@ -9,7 +9,7 @@ import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 import {BaseProps, ButtonProps} from '../types/props';
 
 export const PlainButton = (props: BaseProps) => {
-    return <TouchableOpacity {...props} />;
+    return <TouchableOpacity activeOpacity={props.activeOpacity} {...props} />;
 };
 
 export const Button = (props: ButtonProps) => {

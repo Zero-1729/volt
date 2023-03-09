@@ -17,11 +17,7 @@ import Color from '../constants/Color';
 
 import {formatSats, formatBTC} from '../modules/transform';
 
-const WalletTypes: {[index: string]: string[]} = {
-    bech32: ['Native Segwit', 'Bech32'],
-    legacy: ['Legacy', 'P2PKH'],
-    p2sh: ['Segwit', 'P2SH'],
-};
+import {WalletTypeNames} from '../class/wallet/base';
 
 export const EmptyCard = () => {
     const navigation = useNavigation();
@@ -103,135 +99,156 @@ export const WalletCard = (props: WalletCardProps) => {
     };
 
     return (
-        <View style={tailwind('w-full h-48 relative items-center')}>
-            <View
-                style={[
-                    tailwind('w-full h-48 rounded-md z-50 px-6'),
-                    {
-                        backgroundColor:
-                            ColorScheme.WalletColors[props.walletType],
-                    },
-                ]}>
-                <Text
-                    numberOfLines={1}
-                    ellipsizeMode="middle"
-                    style={[
-                        tailwind(
-                            `pt-4 ${
-                                props.isWatchOnly ? '' : 'mt-1'
-                            } text-2xl w-full text-left font-medium text-white`,
-                        ),
-                        Font.RobotoText,
-                    ]}>
-                    {props.label}
-                </Text>
-
+        <PlainButton
+            onPress={() => {
+                if (props.navCallback) {
+                    props.navCallback();
+                }
+            }}
+            activeOpacity={1}>
+            <View style={tailwind('w-full h-48 relative items-center')}>
                 <View
                     style={[
-                        tailwind(
-                            'bg-black absolute left-6 top-14 rounded-sm opacity-30',
-                        ),
+                        tailwind('w-full h-48 rounded-md z-50 px-6'),
+                        {
+                            backgroundColor:
+                                ColorScheme.WalletColors[props.walletType],
+                        },
                     ]}>
                     <Text
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
                         style={[
-                            tailwind('text-xs text-white font-bold px-2 py-1'),
+                            tailwind(
+                                `pt-4 ${
+                                    props.isWatchOnly ? '' : 'mt-1'
+                                } text-2xl w-full text-left font-medium text-white`,
+                            ),
                             Font.RobotoText,
                         ]}>
-                        {`${WalletTypes[props.walletType][0]}${
-                            isAdvancedMode
-                                ? ' (' + WalletTypes[props.walletType][1] + ')'
-                                : ''
-                        }`}
+                        {props.label}
                     </Text>
-                </View>
 
-                {!props.hideBalance ? (
-                    <PlainButton
-                        onPress={toggleUnit}
-                        style={[
-                            tailwind(
-                                `absolute ${
-                                    props.isWatchOnly ? 'bottom-9' : 'bottom-6'
-                                }`,
-                            ),
-                        ]}>
-                        <View style={[tailwind('flex-row items-center mx-6')]}>
-                            {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
-                            {useSatSymbol || unit.name === 'BTC' ? (
-                                <Text
-                                    numberOfLines={1}
-                                    style={[
-                                        tailwind(
-                                            'text-3xl self-baseline mr-2 text-white',
-                                        ),
-                                        Font.SatSymbol,
-                                    ]}>
-                                    {unit.symbol}
-                                </Text>
-                            ) : (
-                                <></>
-                            )}
-
-                            {/* Display balance in sats or BTC */}
-                            <Text
-                                numberOfLines={1}
-                                style={[
-                                    tailwind(
-                                        'text-3xl text-white self-baseline',
-                                    ),
-                                ]}>
-                                {balance}
-                            </Text>
-
-                            {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
-                            {!useSatSymbol && unit.name === 'sats' ? (
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-xl self-baseline text-white',
-                                        ),
-                                    ]}>
-                                    {' '}
-                                    sats
-                                </Text>
-                            ) : (
-                                <></>
-                            )}
-                        </View>
-                    </PlainButton>
-                ) : (
-                    /* Empty view to keep the card height consistent  */
                     <View
                         style={[
                             tailwind(
-                                `absolute left-6 ${
-                                    props.isWatchOnly ? 'bottom-11' : 'bottom-7'
-                                } rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black`,
-                            ),
-                        ]}
-                    />
-                )}
-
-                {props.isWatchOnly ? (
-                    <View
-                        style={[
-                            tailwind(
-                                'left-0 bg-white w-full py-1 rounded-bl-md rounded-tr-sm absolute bottom-0 self-center opacity-40',
+                                'bg-black absolute left-6 top-14 rounded-sm opacity-30',
                             ),
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-xs self-end pr-4 font-medium'),
+                                tailwind(
+                                    'text-xs text-white font-bold px-2 py-1',
+                                ),
                                 Font.RobotoText,
                             ]}>
-                            Watch-only
+                            {`${WalletTypeNames[props.walletType][0]}${
+                                isAdvancedMode
+                                    ? ' (' +
+                                      WalletTypeNames[props.walletType][1] +
+                                      ')'
+                                    : ''
+                            }`}
                         </Text>
                     </View>
-                ) : (
-                    <></>
-                )}
+
+                    {!props.hideBalance ? (
+                        <PlainButton
+                            onPress={toggleUnit}
+                            style={[
+                                tailwind(
+                                    `absolute ${
+                                        props.isWatchOnly
+                                            ? 'bottom-9'
+                                            : 'bottom-6'
+                                    }`,
+                                ),
+                            ]}>
+                            <View
+                                style={[
+                                    tailwind('flex-row items-center mx-6'),
+                                ]}>
+                                {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
+                                {useSatSymbol || unit.name === 'BTC' ? (
+                                    <Text
+                                        numberOfLines={1}
+                                        style={[
+                                            tailwind(
+                                                'text-3xl self-baseline mr-2 text-white',
+                                            ),
+                                            Font.SatSymbol,
+                                        ]}>
+                                        {unit.symbol}
+                                    </Text>
+                                ) : (
+                                    <></>
+                                )}
+
+                                {/* Display balance in sats or BTC */}
+                                <Text
+                                    numberOfLines={1}
+                                    style={[
+                                        tailwind(
+                                            'text-3xl text-white self-baseline',
+                                        ),
+                                    ]}>
+                                    {balance}
+                                </Text>
+
+                                {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
+                                {!useSatSymbol && unit.name === 'sats' ? (
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                'text-xl self-baseline text-white',
+                                            ),
+                                        ]}>
+                                        {' '}
+                                        sats
+                                    </Text>
+                                ) : (
+                                    <></>
+                                )}
+                            </View>
+                        </PlainButton>
+                    ) : (
+                        /* Empty view to keep the card height consistent  */
+                        <View
+                            style={[
+                                tailwind(
+                                    `absolute left-6 ${
+                                        props.isWatchOnly
+                                            ? 'bottom-11'
+                                            : 'bottom-7'
+                                    } rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black`,
+                                ),
+                            ]}
+                        />
+                    )}
+
+                    {props.isWatchOnly ? (
+                        <View
+                            style={[
+                                tailwind(
+                                    'left-0 bg-white w-full py-1 rounded-bl-md rounded-tr-sm absolute bottom-0 self-center opacity-40',
+                                ),
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-xs self-end pr-4 font-medium',
+                                    ),
+                                    Font.RobotoText,
+                                ]}>
+                                Watch-only
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
+                </View>
             </View>
-        </View>
+        </PlainButton>
     );
 };
 

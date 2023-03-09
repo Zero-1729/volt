@@ -9,6 +9,7 @@ type BaseProps = PropsWithChildren<{
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     onPress?: () => void;
     disabled?: boolean;
+    activeOpacity?: number;
 }>;
 
 type AppCard = BaseProps & {
@@ -50,6 +51,7 @@ type WalletCardProps = CardProps & {
     isWatchOnly: boolean;
     hideBalance: boolean;
     unit: Unit;
+    navCallback?: () => void;
 };
 
 // Base Text Input Prop Type (for reuse)

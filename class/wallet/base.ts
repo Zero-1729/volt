@@ -2,6 +2,18 @@ import Crypto from 'crypto';
 
 import {Unit, UTXOType} from './../../types/wallet';
 
+export const WalletTypeNames: {[index: string]: string[]} = {
+    bech32: ['Native Segwit', 'Bech32'],
+    legacy: ['Legacy', 'P2PKH'],
+    p2sh: ['Segwit', 'P2SH'],
+};
+
+export const WalletPaths: {[index: string]: string} = {
+    bech32: "m/84'/0'/0'",
+    legacy: "m/44'/0'/0'",
+    p2sh: "m/49'/0'/0'",
+};
+
 export class BaseWallet {
     public id: string;
     public name: string;
@@ -27,6 +39,8 @@ export class BaseWallet {
     lastSynced: number;
     units: Unit;
 
+    derivationPath: string;
+
     network: string;
 
     hardwareWalletEnabled: boolean;
@@ -38,7 +52,6 @@ export class BaseWallet {
         secret: string,
         descriptor?: string,
         network?: string,
-        isWatchOnly?: boolean,
     ) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = name; // Wallet name
@@ -65,6 +78,9 @@ export class BaseWallet {
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
 
+        this.derivationPath = WalletPaths[this.type]; // Wallet derivation path
+
+        // TODO: fetch from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
         this.secret = !isWatchOnly ? secret : ''; // private key or recovery phrase
         this.isBIP39 = false; // Whether wallet has a 'BIP39' seed
