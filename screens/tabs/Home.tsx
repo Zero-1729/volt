@@ -51,7 +51,9 @@ const Home = () => {
         0,
     );
 
-    const fiatUSDRate = 23_000;
+    // Fetch from store and update the fiat rate
+    // according to current 'appFiatCurrency'
+    const fiatRate = 23_000; // USD rate
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -191,7 +193,7 @@ const Home = () => {
                                                 appFiatCurrency.symbol
                                             } ${normalizeFiat(
                                                 totalBalance,
-                                                fiatUSDRate,
+                                                fiatRate,
                                             )}`}
                                         </Text>
                                     ) : (

@@ -37,6 +37,9 @@ const Wallet = () => {
 
     const walletName = walletData.name;
 
+    // Ideally get it from store
+    const fiatRate = 23_000; // USD rate
+
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
     return (
