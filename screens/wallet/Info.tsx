@@ -27,6 +27,7 @@ const Info = () => {
         isAdvancedMode,
         currentWalletID,
         getWalletData,
+        renameWallet,
         deleteWallet,
     } = useContext(AppStorageContext);
 
@@ -45,6 +46,8 @@ const Info = () => {
     const walletFingerprint = walletData.masterFingerprint;
     const walletName = 'Wallet Name';
     const walletDescriptor = walletData.descriptor;
+
+    const [tmpName, setTmpName] = useState(walletName);
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -87,8 +90,10 @@ const Info = () => {
                             <TextSingleInput
                                 shavedHeight={true}
                                 placeholder={walletName}
-                                onChangeText={() => {}}
-                                onBlur={() => {}}
+                                onChangeText={setTmpName}
+                                onBlur={() => {
+                                    renameWallet(currentWalletID, tmpName);
+                                }}
                                 color={ColorScheme.Text.Default}
                             />
                         </View>
