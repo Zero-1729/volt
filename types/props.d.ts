@@ -46,6 +46,7 @@ type CardProps = BaseProps & {
 };
 
 type WalletCardProps = CardProps & {
+    id: string;
     walletBalance: number;
     walletType: string;
     isWatchOnly: boolean;
