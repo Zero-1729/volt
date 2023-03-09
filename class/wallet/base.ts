@@ -39,6 +39,8 @@ export class BaseWallet {
     lastSynced: number;
     units: Unit;
 
+    derivationPath: string;
+
     network: string;
 
     hardwareWalletEnabled: boolean;
@@ -77,6 +79,9 @@ export class BaseWallet {
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
 
+        this.derivationPath = WalletPaths[this.type]; // Wallet derivation path
+
+        // TODO: fetch from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
         this.secret = !isWatchOnly ? secret : ''; // private key or recovery phrase
         this.isBIP39 = false; // Whether wallet has a 'BIP39' seed

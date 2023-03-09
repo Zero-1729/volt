@@ -15,6 +15,8 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
 import {AppStorageContext} from '../../class/storageContext';
+import {WalletTypeNames} from '../../class/wallet/base';
+
 const Info = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
@@ -32,9 +34,10 @@ const Info = () => {
     };
 
     // TODO: grab from Wallet store data
-    const walletPath = "m/44'/0'/0'/0/0";
-    const walletType = 'SegWit (Bech32)';
+    const walletPath = walletData.derivationPath;
+    const walletType = WalletTypeNames[walletData.type];
     const walletTypeName =
+        walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
     const walletFingerprint = walletData.masterFingerprint;
     const walletName = 'Wallet Name';
     const walletDescriptor = walletData.descriptor;
@@ -125,7 +128,7 @@ const Info = () => {
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                {walletType}
+                                {walletTypeName}
                             </Text>
                         </PlainButton>
                     </View>
