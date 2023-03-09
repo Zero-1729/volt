@@ -28,7 +28,13 @@ export const TextSingleInput = (props: TextInputProps) => {
             autoCapitalize="none"
             selectTextOnFocus={true}
             {...props}
-            style={[tailwind('py-4 px-2 rounded text-xs')]}
+            style={[
+                tailwind(
+                    `${
+                        props.shavedHeight ? 'py-2' : 'py-4'
+                    } px-2 rounded text-xs`,
+                ),
+            ]}
         />
     );
 };
