@@ -74,23 +74,17 @@ const Backup = () => {
                     </View>
 
                     {/* Display wallet name */}
-                    <View
-                        style={[tailwind('flex-row self-center -mt-16 mb-1')]}>
-                        <Text
-                            style={[
-                                tailwind('text-2xl font-bold mr-2'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            Wallet Name:
-                        </Text>
-                        <Text
-                            style={[
-                                tailwind('text-2xl'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {walletData.name}
-                        </Text>
-                    </View>
+                    <Text
+                        style={[
+                            tailwind(
+                                '-mt-20 mb-1 font-bold self-center text-center text-2xl w-5/6',
+                            ),
+                            {color: ColorScheme.Text.Default},
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode={'middle'}>
+                        {walletData.name}
+                    </Text>
 
                     {/* Display wallet type */}
                     <Text
