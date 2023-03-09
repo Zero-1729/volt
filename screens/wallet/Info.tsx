@@ -44,7 +44,7 @@ const Info = () => {
     const walletTypeName =
         walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
     const walletFingerprint = walletData.masterFingerprint;
-    const walletName = 'Wallet Name';
+    const walletName = walletData.name;
     const walletDescriptor = walletData.descriptor;
 
     const [tmpName, setTmpName] = useState(walletName);
