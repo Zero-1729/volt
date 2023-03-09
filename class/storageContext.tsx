@@ -14,8 +14,10 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 
+import {Unit} from '../types/wallet';
 import {BaseWallet} from './wallet/base';
-import { Unit } from '../types/wallet';
+
+import BdkRn from 'bdk-rn';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -392,6 +394,21 @@ export const AppStorageProvider = ({children}: Props) => {
                 );
 
                 _setCurrentWalletID(newWallet.id);
+
+                const walletKeyInfo = await BdkRn.createExtendedKey({
+                    mnemonic: newWallet.secret,
+                    network: 'bitcoin',
+                });
+
+                const walletDescriptor = await BdkRn.createDescriptor({
+                    path: newWallet.derivationPath,
+                    mnemonic: newWallet.secret,
+                    network: 'bitcoin',
+                });
+
+                // Update Wallet descriptor and fingerprint
+                newWallet._setDescriptor(walletDescriptor.data);
+                newWallet._setFingerprint(walletKeyInfo.data.fingerprint);
 
                 const tmp = wallets ? [...wallets, newWallet] : [newWallet];
 
