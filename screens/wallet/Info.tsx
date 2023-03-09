@@ -217,7 +217,15 @@ const Info = () => {
                 </PlainButton>
 
                 {/* Backup / Export material - Seed, X/Y/ZPUB, X/Y/ZPUB, etc. */}
-                <PlainButton style={[tailwind('w-5/6')]}>
+                <PlainButton
+                    style={[tailwind('w-5/6')]}
+                    onPress={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'WalletBackup',
+                            }),
+                        );
+                    }}>
                     <View
                         style={[
                             tailwind(
