@@ -52,7 +52,6 @@ export class BaseWallet {
         secret: string,
         descriptor?: string,
         network?: string,
-        isWatchOnly?: boolean,
     ) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = name; // Wallet name
