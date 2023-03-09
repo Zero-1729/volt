@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -23,8 +23,12 @@ const Info = () => {
     const navigation = useNavigation();
 
     // Get advacned mode flag, current wallet ID and wallet data
-    const {isAdvancedMode, currentWalletID, getWalletData} =
-        useContext(AppStorageContext);
+    const {
+        isAdvancedMode,
+        currentWalletID,
+        getWalletData,
+        deleteWallet,
+    } = useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
 
@@ -263,7 +267,14 @@ const Info = () => {
                 <LongBottomButton
                     title="Delete"
                     onPress={() => {
-                        console.info('[Action] Delete Wallet');
+                        // Delete wallet from store
+                        deleteWallet(currentWalletID);
+
+                        // Navigate to HomeScreen
+                        // Make it clear deleted wallet is no longer in store
+                        navigation.dispatch(
+                            CommonActions.navigate({name: 'HomeScreen'}),
+                        );
                     }}
                     textColor={'red'}
                     backgroundColor={ColorScheme.Background.Greyed}
