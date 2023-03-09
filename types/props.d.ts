@@ -64,6 +64,7 @@ type BalanceProps = BaseProps & {
 
 // Base Text Input Prop Type (for reuse)
 type TextInputProps = BaseProps & {
+    shavedHeight?: boolean;
     color: string;
     isEnabled?: boolean;
     placeholder: string;
