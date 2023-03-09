@@ -42,7 +42,7 @@ type defaultContextType = {
     addWallet: (
         name: string,
         type: string,
-        secret: string,
+        secret?: string,
         network?: string,
         descriptor?: string,
     ) => void;
@@ -327,7 +327,7 @@ export const AppStorageProvider = ({children}: Props) => {
         async (
             name: string,
             type: string,
-            secret: string,
+            secret?: string,
             descriptor?: string,
             network: string = 'tesnet',
         ) => {
