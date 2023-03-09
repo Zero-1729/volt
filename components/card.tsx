@@ -144,9 +144,9 @@ export const WalletCard = (props: WalletCardProps) => {
                             }`,
                         )}>
                         <Balance
-                            walletBalance={props.walletBalance}
-                            unit={props.unit}
+                            id={props.id}
                             BalanceFontSize={'text-3xl'}
+                            disableFiat={true}
                         />
                     </View>
 
