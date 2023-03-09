@@ -289,8 +289,8 @@ const Info = () => {
                             CommonActions.navigate({name: 'HomeScreen'}),
                         );
                     }}
-                    textColor={'red'}
-                    backgroundColor={ColorScheme.Background.Greyed}
+                    textColor={ColorScheme.Text.Alert}
+                    backgroundColor={ColorScheme.Background.Alert}
                     style={[tailwind('font-bold')]}
                 />
             </View>
