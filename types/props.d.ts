@@ -55,11 +55,12 @@ type WalletCardProps = CardProps & {
 };
 
 type BalanceProps = BaseProps & {
-    walletBalance: number;
-    unit: Unit;
+    id: string; // current id of the wallet to show balance
+    fiatRate?: number;
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
     BalanceFontSize?: string;
     SatsFontSize?: string;
+    disableFiat?: boolean; // false by default
 };
 
 // Base Text Input Prop Type (for reuse)
