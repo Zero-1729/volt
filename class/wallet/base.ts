@@ -2,6 +2,18 @@ import Crypto from 'crypto';
 
 import {Unit, UTXOType} from './../../types/wallet';
 
+export const WalletTypeNames: {[index: string]: string[]} = {
+    bech32: ['Native Segwit', 'Bech32'],
+    legacy: ['Legacy', 'P2PKH'],
+    p2sh: ['Segwit', 'P2SH'],
+};
+
+export const WalletPaths: {[index: string]: string} = {
+    bech32: "m/84'/0'/0'",
+    legacy: "m/44'/0'/0'",
+    p2sh: "m/49'/0'/0'",
+};
+
 export class BaseWallet {
     public id: string;
     public name: string;

@@ -17,11 +17,7 @@ import Color from '../constants/Color';
 
 import {formatSats, formatBTC} from '../modules/transform';
 
-const WalletTypes: {[index: string]: string[]} = {
-    bech32: ['Native Segwit', 'Bech32'],
-    legacy: ['Legacy', 'P2PKH'],
-    p2sh: ['Segwit', 'P2SH'],
-};
+import {WalletTypeNames} from '../class/wallet/base';
 
 export const EmptyCard = () => {
     const navigation = useNavigation();
@@ -146,10 +142,10 @@ export const WalletCard = (props: WalletCardProps) => {
                                 ),
                                 Font.RobotoText,
                             ]}>
-                            {`${WalletTypes[props.walletType][0]}${
+                            {`${WalletTypeNames[props.walletType][0]}${
                                 isAdvancedMode
                                     ? ' (' +
-                                      WalletTypes[props.walletType][1] +
+                                      WalletTypeNames[props.walletType][1] +
                                       ')'
                                     : ''
                             }`}
