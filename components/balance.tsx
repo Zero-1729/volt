@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {Text, View} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
@@ -12,19 +12,29 @@ import Font from '../constants/Font';
 import {formatSats, formatBTC} from '../modules/transform';
 
 import {BalanceProps} from '../types/props';
-import {Unit} from '../types/wallet';
 
 export const Balance = (props: BalanceProps) => {
     const tailwind = useTailwind();
 
-    const {useSatSymbol, hideTotalBalance} = useContext(AppStorageContext);
-    const [unit, setUnit] = useState<Unit>(props.unit);
+    const {
+        useSatSymbol,
+        hideTotalBalance,
+    } = useContext(AppStorageContext);
+
+    const walletData = getWalletData(props.id);
 
     const toggleUnit = () => {
-        if (unit.name === 'BTC') {
-            setUnit({name: 'sats', symbol: 's'});
+        if (walletData.units.name === 'BTC') {
+            updateWalletUnit(props.id, {name: 'sats', symbol: 's'});
+        } else if (walletData.units.name === 'sats' && !props.disableFiat) {
+            // Toggle to fiat is sats
+            updateWalletUnit(props.id, {
+                name: appFiatCurrency.short,
+                symbol: appFiatCurrency.symbol,
+            });
         } else {
-            setUnit({name: 'BTC', symbol: '₿'});
+            // If sats, toggle to BTC
+            updateWalletUnit(props.id, {name: 'BTC', symbol: '₿'});
         }
     };
 
@@ -39,7 +49,7 @@ export const Balance = (props: BalanceProps) => {
                 <PlainButton onPress={toggleUnit}>
                     <View style={[tailwind('flex-row items-center')]}>
                         {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
-                        {useSatSymbol || unit.name === 'BTC' ? (
+                        {useSatSymbol || walletData.units.name === 'BTC' ? (
                             <Text
                                 numberOfLines={1}
                                 style={[
@@ -50,9 +60,9 @@ export const Balance = (props: BalanceProps) => {
                                                 : 'text-2xl'
                                         } self-baseline mr-2 text-white`,
                                     ),
-                                    Font.SatSymbol,
+                                    walletData.units.name === 'sats' ||
                                 ]}>
-                                {unit.symbol}
+                                {walletData.units.symbol}
                             </Text>
                         ) : (
                             <></>
@@ -74,7 +84,7 @@ export const Balance = (props: BalanceProps) => {
                         </Text>
 
                         {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
-                        {!useSatSymbol && unit.name === 'sats' ? (
+                        {!useSatSymbol && walletData.units.name === 'sats' ? (
                             <Text
                                 style={[
                                     tailwind(
