@@ -19,6 +19,7 @@ import RestoreActions from './screens/wallet/RestoreActions';
 import CreateActions from './screens/wallet/CreateActions';
 import WalletViewScreen from './screens/wallet/Wallet';
 import Info from './screens/wallet/Info';
+import Backup from './screens/wallet/Backup';
 
 import Apps from './screens/tabs/Apps';
 
@@ -91,6 +92,8 @@ const WalletRoot = () => {
                     component={CreateActions}
                 />
             </WalletStack.Group>
+
+            <WalletStack.Screen name="WalletBackup" component={Backup} />
         </WalletStack.Navigator>
     );
 };
