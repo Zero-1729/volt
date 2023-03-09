@@ -82,7 +82,7 @@ export class BaseWallet {
 
         // TODO: fetch from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
-        this.secret = !isWatchOnly ? secret : ''; // private key or recovery phrase
+        this.secret = secret ? secret : ''; // private key or recovery phrase
         this.isBIP39 = false; // Whether wallet has a 'BIP39' seed
 
         this.isWatchOnly = !this.secret; // Whether wallet is watch only
