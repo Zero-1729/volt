@@ -145,6 +145,7 @@ const CreateAction = () => {
                         ]}>
                         <TextSingleInput
                             placeholder={'Enter Wallet name'}
+                            placeholderTextColor={ColorScheme.Text.GrayedText}
                             onChangeText={setNewWalletName}
                             onBlur={onBlur}
                             color={ColorScheme.Text.Default}
