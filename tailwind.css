@@ -74,6 +74,10 @@
   top: 0px
 }
 
+.top-12 {
+  top: 3rem
+}
+
 .top-14 {
   top: 3.5rem
 }
@@ -145,6 +149,10 @@
 
 .mb-8 {
   margin-bottom: 2rem
+}
+
+.ml-2 {
+  margin-left: 0.5rem
 }
 
 .ml-6 {
@@ -392,6 +400,10 @@
   background-color: rgb(255 255 255 / var(--tw-bg-opacity))
 }
 
+.p-1 {
+  padding: 0.25rem
+}
+
 .p-3 {
   padding: 0.75rem
 }
@@ -528,6 +540,11 @@
   font-weight: 500
 }
 
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity))
+}
+
 .text-red-600 {
   --tw-text-opacity: 1;
   color: rgb(220 38 38 / var(--tw-text-opacity))
@@ -542,12 +559,12 @@
   opacity: 0.2
 }
 
-.opacity-30 {
-  opacity: 0.3
-}
-
 .opacity-40 {
   opacity: 0.4
+}
+
+.opacity-50 {
+  opacity: 0.5
 }
 
 .opacity-60 {
