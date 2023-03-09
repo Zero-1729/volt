@@ -39,6 +39,7 @@ type defaultContextType = {
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setWalletInitialized: (isWalletInitialized: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
+    renameWallet: (id: string, newName: string) => void;
     addWallet: (
         name: string,
         type: string,
@@ -77,6 +78,7 @@ const defaultContext: defaultContextType = {
     setWalletInitialized: () => {},
     setIsAdvancedMode: () => {},
     addWallet: () => {},
+    renameWallet: () => {},
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
@@ -323,6 +325,19 @@ export const AppStorageProvider = ({children}: Props) => {
         [_setWallets, _updateWallets],
     );
 
+    const renameWallet = useCallback(
+        async (id: string, newName: string) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            const tmp = [...wallets];
+            tmp[index].name = newName;
+
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const addWallet = useCallback(
         async (
             name: string,
@@ -428,6 +443,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 isAdvancedMode,
                 setIsAdvancedMode,
                 getWalletData,
+                renameWallet,
             }}>
             {children}
         </AppStorageContext.Provider>
