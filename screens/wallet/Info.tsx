@@ -254,7 +254,15 @@ const Info = () => {
                 </PlainButton>
 
                 {/* Wallet Tools */}
-                <PlainButton style={[tailwind('w-5/6')]}>
+                <PlainButton
+                    style={[tailwind('w-5/6')]}
+                    onPress={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'AddressOwnership',
+                            }),
+                        );
+                    }}>
                     <View
                         style={[
                             tailwind(
@@ -266,7 +274,7 @@ const Info = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Tools
+                            Check Address Ownership
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
