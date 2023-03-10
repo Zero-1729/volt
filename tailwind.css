@@ -94,6 +94,10 @@
   top: 1.5rem
 }
 
+.right-0 {
+  right: 0px
+}
+
 .z-10 {
   z-index: 10
 }
@@ -221,6 +225,10 @@
 
 .mt-8 {
   margin-top: 2rem
+}
+
+.mb-12 {
+  margin-bottom: 3rem
 }
 
 .flex {
