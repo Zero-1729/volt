@@ -150,6 +150,12 @@
 			"marginRight": 24
 		}
 	},
+	"my-8": {
+		"style": {
+			"marginTop": 32,
+			"marginBottom": 32
+		}
+	},
 	"-ml-1": {
 		"style": {
 			"marginLeft": -4

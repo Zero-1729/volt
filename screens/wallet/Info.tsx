@@ -22,7 +22,7 @@ const Info = () => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    // Get advacned mode flag, current wallet ID and wallet data
+    // Get advanced mode flag, current wallet ID and wallet data
     const {
         isAdvancedMode,
         currentWalletID,
@@ -103,9 +103,12 @@ const Info = () => {
                     </View>
                 </PlainButton>
 
+                {/* View Divider */}
+                <View style={[tailwind('w-full my-8'), HeadingBar]} />
+
                 {/* Wallet Info */}
                 {/* Wallet Type Path and Derivation Path */}
-                <View style={[tailwind('w-5/6 flex-row mt-6 justify-start')]}>
+                <View style={[tailwind('w-5/6 flex-row justify-start')]}>
                     <View>
                         <Text
                             style={[
@@ -130,7 +133,7 @@ const Info = () => {
                         <Text
                             style={[
                                 tailwind('text-sm mb-2'),
-                                {color: ColorScheme.Text.GeyedText},
+                                {color: ColorScheme.Text.GrayedText},
                             ]}>
                             Type
                         </Text>
@@ -193,7 +196,7 @@ const Info = () => {
                 </View>
 
                 {/* View Divider */}
-                <View style={[tailwind('w-full mt-8 mb-8'), HeadingBar]} />
+                <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
                 {/* Wallet Addresses */}
                 <PlainButton style={[tailwind('w-5/6 mb-6')]}>
