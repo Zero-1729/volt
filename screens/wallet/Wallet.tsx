@@ -118,6 +118,7 @@ const Wallet = () => {
                             id={currentWalletID}
                             BalanceFontSize={'text-4xl'}
                             fiatRate={fiatRate}
+                            disableFiat={false}
                         />
                     </View>
 
