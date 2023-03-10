@@ -110,7 +110,7 @@ const Info = () => {
                         <Text
                             style={[
                                 tailwind('text-sm mr-16 mb-2'),
-                                {color: ColorScheme.Text.Default},
+                                {color: ColorScheme.Text.GrayedText},
                             ]}>
                             Derivation Path
                         </Text>
@@ -119,7 +119,7 @@ const Info = () => {
                             <Text
                                 style={[
                                     tailwind('text-sm'),
-                                    {color: ColorScheme.Text.GrayedText},
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
                                 {walletPath}
                             </Text>
@@ -130,7 +130,7 @@ const Info = () => {
                         <Text
                             style={[
                                 tailwind('text-sm mb-2'),
-                                {color: ColorScheme.Text.Default},
+                                {color: ColorScheme.Text.GeyedText},
                             ]}>
                             Type
                         </Text>
@@ -139,7 +139,7 @@ const Info = () => {
                             <Text
                                 style={[
                                     tailwind('text-sm'),
-                                    {color: ColorScheme.Text.GrayedText},
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
                                 {walletTypeName}
                             </Text>
@@ -152,7 +152,7 @@ const Info = () => {
                     <Text
                         style={[
                             tailwind('text-sm mb-2'),
-                            {color: ColorScheme.Text.Default},
+                            {color: ColorScheme.Text.GrayedText},
                         ]}>
                         Master Fingerprint
                     </Text>
@@ -161,7 +161,7 @@ const Info = () => {
                         <Text
                             style={[
                                 tailwind('text-sm'),
-                                {color: ColorScheme.Text.GrayedText},
+                                {color: ColorScheme.Text.Default},
                             ]}>
                             {walletFingerprint}
                         </Text>
@@ -173,7 +173,7 @@ const Info = () => {
                     <Text
                         style={[
                             tailwind('text-sm mb-2'),
-                            {color: ColorScheme.Text.Default},
+                            {color: ColorScheme.Text.GrayedText},
                         ]}>
                         Descriptor
                     </Text>
@@ -185,7 +185,7 @@ const Info = () => {
                             ellipsizeMode="middle"
                             style={[
                                 tailwind('text-sm'),
-                                {color: ColorScheme.Text.GrayedText},
+                                {color: ColorScheme.Text.Default},
                             ]}>
                             {walletDescriptor}
                         </Text>
