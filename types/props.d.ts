@@ -61,7 +61,7 @@ type BalanceProps = BaseProps & {
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
     BalanceFontSize?: string;
     SatsFontSize?: string;
-    disableFiat?: boolean; // false by default
+    disableFiat: boolean; // false by default
 };
 
 // Base Text Input Prop Type (for reuse)
