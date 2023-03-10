@@ -46,6 +46,7 @@ type CardProps = BaseProps & {
 };
 
 type WalletCardProps = CardProps & {
+    id: string;
     walletBalance: number;
     walletType: string;
     isWatchOnly: boolean;
@@ -54,8 +55,18 @@ type WalletCardProps = CardProps & {
     navCallback?: () => void;
 };
 
+type BalanceProps = BaseProps & {
+    id: string; // current id of the wallet to show balance
+    fiatRate?: number;
+    // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
+    BalanceFontSize?: string;
+    SatsFontSize?: string;
+    disableFiat?: boolean; // false by default
+};
+
 // Base Text Input Prop Type (for reuse)
 type TextInputProps = BaseProps & {
+    shavedHeight?: boolean;
     color: string;
     isEnabled?: boolean;
     placeholder: string;

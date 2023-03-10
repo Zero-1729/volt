@@ -14,7 +14,10 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 
-import {BaseWallet} from './wallet/base';
+import {Unit} from '../types/wallet';
+import {BaseWallet, BDKWalletTypeNames} from './wallet/base';
+
+import BdkRn from 'bdk-rn';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -39,10 +42,13 @@ type defaultContextType = {
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setWalletInitialized: (isWalletInitialized: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
+    updateWalletUnit: (id: string, unit: Unit) => void;
+    renameWallet: (id: string, newName: string) => void;
+    deleteWallet: (id: string) => void;
     addWallet: (
         name: string,
         type: string,
-        secret: string,
+        secret?: string,
         network?: string,
         descriptor?: string,
     ) => void;
@@ -77,6 +83,9 @@ const defaultContext: defaultContextType = {
     setWalletInitialized: () => {},
     setIsAdvancedMode: () => {},
     addWallet: () => {},
+    updateWalletUnit: () => {},
+    renameWallet: () => {},
+    deleteWallet: () => {},
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
@@ -323,11 +332,55 @@ export const AppStorageProvider = ({children}: Props) => {
         [_setWallets, _updateWallets],
     );
 
+    const deleteWallet = useCallback(
+        async (id: string) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            const tmp = [...wallets];
+            tmp.splice(index, 1);
+
+            // Assuming the user has deleted the last wallet
+            // Reset wallet init flag
+            if (tmp.length === 0) {
+                setWalletInitialized(false);
+            }
+
+            setWallets(tmp);
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
+    const updateWalletUnit = useCallback(
+        async (id: string, unit: Unit) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            const tmp = [...wallets];
+            tmp[index].units = unit;
+
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
+    const renameWallet = useCallback(
+        async (id: string, newName: string) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            const tmp = [...wallets];
+            tmp[index].name = newName;
+
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const addWallet = useCallback(
         async (
             name: string,
             type: string,
-            secret: string,
+            secret?: string,
             descriptor?: string,
             network: string = 'tesnet',
         ) => {
@@ -341,6 +394,22 @@ export const AppStorageProvider = ({children}: Props) => {
                 );
 
                 _setCurrentWalletID(newWallet.id);
+
+                const walletKeyInfo = await BdkRn.createExtendedKey({
+                    mnemonic: newWallet.secret,
+                    network: 'bitcoin',
+                });
+
+                const walletDescriptor = await BdkRn.createDescriptor({
+                    type: BDKWalletTypeNames[newWallet.type],
+                    path: newWallet.derivationPath,
+                    mnemonic: newWallet.secret,
+                    network: 'bitcoin',
+                });
+
+                // Update Wallet descriptor and fingerprint
+                newWallet._setDescriptor(walletDescriptor.data);
+                newWallet._setFingerprint(walletKeyInfo.data.fingerprint);
 
                 const tmp = wallets ? [...wallets, newWallet] : [newWallet];
 
@@ -428,6 +497,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 isAdvancedMode,
                 setIsAdvancedMode,
                 getWalletData,
+                updateWalletUnit,
+                renameWallet,
+                deleteWallet,
             }}>
             {children}
         </AppStorageContext.Provider>

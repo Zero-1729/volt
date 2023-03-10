@@ -1,5 +1,7 @@
 import Crypto from 'crypto';
 
+import {generateMnemonic} from '../../modules/bip39';
+
 import {Unit, UTXOType} from './../../types/wallet';
 
 export const WalletTypeNames: {[index: string]: string[]} = {
@@ -14,26 +16,40 @@ export const WalletPaths: {[index: string]: string} = {
     p2sh: "m/49'/0'/0'",
 };
 
+type BDKWalletTypes =
+    | 'wpkh'
+    | 'pkh'
+    | 'p2pkh'
+    | 'shp2wpkh'
+    | 'MULTI'
+    | 'p2shp2wpkh';
+
+export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
+    bech32: 'wpkh',
+    legacy: 'p2pkh',
+    p2sh: 'shp2wpkh',
+};
+
 export class BaseWallet {
-    public id: string;
-    public name: string;
+    id: string;
+    name: string;
 
-    readonly isWatchOnly: boolean;
-    readonly type: string;
+    isWatchOnly: boolean;
+    type: string;
 
-    readonly descriptor: string;
-    readonly birthday: string | Date;
-    readonly secret: string;
+    descriptor: string;
+    birthday: string | Date;
+    secret: string;
 
-    readonly masterFingerprint: string;
-    readonly isBIP39: boolean;
+    masterFingerprint: string;
+    isBIP39: boolean;
 
     balance: number;
 
-    protected UTXOs: UTXOType[];
+    UTXOs: UTXOType[];
 
-    protected addresses: Array<string>;
-    protected address: string;
+    addresses: Array<string>;
+    address: string;
 
     syncedBalance: number;
     lastSynced: number;
@@ -49,7 +65,7 @@ export class BaseWallet {
     constructor(
         name: string,
         type: string,
-        secret: string,
+        secret?: string,
         descriptor?: string,
         network?: string,
     ) {
@@ -82,8 +98,8 @@ export class BaseWallet {
 
         // TODO: fetch from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
-        this.secret = !isWatchOnly ? secret : ''; // private key or recovery phrase
-        this.isBIP39 = false; // Whether wallet has a 'BIP39' seed
+        this.secret = secret ? secret : generateMnemonic(); // private key or recovery phrase
+        this.isBIP39 = this.secret.includes(' ') ? true : false; // Whether wallet has a 'BIP39' seed
 
         this.isWatchOnly = !this.secret; // Whether wallet is watch only
     }
@@ -98,5 +114,13 @@ export class BaseWallet {
 
     public updateName(text: string) {
         this.name = text;
+    }
+
+    _setFingerprint(fingerprint: string) {
+        this.masterFingerprint = fingerprint;
+    }
+
+    _setDescriptor(descriptor: string) {
+        this.descriptor = descriptor;
     }
 }

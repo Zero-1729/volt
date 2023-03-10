@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -22,9 +22,14 @@ const Info = () => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    // Get advacned mode flag, current wallet ID and wallet data
-    const {isAdvancedMode, currentWalletID, getWalletData} =
-        useContext(AppStorageContext);
+    // Get advanced mode flag, current wallet ID and wallet data
+    const {
+        isAdvancedMode,
+        currentWalletID,
+        getWalletData,
+        renameWallet,
+        deleteWallet,
+    } = useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
 
@@ -39,8 +44,10 @@ const Info = () => {
     const walletTypeName =
         walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
     const walletFingerprint = walletData.masterFingerprint;
-    const walletName = 'Wallet Name';
+    const walletName = walletData.name;
     const walletDescriptor = walletData.descriptor;
+
+    const [tmpName, setTmpName] = useState(walletName);
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -81,23 +88,32 @@ const Info = () => {
                                 {borderWidth: 1, borderRadius: 6},
                             ]}>
                             <TextSingleInput
+                                placeholderTextColor={
+                                    ColorScheme.Text.GrayedText
+                                }
+                                shavedHeight={true}
                                 placeholder={walletName}
-                                onChangeText={() => {}}
-                                onBlur={() => {}}
+                                onChangeText={setTmpName}
+                                onBlur={() => {
+                                    renameWallet(currentWalletID, tmpName);
+                                }}
                                 color={ColorScheme.Text.Default}
                             />
                         </View>
                     </View>
                 </PlainButton>
 
+                {/* View Divider */}
+                <View style={[tailwind('w-full my-8'), HeadingBar]} />
+
                 {/* Wallet Info */}
                 {/* Wallet Type Path and Derivation Path */}
-                <View style={[tailwind('w-5/6 flex-row mt-6 justify-start')]}>
+                <View style={[tailwind('w-5/6 flex-row justify-start')]}>
                     <View>
                         <Text
                             style={[
                                 tailwind('text-sm mr-16 mb-2'),
-                                {color: ColorScheme.Text.Default},
+                                {color: ColorScheme.Text.GrayedText},
                             ]}>
                             Derivation Path
                         </Text>
@@ -106,7 +122,7 @@ const Info = () => {
                             <Text
                                 style={[
                                     tailwind('text-sm'),
-                                    {color: ColorScheme.Text.GrayedText},
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
                                 {walletPath}
                             </Text>
@@ -117,7 +133,7 @@ const Info = () => {
                         <Text
                             style={[
                                 tailwind('text-sm mb-2'),
-                                {color: ColorScheme.Text.Default},
+                                {color: ColorScheme.Text.GrayedText},
                             ]}>
                             Type
                         </Text>
@@ -126,7 +142,7 @@ const Info = () => {
                             <Text
                                 style={[
                                     tailwind('text-sm'),
-                                    {color: ColorScheme.Text.GrayedText},
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
                                 {walletTypeName}
                             </Text>
@@ -139,7 +155,7 @@ const Info = () => {
                     <Text
                         style={[
                             tailwind('text-sm mb-2'),
-                            {color: ColorScheme.Text.Default},
+                            {color: ColorScheme.Text.GrayedText},
                         ]}>
                         Master Fingerprint
                     </Text>
@@ -148,7 +164,7 @@ const Info = () => {
                         <Text
                             style={[
                                 tailwind('text-sm'),
-                                {color: ColorScheme.Text.GrayedText},
+                                {color: ColorScheme.Text.Default},
                             ]}>
                             {walletFingerprint}
                         </Text>
@@ -160,7 +176,7 @@ const Info = () => {
                     <Text
                         style={[
                             tailwind('text-sm mb-2'),
-                            {color: ColorScheme.Text.Default},
+                            {color: ColorScheme.Text.GrayedText},
                         ]}>
                         Descriptor
                     </Text>
@@ -172,7 +188,7 @@ const Info = () => {
                             ellipsizeMode="middle"
                             style={[
                                 tailwind('text-sm'),
-                                {color: ColorScheme.Text.GrayedText},
+                                {color: ColorScheme.Text.Default},
                             ]}>
                             {walletDescriptor}
                         </Text>
@@ -180,7 +196,7 @@ const Info = () => {
                 </View>
 
                 {/* View Divider */}
-                <View style={[tailwind('w-full mt-8 mb-8'), HeadingBar]} />
+                <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
                 {/* Wallet Addresses */}
                 <PlainButton style={[tailwind('w-5/6 mb-6')]}>
@@ -207,7 +223,15 @@ const Info = () => {
                 </PlainButton>
 
                 {/* Backup / Export material - Seed, X/Y/ZPUB, X/Y/ZPUB, etc. */}
-                <PlainButton style={[tailwind('w-5/6')]}>
+                <PlainButton
+                    style={[tailwind('w-5/6')]}
+                    onPress={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'WalletBackup',
+                            }),
+                        );
+                    }}>
                     <View
                         style={[
                             tailwind(
@@ -233,7 +257,15 @@ const Info = () => {
                 </PlainButton>
 
                 {/* Wallet Tools */}
-                <PlainButton style={[tailwind('w-5/6')]}>
+                <PlainButton
+                    style={[tailwind('w-5/6')]}
+                    onPress={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'AddressOwnership',
+                            }),
+                        );
+                    }}>
                     <View
                         style={[
                             tailwind(
@@ -245,7 +277,7 @@ const Info = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Tools
+                            Check Address Ownership
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
@@ -262,10 +294,17 @@ const Info = () => {
                 <LongBottomButton
                     title="Delete"
                     onPress={() => {
-                        console.info('[Action] Delete Wallet');
+                        // Delete wallet from store
+                        deleteWallet(currentWalletID);
+
+                        // Navigate to HomeScreen
+                        // Make it clear deleted wallet is no longer in store
+                        navigation.dispatch(
+                            CommonActions.navigate({name: 'HomeScreen'}),
+                        );
                     }}
-                    textColor={'red'}
-                    backgroundColor={ColorScheme.Background.Greyed}
+                    textColor={ColorScheme.Text.Alert}
+                    backgroundColor={ColorScheme.Background.Alert}
                     style={[tailwind('font-bold')]}
                 />
             </View>

@@ -16,6 +16,8 @@ import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
 
+import {Balance} from '../../components/balance';
+
 const Wallet = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
@@ -34,6 +36,9 @@ const Wallet = () => {
     const transactions = [];
 
     const walletName = walletData.name;
+
+    // Ideally get it from store
+    const fiatRate = 23_000; // USD rate
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
@@ -55,10 +60,15 @@ const Wallet = () => {
                         <PlainButton
                             style={[tailwind('items-center flex-row left-6')]}
                             onPress={() => {
-                                navigation.dispatch(CommonActions.goBack());
+                                navigation.dispatch(
+                                    CommonActions.navigate('HomeScreen'),
+                                );
                             }}>
                             <Back style={tailwind('mr-2')} fill={'white'} />
-                            <Text style={[tailwind('text-white font-bold')]}>
+                            <Text
+                                style={[tailwind('text-white w-1/2 font-bold')]}
+                                numberOfLines={1}
+                                ellipsizeMode={'middle'}>
                                 {walletName}
                             </Text>
                         </PlainButton>
@@ -75,18 +85,40 @@ const Wallet = () => {
                         </PlainButton>
                     </View>
 
+                    {/* Watch-only */}
+                    {walletData.isWatchOnly ? (
+                        <View style={[tailwind('absolute top-12 right-6')]}>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-sm ml-2 p-1 self-center text-black font-bold bg-white rounded-sm opacity-40',
+                                    ),
+                                ]}>
+                                Watch-only
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
+
                     {/* Balance */}
                     <View
                         style={[
                             tailwind('absolute self-center w-5/6 bottom-28'),
                         ]}>
                         <Text
-                            style={[tailwind('text-sm text-white opacity-60')]}>
+                            style={[
+                                tailwind('text-sm text-white opacity-60 mb-1'),
+                            ]}>
                             Balance
                         </Text>
-                        <Text style={[tailwind('text-3xl text-white')]}>
-                            0 Sats
-                        </Text>
+
+                        {/* Balance component */}
+                        <Balance
+                            id={currentWalletID}
+                            BalanceFontSize={'text-4xl'}
+                            fiatRate={fiatRate}
+                        />
                     </View>
 
                     {/* Send and receive */}
@@ -144,7 +176,18 @@ const Wallet = () => {
                                         ColorScheme.Background.Primary,
                                 },
                             ]}>
-                            <PlainButton>
+                            <PlainButton
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'Scan',
+                                            params: {
+                                                walletID: currentWalletID,
+                                                key: 'Wallet',
+                                            },
+                                        }),
+                                    );
+                                }}>
                                 <Scan
                                     width={32}
                                     fill={ColorScheme.SVG.Default}

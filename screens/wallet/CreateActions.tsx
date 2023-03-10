@@ -69,7 +69,7 @@ const CreateAction = () => {
         try {
             // Default wallet type is Segwit bech32
             // Connects to testnet
-            addWallet(walletName, type, '');
+            addWallet(walletName, type);
         } catch (e) {
             console.error(`[CreateAction] Error adding wallet: [${e}]`);
         }
@@ -145,6 +145,7 @@ const CreateAction = () => {
                         ]}>
                         <TextSingleInput
                             placeholder={'Enter Wallet name'}
+                            placeholderTextColor={ColorScheme.Text.GrayedText}
                             onChangeText={setNewWalletName}
                             onBlur={onBlur}
                             color={ColorScheme.Text.Default}

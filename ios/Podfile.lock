@@ -1,4 +1,6 @@
 PODS:
+  - bdk-rn (0.1.1):
+    - React
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
@@ -452,7 +454,7 @@ PODS:
     - React
   - RNCAsyncStorage (1.17.11):
     - React-Core
-  - RNCClipboard (1.11.1):
+  - RNCClipboard (1.11.2):
     - React-Core
   - RNCPushNotificationIOS (1.10.1):
     - React-Core
@@ -513,6 +515,7 @@ PODS:
     - Yoga (~> 1.14)
 
 DEPENDENCIES:
+  - bdk-rn (from `../node_modules/bdk-rn`)
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -628,6 +631,8 @@ SPEC REPOS:
     - YogaKit
 
 EXTERNAL SOURCES:
+  bdk-rn:
+    :path: "../node_modules/bdk-rn"
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -744,6 +749,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  bdk-rn: 3a98818963a051be5d2356c0dd79cf904768ce26
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
@@ -813,7 +819,7 @@ SPEC CHECKSUMS:
   ReactCommon: 0253d197eaa7f6689dcd3e7d5360449ab93e10df
   RealmJS: 43fc7bfb83229c8a2755cb34f71f769c97b7b581
   RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
-  RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
+  RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
   RNCPushNotificationIOS: 87b8d16d3ede4532745e05b03c42cff33a36cc45
   RNDefaultPreference: 08bdb06cfa9188d5da97d4642dac745218d7fb31
   RNDeviceInfo: aad3c663b25752a52bf8fce93f2354001dd185aa

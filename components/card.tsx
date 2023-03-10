@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -9,13 +9,12 @@ import {PlainButton, Button} from './button';
 
 import {AppStorageContext} from '../class/storageContext';
 
+import {Balance} from './balance';
+
 import {WalletCardProps} from '../types/props';
-import {Unit} from '../types/wallet';
 
 import Font from '../constants/Font';
 import Color from '../constants/Color';
-
-import {formatSats, formatBTC} from '../modules/transform';
 
 import {WalletTypeNames} from '../class/wallet/base';
 
@@ -81,22 +80,7 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const tailwind = useTailwind();
 
-    const [unit, setUnit] = useState<Unit>(props.unit);
-
-    const {useSatSymbol, isAdvancedMode} = useContext(AppStorageContext);
-
-    const balance =
-        unit.name === 'sats'
-            ? formatSats(props.walletBalance)
-            : formatBTC(props.walletBalance);
-
-    const toggleUnit = () => {
-        if (unit.name === 'BTC') {
-            setUnit({name: 'sats', symbol: 's'});
-        } else {
-            setUnit({name: 'BTC', symbol: '₿'});
-        }
-    };
+    const {isAdvancedMode} = useContext(AppStorageContext);
 
     return (
         <PlainButton
@@ -132,7 +116,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                'bg-black absolute left-6 top-14 rounded-sm opacity-30',
+                                'bg-black absolute left-6 top-14 rounded-sm opacity-50',
                             ),
                         ]}>
                         <Text
@@ -152,79 +136,19 @@ export const WalletCard = (props: WalletCardProps) => {
                         </Text>
                     </View>
 
-                    {!props.hideBalance ? (
-                        <PlainButton
-                            onPress={toggleUnit}
-                            style={[
-                                tailwind(
-                                    `absolute ${
-                                        props.isWatchOnly
-                                            ? 'bottom-9'
-                                            : 'bottom-6'
-                                    }`,
-                                ),
-                            ]}>
-                            <View
-                                style={[
-                                    tailwind('flex-row items-center mx-6'),
-                                ]}>
-                                {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
-                                {useSatSymbol || unit.name === 'BTC' ? (
-                                    <Text
-                                        numberOfLines={1}
-                                        style={[
-                                            tailwind(
-                                                'text-3xl self-baseline mr-2 text-white',
-                                            ),
-                                            Font.SatSymbol,
-                                        ]}>
-                                        {unit.symbol}
-                                    </Text>
-                                ) : (
-                                    <></>
-                                )}
-
-                                {/* Display balance in sats or BTC */}
-                                <Text
-                                    numberOfLines={1}
-                                    style={[
-                                        tailwind(
-                                            'text-3xl text-white self-baseline',
-                                        ),
-                                    ]}>
-                                    {balance}
-                                </Text>
-
-                                {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
-                                {!useSatSymbol && unit.name === 'sats' ? (
-                                    <Text
-                                        style={[
-                                            tailwind(
-                                                'text-xl self-baseline text-white',
-                                            ),
-                                        ]}>
-                                        {' '}
-                                        sats
-                                    </Text>
-                                ) : (
-                                    <></>
-                                )}
-                            </View>
-                        </PlainButton>
-                    ) : (
-                        /* Empty view to keep the card height consistent  */
-                        <View
-                            style={[
-                                tailwind(
-                                    `absolute left-6 ${
-                                        props.isWatchOnly
-                                            ? 'bottom-11'
-                                            : 'bottom-7'
-                                    } rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black`,
-                                ),
-                            ]}
+                    {/* Balance */}
+                    <View
+                        style={tailwind(
+                            `w-full absolute mx-6 ${
+                                props.isWatchOnly ? 'bottom-9' : 'bottom-6'
+                            }`,
+                        )}>
+                        <Balance
+                            id={props.id}
+                            BalanceFontSize={'text-3xl'}
+                            disableFiat={true}
                         />
-                    )}
+                    </View>
 
                     {props.isWatchOnly ? (
                         <View

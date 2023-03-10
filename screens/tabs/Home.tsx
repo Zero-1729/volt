@@ -51,7 +51,9 @@ const Home = () => {
         0,
     );
 
-    const fiatUSDRate = 23_000;
+    // Fetch from store and update the fiat rate
+    // according to current 'appFiatCurrency'
+    const fiatRate = 23_000; // USD rate
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -71,6 +73,7 @@ const Home = () => {
         return (
             <View style={[tailwind('w-full absolute -top-24')]}>
                 <WalletCard
+                    id={item.id}
                     isWatchOnly={item.isWatchOnly}
                     label={item.name}
                     walletBalance={item.balance}
@@ -190,7 +193,7 @@ const Home = () => {
                                                 appFiatCurrency.symbol
                                             } ${normalizeFiat(
                                                 totalBalance,
-                                                fiatUSDRate,
+                                                fiatRate,
                                             )}`}
                                         </Text>
                                     ) : (
