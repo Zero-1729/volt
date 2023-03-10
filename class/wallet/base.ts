@@ -16,6 +16,20 @@ export const WalletPaths: {[index: string]: string} = {
     p2sh: "m/49'/0'/0'",
 };
 
+type BDKWalletTypes =
+    | 'wpkh'
+    | 'pkh'
+    | 'p2pkh'
+    | 'shp2wpkh'
+    | 'MULTI'
+    | 'p2shp2wpkh';
+
+export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
+    bech32: 'wpkh',
+    legacy: 'p2pkh',
+    p2sh: 'shp2wpkh',
+};
+
 export class BaseWallet {
     id: string;
     name: string;
