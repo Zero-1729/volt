@@ -15,7 +15,7 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import {LanguageType, CurrencyType} from '../types/settings';
 
 import {Unit} from '../types/wallet';
-import {BaseWallet} from './wallet/base';
+import {BaseWallet, BDKWalletTypeNames} from './wallet/base';
 
 import BdkRn from 'bdk-rn';
 
@@ -401,6 +401,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 });
 
                 const walletDescriptor = await BdkRn.createDescriptor({
+                    type: BDKWalletTypeNames[newWallet.type],
                     path: newWallet.derivationPath,
                     mnemonic: newWallet.secret,
                     network: 'bitcoin',
