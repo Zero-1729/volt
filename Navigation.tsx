@@ -20,6 +20,7 @@ import CreateActions from './screens/wallet/CreateActions';
 import WalletViewScreen from './screens/wallet/Wallet';
 import Info from './screens/wallet/Info';
 import Backup from './screens/wallet/Backup';
+import Ownership from './screens/wallet/AddressOwnership';
 
 import Apps from './screens/tabs/Apps';
 
@@ -94,6 +95,7 @@ const WalletRoot = () => {
             </WalletStack.Group>
 
             <WalletStack.Screen name="WalletBackup" component={Backup} />
+            <WalletStack.Screen name="AddressOwnership" component={Ownership} />
         </WalletStack.Navigator>
     );
 };
