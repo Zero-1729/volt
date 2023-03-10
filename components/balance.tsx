@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
@@ -28,26 +28,31 @@ export const Balance = (props: BalanceProps) => {
 
     const walletData = getWalletData(props.id);
 
+    // Use this temporarily from wallet data
+    const [unit, setUnit] = useState(walletData.units);
+
+    const isBitcoinUnit =
+        walletData.units.name === 'BTC' || walletData.units.name === 'sats';
+
     const toggleUnit = () => {
-        if (walletData.units.name === 'BTC') {
+        if (unit.name === 'BTC') {
+            setUnit({name: 'sats', symbol: 's'});
             updateWalletUnit(props.id, {name: 'sats', symbol: 's'});
-        } else if (walletData.units.name === 'sats' && !props.disableFiat) {
-            // Toggle to fiat is sats
-            updateWalletUnit(props.id, {
+        } else if (unit.name === 'sats' && !props.disableFiat) {
+            // NOTE: we do not set the unit to fiat here, as we want to keep the unit as BTC or sats
+            // fiat is an exception, and is only used for display purposes
+            setUnit({
                 name: appFiatCurrency.short,
                 symbol: appFiatCurrency.symbol,
             });
         } else {
-            // If sats, toggle to BTC
+            setUnit({name: 'BTC', symbol: '₿'});
             updateWalletUnit(props.id, {name: 'BTC', symbol: '₿'});
         }
     };
 
-    const isBitcoinUnit = walletData.units.name === 'BTC' || walletData.units.name === 'sats';
-    const hideFiat = props.disableFiat && !isBitcoinUnit;
-
     const getBalance = () => {
-        if (walletData.units.name === 'sats' || hideFiat) {
+        if (walletData.units.name === 'sats') {
             return formatSats(walletData.balance);
         }
 
@@ -55,7 +60,7 @@ export const Balance = (props: BalanceProps) => {
             return formatBTC(walletData.balance);
         }
 
-        if (props.fiatRate && !props.disableFiat) {
+        if (props.fiatRate && !isBitcoinUnit) {
             return normalizeFiat(walletData.balance, props.fiatRate);
         }
     };
@@ -66,7 +71,7 @@ export const Balance = (props: BalanceProps) => {
                 <PlainButton onPress={toggleUnit}>
                     <View style={[tailwind('flex-row items-center')]}>
                         {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
-                        {useSatSymbol || walletData.units.name === 'BTC' ? (
+                        {useSatSymbol || unit.name === 'BTC' ? (
                             <Text
                                 numberOfLines={1}
                                 style={[
@@ -77,12 +82,11 @@ export const Balance = (props: BalanceProps) => {
                                                 : 'text-2xl'
                                         } self-baseline mr-2 text-white`,
                                     ),
-                                    walletData.units.name === 'sats' ||
-                                    props.disableFiat
+                                    unit.name === 'sats' || props.disableFiat
                                         ? Font.SatSymbol
                                         : {},
                                 ]}>
-                                {walletData.units.symbol}
+                                {unit.symbol}
                             </Text>
                         ) : (
                             <></>
@@ -104,7 +108,7 @@ export const Balance = (props: BalanceProps) => {
                         </Text>
 
                         {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
-                        {!useSatSymbol && walletData.units.name === 'sats' ? (
+                        {!useSatSymbol && unit.name === 'sats' ? (
                             <Text
                                 style={[
                                     tailwind(
