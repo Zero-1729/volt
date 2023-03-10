@@ -17,25 +17,25 @@ export const WalletPaths: {[index: string]: string} = {
 };
 
 export class BaseWallet {
-    public id: string;
-    public name: string;
+    id: string;
+    name: string;
 
-    readonly isWatchOnly: boolean;
-    readonly type: string;
+    isWatchOnly: boolean;
+    type: string;
 
     descriptor: string;
-    readonly birthday: string | Date;
+    birthday: string | Date;
     secret: string;
 
     masterFingerprint: string;
-    readonly isBIP39: boolean;
+    isBIP39: boolean;
 
     balance: number;
 
-    protected UTXOs: UTXOType[];
+    UTXOs: UTXOType[];
 
-    protected addresses: Array<string>;
-    protected address: string;
+    addresses: Array<string>;
+    address: string;
 
     syncedBalance: number;
     lastSynced: number;
