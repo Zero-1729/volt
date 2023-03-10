@@ -31,14 +31,10 @@ export const Balance = (props: BalanceProps) => {
     // Use this temporarily from wallet data
     const [unit, setUnit] = useState(walletData.units);
 
-    const isBitcoinUnit =
-        walletData.units.name === 'BTC' || walletData.units.name === 'sats';
-
+    // Toggle between BTC and sats
+    // and fiat if enabled
     const toggleUnit = () => {
-        if (unit.name === 'BTC') {
-            setUnit({name: 'sats', symbol: 's'});
-            updateWalletUnit(props.id, {name: 'sats', symbol: 's'});
-        } else if (unit.name === 'sats' && !props.disableFiat) {
+        if (unit.name === 'sats' && !props.disableFiat) {
             // NOTE: we do not set the unit to fiat here, as we want to keep the unit as BTC or sats
             // fiat is an exception, and is only used for display purposes
             setUnit({
@@ -46,22 +42,36 @@ export const Balance = (props: BalanceProps) => {
                 symbol: appFiatCurrency.symbol,
             });
         } else {
+            toggleBTCtoSats();
+        }
+    };
+
+    // Generic function to toggle between BTC and sats
+    const toggleBTCtoSats = () => {
+        if (unit.name === 'BTC') {
+            setUnit({name: 'sats', symbol: 's'});
+            updateWalletUnit(props.id, {name: 'sats', symbol: 's'});
+        } else {
             setUnit({name: 'BTC', symbol: '₿'});
             updateWalletUnit(props.id, {name: 'BTC', symbol: '₿'});
         }
     };
 
     const getBalance = () => {
-        if (walletData.units.name === 'sats') {
+        if (unit.name === 'sats') {
             return formatSats(walletData.balance);
         }
 
-        if (walletData.units.name === 'BTC') {
+        if (unit.name === 'BTC') {
             return formatBTC(walletData.balance);
         }
 
-        if (props.fiatRate && !isBitcoinUnit) {
+        if (!props.disableFiat && props.fiatRate) {
             return normalizeFiat(walletData.balance, props.fiatRate);
+        } else {
+            console.error(
+                '[Balance Component] No fiat rate provided for fiat balance',
+            );
         }
     };
 
