@@ -54,6 +54,10 @@
   left: 1.5rem
 }
 
+.right-0 {
+  right: 0px
+}
+
 .right-12 {
   right: 3rem
 }
@@ -92,10 +96,6 @@
 
 .top-6 {
   top: 1.5rem
-}
-
-.right-0 {
-  right: 0px
 }
 
 .z-10 {
@@ -230,10 +230,6 @@
 
 .mt-8 {
   margin-top: 2rem
-}
-
-.mb-12 {
-  margin-bottom: 3rem
 }
 
 .flex {

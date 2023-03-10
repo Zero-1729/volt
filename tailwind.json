@@ -69,6 +69,11 @@
 			"left": 24
 		}
 	},
+	"right-0": {
+		"style": {
+			"right": 0
+		}
+	},
 	"right-12": {
 		"style": {
 			"right": 48
@@ -117,11 +122,6 @@
 	"top-6": {
 		"style": {
 			"top": 24
-		}
-	},
-	"right-0": {
-		"style": {
-			"right": 0
 		}
 	},
 	"z-10": {
@@ -289,11 +289,6 @@
 	"mt-8": {
 		"style": {
 			"marginTop": 32
-		}
-	},
-	"mb-12": {
-		"style": {
-			"marginBottom": 48
 		}
 	},
 	"flex": {
