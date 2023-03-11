@@ -124,7 +124,7 @@ const Scan = ({navigation, route}) => {
     const onQRDetected = useCallback(async (data: Barcode[]) => {
         // TODO: Handle only first item detected
         for (let qr of data) {
-            console.log(`[Scanner] Detected QR Raw Data: ${qr.rawValue}`);
+            console.info(`[Scanner] Detected QR Raw Data: ${qr.rawValue}`);
         }
 
         // To highlight the successful scan, we'll trigger a success haptic
