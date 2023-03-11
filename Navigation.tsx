@@ -77,11 +77,7 @@ const WalletRoot = () => {
                 name="WalletView"
                 component={WalletViewScreen}
             />
-            <WalletStack.Screen
-                name="WalletInfo"
-                component={Info}
-                options={{presentation: 'modal'}}
-            />
+            <WalletStack.Screen name="WalletInfo" component={Info} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen
