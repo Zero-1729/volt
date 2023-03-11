@@ -50,7 +50,7 @@ const Info = () => {
     const [tmpName, setTmpName] = useState(walletName);
 
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView>
             {/* Display Wallet Info, addresses, and other related data / settings */}
             <View style={[tailwind('w-full h-full items-center relative')]}>
                 <PlainButton
