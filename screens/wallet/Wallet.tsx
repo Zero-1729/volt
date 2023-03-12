@@ -137,10 +137,10 @@ const Wallet = () => {
                         ]}>
                         <View
                             style={[
-                                tailwind('rounded p-4 w-32'),
+                                tailwind('rounded p-4 w-32 opacity-60'),
                                 {
                                     backgroundColor:
-                                        ColorScheme.Background.Primary,
+                                        ColorScheme.Background.Inverted,
                                 },
                             ]}>
                             <PlainButton>
@@ -149,7 +149,7 @@ const Wallet = () => {
                                         tailwind(
                                             'text-sm text-center font-bold',
                                         ),
-                                        {color: ColorScheme.Text.Default},
+                                        {color: ColorScheme.Text.Alt},
                                     ]}>
                                     Send
                                 </Text>
@@ -157,10 +157,10 @@ const Wallet = () => {
                         </View>
                         <View
                             style={[
-                                tailwind('rounded p-4 w-32'),
+                                tailwind('rounded p-4 w-32 opacity-60'),
                                 {
                                     backgroundColor:
-                                        ColorScheme.Background.Primary,
+                                        ColorScheme.Background.Inverted,
                                 },
                             ]}>
                             <PlainButton>
@@ -169,7 +169,7 @@ const Wallet = () => {
                                         tailwind(
                                             'text-sm text-center font-bold',
                                         ),
-                                        {color: ColorScheme.Text.Default},
+                                        {color: ColorScheme.Text.Alt},
                                     ]}>
                                     Receive
                                 </Text>
@@ -177,10 +177,12 @@ const Wallet = () => {
                         </View>
                         <View
                             style={[
-                                tailwind('justify-center rounded px-4'),
+                                tailwind(
+                                    'justify-center rounded px-4 opacity-60',
+                                ),
                                 {
                                     backgroundColor:
-                                        ColorScheme.Background.Primary,
+                                        ColorScheme.Background.Inverted,
                                 },
                             ]}>
                             <PlainButton
@@ -197,7 +199,7 @@ const Wallet = () => {
                                 }}>
                                 <Scan
                                     width={32}
-                                    fill={ColorScheme.SVG.Default}
+                                    fill={ColorScheme.SVG.Inverted}
                                 />
                             </PlainButton>
                         </View>
@@ -207,9 +209,9 @@ const Wallet = () => {
                     <View
                         style={[
                             tailwind(
-                                'w-16 h-1 absolute bottom-2 rounded-full mt-2 self-center',
+                                'w-16 h-1 absolute bottom-2 rounded-full mt-2 self-center opacity-60',
                             ),
-                            {backgroundColor: ColorScheme.Background.Primary},
+                            {backgroundColor: ColorScheme.Background.Inverted},
                         ]}
                     />
                 </View>
