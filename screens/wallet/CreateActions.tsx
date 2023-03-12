@@ -34,12 +34,7 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {
-        isWalletInitialized,
-        setWalletInitialized,
-        addWallet,
-        isAdvancedMode,
-    } = useContext(AppStorageContext);
+    const {addWallet, isAdvancedMode} = useContext(AppStorageContext);
 
     const [newWalletName, setNewWalletName] = useState('');
 
@@ -61,11 +56,6 @@ const CreateAction = () => {
     };
 
     const updateWalletName = async (walletName: string, type: string) => {
-        // Indicate that the wallet has been created
-        if (!isWalletInitialized) {
-            setWalletInitialized(true);
-        }
-
         try {
             // Default wallet type is Segwit bech32
             // Connects to testnet
