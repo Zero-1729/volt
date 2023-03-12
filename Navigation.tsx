@@ -88,10 +88,12 @@ const WalletRoot = () => {
                     name="CreateActions"
                     component={CreateActions}
                 />
+                <WalletStack.Screen name="WalletBackup" component={Backup} />
+                <WalletStack.Screen
+                    name="AddressOwnership"
+                    component={Ownership}
+                />
             </WalletStack.Group>
-
-            <WalletStack.Screen name="WalletBackup" component={Backup} />
-            <WalletStack.Screen name="AddressOwnership" component={Ownership} />
         </WalletStack.Navigator>
     );
 };
