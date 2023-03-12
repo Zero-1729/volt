@@ -6,6 +6,7 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
+import {DeletionAlert} from '../../components/alert';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -48,6 +49,28 @@ const Info = () => {
     const walletDescriptor = walletData.descriptor;
 
     const [tmpName, setTmpName] = useState(walletName);
+
+    const showDialog = () => {
+        DeletionAlert(
+            'Delete Wallet',
+            'Are you sure you want to delete this wallet?',
+            'Delete',
+            handleDeleteWallet,
+        );
+    };
+
+    const handleDeleteWallet = () => {
+        try {
+            // Navigate to HomeScreen
+            // Make it clear deleted wallet is no longer in store
+            navigation.dispatch(CommonActions.navigate({name: 'HomeScreen'}));
+
+            // Delete wallet from store
+            deleteWallet(currentWalletID);
+        } catch (e) {
+            console.error('[Wallet Screen] Error deleting wallet: ', e);
+        }
+    };
 
     return (
         <SafeAreaView>
@@ -266,16 +289,7 @@ const Info = () => {
                 {/* Delete Wallet btn */}
                 <LongBottomButton
                     title="Delete"
-                    onPress={() => {
-                        // Delete wallet from store
-                        deleteWallet(currentWalletID);
-
-                        // Navigate to HomeScreen
-                        // Make it clear deleted wallet is no longer in store
-                        navigation.dispatch(
-                            CommonActions.navigate({name: 'HomeScreen'}),
-                        );
-                    }}
+                    onPress={showDialog}
                     textColor={ColorScheme.Text.Alert}
                     backgroundColor={ColorScheme.Background.Alert}
                     style={[tailwind('font-bold')]}
