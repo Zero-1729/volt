@@ -68,7 +68,7 @@ const Info = () => {
                             tailwind('text-white font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Back
+                        Wallet Info
                     </Text>
                 </PlainButton>
 
