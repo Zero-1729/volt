@@ -165,7 +165,7 @@ const Backup = () => {
 
                     {/* Display QR code with seed */}
                     <View style={[tailwind('self-center mb-4')]}>
-                        <QRCode value={getMnemonicData()} size={256} />
+                        <QRCode value={getMnemonicData()} size={225} />
                     </View>
 
                     {/* Display either seed or descriptor */}
