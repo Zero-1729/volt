@@ -85,7 +85,7 @@ const Info = () => {
                         <View
                             style={[
                                 tailwind('border-gray-400 px-4 w-full'),
-                                {borderWidth: 1, borderRadius: 6},
+                                {borderWidth: 1, borderRadius: 4},
                             ]}>
                             <TextSingleInput
                                 placeholderTextColor={
