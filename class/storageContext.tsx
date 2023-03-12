@@ -14,6 +14,8 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit} from '../types/wallet';
+import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
+
 import {BaseWallet, BDKWalletTypeNames} from './wallet/base';
 
 import BdkRn from 'bdk-rn';
@@ -376,7 +378,7 @@ export const AppStorageProvider = ({children}: Props) => {
             type: string,
             secret?: string,
             descriptor?: string,
-            network: string = 'tesnet',
+            network: NetworkType = 'testnet',
         ) => {
             try {
                 const newWallet = new BaseWallet(
