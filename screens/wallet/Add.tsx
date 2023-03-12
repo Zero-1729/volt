@@ -97,7 +97,7 @@ const Add = () => {
                                 tailwind('mt-4 text-xs'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            Create a new wallet with a new seed.
+                            Create a wallet with a new seed.
                         </Text>
 
                         <View style={[tailwind('items-end')]}>
