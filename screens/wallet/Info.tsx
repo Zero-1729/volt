@@ -198,31 +198,8 @@ const Info = () => {
                 {/* View Divider */}
                 <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
-                {/* Wallet Addresses */}
-                <PlainButton style={[tailwind('w-5/6 mb-6')]}>
-                    <View
-                        style={[
-                            tailwind('items-center flex-row justify-between'),
-                        ]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            Addresses List
-                        </Text>
-
-                        <View style={[tailwind('items-center')]}>
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
-                        </View>
-                    </View>
-                </PlainButton>
-
-                {/* Backup / Export material - Seed, X/Y/ZPUB, X/Y/ZPUB, etc. */}
+                {/* Wallet Tools */}
+                {/* Backup / Export material - Seed and Descriptor */}
                 <PlainButton
                     style={[tailwind('w-5/6')]}
                     onPress={() => {
