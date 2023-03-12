@@ -341,7 +341,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 _setWalletInit(false);
             }
 
-            setWallets(tmp);
+            await setWallets(tmp);
         },
         [wallets, _updateWallets, _setWallets],
     );
