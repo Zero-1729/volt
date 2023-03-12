@@ -63,7 +63,7 @@ const AddressOwnership = () => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView edges={['bottom', 'right', 'left']}>
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View
                     style={[

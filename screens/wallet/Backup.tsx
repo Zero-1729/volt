@@ -48,7 +48,7 @@ const Backup = () => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView edges={['bottom', 'right', 'left']}>
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}
