@@ -201,7 +201,7 @@ const Info = () => {
                 {/* Wallet Tools */}
                 {/* Backup / Export material - Seed and Descriptor */}
                 <PlainButton
-                    style={[tailwind('w-5/6')]}
+                    style={[tailwind('w-5/6 mb-6')]}
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({
@@ -211,9 +211,7 @@ const Info = () => {
                     }}>
                     <View
                         style={[
-                            tailwind(
-                                'items-center flex-row justify-between mb-6',
-                            ),
+                            tailwind('items-center flex-row justify-between'),
                         ]}>
                         <Text
                             style={[
@@ -233,7 +231,7 @@ const Info = () => {
                     </View>
                 </PlainButton>
 
-                {/* Wallet Tools */}
+                {/* Address Ownership Checker */}
                 <PlainButton
                     style={[tailwind('w-5/6')]}
                     onPress={() => {
@@ -245,9 +243,7 @@ const Info = () => {
                     }}>
                     <View
                         style={[
-                            tailwind(
-                                'items-center flex-row justify-between mb-6',
-                            ),
+                            tailwind('items-center flex-row justify-between'),
                         ]}>
                         <Text
                             style={[
