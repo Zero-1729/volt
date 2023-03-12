@@ -49,8 +49,8 @@ type defaultContextType = {
         name: string,
         type: string,
         secret?: string,
-        network?: string,
         descriptor?: string,
+        network?: NetworkType,
     ) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
