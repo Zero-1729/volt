@@ -13,6 +13,7 @@ import {AppStorageContext} from '../../class/storageContext';
 import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
+import {DeletionAlert} from '../../components/alert';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
@@ -47,6 +48,21 @@ const Settings = () => {
         isDevMode,
         isWalletInitialized,
     } = useContext(AppStorageContext);
+
+    const showDialog = () => {
+        DeletionAlert(
+            'Delete App Data',
+            'Are you sure you want to reset the App Data?',
+            'Reset',
+            handleAppDataReset,
+        );
+    };
+
+    const handleAppDataReset = () => {
+        if (isWalletInitialized) {
+            resetAppData();
+        }
+    };
 
     return (
         <SafeAreaView>
@@ -261,11 +277,12 @@ const Settings = () => {
                 {isDevMode ? (
                     <PlainButton
                         disabled={!isWalletInitialized}
-                        onPress={() => {
-                            if (isWalletInitialized) {
-                                resetAppData();
-                            }
-                        }}
+                        // onPress={() => {
+                        //     if (isWalletInitialized) {
+                        //         resetAppData();
+                        //     }
+                        // }}
+                        onPress={showDialog}
                         style={[
                             tailwind('absolute items-center'),
                             {bottom: bottomOffset[device]},
