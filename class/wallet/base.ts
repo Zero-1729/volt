@@ -4,6 +4,8 @@ import {generateMnemonic} from '../../modules/bip39';
 
 import {Unit, UTXOType} from './../../types/wallet';
 
+import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
+
 export const WalletTypeNames: {[index: string]: string[]} = {
     bech32: ['Native Segwit', 'Bech32'],
     legacy: ['Legacy', 'P2PKH'],
@@ -57,7 +59,7 @@ export class BaseWallet {
 
     derivationPath: string;
 
-    network: string;
+    network: NetworkType;
 
     hardwareWalletEnabled: boolean;
     hasBackedUp: boolean;
