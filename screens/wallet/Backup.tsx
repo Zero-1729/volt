@@ -60,7 +60,7 @@ const Backup = () => {
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-2xl font-bold'),
+                                tailwind('text-xl font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             Backup Material
@@ -77,7 +77,7 @@ const Backup = () => {
                     <Text
                         style={[
                             tailwind(
-                                '-mt-20 mb-1 font-bold self-center text-center text-2xl w-5/6',
+                                '-mt-20 mb-1 font-bold self-center text-center text-xl w-5/6',
                             ),
                             {color: ColorScheme.Text.Default},
                         ]}
@@ -89,7 +89,7 @@ const Backup = () => {
                     {/* Display wallet type */}
                     <Text
                         style={[
-                            tailwind('text-lg self-center mb-6'),
+                            tailwind('text-base self-center mb-6'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         {walletTypeName}
@@ -112,7 +112,7 @@ const Backup = () => {
                             <Text
                                 style={[
                                     tailwind(
-                                        `text-base ${
+                                        `text-sm ${
                                             backupMaterial === 'mnemonic'
                                                 ? 'font-bold'
                                                 : ''
@@ -145,7 +145,7 @@ const Backup = () => {
                             <Text
                                 style={[
                                     tailwind(
-                                        `text-base ${
+                                        `text-sm ${
                                             backupMaterial === 'descriptor'
                                                 ? 'font-bold'
                                                 : ''
@@ -172,9 +172,7 @@ const Backup = () => {
                     <PlainButton style={[tailwind('items-center')]}>
                         <Text
                             style={[
-                                tailwind(
-                                    'text-base p-3 text-center rounded-sm',
-                                ),
+                                tailwind('text-sm p-3 text-center rounded-sm'),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
@@ -198,13 +196,13 @@ const Backup = () => {
                         ]}>
                         <Text
                             style={[
-                                tailwind('items-center justify-center'),
+                                tailwind('items-center text-sm justify-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             <Text style={[tailwind('font-bold ml-4')]}>
                                 WARNING:{' '}
                             </Text>
-                            <Text style={[tailwind('text-sm')]}>{warning}</Text>
+                            <Text>{warning}</Text>
                         </Text>
                     </View>
                 </View>
