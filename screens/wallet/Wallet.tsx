@@ -65,13 +65,19 @@ const Wallet = () => {
                                 );
                             }}>
                             <Back style={tailwind('mr-2')} fill={'white'} />
-                            <Text
-                                style={[tailwind('text-white w-1/2 font-bold')]}
-                                numberOfLines={1}
-                                ellipsizeMode={'middle'}>
-                                {walletName}
-                            </Text>
                         </PlainButton>
+
+                        <Text
+                            style={[
+                                tailwind(
+                                    'text-white self-center text-center w-1/2 font-bold',
+                                ),
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode={'middle'}>
+                            {walletName}
+                        </Text>
+
                         <PlainButton
                             style={[tailwind('right-6')]}
                             onPress={() => {
