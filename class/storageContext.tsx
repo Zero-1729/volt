@@ -389,23 +389,42 @@ export const AppStorageProvider = ({children}: Props) => {
                     network,
                 );
 
+                // Set wallet ID
                 _setCurrentWalletID(newWallet.id);
 
-                const walletKeyInfo = await BdkRn.createExtendedKey({
-                    mnemonic: newWallet.secret,
-                    network: 'bitcoin',
-                });
+                try {
+                    const walletKeyInfo = await BdkRn.createExtendedKey({
+                        mnemonic: newWallet.secret,
+                        network: network,
+                        password: '',
+                    });
 
-                const walletDescriptor = await BdkRn.createDescriptor({
-                    type: BDKWalletTypeNames[newWallet.type],
-                    path: newWallet.derivationPath,
-                    mnemonic: newWallet.secret,
-                    network: 'bitcoin',
-                });
+                    newWallet._setFingerprint(walletKeyInfo.data.fingerprint);
+                } catch (e) {
+                    console.error(
+                        '[StorageContext] Error generating wallet key info: ',
+                        e,
+                    );
+                }
 
-                // Update Wallet descriptor and fingerprint
-                newWallet._setDescriptor(walletDescriptor.data);
-                newWallet._setFingerprint(walletKeyInfo.data.fingerprint);
+                try {
+                    const walletDescriptor = await BdkRn.createDescriptor({
+                        type: BDKWalletTypeNames[newWallet.type],
+                        path: newWallet.derivationPath,
+                        mnemonic: newWallet.secret,
+                        network: network,
+                        password: '',
+                    });
+
+                    // Update Wallet descriptor and fingerprint
+                    newWallet._setDescriptor(walletDescriptor.data);
+                } catch (e) {
+                    console.error(
+                        '[StorageContext] Error generating wallet descriptor: ',
+                        e,
+                    );
+                }
+
                 // Set wallet as initialized
                 await _setWalletInit(true);
 
