@@ -13,7 +13,6 @@ import React, {
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
-
 import {Unit} from '../types/wallet';
 import {BaseWallet, BDKWalletTypeNames} from './wallet/base';
 
@@ -40,7 +39,6 @@ type defaultContextType = {
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
     setSatSymbol: (useSatSymbol: boolean) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
-    setWalletInitialized: (isWalletInitialized: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
     renameWallet: (id: string, newName: string) => void;
@@ -80,7 +78,6 @@ const defaultContext: defaultContextType = {
     setAppFiatCurrency: () => {},
     setSatSymbol: () => {},
     setTotalBalanceHidden: () => {},
-    setWalletInitialized: () => {},
     setIsAdvancedMode: () => {},
     addWallet: () => {},
     updateWalletUnit: () => {},
@@ -234,19 +231,16 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
-    const setWalletInitialized = useCallback(
-        async (initialized: boolean) => {
-            try {
-                _setWalletInitialized(initialized);
-                _updateWalletInitialized(JSON.stringify(initialized));
-            } catch (e) {
-                console.error(
-                    `[AsyncStorage] (Wallet initialized setting) Error loading data: ${e}`,
-                );
-            }
-        },
-        [_updateWalletInitialized, _setWalletInitialized],
-    );
+    const _setWalletInit = async (initialized: boolean) => {
+        try {
+            _setWalletInitialized(initialized);
+            _updateWalletInitialized(JSON.stringify(initialized));
+        } catch (e) {
+            console.error(
+                `[AsyncStorage] (Wallet initialized setting) Error loading data: ${e}`,
+            );
+        }
+    };
 
     const _loadWalletInitialized = async () => {
         const init = await _getWalletInitialized();
@@ -342,7 +336,7 @@ export const AppStorageProvider = ({children}: Props) => {
             // Assuming the user has deleted the last wallet
             // Reset wallet init flag
             if (tmp.length === 0) {
-                setWalletInitialized(false);
+                _setWalletInit(false);
             }
 
             setWallets(tmp);
@@ -410,6 +404,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Update Wallet descriptor and fingerprint
                 newWallet._setDescriptor(walletDescriptor.data);
                 newWallet._setFingerprint(walletKeyInfo.data.fingerprint);
+                // Set wallet as initialized
+                await _setWalletInit(true);
 
                 const tmp = wallets ? [...wallets, newWallet] : [newWallet];
 
@@ -430,7 +426,7 @@ export const AppStorageProvider = ({children}: Props) => {
             await setAppLanguage(defaultContext.appLanguage);
             await setAppFiatCurrency(defaultContext.appFiatCurrency);
             await setTotalBalanceHidden(false);
-            await setWalletInitialized(false);
+            await _setWalletInit(false);
             await setWallets([]);
             await setCurrentWalletID('');
         } catch (e) {
@@ -487,7 +483,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 hideTotalBalance,
                 setTotalBalanceHidden,
                 isWalletInitialized,
-                setWalletInitialized,
                 resetAppData,
                 isDevMode,
                 wallets,
