@@ -16,7 +16,7 @@ export const formatSats = (sats: number) => {
         // Anything lower is assumed to be an approximation
         // ... to zero
         if (sats < 0.00_000_001) {
-            return `~${sats.toFixed(2)}`;
+            return `≈ ${sats.toFixed(2)}`;
         }
 
         // Display in range of eight decimals (sats)
@@ -40,10 +40,10 @@ export const formatBTC = (sats: number) => {
     // If below whole BTC, let's attempt to display that
     // in range of 11 decimals (msats)
     // However, if balance sub-msats,
-    // indicate approximation with '~0.00'
+    // indicate approximation with '≈ 0.00'
     if (BTC < 0.1 && BTC !== 0) {
         if (BTC < 0.00_000_000_001) {
-            return `~${BTC.toFixed(2)}`;
+            return `≈ ${BTC.toFixed(2)}`;
         }
 
         // Limit it to 1 sat - 1 milisats (11 decimals)
@@ -85,7 +85,7 @@ export const normalizeFiat = (sats: number, rate: number) => {
     if (fiat < 0.01 && fiat !== 0) {
         // We just let them know it's less than a cent
         // So approximately a zero (insignificant)
-        return `~${fiat.toFixed(2)}`;
+        return `≈ ${fiat.toFixed(2)}`;
     }
 
     // Amount in range of 100,000,000.00
