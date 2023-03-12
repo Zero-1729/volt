@@ -30,9 +30,7 @@ export const TextSingleInput = (props: TextInputProps) => {
             {...props}
             style={[
                 tailwind(
-                    `${
-                        props.shavedHeight ? 'py-2' : 'py-4'
-                    } px-2 rounded text-xs`,
+                    `${props.shavedHeight ? 'py-2' : 'py-4'} px-2 text-xs`,
                 ),
             ]}
         />
