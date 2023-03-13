@@ -241,7 +241,7 @@ const Info = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Export / Backup
+                            Backup
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
