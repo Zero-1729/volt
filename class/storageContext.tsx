@@ -148,6 +148,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Language setting) Error loading data: ${e} [${languageObject}]`,
                 );
+
+                throw new Error('Error setting language option');
             }
         },
         [_setAppLanguage, _updateAppLanguage],
@@ -172,6 +174,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Currency setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set currency option');
             }
         },
         [_setFiatCurrency, _updateFiatCurrency],
@@ -196,6 +200,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Use sat symbol setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set sat symbol option');
             }
         },
         [_updateUseSatSymbol, _setSatSymbol],
@@ -218,6 +224,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Hide Total balance setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set hide total balance option');
             }
         },
         [_setTotalBalanceHidden, _updateTotalBalanceHidden],
@@ -263,6 +271,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Advanced mode setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set advanced mode option');
             }
         },
         [_setAdvancedMode, _updateIsAdvancedMode],
@@ -287,6 +297,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Current wallet ID setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set current wallet ID');
             }
         },
         [_setCurrentWalletID, _updateCurrentWalletID],
@@ -436,6 +448,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to add wallet');
             }
         },
         [wallets, _updateWallets, _setWallets],
@@ -454,6 +468,8 @@ export const AppStorageProvider = ({children}: Props) => {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
             );
+
+            throw new Error('Unable to reset app data');
         }
     }, []);
 
