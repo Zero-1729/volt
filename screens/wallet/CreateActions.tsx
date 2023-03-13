@@ -26,6 +26,7 @@ import Tick from './../../assets/svg/check-16.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
+import {errorAlert} from '../../components/alert';
 
 const CreateAction = () => {
     const navigation = useNavigation();
@@ -59,17 +60,18 @@ const CreateAction = () => {
         try {
             // Default wallet type is Segwit bech32
             // Connects to testnet
-            addWallet(walletName, type);
-        } catch (e) {
-            console.error(`[CreateAction] Error adding wallet: [${e}]`);
-        }
+            await addWallet(walletName, type);
 
-        // Navigate to the wallet screen
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'Home',
-            }),
-        );
+            // Navigate to the wallet screen
+            // TODO: show wallet seed phrases
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'Home',
+                }),
+            );
+        } catch (e: any) {
+            errorAlert('Alert', e.message);
+        }
     };
 
     const onBlur = () => {

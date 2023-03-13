@@ -148,6 +148,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Language setting) Error loading data: ${e} [${languageObject}]`,
                 );
+
+                throw new Error('Error setting language option');
             }
         },
         [_setAppLanguage, _updateAppLanguage],
@@ -172,6 +174,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Currency setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set currency option');
             }
         },
         [_setFiatCurrency, _updateFiatCurrency],
@@ -196,6 +200,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Use sat symbol setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set sat symbol option');
             }
         },
         [_updateUseSatSymbol, _setSatSymbol],
@@ -218,6 +224,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Hide Total balance setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set hide total balance option');
             }
         },
         [_setTotalBalanceHidden, _updateTotalBalanceHidden],
@@ -263,6 +271,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Advanced mode setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set advanced mode option');
             }
         },
         [_setAdvancedMode, _updateIsAdvancedMode],
@@ -287,6 +297,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Current wallet ID setting) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to set current wallet ID');
             }
         },
         [_setCurrentWalletID, _updateCurrentWalletID],
@@ -392,38 +404,39 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Set wallet ID
                 _setCurrentWalletID(newWallet.id);
 
-                try {
-                    const walletKeyInfo = await BdkRn.createExtendedKey({
-                        mnemonic: newWallet.secret,
-                        network: network ? network : newWallet.network,
-                        password: '',
-                    });
+                // Get extended key material from BDK
+                const extendedKeyResponse = await BdkRn.createExtendedKey({
+                    mnemonic: newWallet.secret,
+                    network: network ? network : newWallet.network,
+                    password: '',
+                });
 
-                    newWallet._setFingerprint(walletKeyInfo.data.fingerprint);
-                } catch (e) {
-                    console.error(
-                        '[StorageContext] Error generating wallet key info: ',
-                        e,
-                    );
+                // Return an error if BDK key function fails
+                if (extendedKeyResponse.error) {
+                    throw extendedKeyResponse.data;
                 }
 
-                try {
-                    const walletDescriptor = await BdkRn.createDescriptor({
-                        type: BDKWalletTypeNames[newWallet.type],
-                        path: newWallet.derivationPath,
-                        mnemonic: newWallet.secret,
-                        network: network ? network : newWallet.network,
-                        password: '',
-                    });
+                // Update wallet fingerprint from extended key material
+                const walletKeyInfo = extendedKeyResponse.data;
+                newWallet._setFingerprint(walletKeyInfo.fingerprint);
 
-                    // Update Wallet descriptor and fingerprint
-                    newWallet._setDescriptor(walletDescriptor.data);
-                } catch (e) {
-                    console.error(
-                        '[StorageContext] Error generating wallet descriptor: ',
-                        e,
-                    );
+                // Get descriptor from BDK
+                const descriptorResponse = await BdkRn.createDescriptor({
+                    type: BDKWalletTypeNames[newWallet.type],
+                    path: newWallet.derivationPath,
+                    mnemonic: newWallet.secret,
+                    network: network ? network : newWallet.network,
+                    password: '',
+                });
+
+                // Return an error if BDK descriptor function fails
+                if (descriptorResponse.error) {
+                    throw descriptorResponse.data;
                 }
+
+                // Update Wallet descriptor and fingerprint
+                const walletDescriptor = descriptorResponse.data;
+                newWallet._setDescriptor(walletDescriptor);
 
                 // Set wallet as initialized
                 await _setWalletInit(true);
@@ -436,6 +449,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 console.error(
                     `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
                 );
+
+                throw new Error('Unable to add wallet');
             }
         },
         [wallets, _updateWallets, _setWallets],
@@ -454,6 +469,8 @@ export const AppStorageProvider = ({children}: Props) => {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
             );
+
+            throw new Error('Unable to reset app data');
         }
     }, []);
 
