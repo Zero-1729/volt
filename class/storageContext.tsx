@@ -404,38 +404,39 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Set wallet ID
                 _setCurrentWalletID(newWallet.id);
 
-                try {
-                    const walletKeyInfo = await BdkRn.createExtendedKey({
-                        mnemonic: newWallet.secret,
-                        network: network ? network : newWallet.network,
-                        password: '',
-                    });
+                // Get extended key material from BDK
+                const extendedKeyResponse = await BdkRn.createExtendedKey({
+                    mnemonic: newWallet.secret,
+                    network: network ? network : newWallet.network,
+                    password: '',
+                });
 
-                    newWallet._setFingerprint(walletKeyInfo.data.fingerprint);
-                } catch (e) {
-                    console.error(
-                        '[StorageContext] Error generating wallet key info: ',
-                        e,
-                    );
+                // Return an error if BDK key function fails
+                if (extendedKeyResponse.error) {
+                    throw extendedKeyResponse.data;
                 }
 
-                try {
-                    const walletDescriptor = await BdkRn.createDescriptor({
-                        type: BDKWalletTypeNames[newWallet.type],
-                        path: newWallet.derivationPath,
-                        mnemonic: newWallet.secret,
-                        network: network ? network : newWallet.network,
-                        password: '',
-                    });
+                // Update wallet fingerprint from extended key material
+                const walletKeyInfo = extendedKeyResponse.data;
+                newWallet._setFingerprint(walletKeyInfo.fingerprint);
 
-                    // Update Wallet descriptor and fingerprint
-                    newWallet._setDescriptor(walletDescriptor.data);
-                } catch (e) {
-                    console.error(
-                        '[StorageContext] Error generating wallet descriptor: ',
-                        e,
-                    );
+                // Get descriptor from BDK
+                const descriptorResponse = await BdkRn.createDescriptor({
+                    type: BDKWalletTypeNames[newWallet.type],
+                    path: newWallet.derivationPath,
+                    mnemonic: newWallet.secret,
+                    network: network ? network : newWallet.network,
+                    password: '',
+                });
+
+                // Return an error if BDK descriptor function fails
+                if (descriptorResponse.error) {
+                    throw descriptorResponse.data;
                 }
+
+                // Update Wallet descriptor and fingerprint
+                const walletDescriptor = descriptorResponse.data;
+                newWallet._setDescriptor(walletDescriptor);
 
                 // Set wallet as initialized
                 await _setWalletInit(true);
