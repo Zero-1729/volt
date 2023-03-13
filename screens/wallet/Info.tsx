@@ -76,24 +76,32 @@ const Info = () => {
         <SafeAreaView>
             {/* Display Wallet Info, addresses, and other related data / settings */}
             <View style={[tailwind('w-full h-full items-center relative')]}>
-                <PlainButton
-                    style={[tailwind('items-center mt-6 flex-row w-5/6')]}
-                    onPress={() => {
-                        navigation.dispatch(CommonActions.goBack());
-                    }}>
-                    <Back
-                        style={tailwind('mr-2')}
-                        fill={ColorScheme.SVG.Default}
-                    />
+                <View
+                    style={[
+                        tailwind(
+                            'flex-row mt-6 w-5/6 justify-center items-center',
+                        ),
+                    ]}>
+                    <PlainButton
+                        style={[
+                            tailwind(
+                                'absolute w-full left-0 items-center flex-row',
+                            ),
+                        ]}
+                        onPress={() => {
+                            navigation.dispatch(CommonActions.goBack());
+                        }}>
+                        <Back fill={ColorScheme.SVG.Default} />
+                    </PlainButton>
                     {/* Wallet name */}
                     <Text
                         style={[
-                            tailwind('text-white font-bold'),
+                            tailwind('font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Wallet Info
+                        Wallet Information
                     </Text>
-                </PlainButton>
+                </View>
 
                 {/* Allow user to change wallet name */}
                 <PlainButton style={[tailwind('w-5/6 mt-12')]}>
