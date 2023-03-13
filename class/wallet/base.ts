@@ -69,7 +69,7 @@ export class BaseWallet {
         type: string,
         secret?: string,
         descriptor?: string,
-        network?: string,
+        network?: NetworkType,
     ) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = name; // Wallet name
@@ -89,7 +89,7 @@ export class BaseWallet {
         this.balance = 0; // By default the balance is in sats
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = network ? network : 'mainnet'; // Can have 'mainnet', 'testnet', or 'signet' wallets
+        this.network = network ? network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
 
         this.UTXOs = []; // Set of wallet UTXOs
 

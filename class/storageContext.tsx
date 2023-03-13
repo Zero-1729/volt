@@ -378,7 +378,7 @@ export const AppStorageProvider = ({children}: Props) => {
             type: string,
             secret?: string,
             descriptor?: string,
-            network: NetworkType = 'testnet',
+            network?: NetworkType,
         ) => {
             try {
                 const newWallet = new BaseWallet(
@@ -395,7 +395,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 try {
                     const walletKeyInfo = await BdkRn.createExtendedKey({
                         mnemonic: newWallet.secret,
-                        network: network,
+                        network: network ? network : newWallet.network,
                         password: '',
                     });
 
@@ -412,7 +412,7 @@ export const AppStorageProvider = ({children}: Props) => {
                         type: BDKWalletTypeNames[newWallet.type],
                         path: newWallet.derivationPath,
                         mnemonic: newWallet.secret,
-                        network: network,
+                        network: network ? network : newWallet.network,
                         password: '',
                     });
 
