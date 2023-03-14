@@ -51,8 +51,8 @@ const Settings = () => {
 
     const showDialog = () => {
         DeletionAlert(
-            'Delete App Data',
-            'Are you sure you want to reset the App Data?',
+            'Delete Data',
+            'Are you sure you want to reset the App data?',
             'Reset',
             handleAppDataReset,
         );
@@ -277,11 +277,6 @@ const Settings = () => {
                 {isDevMode ? (
                     <PlainButton
                         disabled={!isWalletInitialized}
-                        // onPress={() => {
-                        //     if (isWalletInitialized) {
-                        //         resetAppData();
-                        //     }
-                        // }}
                         onPress={showDialog}
                         style={[
                             tailwind('absolute items-center'),
