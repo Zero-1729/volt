@@ -18,6 +18,9 @@ export const WalletPaths: {[index: string]: string} = {
     p2sh: "m/49'/0'/0'",
 };
 
+export const extendedPrivs = ['xprv', 'yprv', 'tprv', 'zprv', 'vprv'];
+export const extendedPubs = ['xpub', 'ypub', 'tpub', 'zpub', 'vpub'];
+
 export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
 export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
     MNEMONIC: 'mnemonic',
