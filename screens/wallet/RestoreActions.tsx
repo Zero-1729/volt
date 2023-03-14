@@ -9,7 +9,11 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
 import {validateMnenomic} from '../../modules/bip39';
-import {descriptorSymbols} from '../../class/wallet/base';
+import {
+    descriptorSymbols,
+    extendedPrivs,
+    extendedPubs,
+} from '../../class/wallet/base';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -118,9 +122,6 @@ const ImportAction = () => {
     };
 
     const isExtendedKey = (text: string) => {
-        const extendedPrivs = ['xprv', 'yprv', 'tprv', 'zprv', 'vprv'];
-        const extendedPubs = ['xpub', 'ypub', 'tpub', 'zpub', 'vpub'];
-
         const prefix = text.substring(0, 4);
 
         // Preliminary length check
