@@ -97,7 +97,7 @@ const Wallet = () => {
                             <Text
                                 style={[
                                     tailwind(
-                                        'text-sm ml-2 p-1 self-center text-black font-bold bg-white rounded-sm opacity-40',
+                                        'text-sm py-1 px-2 self-center text-black font-bold bg-white rounded opacity-30',
                                     ),
                                 ]}>
                                 Watch-only
