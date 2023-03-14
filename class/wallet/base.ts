@@ -18,8 +18,15 @@ export const WalletPaths: {[index: string]: string} = {
     p2sh: "m/49'/0'/0'",
 };
 
-type descriptorSymbolsType = string[];
+export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
+export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
+    MNEMONIC: 'mnemonic',
+    XPRIV: 'xprv',
+    XPUB: 'xpub',
+    DESCRIPTOR: 'descriptor',
+};
 
+type descriptorSymbolsType = string[];
 export const descriptorSymbols: descriptorSymbolsType = [
     '[',
     ']',
