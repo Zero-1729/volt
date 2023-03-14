@@ -32,7 +32,7 @@ const ImportAction = () => {
 
     const [importText, setImportText] = useState('');
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
+    const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
         console.info(`[Success] Document Picker: ${data.uri}`);
@@ -65,6 +65,7 @@ const ImportAction = () => {
             validateMnenomic(mnemonic);
 
             // TODO: call the wallet creation function
+            restoreWallet(mnemonic, 'mnemonic');
         } catch (e: any) {
             // Let user know the mnemonic is valid
             errorAlert(e.message, 'Invalid mnemonic');
