@@ -39,41 +39,25 @@ const Release = () => {
     };
 
     return (
-        <SafeAreaView>
-            <View
-                style={[
-                    tailwind('w-5/6 self-center mt-4 mb-6'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
-                <PlainButton
-                    style={tailwind('items-center flex-row -ml-1')}
-                    onPress={() => {
-                        navigation.goBack();
-                    }}>
-                    <Back
-                        style={tailwind('mr-2')}
-                        fill={ColorScheme.SVG.Default}
-                    />
+        <SafeAreaView edges={['left', 'bottom', 'right']}>
+            <View style={[tailwind('w-full h-full items-center')]}>
+                <View
+                    style={[
+                        tailwind(
+                            'w-5/6 my-8 items-center justify-center flex-row',
+                        ),
+                        {backgroundColor: ColorScheme.Background.Primary},
+                    ]}>
+                    <PlainButton
+                        style={[tailwind('absolute w-full left-0')]}
+                        onPress={() => {
+                            navigation.goBack();
+                        }}>
+                        <Back fill={ColorScheme.SVG.Default} />
+                    </PlainButton>
                     <Text
                         style={[
                             tailwind('text-sm font-medium'),
-                            {color: ColorScheme.Text.Default},
-                            Font.RobotoText,
-                        ]}>
-                        About
-                    </Text>
-                </PlainButton>
-            </View>
-
-            <View
-                style={[
-                    tailwind('self-center w-full h-full items-center'),
-                    {backgroundColor: ColorScheme.Background.Secondary},
-                ]}>
-                <View style={tailwind('w-5/6 mt-6')}>
-                    <Text
-                        style={[
-                            tailwind('text-xl font-medium'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
@@ -81,12 +65,20 @@ const Release = () => {
                     </Text>
                 </View>
 
-                <FlatList
-                    style={tailwind('w-5/6 mt-6')}
-                    data={Notes}
-                    renderItem={renderItem}
-                    keyExtractor={(_item, index) => `${index}`}
-                />
+                <View
+                    style={[
+                        tailwind(
+                            'self-center w-full h-full items-center rounded-t-2xl',
+                        ),
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}>
+                    <FlatList
+                        style={[tailwind('w-5/6 pt-8')]}
+                        data={Notes}
+                        renderItem={renderItem}
+                        keyExtractor={(_item, index) => `${index}`}
+                    />
+                </View>
             </View>
         </SafeAreaView>
     );
