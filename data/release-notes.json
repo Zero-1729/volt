@@ -1,6 +1,12 @@
 [
-    "Created Bare App Build",
-    "Added Settings screen",
-    "Added Dummy Home screen",
-    "Added child settings screens"
+    "Moved to React Native v0.70",
+    "Migrated to Tailwind-RN 4",
+    "Added more settings options such as Advanced Mode",
+    "Fixed and unified balances display across the app",
+    "Added wallet screen",
+    "Added BDK-RN support for wallet functions",
+    "Add wallet screen is now a stack of models",
+    "Included Wallet information and tools in wallet screen",
+    "Added a new Mnemonic screen to show newly created wallet mnemonic for backup",
+    "Improved UI error handling"
 ]
