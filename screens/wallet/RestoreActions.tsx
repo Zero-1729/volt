@@ -56,7 +56,7 @@ const ImportAction = () => {
     };
 
     const importInstructions = isAdvancedMode
-        ? 'Enter one of the following:\n\n- 12 - 24 word seed\n- Xpriv/Zpriv\n- PrivateKey (WIF)\n- Wallet Descriptor (e.g. pkh(...))'
+        ? 'Enter one of the following:\n\n- 12 - 24 word seed\n- Xpriv/Zpriv\n- Wallet Descriptor (e.g. pkh(...))'
         : 'Enter your 12 - 24 word seed';
 
     return (
