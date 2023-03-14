@@ -8,6 +8,7 @@ import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
+import {descriptorSymbols} from '../../class/wallet/base';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -55,6 +56,57 @@ const ImportAction = () => {
         setImportText(valueWithSingleWhitespace);
 
         return valueWithSingleWhitespace;
+    };
+
+    const isMnemonic = (text: string) => {
+        // We assume it is a mnemonic if it meets the following:
+        // (1) it has more than one word separated by a space
+        // (2) it has 12 or 24 words
+        const textWordLength = text.split(' ').length;
+        const isSingleWord = textWordLength === 1;
+        const isMnemonicLength = textWordLength === 12 || textWordLength === 24;
+
+        if (isSingleWord && isMnemonicLength) {
+            return true;
+        }
+    };
+
+    const isDescriptor = (text: string) => {
+        const hasDigits = /\d/.test(text);
+
+        // Assume it is a descriptor if it has both
+        // numbers or descriptor symbols
+        // TODO: implement a stricter pattern check
+        if (
+            descriptorSymbols.some(symbol => text.includes(symbol)) &&
+            hasDigits
+        ) {
+            return true;
+        }
+        return false;
+    };
+
+    const isExtendedKey = (text: string) => {
+        const extendedPrivs = ['xprv', 'yprv', 'tprv', 'zprv', 'vprv'];
+        const extendedPubs = ['xpub', 'ypub', 'tpub', 'zpub', 'vpub'];
+
+        const prefix = text.substring(0, 4);
+
+        // Preliminary length check
+        if (text.length !== 111) {
+            return false;
+        }
+
+        // Check if prefix is valid xpriv or xpub
+        // NOTE: We mean xpub and xpriv in the general BIP32 sense,
+        // where tprv, yprv, zprv, vprv, are all considered xprvs
+        // and similarly, tpub, ypub, zpub, vpub are all considered xpubs
+        // TODO: perform stricter check
+        if (extendedPrivs.includes(prefix) || extendedPubs.includes(prefix)) {
+            return true;
+        }
+
+        return false;
     };
 
     const handleImport = () => {
