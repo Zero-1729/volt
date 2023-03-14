@@ -16,7 +16,12 @@ import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit} from '../types/wallet';
 import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
 
-import {BaseWallet, BDKWalletTypeNames} from './wallet/base';
+import {
+    BaseWallet,
+    BDKWalletTypeNames,
+    BackupMaterialTypes,
+    BackupMaterialType,
+} from './wallet/base';
 
 import BdkRn from 'bdk-rn';
 
@@ -45,6 +50,10 @@ type defaultContextType = {
     updateWalletUnit: (id: string, unit: Unit) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
+    restoreWallet: (
+        backupMaterial: string,
+        backupType: BackupMaterialTypes,
+    ) => void;
     addWallet: (
         name: string,
         type: string,
@@ -81,6 +90,7 @@ const defaultContext: defaultContextType = {
     setSatSymbol: () => {},
     setTotalBalanceHidden: () => {},
     setIsAdvancedMode: () => {},
+    restoreWallet: () => {},
     addWallet: () => {},
     updateWalletUnit: () => {},
     renameWallet: () => {},
@@ -384,6 +394,32 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const restoreWallet = useCallback(
+        async (
+            backupMaterial: string,
+            backMeterialType: BackupMaterialTypes,
+        ) => {
+            console.info(
+                `[restoreWallet] ${backMeterialType}: ${backupMaterial}`,
+            );
+            // Handle material accrodig to type
+            switch (backMeterialType) {
+                case BackupMaterialType.MNEMONIC:
+                    // handle that
+                    break;
+                case BackupMaterialType.XPUB:
+                    // handle that
+                    break;
+                case BackupMaterialType.DESCRIPTOR:
+                    // handle that
+                    break;
+            }
+
+            // Add wallet to wallet list
+        },
+        [],
+    );
+
     const addWallet = useCallback(
         async (
             name: string,
@@ -524,6 +560,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 resetAppData,
                 isDevMode,
                 wallets,
+                restoreWallet,
                 addWallet,
                 currentWalletID,
                 setCurrentWalletID,
