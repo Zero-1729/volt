@@ -147,31 +147,34 @@ const ImportAction = () => {
         // - Wallet Descriptor (e.g. pkh(...))
         // - Xpriv / Xpub
 
+        // Take out any leading or trailing whitespace
+        const material = importText.trim();
+
         // Check if mnemonic
-        if (isMnemonic(importText)) {
+        if (isMnemonic(material)) {
             // Handle import of Mnemonic
-            handleMnemonic(importText);
+            handleMnemonic(material);
             return;
         }
 
         // Check if descriptor
-        if (isDescriptor(importText)) {
+        if (isDescriptor(material)) {
             // Handle import of descriptor
             errorAlert('Descriptor', 'Descriptor import not yet supported');
 
-            handleDescriptor(importText);
+            handleDescriptor(material);
             return;
         }
 
         // Check if user provided an xpriv or xpub
-        if (isExtendedKey(importText)) {
+        if (isExtendedKey(material)) {
             // Handle import of extended key
             errorAlert(
                 'Extended Key',
                 'Extended private & public key import not yet supported',
             );
 
-            handleExtendedKey(importText);
+            handleExtendedKey(material);
             return;
         }
 
