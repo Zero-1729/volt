@@ -3,7 +3,7 @@ import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
-import {CommonActions} from '@react-navigation/native';
+import {StackActions} from '@react-navigation/native';
 
 import {useNavigation} from '@react-navigation/core';
 
@@ -31,13 +31,13 @@ const Add = () => {
     const {isAdvancedMode} = useContext(AppStorageContext);
 
     return (
-        <SafeAreaView>
+        <SafeAreaView edges={['left', 'bottom', 'right']}>
             <View
                 style={[
                     tailwind('w-full h-full items-center'),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
-                <View style={tailwind('w-5/6 mt-4 mb-16')}>
+                <View style={tailwind('w-5/6 mt-8 mb-16')}>
                     <PlainButton
                         style={tailwind('items-center flex-row -ml-1')}
                         onPress={() => {
@@ -104,9 +104,7 @@ const Add = () => {
                             <PlainButton
                                 onPress={() => {
                                     navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'CreateActions',
-                                        }),
+                                        StackActions.push('CreateActions'),
                                     );
                                 }}>
                                 <View
@@ -149,9 +147,7 @@ const Add = () => {
                             <PlainButton
                                 onPress={() => {
                                     navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'RestoreActions',
-                                        }),
+                                        StackActions.push('RestoreActions'),
                                     );
                                 }}>
                                 <View

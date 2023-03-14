@@ -17,6 +17,7 @@ import Home from './screens/tabs/Home';
 import Add from './screens/wallet/Add';
 import RestoreActions from './screens/wallet/RestoreActions';
 import CreateActions from './screens/wallet/CreateActions';
+import Mnemonic from './screens/wallet/Mnemonic';
 import WalletViewScreen from './screens/wallet/Wallet';
 import Info from './screens/wallet/Info';
 import Backup from './screens/wallet/Backup';
@@ -72,7 +73,6 @@ const WalletStack = createNativeStackNavigator();
 const WalletRoot = () => {
     return (
         <WalletStack.Navigator screenOptions={{headerShown: false}}>
-            <WalletStack.Screen name="Add" component={Add} />
             <WalletStack.Screen
                 name="WalletView"
                 component={WalletViewScreen}
@@ -80,14 +80,6 @@ const WalletRoot = () => {
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
-                <WalletStack.Screen
-                    name="RestoreActions"
-                    component={RestoreActions}
-                />
-                <WalletStack.Screen
-                    name="CreateActions"
-                    component={CreateActions}
-                />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
@@ -95,6 +87,24 @@ const WalletRoot = () => {
                 />
             </WalletStack.Group>
         </WalletStack.Navigator>
+    );
+};
+
+const AddWalletStack = createNativeStackNavigator();
+const AddWalletRoot = () => {
+    return (
+        <AddWalletStack.Navigator screenOptions={{headerShown: false}}>
+            <AddWalletStack.Screen name="Add" component={Add} />
+            <AddWalletStack.Screen name="Mnemonic" component={Mnemonic} />
+            <AddWalletStack.Screen
+                name="RestoreActions"
+                component={RestoreActions}
+            />
+            <AddWalletStack.Screen
+                name="CreateActions"
+                component={CreateActions}
+            />
+        </AddWalletStack.Navigator>
     );
 };
 
@@ -186,6 +196,11 @@ const initScreen = () => {
     return (
         <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
             <InitScreenStack.Screen name="Home" component={HomeTabs} />
+            <InitScreenStack.Screen
+                name="AddWalletRoot"
+                component={AddWalletRoot}
+                options={{headerShown: false, presentation: 'modal'}}
+            />
             <InitScreenStack.Screen name="WalletRoot" component={WalletRoot} />
             <InitScreenStack.Screen
                 name="SettingsRoot"

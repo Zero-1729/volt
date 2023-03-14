@@ -63,7 +63,7 @@ export const EmptyCard = () => {
                     style={[tailwind('absolute bottom-0 left-6 w-full')]}
                     onPress={() => {
                         navigation.dispatch(
-                            CommonActions.navigate({name: 'WalletRoot'}),
+                            CommonActions.navigate({name: 'AddWalletRoot'}),
                         );
                     }}
                     title={'Add'}

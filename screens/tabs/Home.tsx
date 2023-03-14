@@ -137,9 +137,7 @@ const Home = () => {
                             <PlainButton
                                 onPress={() =>
                                     navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'WalletRoot',
-                                        }),
+                                        CommonActions.navigate('AddWalletRoot'),
                                     )
                                 }>
                                 <Add

@@ -3,9 +3,7 @@ import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
 
-import {useNavigation} from '@react-navigation/core';
-
-import {CommonActions} from '@react-navigation/native';
+import {StackActions, useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -58,17 +56,15 @@ const CreateAction = () => {
 
     const updateWalletName = async (walletName: string, type: string) => {
         try {
+            // Clear wallet name
+            setNewWalletName('');
+
             // Default wallet type is Segwit bech32
             // Connects to testnet
             await addWallet(walletName, type);
 
-            // Navigate to the wallet screen
-            // TODO: show wallet seed phrases
-            navigation.dispatch(
-                CommonActions.navigate({
-                    name: 'Home',
-                }),
-            );
+            // Navigate to mnemonic screen
+            navigation.dispatch(StackActions.push('Mnemonic'));
         } catch (e: any) {
             errorAlert('Alert', e.message);
         }
