@@ -54,8 +54,11 @@ const SettingsRoot = () => {
             <SettingsStack.Screen name="Wallet" component={Wallet} />
             <SettingsStack.Screen name="Security" component={Security} />
             <SettingsStack.Screen name="About" component={About} />
-            <SettingsStack.Screen name="License" component={License} />
-            <SettingsStack.Screen name="Release" component={Release} />
+
+            <SettingsStack.Group screenOptions={{presentation: 'modal'}}>
+                <SettingsStack.Screen name="License" component={License} />
+                <SettingsStack.Screen name="Release" component={Release} />
+            </SettingsStack.Group>
         </SettingsStack.Navigator>
     );
 };
