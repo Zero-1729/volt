@@ -92,3 +92,12 @@ export const normalizeFiat = (sats: number, rate: number) => {
     // (i.e. 14 digit characters)
     return addCommas(formatWithUnits(fiat));
 };
+
+// Format a string of Mnemonic phrases into
+// a numbered string of phrases
+export const displayNumberedSeed = (seed: string) => {
+    const words = seed.split(' ');
+
+    // Return an array of numbered Mnemonic phrases
+    return words.map((word, i) => `${i + 1}. ${word}`);
+};
