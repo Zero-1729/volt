@@ -87,7 +87,7 @@ const ImportAction = () => {
         const isSingleWord = textWordLength === 1;
         const isMnemonicLength = textWordLength === 12 || textWordLength === 24;
 
-        if (isSingleWord && isMnemonicLength) {
+        if (!isSingleWord && isMnemonicLength) {
             return true;
         }
     };
@@ -136,10 +136,9 @@ const ImportAction = () => {
         // - Wallet Descriptor (e.g. pkh(...))
         // - Xpriv / Xpub
 
+        // Check if mnemonic
         if (isMnemonic(importText)) {
             // Handle import of Mnemonic
-            errorAlert('Descriptor', 'Descriptor import not yet supported');
-
             handleMnemonic(importText);
             return;
         }
