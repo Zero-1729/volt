@@ -18,6 +18,21 @@ export const WalletPaths: {[index: string]: string} = {
     p2sh: "m/49'/0'/0'",
 };
 
+type descriptorSymbolsType = string[];
+
+export const descriptorSymbols: descriptorSymbolsType = [
+    '[',
+    ']',
+    '(',
+    ')',
+    ',',
+    "'",
+    '/',
+    ':',
+    '_',
+    '*',
+];
+
 type BDKWalletTypes =
     | 'wpkh'
     | 'pkh'
