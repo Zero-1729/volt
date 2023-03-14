@@ -19,6 +19,8 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
+import {liberalAlert, errorAlert} from '../../components/alert';
+
 const ImportAction = () => {
     const navigation = useNavigation();
 
@@ -53,6 +55,38 @@ const ImportAction = () => {
         setImportText(valueWithSingleWhitespace);
 
         return valueWithSingleWhitespace;
+    };
+
+    const handleImport = () => {
+        // determine if the import text is one of the following:
+        // - 12 - 24 word seed
+        // - Wallet Descriptor (e.g. pkh(...))
+        // - Xpriv / Xpub
+
+        if (isMnemonic(importText)) {
+            // Handle import of Mnemonic
+            errorAlert('Descriptor', 'Descriptor import not yet supported');
+            return;
+        }
+
+        // Check if descriptor
+        if (isDescriptor(importText)) {
+            // Handle import of descriptor
+            errorAlert('Descriptor', 'Descriptor import not yet supported');
+            return;
+        }
+
+        // Check if user provided an xpriv or xpub
+        if (isExtendedKey(importText)) {
+            // Handle import of extended key
+            errorAlert(
+                'Extended Key',
+                'Extended private & public key import not yet supported',
+            );
+            return;
+        }
+
+        liberalAlert('Import', 'Cannot import material', 'Try Again');
     };
 
     const importInstructions = isAdvancedMode
