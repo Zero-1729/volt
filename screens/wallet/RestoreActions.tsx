@@ -11,10 +11,10 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {PlainButton} from '../../components/button';
+import {PlainButton, LongBottomButton} from '../../components/button';
 import {TextMultiInput} from '../../components/input';
 
-import Back from './../../assets/svg/arrow-left-24.svg';
+import Back from '../../assets/svg/arrow-left-24.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
@@ -116,33 +116,21 @@ const ImportAction = () => {
                         onError={handleFolderError}
                         onCancel={handleFolderCancel}
                     />
-
-                    <PlainButton disabled={importText.trim().length === 0}>
-                        <View
-                            style={[
-                                tailwind('mt-8 rounded items-center'),
-                                {
-                                    backgroundColor:
-                                        importText.trim().length > 0
-                                            ? ColorScheme.Background.Inverted
-                                            : ColorScheme.Background.Secondary,
-                                },
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('px-4 py-4 font-bold'),
-                                    {
-                                        color:
-                                            importText.trim().length > 0
-                                                ? ColorScheme.Text.Alt
-                                                : ColorScheme.Text.GrayedText,
-                                    },
-                                ]}>
-                                Continue
-                            </Text>
-                        </View>
-                    </PlainButton>
                 </View>
+                <LongBottomButton
+                    onPress={handleImport}
+                    title="Continue"
+                    color={
+                        importText.trim().length > 0
+                            ? ColorScheme.Text.Alt
+                            : ColorScheme.Text.GrayedText
+                    }
+                    backgroundColor={
+                        importText.trim().length > 0
+                            ? ColorScheme.Background.Inverted
+                            : ColorScheme.Background.Secondary
+                    }
+                />
             </View>
         </SafeAreaView>
     );
