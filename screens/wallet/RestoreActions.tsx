@@ -3,7 +3,7 @@ import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
 
-import {useNavigation} from '@react-navigation/core';
+import {StackActions, useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -59,13 +59,22 @@ const ImportAction = () => {
         return valueWithSingleWhitespace;
     };
 
-    const handleMnemonic = (mnemonic: string) => {
+    const handleSuccessRoute = () => {
+        // Simple helper to show successful import and navigate back home
+        liberalAlert('Success', 'Wallet restored successfully', 'OK');
+
+        navigation.getParent()?.dispatch(StackActions.popToTop());
+    };
+
+    const handleMnemonic = async (mnemonic: string) => {
         // Validate if a valid mnemonic
         try {
             validateMnenomic(mnemonic);
 
-            // TODO: call the wallet creation function
-            restoreWallet(mnemonic, 'mnemonic');
+            // Restore wallet using mnemonic
+            await restoreWallet(mnemonic, 'mnemonic');
+
+            handleSuccessRoute();
         } catch (e: any) {
             // Let user know the mnemonic is valid
             errorAlert(e.message, 'Invalid mnemonic');
