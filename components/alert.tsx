@@ -10,6 +10,19 @@ export const errorAlert = (heading: string, msg: string): void => {
     ]);
 };
 
+export const liberalAlert = (
+    heading: string,
+    msg: string,
+    primaryButtonText: string,
+): void => {
+    Alert.alert(heading, msg, [
+        {
+            text: primaryButtonText,
+            onPress: () => {},
+        },
+    ]);
+};
+
 export const DeletionAlert = (
     heading: string,
     msg: string,
