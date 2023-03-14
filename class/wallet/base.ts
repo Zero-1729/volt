@@ -63,10 +63,12 @@ export class BaseWallet {
 
     descriptor: string;
     birthday: string | Date;
+
     secret: string;
+    xprv: string;
+    xpub: string;
 
     masterFingerprint: string;
-    isBIP39: boolean;
 
     balance: number;
 
@@ -91,6 +93,8 @@ export class BaseWallet {
         type: string,
         secret?: string,
         descriptor?: string,
+        xprv?: string,
+        xpub?: string,
         network?: NetworkType,
     ) {
         this.id = this._generateID(); // Unique wallet ID
@@ -100,9 +104,7 @@ export class BaseWallet {
 
         this.addresses = []; // List of addresses
         this.address = ''; // Temporarily generated receiving address
-        this.descriptor = descriptor ? descriptor : '';
         this.birthday = Date(); // Timestamp of wallet creation
-
         this.units = {
             name: 'sats',
             symbol: 's',
@@ -120,10 +122,13 @@ export class BaseWallet {
 
         this.derivationPath = WalletPaths[this.type]; // Wallet derivation path
 
+        this.secret = secret ? secret : generateMnemonic(); // mnemonic phrase
+        this.descriptor = descriptor ? descriptor : '';
+        this.xprv = xprv ? xprv : '';
+        this.xpub = xpub ? xpub : '';
+
         // TODO: fetch from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
-        this.secret = secret ? secret : generateMnemonic(); // private key or recovery phrase
-        this.isBIP39 = this.secret.includes(' ') ? true : false; // Whether wallet has a 'BIP39' seed
 
         this.isWatchOnly = !this.secret; // Whether wallet is watch only
     }
