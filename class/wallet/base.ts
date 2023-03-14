@@ -130,7 +130,13 @@ export class BaseWallet {
         // TODO: fetch from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
 
-        this.isWatchOnly = !this.secret; // Whether wallet is watch only
+        // Assume wallet watch-only if no key material available
+        // TODO: make this more robust
+        // i.e., there maybe a watch-only wallet with a descriptor
+        this.isWatchOnly =
+            this.secret.length === 0 &&
+            this.descriptor.length === 0 &&
+            this.xprv.length === 0; // Whether wallet is watch only
     }
 
     protected _generateID(): string {
