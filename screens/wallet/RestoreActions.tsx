@@ -8,6 +8,7 @@ import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
+import {validateMnenomic} from '../../modules/bip39';
 import {descriptorSymbols} from '../../class/wallet/base';
 
 import {useTailwind} from 'tailwind-rn';
@@ -59,7 +60,15 @@ const ImportAction = () => {
     };
 
     const handleMnemonic = (mnemonic: string) => {
-        // TODO: perform mnemonic validity check
+        // Validate if a valid mnemonic
+        try {
+            validateMnenomic(mnemonic);
+
+            // TODO: call the wallet creation function
+        } catch (e: any) {
+            // Let user know the mnemonic is valid
+            errorAlert(e.message, 'Invalid mnemonic');
+        }
     };
 
     const handleDescriptor = (descriptor: string) => {
