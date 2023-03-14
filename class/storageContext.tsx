@@ -394,28 +394,73 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const _addNewWallet = async (newWallet: BaseWallet) => {
+        // TODO: add param to ensure we aren't needlessly
+        // overwriting extended key material for exisiting
+        // xpub or descriptor
+
+        // Set wallet ID
+        _setCurrentWalletID(newWallet.id);
+
+        // Get extended key material from BDK
+        const extendedKeyResponse = await BdkRn.createExtendedKey({
+            mnemonic: newWallet.secret,
+            network: newWallet.network,
+            password: '',
+        });
+
+        // Return an error if BDK key function fails
+        if (extendedKeyResponse.error) {
+            throw extendedKeyResponse.data;
+        }
+
+        // Update wallet fingerprint from extended key material
+        const walletKeyInfo = extendedKeyResponse.data;
+        newWallet._setFingerprint(walletKeyInfo.fingerprint);
+
+        // Get descriptor from BDK
+        const descriptorResponse = await BdkRn.createDescriptor({
+            type: BDKWalletTypeNames[newWallet.type],
+            path: newWallet.derivationPath,
+            mnemonic: newWallet.secret,
+            network: newWallet.network,
+            password: '',
+        });
+
+        // Return an error if BDK descriptor function fails
+        if (descriptorResponse.error) {
+            throw descriptorResponse.data;
+        }
+
+        // Update Wallet descriptor and fingerprint
+        const walletDescriptor = descriptorResponse.data;
+        newWallet._setDescriptor(walletDescriptor);
+
+        // Set wallet as initialized
+        await _setWalletInit(true);
+
+        const tmp = wallets ? [...wallets, newWallet] : [newWallet];
+
+        _setWallets(tmp);
+        _updateWallets(JSON.stringify(tmp));
+    };
+
     const restoreWallet = useCallback(
         async (
             backupMaterial: string,
-            backMeterialType: BackupMaterialTypes,
+            backupMaterialType: BackupMaterialTypes,
         ) => {
-            console.info(
-                `[restoreWallet] ${backMeterialType}: ${backupMaterial}`,
+            // Handle material according to type
+            let newWallet = new BaseWallet(
+                'Restored wallet',
+                'bech32', // Allow user
+                backupMaterialType === 'mnemonic' ? backupMaterial : '',
+                backupMaterialType === 'descriptor' ? backupMaterial : '',
+                backupMaterialType === 'xprv' ? backupMaterial : '',
+                backupMaterialType === 'xpub' ? backupMaterial : '',
             );
-            // Handle material accrodig to type
-            switch (backMeterialType) {
-                case BackupMaterialType.MNEMONIC:
-                    // handle that
-                    break;
-                case BackupMaterialType.XPUB:
-                    // handle that
-                    break;
-                case BackupMaterialType.DESCRIPTOR:
-                    // handle that
-                    break;
-            }
 
-            // Add wallet to wallet list
+            _addNewWallet(newWallet);
         },
         [],
     );
@@ -434,53 +479,12 @@ export const AppStorageProvider = ({children}: Props) => {
                     type,
                     secret,
                     descriptor,
+                    '',
+                    '',
                     network,
                 );
 
-                // Set wallet ID
-                _setCurrentWalletID(newWallet.id);
-
-                // Get extended key material from BDK
-                const extendedKeyResponse = await BdkRn.createExtendedKey({
-                    mnemonic: newWallet.secret,
-                    network: network ? network : newWallet.network,
-                    password: '',
-                });
-
-                // Return an error if BDK key function fails
-                if (extendedKeyResponse.error) {
-                    throw extendedKeyResponse.data;
-                }
-
-                // Update wallet fingerprint from extended key material
-                const walletKeyInfo = extendedKeyResponse.data;
-                newWallet._setFingerprint(walletKeyInfo.fingerprint);
-
-                // Get descriptor from BDK
-                const descriptorResponse = await BdkRn.createDescriptor({
-                    type: BDKWalletTypeNames[newWallet.type],
-                    path: newWallet.derivationPath,
-                    mnemonic: newWallet.secret,
-                    network: network ? network : newWallet.network,
-                    password: '',
-                });
-
-                // Return an error if BDK descriptor function fails
-                if (descriptorResponse.error) {
-                    throw descriptorResponse.data;
-                }
-
-                // Update Wallet descriptor and fingerprint
-                const walletDescriptor = descriptorResponse.data;
-                newWallet._setDescriptor(walletDescriptor);
-
-                // Set wallet as initialized
-                await _setWalletInit(true);
-
-                const tmp = wallets ? [...wallets, newWallet] : [newWallet];
-
-                _setWallets(tmp);
-                _updateWallets(JSON.stringify(tmp));
+                _addNewWallet(newWallet);
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
