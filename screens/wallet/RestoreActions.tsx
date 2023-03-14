@@ -58,6 +58,18 @@ const ImportAction = () => {
         return valueWithSingleWhitespace;
     };
 
+    const handleMnemonic = (mnemonic: string) => {
+        // TODO: perform mnemonic validity check
+    };
+
+    const handleDescriptor = (descriptor: string) => {
+        // TODO: perform descriptor validity check
+    };
+
+    const handleExtendedKey = (extendedKey: string) => {
+        // TODO: perform checksum check here
+    };
+
     const isMnemonic = (text: string) => {
         // We assume it is a mnemonic if it meets the following:
         // (1) it has more than one word separated by a space
@@ -118,6 +130,8 @@ const ImportAction = () => {
         if (isMnemonic(importText)) {
             // Handle import of Mnemonic
             errorAlert('Descriptor', 'Descriptor import not yet supported');
+
+            handleMnemonic(importText);
             return;
         }
 
@@ -125,6 +139,8 @@ const ImportAction = () => {
         if (isDescriptor(importText)) {
             // Handle import of descriptor
             errorAlert('Descriptor', 'Descriptor import not yet supported');
+
+            handleDescriptor(importText);
             return;
         }
 
@@ -135,6 +151,8 @@ const ImportAction = () => {
                 'Extended Key',
                 'Extended private & public key import not yet supported',
             );
+
+            handleExtendedKey(importText);
             return;
         }
 
