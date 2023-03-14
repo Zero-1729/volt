@@ -43,45 +43,46 @@ const License = () => {
     };
 
     return (
-        <SafeAreaView>
-            <View
-                style={[
-                    tailwind('w-5/6 self-center mt-4 mb-6'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
-                <TouchableOpacity
-                    style={tailwind('items-center flex-row -ml-1')}
-                    onPress={() => {
-                        navigation.goBack();
-                    }}>
-                    <Back
-                        style={tailwind('mr-2')}
-                        fill={ColorScheme.SVG.Default}
-                    />
+        <SafeAreaView edges={['left', 'bottom', 'right']}>
+            <View style={[tailwind('w-full h-full items-center')]}>
+                <View
+                    style={[
+                        tailwind(
+                            'w-5/6 my-8 items-center justify-center flex-row',
+                        ),
+                        {backgroundColor: ColorScheme.Background.Primary},
+                    ]}>
+                    <TouchableOpacity
+                        style={tailwind('absolute w-full left-0')}
+                        onPress={() => {
+                            navigation.goBack();
+                        }}>
+                        <Back fill={ColorScheme.SVG.Default} />
+                    </TouchableOpacity>
                     <Text
                         style={[
                             tailwind('text-sm font-medium'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
-                        About
+                        License
                     </Text>
-                </TouchableOpacity>
-            </View>
+                </View>
 
-            <View
-                style={[
-                    tailwind(
-                        'self-center items-center justify-center w-full h-full',
-                    ),
-                    {backgroundColor: ColorScheme.Background.Secondary},
-                ]}>
-                <FlatList
-                    style={tailwind('w-5/6 mt-8')}
-                    data={LICENSE}
-                    renderItem={renderItem}
-                    keyExtractor={(_item, index) => `${index}`}
-                />
+                <View
+                    style={[
+                        tailwind(
+                            'self-center w-full h-full items-center rounded-t-2xl',
+                        ),
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}>
+                    <FlatList
+                        style={tailwind('w-5/6 pt-8')}
+                        data={LICENSE}
+                        renderItem={renderItem}
+                        keyExtractor={(_item, index) => `${index}`}
+                    />
+                </View>
             </View>
         </SafeAreaView>
     );
