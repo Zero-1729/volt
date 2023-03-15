@@ -446,6 +446,9 @@ export const AppStorageProvider = ({children}: Props) => {
             newWallet.setDescriptor(walletDescriptor);
         }
 
+        // Determine if watch only wallet
+        newWallet.setWatchOnly();
+
         // Set wallet as initialized
         await _setWalletInit(true);
 

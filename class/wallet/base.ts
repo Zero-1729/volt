@@ -131,13 +131,7 @@ export class BaseWallet {
 
         this.secret = secret ? secret : '';
 
-        // Assume wallet watch-only if no key material available
-        // TODO: make this more robust
-        // i.e., there maybe a watch-only wallet with a descriptor
-        this.isWatchOnly =
-            this.secret.length === 0 &&
-            this.descriptor.length === 0 &&
-            this.xprv.length === 0; // Whether wallet is watch only
+        this.isWatchOnly = false; // Whether wallet is watch only
 
         // Retrieved and updated from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
@@ -151,6 +145,26 @@ export class BaseWallet {
 
     protected _generateID(): string {
         return Crypto.randomUUID();
+    }
+
+    setWatchOnly(isWatchOnly?: boolean) {
+        // Assume wallet watch-only if no key material available
+        // TODO: make this more robust
+        // i.e., there maybe a watch-only wallet with a descriptor
+        if (isWatchOnly === undefined) {
+            const noPrivKeys =
+                this.secret.length === 0 && this.xprv.length === 0;
+            const noPrivKeyDescriptor = !extendedPrivs.includes(
+                this.descriptor,
+            );
+
+            if (noPrivKeys && noPrivKeyDescriptor) {
+                this.isWatchOnly = true;
+            }
+            return;
+        }
+
+        this.isWatchOnly = isWatchOnly;
     }
 
     updateBalance(sats: number) {
