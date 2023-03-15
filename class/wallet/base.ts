@@ -143,7 +143,7 @@ export class BaseWallet {
         this.masterFingerprint = ''; // Wallet master fingerprint
     }
 
-    public generateMnemonic(): void {
+    generateMnemonic(): void {
         if (this.secret.length === 0) {
             this.secret = bip39.generateMnemonic();
         }
@@ -153,19 +153,27 @@ export class BaseWallet {
         return Crypto.randomUUID();
     }
 
-    public updateBalance(sats: number) {
+    updateBalance(sats: number) {
         this.balance = sats;
     }
 
-    public updateName(text: string) {
+    updateName(text: string) {
         this.name = text;
     }
 
-    _setFingerprint(fingerprint: string) {
+    setXprv(xprv: string) {
+        this.xprv = xprv;
+    }
+
+    setXpub(xpub: string) {
+        this.xpub = xpub;
+    }
+
+    setFingerprint(fingerprint: string) {
         this.masterFingerprint = fingerprint;
     }
 
-    _setDescriptor(descriptor: string) {
+    setDescriptor(descriptor: string) {
         this.descriptor = descriptor;
     }
 }
