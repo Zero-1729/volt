@@ -403,21 +403,24 @@ export const AppStorageProvider = ({children}: Props) => {
             newWallet.generateMnemonic();
         }
 
-        // Get extended key material from BDK
-        const extendedKeyResponse = await BdkRn.createExtendedKey({
-            mnemonic: newWallet.secret,
-            network: newWallet.network,
-            password: '',
-        });
+        // If we have a mnemonic, generate extended key material
+        if (newWallet.secret !== '') {
+            // Get extended key material from BDK
+            const extendedKeyResponse = await BdkRn.createExtendedKey({
+                mnemonic: newWallet.secret,
+                network: newWallet.network,
+                password: '',
+            });
 
-        // Return an error if BDK key function fails
-        if (extendedKeyResponse.error) {
-            throw extendedKeyResponse.data;
+            // Return an error if BDK key function fails
+            if (extendedKeyResponse.error) {
+                throw extendedKeyResponse.data;
+            }
+
+            // Update wallet fingerprint from extended key material
+            const walletKeyInfo = extendedKeyResponse.data;
+            newWallet._setFingerprint(walletKeyInfo.fingerprint);
         }
-
-        // Update wallet fingerprint from extended key material
-        const walletKeyInfo = extendedKeyResponse.data;
-        newWallet._setFingerprint(walletKeyInfo.fingerprint);
 
         // Get descriptor from BDK
         const descriptorResponse = await BdkRn.createDescriptor({
