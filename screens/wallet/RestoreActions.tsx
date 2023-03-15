@@ -249,9 +249,10 @@ const ImportAction = () => {
                     />
                 </View>
                 <LongBottomButton
+                    disabled={importText.trim().length === 0}
                     onPress={handleImport}
                     title="Continue"
-                    color={
+                    textColor={
                         importText.trim().length > 0
                             ? ColorScheme.Text.Alt
                             : ColorScheme.Text.GrayedText
