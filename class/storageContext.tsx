@@ -431,10 +431,10 @@ export const AppStorageProvider = ({children}: Props) => {
             const descriptorResponse = await BdkRn.createDescriptor({
                 type: BDKWalletTypeNames[newWallet.type],
                 path: newWallet.derivationPath,
-                mnemonic: newWallet.secret,
+                mnemonic: !restored ? newWallet.secret : '',
                 network: newWallet.network,
                 password: '',
-                xprv: newWallet.xprv,
+                xprv: restored ? newWallet.xprv : '',
             });
 
             // Return an error if BDK descriptor function fails
