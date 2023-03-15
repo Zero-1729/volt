@@ -467,8 +467,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 const newWallet = new BaseWallet(
                     name,
                     type,
-                    secret,
-                    descriptor,
+                    '',
+                    '',
                     '',
                     '',
                     network,
