@@ -398,6 +398,11 @@ export const AppStorageProvider = ({children}: Props) => {
         // Set wallet ID
         _setCurrentWalletID(newWallet.id);
 
+        // Generate mnemonic and other key material if needed
+        if (!restored) {
+            newWallet.generateMnemonic();
+        }
+
         // Get extended key material from BDK
         const extendedKeyResponse = await BdkRn.createExtendedKey({
             mnemonic: newWallet.secret,
