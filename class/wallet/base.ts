@@ -1,6 +1,6 @@
 import Crypto from 'crypto';
 
-import {generateMnemonic} from '../../modules/bip39';
+import * as bip39 from '../../modules/bip39';
 
 import {Unit, UTXOType} from './../../types/wallet';
 
@@ -125,13 +125,11 @@ export class BaseWallet {
 
         this.derivationPath = WalletPaths[this.type]; // Wallet derivation path
 
-        this.secret = secret ? secret : generateMnemonic(); // mnemonic phrase
         this.descriptor = descriptor ? descriptor : '';
         this.xprv = xprv ? xprv : '';
         this.xpub = xpub ? xpub : '';
 
-        // TODO: fetch from BDK
-        this.masterFingerprint = ''; // Wallet master fingerprint
+        this.secret = secret ? secret : '';
 
         // Assume wallet watch-only if no key material available
         // TODO: make this more robust
@@ -140,6 +138,15 @@ export class BaseWallet {
             this.secret.length === 0 &&
             this.descriptor.length === 0 &&
             this.xprv.length === 0; // Whether wallet is watch only
+
+        // Retrieved and updated from BDK
+        this.masterFingerprint = ''; // Wallet master fingerprint
+    }
+
+    public generateMnemonic(): void {
+        if (this.secret.length === 0) {
+            this.secret = bip39.generateMnemonic();
+        }
     }
 
     protected _generateID(): string {
