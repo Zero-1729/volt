@@ -168,10 +168,15 @@ const ImportAction = () => {
 
         // Check if user provided an xpriv or xpub
         if (isExtendedKey(material)) {
+            const prefix = material.substring(0, 4);
+            const keyType = extendedPrivs.includes(prefix) ? 'xprv' : 'xpub';
+
             // Handle import of extended key
             errorAlert(
                 'Extended Key',
-                'Extended private & public key import not yet supported',
+                `Extended ${
+                    keyType === 'xprv' ? 'private' : 'public'
+                } key import not yet supported`,
             );
 
             handleExtendedKey(material);
