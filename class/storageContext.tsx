@@ -451,8 +451,8 @@ export const AppStorageProvider = ({children}: Props) => {
 
         const tmp = wallets ? [...wallets, newWallet] : [newWallet];
 
-        _setWallets(tmp);
-        _updateWallets(JSON.stringify(tmp));
+        await _setWallets(tmp);
+        await _updateWallets(JSON.stringify(tmp));
     };
 
     const restoreWallet = useCallback(
@@ -461,7 +461,7 @@ export const AppStorageProvider = ({children}: Props) => {
             backupMaterialType: BackupMaterialTypes,
         ) => {
             // Handle material according to type
-            let newWallet = new BaseWallet(
+            const newWallet = new BaseWallet(
                 'Restored wallet',
                 'bech32', // Allow user to set in advanced mode or guess it from wallet scan
                 backupMaterialType === 'mnemonic' ? backupMaterial : '',
@@ -470,7 +470,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 backupMaterialType === 'xpub' ? backupMaterial : '',
             );
 
-            _addNewWallet(newWallet, true);
+            await _addNewWallet(newWallet, true);
         },
         [],
     );
@@ -488,7 +488,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     network,
                 );
 
-                _addNewWallet(newWallet, false);
+                await _addNewWallet(newWallet);
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
