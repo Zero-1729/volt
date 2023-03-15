@@ -387,9 +387,12 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
-    const _addNewWallet = async (newWallet: BaseWallet) => {
-        // TODO: add param to ensure we aren't needlessly
-        // overwriting extended key material for exisiting
+    const _addNewWallet = async (
+        newWallet: BaseWallet,
+        restored: boolean = false,
+    ) => {
+        // TODO: Ensure we aren't needlessly
+        // overwriting extended key material for existing
         // xpub or descriptor
 
         // Set wallet ID
@@ -446,14 +449,14 @@ export const AppStorageProvider = ({children}: Props) => {
             // Handle material according to type
             let newWallet = new BaseWallet(
                 'Restored wallet',
-                'bech32', // Allow user
+                'bech32', // Allow user to set in advanced mode or guess it from wallet scan
                 backupMaterialType === 'mnemonic' ? backupMaterial : '',
                 backupMaterialType === 'descriptor' ? backupMaterial : '',
                 backupMaterialType === 'xprv' ? backupMaterial : '',
                 backupMaterialType === 'xpub' ? backupMaterial : '',
             );
 
-            _addNewWallet(newWallet);
+            _addNewWallet(newWallet, true);
         },
         [],
     );
@@ -471,7 +474,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     network,
                 );
 
-                _addNewWallet(newWallet);
+                _addNewWallet(newWallet, false);
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
