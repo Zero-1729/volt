@@ -419,7 +419,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
             // Update wallet fingerprint & xprv from extended key material
             const walletKeyInfo = extendedKeyResponse.data;
-            newWallet.setXprv(walletKeyInfo.xpriv);
+            newWallet.setXprv(walletKeyInfo.xprv);
             newWallet.setFingerprint(walletKeyInfo.fingerprint);
         }
 
