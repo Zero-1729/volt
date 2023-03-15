@@ -43,7 +43,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
     return (
         <View
             style={[
-                tailwind('rounded pt-4 pb-10 px-5 h-52'),
+                tailwind('rounded pb-11 px-4 h-44'),
                 {
                     borderWidth: 2,
                     borderColor: props.borderColor
@@ -63,7 +63,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 selectTextOnFocus={false}
                 {...props}
                 style={[
-                    tailwind('text-xs'),
+                    tailwind('text-xs pt-4'),
                     {
                         textAlignVertical: 'top',
                     },
@@ -76,7 +76,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         tailwind(
                             `absolute ${
                                 props.showFolder ? 'right-12' : 'right-4'
-                            } bottom-4`,
+                            } bottom-3`,
                         ),
                     ]}>
                     <PlainButton onPress={() => {}}>
@@ -88,7 +88,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
             )}
 
             {props.showFolder ? (
-                <View style={[tailwind('absolute right-4 bottom-4')]}>
+                <View style={[tailwind('absolute right-4 bottom-3')]}>
                     <PlainButton
                         onPress={() => {
                             DocumentPicker.pick({
