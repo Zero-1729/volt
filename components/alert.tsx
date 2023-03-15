@@ -13,7 +13,6 @@ export const errorAlert = (heading: string, msg: string): void => {
 export const DeletionAlert = (
     heading: string,
     msg: string,
-    primaryButtonText: string,
     onSuccess: () => void,
 ): void => {
     Alert.alert(heading, msg, [
@@ -23,7 +22,7 @@ export const DeletionAlert = (
             style: 'cancel',
         },
         {
-            text: primaryButtonText,
+            text: 'Delete',
             onPress: onSuccess,
             style: 'destructive',
         },
