@@ -423,23 +423,28 @@ export const AppStorageProvider = ({children}: Props) => {
             newWallet.setFingerprint(walletKeyInfo.fingerprint);
         }
 
-        // Get descriptor from BDK
-        const descriptorResponse = await BdkRn.createDescriptor({
-            type: BDKWalletTypeNames[newWallet.type],
-            path: newWallet.derivationPath,
-            mnemonic: newWallet.secret,
-            network: newWallet.network,
-            password: '',
-        });
+        // If it is not a restored wallet (i.e. new fresh one)
+        // or if restored must have an xprv
+        // to generate a descriptor
+        if (!restored || newWallet.xprv !== '') {
+            // Get descriptor from BDK
+            const descriptorResponse = await BdkRn.createDescriptor({
+                type: BDKWalletTypeNames[newWallet.type],
+                path: newWallet.derivationPath,
+                mnemonic: newWallet.secret,
+                network: newWallet.network,
+                password: '',
+                xprv: newWallet.xprv,
+            });
 
-        // Return an error if BDK descriptor function fails
-        if (descriptorResponse.error) {
-            throw descriptorResponse.data;
+            // Return an error if BDK descriptor function fails
+            if (descriptorResponse.error) {
+                throw descriptorResponse.data;
+            }
+
+            const walletDescriptor = descriptorResponse.data;
+            newWallet.setDescriptor(walletDescriptor);
         }
-
-        // Update Wallet descriptor and fingerprint
-        const walletDescriptor = descriptorResponse.data;
-        newWallet._setDescriptor(walletDescriptor);
 
         // Set wallet as initialized
         await _setWalletInit(true);
