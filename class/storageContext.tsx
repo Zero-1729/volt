@@ -417,9 +417,10 @@ export const AppStorageProvider = ({children}: Props) => {
                 throw extendedKeyResponse.data;
             }
 
-            // Update wallet fingerprint from extended key material
+            // Update wallet fingerprint & xprv from extended key material
             const walletKeyInfo = extendedKeyResponse.data;
-            newWallet._setFingerprint(walletKeyInfo.fingerprint);
+            newWallet.setXprv(walletKeyInfo.xpriv);
+            newWallet.setFingerprint(walletKeyInfo.fingerprint);
         }
 
         // Get descriptor from BDK
