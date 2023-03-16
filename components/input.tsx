@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import {TextInput, Platform, View} from 'react-native';
+import {
+    TextInput,
+    Keyboard,
+    Platform,
+    View,
+    InputAccessoryView,
+    Button,
+} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -40,6 +47,8 @@ export const TextSingleInput = (props: TextInputProps) => {
 export const TextMultiInput = (props: TextLongInputProps) => {
     const tailwind = useTailwind();
 
+    const InputAccessoryViewID = 'notsoUniqueID';
+
     return (
         <View
             style={[
@@ -61,6 +70,8 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 autoCorrect={false}
                 autoCapitalize="none"
                 selectTextOnFocus={false}
+                enablesReturnKeyAutomatically={true}
+                inputAccessoryViewID={InputAccessoryViewID}
                 {...props}
                 style={[
                     tailwind('text-xs pt-4'),
@@ -69,6 +80,15 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                     },
                 ]}
             />
+
+            <InputAccessoryView nativeID={InputAccessoryViewID}>
+                <Button
+                    title="Done"
+                    onPress={() => {
+                        Keyboard.dismiss();
+                    }}
+                />
+            </InputAccessoryView>
 
             {props.showScanIcon ? (
                 <View
