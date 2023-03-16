@@ -31,6 +31,13 @@ export const Balance = (props: BalanceProps) => {
     // Use this temporarily from wallet data
     const [unit, setUnit] = useState(walletData.units);
 
+    // Whether we are displaying fiat or not
+    const isFiat =
+        !(unit.name === 'BTC') &&
+        !(unit.name === 'sats') &&
+        !props.disableFiat &&
+        props.fiatRate;
+
     // Toggle between BTC and sats
     // and fiat if enabled
     const toggleUnit = () => {
@@ -80,8 +87,9 @@ export const Balance = (props: BalanceProps) => {
             {!hideTotalBalance ? (
                 <PlainButton onPress={toggleUnit}>
                     <View style={[tailwind('flex-row items-center')]}>
-                        {/* Display satSymbol if enabled in settings, otherwise default to 'BTC' symbol or just 'sats' */}
-                        {useSatSymbol || unit.name === 'BTC' ? (
+                        {/* Display satSymbol if enabled in settings, otherwise display BTC or Fiat symbol (if enabled).
+                        Hide and fallback to 'sats' below if unit is sats and satSymbol is disabled in settings */}
+                        {useSatSymbol || isFiat || unit.name === 'BTC' ? (
                             <Text
                                 numberOfLines={1}
                                 style={[
