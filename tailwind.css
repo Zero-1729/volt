@@ -34,6 +34,10 @@
   bottom: 7rem
 }
 
+.bottom-3 {
+  bottom: 0.75rem
+}
+
 .bottom-4 {
   bottom: 1rem
 }
@@ -96,10 +100,6 @@
 
 .top-6 {
   top: 1.5rem
-}
-
-.bottom-3 {
-  bottom: 0.75rem
 }
 
 .z-10 {
@@ -272,12 +272,12 @@
   height: 60%
 }
 
-.h-32 {
-  height: 8rem
-}
-
 .h-4\/6 {
   height: 66.666667%
+}
+
+.h-44 {
+  height: 11rem
 }
 
 .h-48 {
@@ -298,14 +298,6 @@
 
 .h-full {
   height: 100%
-}
-
-.h-40 {
-  height: 10rem
-}
-
-.h-44 {
-  height: 11rem
 }
 
 .w-0 {
@@ -502,11 +494,6 @@
   padding-right: 1rem
 }
 
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem
-}
-
 .px-6 {
   padding-left: 1.5rem;
   padding-right: 1.5rem
@@ -532,8 +519,8 @@
   padding-bottom: 1rem
 }
 
-.pb-10 {
-  padding-bottom: 2.5rem
+.pb-11 {
+  padding-bottom: 2.75rem
 }
 
 .pl-8 {
@@ -554,10 +541,6 @@
 
 .pt-8 {
   padding-top: 2rem
-}
-
-.pb-11 {
-  padding-bottom: 2.75rem
 }
 
 .text-left {
