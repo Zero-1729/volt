@@ -21,3 +21,15 @@ type NetworkConfigType = {
     name: string; // Mainnet, Testnet, etc.
     initNode?: string; // Initial node to connect to
 };
+
+type descriptorSymbolsType = string[];
+
+export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
+
+type BDKWalletTypes =
+    | 'wpkh'
+    | 'pkh'
+    | 'p2pkh'
+    | 'shp2wpkh'
+    | 'MULTI'
+    | 'p2shp2wpkh';
