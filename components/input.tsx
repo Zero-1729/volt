@@ -60,6 +60,15 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         : 'transparent',
                 },
             ]}>
+            <InputAccessoryView nativeID={InputAccessoryViewID}>
+                <Button
+                    title="Done"
+                    onPress={() => {
+                        Keyboard.dismiss();
+                    }}
+                />
+            </InputAccessoryView>
+
             <TextInput
                 multiline
                 underlineColorAndroid="transparent"
@@ -80,15 +89,6 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                     },
                 ]}
             />
-
-            <InputAccessoryView nativeID={InputAccessoryViewID}>
-                <Button
-                    title="Done"
-                    onPress={() => {
-                        Keyboard.dismiss();
-                    }}
-                />
-            </InputAccessoryView>
 
             {props.showScanIcon ? (
                 <View
