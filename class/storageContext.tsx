@@ -15,12 +15,10 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit} from '../types/wallet';
 import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
+import {BackupMaterialTypes} from '../types/wallet';
 
-import {
-    BaseWallet,
-    BDKWalletTypeNames,
-    BackupMaterialTypes,
-} from './wallet/base';
+import {BaseWallet} from './wallet/base';
+import {BDKWalletTypeNames} from '../modules/wallet-utils';
 
 import BdkRn from 'bdk-rn';
 
