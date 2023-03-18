@@ -16,7 +16,7 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {WalletTypeNames} from '../../class/wallet/base';
+import {WalletTypeNames} from '../../modules/wallet-utils';
 
 const Info = () => {
     const tailwind = useTailwind();

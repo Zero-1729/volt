@@ -15,7 +15,7 @@ import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {WalletTypeNames} from '../../class/wallet/base';
+import {WalletTypeNames} from '../../modules/wallet-utils';
 
 import Close from '../../assets/svg/x-circle-fill-24.svg';
 

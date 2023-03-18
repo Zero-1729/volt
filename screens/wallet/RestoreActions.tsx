@@ -13,7 +13,7 @@ import {
     descriptorSymbols,
     extendedPrivs,
     extendedPubs,
-} from '../../class/wallet/base';
+} from '../../modules/wallet-utils';
 import {getExtendedKeyPrefix} from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
