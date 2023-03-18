@@ -8,7 +8,7 @@ export type LanguageType = {
 
 // The App currency Type
 // We need to know the short code of the currency, the locale and the symbol of the currency
-type CurrencyType = {
+export type CurrencyType = {
     short: string;
     symbol: string;
     locale: string;

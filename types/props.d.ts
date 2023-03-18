@@ -5,14 +5,14 @@ import {SvgProps} from 'react-native-svg';
 import {Unit} from './wallet';
 
 // Base Prop Type
-type BaseProps = PropsWithChildren<{
+export type BaseProps = PropsWithChildren<{
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     onPress?: () => void;
     disabled?: boolean;
     activeOpacity?: number;
 }>;
 
-type AppCard = BaseProps & {
+export type AppCard = BaseProps & {
     key: React.Key;
     title: string;
     description: string;
@@ -28,7 +28,7 @@ type AppCard = BaseProps & {
 };
 
 // Button prop type
-type ButtonProps = BaseProps & {
+export type ButtonProps = BaseProps & {
     backgroundColor: string;
     color?: string;
     textColor?: string;
@@ -39,13 +39,13 @@ type ButtonProps = BaseProps & {
 };
 
 // Base Card Prop Type (for reuse)
-type CardProps = BaseProps & {
+export type CardProps = BaseProps & {
     color?: string;
     backgroundColor?: string;
     label: string;
 };
 
-type WalletCardProps = CardProps & {
+export type WalletCardProps = CardProps & {
     id: string;
     walletBalance: number;
     walletType: string;
@@ -55,7 +55,7 @@ type WalletCardProps = CardProps & {
     navCallback?: () => void;
 };
 
-type BalanceProps = BaseProps & {
+export type BalanceProps = BaseProps & {
     id: string; // current id of the wallet to show balance
     fiatRate?: number;
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
@@ -65,7 +65,7 @@ type BalanceProps = BaseProps & {
 };
 
 // Base Text Input Prop Type (for reuse)
-type TextInputProps = BaseProps & {
+export type TextInputProps = BaseProps & {
     shavedHeight?: boolean;
     color: string;
     isEnabled?: boolean;
@@ -78,7 +78,7 @@ type TextInputProps = BaseProps & {
 };
 
 // Text Long Input Prop Type
-type TextLongInputProps = BaseProps &
+export type TextLongInputProps = BaseProps &
     TextInputProps & {
         borderColor?: string;
         showFolder?: boolean;
