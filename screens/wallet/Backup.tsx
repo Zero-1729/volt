@@ -26,25 +26,42 @@ const Backup = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const [backupMaterial, setBackupMaterial] = useState<string>('mnemonic');
-
     const {currentWalletID, getWalletData, isAdvancedMode} =
         useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
-
     const walletType = WalletTypeNames[walletData.type];
     const walletTypeName =
         walletType[0] +
         (isAdvancedMode ? ` (${WalletTypeNames[walletData.type][1]})` : '');
 
+    // Key material currently stored in wallet
+    const walletAvailMaterial: string =
+        walletData.secret !== ''
+            ? 'mnemonic'
+            : walletData.descriptor !== ''
+            ? 'descriptor'
+            : 'xpub';
+
+    const [backupMaterial, setBackupMaterial] =
+        useState<string>(walletAvailMaterial);
+
     const warning =
         'This material is the only way to recover your wallet. If you lose it, you will lose your funds. Please write it down and keep it in a safe place. Do not Screenshot or share it with anyone.';
 
-    const getMnemonicData = () => {
-        return backupMaterial === 'mnemonic'
-            ? walletData.secret
-            : walletData.descriptor;
+    const getQRData = () => {
+        // Only show mnemonic if mnemonic available and toggled
+        if (backupMaterial === 'mnemonic' && walletData.secret !== '') {
+            return walletData.secret;
+        }
+
+        // Shows descriptor if available or toggled
+        if (walletData.descriptor || backupMaterial === 'descriptor') {
+            return walletData.descriptor;
+        }
+
+        // Fallback to xpub, assuming first two unavailable (i.e., in case only watch only xpub restore)
+        return walletData.xpub;
     };
 
     return (
@@ -103,69 +120,130 @@ const Backup = () => {
                             ),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
-                        <PlainButton
-                            style={[tailwind('mr-4')]}
-                            disabled={backupMaterial === 'mnemonic'}
-                            onPress={() => {
-                                setBackupMaterial('mnemonic');
-                            }}>
-                            <Text
-                                style={[
-                                    tailwind(
-                                        `text-sm ${
-                                            backupMaterial === 'mnemonic'
-                                                ? 'font-bold'
-                                                : ''
-                                        }`,
-                                    ),
-                                    {
-                                        color:
-                                            backupMaterial === 'mnemonic'
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.GrayText,
-                                    },
-                                ]}>
-                                Mnemonic
-                            </Text>
-                        </PlainButton>
-                        <View
-                            style={[
-                                tailwind('h-6 w-0.5 mr-4 rounded-full'),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.CardGreyed,
-                                },
-                            ]}
-                        />
-                        <PlainButton
-                            disabled={backupMaterial === 'descriptor'}
-                            onPress={() => {
-                                setBackupMaterial('descriptor');
-                            }}>
-                            <Text
-                                style={[
-                                    tailwind(
-                                        `text-sm ${
-                                            backupMaterial === 'descriptor'
-                                                ? 'font-bold'
-                                                : ''
-                                        }`,
-                                    ),
-                                    {
-                                        color:
-                                            backupMaterial === 'descriptor'
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.GrayedText,
-                                    },
-                                ]}>
-                                Descriptor
-                            </Text>
-                        </PlainButton>
+                        {walletAvailMaterial === 'xpub' ? (
+                            <>
+                                <PlainButton
+                                    style={[tailwind('mr-4')]}
+                                    disabled={
+                                        backupMaterial === 'mnemonic' ||
+                                        walletData.secret === ''
+                                    }
+                                    onPress={() => {
+                                        setBackupMaterial('mnemonic');
+                                    }}>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                `text-sm ${
+                                                    backupMaterial ===
+                                                    'mnemonic'
+                                                        ? 'font-bold'
+                                                        : ''
+                                                }`,
+                                            ),
+                                            {
+                                                color:
+                                                    backupMaterial ===
+                                                    'mnemonic'
+                                                        ? ColorScheme.Text
+                                                              .Default
+                                                        : ColorScheme.Text
+                                                              .GrayText,
+                                            },
+                                        ]}>
+                                        Mnemonic
+                                    </Text>
+                                </PlainButton>
+                                <View
+                                    style={[
+                                        tailwind('h-6 w-0.5 mr-4 rounded-full'),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .CardGreyed,
+                                        },
+                                    ]}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <PlainButton
+                                    style={[tailwind('mr-4')]}
+                                    disabled={
+                                        backupMaterial === 'mnemonic' ||
+                                        walletData.secret === ''
+                                    }
+                                    onPress={() => {
+                                        setBackupMaterial('mnemonic');
+                                    }}>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                `text-sm ${
+                                                    backupMaterial ===
+                                                    'mnemonic'
+                                                        ? 'font-bold'
+                                                        : ''
+                                                }`,
+                                            ),
+                                            {
+                                                color:
+                                                    backupMaterial ===
+                                                    'mnemonic'
+                                                        ? ColorScheme.Text
+                                                              .Default
+                                                        : ColorScheme.Text
+                                                              .GrayText,
+                                            },
+                                        ]}>
+                                        Mnemonic
+                                    </Text>
+                                </PlainButton>
+                                <View
+                                    style={[
+                                        tailwind('h-6 w-0.5 mr-4 rounded-full'),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .CardGreyed,
+                                        },
+                                    ]}
+                                />
+                                <PlainButton
+                                    disabled={backupMaterial === 'descriptor'}
+                                    onPress={() => {
+                                        setBackupMaterial('descriptor');
+                                    }}>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                `text-sm ${
+                                                    backupMaterial ===
+                                                    'descriptor'
+                                                        ? 'font-bold'
+                                                        : ''
+                                                }`,
+                                            ),
+                                            {
+                                                color:
+                                                    backupMaterial ===
+                                                    'descriptor'
+                                                        ? ColorScheme.Text
+                                                              .Default
+                                                        : ColorScheme.Text
+                                                              .GrayedText,
+                                            },
+                                        ]}>
+                                        Descriptor
+                                    </Text>
+                                </PlainButton>
+                            </>
+                        )}
                     </View>
 
                     {/* Display QR code with seed */}
                     <View style={[tailwind('self-center mb-4')]}>
-                        <QRCode value={getMnemonicData()} size={225} />
+                        <QRCode value={getQRData()} size={225} />
                     </View>
 
                     {/* Display either seed or descriptor */}
