@@ -8,6 +8,16 @@ import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
 
 import {WalletPaths, extendedPrivs} from '../../modules/wallet-utils';
 
+type baseWalletArgs = {
+    name: string;
+    type: string;
+    secret?: string;
+    descriptor?: string;
+    xprv?: string;
+    xpub?: string;
+    network?: NetworkType | string;
+};
+
 export class BaseWallet {
     id: string;
     name: string;
@@ -42,19 +52,11 @@ export class BaseWallet {
     hardwareWalletEnabled: boolean;
     hasBackedUp: boolean;
 
-    constructor(
-        name: string,
-        type: string,
-        secret?: string,
-        descriptor?: string,
-        xprv?: string,
-        xpub?: string,
-        network?: NetworkType,
-    ) {
+    constructor(args: baseWalletArgs) {
         this.id = this._generateID(); // Unique wallet ID
-        this.name = name; // Wallet name
+        this.name = args.name; // Wallet name
 
-        this.type = type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
+        this.type = args.type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
         this.addresses = []; // List of addresses
         this.address = ''; // Temporarily generated receiving address
@@ -67,7 +69,7 @@ export class BaseWallet {
         this.balance = 0; // By default the balance is in sats
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = network ? network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
+        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
 
         this.UTXOs = []; // Set of wallet UTXOs
 
@@ -76,11 +78,11 @@ export class BaseWallet {
 
         this.derivationPath = WalletPaths[this.type]; // Wallet derivation path
 
-        this.descriptor = descriptor ? descriptor : '';
-        this.xprv = xprv ? xprv : '';
-        this.xpub = xpub ? xpub : '';
+        this.descriptor = args.descriptor ? args.descriptor : '';
+        this.xprv = args.xprv ? args.xprv : '';
+        this.xpub = args.xpub ? args.xpub : '';
 
-        this.secret = secret ? secret : '';
+        this.secret = args.secret ? args.secret : '';
 
         this.isWatchOnly = false; // Whether wallet is watch only
 
