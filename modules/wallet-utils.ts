@@ -77,7 +77,7 @@ const _getPrefix = (key: string): string => {
 export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
     const prefix = _getPrefix(key);
 
-    if (isExtendedKey(key)) {
+    if (!isExtendedKey(key)) {
         throw new Error('Invalid extended key');
     }
 
