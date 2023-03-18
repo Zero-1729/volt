@@ -179,14 +179,16 @@ const ImportAction = () => {
             const keyType = getExtendedKeyPrefix(material);
 
             // Handle import of extended key
-            errorAlert(
-                'Extended Key',
-                `Extended ${
-                    keyType === 'xprv' ? 'private' : 'public'
-                } key import not yet supported`,
-            );
+            if (keyType === 'xpub') {
+                errorAlert(
+                    'Extended Key',
+                    'Extended public key import not yet supported',
+                );
+            } else {
+                // Currently only hanlding xprvs
+                handleExtendedKey(material);
+            }
 
-            handleExtendedKey(material);
             return;
         }
 
