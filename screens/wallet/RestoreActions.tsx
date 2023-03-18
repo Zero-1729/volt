@@ -11,10 +11,11 @@ import {AppStorageContext} from '../../class/storageContext';
 import {validateMnenomic} from '../../modules/bip39';
 import {
     descriptorSymbols,
-    extendedPrivs,
-    extendedPubs,
+    isExtendedPubKey,
+    isExtendedPrvKey,
+    isExtendedKey,
+    getExtendedKeyPrefix,
 } from '../../modules/wallet-utils';
-import {getExtendedKeyPrefix} from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -129,26 +130,6 @@ const ImportAction = () => {
         return false;
     };
 
-    const isExtendedKey = (text: string) => {
-        const prefix = text.substring(0, 4);
-
-        // Preliminary length check
-        if (text.length !== 111) {
-            return false;
-        }
-
-        // Check if prefix is valid xpriv or xpub
-        // NOTE: We mean xpub and xpriv in the general BIP32 sense,
-        // where tprv, yprv, zprv, vprv, are all considered xprvs
-        // and similarly, tpub, ypub, zpub, vpub are all considered xpubs
-        // TODO: perform stricter check
-        if (extendedPrivs.includes(prefix) || extendedPubs.includes(prefix)) {
-            return true;
-        }
-
-        return false;
-    };
-
     const handleImport = () => {
         // determine if the import text is one of the following:
         // - 12 - 24 word seed
@@ -176,17 +157,24 @@ const ImportAction = () => {
 
         // Check if user provided an xpriv or xpub
         if (isExtendedKey(material)) {
-            const keyType = getExtendedKeyPrefix(material);
-
             // Handle import of extended key
-            if (keyType === 'xpub') {
+            if (isExtendedPubKey(material)) {
                 errorAlert(
                     'Extended Key',
                     'Extended public key import not yet supported',
                 );
             } else {
-                // Currently only hanlding xprvs
-                handleExtendedKey(material);
+                if (isExtendedPrvKey(material)) {
+                    // Currently only handling xprvs only
+                    handleExtendedKey(material);
+                } else {
+                    // Report unsupported extended keys
+                    liberalAlert(
+                        'Extended Key',
+                        'This extended key is unsupported',
+                        'Cancel',
+                    );
+                }
             }
 
             return;
