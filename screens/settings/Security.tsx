@@ -11,6 +11,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
 import Checkbox from 'react-native-bouncy-checkbox';
 
 import {useTailwind} from 'tailwind-rn';
@@ -34,11 +36,6 @@ const Security = () => {
     const HeadingBar = {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
-    };
-
-    const RNHapticFeedbackOptions = {
-        enableVibrateFallback: true,
-        ignoreAndroidSystemSettings: false,
     };
 
     const {hideTotalBalance, setTotalBalanceHidden} =

@@ -12,6 +12,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
 import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -34,11 +36,6 @@ const Language = () => {
     const HeadingBar = {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
-    };
-
-    const RNHapticFeedbackOptions = {
-        enableVibrateFallback: true,
-        ignoreAndroidSystemSettings: false,
     };
 
     // Retrieved from general App context provider

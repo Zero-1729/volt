@@ -6,6 +6,8 @@ import {useIsFocused, CommonActions} from '@react-navigation/native';
 
 import {runOnJS} from 'react-native-reanimated';
 
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
 import {
     useCameraDevices,
     Camera,
@@ -100,11 +102,6 @@ const Scan = ({navigation, route}) => {
     const isFocused = useIsFocused();
 
     const tailwind = useTailwind();
-
-    const RNHapticFeedbackOptions = {
-        enableVibrateFallback: true,
-        ignoreAndroidSystemSettings: false,
-    };
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message

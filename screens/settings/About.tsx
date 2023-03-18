@@ -11,6 +11,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
 import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
@@ -33,11 +35,6 @@ const About = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
-
-    const RNHapticFeedbackOptions = {
-        enableVibrateFallback: true,
-        ignoreAndroidSystemSettings: false,
-    };
 
     return (
         <SafeAreaView>
