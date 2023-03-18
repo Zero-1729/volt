@@ -14,8 +14,7 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit} from '../types/wallet';
-import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
-import {BackupMaterialTypes} from '../types/wallet';
+import {BackupMaterialTypes, NetType} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
 import {BDKWalletTypeNames} from '../modules/wallet-utils';
@@ -51,7 +50,7 @@ type defaultContextType = {
         backupMaterial: string,
         backupType: BackupMaterialTypes,
     ) => void;
-    addWallet: (name: string, type: string, network?: NetworkType) => void;
+    addWallet: (name: string, type: string, network?: NetType) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => BaseWallet;
@@ -477,7 +476,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const addWallet = useCallback(
-        async (name: string, type: string, network?: NetworkType) => {
+        async (name: string, type: string, network?: NetType) => {
             try {
                 const newWallet = new BaseWallet(
                     name,
