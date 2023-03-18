@@ -1,8 +1,12 @@
 // All Base Wallet-related Types for App
 import 'react';
 
+import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
+
+export type NetType = NetworkType | string;
+
 // UTXO Type
-type UTXOType = {
+export type UTXOType = {
     txid: string; // Transaction ID
     vout: number; // Transaction output index
     value: number; // Transaction output value in sats
@@ -11,25 +15,24 @@ type UTXOType = {
 };
 
 // Wallet Unit Type
-type Unit = {
+export type Unit = {
     name: string; // Unit name, 'sats' or 'BTC'
     symbol: string; // Unit symbol '₿' or 'sats' (see https://satsymbol.com/)
 };
 
-// Base Net Configs
-type NetworkConfigType = {
-    name: string; // Mainnet, Testnet, etc.
-    initNode?: string; // Initial node to connect to
-};
-
-type descriptorSymbolsType = string[];
+export type descriptorSymbolsType = string[];
 
 export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
 
-type BDKWalletTypes =
+export type BDKWalletTypes =
     | 'wpkh'
     | 'pkh'
     | 'p2pkh'
     | 'shp2wpkh'
     | 'MULTI'
     | 'p2shp2wpkh';
+
+export type extendedKeyInfoType = {
+    network: NetworkType;
+    type: string; // Wallet type
+};
