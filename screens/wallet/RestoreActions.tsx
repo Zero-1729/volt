@@ -90,8 +90,15 @@ const ImportAction = () => {
         // TODO: perform descriptor validity check
     };
 
-    const handleExtendedKey = (extendedKey: string) => {
-        // TODO: perform checksum check here
+    const handleExtendedKey = async (extendedKey: string) => {
+        try {
+            // TODO: perform checksum check
+            await restoreWallet(extendedKey, getExtendedKeyPrefix(extendedKey));
+
+            handleSuccessRoute();
+        } catch (e: any) {
+            errorAlert(e.message, 'Error importing key');
+        }
     };
 
     const isMnemonic = (text: string) => {
