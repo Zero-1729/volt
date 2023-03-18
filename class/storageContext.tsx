@@ -88,7 +88,7 @@ const defaultContext: defaultContextType = {
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
-        return new BaseWallet('test wallet', 'bech32', '');
+        return new BaseWallet({name: 'test wallet', type: 'bech32'});
     }, // Function grabs wallet data through a fetch by index via ids
 };
 
@@ -460,15 +460,19 @@ export const AppStorageProvider = ({children}: Props) => {
             backupMaterial: string,
             backupMaterialType: BackupMaterialTypes,
         ) => {
+            const walletArgs = {
+                name: 'Restored Wallet',
+                type: 'bech32', // Allow user to set in advanced mode or guess it from wallet scan
+                secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
+                descriptor:
+                    backupMaterialType === 'descriptor' ? backupMaterial : '',
+                xprv: backupMaterialType === 'xprv' ? backupMaterial : '',
+                xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
+                network: 'testnet',
+            };
+
             // Handle material according to type
-            const newWallet = new BaseWallet(
-                'Restored wallet',
-                'bech32', // Allow user to set in advanced mode or guess it from wallet scan
-                backupMaterialType === 'mnemonic' ? backupMaterial : '',
-                backupMaterialType === 'descriptor' ? backupMaterial : '',
-                backupMaterialType === 'xprv' ? backupMaterial : '',
-                backupMaterialType === 'xpub' ? backupMaterial : '',
-            );
+            const newWallet = new BaseWallet(walletArgs);
 
             await _addNewWallet(newWallet, true);
         },
@@ -478,15 +482,11 @@ export const AppStorageProvider = ({children}: Props) => {
     const addWallet = useCallback(
         async (name: string, type: string, network?: NetType) => {
             try {
-                const newWallet = new BaseWallet(
-                    name,
-                    type,
-                    '',
-                    '',
-                    '',
-                    '',
-                    network,
-                );
+                const newWallet = new BaseWallet({
+                    name: name,
+                    type: type,
+                    network: network,
+                });
 
                 await _addNewWallet(newWallet);
             } catch (e) {
