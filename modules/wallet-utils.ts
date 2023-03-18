@@ -1,7 +1,3 @@
-import * as BIP39 from 'bip39';
-import * as BIP32Utils from 'bip32-utils';
-
-
 import {
     descriptorSymbolsType,
     BackupMaterialTypes,
