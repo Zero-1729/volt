@@ -114,7 +114,7 @@ const ImportAction = () => {
         // numbers or descriptor symbols
         // TODO: implement a stricter pattern check
         if (
-            descriptorSymbols.some(symbol => text.includes(symbol)) &&
+            descriptorSymbols.some((symbol: string) => text.includes(symbol)) &&
             hasDigits
         ) {
             return true;
