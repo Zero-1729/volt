@@ -30,6 +30,17 @@ export const liberalAlert = (
     ]);
 };
 
+export const conservativeAlert = (heading: string, msg: string): void => {
+    RNHapticFeedback.trigger('notificationSuccess', RNHapticFeedbackOptions);
+
+    Alert.alert(heading, msg, [
+        {
+            text: 'Ok',
+            onPress: () => {},
+        },
+    ]);
+};
+
 export const DeletionAlert = (
     heading: string,
     msg: string,
