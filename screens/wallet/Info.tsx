@@ -39,14 +39,17 @@ const Info = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    // TODO: grab from Wallet store data
+    const walletName = walletData.name;
     const walletPath = walletData.derivationPath;
     const walletType = WalletTypeNames[walletData.type];
     const walletTypeName =
         walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
-    const walletFingerprint = walletData.masterFingerprint;
-    const walletName = walletData.name;
-    const walletDescriptor = walletData.descriptor;
+    const walletFingerprint = walletData.masterFingerprint
+        ? walletData.masterFingerprint
+        : '-';
+    const walletDescriptor = walletData.descriptor
+        ? walletData.descriptor
+        : '-';
 
     const [tmpName, setTmpName] = useState(walletName);
 
