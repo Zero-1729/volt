@@ -17,7 +17,7 @@ import {Unit} from '../types/wallet';
 import {BackupMaterialTypes, NetType} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
-import {BDKWalletTypeNames} from '../modules/wallet-utils';
+import {BDKWalletTypeNames, extendedKeyInfo} from '../modules/wallet-utils';
 
 import BdkRn from 'bdk-rn';
 
@@ -470,6 +470,17 @@ export const AppStorageProvider = ({children}: Props) => {
                 xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
                 network: 'testnet',
             };
+
+            if (
+                backupMaterialType === 'xprv' ||
+                backupMaterialType === 'xpub'
+            ) {
+                // Get extended key info based on the first letter prefix
+                const {network, type} = extendedKeyInfo[backupMaterial[0]];
+
+                walletArgs.network = network;
+                walletArgs.type = type;
+            }
 
             // Handle material according to type
             const newWallet = new BaseWallet(walletArgs);
