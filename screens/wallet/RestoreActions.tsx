@@ -14,6 +14,7 @@ import {
     extendedPrivs,
     extendedPubs,
 } from '../../class/wallet/base';
+import {getExtendedKeyPrefix} from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -168,8 +169,7 @@ const ImportAction = () => {
 
         // Check if user provided an xpriv or xpub
         if (isExtendedKey(material)) {
-            const prefix = material.substring(0, 4);
-            const keyType = extendedPrivs.includes(prefix) ? 'xprv' : 'xpub';
+            const keyType = getExtendedKeyPrefix(material);
 
             // Handle import of extended key
             errorAlert(
