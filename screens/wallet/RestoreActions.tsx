@@ -27,7 +27,11 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-import {liberalAlert, errorAlert} from '../../components/alert';
+import {
+    conservativeAlert,
+    liberalAlert,
+    errorAlert,
+} from '../../components/alert';
 
 const ImportAction = () => {
     const navigation = useNavigation();
@@ -67,7 +71,7 @@ const ImportAction = () => {
 
     const handleSuccessRoute = () => {
         // Simple helper to show successful import and navigate back home
-        liberalAlert('Success', 'Wallet restored successfully', 'OK');
+        conservativeAlert('Success', 'Wallet restored successfully');
 
         navigation.getParent()?.dispatch(StackActions.popToTop());
     };
