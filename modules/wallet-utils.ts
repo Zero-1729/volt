@@ -17,6 +17,42 @@ export const WalletPaths: {[index: string]: string} = {
     p2sh: "m/49'/0'/0'",
 };
 
+// Version bytes as described here:
+// https://github.com/satoshilabs/slips/blob/master/slip-0132.md
+/*
+    Bitcoin	0488b21e - xpub	0488ade4 - xprv	P2PKH or P2SH	m/44'/0'
+    Bitcoin	049d7cb2 - ypub	049d7878 - yprv	P2WPKH in P2SH	m/49'/0'
+    Bitcoin	04b24746 - zpub	04b2430c - zprv	P2WPKH	m/84'/0'
+    Bitcoin	0295b43f - Ypub	0295b005 - Yprv	Multi-signature P2WSH in P2SH	-
+    Bitcoin	02aa7ed3 - Zpub	02aa7a99 - Zprv	Multi-signature P2WSH	-
+
+    Bitcoin Testnet	043587cf - tpub	04358394 - tprv	P2PKH or P2SH	m/44'/1'
+    Bitcoin Testnet	044a5262 - upub	044a4e28 - uprv	P2WPKH in P2SH	m/49'/1'
+    Bitcoin Testnet	045f1cf6 - vpub	045f18bc - vprv	P2WPKH	m/84'/1'
+    Bitcoin Testnet	024289ef - Upub	024285b5 - Uprv	Multi-signature P2WSH in P2SH	-
+    Bitcoin Testnet	02575483 - Vpub	02575048 - Vprv
+*/
+// Note: Might support Y/Z and T/U/V privs and pubs
+const _validXpubPrefixes = new Map([
+    // xpub
+    ['xpub', '0488b21e'],
+    ['ypub', '049d7cb2'],
+    ['zpub', '04b24746'],
+    ['tpub', '043587cf'],
+    ['upub', '044a5262'],
+    ['vpub', '045f1cf6'],
+]);
+
+const _validXprvPrefixes = new Map([
+    // xprv
+    ['xprv', '0488ade4'],
+    ['yprv', '049d7878'],
+    ['zprv', '04b2430c'],
+    ['tprv', '04358394'],
+    ['uprv', '044a4e28'],
+    ['vprv', '045f18bc'],
+]);
+
 export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
     // mainnet / bitcoin
     x: {network: 'bitcoin', type: 'legacy'}, // Account path P2PKH (legacy) [1...]
@@ -28,11 +64,6 @@ export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
     u: {network: 'testnet', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
     v: {network: 'testnet', type: 'bech32'}, // Account path P2WPKH [bc1...]
 };
-
-// Note: Might support X/Y/Z and T/U/V privs and pubs
-// For now, we only support these three account types for both mainnet & testnet
-export const extendedPrivs = ['xprv', 'yprv', 'tprv', 'zprv', 'vprv'];
-export const extendedPubs = ['xpub', 'ypub', 'tpub', 'zpub', 'vpub'];
 
 export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
     MNEMONIC: 'mnemonic',
@@ -54,15 +85,11 @@ export const descriptorSymbols: descriptorSymbolsType = [
     '*',
 ];
 
+// Extended key regexes
 export const extendedKeyPattern: RegExp =
     /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-export const xpubPrefixPattern: RegExp = /^([xyztuv]pub)$/;
-export const xprvPrefixPattern: RegExp = /^([xyztuv]prv)$/;
 const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-
-export const extendedKeyPrefix: RegExp = /^([xyztuv])(prv|pub)$/;
-export const unsupportedExtendedKeyPrefix: RegExp = /^([XYZTUV])(prv|pub)$/;
 
 export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
     bech32: 'wpkh',
