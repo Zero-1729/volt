@@ -60,14 +60,18 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         : 'transparent',
                 },
             ]}>
-            <InputAccessoryView nativeID={InputAccessoryViewID}>
-                <Button
-                    title="Done"
-                    onPress={() => {
-                        Keyboard.dismiss();
-                    }}
-                />
-            </InputAccessoryView>
+            {Platform.OS === 'ios' ? (
+                <InputAccessoryView nativeID={InputAccessoryViewID}>
+                    <Button
+                        title="Done"
+                        onPress={() => {
+                            Keyboard.dismiss();
+                        }}
+                    />
+                </InputAccessoryView>
+            ) : (
+                <></>
+            )}
 
             <TextInput
                 multiline
