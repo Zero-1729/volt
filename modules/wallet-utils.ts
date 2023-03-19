@@ -1,3 +1,6 @@
+import * as b58c from 'bs58check';
+import {Buffer} from 'buffer';
+
 import {
     descriptorSymbolsType,
     BackupMaterialTypes,
@@ -143,4 +146,32 @@ export const isValidExtendedKey = (key: string): boolean => {
     // and similarly, tpub, ypub, zpub, vpub are all considered xpubs
     // TODO: perform checksum check
     return true;
+};
+
+// Based on Jlopp's code here:
+// https://github.com/jlopp/xpub-converter
+export const convert_xpub = (xpub: string, pub_prefix: string): string => {
+    // Grab new xpub version to convert to
+    const ver = _validXpubPrefixes.get(pub_prefix);
+
+    // Make sure the version is a valid one we support
+    if (!ver) {
+        throw new Error('Invalid extended public key version');
+    }
+
+    try {
+        // Get the decoded key from trimmed xpub
+        const decoded = b58c.decode(xpub.trim());
+
+        // Cut off prefix to include new xpub version
+        const data = decoded.slice(4);
+        // Re-attach data with new prefix
+        const nPub = Buffer.concat([Buffer.from(ver, 'hex'), data]);
+
+        // Return new Base58 formatted key
+        return b58c.encode(nPub);
+    } catch (e) {
+        // Assume an invalid key if unable to disassemble and re-assemble
+        throw new Error('Invalid extended public key');
+    }
 };
