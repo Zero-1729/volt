@@ -4,10 +4,10 @@ import * as bip39 from '../../modules/bip39';
 
 import {Unit, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
 
-import {WalletPaths, extendedPrivs} from '../../modules/wallet-utils';
-
-type baseWalletArgs = {
-    name: string;
+import {
+    WalletPaths,
+    hasExtendedPubKeyPattern,
+} from '../../modules/wallet-utils';
 
 export class BaseWallet {
     id: string;
@@ -98,7 +98,9 @@ export class BaseWallet {
         if (isWatchOnly === undefined) {
             const noPrivKeys =
                 this.secret.length === 0 && this.xprv.length === 0;
-            const noPrivKeyDescriptor = !extendedPrivs.includes(
+
+            // Naively check if extended key present
+            const noPrivKeyDescriptor = !hasExtendedPubKeyPattern.test(
                 this.descriptor,
             );
 
