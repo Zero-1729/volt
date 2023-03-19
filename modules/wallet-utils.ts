@@ -54,6 +54,8 @@ const _validExtendedKeyPrefixes = new Map([
     ['vprv', '045f18bc'],
 ]);
 
+export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
+
 export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
     // mainnet / bitcoin
     x: {network: 'bitcoin', type: 'legacy'}, // Account path P2PKH (legacy) [1...]
