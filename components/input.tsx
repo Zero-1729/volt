@@ -76,9 +76,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
             <TextInput
                 multiline
                 underlineColorAndroid="transparent"
-                keyboardType={
-                    Platform.OS === 'android' ? 'visible-password' : 'default'
-                }
+                keyboardType={'default'}
                 spellCheck={false}
                 autoCorrect={false}
                 autoCapitalize="none"
