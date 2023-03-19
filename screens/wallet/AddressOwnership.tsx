@@ -73,7 +73,7 @@ const AddressOwnership = () => {
                     ]}>
                     <Text
                         style={[
-                            tailwind('text-xl font-bold'),
+                            tailwind('text-lg font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         Address Ownership

@@ -79,7 +79,7 @@ const Backup = () => {
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-xl font-bold'),
+                                tailwind('text-lg font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             Backup Material
