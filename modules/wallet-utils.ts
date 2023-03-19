@@ -109,7 +109,7 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
         throw new Error('Invalid extended key');
     }
 
-    if (!_validXprvPrefixes.has(prefix) || !_validXpubPrefixes.has(prefix)) {
+    if (!_validExtendedKeyPrefixes.has(prefix)) {
         throw new Error('Unsupported extended key');
     }
 
@@ -167,7 +167,7 @@ const doubleSha256 = (data: Buffer) => {
 // https://github.com/jlopp/xpub-converter
 export const convert_xpub = (xpub: string, pub_prefix: string): string => {
     // Grab new xpub version to convert to
-    const ver = _validXpubPrefixes.get(pub_prefix);
+    const ver = _validExtendedKeyPrefixes.get(pub_prefix);
 
     // Make sure the version is a valid one we support
     if (!ver) {
