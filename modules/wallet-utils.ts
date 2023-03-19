@@ -87,7 +87,7 @@ export const descriptorSymbols: descriptorSymbolsType = [
 ];
 
 // Extended key regexes
-export const extendedKeyPattern: RegExp =
+const _extendedKeyPattern: RegExp =
     /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
@@ -131,7 +131,7 @@ export const isExtendedKey = (key: string): boolean => {
     }
 
     // Pattern check
-    return extendedKeyPattern.test(key);
+    return _extendedKeyPattern.test(key);
 };
 
 // Get network and account path info from extended key
