@@ -111,7 +111,11 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
         throw new Error('Invalid extended key');
     }
 
-    return xpubPrefixPattern.test(prefix) ? 'xpub' : 'xprv';
+    if (!_validXprvPrefixes.has(prefix) || !_validXpubPrefixes.has(prefix)) {
+        throw new Error('Unsupported extended key');
+    }
+
+    return prefix.slice(1) === 'pub' ? 'xpub' : 'xprv';
 };
 
 export const isExtendedPubKey = (key: string): boolean => {
