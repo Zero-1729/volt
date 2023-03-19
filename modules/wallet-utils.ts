@@ -1,4 +1,5 @@
 import * as b58c from 'bs58check';
+import Crypto from 'react-native-quick-crypto';
 import {Buffer} from 'buffer';
 
 import {
@@ -155,6 +156,14 @@ export const isValidExtendedKey = (key: string): boolean => {
 // Deserialize Extended Key
 const _deserializeExtendedKey = (key: string): Buffer => {
     return b58c.decode(key);
+};
+
+const doubleSha256 = (data: Buffer) => {
+    const hashed = Crypto.createHash('sha256').update(data).digest();
+    const hashed1 = Crypto.createHash('sha256').update(hashed).digest();
+
+    // Return sha256(sha256(data))
+    return hashed1;
 };
 
 // Based on Jlopp's code here:
