@@ -154,13 +154,13 @@ export const WalletCard = (props: WalletCardProps) => {
                         <View
                             style={[
                                 tailwind(
-                                    'left-0 bg-white w-full py-1 rounded-bl-md rounded-tr-sm absolute bottom-0 self-center opacity-40',
+                                    'left-0 bg-white w-full py-1 rounded-bl-md rounded-tr-sm absolute bottom-0 self-center opacity-60',
                                 ),
                             ]}>
                             <Text
                                 style={[
                                     tailwind(
-                                        'text-xs self-end pr-4 font-medium',
+                                        'text-xs self-end pr-4 font-medium text-black',
                                     ),
                                     Font.RobotoText,
                                 ]}>
