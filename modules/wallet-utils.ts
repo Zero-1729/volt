@@ -37,7 +37,7 @@ export const WalletPaths: {[index: string]: string} = {
     Bitcoin Testnet	02575483 - Vpub	02575048 - Vprv
 */
 // Note: Might support Y/Z and T/U/V privs and pubs
-const _validXpubPrefixes = new Map([
+const _validExtendedKeyPrefixes = new Map([
     // xpub
     ['xpub', '0488b21e'],
     ['ypub', '049d7cb2'],
@@ -45,9 +45,6 @@ const _validXpubPrefixes = new Map([
     ['tpub', '043587cf'],
     ['upub', '044a5262'],
     ['vpub', '045f1cf6'],
-]);
-
-const _validXprvPrefixes = new Map([
     // xprv
     ['xprv', '0488ade4'],
     ['yprv', '049d7878'],
