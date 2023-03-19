@@ -3,7 +3,7 @@ import 'react';
 
 import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
 
-export type NetType = NetworkType | string;
+export type NetType = NetworkType;
 
 // UTXO Type
 export type UTXOType = {
@@ -24,6 +24,16 @@ export type descriptorSymbolsType = string[];
 
 export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
 
+export type baseWalletArgs = {
+    name: string;
+    type: string;
+    secret?: string;
+    descriptor?: string;
+    xprv?: string;
+    xpub?: string;
+    network?: NetType;
+};
+
 export type BDKWalletTypes =
     | 'wpkh'
     | 'pkh'
@@ -33,6 +43,6 @@ export type BDKWalletTypes =
     | 'p2shp2wpkh';
 
 export type extendedKeyInfoType = {
-    network: NetworkType;
+    network: NetType;
     type: string; // Wallet type
 };
