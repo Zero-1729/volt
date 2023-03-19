@@ -152,6 +152,11 @@ export const isValidExtendedKey = (key: string): boolean => {
     return true;
 };
 
+// Deserialize Extended Key
+const _deserializeExtendedKey = (key: string): Buffer => {
+    return b58c.decode(key);
+};
+
 // Based on Jlopp's code here:
 // https://github.com/jlopp/xpub-converter
 export const convert_xpub = (xpub: string, pub_prefix: string): string => {
