@@ -161,24 +161,18 @@ const ImportAction = () => {
 
         // Check if user provided an xpriv or xpub
         if (isExtendedKey(material)) {
+            // TODO: Perform Checksum check here
+
             // Handle import of extended key
-            if (isExtendedPubKey(material)) {
-                errorAlert(
-                    'Extended Key',
-                    'Extended public key import not yet supported',
-                );
+            if (isExtendedPubKey(material) || isExtendedPrvKey(material)) {
+                handleExtendedKey(material);
             } else {
-                if (isExtendedPrvKey(material)) {
-                    // Currently only handling xprvs only
-                    handleExtendedKey(material);
-                } else {
-                    // Report unsupported extended keys
-                    liberalAlert(
-                        'Extended Key',
-                        'This extended key is unsupported',
-                        'Cancel',
-                    );
-                }
+                // Report unsupported extended keys
+                liberalAlert(
+                    'Extended Key',
+                    'This extended key is unsupported',
+                    'Cancel',
+                );
             }
 
             return;
