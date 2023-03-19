@@ -252,6 +252,35 @@ const Settings = () => {
                         </View>
                     </PlainButton>
 
+                    <PlainButton
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({name: 'SettingsTools'}),
+                            );
+                        }}>
+                        <View
+                            style={[
+                                tailwind(
+                                    'items-center flex-row justify-between mt-2 mb-6',
+                                ),
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm font-medium'),
+                                    {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
+                                ]}>
+                                Tools
+                            </Text>
+
+                            <Right
+                                width={16}
+                                stroke={ColorScheme.SVG.GrayFill}
+                                fill={ColorScheme.SVG.GrayFill}
+                            />
+                        </View>
+                    </PlainButton>
+
                     <View
                         style={[
                             tailwind(
