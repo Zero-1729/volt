@@ -2,19 +2,12 @@ import Crypto from 'crypto';
 
 import * as bip39 from '../../modules/bip39';
 
-import {Unit, UTXOType, NetType} from './../../types/wallet';
+import {Unit, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
 
 import {WalletPaths, extendedPrivs} from '../../modules/wallet-utils';
 
 type baseWalletArgs = {
     name: string;
-    type: string;
-    secret?: string;
-    descriptor?: string;
-    xprv?: string;
-    xpub?: string;
-    network?: NetType;
-};
 
 export class BaseWallet {
     id: string;

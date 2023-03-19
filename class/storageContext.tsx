@@ -14,7 +14,7 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit} from '../types/wallet';
-import {BackupMaterialTypes, NetType} from '../types/wallet';
+import {BackupMaterialTypes, NetType, baseWalletArgs} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
 import {BDKWalletTypeNames, extendedKeyInfo} from '../modules/wallet-utils';
@@ -483,7 +483,7 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Handle material according to type
-            const newWallet = new BaseWallet(walletArgs);
+            const newWallet = new BaseWallet(walletArgs as baseWalletArgs);
 
             await _addNewWallet(newWallet, true);
         },
