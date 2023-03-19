@@ -21,6 +21,8 @@ import Close from '../../assets/svg/x-circle-fill-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
+import {getExtendedKeyPrefix} from '../../modules/wallet-utils';
+
 const Backup = () => {
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -123,7 +125,6 @@ const Backup = () => {
                         {walletAvailMaterial === 'xpub' ? (
                             <>
                                 <PlainButton
-                                    style={[tailwind('mr-4')]}
                                     disabled={
                                         backupMaterial === 'mnemonic' ||
                                         walletData.secret === ''
@@ -151,19 +152,14 @@ const Backup = () => {
                                                               .GrayText,
                                             },
                                         ]}>
-                                        Mnemonic
+                                        Extended Key{' '}
+                                        {'(' +
+                                            getExtendedKeyPrefix(
+                                                walletData.xpub,
+                                            ).toUpperCase() +
+                                            ')'}
                                     </Text>
                                 </PlainButton>
-                                <View
-                                    style={[
-                                        tailwind('h-6 w-0.5 mr-4 rounded-full'),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background
-                                                    .CardGreyed,
-                                        },
-                                    ]}
-                                />
                             </>
                         ) : (
                             <>
@@ -261,9 +257,7 @@ const Backup = () => {
                                 backupMaterial === 'mnemonic' ? 2 : 1
                             }
                             ellipsizeMode={'middle'}>
-                            {backupMaterial === 'mnemonic'
-                                ? walletData.secret
-                                : walletData.descriptor}
+                            {getQRData()}
                         </Text>
                     </PlainButton>
 
