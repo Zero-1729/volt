@@ -170,7 +170,7 @@ export const convert_xpub = (xpub: string, pub_prefix: string): string => {
 
     try {
         // Get the decoded key from trimmed xpub
-        const decoded = b58c.decode(xpub.trim());
+        const decoded = _deserializeExtendedKey(xpub.trim());
 
         // Cut off prefix to include new xpub version
         const data = decoded.slice(4);
