@@ -89,6 +89,8 @@ export const descriptorSymbols: descriptorSymbolsType = [
 // Extended key regexes
 const _extendedKeyPattern: RegExp =
     /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
+export const hasExtendedPubKeyPattern: RegExp =
+    /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 
