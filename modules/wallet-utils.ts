@@ -167,7 +167,7 @@ const doubleSha256 = (data: Buffer) => {
 
 // Based on Jlopp's code here:
 // https://github.com/jlopp/xpub-converter
-export const convert_xpub = (xpub: string, pub_prefix: string): string => {
+export const convertXPUB = (xpub: string, pub_prefix: string): string => {
     // Grab new xpub version to convert to
     const ver = _validExtendedKeyPrefixes.get(pub_prefix);
 
