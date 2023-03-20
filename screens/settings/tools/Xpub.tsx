@@ -142,7 +142,7 @@ const Xpub = () => {
                 </View>
 
                 {/* Dropdown */}
-                <View style={[tailwind('mt-6 w-5/6 self-center')]}>
+                <View style={[tailwind('mt-6 w-5/6 self-center z-50')]}>
                     <Text
                         style={[
                             tailwind('text-sm'),
