@@ -39,6 +39,10 @@ const Info = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
+    const capitalize = (text: string) => {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    };
+
     const walletName = walletData.name;
     const walletPath = walletData.derivationPath;
     const walletType = WalletTypeNames[walletData.type];
