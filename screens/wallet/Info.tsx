@@ -39,14 +39,10 @@ const Info = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const capitalize = (text: string) => {
-        return text.charAt(0).toUpperCase() + text.slice(1);
-    };
-
     const walletName = walletData.name;
     const walletPath = walletData.derivationPath;
     const walletType = WalletTypeNames[walletData.type];
-    const walletNetwork = capitalize(walletData.network);
+    const walletNetwork = walletData.network;
     const walletTypeName =
         walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
     const walletFingerprint = walletData.masterFingerprint
@@ -203,7 +199,7 @@ const Info = () => {
                         <PlainButton>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
+                                    tailwind('text-sm capitalize'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
                                 {walletNetwork}

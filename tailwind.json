@@ -782,6 +782,11 @@
 			"fontWeight": "500"
 		}
 	},
+	"capitalize": {
+		"style": {
+			"textTransform": "capitalize"
+		}
+	},
 	"text-black": {
 		"style": {
 			"--tw-text-opacity": 1,
@@ -803,11 +808,6 @@
 	"opacity-20": {
 		"style": {
 			"opacity": 0.2
-		}
-	},
-	"opacity-30": {
-		"style": {
-			"opacity": 0.3
 		}
 	},
 	"opacity-40": {
