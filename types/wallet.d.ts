@@ -44,3 +44,8 @@ export type extendedKeyInfoType = {
     network: NetType;
     type: string; // Wallet type
 };
+
+export type accountPaths = {
+    bitcoin: string;
+    testnet: string;
+};
