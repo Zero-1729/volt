@@ -67,7 +67,7 @@ export class BaseWallet {
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
 
-        this.derivationPath = WalletPaths[this.type]; // Wallet derivation path
+        this.derivationPath = WalletPaths[this.type][this.network]; // Wallet derivation path
 
         this.descriptor = args.descriptor ? args.descriptor : '';
         this.xprv = args.xprv ? args.xprv : '';
