@@ -1,9 +1,7 @@
 // All Base Wallet-related Types for App
 import 'react';
 
-import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
-
-export type NetType = NetworkType;
+export type NetType = 'bitcoin' | 'testnet';
 
 // UTXO Type
 export type UTXOType = {
