@@ -46,6 +46,7 @@ const Info = () => {
     const walletName = walletData.name;
     const walletPath = walletData.derivationPath;
     const walletType = WalletTypeNames[walletData.type];
+    const walletNetwork = capitalize(walletData.network);
     const walletTypeName =
         walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
     const walletFingerprint = walletData.masterFingerprint
@@ -145,9 +146,9 @@ const Info = () => {
                 <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
                 {/* Wallet Info */}
-                {/* Wallet Type Path and Derivation Path */}
+                {/* Wallet Type Path and Master Fingerprint */}
                 <View style={[tailwind('w-5/6 flex-row justify-start')]}>
-                    <View>
+                    <View style={[tailwind('w-1/2')]}>
                         <Text
                             style={[
                                 tailwind('text-sm mr-16 mb-2'),
@@ -167,10 +168,53 @@ const Info = () => {
                         </PlainButton>
                     </View>
 
-                    <View>
+                    <View style={[tailwind('w-1/2')]}>
                         <Text
                             style={[
                                 tailwind('text-sm mb-2'),
+                                {color: ColorScheme.Text.GrayedText},
+                            ]}>
+                            Master Fingerprint
+                        </Text>
+
+                        <PlainButton>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {walletFingerprint}
+                            </Text>
+                        </PlainButton>
+                    </View>
+                </View>
+
+                {/* Wallet Network and Type */}
+                <View style={[tailwind('w-5/6 mt-6 flex-row justify-start')]}>
+                    <View style={[tailwind('w-1/2')]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm mb-2'),
+                                {color: ColorScheme.Text.GrayedText},
+                            ]}>
+                            Network
+                        </Text>
+
+                        <PlainButton>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {walletNetwork}
+                            </Text>
+                        </PlainButton>
+                    </View>
+
+                    <View style={[tailwind('w-1/2')]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm mr-16 mb-2'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
                             Type
@@ -186,27 +230,6 @@ const Info = () => {
                             </Text>
                         </PlainButton>
                     </View>
-                </View>
-
-                {/* Wallet Fingerprint */}
-                <View style={[tailwind('w-5/6 mt-6')]}>
-                    <Text
-                        style={[
-                            tailwind('text-sm mb-2'),
-                            {color: ColorScheme.Text.GrayedText},
-                        ]}>
-                        Master Fingerprint
-                    </Text>
-
-                    <PlainButton>
-                        <Text
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {walletFingerprint}
-                        </Text>
-                    </PlainButton>
                 </View>
 
                 {/* Wallet Descriptor */}
