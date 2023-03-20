@@ -45,7 +45,7 @@ const Info = () => {
     const walletTypeName =
         walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
     const walletFingerprint = walletData.masterFingerprint
-        ? walletData.masterFingerprint
+        ? walletData.masterFingerprint.toUpperCase()
         : '-';
     const walletDescriptor = walletData.descriptor
         ? walletData.descriptor
