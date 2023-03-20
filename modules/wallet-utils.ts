@@ -7,6 +7,7 @@ import {
     BackupMaterialTypes,
     BDKWalletTypes,
     extendedKeyInfoType,
+    accountPaths,
 } from '../types/wallet';
 
 export const WalletTypeNames: {[index: string]: string[]} = {
@@ -15,10 +16,42 @@ export const WalletTypeNames: {[index: string]: string[]} = {
     p2sh: ['Segwit', 'P2SH'],
 };
 
-export const WalletPaths: {[index: string]: string} = {
-    bech32: "m/84'/0'/0'",
-    legacy: "m/44'/0'/0'",
-    p2sh: "m/49'/0'/0'",
+// Based on BIP44 definitions
+// See here: https://en.bitcoin.it/wiki/BIP_0044#Registered_coin_types
+/*
+    Coin	            Account	    Chain	      Address	  Path
+    --------------      -------     --------      -------     -------------------------
+    Bitcoin	            first	     external	   first	    m / 44' / 0' / 0' / 0 / 0
+    Bitcoin	            first	     external	   second	   m / 44' / 0' / 0' / 0 / 1
+
+    Bitcoin	            first        change	       first	    m / 44' / 0' / 0' / 1 / 0
+    Bitcoin	            first	     change	       second	   m / 44' / 0' / 0' / 1 / 1
+
+    Bitcoin	            second	    external	  first	       m / 44' / 0' / 1' / 0 / 0
+    Bitcoin	            second	    external	  second	  m / 44' / 0' / 1' / 0 / 1
+
+    Bitcoin	            second	    change	      first	       m / 44' / 0' / 1' / 1 / 0
+    Bitcoin	            second	    change	      second	  m / 44' / 0' / 1' / 1 / 1
+
+
+
+    Bitcoin Testnet	    first	     external	   first	    m / 44' / 1' / 0' / 0 / 0
+    Bitcoin Testnet	    first	     external	   second	   m / 44' / 1' / 0' / 0 / 1
+
+    Bitcoin Testnet	    first	     change	       first	    m / 44' / 1' / 0' / 1 / 0
+    Bitcoin Testnet	    first	     change	       second	   m / 44' / 1' / 0' / 1 / 1
+
+    Bitcoin Testnet	    second	    external	  first	       m / 44' / 1' / 1' / 0 / 0
+    Bitcoin Testnet	    second	    external	  second	  m / 44' / 1' / 1' / 0 / 1
+
+    Bitcoin Testnet	    second	    change	      first	       m / 44' / 1' / 1' / 1 / 0
+    Bitcoin Testnet	    second	    change	      second	  m / 44' / 1' / 1' / 1 / 1
+
+*/
+export const WalletPaths: {[index: string]: accountPaths} = {
+    bech32: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
+    legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/84'/1'/0'"},
+    p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/84'/1'/0'"},
 };
 
 // Version bytes as described here:
