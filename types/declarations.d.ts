@@ -6,4 +6,3 @@ declare module '*.svg' {
 }
 
 declare module 'bitcoinjs-lib';
-declare module 'bs58check';
