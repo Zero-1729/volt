@@ -14,6 +14,7 @@ import {
     isSupportedExtKey,
     isExtendedKey,
     getExtendedKeyPrefix,
+    isValidExtendedKey,
 } from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
@@ -96,7 +97,6 @@ const ImportAction = () => {
 
     const handleExtendedKey = async (extendedKey: string) => {
         try {
-            // TODO: perform checksum check
             await restoreWallet(extendedKey, getExtendedKeyPrefix(extendedKey));
 
             handleSuccessRoute();
@@ -160,7 +160,7 @@ const ImportAction = () => {
 
         // Check if user provided an xpriv or xpub
         if (isExtendedKey(material)) {
-            // Handle import of extended key
+            // Check if ext key is supported
             if (!isSupportedExtKey(material)) {
                 // Report unsupported extended keys
                 liberalAlert(
@@ -168,10 +168,20 @@ const ImportAction = () => {
                     'This extended key is unsupported',
                     'Cancel',
                 );
-
                 return;
             }
 
+            // Perform a checksum check
+            try {
+                isValidExtendedKey(material);
+            } catch (e: any) {
+                // Report invalid ext key
+                errorAlert('Extended Key', e.message);
+                return;
+            }
+
+            // Handle import of support valid extended key
+            handleExtendedKey(material);
             return;
         }
 
