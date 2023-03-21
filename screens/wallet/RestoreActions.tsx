@@ -11,8 +11,7 @@ import {AppStorageContext} from '../../class/storageContext';
 import {validateMnenomic} from '../../modules/bip39';
 import {
     descriptorSymbols,
-    isExtendedPubKey,
-    isExtendedPrvKey,
+    isSupportedExtKey,
     isExtendedKey,
     getExtendedKeyPrefix,
 } from '../../modules/wallet-utils';
@@ -161,18 +160,16 @@ const ImportAction = () => {
 
         // Check if user provided an xpriv or xpub
         if (isExtendedKey(material)) {
-            // TODO: Perform Checksum check here
-
             // Handle import of extended key
-            if (isExtendedPubKey(material) || isExtendedPrvKey(material)) {
-                handleExtendedKey(material);
-            } else {
+            if (!isSupportedExtKey(material)) {
                 // Report unsupported extended keys
                 liberalAlert(
                     'Extended Key',
                     'This extended key is unsupported',
                     'Cancel',
                 );
+
+                return;
             }
 
             return;
