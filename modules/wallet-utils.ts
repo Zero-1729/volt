@@ -137,7 +137,7 @@ export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
 };
 
 const _getPrefix = (key: string): string => {
-    return key.substring(0, 4);
+    return key.slice(0, 4);
 };
 
 export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
@@ -177,11 +177,19 @@ export const getInfoFromXKey = (key: string) => {
 };
 
 export const isValidExtendedKey = (key: string): boolean => {
-    // NOTE: We mean xpub and xpriv in the general BIP32 sense,
-    // where tprv, yprv, zprv, vprv, are all considered xprvs
-    // and similarly, tpub, ypub, zpub, vpub are all considered xpubs
-    // TODO: perform checksum check
-    return true;
+    // Validate an extended key by checking it's checksum matches the data
+    const deserializedKey = _deserializeExtendedKey(key);
+    const checksum = deserializedKey.slice(-4).toString('hex');
+
+    const hashedChecksum = _get256Checksum(deserializedKey.toString('hex'));
+
+    const isValid = hashedChecksum === checksum;
+
+    if (!isValid) {
+        throw new Error('Invalid extended key checksum');
+    }
+
+    return isValid;
 };
 
 // Deserialize Extended Key
@@ -190,7 +198,7 @@ const _deserializeExtendedKey = (key: string): Buffer => {
     return Buffer.from(decodedBuffArray);
 };
 
-const doubleSha256 = (data: Buffer) => {
+const _doubleSha256 = (data: Buffer) => {
     const hashed = Crypto.createHash('sha256').update(data).digest();
     const hashed1 = Crypto.createHash('sha256').update(hashed).digest();
 
@@ -224,4 +232,10 @@ export const convertXPUB = (xpub: string, pub_prefix: string): string => {
         // Assume an invalid key if unable to disassemble and re-assemble
         throw new Error('Invalid extended public key');
     }
+};
+
+const _get256Checksum = (data: string): string => {
+    const hashed_data = _doubleSha256(Buffer.from(data, 'hex'));
+
+    return hashed_data.slice(0, 4).toString('hex');
 };
