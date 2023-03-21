@@ -154,12 +154,8 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
     return prefix.slice(1) === 'pub' ? 'xpub' : 'xprv';
 };
 
-export const isExtendedPubKey = (key: string): boolean => {
-    return _xpubPattern.test(key);
-};
-
-export const isExtendedPrvKey = (key: string): boolean => {
-    return _xprvPattern.test(key);
+export const isSupportedExtKey = (key: string): boolean => {
+    return _xprvPattern.test(key) || _xpubPattern.test(key);
 };
 
 export const isExtendedKey = (key: string): boolean => {
