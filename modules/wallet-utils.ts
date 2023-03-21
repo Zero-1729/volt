@@ -1,6 +1,7 @@
-import * as b58c from 'bs58check';
-import Crypto from 'react-native-quick-crypto';
 import {Buffer} from 'buffer';
+
+import * as b58 from 'bs58';
+import Crypto from 'react-native-quick-crypto';
 
 import {
     descriptorSymbolsType,
@@ -189,7 +190,8 @@ export const isValidExtendedKey = (key: string): boolean => {
 
 // Deserialize Extended Key
 const _deserializeExtendedKey = (key: string): Buffer => {
-    return b58c.decode(key);
+    const decodedBuffArray = b58.decode(key).buffer;
+    return Buffer.from(decodedBuffArray);
 };
 
 const doubleSha256 = (data: Buffer) => {
@@ -221,7 +223,7 @@ export const convertXPUB = (xpub: string, pub_prefix: string): string => {
         const nPub = Buffer.concat([Buffer.from(ver, 'hex'), data]);
 
         // Return new Base58 formatted key
-        return b58c.encode(nPub);
+        return b58.encode(nPub);
     } catch (e) {
         // Assume an invalid key if unable to disassemble and re-assemble
         throw new Error('Invalid extended public key');
