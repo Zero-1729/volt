@@ -179,9 +179,13 @@ export const getInfoFromXKey = (key: string) => {
 export const isValidExtendedKey = (key: string): boolean => {
     // Validate an extended key by checking it's checksum matches the data
     const deserializedKey = _deserializeExtendedKey(key);
+    // Grab last 4 bytes as checksum
     const checksum = deserializedKey.slice(-4).toString('hex');
 
-    const hashedChecksum = _get256Checksum(deserializedKey.toString('hex'));
+    // Grab data minus checksum
+    const data_chunk = deserializedKey.slice(0, -4);
+    // Double sha256 data and grab first 4 bytes as checksum
+    const hashedChecksum = _get256Checksum(data_chunk.toString('hex'));
 
     const isValid = hashedChecksum === checksum;
 
