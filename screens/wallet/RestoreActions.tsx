@@ -101,7 +101,7 @@ const ImportAction = () => {
 
             handleSuccessRoute();
         } catch (e: any) {
-            errorAlert(e.message, 'Error importing key');
+            errorAlert('Extended Key', e.message);
         }
     };
 
