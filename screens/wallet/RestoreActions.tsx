@@ -91,8 +91,15 @@ const ImportAction = () => {
         }
     };
 
-    const handleDescriptor = (descriptor: string) => {
+    const handleDescriptor = async (descriptor: string) => {
         // TODO: perform descriptor validity check
+        try {
+            await restoreWallet(descriptor, 'descriptor');
+
+            handleSuccessRoute();
+        } catch (e: any) {
+            errorAlert('Descriptor', e.message);
+        }
     };
 
     const handleExtendedKey = async (extendedKey: string) => {
