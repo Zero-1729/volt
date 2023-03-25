@@ -159,7 +159,10 @@ const ImportAction = () => {
         // Check if descriptor
         if (isDescriptor(material)) {
             // Handle import of descriptor
-            errorAlert('Descriptor', 'Descriptor import not yet supported');
+            errorAlert(
+                'Descriptor',
+                'Descriptor import not yet fully supported',
+            );
 
             handleDescriptor(material);
             return;
