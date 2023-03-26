@@ -109,6 +109,11 @@ export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
     DESCRIPTOR: 'descriptor',
 };
 
+// For now, we only support single key descriptors
+// with three specific script types (legacy, P2SH, and Bech32)
+//  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
+const _validDescriptorScripts = ['pkh', 'wpkh', 'sh'];
+
 export const descriptorSymbols: descriptorSymbolsType = [
     '[',
     ']',
