@@ -17,7 +17,7 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {WalletTypeNames} from '../../modules/wallet-utils';
 
-import Close from '../../assets/svg/x-circle-fill-24.svg';
+import Close from '../../assets/svg/x-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
