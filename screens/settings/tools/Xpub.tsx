@@ -14,7 +14,7 @@ import Color from '../../../constants/Color';
 import {LongBottomButton, PlainButton} from '../../../components/button';
 import {TextSingleInput} from '../../../components/input';
 
-import Close from '../../../assets/svg/x-circle-fill-24.svg';
+import Close from '../../../assets/svg/x-24.svg';
 import ArrowUp from '../../../assets/svg/chevron-up-16.svg';
 import ArrowDown from '../../../assets/svg/chevron-down-16.svg';
 import Tick from '../../../assets/svg/check-16.svg';
