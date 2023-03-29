@@ -120,8 +120,8 @@ const Xpub = () => {
                             ]}>
                             INFO:
                         </Text>{' '}
-                        This tool allows you to convert any extended public key
-                        to a different extended public key version.
+                        This tool allows you to convert extended public keys
+                        between different versions.
                     </Text>
                 </View>
 
