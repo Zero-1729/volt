@@ -160,7 +160,7 @@ const Xpub = () => {
                                 borderColor: ColorScheme.Background.Greyed,
                             },
                         ]}
-                        containerStyle={[tailwind('mt-4')]}
+                        containerStyle={[tailwind('mt-2')]}
                         labelStyle={{color: ColorScheme.Text.Default}}
                         dropDownContainerStyle={{
                             borderColor: ColorScheme.Background.Greyed,
