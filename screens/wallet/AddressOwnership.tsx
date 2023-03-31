@@ -103,9 +103,7 @@ const AddressOwnership = () => {
                             INFO:
                         </Text>{' '}
                         This tool allows you to check whether an address is
-                        owned by you or not. This is useful when you are not
-                        sure whether you have imported a private key or a
-                        watch-only address.
+                        owned by this wallet or not. If there is a match, the tool will also indicate whether this wallet has the key material to spend from the address.
                     </Text>
                 </View>
 
