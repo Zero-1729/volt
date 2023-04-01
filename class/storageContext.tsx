@@ -71,7 +71,7 @@ const defaultContext: defaultContextType = {
     wallets: [],
     currentWalletID: '',
     isDevMode: false,
-    useSatSymbol: false,
+    useSatSymbol: true, // To boost adoption and awareness of sat symbol
     hideTotalBalance: false,
     isWalletInitialized: false,
     isAdvancedMode: false,
@@ -514,6 +514,7 @@ export const AppStorageProvider = ({children}: Props) => {
     // Resets app data
     const resetAppData = useCallback(async () => {
         try {
+            await setSatSymbol(true);
             await setAppLanguage(defaultContext.appLanguage);
             await setAppFiatCurrency(defaultContext.appFiatCurrency);
             await setTotalBalanceHidden(false);
