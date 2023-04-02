@@ -521,6 +521,7 @@ export const AppStorageProvider = ({children}: Props) => {
             await _setWalletInit(false);
             await setWallets([]);
             await setCurrentWalletID('');
+            await setIsAdvancedMode(false);
         } catch (e) {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
