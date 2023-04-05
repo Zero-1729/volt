@@ -107,7 +107,7 @@ const About = () => {
                             {color: ColorScheme.Text.AltGray},
                             Font.RobotoText,
                         ]}>
-                        Built with Open Source technologies
+                        Built with and on Open Source technologies
                     </Text>
                 </View>
 
