@@ -229,7 +229,7 @@ const About = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Report Issue or Bug(s)
+                                Report Issue or Bug
                             </Text>
                         </View>
                     </PlainButton>
