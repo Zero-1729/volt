@@ -201,7 +201,7 @@ const About = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Volt Source Code
+                                Source Code
                             </Text>
                         </View>
                     </PlainButton>
