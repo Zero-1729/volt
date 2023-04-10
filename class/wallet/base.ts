@@ -1,4 +1,4 @@
-import Crypto from 'crypto';
+import Crypto from 'react-native-quick-crypto';
 
 import * as bip39 from '../../modules/bip39';
 
