@@ -17,6 +17,7 @@
     "npm": ">=8.1.0"
   },
   "dependencies": {
+    "@craftzdog/react-native-buffer": "^6.0.5",
     "@react-native-async-storage/async-storage": "^1.17.10",
     "@react-native-clipboard/clipboard": "^1.10.0",
     "@react-native-community/cli": "^9.0.0",
@@ -40,8 +41,6 @@
     "bitcoinjs-lib": "^3.3.2",
     "bitcoinjs-message": "^2.2.0",
     "bs58": "^5.0.0",
-    "buffer": "^6.0.3",
-    "buffer-reverse": "^1.0.1",
     "coinselect": "^3.1.12",
     "dayjs": "^1.10.6",
     "detox": "^18.19.0",
