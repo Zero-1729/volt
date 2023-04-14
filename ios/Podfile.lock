@@ -387,8 +387,6 @@ PODS:
     - glog
   - react-native-document-picker (5.2.0):
     - React-Core
-  - react-native-fingerprint-scanner (6.0.0):
-    - React
   - react-native-image-picker (4.10.3):
     - React-Core
   - react-native-quick-base64 (2.0.5):
@@ -602,7 +600,6 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
-  - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-quick-crypto (from `../node_modules/react-native-quick-crypto`)
@@ -713,8 +710,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
-  react-native-fingerprint-scanner:
-    :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-quick-base64:
@@ -832,11 +827,10 @@ SPEC CHECKSUMS:
   React-jsinspector: d5ce2ef3eb8fd30c28389d0bc577918c70821bd6
   React-logger: 9332c3e7b4ef007a0211c0a9868253aac3e1da82
   react-native-document-picker: f1b5398801b332c77bc62ae0eae2116f49bdff26
-  react-native-fingerprint-scanner: ac6656f18c8e45a7459302b84da41a44ad96dbbe
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
   react-native-quick-base64: e657e9197e61b60a9dec49807843052b830da254
-  react-native-quick-crypto: a903ff39ac8fea78bb9d37cccc5cc0596afc9670
-  react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
+  react-native-quick-crypto: b62a7834b26506f3aa7785842069b3722f530f65
+  react-native-safe-area-context: f5549f36508b1b7497434baa0cd97d7e470920d4
   react-native-secure-key-store: 910e6df6bc33cb790aba6ee24bc7818df1fe5898
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   React-perflogger: 43392072a5b867a504e2b4857606f8fc5a403d7f
@@ -870,6 +864,6 @@ SPEC CHECKSUMS:
   Yoga: ba09b6b11e6139e3df8229238aa794205ca6a02a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 7b1772c588700eb5bbad00aa94ebdd75e3f327ee
+PODFILE CHECKSUM: bb434d144a78569ff02002572bf13aab30e2cf41
 
 COCOAPODS: 1.12.0
