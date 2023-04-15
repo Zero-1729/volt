@@ -1,11 +1,8 @@
 import React, {useEffect} from 'react';
 
 import {StatusBar, useColorScheme} from 'react-native';
-
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
-
 import SplashScreen from 'react-native-splash-screen';
 
 import 'react-native-gesture-handler';
