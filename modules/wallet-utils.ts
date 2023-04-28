@@ -112,7 +112,23 @@ export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
 // For now, we only support single key descriptors
 // with three specific script types (legacy, P2SH, and Bech32)
 //  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
-const _validDescriptorScripts = ['pkh', 'wpkh', 'sh'];
+// Create a descriptor regex for the script types we support
+// export const walletDescriptorRegex =
+//     /^((wpkh|pkh|sh))\(([0-9A-HJ-NP-Za-km-z]{66,})\))$$/;
+// TODO: add support for Bitcoin core format pattern
+// Create a bitcoin wallet descriptor pattern for the following valid scripts
+// 1. wpkh([0-9A-HJ-NP-Za-km-z]{66,}) - bech32
+// 2. pkh([0-9A-HJ-NP-Za-km-z]{66,}) - legacy
+// 3. sh(wpkh([0-9A-HJ-NP-Za-km-z]{66,})) - nested segwit
+const _nativeWalletDescriptorRegex = /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})\))$/;
+const _wrappedWalletDescriptorRegex = /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})\)\))$/;
+
+export const isDescriptorPattern = (expression: string) => {
+    return (
+        _nativeWalletDescriptorRegex.test(expression) ||
+        _wrappedWalletDescriptorRegex.test(expression)
+    );
+};
 
 export const descriptorSymbols: descriptorSymbolsType = [
     '[',
