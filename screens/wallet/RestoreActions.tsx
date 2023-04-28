@@ -15,6 +15,7 @@ import {
     isExtendedKey,
     getExtendedKeyPrefix,
     isValidExtendedKey,
+    isDescriptorPattern,
 } from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
@@ -94,9 +95,13 @@ const ImportAction = () => {
     const handleDescriptor = async (descriptor: string) => {
         // TODO: perform descriptor validity check
         try {
-            await restoreWallet(descriptor, 'descriptor');
-
-            handleSuccessRoute();
+            if (isDescriptorPattern(descriptor)) {
+                console.info('descriptor: ', descriptor);
+                liberalAlert('Descriptor', 'Import not fully supported yet', 'Cancel');
+            } else {
+                errorAlert('Descriptor', 'Only single sig descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))');
+                return;
+            }
         } catch (e: any) {
             errorAlert('Descriptor', e.message);
         }
@@ -159,11 +164,6 @@ const ImportAction = () => {
         // Check if descriptor
         if (isDescriptor(material)) {
             // Handle import of descriptor
-            errorAlert(
-                'Descriptor',
-                'Descriptor import not yet fully supported',
-            );
-
             handleDescriptor(material);
             return;
         }
