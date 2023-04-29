@@ -460,15 +460,19 @@ export const AppStorageProvider = ({children}: Props) => {
             backupMaterial: string,
             backupMaterialType: BackupMaterialTypes,
         ) => {
+            // Default network and wallet type
+            var net = 'testnet';
+            var walletType = 'bech32';
+
             const walletArgs = {
                 name: 'Restored Wallet',
-                type: 'bech32', // Allow user to set in advanced mode or guess it from wallet scan
+                type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
                 secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
                 descriptor:
                     backupMaterialType === 'descriptor' ? backupMaterial : '',
                 xprv: backupMaterialType === 'xprv' ? backupMaterial : '',
                 xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
-                network: 'testnet',
+                network: net,
             };
 
             if (
@@ -478,6 +482,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Get extended key info based on the first letter prefix
                 const {network, type} = extendedKeyInfo[backupMaterial[0]];
 
+                // Set the assumed default network and wallet type based on SLIP132
                 walletArgs.network = network;
                 walletArgs.type = type;
             }
