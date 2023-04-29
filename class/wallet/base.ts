@@ -6,7 +6,7 @@ import {Unit, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
 
 import {
     WalletPaths,
-    hasExtendedPubKeyPattern,
+    descXpubPattern,
 } from '../../modules/wallet-utils';
 
 export class BaseWallet {
@@ -100,9 +100,7 @@ export class BaseWallet {
                 this.secret.length === 0 && this.xprv.length === 0;
 
             // Naively check if extended key present
-            const noPrivKeyDescriptor = !hasExtendedPubKeyPattern.test(
-                this.descriptor,
-            );
+            const noPrivKeyDescriptor = this.descriptor.match(descXpubPattern);
 
             if (noPrivKeys && noPrivKeyDescriptor) {
                 this.isWatchOnly = true;
