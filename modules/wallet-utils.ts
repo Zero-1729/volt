@@ -58,19 +58,21 @@ export const WalletPaths: {[index: string]: accountPaths} = {
 // Version bytes as described here:
 // https://github.com/satoshilabs/slips/blob/master/slip-0132.md
 /*
-    Bitcoin	0488b21e - xpub	0488ade4 - xprv	P2PKH or P2SH	m/44'/0'
-    Bitcoin	049d7cb2 - ypub	049d7878 - yprv	P2WPKH in P2SH	m/49'/0'
-    Bitcoin	04b24746 - zpub	04b2430c - zprv	P2WPKH	m/84'/0'
-    Bitcoin	0295b43f - Ypub	0295b005 - Yprv	Multi-signature P2WSH in P2SH	-
-    Bitcoin	02aa7ed3 - Zpub	02aa7a99 - Zprv	Multi-signature P2WSH	-
+    Coin	          Public Key	    Private Key	      Address Encoding	                BIP 32 Path
+    --------------    ---------------    ------------     ------------------------------    ------------------------
+    Bitcoin	          0488b21e - xpub   0488ade4 - xprv	  P2PKH  or P2SH	                m/44'/0'
+    Bitcoin	          049d7cb2 - ypub   049d7878 - yprv	  P2WPKH in P2SH	                m/49'/0'
+    Bitcoin	          04b24746 - zpub   04b2430c - zprv	  P2WPKH	                        m/84'/0'
+    Bitcoin	          0295b43f - Ypub   0295b005 - Yprv	  Multi-signature P2WSH in P2SH	    -
+    Bitcoin	          02aa7ed3 - Zpub   02aa7a99 - Zprv	  Multi-signature P2WSH	            -
 
-    Bitcoin Testnet	043587cf - tpub	04358394 - tprv	P2PKH or P2SH	m/44'/1'
-    Bitcoin Testnet	044a5262 - upub	044a4e28 - uprv	P2WPKH in P2SH	m/49'/1'
-    Bitcoin Testnet	045f1cf6 - vpub	045f18bc - vprv	P2WPKH	m/84'/1'
-    Bitcoin Testnet	024289ef - Upub	024285b5 - Uprv	Multi-signature P2WSH in P2SH	-
-    Bitcoin Testnet	02575483 - Vpub	02575048 - Vprv
+    Bitcoin Testnet	  043587cf - tpub	04358394 - tprv	  P2PKH  or P2SH	                m/44'/1'
+    Bitcoin Testnet	  044a5262 - upub	044a4e28 - uprv	  P2WPKH in P2SH	                m/49'/1'
+    Bitcoin Testnet	  045f1cf6 - vpub	045f18bc - vprv	  P2WPKH	                        m/84'/1'
+    Bitcoin Testnet	  024289ef - Upub	024285b5 - Uprv	  Multi-signature P2WSH in P2SH     -
+    Bitcoin Testnet	  02575483 - Vpub	02575048 - Vprv   Multi-signature P2WSH	            -
 */
-// Note: Might support Y/Z and T/U/V privs and pubs
+// Note: Currently do not support Y/Z and T/U/V privs and pubs
 const _validExtendedKeyPrefixes = new Map([
     // xpub
     ['xpub', '0488b21e'],
