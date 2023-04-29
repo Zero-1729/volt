@@ -96,8 +96,9 @@ const ImportAction = () => {
         // TODO: perform descriptor validity check
         try {
             if (isDescriptorPattern(descriptor)) {
-                console.info('descriptor: ', descriptor);
-                liberalAlert('Descriptor', 'Import not fully supported yet', 'Cancel');
+                await restoreWallet(descriptor, 'descriptor');
+
+                handleSuccessRoute();
             } else {
                 errorAlert('Descriptor', 'Only single sig descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))');
                 return;
