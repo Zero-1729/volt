@@ -51,8 +51,8 @@ export const WalletTypeNames: {[index: string]: string[]} = {
 */
 export const WalletPaths: {[index: string]: accountPaths} = {
     bech32: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
-    legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/84'/1'/0'"},
-    p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/84'/1'/0'"},
+    legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
+    p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
 };
 
 // Version bytes as described here:
