@@ -152,6 +152,12 @@ export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
     p2sh: 'shp2wpkh',
 };
 
+const _descriptorType: {[index: string]: string} = {
+    pkh: 'legacy',
+    wpkh: 'bech32',
+    sh: 'p2sh',
+};
+
 const _getPrefix = (key: string): string => {
     return key.slice(0, 4);
 };
