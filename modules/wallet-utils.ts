@@ -139,7 +139,6 @@ export const descriptorSymbols: descriptorSymbolsType = [
 ];
 
 // Extended key regexes
-// TODO: breakup pattern matching for xpubs and xprvs, soecifically handle for descriptor import, i.e. has key if (x|t|u|v)prv
 const _extendedKeyPattern: RegExp =
     /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 export const descXpubPattern: RegExp = /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
@@ -264,4 +263,37 @@ const _get256Checksum = (data: string): string => {
     const hashed_data = _doubleSha256(Buffer.from(data, 'hex'));
 
     return hashed_data.slice(0, 4).toString('hex');
+};
+
+// Get descriptor components
+// Descriptor format:
+// {script}({xprv/xpub})
+// E.g. wpkh(tprv8ZgxMBicQKsPd97TPtNtP25LfqmXxDQa4fwJhtWcbc896RTiemtHnQmJNccVQJTH7eU3EpzqdyVJd9JPX1SQy9oKXfhm9o5mAHYEN3rcdV6)
+// TODO: add support for Bitcoin core format pattern
+export const getDescriptorParts = (descriptor: string) => {
+    // extract descriptor prefix
+    const parts = descriptor.split('(');
+
+    // Gather data assuming non-nested script
+    const components = {
+        key: parts[1].split(')')[0],
+        network: parts.length === 2 ? extendedKeyInfo[parts[1].split(')')[0][0]].network : '',
+        type: parts.length === 2 ? _descriptorType[parts[0].split(')')[0]] : '',
+    };
+    
+    // Handle nested script case
+    const prefix = descriptor.split('(')[0];
+
+    if (prefix === "sh" && parts[1] === 'wpkh' && parts.length == 3) {
+        // Extract embedded key
+        const key = parts[2].split(')')[0]
+
+        components.key = key;
+
+        // Set network and wallet type from descriptor
+        components.network = extendedKeyInfo[key[0]].network;
+        components.type = _descriptorType[prefix];
+    }
+
+    return components;
 };
