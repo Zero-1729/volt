@@ -17,7 +17,7 @@ import {Unit} from '../types/wallet';
 import {BackupMaterialTypes, NetType, baseWalletArgs} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
-import {BDKWalletTypeNames, extendedKeyInfo} from '../modules/wallet-utils';
+import {BDKWalletTypeNames, extendedKeyInfo, getDescriptorParts} from '../modules/wallet-utils';
 
 import BdkRn from 'bdk-rn';
 
@@ -464,6 +464,14 @@ export const AppStorageProvider = ({children}: Props) => {
             var net = 'testnet';
             var walletType = 'bech32';
 
+            if (backupMaterialType === 'descriptor') {
+                // Grab the descriptor network and type
+                const desc = getDescriptorParts(backupMaterial);
+
+                net = desc.network;
+                walletType = desc.type;
+            }
+            
             const walletArgs = {
                 name: 'Restored Wallet',
                 type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
