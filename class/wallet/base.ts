@@ -92,15 +92,16 @@ export class BaseWallet {
     }
 
     setWatchOnly(isWatchOnly?: boolean) {
-        // Assume wallet watch-only if no key material available
-        // TODO: make this more robust
-        // i.e., there maybe a watch-only wallet with a descriptor
+        // Assume wallet watch-only if no prvkey material available
+        // i.e. no mnemonic, xprv, or descriptor with xprv
         if (isWatchOnly === undefined) {
             const noPrivKeys =
                 this.secret.length === 0 && this.xprv.length === 0;
 
-            // Naively check if extended key present
-            const noPrivKeyDescriptor = this.descriptor.match(descXpubPattern);
+            // Naively check if extended pub key present
+            // i.e. no prv key material in descriptor
+            // Make sure descriptor is not empty, else assume no prv key material
+            const noPrivKeyDescriptor = this.descriptor !== '' ? this.descriptor.match(descXpubPattern) : true;
 
             if (noPrivKeys && noPrivKeyDescriptor) {
                 this.isWatchOnly = true;
