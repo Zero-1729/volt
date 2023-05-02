@@ -420,10 +420,10 @@ export const AppStorageProvider = ({children}: Props) => {
             newWallet.setFingerprint(walletKeyInfo.fingerprint);
         }
 
-        // If it is not a restored wallet (i.e. new fresh one)
-        // or if restored must have an xprv
-        // to generate a descriptor
-        if (!restored || newWallet.xprv !== '') {
+        // Only generate if we don't already have one
+        // We can only generate one if we have either a mnemonic
+        // or an xprv, so check to see if either of those exist
+        if (newWallet.secret !== '' || newWallet.xprv !== '') {
             // Get descriptor from BDK
             const descriptorResponse = await BdkRn.createDescriptor({
                 type: BDKWalletTypeNames[newWallet.type],
