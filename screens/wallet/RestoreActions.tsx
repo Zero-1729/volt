@@ -100,7 +100,7 @@ const ImportAction = () => {
 
                 handleSuccessRoute();
             } else {
-                errorAlert('Descriptor', 'Only single sig descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))');
+                errorAlert('Descriptor', 'Only single key descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))');
                 return;
             }
         } catch (e: any) {
