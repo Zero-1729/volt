@@ -88,7 +88,7 @@ const ImportAction = () => {
             handleSuccessRoute();
         } catch (e: any) {
             // Let user know the mnemonic is valid
-            errorAlert(e.message, 'Invalid mnemonic');
+            errorAlert('Mnemonic', 'This is an invalid mnemonic');
         }
     };
 
