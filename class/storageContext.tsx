@@ -436,7 +436,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
             // Return an error if BDK descriptor function fails
             if (descriptorResponse.error) {
-                throw descriptorResponse.data;
+                throw new Error(descriptorResponse.data);
             }
 
             const walletDescriptor = descriptorResponse.data;
