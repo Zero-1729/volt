@@ -69,4 +69,5 @@ package-lock.json
 *.jsbundle
 
 # CocoaPods
-/ios/Pods/
+ios/Pods/
+ios/.xcode.env
