@@ -18,6 +18,8 @@ import Right from './../../assets/svg/chevron-right-24.svg';
 import {AppStorageContext} from '../../class/storageContext';
 import {WalletTypeNames} from '../../modules/wallet-utils';
 
+import Clipboard from '@react-native-clipboard/clipboard';
+
 const Info = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
@@ -43,14 +45,21 @@ const Info = () => {
     const walletPath = walletData.derivationPath;
     const walletType = WalletTypeNames[walletData.type];
     const walletNetwork = walletData.network;
-    const walletTypeName =
-        walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
-    const walletFingerprint = walletData.masterFingerprint
-        ? walletData.masterFingerprint.toUpperCase()
-        : '-';
-    const walletDescriptor = walletData.descriptor
-        ? walletData.descriptor
-        : '-';
+    const walletTypeName = walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
+    const walletFingerprint = walletData.masterFingerprint ? walletData.masterFingerprint.toUpperCase() : '-';
+    const walletDescriptor = walletData.descriptor ? walletData.descriptor : '-';
+
+    const [walletDescriptorText, setWalletDescriptorText] = useState(walletDescriptor);
+
+    const copyDescToClipboard = () => {
+        Clipboard.setString(walletDescriptor);
+
+        setWalletDescriptorText('Copied to clipboard');
+
+        setTimeout(() => {
+            setWalletDescriptorText(walletDescriptorText);
+        }, 450)
+    };
 
     const [tmpName, setTmpName] = useState(walletName);
 
@@ -238,8 +247,7 @@ const Info = () => {
                         Descriptor
                     </Text>
 
-                    {/* TODO: Allow to be copied to clipboard */}
-                    <PlainButton>
+                    <PlainButton onPress={copyDescToClipboard}>
                         <Text
                             numberOfLines={1}
                             ellipsizeMode="middle"
@@ -247,7 +255,7 @@ const Info = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {walletDescriptor}
+                            {walletDescriptorText}
                         </Text>
                     </PlainButton>
                 </View>
