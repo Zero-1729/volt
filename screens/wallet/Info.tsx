@@ -252,7 +252,7 @@ const Info = () => {
                             numberOfLines={1}
                             ellipsizeMode="middle"
                             style={[
-                                tailwind('text-sm'),
+                                tailwind('text-sm text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             {walletDescriptorText}
