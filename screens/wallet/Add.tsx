@@ -138,9 +138,7 @@ const Add = () => {
                         </Text>
 
                         <Text style={[tailwind('mt-4 text-white text-xs')]}>
-                            Restore wallet from seed or other backup material.
-                            {'\n'}Select if you want to import an existing
-                            wallet.
+                            Restore wallet from seed or other backup material. Select if you want to import an existing wallet.
                         </Text>
 
                         <View style={[tailwind('items-end')]}>
