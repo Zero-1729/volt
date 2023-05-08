@@ -18,7 +18,6 @@ export type AppCard = BaseProps & {
     description: string;
     icon: React.FC<SvgProps>;
     url: string;
-    description: string;
     color: {
         backgroundColor: string;
     };
