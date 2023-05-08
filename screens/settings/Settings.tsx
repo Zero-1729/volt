@@ -49,6 +49,12 @@ const Settings = () => {
         isWalletInitialized,
     } = useContext(AppStorageContext);
 
+    const handleAppDataReset = () => {
+        if (isWalletInitialized) {
+            resetAppData();
+        }
+    };
+
     const showDialog = () => {
         DeletionAlert(
             'Delete Data',
@@ -56,12 +62,6 @@ const Settings = () => {
             'Reset',
             handleAppDataReset,
         );
-    };
-
-    const handleAppDataReset = () => {
-        if (isWalletInitialized) {
-            resetAppData();
-        }
     };
 
     return (
