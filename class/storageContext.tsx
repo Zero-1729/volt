@@ -14,9 +14,10 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit} from '../types/wallet';
-import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
+import {BackupMaterialTypes, NetType, baseWalletArgs} from '../types/wallet';
 
-import {BaseWallet, BDKWalletTypeNames} from './wallet/base';
+import {BaseWallet} from './wallet/base';
+import {BDKWalletTypeNames, extendedKeyInfo, getDescriptorParts} from '../modules/wallet-utils';
 
 import BdkRn from 'bdk-rn';
 
@@ -45,13 +46,11 @@ type defaultContextType = {
     updateWalletUnit: (id: string, unit: Unit) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
-    addWallet: (
-        name: string,
-        type: string,
-        secret?: string,
-        descriptor?: string,
-        network?: NetworkType,
+    restoreWallet: (
+        backupMaterial: string,
+        backupType: BackupMaterialTypes,
     ) => void;
+    addWallet: (name: string, type: string, network?: NetType) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => BaseWallet;
@@ -72,7 +71,7 @@ const defaultContext: defaultContextType = {
     wallets: [],
     currentWalletID: '',
     isDevMode: false,
-    useSatSymbol: false,
+    useSatSymbol: true, // To boost adoption and awareness of sat symbol
     hideTotalBalance: false,
     isWalletInitialized: false,
     isAdvancedMode: false,
@@ -81,6 +80,7 @@ const defaultContext: defaultContextType = {
     setSatSymbol: () => {},
     setTotalBalanceHidden: () => {},
     setIsAdvancedMode: () => {},
+    restoreWallet: () => {},
     addWallet: () => {},
     updateWalletUnit: () => {},
     renameWallet: () => {},
@@ -88,7 +88,7 @@ const defaultContext: defaultContextType = {
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
-        return new BaseWallet('test wallet', 'bech32', '');
+        return new BaseWallet({name: 'test wallet', type: 'bech32'});
     }, // Function grabs wallet data through a fetch by index via ids
 };
 
@@ -384,67 +384,135 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
-    const addWallet = useCallback(
+    const _addNewWallet = async (
+        newWallet: BaseWallet,
+        restored: boolean = false,
+    ) => {
+        // TODO: Ensure we aren't needlessly
+        // overwriting extended key material for existing
+        // xpub or descriptor
+
+        // Set wallet ID
+        _setCurrentWalletID(newWallet.id);
+
+        // Generate mnemonic and other key material if needed
+        if (!restored) {
+            newWallet.generateMnemonic();
+        }
+
+        // If we have a mnemonic, generate extended key material
+        if (newWallet.secret !== '') {
+            // Get extended key material from BDK
+            const extendedKeyResponse = await BdkRn.createExtendedKey({
+                mnemonic: newWallet.secret,
+                network: newWallet.network,
+                password: '',
+            });
+
+            // Return an error if BDK key function fails
+            if (extendedKeyResponse.error) {
+                throw extendedKeyResponse.data;
+            }
+
+            // Update wallet fingerprint & xprv from extended key material
+            const walletKeyInfo = extendedKeyResponse.data;
+            newWallet.setXprv(walletKeyInfo.xprv);
+            newWallet.setFingerprint(walletKeyInfo.fingerprint);
+        }
+
+        // Only generate if we don't already have one
+        // We can only generate one if we have either a mnemonic
+        // or an xprv, so check to see if either of those exist
+        if (newWallet.secret !== '' || newWallet.xprv !== '') {
+            // Get descriptor from BDK
+            const descriptorResponse = await BdkRn.createDescriptor({
+                type: BDKWalletTypeNames[newWallet.type],
+                path: newWallet.derivationPath,
+                mnemonic: !restored ? newWallet.secret : '',
+                network: newWallet.network,
+                password: '',
+                xprv: restored ? newWallet.xprv : '',
+            });
+
+            // Return an error if BDK descriptor function fails
+            if (descriptorResponse.error) {
+                throw new Error(descriptorResponse.data);
+            }
+
+            const walletDescriptor = descriptorResponse.data;
+            newWallet.setDescriptor(walletDescriptor);
+        }
+
+        // Determine if watch only wallet
+        newWallet.setWatchOnly();
+
+        // Set wallet as initialized
+        await _setWalletInit(true);
+
+        const tmp = wallets ? [...wallets, newWallet] : [newWallet];
+
+        await _setWallets(tmp);
+        await _updateWallets(JSON.stringify(tmp));
+    };
+
+    const restoreWallet = useCallback(
         async (
-            name: string,
-            type: string,
-            secret?: string,
-            descriptor?: string,
-            network?: NetworkType,
+            backupMaterial: string,
+            backupMaterialType: BackupMaterialTypes,
         ) => {
+            // Default network and wallet type
+            var net = 'testnet';
+            var walletType = 'bech32';
+
+            if (backupMaterialType === 'descriptor') {
+                // Grab the descriptor network and type
+                const desc = getDescriptorParts(backupMaterial);
+
+                net = desc.network;
+                walletType = desc.type;
+            }
+            
+            const walletArgs = {
+                name: 'Restored Wallet',
+                type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
+                secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
+                descriptor:
+                    backupMaterialType === 'descriptor' ? backupMaterial : '',
+                xprv: backupMaterialType === 'xprv' ? backupMaterial : '',
+                xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
+                network: net,
+            };
+
+            if (
+                backupMaterialType === 'xprv' ||
+                backupMaterialType === 'xpub'
+            ) {
+                // Get extended key info based on the first letter prefix
+                const {network, type} = extendedKeyInfo[backupMaterial[0]];
+
+                // Set the assumed default network and wallet type based on SLIP132
+                walletArgs.network = network;
+                walletArgs.type = type;
+            }
+
+            // Handle material according to type
+            const newWallet = new BaseWallet(walletArgs as baseWalletArgs);
+
+            await _addNewWallet(newWallet, true);
+        },
+        [],
+    );
+
+    const addWallet = useCallback(
+        async (name: string, type: string, network?: NetType) => {
             try {
-                const newWallet = new BaseWallet(
-                    name,
-                    type,
-                    secret,
-                    descriptor,
-                    network,
-                );
-
-                // Set wallet ID
-                _setCurrentWalletID(newWallet.id);
-
-                // Get extended key material from BDK
-                const extendedKeyResponse = await BdkRn.createExtendedKey({
-                    mnemonic: newWallet.secret,
-                    network: network ? network : newWallet.network,
-                    password: '',
+                const newWallet = new BaseWallet({
+                    name: name,
+                    type: type,
+                    network: network,
                 });
 
-                // Return an error if BDK key function fails
-                if (extendedKeyResponse.error) {
-                    throw extendedKeyResponse.data;
-                }
-
-                // Update wallet fingerprint from extended key material
-                const walletKeyInfo = extendedKeyResponse.data;
-                newWallet._setFingerprint(walletKeyInfo.fingerprint);
-
-                // Get descriptor from BDK
-                const descriptorResponse = await BdkRn.createDescriptor({
-                    type: BDKWalletTypeNames[newWallet.type],
-                    path: newWallet.derivationPath,
-                    mnemonic: newWallet.secret,
-                    network: network ? network : newWallet.network,
-                    password: '',
-                });
-
-                // Return an error if BDK descriptor function fails
-                if (descriptorResponse.error) {
-                    throw descriptorResponse.data;
-                }
-
-                // Update Wallet descriptor and fingerprint
-                const walletDescriptor = descriptorResponse.data;
-                newWallet._setDescriptor(walletDescriptor);
-
-                // Set wallet as initialized
-                await _setWalletInit(true);
-
-                const tmp = wallets ? [...wallets, newWallet] : [newWallet];
-
-                _setWallets(tmp);
-                _updateWallets(JSON.stringify(tmp));
+                await _addNewWallet(newWallet);
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
@@ -459,12 +527,14 @@ export const AppStorageProvider = ({children}: Props) => {
     // Resets app data
     const resetAppData = useCallback(async () => {
         try {
+            await setSatSymbol(true);
             await setAppLanguage(defaultContext.appLanguage);
             await setAppFiatCurrency(defaultContext.appFiatCurrency);
             await setTotalBalanceHidden(false);
             await _setWalletInit(false);
             await setWallets([]);
             await setCurrentWalletID('');
+            await setIsAdvancedMode(false);
         } catch (e) {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
@@ -524,6 +594,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 resetAppData,
                 isDevMode,
                 wallets,
+                restoreWallet,
                 addWallet,
                 currentWalletID,
                 setCurrentWalletID,

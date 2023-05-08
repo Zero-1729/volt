@@ -34,6 +34,10 @@
   bottom: 7rem
 }
 
+.bottom-3 {
+  bottom: 0.75rem
+}
+
 .bottom-4 {
   bottom: 1rem
 }
@@ -172,10 +176,6 @@
   margin-bottom: 2rem
 }
 
-.ml-2 {
-  margin-left: 0.5rem
-}
-
 .ml-4 {
   margin-left: 1rem
 }
@@ -276,16 +276,16 @@
   height: 66.666667%
 }
 
+.h-44 {
+  height: 11rem
+}
+
 .h-48 {
   height: 12rem
 }
 
 .h-5\/6 {
   height: 83.333333%
-}
-
-.h-52 {
-  height: 13rem
 }
 
 .h-6 {
@@ -459,10 +459,6 @@
   background-color: rgb(255 255 255 / var(--tw-bg-opacity))
 }
 
-.p-1 {
-  padding: 0.25rem
-}
-
 .p-2 {
   padding: 0.5rem
 }
@@ -498,11 +494,6 @@
   padding-right: 1rem
 }
 
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem
-}
-
 .px-6 {
   padding-left: 1.5rem;
   padding-right: 1.5rem
@@ -528,8 +519,8 @@
   padding-bottom: 1rem
 }
 
-.pb-10 {
-  padding-bottom: 2.5rem
+.pb-11 {
+  padding-bottom: 2.75rem
 }
 
 .pl-8 {
@@ -610,6 +601,10 @@
 
 .font-medium {
   font-weight: 500
+}
+
+.capitalize {
+  text-transform: capitalize
 }
 
 .text-black {

@@ -12,7 +12,7 @@ import Color from '../../constants/Color';
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 
-import Close from '../../assets/svg/x-circle-fill-24.svg';
+import Close from '../../assets/svg/x-24.svg';
 
 const AddressOwnership = () => {
     const [resultMessage, setResultMessage] = useState('');
@@ -73,7 +73,7 @@ const AddressOwnership = () => {
                     ]}>
                     <Text
                         style={[
-                            tailwind('text-xl font-bold'),
+                            tailwind('text-lg font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         Address Ownership
@@ -103,9 +103,7 @@ const AddressOwnership = () => {
                             INFO:
                         </Text>{' '}
                         This tool allows you to check whether an address is
-                        owned by you or not. This is useful when you are not
-                        sure whether you have imported a private key or a
-                        watch-only address.
+                        owned by this wallet or not. If there is a match, the tool will also indicate whether this wallet has the key material to spend from the address.
                     </Text>
                 </View>
 

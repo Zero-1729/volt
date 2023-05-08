@@ -3,6 +3,8 @@ import React, {useContext, useState} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import Clipboard from '@react-native-clipboard/clipboard';
+
 import {useNavigation, CommonActions} from '@react-navigation/core';
 
 import QRCode from 'react-native-qrcode-svg';
@@ -15,9 +17,9 @@ import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {WalletTypeNames} from '../../class/wallet/base';
+import {WalletTypeNames} from '../../modules/wallet-utils';
 
-import Close from '../../assets/svg/x-circle-fill-24.svg';
+import Close from '../../assets/svg/x-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
@@ -26,26 +28,64 @@ const Backup = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const [backupMaterial, setBackupMaterial] = useState<string>('mnemonic');
-
     const {currentWalletID, getWalletData, isAdvancedMode} =
         useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
-
     const walletType = WalletTypeNames[walletData.type];
     const walletTypeName =
         walletType[0] +
         (isAdvancedMode ? ` (${WalletTypeNames[walletData.type][1]})` : '');
 
+    // Key material currently stored in wallet
+    const isSingleMaterial = walletData.secret === '';
+    const walletAvailMaterial: string =
+    walletData.secret !== ''
+        ? 'Mnemonic'
+        : walletData.descriptor !== ''
+        ? 'Descriptor'
+        : 'Extended Public Key (XPUB)';
+
+    const getQRData = (material: string) => {
+        // Only show mnemonic if mnemonic available and toggled
+        if (material === 'Mnemonic' && walletData.secret !== '') {
+            return walletData.secret;
+        }
+            
+        // Shows descriptor if available or toggled
+        if (walletData.descriptor || material === 'Descriptor') {
+            return walletData.descriptor;
+        }
+            
+        // Fallback to xpub, assuming first two unavailable (i.e., in case only watch only xpub restore)
+        return walletData.xpub;
+    };
+   
+    const [backupMaterial, setBackupMaterial] =
+                useState<string>(walletAvailMaterial);
+    const [backupData, setBackupData] = useState<string>(getQRData(walletAvailMaterial));
+
+    // Update the displayed backup data and current backup material type
+    const updateData = (material: string) => {
+        setBackupData(getQRData(material));
+        setBackupMaterial(material);
+    };
+
+    const copyDescToClipboard = () => {
+        // Copy backup material to Clipboard
+        // Temporarily set copied message
+        // and revert after a few seconds
+        Clipboard.setString(getQRData(backupMaterial));
+    
+        setBackupData('Copied to clipboard');
+    
+        setTimeout(() => {
+            setBackupData(getQRData(backupMaterial));
+        }, 450)
+    };
+
     const warning =
         'This material is the only way to recover your wallet. If you lose it, you will lose your funds. Please write it down and keep it in a safe place. Do not Screenshot or share it with anyone.';
-
-    const getMnemonicData = () => {
-        return backupMaterial === 'mnemonic'
-            ? walletData.secret
-            : walletData.descriptor;
-    };
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -60,10 +100,10 @@ const Backup = () => {
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-xl font-bold'),
+                                tailwind('text-lg font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Backup Material
+                            Backup
                         </Text>
                         <PlainButton
                             onPress={() => {
@@ -103,76 +143,102 @@ const Backup = () => {
                             ),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
-                        <PlainButton
-                            style={[tailwind('mr-4')]}
-                            disabled={backupMaterial === 'mnemonic'}
-                            onPress={() => {
-                                setBackupMaterial('mnemonic');
-                            }}>
-                            <Text
-                                style={[
-                                    tailwind(
-                                        `text-sm ${
-                                            backupMaterial === 'mnemonic'
-                                                ? 'font-bold'
-                                                : ''
-                                        }`,
-                                    ),
-                                    {
-                                        color:
-                                            backupMaterial === 'mnemonic'
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.GrayText,
-                                    },
-                                ]}>
-                                Mnemonic
-                            </Text>
-                        </PlainButton>
-                        <View
-                            style={[
-                                tailwind('h-6 w-0.5 mr-4 rounded-full'),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.CardGreyed,
-                                },
-                            ]}
-                        />
-                        <PlainButton
-                            disabled={backupMaterial === 'descriptor'}
-                            onPress={() => {
-                                setBackupMaterial('descriptor');
-                            }}>
-                            <Text
-                                style={[
-                                    tailwind(
-                                        `text-sm ${
-                                            backupMaterial === 'descriptor'
-                                                ? 'font-bold'
-                                                : ''
-                                        }`,
-                                    ),
-                                    {
-                                        color:
-                                            backupMaterial === 'descriptor'
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.GrayedText,
-                                    },
-                                ]}>
-                                Descriptor
-                            </Text>
-                        </PlainButton>
+                            {/* Display the single backup material if restored non-mnemonic */}
+                            {isSingleMaterial ? (<>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold'),
+                                        {
+                                            color: ColorScheme.Text.Default
+                                        },
+                                    ]}>
+                                    {backupMaterial}
+                                </Text>
+                            </>) : (<>
+                                {/* Display the backup material selector if restored mnemonic */}
+                                <PlainButton
+                                    style={[tailwind('mr-4')]}
+                                    disabled={
+                                        backupMaterial === 'Mnemonic' ||
+                                        walletData.secret === ''
+                                    }
+                                    onPress={() => {
+                                        updateData('Mnemonic');
+                                    }}>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                `text-sm ${
+                                                    backupMaterial ===
+                                                    'Mnemonic'
+                                                        ? 'font-bold'
+                                                        : ''
+                                                }`,
+                                            ),
+                                            {
+                                                color:
+                                                    backupMaterial ===
+                                                    'Mnemonic'
+                                                        ? ColorScheme.Text
+                                                              .Default
+                                                        : ColorScheme.Text
+                                                              .GrayedText,
+                                            },
+                                        ]}>
+                                        Mnemonic
+                                    </Text>
+                                </PlainButton>
+                                <View
+                                    style={[
+                                        tailwind('h-6 w-0.5 mr-4 rounded-full'),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .CardGreyed,
+                                        },
+                                    ]}
+                                />
+                                <PlainButton
+                                    disabled={backupMaterial === 'Descriptor'}
+                                    onPress={() => {
+                                        updateData('Descriptor');
+                                    }}>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                `text-sm ${
+                                                    backupMaterial ===
+                                                    'Descriptor'
+                                                        ? 'font-bold'
+                                                        : ''
+                                                }`,
+                                            ),
+                                            {
+                                                color:
+                                                    backupMaterial ===
+                                                    'Descriptor'
+                                                        ? ColorScheme.Text
+                                                              .Default
+                                                        : ColorScheme.Text
+                                                              .GrayedText,
+                                            },
+                                        ]}>
+                                        Descriptor
+                                    </Text>
+                                </PlainButton>
+                            </>)}
                     </View>
 
                     {/* Display QR code with seed */}
                     <View style={[tailwind('self-center mb-4')]}>
-                        <QRCode value={getMnemonicData()} size={225} />
+                        <QRCode value={getQRData(backupMaterial)} size={225} />
                     </View>
 
                     {/* Display either seed or descriptor */}
-                    <PlainButton style={[tailwind('items-center')]}>
+                    <PlainButton style={[tailwind('items-center')]} onPress={copyDescToClipboard}>
                         <Text
                             style={[
-                                tailwind('text-sm p-3 text-center rounded-sm'),
+                                tailwind('text-sm w-full p-3 text-center rounded-sm'),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
@@ -180,12 +246,10 @@ const Backup = () => {
                                 },
                             ]}
                             numberOfLines={
-                                backupMaterial === 'mnemonic' ? 2 : 1
+                                backupMaterial === 'Mnemonic' ? 2 : 1
                             }
                             ellipsizeMode={'middle'}>
-                            {backupMaterial === 'mnemonic'
-                                ? walletData.secret
-                                : walletData.descriptor}
+                            {backupData}
                         </Text>
                     </PlainButton>
 

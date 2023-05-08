@@ -134,11 +134,11 @@ const Add = () => {
                             {backgroundColor: '#8b8b8b'},
                         ]}>
                         <Text style={[tailwind('font-bold mt-2 text-white')]}>
-                            Restore
+                            Import
                         </Text>
 
                         <Text style={[tailwind('mt-4 text-white text-xs')]}>
-                            Import wallet from seed or other material.
+                            Restore wallet from seed or other backup material.
                             {'\n'}Select if you want to import an existing
                             wallet.
                         </Text>
@@ -163,7 +163,7 @@ const Add = () => {
                                             ),
                                             Font.RobotoText,
                                         ]}>
-                                        Import
+                                        Restore
                                     </Text>
                                 </View>
                             </PlainButton>

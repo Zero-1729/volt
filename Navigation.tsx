@@ -36,6 +36,10 @@ import Currency from './screens/settings/Currency';
 import Wallet from './screens/settings/Wallet';
 import Security from './screens/settings/Security';
 
+// Settings Tools
+import SettingsTools from './screens/settings/tools/Index';
+import Xpub from './screens/settings/tools/Xpub';
+
 import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
@@ -54,10 +58,15 @@ const SettingsRoot = () => {
             <SettingsStack.Screen name="Wallet" component={Wallet} />
             <SettingsStack.Screen name="Security" component={Security} />
             <SettingsStack.Screen name="About" component={About} />
+            <SettingsStack.Screen
+                name="SettingsTools"
+                component={SettingsTools}
+            />
 
             <SettingsStack.Group screenOptions={{presentation: 'modal'}}>
                 <SettingsStack.Screen name="License" component={License} />
                 <SettingsStack.Screen name="Release" component={Release} />
+                <SettingsStack.Screen name="XpubTool" component={Xpub} />
             </SettingsStack.Group>
         </SettingsStack.Navigator>
     );

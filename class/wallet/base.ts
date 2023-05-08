@@ -1,36 +1,13 @@
-import Crypto from 'crypto';
+import Crypto from 'react-native-quick-crypto';
 
-import {generateMnemonic} from '../../modules/bip39';
+import * as bip39 from '../../modules/bip39';
 
-import {Unit, UTXOType} from './../../types/wallet';
+import {Unit, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
 
-import {NetworkType} from 'bdk-rn/lib/lib/interfaces';
-
-export const WalletTypeNames: {[index: string]: string[]} = {
-    bech32: ['Native Segwit', 'Bech32'],
-    legacy: ['Legacy', 'P2PKH'],
-    p2sh: ['Segwit', 'P2SH'],
-};
-
-export const WalletPaths: {[index: string]: string} = {
-    bech32: "m/84'/0'/0'",
-    legacy: "m/44'/0'/0'",
-    p2sh: "m/49'/0'/0'",
-};
-
-type BDKWalletTypes =
-    | 'wpkh'
-    | 'pkh'
-    | 'p2pkh'
-    | 'shp2wpkh'
-    | 'MULTI'
-    | 'p2shp2wpkh';
-
-export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
-    bech32: 'wpkh',
-    legacy: 'p2pkh',
-    p2sh: 'shp2wpkh',
-};
+import {
+    WalletPaths,
+    descXpubPattern,
+} from '../../modules/wallet-utils';
 
 export class BaseWallet {
     id: string;
@@ -41,10 +18,12 @@ export class BaseWallet {
 
     descriptor: string;
     birthday: string | Date;
+
     secret: string;
+    xprv: string;
+    xpub: string;
 
     masterFingerprint: string;
-    isBIP39: boolean;
 
     balance: number;
 
@@ -59,28 +38,20 @@ export class BaseWallet {
 
     derivationPath: string;
 
-    network: NetworkType;
+    network: NetType;
 
     hardwareWalletEnabled: boolean;
     hasBackedUp: boolean;
 
-    constructor(
-        name: string,
-        type: string,
-        secret?: string,
-        descriptor?: string,
-        network?: NetworkType,
-    ) {
+    constructor(args: baseWalletArgs) {
         this.id = this._generateID(); // Unique wallet ID
-        this.name = name; // Wallet name
+        this.name = args.name; // Wallet name
 
-        this.type = type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
+        this.type = args.type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
         this.addresses = []; // List of addresses
         this.address = ''; // Temporarily generated receiving address
-        this.descriptor = descriptor ? descriptor : '';
         this.birthday = Date(); // Timestamp of wallet creation
-
         this.units = {
             name: 'sats',
             symbol: 's',
@@ -89,40 +60,79 @@ export class BaseWallet {
         this.balance = 0; // By default the balance is in sats
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = network ? network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
+        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
 
         this.UTXOs = []; // Set of wallet UTXOs
 
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
 
-        this.derivationPath = WalletPaths[this.type]; // Wallet derivation path
+        this.derivationPath = WalletPaths[this.type][this.network]; // Wallet derivation path
 
-        // TODO: fetch from BDK
+        this.descriptor = args.descriptor ? args.descriptor : '';
+        this.xprv = args.xprv ? args.xprv : '';
+        this.xpub = args.xpub ? args.xpub : '';
+
+        this.secret = args.secret ? args.secret : '';
+
+        this.isWatchOnly = false; // Whether wallet is watch only
+
+        // Retrieved and updated from BDK
         this.masterFingerprint = ''; // Wallet master fingerprint
-        this.secret = secret ? secret : generateMnemonic(); // private key or recovery phrase
-        this.isBIP39 = this.secret.includes(' ') ? true : false; // Whether wallet has a 'BIP39' seed
+    }
 
-        this.isWatchOnly = !this.secret; // Whether wallet is watch only
+    generateMnemonic(): void {
+        if (this.secret.length === 0) {
+            this.secret = bip39.generateMnemonic();
+        }
     }
 
     protected _generateID(): string {
         return Crypto.randomUUID();
     }
 
-    public updateBalance(sats: number) {
+    setWatchOnly(isWatchOnly?: boolean) {
+        // Assume wallet watch-only if no prvkey material available
+        // i.e. no mnemonic, xprv, or descriptor with xprv
+        if (isWatchOnly === undefined) {
+            const noPrivKeys =
+                this.secret.length === 0 && this.xprv.length === 0;
+
+            // Naively check if extended pub key present
+            // i.e. no prv key material in descriptor
+            // Make sure descriptor is not empty, else assume no prv key material
+            const noPrivKeyDescriptor = this.descriptor !== '' ? this.descriptor.match(descXpubPattern) : true;
+
+            if (noPrivKeys && noPrivKeyDescriptor) {
+                this.isWatchOnly = true;
+            }
+            return;
+        }
+
+        this.isWatchOnly = isWatchOnly;
+    }
+
+    updateBalance(sats: number) {
         this.balance = sats;
     }
 
-    public updateName(text: string) {
+    updateName(text: string) {
         this.name = text;
     }
 
-    _setFingerprint(fingerprint: string) {
+    setXprv(xprv: string) {
+        this.xprv = xprv;
+    }
+
+    setXpub(xpub: string) {
+        this.xpub = xpub;
+    }
+
+    setFingerprint(fingerprint: string) {
         this.masterFingerprint = fingerprint;
     }
 
-    _setDescriptor(descriptor: string) {
+    setDescriptor(descriptor: string) {
         this.descriptor = descriptor;
     }
 }

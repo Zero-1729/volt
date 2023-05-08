@@ -3,21 +3,36 @@ import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
 
-import {useNavigation} from '@react-navigation/core';
+import {StackActions, useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
+import {validateMnenomic} from '../../modules/bip39';
+import {
+    descriptorSymbols,
+    isSupportedExtKey,
+    isExtendedKey,
+    getExtendedKeyPrefix,
+    isValidExtendedKey,
+    isDescriptorPattern,
+} from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {PlainButton} from '../../components/button';
+import {PlainButton, LongBottomButton} from '../../components/button';
 import {TextMultiInput} from '../../components/input';
 
-import Back from './../../assets/svg/arrow-left-24.svg';
+import Back from '../../assets/svg/arrow-left-24.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
+
+import {
+    conservativeAlert,
+    liberalAlert,
+    errorAlert,
+} from '../../components/alert';
 
 const ImportAction = () => {
     const navigation = useNavigation();
@@ -28,7 +43,7 @@ const ImportAction = () => {
 
     const [importText, setImportText] = useState('');
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
+    const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
         console.info(`[Success] Document Picker: ${data.uri}`);
@@ -55,8 +70,137 @@ const ImportAction = () => {
         return valueWithSingleWhitespace;
     };
 
+    const handleSuccessRoute = () => {
+        // Simple helper to show successful import and navigate back home
+        conservativeAlert('Success', 'Wallet restored successfully');
+
+        navigation.getParent()?.dispatch(StackActions.popToTop());
+    };
+
+    const handleMnemonic = async (mnemonic: string) => {
+        // Validate if a valid mnemonic
+        try {
+            validateMnenomic(mnemonic);
+
+            // Restore wallet using mnemonic
+            await restoreWallet(mnemonic, 'mnemonic');
+
+            handleSuccessRoute();
+        } catch (e: any) {
+            // Let user know the mnemonic is valid
+            errorAlert('Mnemonic', 'This is an invalid mnemonic');
+        }
+    };
+
+    const handleDescriptor = async (descriptor: string) => {
+        // TODO: perform descriptor validity check
+        try {
+            if (isDescriptorPattern(descriptor)) {
+                await restoreWallet(descriptor, 'descriptor');
+
+                handleSuccessRoute();
+            } else {
+                errorAlert('Descriptor', 'Only single key descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))');
+                return;
+            }
+        } catch (e: any) {
+            errorAlert('Descriptor', e.message);
+        }
+    };
+
+    const handleExtendedKey = async (extendedKey: string) => {
+        try {
+            await restoreWallet(extendedKey, getExtendedKeyPrefix(extendedKey));
+
+            handleSuccessRoute();
+        } catch (e: any) {
+            errorAlert('Extended Key', e.message);
+        }
+    };
+
+    const isMnemonic = (text: string) => {
+        // We assume it is a mnemonic if it meets the following:
+        // (1) it has more than one word separated by a space
+        // (2) it has 12 or 24 words
+        const textWordLength = text.split(' ').length;
+        const isSingleWord = textWordLength === 1;
+        const isMnemonicLength = textWordLength === 12 || textWordLength === 24;
+
+        if (!isSingleWord && isMnemonicLength) {
+            return true;
+        }
+    };
+
+    const isDescriptor = (text: string) => {
+        const hasDigits = /\d/.test(text);
+
+        // Assume it is a descriptor if it has both
+        // numbers or descriptor symbols
+        // TODO: implement a stricter pattern check
+        if (
+            descriptorSymbols.some((symbol: string) => text.includes(symbol)) &&
+            hasDigits
+        ) {
+            return true;
+        }
+        return false;
+    };
+
+    const handleImport = () => {
+        // determine if the import text is one of the following:
+        // - 12 - 24 word seed
+        // - Wallet Descriptor (e.g. pkh(...))
+        // - Xpriv / Xpub
+
+        // Take out any leading or trailing whitespace
+        const material = importText.trim();
+
+        // Check if mnemonic
+        if (isMnemonic(material)) {
+            // Handle import of Mnemonic
+            handleMnemonic(material);
+            return;
+        }
+
+        // Check if descriptor
+        if (isDescriptor(material)) {
+            // Handle import of descriptor
+            handleDescriptor(material);
+            return;
+        }
+
+        // Check if user provided an xpriv or xpub
+        if (isExtendedKey(material)) {
+            // Check if ext key is supported
+            if (!isSupportedExtKey(material)) {
+                // Report unsupported extended keys
+                liberalAlert(
+                    'Extended Key',
+                    'This extended key is unsupported',
+                    'Cancel',
+                );
+                return;
+            }
+
+            // Perform a checksum check
+            try {
+                isValidExtendedKey(material);
+            } catch (e: any) {
+                // Report invalid ext key
+                errorAlert('Extended Key', e.message);
+                return;
+            }
+
+            // Handle import of support valid extended key
+            handleExtendedKey(material);
+            return;
+        }
+
+        liberalAlert('Import', 'Cannot import material', 'Try Again');
+    };
+
     const importInstructions = isAdvancedMode
-        ? 'Enter one of the following:\n\n- 12 - 24 word seed\n- Xpriv/Zpriv\n- PrivateKey (WIF)\n- Wallet Descriptor (e.g. pkh(...))'
+        ? 'Enter one of the following:\n\n- 12 - 24 word seed\n- Extended private Key (e.g., x/y/z/tprv)\n- Extended public key (e.g., x/y/z/tpub)\n- Wallet Descriptor (e.g., pkh(tprv...))'
         : 'Enter your 12 - 24 word seed';
 
     return (
@@ -116,33 +260,22 @@ const ImportAction = () => {
                         onError={handleFolderError}
                         onCancel={handleFolderCancel}
                     />
-
-                    <PlainButton disabled={importText.trim().length === 0}>
-                        <View
-                            style={[
-                                tailwind('mt-8 rounded items-center'),
-                                {
-                                    backgroundColor:
-                                        importText.trim().length > 0
-                                            ? ColorScheme.Background.Inverted
-                                            : ColorScheme.Background.Secondary,
-                                },
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('px-4 py-4 font-bold'),
-                                    {
-                                        color:
-                                            importText.trim().length > 0
-                                                ? ColorScheme.Text.Alt
-                                                : ColorScheme.Text.GrayedText,
-                                    },
-                                ]}>
-                                Continue
-                            </Text>
-                        </View>
-                    </PlainButton>
                 </View>
+                <LongBottomButton
+                    disabled={importText.trim().length === 0}
+                    onPress={handleImport}
+                    title="Continue"
+                    textColor={
+                        importText.trim().length > 0
+                            ? ColorScheme.Text.Alt
+                            : ColorScheme.Text.GrayedText
+                    }
+                    backgroundColor={
+                        importText.trim().length > 0
+                            ? ColorScheme.Background.Inverted
+                            : ColorScheme.Background.Secondary
+                    }
+                />
             </View>
         </SafeAreaView>
     );

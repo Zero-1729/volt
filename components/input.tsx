@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import {TextInput, Platform, View} from 'react-native';
+import {
+    TextInput,
+    Keyboard,
+    Platform,
+    View,
+    InputAccessoryView,
+    Button,
+} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -40,10 +47,12 @@ export const TextSingleInput = (props: TextInputProps) => {
 export const TextMultiInput = (props: TextLongInputProps) => {
     const tailwind = useTailwind();
 
+    const InputAccessoryViewID = 'notsoUniqueID';
+
     return (
         <View
             style={[
-                tailwind('rounded pt-4 pb-10 px-5 h-52'),
+                tailwind('rounded pb-11 px-4 h-44'),
                 {
                     borderWidth: 2,
                     borderColor: props.borderColor
@@ -51,19 +60,32 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         : 'transparent',
                 },
             ]}>
+            {Platform.OS === 'ios' ? (
+                <InputAccessoryView nativeID={InputAccessoryViewID}>
+                    <Button
+                        title="Done"
+                        onPress={() => {
+                            Keyboard.dismiss();
+                        }}
+                    />
+                </InputAccessoryView>
+            ) : (
+                <></>
+            )}
+
             <TextInput
                 multiline
                 underlineColorAndroid="transparent"
-                keyboardType={
-                    Platform.OS === 'android' ? 'visible-password' : 'default'
-                }
+                keyboardType={'default'}
                 spellCheck={false}
                 autoCorrect={false}
                 autoCapitalize="none"
                 selectTextOnFocus={false}
+                enablesReturnKeyAutomatically={true}
+                inputAccessoryViewID={InputAccessoryViewID}
                 {...props}
                 style={[
-                    tailwind('text-xs'),
+                    tailwind('text-xs pt-4'),
                     {
                         textAlignVertical: 'top',
                     },
@@ -76,7 +98,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         tailwind(
                             `absolute ${
                                 props.showFolder ? 'right-12' : 'right-4'
-                            } bottom-4`,
+                            } bottom-3`,
                         ),
                     ]}>
                     <PlainButton onPress={() => {}}>
@@ -88,7 +110,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
             )}
 
             {props.showFolder ? (
-                <View style={[tailwind('absolute right-4 bottom-4')]}>
+                <View style={[tailwind('absolute right-4 bottom-3')]}>
                     <PlainButton
                         onPress={() => {
                             DocumentPicker.pick({

@@ -10,6 +10,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
 import {useTailwind} from 'tailwind-rn';
 
 import {CurrencyType} from '../../types/settings';
@@ -36,11 +38,6 @@ const Currency = () => {
     const HeadingBar = {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
-    };
-
-    const RNHapticFeedbackOptions = {
-        enableVibrateFallback: true,
-        ignoreAndroidSystemSettings: false,
     };
 
     const {appFiatCurrency, setAppFiatCurrency} = useContext(AppStorageContext);

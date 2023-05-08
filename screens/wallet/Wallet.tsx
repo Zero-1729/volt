@@ -97,7 +97,7 @@ const Wallet = () => {
                             <Text
                                 style={[
                                     tailwind(
-                                        'text-sm ml-2 p-1 self-center text-black font-bold bg-white rounded-sm opacity-40',
+                                        'text-sm py-1 px-2 self-center text-white font-bold bg-black rounded opacity-40',
                                     ),
                                 ]}>
                                 Watch-only
@@ -135,29 +135,39 @@ const Wallet = () => {
                                 'absolute bottom-4 w-full justify-evenly flex-row mt-4 mb-4',
                             ),
                         ]}>
+                        {!walletData.isWatchOnly ? (
+                            <View
+                                style={[
+                                    tailwind('rounded p-4 w-32 opacity-60'),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Inverted,
+                                    },
+                                ]}>
+                                <PlainButton>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                'text-sm text-center font-bold',
+                                            ),
+                                            {color: ColorScheme.Text.Alt},
+                                        ]}>
+                                        Send
+                                    </Text>
+                                </PlainButton>
+                            </View>
+                        ) : (
+                            <></>
+                        )}
                         <View
                             style={[
-                                tailwind('rounded p-4 w-32 opacity-60'),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
-                                },
-                            ]}>
-                            <PlainButton>
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-sm text-center font-bold',
-                                        ),
-                                        {color: ColorScheme.Text.Alt},
-                                    ]}>
-                                    Send
-                                </Text>
-                            </PlainButton>
-                        </View>
-                        <View
-                            style={[
-                                tailwind('rounded p-4 w-32 opacity-60'),
+                                tailwind(
+                                    `rounded p-4 ${
+                                        walletData.isWatchOnly
+                                            ? 'w-5/6'
+                                            : 'w-32'
+                                    } opacity-60`,
+                                ),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Inverted,
@@ -175,34 +185,38 @@ const Wallet = () => {
                                 </Text>
                             </PlainButton>
                         </View>
-                        <View
-                            style={[
-                                tailwind(
-                                    'justify-center rounded px-4 opacity-60',
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
-                                },
-                            ]}>
-                            <PlainButton
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'Scan',
-                                            params: {
-                                                walletID: currentWalletID,
-                                                key: 'Wallet',
-                                            },
-                                        }),
-                                    );
-                                }}>
-                                <Scan
-                                    width={32}
-                                    fill={ColorScheme.SVG.Inverted}
-                                />
-                            </PlainButton>
-                        </View>
+                        {!walletData.isWatchOnly ? (
+                            <View
+                                style={[
+                                    tailwind(
+                                        'justify-center rounded px-4 opacity-60',
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Inverted,
+                                    },
+                                ]}>
+                                <PlainButton
+                                    onPress={() => {
+                                        navigation.dispatch(
+                                            CommonActions.navigate({
+                                                name: 'Scan',
+                                                params: {
+                                                    walletID: currentWalletID,
+                                                    key: 'Wallet',
+                                                },
+                                            }),
+                                        );
+                                    }}>
+                                    <Scan
+                                        width={32}
+                                        fill={ColorScheme.SVG.Inverted}
+                                    />
+                                </PlainButton>
+                            </View>
+                        ) : (
+                            <></>
+                        )}
                     </View>
 
                     {/* Bottom line divider */}
