@@ -114,9 +114,10 @@ export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
 // For now, we only support single key descriptors
 // with three specific script types (legacy, P2SH, and Bech32)
 //  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
-// TODO: add support for Bitcoin core format pattern
-const _nativeWalletDescriptorRegex = /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})\))$/;
-const _wrappedWalletDescriptorRegex = /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})\)\))$/;
+// Includes support for optional derivation path suffix (i.e., m/44'/0'/0')
+// TODO: Add support for Bitcoin core format (fingerprint + path prefix)
+const _nativeWalletDescriptorRegex = /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\))$/;
+const _wrappedWalletDescriptorRegex = /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\)\))$/;
 
 export const isDescriptorPattern = (expression: string) => {
     return (
@@ -270,6 +271,7 @@ const _get256Checksum = (data: string): string => {
 // {script}({xprv/xpub})
 // E.g. wpkh(tprv8ZgxMBicQKsPd97TPtNtP25LfqmXxDQa4fwJhtWcbc896RTiemtHnQmJNccVQJTH7eU3EpzqdyVJd9JPX1SQy9oKXfhm9o5mAHYEN3rcdV6)
 // TODO: add support for Bitcoin core format pattern
+// TODO: Check that there is no mismatch between attached derivation path and script prefix
 export const getDescriptorParts = (descriptor: string) => {
     // extract descriptor prefix
     const parts = descriptor.split('(');
