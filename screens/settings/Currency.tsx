@@ -114,35 +114,36 @@ const Currency = () => {
 
                     <View
                         style={tailwind('justify-center w-full items-center')}>
-                        <Text
+                            <View style={[tailwind('flex-row w-5/6 justify-between')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-2xl mb-4 font-medium'),
+                                    {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
+                                ]}>
+                                Currency
+                            </Text>
+
+                            {/* Highlight current select currency here */}
+                            <View
                             style={[
-                                tailwind('text-2xl mb-4 w-5/6 font-medium'),
-                                {color: ColorScheme.Text.Default},
-                                Font.RobotoText,
+                                tailwind(
+                                    'px-4 py-0 flex-row items-center h-8 rounded-full',
+                                ),
+                                {backgroundColor: ColorScheme.Background.Inverted},
                             ]}>
-                            Currency
-                        </Text>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold'),
+                                        {color: ColorScheme.Text.Alt, backgroundColor: ColorScheme.Background.Inverted},
+                                        Font.RobotoText,
+                                    ]}>
+                                    {`${appFiatCurrency.short} (${appFiatCurrency.symbol})`}
+                                </Text>
+                            </View>
+                            </View>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
-                    </View>
-
-                    {/* Highlight current select currency here */}
-                    <View
-                        style={[
-                            tailwind(
-                                'w-full h-12 self-center items-center flex-row justify-between',
-                            ),
-                            {backgroundColor: ColorScheme.Background.Secondary},
-                        ]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm pl-8 font-bold'),
-                                {color: ColorScheme.Text.Default},
-                                Font.RobotoText,
-                            ]}>
-                            Selected:{' '}
-                            {`${appFiatCurrency.short} (${appFiatCurrency.symbol})`}
-                        </Text>
                     </View>
 
                     <FlatList
