@@ -655,6 +655,12 @@
 			"paddingRight": 24
 		}
 	},
+	"py-0": {
+		"style": {
+			"paddingTop": 0,
+			"paddingBottom": 0
+		}
+	},
 	"py-1": {
 		"style": {
 			"paddingTop": 4,
@@ -682,11 +688,6 @@
 	"pb-11": {
 		"style": {
 			"paddingBottom": 44
-		}
-	},
-	"pl-8": {
-		"style": {
-			"paddingLeft": 32
 		}
 	},
 	"pl-9": {
