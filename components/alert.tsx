@@ -44,6 +44,7 @@ export const conservativeAlert = (heading: string, msg: string): void => {
 export const DeletionAlert = (
     heading: string,
     msg: string,
+    primaryButtonText: string,
     onSuccess: () => void,
 ): void => {
     RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
