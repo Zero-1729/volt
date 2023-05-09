@@ -389,6 +389,8 @@ PODS:
     - React-Core
   - react-native-image-picker (4.10.3):
     - React-Core
+  - react-native-netinfo (9.3.10):
+    - React-Core
   - react-native-quick-base64 (2.0.5):
     - React-Core
   - react-native-quick-crypto (0.5.0):
@@ -601,6 +603,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-quick-crypto (from `../node_modules/react-native-quick-crypto`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -712,6 +715,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-quick-base64:
     :path: "../node_modules/react-native-quick-base64"
   react-native-quick-crypto:
@@ -828,6 +833,7 @@ SPEC CHECKSUMS:
   React-logger: 3f8ebad1be1bf3299d1ab6d7f971802d7395c7ef
   react-native-document-picker: f1b5398801b332c77bc62ae0eae2116f49bdff26
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
+  react-native-netinfo: ccbe1085dffd16592791d550189772e13bf479e2
   react-native-quick-base64: e657e9197e61b60a9dec49807843052b830da254
   react-native-quick-crypto: b62a7834b26506f3aa7785842069b3722f530f65
   react-native-safe-area-context: f5549f36508b1b7497434baa0cd97d7e470920d4
