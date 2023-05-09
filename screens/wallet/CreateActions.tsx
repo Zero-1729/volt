@@ -33,7 +33,7 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {addWallet, isAdvancedMode} = useContext(AppStorageContext);
+    const {addWallet, isAdvancedMode, networkState} = useContext(AppStorageContext);
 
     const [newWalletName, setNewWalletName] = useState('');
 
@@ -56,6 +56,12 @@ const CreateAction = () => {
 
     const updateWalletName = async (walletName: string, type: string) => {
         try {
+            // Perform network check to avoid BDK native code error
+            // Must be connected to network to use bdk-rn fns
+            if (!networkState?.isConnected) {
+                throw new Error('Internet connection offline, re-connect to create wallet.')
+            }
+
             // Clear wallet name
             setNewWalletName('');
 

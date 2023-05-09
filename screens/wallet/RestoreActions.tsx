@@ -43,7 +43,7 @@ const ImportAction = () => {
 
     const [importText, setImportText] = useState('');
 
-    const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
+    const {isAdvancedMode, restoreWallet, networkState} = useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
         console.info(`[Success] Document Picker: ${data.uri}`);
@@ -151,6 +151,13 @@ const ImportAction = () => {
         // - 12 - 24 word seed
         // - Wallet Descriptor (e.g. pkh(...))
         // - Xpriv / Xpub
+
+        // Perform network check to avoid BDK native code error
+        // Must be connected to network to use bdk-rn fns
+        if (!networkState?.isConnected) {
+            errorAlert('Alert', 'Internet connection offline, re-connect to restore wallet.');
+            return;
+        }
 
         // Take out any leading or trailing whitespace
         const material = importText.trim();
