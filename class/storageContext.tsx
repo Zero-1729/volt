@@ -14,7 +14,7 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit} from '../types/wallet';
-import {BackupMaterialTypes, NetType, baseWalletArgs} from '../types/wallet';
+import {BackupMaterialTypes, NetType, baseWalletArgs, NetInfoType} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
 import {BDKWalletTypeNames, extendedKeyInfo, getDescriptorParts} from '../modules/wallet-utils';
@@ -29,6 +29,7 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
+    networkState: NetInfoType;
     appLanguage: LanguageType;
     appFiatCurrency: CurrencyType;
     useSatSymbol: boolean;
@@ -38,12 +39,14 @@ type defaultContextType = {
     wallets: BaseWallet[];
     currentWalletID: string;
     isDevMode: boolean;
+    setNetworkState: (networkState: NetInfoType) => void;
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
     setSatSymbol: (useSatSymbol: boolean) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
+    updateWalletBalance: (id: string, balance: number) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
@@ -58,6 +61,7 @@ type defaultContextType = {
 
 // Default app context values
 const defaultContext: defaultContextType = {
+    networkState: null,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -75,6 +79,7 @@ const defaultContext: defaultContextType = {
     hideTotalBalance: false,
     isWalletInitialized: false,
     isAdvancedMode: false,
+    setNetworkState: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     setSatSymbol: () => {},
@@ -83,6 +88,7 @@ const defaultContext: defaultContextType = {
     restoreWallet: () => {},
     addWallet: () => {},
     updateWalletUnit: () => {},
+    updateWalletBalance: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
     resetAppData: () => {},
@@ -97,6 +103,7 @@ export const AppStorageContext =
     createContext<defaultContextType>(defaultContext);
 export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
+    const [networkState, _setNetworkState] = useState<NetInfoType>(null);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -119,6 +126,7 @@ export const AppStorageProvider = ({children}: Props) => {
         defaultContext.isAdvancedMode,
     );
 
+    const {getItem: _getNetworkState, setItem: _updateNetworkState} = useAsyncStorage('networkState');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -139,6 +147,21 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('currentWalletID');
 
     // |> Create functions for getting, setting, and other data manipulation
+    const setNetworkState = useCallback(
+        async (networkState: NetInfoType) => {
+            try {
+                await _setNetworkState(networkState);
+                await _updateNetworkState(JSON.stringify(networkState));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Network state) Error loading data: ${e} [${networkState}]`,
+                );
+
+                throw new Error('Error setting network state');
+            }
+        }, [_setNetworkState, _updateNetworkState]
+    );
+
     const setAppLanguage = useCallback(
         async (languageObject: LanguageType) => {
             try {
@@ -371,6 +394,19 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const updateWalletBalance = useCallback(
+        async (id: string, balance: number) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            const tmp = [...wallets];
+            tmp[index].balance = balance;
+
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const renameWallet = useCallback(
         async (id: string, newName: string) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
@@ -582,6 +618,8 @@ export const AppStorageProvider = ({children}: Props) => {
     return (
         <AppStorageContext.Provider
             value={{
+                networkState,
+                setNetworkState,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,
@@ -602,6 +640,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 setIsAdvancedMode,
                 getWalletData,
                 updateWalletUnit,
+                updateWalletBalance,
                 renameWallet,
                 deleteWallet,
             }}>
