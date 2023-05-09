@@ -29,6 +29,8 @@ import {normalizeFiat} from '../../modules/transform';
 
 import {BaseWallet} from '../../class/wallet/base';
 
+import NetInfo from '@react-native-community/netinfo';
+
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
 
@@ -42,7 +44,18 @@ const Home = () => {
         hideTotalBalance,
         appFiatCurrency,
         setCurrentWalletID,
+        setNetworkState,
+        networkState,
     } = useContext(AppStorageContext);
+
+    // Subscribe
+    NetInfo.addEventListener(state => {
+        // Limit updates to when connection drops or re-established
+        // or initial load
+        if (state.isConnected !== networkState?.isConnected || !networkState) {
+            setNetworkState(state);
+        }
+    });
 
     // add the total balances of the wallets
     const totalBalance = wallets.reduce(
