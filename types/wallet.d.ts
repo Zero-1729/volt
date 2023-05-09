@@ -1,7 +1,11 @@
 // All Base Wallet-related Types for App
 import 'react';
 
+import {NetInfoState} from '@react-native-community/netinfo';
+
 export type NetType = 'bitcoin' | 'testnet';
+
+export type NetInfoType = NetInfoState | null;
 
 // UTXO Type
 export type UTXOType = {
