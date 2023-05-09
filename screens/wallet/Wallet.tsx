@@ -1,7 +1,9 @@
-import React, {useContext} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
+
+import BdkRn from 'bdk-rn';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -18,13 +20,19 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {Balance} from '../../components/balance';
 
+import {liberalAlert} from '../../components/alert';
+
 const Wallet = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
     // Get current wallet ID and wallet data
-    const {currentWalletID, getWalletData} = useContext(AppStorageContext);
+    const {currentWalletID, getWalletData, updateWalletBalance, networkState} =
+        useContext(AppStorageContext);
+
+    // For loading effect on balance
+    const [loadingBalance, setLoadingBalance] = useState(networkState?.isConnected);
 
     // Get current wallet data
     const walletData = getWalletData(currentWalletID);
@@ -38,7 +46,65 @@ const Wallet = () => {
     const walletName = walletData.name;
 
     // Ideally get it from store
+    // TODO: get data from remote exchange or similar source
     const fiatRate = 23_000; // USD rate
+
+    const syncWallet = useCallback(async () => {
+        // Perform network check to avoid BDK native code error
+        // Must be connected to network to use bdk-rn fns
+        if (!networkState?.isConnected) {
+            return;
+        }
+
+        // Create wallet from current wallet data
+        createWallet();
+
+        // Sync wallet
+        const syncResponse = await BdkRn.syncWallet();
+        
+        // report any sync errors
+        if (syncResponse.error) {
+            liberalAlert('Error', syncResponse.data, 'OK');
+            return;
+        }
+
+        // Attempt call to get wallet balance
+        const balanceResponse = await BdkRn.getBalance();
+
+        if (balanceResponse.error) {
+            // Report any errors in fetch attempt
+            liberalAlert('Error', balanceResponse.data, 'OK');
+            return;
+        }
+        
+        // End loading and update value
+        setLoadingBalance(false);
+
+        // Update balance amount (in sats)
+        // only update if balance different from stored version
+        if (balanceResponse.data !== walletData.balance) {
+            updateWalletBalance(currentWalletID, balanceResponse.data);
+        }
+    }, [currentWalletID, updateWalletBalance]);
+
+    const createWallet = useCallback(async () => {
+        const createResponse = await BdkRn.createWallet({
+            mnemonic: walletData.secret ? walletData.secret : '',
+            descriptor: walletData.descriptor && walletData.secret === '' ? walletData.descriptor : '',
+            password: '',
+            network: walletData.network,
+        });
+
+        // Report error from wallet creation function
+        if (createResponse.error) {
+            liberalAlert('Error', createResponse.data, 'OK');
+        }
+    }, [walletData.secret, walletData.network]);
+
+    useEffect(() => {
+        // Attempt to sync balance
+        syncWallet();
+    }, [createWallet, syncWallet]);
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
@@ -116,16 +182,23 @@ const Wallet = () => {
                             style={[
                                 tailwind('text-sm text-white opacity-60 mb-1'),
                             ]}>
-                            Balance
+                            {!networkState?.isConnected ? 'Offline ' : ''}Balance
                         </Text>
 
                         {/* Balance component */}
-                        <Balance
-                            id={currentWalletID}
-                            BalanceFontSize={'text-4xl'}
-                            fiatRate={fiatRate}
-                            disableFiat={false}
-                        />
+                        <View
+                            style={[
+                                tailwind(
+                                    `${loadingBalance ? 'opacity-40' : ''}`,
+                                ),
+                            ]}>
+                            <Balance
+                                id={currentWalletID}
+                                BalanceFontSize={'text-4xl'}
+                                fiatRate={fiatRate}
+                                disableFiat={false}
+                            />
+                        </View>
                     </View>
 
                     {/* Send and receive */}
