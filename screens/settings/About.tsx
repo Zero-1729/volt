@@ -11,6 +11,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
+import Package from './../../package.json';
+
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {useTailwind} from 'tailwind-rn';
@@ -86,7 +88,7 @@ const About = () => {
                     />
                 </View>
 
-                <View style={[tailwind('w-full mb-10')]}>
+                <View style={[tailwind('w-full mb-2')]}>
                     <View
                         style={[
                             tailwind(
@@ -108,6 +110,12 @@ const About = () => {
                             Font.RobotoText,
                         ]}>
                         Built with and on Open Source technologies
+                    </Text>
+                </View>
+
+                <View style={[tailwind('mb-4')]}>
+                    <Text style={[tailwind('text-center'), {color: ColorScheme.Text.AltGray}]}>
+                        v{Package.version} (Beta)
                     </Text>
                 </View>
 
