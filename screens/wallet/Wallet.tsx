@@ -28,7 +28,7 @@ const Wallet = () => {
     const navigation = useNavigation();
 
     // Get current wallet ID and wallet data
-    const {currentWalletID, getWalletData, updateWalletBalance, networkState} =
+    const {currentWalletID, getWalletData, updateWalletBalance, networkState, fiatRate} =
         useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -44,10 +44,6 @@ const Wallet = () => {
     const transactions = [];
 
     const walletName = walletData.name;
-
-    // Ideally get it from store
-    // TODO: get data from remote exchange or similar source
-    const fiatRate = 23_000; // USD rate
 
     const syncWallet = useCallback(async () => {
         // Perform network check to avoid BDK native code error
