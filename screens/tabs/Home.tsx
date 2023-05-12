@@ -46,6 +46,7 @@ const Home = () => {
         setCurrentWalletID,
         setNetworkState,
         networkState,
+        fiatRate,
     } = useContext(AppStorageContext);
 
     // Subscribe
@@ -64,9 +65,7 @@ const Home = () => {
         0,
     );
 
-    // Fetch from store and update the fiat rate
-    // according to current 'appFiatCurrency'
-    const fiatRate = 23_000; // USD rate
+    // TODO: Fetch and update the fiat rate
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
