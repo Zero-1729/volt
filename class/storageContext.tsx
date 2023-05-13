@@ -13,7 +13,7 @@ import React, {
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import {LanguageType, CurrencyType} from '../types/settings';
-import {Unit} from '../types/wallet';
+import {Unit, BalanceType} from '../types/wallet';
 import {BackupMaterialTypes, NetType, baseWalletArgs, NetInfoType} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -48,7 +48,7 @@ type defaultContextType = {
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
-    updateWalletBalance: (id: string, balance: number) => void;
+    updateWalletBalance: (id: string, balance: BalanceType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
@@ -411,7 +411,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletBalance = useCallback(
-        async (id: string, balance: number) => {
+        async (id: string, balance: BalanceType) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             const tmp = [...wallets];
