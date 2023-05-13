@@ -8,6 +8,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {FlatList} from 'react-native-gesture-handler';
+import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -28,6 +29,7 @@ import {EmptyCard, WalletCard} from '../../components/card';
 import {normalizeFiat} from '../../modules/transform';
 
 import {BaseWallet} from '../../class/wallet/base';
+import { BalanceType } from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
@@ -59,10 +61,10 @@ const Home = () => {
     });
 
     // add the total balances of the wallets
-    const totalBalance = wallets.reduce(
-        (accumulator: number, currentValue: BaseWallet) =>
-            accumulator + currentValue.balance,
-        0,
+    const totalBalance: BalanceType = wallets.reduce(
+        (accumulator: BigNumber, currentValue: BaseWallet) =>
+            accumulator.plus(currentValue.balance),
+        new BigNumber(0),
     );
 
     // TODO: Fetch and update the fiat rate
