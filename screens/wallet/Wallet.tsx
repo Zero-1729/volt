@@ -4,6 +4,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import BdkRn from 'bdk-rn';
+import BigNum from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -79,7 +80,10 @@ const Wallet = () => {
         // Update balance amount (in sats)
         // only update if balance different from stored version
         if (balanceResponse.data !== walletData.balance) {
-            updateWalletBalance(currentWalletID, balanceResponse.data);
+            // Receive balance in sats as string
+            // convert to BigNumber
+            const balance = new BigNum(balanceResponse.data);
+            updateWalletBalance(currentWalletID, balance);
         }
     }, [currentWalletID, updateWalletBalance]);
 
