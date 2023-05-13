@@ -51,6 +51,18 @@ const Info = () => {
 
     const [walletDescriptorText, setWalletDescriptorText] = useState(walletDescriptor);
     const [walletFingerprintText, setWalletFingerprintText] = useState(walletFingerprint);
+    const [walletPathText, setWalletPathText] = useState(walletPath);
+
+    const copyPathToClipboard = () => {
+        Clipboard.setString(walletPath);
+
+        setWalletPathText('Copied to clipboard');
+
+        setTimeout(() => {
+            setWalletPathText(walletPath);
+        }, 450)
+    };
+
     const copyFingerToClipboard = () => {
         Clipboard.setString(walletFingerprint);
 
@@ -172,13 +184,13 @@ const Info = () => {
                             Derivation Path
                         </Text>
 
-                        <PlainButton>
+                        <PlainButton onPress={copyPathToClipboard}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {walletPath}
+                                {walletPathText}
                             </Text>
                         </PlainButton>
                     </View>
