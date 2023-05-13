@@ -2,7 +2,7 @@
 import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import {Unit} from './wallet';
+import {BalanceType, Unit} from './wallet';
 
 // Base Prop Type
 export type BaseProps = PropsWithChildren<{
@@ -46,7 +46,7 @@ export type CardProps = BaseProps & {
 
 export type WalletCardProps = CardProps & {
     id: string;
-    walletBalance: number;
+    walletBalance: BalanceType;
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
