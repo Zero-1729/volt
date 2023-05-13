@@ -245,15 +245,13 @@ const Info = () => {
                             Type
                         </Text>
 
-                        <PlainButton>
-                            <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {walletTypeName}
-                            </Text>
-                        </PlainButton>
+                        <Text
+                            style={[
+                                tailwind('text-sm'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {walletTypeName}
+                        </Text>
                     </View>
                 </View>
 
