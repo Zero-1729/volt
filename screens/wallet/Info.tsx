@@ -50,6 +50,16 @@ const Info = () => {
     const walletDescriptor = walletData.descriptor ? walletData.descriptor : '-';
 
     const [walletDescriptorText, setWalletDescriptorText] = useState(walletDescriptor);
+    const [walletFingerprintText, setWalletFingerprintText] = useState(walletFingerprint);
+    const copyFingerToClipboard = () => {
+        Clipboard.setString(walletFingerprint);
+
+        setWalletFingerprintText('Copied to clipboard');
+
+        setTimeout(() => {
+            setWalletFingerprintText(walletFingerprintText);
+        }, 450)
+    };
 
     const copyDescToClipboard = () => {
         Clipboard.setString(walletDescriptor);
@@ -182,13 +192,13 @@ const Info = () => {
                             Master Fingerprint
                         </Text>
 
-                        <PlainButton>
+                        <PlainButton onPress={copyFingerToClipboard}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {walletFingerprint}
+                                {walletFingerprintText}
                             </Text>
                         </PlainButton>
                     </View>
