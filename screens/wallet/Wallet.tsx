@@ -34,6 +34,7 @@ const Wallet = () => {
 
     // For loading effect on balance
     const [loadingBalance, setLoadingBalance] = useState(networkState?.isConnected);
+    const [singleLoadLock, setSingleLoadLock] = useState(false);
 
     // Get current wallet data
     const walletData = getWalletData(currentWalletID);
@@ -54,7 +55,17 @@ const Wallet = () => {
         }
 
         // Create wallet from current wallet data
-        createWallet();
+        const createResponse = await BdkRn.createWallet({
+            mnemonic: walletData.secret ? walletData.secret : '',
+            descriptor: walletData.descriptor && walletData.secret === '' ? walletData.descriptor : '',
+            password: '',
+            network: walletData.network,
+        });
+
+        // Report error from wallet creation function
+        if (createResponse.error) {
+            liberalAlert('Error', createResponse.data, 'OK');
+        }
 
         // Sync wallet
         const syncResponse = await BdkRn.syncWallet();
@@ -85,26 +96,15 @@ const Wallet = () => {
             const balance = new BigNum(balanceResponse.data);
             updateWalletBalance(currentWalletID, balance);
         }
-    }, [currentWalletID, updateWalletBalance]);
-
-    const createWallet = useCallback(async () => {
-        const createResponse = await BdkRn.createWallet({
-            mnemonic: walletData.secret ? walletData.secret : '',
-            descriptor: walletData.descriptor && walletData.secret === '' ? walletData.descriptor : '',
-            password: '',
-            network: walletData.network,
-        });
-
-        // Report error from wallet creation function
-        if (createResponse.error) {
-            liberalAlert('Error', createResponse.data, 'OK');
-        }
-    }, [walletData.secret, walletData.network]);
+    }, [currentWalletID, updateWalletBalance, walletData.secret, walletData.network]);
 
     useEffect(() => {
         // Attempt to sync balance
-        syncWallet();
-    }, [createWallet, syncWallet]);
+        if (!singleLoadLock) {
+            syncWallet();
+            setSingleLoadLock(true);
+        }
+    }, [syncWallet]);
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
