@@ -1,17 +1,21 @@
 // All Base Wallet-related Types for App
 import 'react';
 
+import BigNumber from 'bignumber.js';
 import {NetInfoState} from '@react-native-community/netinfo';
 
 export type NetType = 'bitcoin' | 'testnet';
 
 export type NetInfoType = NetInfoState | null;
 
+// Wallet balance type
+export type BalanceType = BigNumber;
+
 // UTXO Type
 export type UTXOType = {
     txid: string; // Transaction ID
     vout: number; // Transaction output index
-    value: number; // Transaction output value in sats
+    value: BalanceType; // Transaction output value in sats
     address: string; // Transaction output address
     flagged: boolean; // Whether flagged by user to avoid spending, i.e. dust
 };
