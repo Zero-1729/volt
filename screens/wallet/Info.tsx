@@ -227,15 +227,13 @@ const Info = () => {
                             Network
                         </Text>
 
-                        <PlainButton>
-                            <Text
-                                style={[
-                                    tailwind('text-sm capitalize'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {walletNetwork}
-                            </Text>
-                        </PlainButton>
+                        <Text
+                            style={[
+                                tailwind('text-sm capitalize'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {walletNetwork}
+                        </Text>
                     </View>
 
                     <View style={[tailwind('w-1/2')]}>
