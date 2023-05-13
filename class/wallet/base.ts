@@ -2,7 +2,7 @@ import Crypto from 'react-native-quick-crypto';
 
 import * as bip39 from '../../modules/bip39';
 
-import {Unit, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
+import {Unit, BalanceType, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
 
 import {
     WalletPaths,
@@ -25,7 +25,7 @@ export class BaseWallet {
 
     masterFingerprint: string;
 
-    balance: number;
+    balance: BalanceType;
 
     UTXOs: UTXOType[];
 
@@ -112,7 +112,7 @@ export class BaseWallet {
         this.isWatchOnly = isWatchOnly;
     }
 
-    updateBalance(sats: number) {
+    updateBalance(sats: BalanceType) {
         this.balance = sats;
     }
 
