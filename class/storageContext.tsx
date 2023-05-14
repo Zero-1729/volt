@@ -44,7 +44,7 @@ type defaultContextType = {
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
     setSatSymbol: (useSatSymbol: boolean) => void;
-    updateFiatRate: (n: number) => void;
+    updateFiatRate: (n: BalanceType) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
@@ -220,7 +220,7 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
-    const updateFiatRate = useCallback(async (n: number) => {
+    const updateFiatRate = useCallback(async (n: BalanceType) => {
         try {
             _setFiatRate(n);
             _syncFiatRate(JSON.stringify(n));
