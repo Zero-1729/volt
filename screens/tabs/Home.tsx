@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import {Platform, Text, useColorScheme, View} from 'react-native';
 
@@ -33,6 +33,8 @@ import { BalanceType } from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
+import {fetchPrice} from '../../modules/currency';
+
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
 
@@ -49,7 +51,10 @@ const Home = () => {
         setNetworkState,
         networkState,
         fiatRate,
+        updateFiatRate,
     } = useContext(AppStorageContext);
+
+    const [initFiatRate, setInitFiatRate] = useState(false);
 
     // Subscribe
     NetInfo.addEventListener(state => {
@@ -67,7 +72,12 @@ const Home = () => {
         new BigNumber(0),
     );
 
-    // TODO: Fetch and update the fiat rate
+    // Fetch and update the fiat rate
+    const getFiatRate = useCallback(async () => {
+        const fiatRate = await fetchPrice(appFiatCurrency.short);
+
+        updateFiatRate(fiatRate);
+    }, [fetchPrice, updateFiatRate]);
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -82,6 +92,13 @@ const Home = () => {
     const topPlatformOffset = {
         marginTop: Platform.OS === 'android' ? 12 : 0,
     };
+
+    useEffect(() => {
+        if (!initFiatRate) {
+            getFiatRate();
+            setInitFiatRate(true);
+        }
+    })
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
