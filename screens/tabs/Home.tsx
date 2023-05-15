@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {Platform, Text, useColorScheme, View} from 'react-native';
 
@@ -29,11 +29,11 @@ import {EmptyCard, WalletCard} from '../../components/card';
 import {normalizeFiat} from '../../modules/transform';
 
 import {BaseWallet} from '../../class/wallet/base';
-import { BalanceType } from '../../types/wallet';
+import {BalanceType} from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
-import {fetchPrice} from '../../modules/currency';
+import {fetchFiatRate} from '../../modules/currency';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
@@ -71,13 +71,6 @@ const Home = () => {
             accumulator.plus(currentValue.balance),
         new BigNumber(0),
     );
-
-    // Fetch and update the fiat rate
-    const getFiatRate = useCallback(async () => {
-        const fiatRate = await fetchPrice(appFiatCurrency.short);
-
-        updateFiatRate(fiatRate);
-    }, [fetchPrice, updateFiatRate]);
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
