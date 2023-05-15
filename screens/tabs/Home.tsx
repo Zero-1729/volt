@@ -86,12 +86,32 @@ const Home = () => {
         marginTop: Platform.OS === 'android' ? 12 : 0,
     };
 
+    // Fetch the fiat rate on initial load
     useEffect(() => {
+        // Avoid fiat rate update call when offline
+        if (!networkState?.isConnected) {
+            return;
+        }
+
         if (!initFiatRate) {
-            getFiatRate();
+            fetchFiatRate(appFiatCurrency.short, (rate: BalanceType) => {
+                updateFiatRate({rate: rate, lastUpdated: new Date()});
+            });
             setInitFiatRate(true);
         }
     })
+
+    // Fetch the fiat rate on currency change
+    useEffect(() => {
+        // Avoid fiat rate update call when offline
+        if (!networkState?.isConnected) {
+            return;
+        }
+
+        fetchFiatRate(appFiatCurrency.short, (rate: BalanceType) => {
+            updateFiatRate({rate: rate, lastUpdated: new Date()});
+        });
+    }, [appFiatCurrency])
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
