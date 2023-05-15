@@ -141,7 +141,7 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
         useAsyncStorage('appFiatCurrency');
-    const {getItem: _getFiatRate, setItem: _syncFiatRate} = useAsyncStorage('fiatRate')
+    const {getItem: _getFiatRate, setItem: _updateFiatRate} = useAsyncStorage('fiatRate')
     const {getItem: _getUseSatSymbol, setItem: _updateUseSatSymbol} =
         useAsyncStorage('useSatSymbol');
     const {
@@ -225,7 +225,22 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
-    const updateFiatRate = useCallback(async (n: BalanceType) => {
+    const _loadFiatRate = async () => {
+        const cachedFiatRate = await _getFiatRate();
+
+        // Only update setting if value already exists
+        // ...otherwise, use default
+        if (cachedFiatRate !== null) {
+            const parsedRate = JSON.parse(cachedFiatRate);
+
+            const rehydratedFiatRate = {
+                rate: new BigNumber(parsedRate.rate),
+                lastUpdated: parsedRate.lastUpdated  
+            }
+            _setFiatRate(rehydratedFiatRate);
+        }
+    };
+
     const updateFiatRate = useCallback(async (fiat: FiatRate) => {
         try {
             _setFiatRate(fiat);
@@ -635,6 +650,10 @@ export const AppStorageProvider = ({children}: Props) => {
     useEffect(() => {
         _loadCurrentWalletID();
     }, []);
+
+    useEffect(() => {
+        _loadFiatRate();
+    }, [])
 
     // Return provider
     return (
