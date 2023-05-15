@@ -12,8 +12,10 @@ import React, {
 
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
+import BigNumber from 'bignumber.js';
+
 import {LanguageType, CurrencyType} from '../types/settings';
-import {Unit, BalanceType} from '../types/wallet';
+import {Unit, BalanceType, FiatRate} from '../types/wallet';
 import {BackupMaterialTypes, NetType, baseWalletArgs, NetInfoType} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -32,7 +34,7 @@ type defaultContextType = {
     networkState: NetInfoType;
     appLanguage: LanguageType;
     appFiatCurrency: CurrencyType;
-    fiatRate: number;
+    fiatRate: FiatRate;
     useSatSymbol: boolean;
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
@@ -44,7 +46,7 @@ type defaultContextType = {
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
     setSatSymbol: (useSatSymbol: boolean) => void;
-    updateFiatRate: (n: BalanceType) => void;
+    updateFiatRate: (fiatObj: FiatRate) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
@@ -75,7 +77,10 @@ const defaultContext: defaultContextType = {
         locale: 'en-US',
     },
     wallets: [],
-    fiatRate: 1,
+    fiatRate:  {
+        rate: new BigNumber(1),
+        lastUpdated: new Date(),
+    },
     currentWalletID: '',
     isDevMode: false,
     useSatSymbol: true, // To boost adoption and awareness of sat symbol
@@ -112,7 +117,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
     );
-    const [fiatRate, _setFiatRate] = useState(1);
+    const [fiatRate, _setFiatRate] = useState(defaultContext.fiatRate);
     const [useSatSymbol, _setSatSymbol] = useState(defaultContext.useSatSymbol);
     // Will change to false once app in Beta version
     const [hideTotalBalance, _setTotalBalanceHidden] = useState(
@@ -221,14 +226,15 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const updateFiatRate = useCallback(async (n: BalanceType) => {
+    const updateFiatRate = useCallback(async (fiat: FiatRate) => {
         try {
-            _setFiatRate(n);
-            _syncFiatRate(JSON.stringify(n));
+            _setFiatRate(fiat);
+            _updateFiatRate(JSON.stringify(fiat));
         } catch (e) {
             console.error(`[AsyncStorage] (Fiat Rate) Error updating rate: ${e}`)
             throw new Error('Unable to set fiat rate')
         }
-    }, [_setFiatRate])
+    }, [_setFiatRate, _updateFiatRate])
 
     const setSatSymbol = useCallback(
         async (useSat: boolean) => {
