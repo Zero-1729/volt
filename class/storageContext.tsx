@@ -80,6 +80,7 @@ const defaultContext: defaultContextType = {
     fiatRate:  {
         rate: new BigNumber(1),
         lastUpdated: new Date(),
+        source: 'CoinGecko',
     },
     currentWalletID: '',
     isDevMode: false,
@@ -235,7 +236,8 @@ export const AppStorageProvider = ({children}: Props) => {
 
             const rehydratedFiatRate = {
                 rate: new BigNumber(parsedRate.rate),
-                lastUpdated: parsedRate.lastUpdated  
+                lastUpdated: parsedRate.lastUpdated,
+                source: 'CoinGecko',
             }
             _setFiatRate(rehydratedFiatRate);
         }
@@ -247,7 +249,6 @@ export const AppStorageProvider = ({children}: Props) => {
             _updateFiatRate(JSON.stringify(fiat));
         } catch (e) {
             console.error(`[AsyncStorage] (Fiat Rate) Error updating rate: ${e}`)
-            throw new Error('Unable to set fiat rate')
         }
     }, [_setFiatRate, _updateFiatRate])
 

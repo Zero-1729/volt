@@ -95,7 +95,7 @@ const Home = () => {
 
         if (!initFiatRate) {
             fetchFiatRate(appFiatCurrency.short, (rate: BalanceType) => {
-                updateFiatRate({rate: rate, lastUpdated: new Date()});
+                updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
             });
             setInitFiatRate(true);
         }
@@ -109,7 +109,7 @@ const Home = () => {
         }
 
         fetchFiatRate(appFiatCurrency.short, (rate: BalanceType) => {
-            updateFiatRate({rate: rate, lastUpdated: new Date()});
+            updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
         });
     }, [appFiatCurrency])
 
