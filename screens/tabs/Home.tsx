@@ -67,7 +67,7 @@ const Home = () => {
 
     // add the total balances of the wallets
     const totalBalance: BalanceType = wallets.reduce(
-        (accumulator: BigNumber, currentValue: BaseWallet) =>
+        (accumulator: BalanceType, currentValue: BaseWallet) =>
             accumulator.plus(currentValue.balance),
         new BigNumber(0),
     );
@@ -215,7 +215,7 @@ const Home = () => {
                                                 appFiatCurrency.symbol
                                             } ${normalizeFiat(
                                                 totalBalance,
-                                                fiatRate,
+                                                fiatRate.rate,
                                             )}`}
                                         </Text>
                                     ) : (
