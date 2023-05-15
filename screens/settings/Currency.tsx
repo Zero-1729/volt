@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
@@ -28,6 +28,8 @@ import Color from '../../constants/Color';
 
 import {Currencies} from '../../constants/Currency';
 
+import {liberalAlert} from '../../components/alert';
+
 const Currency = () => {
     const navigation = useNavigation();
 
@@ -40,14 +42,18 @@ const Currency = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {appFiatCurrency, setAppFiatCurrency} = useContext(AppStorageContext);
+    const {appFiatCurrency, setAppFiatCurrency, networkState} = useContext(AppStorageContext);
 
     const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
+                    if (!networkState?.isConnected) {
+                        liberalAlert('Network', 'Unable to fetch currency data, connect to the Internet', 'Cancel');
+                        return;
+                    }
 
+                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
                     setAppFiatCurrency(item);
                 }}>
                 <View
