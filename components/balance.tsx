@@ -76,11 +76,9 @@ export const Balance = (props: BalanceProps) => {
         }
 
         if (!props.disableFiat && props.fiatRate) {
-            return normalizeFiat(new BigNumber(walletData.balance), props.fiatRate);
+            return normalizeFiat(new BigNumber(walletData.balance), props.fiatRate.rate);
         } else {
-            console.error(
-                '[Balance Component] No fiat rate provided for fiat balance',
-            );
+            console.error('[Balance Component] No fiat rate provided for fiat balance');
         }
     };
 
