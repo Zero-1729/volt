@@ -42,8 +42,22 @@ const APIFetcher = {
     },
 }
 
-export const fetchPrice = async (ticker: string): Promise<BalanceType> => {
+// Make single fire call to CoinGecko
+const fetchPrice = async (ticker: string): Promise<BalanceType> => {
     const response = await APIFetcher.coingecko(ticker.toLowerCase());
 
     return response;
 }
+
+export const fetchFiatRate = async (ticker: string, cb: (rate: BalanceType) => void) => {
+    // TODO: add check to ensure we aren't hitting API call rate limit
+    try {
+        // Grab data from remote source, i.e., CoinGecko
+        const rate = await fetchPrice(ticker);
+
+        // Trigger callback from RN component to update storage context
+        cb(rate);
+    } catch (e) {
+        throw new Error(`Error fetching fiat rate: ${e}`);
+    }
+};
