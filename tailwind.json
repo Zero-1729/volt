@@ -690,6 +690,11 @@
 			"paddingBottom": 44
 		}
 	},
+	"pl-8": {
+		"style": {
+			"paddingLeft": 32
+		}
+	},
 	"pl-9": {
 		"style": {
 			"paddingLeft": 36

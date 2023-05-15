@@ -10,6 +10,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
+import DayJS from 'dayjs';
+import calendar from 'dayjs/plugin/calendar';
+DayJS.extend(calendar);
+
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {useTailwind} from 'tailwind-rn';
@@ -29,6 +33,7 @@ import Color from '../../constants/Color';
 import {Currencies} from '../../constants/Currency';
 
 import {liberalAlert} from '../../components/alert';
+import {addCommas} from '../../modules/transform';
 
 const Currency = () => {
     const navigation = useNavigation();
@@ -42,7 +47,7 @@ const Currency = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {appFiatCurrency, setAppFiatCurrency, networkState} = useContext(AppStorageContext);
+    const {appFiatCurrency, setAppFiatCurrency, networkState, fiatRate} = useContext(AppStorageContext);
 
     const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
@@ -150,6 +155,13 @@ const Currency = () => {
                             </View>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
+
+                        <View style={[tailwind('text-sm py-4 w-full pl-8'), {backgroundColor: ColorScheme.Background.Greyed}]}>
+                            <Text style={{color: ColorScheme.Text.Default}}>
+                                Price at {`${addCommas(fiatRate.rate.toString())} ${appFiatCurrency.short} per ₿`} on
+                                <Text style={[tailwind('font-bold')]}> {fiatRate.source}</Text>
+                            </Text>
+                        </View>
                     </View>
 
                     <FlatList
@@ -160,6 +172,10 @@ const Currency = () => {
                         initialNumToRender={25}
                         contentInsetAdjustmentBehavior="automatic"
                     />
+
+                    <View style={[tailwind('w-full items-center mt-2')]}>
+                        <Text style={[{color: ColorScheme.Text.GrayedText}]}>Last updated {DayJS(fiatRate.lastUpdated).calendar()}</Text>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
