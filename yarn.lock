@@ -5175,7 +5175,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.10.6, dayjs@npm:^1.8.15":
+"dayjs@npm:^1.11.7, dayjs@npm:^1.8.15":
   version: 1.11.7
   resolution: "dayjs@npm:1.11.7"
   checksum: 5003a7c1dd9ed51385beb658231c3548700b82d3548c0cfbe549d85f2d08e90e972510282b7506941452c58d32136d6362f009c77ca55381a09c704e9f177ebb
@@ -13668,7 +13668,7 @@ __metadata:
     bs58: ^5.0.0
     coinselect: ^3.1.12
     concurrently: ^7.6.0
-    dayjs: ^1.10.6
+    dayjs: ^1.11.7
     detox: ^18.19.0
     ecurve: ^1.0.6
     electrum-mnemonic: ^2.0.0
