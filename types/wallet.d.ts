@@ -11,6 +11,12 @@ export type NetInfoType = NetInfoState | null;
 // Wallet balance type
 export type BalanceType = BigNumber;
 
+// Wallet balance fiat rate
+export type FiatRate = {
+    rate: BalanceType,
+    lastUpdated: Date;
+};
+
 // UTXO Type
 export type UTXOType = {
     txid: string; // Transaction ID
