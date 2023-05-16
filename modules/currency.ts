@@ -46,10 +46,11 @@ const APIFetcher = {
 const fetchPrice = async (ticker: string): Promise<BalanceType> => {
     const response = await APIFetcher.coingecko(ticker.toLowerCase());
 
+    // return fetched rate
     return response;
 }
 
-export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, cb: (rate: BalanceType) => void, violate=false) => {
+export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, onSuccess: (rate: BalanceType) => void, violate=false) => {
     const {lastUpdated} = fiatRate;
 
     // Same as Date.getTime()
@@ -58,13 +59,17 @@ export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, cb: (rat
     if (currentTimestamp - lastUpdated.getTime() <= 5 * 1000) {
         // Debounce
         console.info('Not updating fiat rate, last updated less than 5 seconds ago');
-        return;
+
+        // Return false to indicate no update
+        return false;
     }
 
     if ((currentTimestamp - lastUpdated.getTime() <= 30 * 60 * 1000) && !violate) {
         // Avoid updating too frequently
         console.info('Not updating fiat rate, last updated less than 30 minutes ago');
-        return;
+
+        // Return false to indicate no update
+        return false;
     }
 
     try {
@@ -72,7 +77,11 @@ export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, cb: (rat
         const rate = await fetchPrice(ticker);
 
         // Trigger callback from RN component to update storage context
-        cb(rate);
+        await onSuccess(rate);
+
+        // Return true to indicate success
+        // i.e. rate fetched
+        return true;
     } catch (e) {
         throw new Error(`Error fetching fiat rate: ${e}`);
     }
