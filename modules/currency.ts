@@ -58,7 +58,7 @@ export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, onSucces
 
     if (currentTimestamp - lastUpdated.getTime() <= 5 * 1000) {
         // Debounce
-        console.info('Not updating fiat rate, last updated less than 5 seconds ago');
+        console.info('[FiatRate] Not updating fiat rate, last updated less than 5 seconds ago');
 
         // Return false to indicate no update
         return false;
@@ -66,7 +66,7 @@ export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, onSucces
 
     if ((currentTimestamp - lastUpdated.getTime() <= 30 * 60 * 1000) && !violate) {
         // Avoid updating too frequently
-        console.info('Not updating fiat rate, last updated less than 30 minutes ago');
+        console.info('[FiatRate] Not updating fiat rate, last updated less than 30 minutes ago');
 
         // Return false to indicate no update
         return false;
