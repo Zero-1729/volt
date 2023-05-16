@@ -1,6 +1,6 @@
-import BigNumber from "bignumber.js"
+import BigNumber from "bignumber.js";
 
-import {BalanceType, FiatRate} from "../types/wallet"
+import {BalanceType, FiatRate} from "../types/wallet";
 
 const sourcesAPI = {
     coingecko: {
@@ -49,18 +49,19 @@ const fetchPrice = async (ticker: string): Promise<BalanceType> => {
     return response;
 }
 
-export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, cb: (rate: BalanceType) => void) => {
+export const fetchFiatRate = async (ticker: string, fiatRate: FiatRate, cb: (rate: BalanceType) => void, violate=false) => {
     const {lastUpdated} = fiatRate;
+
     // Same as Date.getTime()
     const currentTimestamp = +new Date();
 
-    if (currentTimestamp - lastUpdated.getTime() <= 10 * 1000) {
+    if (currentTimestamp - lastUpdated.getTime() <= 5 * 1000) {
         // Debounce
-        console.info('Not updating fiat rate, last updated less than 10 seconds ago');
+        console.info('Not updating fiat rate, last updated less than 5 seconds ago');
         return;
     }
-    
-    if (currentTimestamp - lastUpdated.getTime() <= 30 * 60 * 1000) {
+
+    if ((currentTimestamp - lastUpdated.getTime() <= 30 * 60 * 1000) && !violate) {
         // Avoid updating too frequently
         console.info('Not updating fiat rate, last updated less than 30 minutes ago');
         return;
