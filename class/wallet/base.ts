@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 
 import * as bip39 from '../../modules/bip39';
 
-import {Unit, BalanceType, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
+import {Unit, BalanceType, TransactionType, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
 
 import {
     WalletPaths,
@@ -29,6 +29,7 @@ export class BaseWallet {
 
     balance: BalanceType;
 
+    transactions: TransactionType[];
     UTXOs: UTXOType[];
 
     addresses: Array<string>;
@@ -64,6 +65,7 @@ export class BaseWallet {
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
 
+        this.transactions = []; // List of wallet transactions
         this.UTXOs = []; // Set of wallet UTXOs
 
         this.hardwareWalletEnabled = false;
