@@ -124,6 +124,18 @@ export class BaseWallet {
         this.name = text;
     }
 
+    buildTx(args: any) {
+        throw new Error('Not implemented');
+    }
+
+    updatedTransaction(tx: TransactionType) {
+        throw new Error('Not implemented');
+    }
+
+    updateTransanctions(transactions: TransactionType[]) {
+        this.transactions = transactions;
+    }
+
     setXprv(xprv: string) {
         this.xprv = xprv;
     }
