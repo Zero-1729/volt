@@ -154,11 +154,9 @@ const Currency = () => {
                             </View>
                             </View>
 
-                        <View style={[tailwind('w-full'), HeadingBar]} />
-
                         <View style={[tailwind('text-sm py-4 w-full pl-8'), {backgroundColor: ColorScheme.Background.Greyed}]}>
                             <Text style={{color: ColorScheme.Text.Default}}>
-                                Price at {`${addCommas(fiatRate.rate.toString())} ${appFiatCurrency.short} per ₿`} on
+                                Price at {`${addCommas(fiatRate.rate.toString())} ${appFiatCurrency.short}`} on
                                 <Text style={[tailwind('font-bold')]}> {fiatRate.source}</Text>
                             </Text>
                         </View>
