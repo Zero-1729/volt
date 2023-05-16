@@ -12,8 +12,10 @@ import React, {
 
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
+import BigNumber from 'bignumber.js';
+
 import {LanguageType, CurrencyType} from '../types/settings';
-import {Unit} from '../types/wallet';
+import {Unit, BalanceType, FiatRate} from '../types/wallet';
 import {BackupMaterialTypes, NetType, baseWalletArgs, NetInfoType} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -32,6 +34,7 @@ type defaultContextType = {
     networkState: NetInfoType;
     appLanguage: LanguageType;
     appFiatCurrency: CurrencyType;
+    fiatRate: FiatRate;
     useSatSymbol: boolean;
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
@@ -43,10 +46,11 @@ type defaultContextType = {
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
     setSatSymbol: (useSatSymbol: boolean) => void;
+    updateFiatRate: (fiatObj: FiatRate) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
-    updateWalletBalance: (id: string, balance: number) => void;
+    updateWalletBalance: (id: string, balance: BalanceType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
@@ -73,6 +77,11 @@ const defaultContext: defaultContextType = {
         locale: 'en-US',
     },
     wallets: [],
+    fiatRate:  {
+        rate: new BigNumber(1),
+        lastUpdated: new Date(),
+        source: 'CoinGecko',
+    },
     currentWalletID: '',
     isDevMode: false,
     useSatSymbol: true, // To boost adoption and awareness of sat symbol
@@ -83,6 +92,7 @@ const defaultContext: defaultContextType = {
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     setSatSymbol: () => {},
+    updateFiatRate: () => {},
     setTotalBalanceHidden: () => {},
     setIsAdvancedMode: () => {},
     restoreWallet: () => {},
@@ -108,6 +118,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
     );
+    const [fiatRate, _setFiatRate] = useState(defaultContext.fiatRate);
     const [useSatSymbol, _setSatSymbol] = useState(defaultContext.useSatSymbol);
     // Will change to false once app in Beta version
     const [hideTotalBalance, _setTotalBalanceHidden] = useState(
@@ -131,6 +142,7 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
         useAsyncStorage('appFiatCurrency');
+    const {getItem: _getFiatRate, setItem: _updateFiatRate} = useAsyncStorage('fiatRate')
     const {getItem: _getUseSatSymbol, setItem: _updateUseSatSymbol} =
         useAsyncStorage('useSatSymbol');
     const {
@@ -213,6 +225,32 @@ export const AppStorageProvider = ({children}: Props) => {
             _setFiatCurrency(JSON.parse(fiat));
         }
     };
+
+    const _loadFiatRate = async () => {
+        const cachedFiatRate = await _getFiatRate();
+
+        // Only update setting if value already exists
+        // ...otherwise, use default
+        if (cachedFiatRate !== null) {
+            const parsedRate = JSON.parse(cachedFiatRate);
+
+            const rehydratedFiatRate = {
+                rate: new BigNumber(parsedRate.rate),
+                lastUpdated: new Date(parsedRate.lastUpdated),
+                source: 'CoinGecko',
+            }
+            _setFiatRate(rehydratedFiatRate);
+        }
+    };
+
+    const updateFiatRate = useCallback(async (fiat: FiatRate) => {
+        try {
+            _setFiatRate(fiat);
+            _updateFiatRate(JSON.stringify(fiat));
+        } catch (e) {
+            console.error(`[AsyncStorage] (Fiat Rate) Error updating rate: ${e}`)
+        }
+    }, [_setFiatRate, _updateFiatRate])
 
     const setSatSymbol = useCallback(
         async (useSat: boolean) => {
@@ -395,7 +433,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletBalance = useCallback(
-        async (id: string, balance: number) => {
+        async (id: string, balance: BalanceType) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             const tmp = [...wallets];
@@ -614,6 +652,10 @@ export const AppStorageProvider = ({children}: Props) => {
         _loadCurrentWalletID();
     }, []);
 
+    useEffect(() => {
+        _loadFiatRate();
+    }, [])
+
     // Return provider
     return (
         <AppStorageContext.Provider
@@ -624,8 +666,10 @@ export const AppStorageProvider = ({children}: Props) => {
                 setAppLanguage,
                 appFiatCurrency,
                 setAppFiatCurrency,
+                fiatRate,
                 useSatSymbol,
                 setSatSymbol,
+                updateFiatRate,
                 hideTotalBalance,
                 setTotalBalanceHidden,
                 isWalletInitialized,

@@ -3,6 +3,8 @@ import {Text, View} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
+import BigNumber from 'bignumber.js';
+
 import {PlainButton} from './button';
 
 import {AppStorageContext} from '../class/storageContext';
@@ -66,19 +68,17 @@ export const Balance = (props: BalanceProps) => {
 
     const getBalance = () => {
         if (unit.name === 'sats') {
-            return formatSats(walletData.balance);
+            return formatSats(new BigNumber(walletData.balance));
         }
 
         if (unit.name === 'BTC') {
-            return formatBTC(walletData.balance);
+            return formatBTC(new BigNumber(walletData.balance));
         }
 
         if (!props.disableFiat && props.fiatRate) {
-            return normalizeFiat(walletData.balance, props.fiatRate);
+            return normalizeFiat(new BigNumber(walletData.balance), props.fiatRate.rate);
         } else {
-            console.error(
-                '[Balance Component] No fiat rate provided for fiat balance',
-            );
+            console.error('[Balance Component] No fiat rate provided for fiat balance');
         }
     };
 

@@ -1,8 +1,10 @@
 import Crypto from 'react-native-quick-crypto';
 
+import BigNumber from 'bignumber.js';
+
 import * as bip39 from '../../modules/bip39';
 
-import {Unit, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
+import {Unit, BalanceType, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
 
 import {
     WalletPaths,
@@ -25,7 +27,7 @@ export class BaseWallet {
 
     masterFingerprint: string;
 
-    balance: number;
+    balance: BalanceType;
 
     UTXOs: UTXOType[];
 
@@ -57,7 +59,7 @@ export class BaseWallet {
             symbol: 's',
         }; // Default unit to display wallet balance is sats
 
-        this.balance = 0; // By default the balance is in sats
+        this.balance = new BigNumber(0); // By default the balance is in sats
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
@@ -112,7 +114,7 @@ export class BaseWallet {
         this.isWatchOnly = isWatchOnly;
     }
 
-    updateBalance(sats: number) {
+    updateBalance(sats: BalanceType) {
         this.balance = sats;
     }
 

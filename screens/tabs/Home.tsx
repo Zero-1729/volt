@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {Platform, Text, useColorScheme, View} from 'react-native';
 
@@ -8,6 +8,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {FlatList} from 'react-native-gesture-handler';
+
+import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -28,8 +30,11 @@ import {EmptyCard, WalletCard} from '../../components/card';
 import {normalizeFiat} from '../../modules/transform';
 
 import {BaseWallet} from '../../class/wallet/base';
+import {BalanceType} from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
+
+import {fetchFiatRate} from '../../modules/currency';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
@@ -46,7 +51,11 @@ const Home = () => {
         setCurrentWalletID,
         setNetworkState,
         networkState,
+        fiatRate,
+        updateFiatRate,
     } = useContext(AppStorageContext);
+
+    const [initFiatRate, setInitFiatRate] = useState(false);
 
     // Subscribe
     NetInfo.addEventListener(state => {
@@ -58,15 +67,11 @@ const Home = () => {
     });
 
     // add the total balances of the wallets
-    const totalBalance = wallets.reduce(
-        (accumulator: number, currentValue: BaseWallet) =>
-            accumulator + currentValue.balance,
-        0,
+    const totalBalance: BalanceType = wallets.reduce(
+        (accumulator: BalanceType, currentValue: BaseWallet) =>
+            accumulator.plus(currentValue.balance),
+        new BigNumber(0),
     );
-
-    // Fetch from store and update the fiat rate
-    // according to current 'appFiatCurrency'
-    const fiatRate = 23_000; // USD rate
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -81,6 +86,33 @@ const Home = () => {
     const topPlatformOffset = {
         marginTop: Platform.OS === 'android' ? 12 : 0,
     };
+
+    // Fetch the fiat rate on initial load
+    useEffect(() => {
+        // Avoid fiat rate update call when offline
+        if (!networkState?.isConnected) {
+            return;
+        }
+
+        if (!initFiatRate) {
+            fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
+                updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
+            });
+            setInitFiatRate(true);
+        }
+    })
+
+    // Fetch the fiat rate on currency change
+    useEffect(() => {
+        // Avoid fiat rate update call when offline
+        if (!networkState?.isConnected) {
+            return;
+        }
+
+        fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
+            updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
+        }, true);
+    }, [appFiatCurrency])
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
@@ -204,7 +236,7 @@ const Home = () => {
                                                 appFiatCurrency.symbol
                                             } ${normalizeFiat(
                                                 totalBalance,
-                                                fiatRate,
+                                                fiatRate.rate,
                                             )}`}
                                         </Text>
                                     ) : (

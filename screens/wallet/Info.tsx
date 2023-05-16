@@ -50,6 +50,28 @@ const Info = () => {
     const walletDescriptor = walletData.descriptor ? walletData.descriptor : '-';
 
     const [walletDescriptorText, setWalletDescriptorText] = useState(walletDescriptor);
+    const [walletFingerprintText, setWalletFingerprintText] = useState(walletFingerprint);
+    const [walletPathText, setWalletPathText] = useState(walletPath);
+
+    const copyPathToClipboard = () => {
+        Clipboard.setString(walletPath);
+
+        setWalletPathText('Copied to clipboard');
+
+        setTimeout(() => {
+            setWalletPathText(walletPath);
+        }, 450)
+    };
+
+    const copyFingerToClipboard = () => {
+        Clipboard.setString(walletFingerprint);
+
+        setWalletFingerprintText('Copied to clipboard');
+
+        setTimeout(() => {
+            setWalletFingerprintText(walletFingerprintText);
+        }, 450)
+    };
 
     const copyDescToClipboard = () => {
         Clipboard.setString(walletDescriptor);
@@ -162,13 +184,13 @@ const Info = () => {
                             Derivation Path
                         </Text>
 
-                        <PlainButton>
+                        <PlainButton onPress={copyPathToClipboard}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {walletPath}
+                                {walletPathText}
                             </Text>
                         </PlainButton>
                     </View>
@@ -182,13 +204,13 @@ const Info = () => {
                             Master Fingerprint
                         </Text>
 
-                        <PlainButton>
+                        <PlainButton onPress={copyFingerToClipboard}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {walletFingerprint}
+                                {walletFingerprintText}
                             </Text>
                         </PlainButton>
                     </View>
@@ -205,15 +227,13 @@ const Info = () => {
                             Network
                         </Text>
 
-                        <PlainButton>
-                            <Text
-                                style={[
-                                    tailwind('text-sm capitalize'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {walletNetwork}
-                            </Text>
-                        </PlainButton>
+                        <Text
+                            style={[
+                                tailwind('text-sm capitalize'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {walletNetwork}
+                        </Text>
                     </View>
 
                     <View style={[tailwind('w-1/2')]}>
@@ -225,15 +245,13 @@ const Info = () => {
                             Type
                         </Text>
 
-                        <PlainButton>
-                            <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {walletTypeName}
-                            </Text>
-                        </PlainButton>
+                        <Text
+                            style={[
+                                tailwind('text-sm'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {walletTypeName}
+                        </Text>
                     </View>
                 </View>
 

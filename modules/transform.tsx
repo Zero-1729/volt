@@ -1,3 +1,7 @@
+import BigNumber from 'bignumber.js';
+
+import {BalanceType} from '../types/wallet';
+
 const SATS_TO_BTC_RATE = 100_000_000;
 const SEPARATOR = ' ';
 
@@ -5,17 +9,17 @@ export const addCommas = (num: string, separator: string = ',') => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 };
 
-export const _getBTCfromSats = (sats: number) => {
-    return sats / SATS_TO_BTC_RATE;
+export const _getBTCfromSats = (sats: BalanceType) => {
+    return sats.toNumber() / SATS_TO_BTC_RATE;
 };
 
-export const formatSats = (sats: number) => {
+export const formatSats = (sats: BalanceType) => {
     // REM: Based on: https://bitcoin.design/guide/designing-products/units-and-symbols/
-    if (sats < 0.1 && sats !== 0) {
+    if (sats.lt(0.1) && !sats.eq(0)) {
         // Limit display to eight decimals
         // Anything lower is assumed to be an approximation
         // ... to zero
-        if (sats < 0.00_000_001) {
+        if (sats.lt(0.00_000_001)) {
             return `≈ ${sats.toFixed(2)}`;
         }
 
@@ -25,15 +29,15 @@ export const formatSats = (sats: number) => {
 
     // If billions range of sats
     // We display with units
-    if (sats > SATS_TO_BTC_RATE) {
-        return formatWithUnits(sats);
+    if (sats.gt(SATS_TO_BTC_RATE)) {
+        return formatWithUnits(sats.toNumber());
     }
 
     // Strip trailing zeros
     return addCommas(sats.toString(), SEPARATOR);
 };
 
-export const formatBTC = (sats: number) => {
+export const formatBTC = (sats: BalanceType) => {
     // REM: Based on: https://bitcoin.design/guide/designing-products/units-and-symbols/
     const BTC = _getBTCfromSats(sats);
 
@@ -76,13 +80,13 @@ const formatWithUnits = (value: number) => {
     return value.toFixed(2);
 };
 
-export const normalizeFiat = (sats: number, rate: number) => {
+export const normalizeFiat = (sats: BalanceType, rate: BalanceType) => {
     // Get BTC to fiat value first
-    const fiat = _getBTCfromSats(sats) * rate;
+    const fiat = sats.eq(0) ? new BigNumber(0) : rate.multipliedBy(_getBTCfromSats(sats));
 
     // If below a cent, let's attempt to display that
     // 'Bullishly' speaking, Bitcoin will 'always' be worth more than a cent
-    if (fiat < 0.01 && fiat !== 0) {
+    if (fiat.lt(0.01) && !fiat.eq(0)) {
         // We just let them know it's less than a cent
         // So approximately a zero (insignificant)
         return `≈ ${fiat.toFixed(2)}`;
@@ -90,7 +94,7 @@ export const normalizeFiat = (sats: number, rate: number) => {
 
     // Amount in range of 100,000,000.00
     // (i.e. 14 digit characters)
-    return addCommas(formatWithUnits(fiat));
+    return addCommas(formatWithUnits(fiat.toNumber()));
 };
 
 // Format a string of Mnemonic phrases into
