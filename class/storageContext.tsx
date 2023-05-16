@@ -236,7 +236,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
             const rehydratedFiatRate = {
                 rate: new BigNumber(parsedRate.rate),
-                lastUpdated: parsedRate.lastUpdated,
+                lastUpdated: new Date(parsedRate.lastUpdated),
                 source: 'CoinGecko',
             }
             _setFiatRate(rehydratedFiatRate);
