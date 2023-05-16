@@ -30,7 +30,7 @@ export const TXBalance = (props: TxBalanceProps) => {
         return formatSats(balance);
     };
 
-    return ( <View>
+    return ( <>
         {!hideTotalBalance ? (
             <View style={[tailwind('flex-row items-center')]}>
                     {/* Display satSymbol if enabled in settings.
@@ -40,8 +40,10 @@ export const TXBalance = (props: TxBalanceProps) => {
                             numberOfLines={1}
                             style={[
                                 tailwind(
-                                    `${props.BalanceFontSize} font-bold self-baseline mr-2 text-white`,
-                                ), Font.SatSymbol,
+                                    `${props.BalanceFontSize} font-bold self-baseline mr-2`,
+                                ),
+                                {color: props.fontColor},
+                                Font.SatSymbol,
                             ]}>
                             s
                         </Text>
@@ -56,6 +58,7 @@ export const TXBalance = (props: TxBalanceProps) => {
                             tailwind(
                                 `${props.BalanceFontSize} font-bold text-white self-baseline`,
                             ),
+                            {color: props.fontColor}
                         ]}>
                         {getBalance(props.balance)}
                     </Text>
@@ -80,12 +83,12 @@ export const TXBalance = (props: TxBalanceProps) => {
             <View
                 style={[
                     tailwind(
-                        'rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black',
+                        'rounded flex-row self-center w-full h-6 opacity-10 bg-black mb-1',
                     ),
                 ]}
             />
         )}
-    </View>)
+    </>)
 };
 
 export const Balance = (props: BalanceProps) => {

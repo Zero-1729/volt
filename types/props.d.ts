@@ -58,6 +58,7 @@ export type TxBalanceProps = BaseProps & {
     balance: BalanceType;
     fiatRate?: FiatRate;
     BalanceFontSize?: string;
+    fontColor?: string;
 };
 
 export type BalanceProps = BaseProps & {
