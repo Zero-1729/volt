@@ -105,10 +105,13 @@ const Wallet = () => {
     // Refresh control
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        setLoadingBalance(true);
 
-        // Update wallet balance first
-        await syncWallet();
+        if (!loadingBalance) {
+            setLoadingBalance(true);
+
+            // Update wallet balance first
+            await syncWallet();
+        }
 
         const triggered = await fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
             // Then fetch fiat rate
