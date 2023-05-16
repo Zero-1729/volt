@@ -104,6 +104,12 @@ const Wallet = () => {
 
     // Refresh control
     const onRefresh = useCallback(async () => {
+        // Only attempt load if connected to network
+        if (networkState?.isConnected) {
+            return;
+        }
+
+        // March on to start refreshing
         setRefreshing(true);
 
         if (!loadingBalance) {
