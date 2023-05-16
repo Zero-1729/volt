@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
@@ -41,11 +41,6 @@ const Currency = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
-
-    const HeadingBar = {
-        height: 2,
-        backgroundColor: ColorScheme.HeadingBar,
-    };
 
     const {appFiatCurrency, setAppFiatCurrency, networkState, fiatRate} = useContext(AppStorageContext);
 
