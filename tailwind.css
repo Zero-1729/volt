@@ -127,6 +127,11 @@
   margin-right: 1.5rem
 }
 
+.my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem
+}
+
 .my-8 {
   margin-top: 2rem;
   margin-bottom: 2rem
@@ -176,12 +181,12 @@
   margin-bottom: 2rem
 }
 
-.ml-4 {
-  margin-left: 1rem
+.ml-1 {
+  margin-left: 0.25rem
 }
 
-.ml-6 {
-  margin-left: 1.5rem
+.ml-4 {
+  margin-left: 1rem
 }
 
 .mr-16 {
@@ -308,8 +313,16 @@
   width: 0.125rem
 }
 
+.w-1 {
+  width: 0.25rem
+}
+
 .w-1\/2 {
   width: 50%
+}
+
+.w-10 {
+  width: 2.5rem
 }
 
 .w-11\/12 {
@@ -336,10 +349,6 @@
   width: 50%
 }
 
-.w-32 {
-  width: 8rem
-}
-
 .w-5\/6 {
   width: 83.333333%
 }
@@ -358,6 +367,10 @@
 
 .flex-wrap {
   flex-wrap: wrap
+}
+
+.items-start {
+  align-items: flex-start
 }
 
 .items-end {
@@ -382,10 +395,6 @@
 
 .justify-around {
   justify-content: space-around
-}
-
-.justify-evenly {
-  justify-content: space-evenly
 }
 
 .self-end {
@@ -625,6 +634,10 @@
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity))
+}
+
+.opacity-10 {
+  opacity: 0.1
 }
 
 .opacity-20 {

@@ -1,19 +1,26 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {useColorScheme, View, Text, RefreshControl, ScrollView, StyleSheet} from 'react-native';
+import {useColorScheme, View, Text, RefreshControl, FlatList, ScrollView, StyleSheet, Linking} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import BdkRn from 'bdk-rn';
 import BigNum from 'bignumber.js';
+import Dayjs from 'dayjs';
+import calendar from 'dayjs/plugin/calendar';
+import LocalizedFormat from 'dayjs/plugin/localizedFormat';
+
+Dayjs.extend(calendar);
+Dayjs.extend(LocalizedFormat);
 
 import {useTailwind} from 'tailwind-rn';
 
 import Color from '../../constants/Color';
 
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
-import Scan from '../../assets/svg/scan.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
+import ArrowUp from '../../assets/svg/arrow-up-right-24.svg';
+import ArrowDown from '../../assets/svg/arrow-down-left-24.svg';
 
 import {formatTXFromBDK} from '../../modules/wallet-utils';
 
@@ -23,10 +30,13 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {fetchFiatRate} from '../../modules/currency';
 
-import {Balance} from '../../components/balance';
+import {Balance, TXBalance} from '../../components/balance';
 
 import {liberalAlert} from '../../components/alert';
-import {BalanceType, TransactionType} from '../../types/wallet';
+import {BalanceType, TransactionType, NetType} from '../../types/wallet';
+
+import RNHapticFeedback from 'react-native-haptic-feedback';
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 const Wallet = () => {
     const tailwind = useTailwind();
@@ -47,9 +57,6 @@ const Wallet = () => {
 
     // Get card color from wallet type
     const CardColor = ColorScheme.WalletColors[walletData.type];
-
-    // Fetch transactions from wallet
-    const [transactions, setTransactions] = useState([]);
 
     const walletName = walletData.name;
 
@@ -168,14 +175,77 @@ const Wallet = () => {
         }
     }, [syncWallet]);
 
+    // Get URL for mempool.space
+    const getURL = (txid: string) => {
+        return `https://mempool.space/${walletData.network === 'testnet' ? 'testnet/' : ''}tx/${txid}`
+    };
+
+    // Display transactions from wallet data
+    const renderItem = ({item, index}: {item: TransactionType, index: number}) => {
+        const getTxTimestamp = (time: Date) => {
+            const date = +new Date() - +time;
+
+            return `${Dayjs(date).calendar()} ${Dayjs(date).format('LT')}`;
+        };
+
+        // Get hex color code
+        const getHexColorCode = (v: string) => {
+            return `#${v}`;
+        };
+
+        return (
+            <PlainButton onPress={() => {
+                RNHapticFeedback.trigger(
+                    'impactLight',
+                    RNHapticFeedbackOptions,
+                );
+
+                const URL = getURL(item.txid);
+
+                Linking.openURL(URL);
+            }}>
+                <View style={[tailwind('flex-row h-16 my-1 justify-between items-center w-full px-4 py-2 rounded-md'), {backgroundColor: ColorScheme.Background.Greyed}]}>
+                    <View style={[tailwind('flex-row items-center w-5/6')]}>
+                        <View style={[tailwind('w-full ml-1')]}>
+                            <TXBalance
+                                balance={new BigNum(item.value)}
+                                BalanceFontSize={'text-lg'}
+                                fiatRate={fiatRate}
+                                fontColor={ColorScheme.Text.Default}
+                            />
+                            <Text style={[tailwind('text-xs'), {color: ColorScheme.Text.GrayedText}]}>{getTxTimestamp(item.timestamp)}</Text>
+                        </View>
+                    </View>
+                    <View style={[tailwind('w-10 h-10 rounded-full items-center justify-center'), {backgroundColor:  ColorScheme.Background.Secondary}]}>
+                        {item.type === 'inbound' ? (<ArrowDown fill={ColorScheme.SVG.Default} style={[tailwind('opacity-60')]} />) : <ArrowUp fill={ColorScheme.SVG.Default} style={[tailwind('opacity-60')]} />}
+                    </View>
+
+                    {/* TXID in colored string */}
+                    <View style={[tailwind('text-xs w-full items-start flex w-full absolute left-0')]}>
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(0, 2))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(2,8))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(8,14))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(14,20))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(20,26))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(26,32))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(32,38))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(38,44))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(44,50))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(50,54))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(54,56))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(56,62))}]} />
+                        <View style={[tailwind("h-1 w-1"), {backgroundColor: getHexColorCode(item.txid.toString().slice(-2))}]} />
+                    </View>
+                </View>
+            </PlainButton>
+        );
+    };
+
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
     return (
         <SafeAreaView style={[{flex: 1, backgroundColor: ColorScheme.Background.Default}]}>
             {/* adjust styling below to ensure content in View covers entire screen */}
-            <ScrollView contentContainerStyle={[styles.ScrollView]} refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} style={[{backgroundColor: 'transparent'}]} />
-            }>
                 {/* Adjust styling below to ensure it covers entire app height */}
                 <View style={[tailwind('w-full h-full')]}>
                     {/* Top panel */}
@@ -272,13 +342,13 @@ const Wallet = () => {
                         <View
                             style={[
                                 tailwind(
-                                    'absolute bottom-4 w-full justify-evenly flex-row mt-4 mb-4',
+                                    'absolute bottom-4 w-full items-center px-4 justify-around flex-row mt-4 mb-4',
                                 ),
                             ]}>
                             {!walletData.isWatchOnly ? (
                                 <View
                                     style={[
-                                        tailwind('rounded p-4 w-32 opacity-60'),
+                                        tailwind('rounded-full py-3 mr-4 w-1/2 opacity-60'),
                                         {
                                             backgroundColor:
                                                 ColorScheme.Background.Inverted,
@@ -288,7 +358,7 @@ const Wallet = () => {
                                         <Text
                                             style={[
                                                 tailwind(
-                                                    'text-sm text-center font-bold',
+                                                    'text-base text-center font-bold',
                                                 ),
                                                 {color: ColorScheme.Text.Alt},
                                             ]}>
@@ -302,10 +372,10 @@ const Wallet = () => {
                             <View
                                 style={[
                                     tailwind(
-                                        `rounded p-4 ${
+                                        `rounded-full py-3 ${
                                             walletData.isWatchOnly
                                                 ? 'w-5/6'
-                                                : 'w-32'
+                                                : 'w-1/2'
                                         } opacity-60`,
                                     ),
                                     {
@@ -317,7 +387,7 @@ const Wallet = () => {
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-sm text-center font-bold',
+                                                'text-base text-center font-bold',
                                             ),
                                             {color: ColorScheme.Text.Alt},
                                         ]}>
@@ -325,45 +395,13 @@ const Wallet = () => {
                                     </Text>
                                 </PlainButton>
                             </View>
-                            {!walletData.isWatchOnly ? (
-                                <View
-                                    style={[
-                                        tailwind(
-                                            'justify-center rounded px-4 opacity-60',
-                                        ),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Inverted,
-                                        },
-                                    ]}>
-                                    <PlainButton
-                                        onPress={() => {
-                                            navigation.dispatch(
-                                                CommonActions.navigate({
-                                                    name: 'Scan',
-                                                    params: {
-                                                        walletID: currentWalletID,
-                                                        key: 'Wallet',
-                                                    },
-                                                }),
-                                            );
-                                        }}>
-                                        <Scan
-                                            width={32}
-                                            fill={ColorScheme.SVG.Inverted}
-                                        />
-                                    </PlainButton>
-                                </View>
-                            ) : (
-                                <></>
-                            )}
                         </View>
 
                         {/* Bottom line divider */}
                         <View
                             style={[
                                 tailwind(
-                                    'w-16 h-1 absolute bottom-2 rounded-full mt-2 self-center opacity-60',
+                                    'w-16 h-1 absolute bottom-2 rounded-full self-center opacity-40',
                                 ),
                                 {backgroundColor: ColorScheme.Background.Inverted},
                             ]}
@@ -371,8 +409,8 @@ const Wallet = () => {
                     </View>
 
                     {/* Transactions List */}
-                    <View style={[tailwind('h-2/3 w-full')]}>
-                        <View style={[tailwind('ml-6 mt-6')]}>
+                    <View style={[tailwind('h-2/3 w-full items-center')]}>
+                        <View style={[tailwind('mt-6 w-11/12')]}>
                             <Text
                                 style={[
                                     tailwind('text-lg font-bold'),
@@ -381,6 +419,9 @@ const Wallet = () => {
                                 Transactions
                             </Text>
                         </View>
+
+                        <ScrollView contentContainerStyle={[styles.ScrollView, tailwind('w-full h-full')]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} style={[{backgroundColor: 'transparent'}]} />
+                        }>
 
                         {walletData.transactions.length === 0 ? (
                             <View
@@ -404,12 +445,19 @@ const Wallet = () => {
                                 </Text>
                             </View>
                         ) : (
-                            /* TODO: display render list of transactions */
-                            <View />
+                            <FlatList
+                                scrollEnabled={true}
+                                style={tailwind('w-11/12 mt-4')}
+                                data={walletData.transactions}
+                                renderItem={renderItem}
+                                keyExtractor={item => item.txid}
+                                initialNumToRender={25}
+                                contentInsetAdjustmentBehavior="automatic"
+                            />
                         )}
+                    </ScrollView>
                     </View>
                 </View>
-            </ScrollView>
         </SafeAreaView>
     );
 };
