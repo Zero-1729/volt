@@ -16,7 +16,7 @@ import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit, BalanceType, FiatRate} from '../types/wallet';
-import {BackupMaterialTypes, NetType, baseWalletArgs, NetInfoType} from '../types/wallet';
+import {BackupMaterialTypes, TransactionType, NetType, baseWalletArgs, NetInfoType} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
 import {BDKWalletTypeNames, extendedKeyInfo, getDescriptorParts} from '../modules/wallet-utils';
@@ -50,6 +50,7 @@ type defaultContextType = {
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
+    updateWalletTransactions: (id: string, transactions: TransactionType[]) => void;
     updateWalletBalance: (id: string, balance: BalanceType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
@@ -98,6 +99,7 @@ const defaultContext: defaultContextType = {
     restoreWallet: () => {},
     addWallet: () => {},
     updateWalletUnit: () => {},
+    updateWalletTransactions: () => {},
     updateWalletBalance: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
@@ -432,13 +434,32 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const updateWalletTransactions = useCallback(
+        async (id: string, transactions: TransactionType[]) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            // Get the current wallet
+            // Update the transactions in the current wallet
+            const tmp = [...wallets];
+            tmp[index].updateTransanctions(transactions);
+
+            // Update wallets list
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const updateWalletBalance = useCallback(
         async (id: string, balance: BalanceType) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
+            // Get the current wallet
+            // Update the balance in the current wallet
             const tmp = [...wallets];
             tmp[index].balance = balance;
 
+            // Update wallets list
             _setWallets(tmp);
             _updateWallets(JSON.stringify(tmp));
         },
@@ -684,6 +705,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 setIsAdvancedMode,
                 getWalletData,
                 updateWalletUnit,
+                updateWalletTransactions,
                 updateWalletBalance,
                 renameWallet,
                 deleteWallet,
