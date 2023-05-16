@@ -441,7 +441,7 @@ export const AppStorageProvider = ({children}: Props) => {
             // Get the current wallet
             // Update the transactions in the current wallet
             const tmp = [...wallets];
-            tmp[index].updateTransanctions(transactions);
+            tmp[index].transactions = transactions;
 
             // Update wallets list
             _setWallets(tmp);
