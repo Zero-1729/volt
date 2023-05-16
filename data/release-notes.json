@@ -9,5 +9,6 @@
     "Add wallet screen is now a stack of models",
     "Included Wallet information and tools in wallet screen",
     "Added a new Mnemonic screen to show newly created wallet mnemonic for backup",
-    "Improved UI error handling"
+    "Improved UI error handling",
+    "Added support for fiat price rate fetch from CoinGecko, with pull-to-refresh in Wallet screen"
 ]
