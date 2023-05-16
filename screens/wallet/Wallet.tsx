@@ -15,6 +15,8 @@ import Scan from '../../assets/svg/scan.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 
+import {formatTXFromBDK} from '../../modules/wallet-utils';
+
 import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -24,7 +26,7 @@ import {fetchFiatRate} from '../../modules/currency';
 import {Balance} from '../../components/balance';
 
 import {liberalAlert} from '../../components/alert';
-import { BalanceType } from '../../types/wallet';
+import {BalanceType, TransactionType} from '../../types/wallet';
 
 const Wallet = () => {
     const tailwind = useTailwind();
@@ -32,7 +34,7 @@ const Wallet = () => {
     const navigation = useNavigation();
 
     // Get current wallet ID and wallet data
-    const {currentWalletID, getWalletData, updateWalletBalance, networkState, fiatRate, appFiatCurrency, updateFiatRate} =
+    const {currentWalletID, getWalletData, updateWalletTransactions, updateWalletBalance, networkState, fiatRate, appFiatCurrency, updateFiatRate} =
         useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -108,7 +110,20 @@ const Wallet = () => {
             liberalAlert('Error', `Could not fetch transactions ${transactionResponse.error}`, 'OK');
         }
 
-        setTransactions(transactionResponse.data);
+        const {confirmed, pending} = transactionResponse.data;
+        const txs: TransactionType[] = [];
+
+        // Update transactions list
+        confirmed.forEach((transaction: any) => {
+            txs.push(formatTXFromBDK({confirmed: true, ...transaction}));
+        });
+
+        pending.forEach((transaction: any) => {
+            txs.push(formatTXFromBDK({confirmed: false, ...transaction}));
+        });
+
+        // Update wallet transactions
+        updateWalletTransactions(currentWalletID, txs);
     }, [currentWalletID, updateWalletBalance, walletData.secret, walletData.network]);
 
     // Refresh control
@@ -367,7 +382,7 @@ const Wallet = () => {
                             </Text>
                         </View>
 
-                        {transactions.length === 0 ? (
+                        {walletData.transactions.length === 0 ? (
                             <View
                                 style={[
                                     tailwind(
