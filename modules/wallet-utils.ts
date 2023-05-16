@@ -2,6 +2,7 @@ import {Buffer} from 'buffer';
 
 import * as b58 from 'bs58';
 import Crypto from 'react-native-quick-crypto';
+import BigNumber from 'bignumber.js';
 
 import {
     descriptorSymbolsType,
@@ -308,8 +309,8 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
         confirmed: tx.confirmed,
         block_height: tx.block_height,
         timestamp: tx.block_timestamp,
-        fee: tx.fee,
-        value: tx.received.length !== '' ? tx.received : tx.sent,
+        fee: new BigNumber(tx.fee),
+        value: new BigNumber(tx.received.length !== '' ? tx.received : tx.sent),
         type: tx.received.length !== '' ? 'inbound' : 'outbound',
     };
 
