@@ -27,6 +27,26 @@ export type UTXOType = {
     flagged: boolean; // Whether flagged by user to avoid spending, i.e. dust
 };
 
+// Transaction Type
+export type TransactionType = {
+    txid: string; // Transaction ID
+    block_height: number; // Block height
+    confirmed: boolean; // Whether transaction is confirmed
+    confirmations?: number; // Number of confirmations
+    size?: number; // Transaction size in bytes
+    vsize?: number; // Transaction size in virtual bytes
+    weight?: number; // Transaction weight
+    fee: BalanceType; // Transaction fee in sats
+    value: BalanceType; // Transaction value in sats
+    timestamp: Date; // Transaction date
+    type: string; // Transaction type, 'outbound' or 'inbound'
+    inputs?: UTXOType[]; // Transaction inputs
+    outputs?: UTXOType[]; // Transaction outputs
+    address?: string; // Transaction address
+    rbf?: boolean; // Whether transaction is RBF
+    memo?: string; // Transaction memo
+};
+
 // Wallet Unit Type
 export type Unit = {
     name: string; // Unit name, 'sats' or 'BTC'
