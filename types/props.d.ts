@@ -54,6 +54,12 @@ export type WalletCardProps = CardProps & {
     navCallback?: () => void;
 };
 
+export type TxBalanceProps = BaseProps & {
+    balance: BalanceType;
+    fiatRate?: FiatRate;
+    BalanceFontSize?: string;
+};
+
 export type BalanceProps = BaseProps & {
     id: string; // current id of the wallet to show balance
     fiatRate?: FiatRate;
