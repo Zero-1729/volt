@@ -9,6 +9,7 @@ import {
     BDKWalletTypes,
     extendedKeyInfoType,
     accountPaths,
+    TransactionType,
 } from '../types/wallet';
 
 export const WalletTypeNames: {[index: string]: string[]} = {
@@ -298,4 +299,20 @@ export const getDescriptorParts = (descriptor: string) => {
     }
 
     return components;
+};
+
+// Formats transaction data from BDK to format for wallet
+export const formatTXFromBDK = (tx: any): TransactionType => {
+    const formattedTx = {
+        txid: tx.txid,
+        confirmed: tx.confirmed,
+        block_height: tx.block_height,
+        timestamp: tx.block_timestamp,
+        fee: tx.fee,
+        value: tx.received.length !== '' ? tx.received : tx.sent,
+        type: tx.received.length !== '' ? 'inbound' : 'outbound',
+    };
+
+    // Returned formatted tx
+    return formattedTx;
 };
