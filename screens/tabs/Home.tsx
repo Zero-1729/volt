@@ -111,7 +111,7 @@ const Home = () => {
 
         fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
             updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
-        });
+        }, true);
     }, [appFiatCurrency])
 
     const renderCard = ({item}: {item: BaseWallet}) => {
