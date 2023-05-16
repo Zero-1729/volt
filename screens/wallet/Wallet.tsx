@@ -104,13 +104,14 @@ const Wallet = () => {
 
     // Refresh control
     const onRefresh = useCallback(async () => {
+        // Set refreshing
+        setRefreshing(true);
+
         // Only attempt load if connected to network
-        if (networkState?.isConnected) {
+        if (!networkState?.isConnected) {
+            setRefreshing(false);
             return;
         }
-
-        // March on to start refreshing
-        setRefreshing(true);
 
         if (!loadingBalance) {
             setLoadingBalance(true);
@@ -149,7 +150,7 @@ const Wallet = () => {
         <SafeAreaView style={[{flex: 1, backgroundColor: ColorScheme.Background.Default}]}>
             {/* adjust styling below to ensure content in View covers entire screen */}
             <ScrollView contentContainerStyle={[styles.ScrollView]} refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} style={[{backgroundColor: 'transparent'}]} />
             }>
                 {/* Adjust styling below to ensure it covers entire app height */}
                 <View style={[tailwind('w-full h-full')]}>
