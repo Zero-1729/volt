@@ -8,6 +8,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {FlatList} from 'react-native-gesture-handler';
+
 import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
@@ -94,7 +95,7 @@ const Home = () => {
         }
 
         if (!initFiatRate) {
-            fetchFiatRate(appFiatCurrency.short, (rate: BalanceType) => {
+            fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
                 updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
             });
             setInitFiatRate(true);
@@ -108,7 +109,7 @@ const Home = () => {
             return;
         }
 
-        fetchFiatRate(appFiatCurrency.short, (rate: BalanceType) => {
+        fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
             updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
         });
     }, [appFiatCurrency])
