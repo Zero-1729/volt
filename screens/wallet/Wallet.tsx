@@ -46,8 +46,8 @@ const Wallet = () => {
     // Get card color from wallet type
     const CardColor = ColorScheme.WalletColors[walletData.type];
 
-    // TODO: Fetch transactions from wallet
-    const transactions = [];
+    // Fetch transactions from wallet
+    const [transactions, setTransactions] = useState([]);
 
     const walletName = walletData.name;
 
@@ -100,6 +100,15 @@ const Wallet = () => {
             const balance = new BigNum(balanceResponse.data);
             updateWalletBalance(currentWalletID, balance);
         }
+
+        // Update transactions list
+        const transactionResponse = await BdkRn.getTransactions();
+
+        if (transactionResponse.error) {
+            liberalAlert('Error', `Could not fetch transactions ${transactionResponse.error}`, 'OK');
+        }
+
+        setTransactions(transactionResponse.data);
     }, [currentWalletID, updateWalletBalance, walletData.secret, walletData.network]);
 
     // Refresh control
@@ -380,6 +389,7 @@ const Wallet = () => {
                                 </Text>
                             </View>
                         ) : (
+                            /* TODO: display render list of transactions */
                             <View />
                         )}
                     </View>
