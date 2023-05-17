@@ -37,6 +37,7 @@ import {BalanceType, TransactionType} from '../../types/wallet';
 import NetInfo from '@react-native-community/netinfo';
 
 import {fetchFiatRate} from '../../modules/currency';
+import {liberalAlert} from '../../components/alert';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
@@ -105,6 +106,41 @@ const Home = () => {
         new BigNumber(0),
     );
 
+    // Fiat fetch
+    const singleSyncFiatRate = useCallback(async (violate: boolean = false) => {
+        // Avoid fiat rate update call when offline
+        if (!networkState?.isConnected) {
+            return;
+        }
+
+        // Only proceed if initial load or if user select new currency in settings
+        if (!initFiatRate || violate) {
+            try {
+                await fetchFiatRate(
+                    appFiatCurrency.short,
+                    fiatRate,
+                    (rate: BalanceType) => {
+                        updateFiatRate({
+                            ...fiatRate,
+                            rate: rate,
+                            lastUpdated: new Date(),
+                        });
+                    },
+                    violate,
+                );
+            } catch (e) {
+                // Report network error
+                liberalAlert('Network', `${e.message}`, 'OK');
+
+                // Kill loading
+                setLoadingBalance(false);
+            }
+
+            // Kill loading
+            setLoadingBalance(false);
+        }
+    }, []);
+
     // Refresh control
     const refreshWallet = useCallback(async () => {
         // start loading
@@ -167,51 +203,32 @@ const Home = () => {
         networkState?.isConnected,
     ]);
 
-    // Fetch the fiat rate on initial load
-    useEffect(() => {
-        // Avoid fiat rate update call when offline
-        if (!networkState?.isConnected) {
-            return;
-        }
-
-        if (!initFiatRate) {
-            fetchFiatRate(
-                appFiatCurrency.short,
-                fiatRate,
-                (rate: BalanceType) => {
-                    updateFiatRate({
-                        ...fiatRate,
-                        rate: rate,
-                        lastUpdated: new Date(),
-                    });
-                },
-            );
-
-            setInitFiatRate(true);
-            setLoadingBalance(false);
-        }
-    });
-
     // Fetch the fiat rate on currency change
     useEffect(() => {
         // Avoid fiat rate update call when offline
-        if (!networkState?.isConnected) {
+        // or when newly loaded screen to avoid dup call
+        if (!networkState?.isConnected || !initFiatRate) {
             return;
         }
 
-        fetchFiatRate(
-            appFiatCurrency.short,
-            fiatRate,
-            (rate: BalanceType) => {
-                updateFiatRate({
-                    ...fiatRate,
-                    rate: rate,
-                    lastUpdated: new Date(),
-                });
-            },
-            true,
-        );
+        // Only call on each change to fiat currency in settings
+        setLoadingBalance(true);
+        singleSyncFiatRate(true);
     }, [appFiatCurrency]);
+
+    // Fetch the fiat rate on initial load
+    useEffect(() => {
+        if (!initFiatRate) {
+            // Begin loading
+            setLoadingBalance(true);
+
+            // Single shot call to update fiat rate
+            singleSyncFiatRate();
+
+            // Kill initial load lock
+            setInitFiatRate(true);
+        }
+    });
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
