@@ -11,8 +11,6 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 Dayjs.extend(calendar);
 Dayjs.extend(LocalizedFormat);
 
-import {formatTXFromBDK}  from '../modules/wallet-utils';
-
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
@@ -26,25 +24,6 @@ import Color from '../constants/Color';
 
 import ArrowUp from '../assets/svg/arrow-up-right-24.svg';
 import ArrowDown from '../assets/svg/arrow-down-left-24.svg';
-
-const ftxs = [];
-
-// iterate over 20 times and generate a transaction and push to txs
-for (let i = 0; i < 20; i++) {
-    ftxs.push(
-        formatTXFromBDK({
-            txid: i,
-            confirmed: true,
-            received: (i * 32).toString(),
-            sent: '',
-            fee: (2 * i).toString(),
-            timestamp: 0,
-            confirmations: 0,
-            block_height: 0,
-            type: 'send',
-        }),
-    );
-}
 
 export const TransactionListItem = (props: TxListItemProps) => {
     console.info('info: ', props);
