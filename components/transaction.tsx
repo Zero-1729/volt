@@ -26,7 +26,6 @@ import ArrowUp from '../assets/svg/arrow-up-right-24.svg';
 import ArrowDown from '../assets/svg/arrow-down-left-24.svg';
 
 export const TransactionListItem = (props: TxListItemProps) => {
-    console.info('info: ', props);
     const tailwind = useTailwind();
 
     const ColorScheme = Color(useColorScheme());
