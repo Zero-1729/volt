@@ -230,6 +230,7 @@ const Wallet = () => {
                                 BalanceFontSize={'text-4xl'}
                                 fiatRate={fiatRate}
                                 disableFiat={false}
+                                loading={loadingBalance}
                             />
                         </View>
                     </View>
