@@ -294,7 +294,7 @@ export const getDescriptorParts = (descriptor: string) => {
     // Handle nested script case
     const prefix = descriptor.split('(')[0];
 
-    if (prefix === 'sh' && parts[1] === 'wpkh' && parts.length == 3) {
+    if (prefix === 'sh' && parts[1] === 'wpkh' && parts.length === 3) {
         // Extract embedded key
         const key = parts[2].split(')')[0];
 
