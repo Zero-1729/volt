@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {
-    useColorScheme,
-    View,
-    Text,
-    FlatList,
-    StyleSheet,
-    Linking,
-} from 'react-native';
+import {useColorScheme, View, Text, FlatList} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -27,8 +20,6 @@ import Color from '../../constants/Color';
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
-import ArrowUp from '../../assets/svg/arrow-up-right-24.svg';
-import ArrowDown from '../../assets/svg/arrow-down-left-24.svg';
 
 import {formatTXFromBDK} from '../../modules/wallet-utils';
 
@@ -38,13 +29,12 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {fetchFiatRate} from '../../modules/currency';
 
-import {Balance, TXBalance} from '../../components/balance';
+import {Balance} from '../../components/balance';
 
 import {liberalAlert} from '../../components/alert';
-import {BalanceType, TransactionType} from '../../types/wallet';
+import {TransactionListItem} from '../../components/transaction';
 
-import RNHapticFeedback from 'react-native-haptic-feedback';
-import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+import {BalanceType, TransactionType} from '../../types/wallet';
 
 const Wallet = () => {
     const tailwind = useTailwind();
@@ -224,225 +214,6 @@ const Wallet = () => {
             setSingleLoadLock(true);
         }
     }, [syncWallet, setSingleLoadLock, singleLoadLock]);
-
-    // Get URL for mempool.space
-    const getURL = (txid: string) => {
-        return `https://mempool.space/${
-            walletData.network === 'testnet' ? 'testnet/' : ''
-        }tx/${txid}`;
-    };
-
-    // Display transactions from wallet data
-    const renderItem = ({item}: {item: TransactionType}) => {
-        const getTxTimestamp = (time: Date) => {
-            const date = +new Date() - +time;
-
-            return `${Dayjs(date).calendar()} ${Dayjs(date).format('LT')}`;
-        };
-
-        // Get hex color code
-        const getHexColorCode = (v: string) => {
-            return `#${v}`;
-        };
-
-        return (
-            <PlainButton
-                onPress={() => {
-                    RNHapticFeedback.trigger(
-                        'impactLight',
-                        RNHapticFeedbackOptions,
-                    );
-
-                    const URL = getURL(item.txid);
-
-                    Linking.openURL(URL);
-                }}>
-                <View
-                    style={[
-                        tailwind(
-                            'flex-row h-16 my-1 justify-between items-center w-full px-4 py-2 rounded-md',
-                        ),
-                        {backgroundColor: ColorScheme.Background.Greyed},
-                    ]}>
-                    <View style={[tailwind('flex-row items-center w-5/6')]}>
-                        <View style={[tailwind('w-full ml-1')]}>
-                            <TXBalance
-                                balance={new BigNum(item.value)}
-                                BalanceFontSize={'text-lg'}
-                                fiatRate={fiatRate}
-                                fontColor={ColorScheme.Text.Default}
-                            />
-                            <Text
-                                style={[
-                                    tailwind('text-xs'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                {getTxTimestamp(item.timestamp)}
-                            </Text>
-                        </View>
-                    </View>
-                    <View
-                        style={[
-                            tailwind(
-                                'w-10 h-10 rounded-full items-center justify-center',
-                            ),
-                            {backgroundColor: ColorScheme.Background.Secondary},
-                        ]}>
-                        {item.type === 'inbound' ? (
-                            <ArrowDown
-                                fill={ColorScheme.SVG.Default}
-                                style={[tailwind('opacity-60')]}
-                            />
-                        ) : (
-                            <ArrowUp
-                                fill={ColorScheme.SVG.Default}
-                                style={[tailwind('opacity-60')]}
-                            />
-                        )}
-                    </View>
-
-                    {/* TXID in colored string */}
-                    <View
-                        style={[
-                            tailwind(
-                                'text-xs w-full items-start flex w-full absolute left-0',
-                            ),
-                        ]}>
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(0, 2),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(2, 8),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(8, 14),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(14, 20),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(20, 26),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(26, 32),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(32, 38),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(38, 44),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(44, 50),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(50, 54),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(54, 56),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(56, 62),
-                                    ),
-                                },
-                            ]}
-                        />
-                        <View
-                            style={[
-                                tailwind('h-1 w-1'),
-                                {
-                                    backgroundColor: getHexColorCode(
-                                        item.txid.toString().slice(-2),
-                                    ),
-                                },
-                            ]}
-                        />
-                    </View>
-                </View>
-            </PlainButton>
-        );
-    };
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
@@ -658,7 +429,12 @@ const Wallet = () => {
                                 scrollEnabled={true}
                                 style={tailwind('w-11/12 mt-4 mb-12')}
                                 data={walletData.transactions}
-                                renderItem={renderItem}
+                                renderItem={item => (
+                                    <TransactionListItem
+                                        fiatRate={fiatRate}
+                                        tx={item.item}
+                                    />
+                                )}
                                 keyExtractor={item => item.txid}
                                 initialNumToRender={25}
                                 contentInsetAdjustmentBehavior="automatic"
