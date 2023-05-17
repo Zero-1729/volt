@@ -54,6 +54,11 @@ export type WalletCardProps = CardProps & {
     navCallback?: () => void;
 };
 
+export type TxListItemProps = BaseProps & {
+    tx: TransactionType;
+    fiatRate: FiatRate;
+};
+
 export type TxBalanceProps = BaseProps & {
     balance: BalanceType;
     fiatRate?: FiatRate;
