@@ -45,12 +45,19 @@ const Info = () => {
     const walletPath = walletData.derivationPath;
     const walletType = WalletTypeNames[walletData.type];
     const walletNetwork = walletData.network;
-    const walletTypeName = walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
-    const walletFingerprint = walletData.masterFingerprint ? walletData.masterFingerprint.toUpperCase() : '-';
-    const walletDescriptor = walletData.descriptor ? walletData.descriptor : '-';
+    const walletTypeName =
+        walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
+    const walletFingerprint = walletData.masterFingerprint
+        ? walletData.masterFingerprint.toUpperCase()
+        : '-';
+    const walletDescriptor = walletData.descriptor
+        ? walletData.descriptor
+        : '-';
 
-    const [walletDescriptorText, setWalletDescriptorText] = useState(walletDescriptor);
-    const [walletFingerprintText, setWalletFingerprintText] = useState(walletFingerprint);
+    const [walletDescriptorText, setWalletDescriptorText] =
+        useState(walletDescriptor);
+    const [walletFingerprintText, setWalletFingerprintText] =
+        useState(walletFingerprint);
     const [walletPathText, setWalletPathText] = useState(walletPath);
 
     const copyPathToClipboard = () => {
@@ -60,7 +67,7 @@ const Info = () => {
 
         setTimeout(() => {
             setWalletPathText(walletPath);
-        }, 450)
+        }, 450);
     };
 
     const copyFingerToClipboard = () => {
@@ -70,7 +77,7 @@ const Info = () => {
 
         setTimeout(() => {
             setWalletFingerprintText(walletFingerprintText);
-        }, 450)
+        }, 450);
     };
 
     const copyDescToClipboard = () => {
@@ -80,7 +87,7 @@ const Info = () => {
 
         setTimeout(() => {
             setWalletDescriptorText(walletDescriptorText);
-        }, 450)
+        }, 450);
     };
 
     const [tmpName, setTmpName] = useState(walletName);
@@ -270,7 +277,13 @@ const Info = () => {
                             numberOfLines={1}
                             ellipsizeMode="middle"
                             style={[
-                                tailwind(`text-sm ${walletDescriptor !== '-' ? 'text-center' : 'text-left'}`),
+                                tailwind(
+                                    `text-sm ${
+                                        walletDescriptor !== '-'
+                                            ? 'text-center'
+                                            : 'text-left'
+                                    }`,
+                                ),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             {walletDescriptorText}

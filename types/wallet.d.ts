@@ -13,9 +13,9 @@ export type BalanceType = BigNumber;
 
 // Wallet balance fiat rate
 export type FiatRate = {
-    rate: BalanceType,
-    lastUpdated: Date,
-    source: string,
+    rate: BalanceType;
+    lastUpdated: Date;
+    source: string;
 };
 
 // UTXO Type

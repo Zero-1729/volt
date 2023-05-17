@@ -16,10 +16,20 @@ import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 import {Unit, BalanceType, FiatRate} from '../types/wallet';
-import {BackupMaterialTypes, TransactionType, NetType, baseWalletArgs, NetInfoType} from '../types/wallet';
+import {
+    BackupMaterialTypes,
+    TransactionType,
+    NetType,
+    baseWalletArgs,
+    NetInfoType,
+} from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
-import {BDKWalletTypeNames, extendedKeyInfo, getDescriptorParts} from '../modules/wallet-utils';
+import {
+    BDKWalletTypeNames,
+    extendedKeyInfo,
+    getDescriptorParts,
+} from '../modules/wallet-utils';
 
 import BdkRn from 'bdk-rn';
 
@@ -50,7 +60,10 @@ type defaultContextType = {
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     updateWalletUnit: (id: string, unit: Unit) => void;
-    updateWalletTransactions: (id: string, transactions: TransactionType[]) => void;
+    updateWalletTransactions: (
+        id: string,
+        transactions: TransactionType[],
+    ) => void;
     updateWalletBalance: (id: string, balance: BalanceType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
@@ -78,7 +91,7 @@ const defaultContext: defaultContextType = {
         locale: 'en-US',
     },
     wallets: [],
-    fiatRate:  {
+    fiatRate: {
         rate: new BigNumber(1),
         lastUpdated: new Date(),
         source: 'CoinGecko',
@@ -139,12 +152,14 @@ export const AppStorageProvider = ({children}: Props) => {
         defaultContext.isAdvancedMode,
     );
 
-    const {getItem: _getNetworkState, setItem: _updateNetworkState} = useAsyncStorage('networkState');
+    const {getItem: _getNetworkState, setItem: _updateNetworkState} =
+        useAsyncStorage('networkState');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
         useAsyncStorage('appFiatCurrency');
-    const {getItem: _getFiatRate, setItem: _updateFiatRate} = useAsyncStorage('fiatRate')
+    const {getItem: _getFiatRate, setItem: _updateFiatRate} =
+        useAsyncStorage('fiatRate');
     const {getItem: _getUseSatSymbol, setItem: _updateUseSatSymbol} =
         useAsyncStorage('useSatSymbol');
     const {
@@ -173,7 +188,8 @@ export const AppStorageProvider = ({children}: Props) => {
 
                 throw new Error('Error setting network state');
             }
-        }, [_setNetworkState, _updateNetworkState]
+        },
+        [_setNetworkState, _updateNetworkState],
     );
 
     const setAppLanguage = useCallback(
@@ -199,6 +215,16 @@ export const AppStorageProvider = ({children}: Props) => {
         // ...otherwise, use default
         if (lang !== null) {
             _setAppLanguage(JSON.parse(lang));
+        }
+    };
+
+    const _loadNetworkState = async () => {
+        const netState = await _getNetworkState();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (netState !== null) {
+            _setNetworkState(JSON.parse(netState));
         }
     };
 
@@ -240,19 +266,24 @@ export const AppStorageProvider = ({children}: Props) => {
                 rate: new BigNumber(parsedRate.rate),
                 lastUpdated: new Date(parsedRate.lastUpdated),
                 source: 'CoinGecko',
-            }
+            };
             _setFiatRate(rehydratedFiatRate);
         }
     };
 
-    const updateFiatRate = useCallback(async (fiat: FiatRate) => {
-        try {
-            _setFiatRate(fiat);
-            _updateFiatRate(JSON.stringify(fiat));
-        } catch (e) {
-            console.error(`[AsyncStorage] (Fiat Rate) Error updating rate: ${e}`)
-        }
-    }, [_setFiatRate, _updateFiatRate])
+    const updateFiatRate = useCallback(
+        async (fiat: FiatRate) => {
+            try {
+                _setFiatRate(fiat);
+                _updateFiatRate(JSON.stringify(fiat));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Fiat Rate) Error updating rate: ${e}`,
+                );
+            }
+        },
+        [_setFiatRate, _updateFiatRate],
+    );
 
     const setSatSymbol = useCallback(
         async (useSat: boolean) => {
@@ -566,7 +597,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 net = desc.network;
                 walletType = desc.type;
             }
-            
+
             const walletArgs = {
                 name: 'Restored Wallet',
                 type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
@@ -646,6 +677,10 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
+        _loadNetworkState();
+    }, []);
+
+    useEffect(() => {
         _loadFiatCurrency();
     }, []);
 
@@ -675,7 +710,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
     useEffect(() => {
         _loadFiatRate();
-    }, [])
+    }, []);
 
     // Return provider
     return (

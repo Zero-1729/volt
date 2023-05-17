@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useEffect, useState} from 'react';
 
@@ -95,12 +96,20 @@ const Home = () => {
         }
 
         if (!initFiatRate) {
-            fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
-                updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
-            });
+            fetchFiatRate(
+                appFiatCurrency.short,
+                fiatRate,
+                (rate: BalanceType) => {
+                    updateFiatRate({
+                        ...fiatRate,
+                        rate: rate,
+                        lastUpdated: new Date(),
+                    });
+                },
+            );
             setInitFiatRate(true);
         }
-    })
+    });
 
     // Fetch the fiat rate on currency change
     useEffect(() => {
@@ -109,10 +118,19 @@ const Home = () => {
             return;
         }
 
-        fetchFiatRate(appFiatCurrency.short, fiatRate, (rate: BalanceType) => {
-            updateFiatRate({...fiatRate, rate: rate, lastUpdated: new Date()});
-        }, true);
-    }, [appFiatCurrency])
+        fetchFiatRate(
+            appFiatCurrency.short,
+            fiatRate,
+            (rate: BalanceType) => {
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: rate,
+                    lastUpdated: new Date(),
+                });
+            },
+            true,
+        );
+    }, [appFiatCurrency]);
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (

@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
@@ -43,7 +42,8 @@ const ImportAction = () => {
 
     const [importText, setImportText] = useState('');
 
-    const {isAdvancedMode, restoreWallet, networkState} = useContext(AppStorageContext);
+    const {isAdvancedMode, restoreWallet, networkState} =
+        useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
         console.info(`[Success] Document Picker: ${data.uri}`);
@@ -100,7 +100,10 @@ const ImportAction = () => {
 
                 handleSuccessRoute();
             } else {
-                errorAlert('Descriptor', 'Only single key descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))');
+                errorAlert(
+                    'Descriptor',
+                    'Only single key descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))',
+                );
                 return;
             }
         } catch (e: any) {
@@ -155,7 +158,10 @@ const ImportAction = () => {
         // Perform network check to avoid BDK native code error
         // Must be connected to network to use bdk-rn fns
         if (!networkState?.isConnected) {
-            errorAlert('Alert', 'Internet connection offline, re-connect to restore wallet.');
+            errorAlert(
+                'Alert',
+                'Internet connection offline, re-connect to restore wallet.',
+            );
             return;
         }
 

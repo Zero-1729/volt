@@ -40,30 +40,32 @@ const Backup = () => {
     // Key material currently stored in wallet
     const isSingleMaterial = walletData.secret === '';
     const walletAvailMaterial: string =
-    walletData.secret !== ''
-        ? 'Mnemonic'
-        : walletData.descriptor !== ''
-        ? 'Descriptor'
-        : 'Extended Public Key (XPUB)';
+        walletData.secret !== ''
+            ? 'Mnemonic'
+            : walletData.descriptor !== ''
+            ? 'Descriptor'
+            : 'Extended Public Key (XPUB)';
 
     const getQRData = (material: string) => {
         // Only show mnemonic if mnemonic available and toggled
         if (material === 'Mnemonic' && walletData.secret !== '') {
             return walletData.secret;
         }
-            
+
         // Shows descriptor if available or toggled
         if (walletData.descriptor || material === 'Descriptor') {
             return walletData.descriptor;
         }
-            
+
         // Fallback to xpub, assuming first two unavailable (i.e., in case only watch only xpub restore)
         return walletData.xpub;
     };
-   
+
     const [backupMaterial, setBackupMaterial] =
-                useState<string>(walletAvailMaterial);
-    const [backupData, setBackupData] = useState<string>(getQRData(walletAvailMaterial));
+        useState<string>(walletAvailMaterial);
+    const [backupData, setBackupData] = useState<string>(
+        getQRData(walletAvailMaterial),
+    );
 
     // Update the displayed backup data and current backup material type
     const updateData = (material: string) => {
@@ -76,12 +78,12 @@ const Backup = () => {
         // Temporarily set copied message
         // and revert after a few seconds
         Clipboard.setString(getQRData(backupMaterial));
-    
+
         setBackupData('Copied to clipboard');
-    
+
         setTimeout(() => {
             setBackupData(getQRData(backupMaterial));
-        }, 450)
+        }, 450);
     };
 
     const warning =
@@ -143,18 +145,21 @@ const Backup = () => {
                             ),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
-                            {/* Display the single backup material if restored non-mnemonic */}
-                            {isSingleMaterial ? (<>
+                        {/* Display the single backup material if restored non-mnemonic */}
+                        {isSingleMaterial ? (
+                            <>
                                 <Text
                                     style={[
                                         tailwind('text-sm font-bold'),
                                         {
-                                            color: ColorScheme.Text.Default
+                                            color: ColorScheme.Text.Default,
                                         },
                                     ]}>
                                     {backupMaterial}
                                 </Text>
-                            </>) : (<>
+                            </>
+                        ) : (
+                            <>
                                 {/* Display the backup material selector if restored mnemonic */}
                                 <PlainButton
                                     style={[tailwind('mr-4')]}
@@ -226,7 +231,8 @@ const Backup = () => {
                                         Descriptor
                                     </Text>
                                 </PlainButton>
-                            </>)}
+                            </>
+                        )}
                     </View>
 
                     {/* Display QR code with seed */}
@@ -235,10 +241,14 @@ const Backup = () => {
                     </View>
 
                     {/* Display either seed or descriptor */}
-                    <PlainButton style={[tailwind('items-center')]} onPress={copyDescToClipboard}>
+                    <PlainButton
+                        style={[tailwind('items-center')]}
+                        onPress={copyDescToClipboard}>
                         <Text
                             style={[
-                                tailwind('text-sm w-full p-3 text-center rounded-sm'),
+                                tailwind(
+                                    'text-sm w-full p-3 text-center rounded-sm',
+                                ),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,

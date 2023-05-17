@@ -4,12 +4,16 @@ import BigNumber from 'bignumber.js';
 
 import * as bip39 from '../../modules/bip39';
 
-import {Unit, BalanceType, TransactionType, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
-
 import {
-    WalletPaths,
-    descXpubPattern,
-} from '../../modules/wallet-utils';
+    Unit,
+    BalanceType,
+    TransactionType,
+    UTXOType,
+    NetType,
+    baseWalletArgs,
+} from './../../types/wallet';
+
+import {WalletPaths, descXpubPattern} from '../../modules/wallet-utils';
 
 export class BaseWallet {
     id: string;
@@ -105,7 +109,10 @@ export class BaseWallet {
             // Naively check if extended pub key present
             // i.e. no prv key material in descriptor
             // Make sure descriptor is not empty, else assume no prv key material
-            const noPrivKeyDescriptor = this.descriptor !== '' ? this.descriptor.match(descXpubPattern) : true;
+            const noPrivKeyDescriptor =
+                this.descriptor !== ''
+                    ? this.descriptor.match(descXpubPattern)
+                    : true;
 
             if (noPrivKeys && noPrivKeyDescriptor) {
                 this.isWatchOnly = true;

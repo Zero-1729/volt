@@ -21,18 +21,16 @@ import {BalanceType} from '../types/wallet';
 export const TXBalance = (props: TxBalanceProps) => {
     const tailwind = useTailwind();
 
-    const {
-        useSatSymbol,
-        hideTotalBalance,
-    } = useContext(AppStorageContext);
+    const {useSatSymbol, hideTotalBalance} = useContext(AppStorageContext);
 
     const getBalance = (balance: BalanceType) => {
         return formatSats(balance);
     };
 
-    return ( <>
-        {!hideTotalBalance ? (
-            <View style={[tailwind('flex-row items-center')]}>
+    return (
+        <>
+            {!hideTotalBalance ? (
+                <View style={[tailwind('flex-row items-center')]}>
                     {/* Display satSymbol if enabled in settings.
                     Hide and fallback to 'sats' below if satSymbol is disabled in settings */}
                     {useSatSymbol ? (
@@ -58,7 +56,7 @@ export const TXBalance = (props: TxBalanceProps) => {
                             tailwind(
                                 `${props.BalanceFontSize} font-bold text-white self-baseline`,
                             ),
-                            {color: props.fontColor}
+                            {color: props.fontColor},
                         ]}>
                         {getBalance(props.balance)}
                     </Text>
@@ -67,9 +65,7 @@ export const TXBalance = (props: TxBalanceProps) => {
                     {!useSatSymbol ? (
                         <Text
                             style={[
-                                tailwind(
-                                    'text-xl self-baseline text-white',
-                                ),
+                                tailwind('text-xl self-baseline text-white'),
                             ]}>
                             {' '}
                             sats
@@ -78,17 +74,18 @@ export const TXBalance = (props: TxBalanceProps) => {
                         <></>
                     )}
                 </View>
-        ) : (
-            /* Empty view to keep the card height consistent  */
-            <View
-                style={[
-                    tailwind(
-                        'rounded flex-row self-center w-full h-6 opacity-10 bg-black mb-1',
-                    ),
-                ]}
-            />
-        )}
-    </>)
+            ) : (
+                /* Empty view to keep the card height consistent  */
+                <View
+                    style={[
+                        tailwind(
+                            'rounded flex-row self-center w-full h-6 opacity-10 bg-black mb-1',
+                        ),
+                    ]}
+                />
+            )}
+        </>
+    );
 };
 
 export const Balance = (props: BalanceProps) => {
@@ -150,9 +147,14 @@ export const Balance = (props: BalanceProps) => {
         }
 
         if (!props.disableFiat && props.fiatRate) {
-            return normalizeFiat(new BigNumber(walletData.balance), props.fiatRate.rate);
+            return normalizeFiat(
+                new BigNumber(walletData.balance),
+                props.fiatRate.rate,
+            );
         } else {
-            console.error('[Balance Component] No fiat rate provided for fiat balance');
+            console.error(
+                '[Balance Component] No fiat rate provided for fiat balance',
+            );
         }
     };
 

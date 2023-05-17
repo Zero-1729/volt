@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
 
@@ -33,7 +34,8 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {addWallet, isAdvancedMode, networkState} = useContext(AppStorageContext);
+    const {addWallet, isAdvancedMode, networkState} =
+        useContext(AppStorageContext);
 
     const [newWalletName, setNewWalletName] = useState('');
 
@@ -59,7 +61,9 @@ const CreateAction = () => {
             // Perform network check to avoid BDK native code error
             // Must be connected to network to use bdk-rn fns
             if (!networkState?.isConnected) {
-                throw new Error('Internet connection offline, re-connect to create wallet.')
+                throw new Error(
+                    'Internet connection offline, re-connect to create wallet.',
+                );
             }
 
             // Clear wallet name
