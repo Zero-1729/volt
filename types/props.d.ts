@@ -50,6 +50,7 @@ export type WalletCardProps = CardProps & {
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
+    loading: boolean;
     unit: Unit;
     navCallback?: () => void;
 };
@@ -72,6 +73,7 @@ export type BalanceProps = BaseProps & {
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
     BalanceFontSize?: string;
     SatsFontSize?: string;
+    loading: boolean;
     disableFiat: boolean; // false by default
 };
 
