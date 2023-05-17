@@ -14,6 +14,8 @@ import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
 
+import {syncWallet} from '../../modules/bdk';
+
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Bell from '../../assets/svg/bell-fill-24.svg';
 import Add from '../../assets/svg/plus-32.svg';
@@ -62,15 +64,20 @@ const Home = () => {
         wallets,
         hideTotalBalance,
         appFiatCurrency,
+        currentWalletID,
         setCurrentWalletID,
+        getWalletData,
         setNetworkState,
         networkState,
         fiatRate,
         updateFiatRate,
+        updateWalletTransactions,
+        updateWalletBalance,
     } = useContext(AppStorageContext);
 
     const [initFiatRate, setInitFiatRate] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [loadingBalance, setLoadingBalance] = useState(false);
 
     // Subscribe
     NetInfo.addEventListener(state => {
@@ -99,7 +106,13 @@ const Home = () => {
     );
 
     // Refresh control
-    const onRefresh = useCallback(async () => {
+    const refreshWallet = useCallback(async () => {
+        // start loading
+        setLoadingBalance(true);
+
+        // Grab current wallet data
+        const wallet = getWalletData(currentWalletID);
+
         // Set refreshing
         setRefreshing(true);
 
@@ -119,17 +132,33 @@ const Home = () => {
                     rate: rate,
                     lastUpdated: new Date(),
                 });
-
-                // Kill loading
-                setRefreshing(false);
             },
         );
 
-        // Kill loading if fiat rate fetch not triggered
         if (!triggered) {
-            setRefreshing(false);
-            // setLoadingBalance(false);
+            console.info('[Fiat Rate] Did not fetch fiat rate');
         }
+
+        // Check net again, just in case there is a drop mid execution
+        if (!networkState?.isConnected) {
+            setRefreshing(false);
+            return;
+        }
+
+        // Sync wallet
+        const {transactions, balance} = await syncWallet(wallet);
+
+        // Kill refreshing
+        setRefreshing(false);
+
+        // Update wallet balance
+        updateWalletBalance(currentWalletID, balance);
+
+        // Update wallet transactions
+        updateWalletTransactions(currentWalletID, transactions);
+
+        // Kill loading
+        setLoadingBalance(false);
     }, [
         setRefreshing,
         fiatRate,
@@ -157,7 +186,9 @@ const Home = () => {
                     });
                 },
             );
+
             setInitFiatRate(true);
+            setLoadingBalance(false);
         }
     });
 
@@ -191,6 +222,7 @@ const Home = () => {
                     label={item.name}
                     walletBalance={item.balance}
                     walletType={item.type}
+                    loading={loadingBalance}
                     hideBalance={hideTotalBalance}
                     unit={item.units}
                     navCallback={() => {
@@ -292,7 +324,11 @@ const Home = () => {
                                         <Text
                                             style={[
                                                 tailwind(
-                                                    'text-3xl font-medium',
+                                                    `text-3xl font-medium ${
+                                                        loadingBalance
+                                                            ? 'opacity-40'
+                                                            : ''
+                                                    }`,
                                                 ),
                                                 {
                                                     color: ColorScheme.Text
@@ -390,7 +426,7 @@ const Home = () => {
                         ) : (
                             <FlatList
                                 refreshing={refreshing}
-                                onRefresh={onRefresh}
+                                onRefresh={refreshWallet}
                                 scrollEnabled={true}
                                 style={tailwind('w-full mb-12')}
                                 data={txs}
