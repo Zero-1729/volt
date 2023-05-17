@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {useColorScheme, View, Text, FlatList} from 'react-native';
@@ -29,6 +30,7 @@ import {fetchFiatRate} from '../../modules/currency';
 
 import {Balance} from '../../components/balance';
 
+import {liberalAlert} from '../../components/alert';
 import {TransactionListItem} from '../../components/transaction';
 
 import {BalanceType} from '../../types/wallet';
@@ -81,21 +83,29 @@ const Wallet = () => {
             return;
         }
 
-        const triggered = await fetchFiatRate(
-            appFiatCurrency.short,
-            fiatRate,
-            (rate: BalanceType) => {
-                // Then fetch fiat rate
-                updateFiatRate({
-                    ...fiatRate,
-                    rate: rate,
-                    lastUpdated: new Date(),
-                });
-            },
-        );
+        try {
+            const triggered = await fetchFiatRate(
+                appFiatCurrency.short,
+                fiatRate,
+                (rate: BalanceType) => {
+                    // Then fetch fiat rate
+                    updateFiatRate({
+                        ...fiatRate,
+                        rate: rate,
+                        lastUpdated: new Date(),
+                    });
+                },
+            );
 
-        if (!triggered) {
-            console.log('[Fiat Rate] Did not fetch fiat rate');
+            if (!triggered) {
+                console.log('[Fiat Rate] Did not fetch fiat rate');
+            }
+        } catch (e) {
+            liberalAlert('Network', `${e.message}`, 'OK');
+
+            setLoadingBalance(false);
+            setRefreshing(false);
+            return;
         }
 
         if (!loadingBalance) {
@@ -131,7 +141,7 @@ const Wallet = () => {
             refreshWallet();
             setSingleLoadLock(true);
         }
-    }, [refreshWallet, setSingleLoadLock, singleLoadLock, loadingBalance]);
+    }, []);
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
