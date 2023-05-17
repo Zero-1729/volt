@@ -162,7 +162,14 @@ export const Balance = (props: BalanceProps) => {
         <View>
             {!hideTotalBalance ? (
                 <PlainButton onPress={toggleUnit}>
-                    <View style={[tailwind('flex-row items-center')]}>
+                    <View
+                        style={[
+                            tailwind(
+                                `flex-row items-center ${
+                                    props.loading ? 'opacity-40' : ''
+                                }`,
+                            ),
+                        ]}>
                         {/* Display satSymbol if enabled in settings, otherwise display BTC or Fiat symbol (if enabled).
                         Hide and fallback to 'sats' below if unit is sats and satSymbol is disabled in settings */}
                         {useSatSymbol || isFiat || unit.name === 'BTC' ? (
