@@ -4,9 +4,7 @@ import {
     useColorScheme,
     View,
     Text,
-    RefreshControl,
     FlatList,
-    ScrollView,
     StyleSheet,
     Linking,
 } from 'react-native';
@@ -631,18 +629,7 @@ const Wallet = () => {
                         </Text>
                     </View>
 
-                    <ScrollView
-                        contentContainerStyle={[
-                            styles.ScrollView,
-                            tailwind('w-full h-full'),
-                        ]}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={refreshing}
-                                onRefresh={onRefresh}
-                                style={[{backgroundColor: 'transparent'}]}
-                            />
-                        }>
+                    <View style={[tailwind('w-full h-full items-center')]}>
                         {walletData.transactions.length === 0 ? (
                             <View
                                 style={[
@@ -666,8 +653,10 @@ const Wallet = () => {
                             </View>
                         ) : (
                             <FlatList
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
                                 scrollEnabled={true}
-                                style={tailwind('w-11/12 mt-4')}
+                                style={tailwind('w-11/12 mt-4 mb-12')}
                                 data={walletData.transactions}
                                 renderItem={renderItem}
                                 keyExtractor={item => item.txid}
@@ -675,7 +664,7 @@ const Wallet = () => {
                                 contentInsetAdjustmentBehavior="automatic"
                             />
                         )}
-                    </ScrollView>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
@@ -683,11 +672,3 @@ const Wallet = () => {
 };
 
 export default Wallet;
-
-const styles = StyleSheet.create({
-    ScrollView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
