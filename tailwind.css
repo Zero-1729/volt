@@ -161,6 +161,10 @@
   margin-bottom: 2.5rem
 }
 
+.mb-12 {
+  margin-bottom: 3rem
+}
+
 .mb-16 {
   margin-bottom: 4rem
 }
@@ -267,6 +271,10 @@
 
 .h-2\/3 {
   height: 66.666667%
+}
+
+.h-20 {
+  height: 5rem
 }
 
 .h-28 {

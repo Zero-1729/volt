@@ -205,6 +205,11 @@
 			"marginBottom": 40
 		}
 	},
+	"mb-12": {
+		"style": {
+			"marginBottom": 48
+		}
+	},
 	"mb-16": {
 		"style": {
 			"marginBottom": 64
@@ -338,6 +343,11 @@
 	"h-2/3": {
 		"style": {
 			"height": "66.666667%"
+		}
+	},
+	"h-20": {
+		"style": {
+			"height": 80
 		}
 	},
 	"h-28": {
