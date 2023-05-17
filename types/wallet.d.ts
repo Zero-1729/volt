@@ -29,6 +29,7 @@ export type UTXOType = {
 
 // Transaction Type
 export type TransactionType = {
+    network: NetType; // Network type
     txid: string; // Transaction ID
     block_height: number; // Block height
     confirmed: boolean; // Whether transaction is confirmed
