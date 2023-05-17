@@ -4,8 +4,6 @@ import {useColorScheme, View, Text, FlatList} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-import BdkRn from 'bdk-rn';
-import BigNum from 'bignumber.js';
 import Dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import LocalizedFormat from 'dayjs/plugin/localizedFormat';
@@ -21,7 +19,7 @@ import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 
-import {formatTXFromBDK} from '../../modules/wallet-utils';
+import {syncWallet} from '../../modules/bdk';
 
 import {PlainButton} from '../../components/button';
 
@@ -31,10 +29,9 @@ import {fetchFiatRate} from '../../modules/currency';
 
 import {Balance} from '../../components/balance';
 
-import {liberalAlert} from '../../components/alert';
 import {TransactionListItem} from '../../components/transaction';
 
-import {BalanceType, TransactionType} from '../../types/wallet';
+import {BalanceType} from '../../types/wallet';
 
 const Wallet = () => {
     const tailwind = useTailwind();
@@ -45,18 +42,17 @@ const Wallet = () => {
     const {
         currentWalletID,
         getWalletData,
-        updateWalletTransactions,
-        updateWalletBalance,
         networkState,
         fiatRate,
         appFiatCurrency,
         updateFiatRate,
+        updateWalletBalance,
+        updateWalletTransactions,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
-    const [loadingBalance, setLoadingBalance] = useState(
-        networkState?.isConnected,
-    );
+    const [loadingBalance, setLoadingBalance] = useState(false);
+
     const [singleLoadLock, setSingleLoadLock] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -68,123 +64,21 @@ const Wallet = () => {
 
     const walletName = walletData.name;
 
-    const syncWallet = useCallback(async () => {
-        // Perform network check to avoid BDK native code error
-        // Must be connected to network to use bdk-rn fns
-        if (!networkState?.isConnected) {
-            return;
-        }
-
-        // Create wallet from current wallet data
-        const createResponse = await BdkRn.createWallet({
-            mnemonic: walletData.secret ? walletData.secret : '',
-            descriptor:
-                walletData.descriptor && walletData.secret === ''
-                    ? walletData.descriptor
-                    : '',
-            password: '',
-            network: walletData.network,
-        });
-
-        // Report error from wallet creation function
-        if (createResponse.error) {
-            liberalAlert('Error', createResponse.data, 'OK');
-        }
-
-        // Sync wallet
-        const syncResponse = await BdkRn.syncWallet();
-
-        // report any sync errors
-        if (syncResponse.error) {
-            liberalAlert('Error', syncResponse.data, 'OK');
-            return;
-        }
-
-        // Attempt call to get wallet balance
-        const balanceResponse = await BdkRn.getBalance();
-
-        if (balanceResponse.error) {
-            // Report any errors in fetch attempt
-            liberalAlert('Error', balanceResponse.data, 'OK');
-            return;
-        }
-
-        // End loading and update value
-        setLoadingBalance(false);
-
-        // Update balance amount (in sats)
-        // only update if balance different from stored version
-        if (balanceResponse.data !== walletData.balance) {
-            // Receive balance in sats as string
-            // convert to BigNumber
-            const balance = new BigNum(balanceResponse.data);
-            updateWalletBalance(currentWalletID, balance);
-        }
-
-        // Update transactions list
-        const transactionResponse = await BdkRn.getTransactions();
-
-        if (transactionResponse.error) {
-            liberalAlert(
-                'Error',
-                `Could not fetch transactions ${transactionResponse.error}`,
-                'OK',
-            );
-        }
-
-        const {confirmed, pending} = transactionResponse.data;
-        const txs: TransactionType[] = [];
-
-        // Update transactions list
-        confirmed.forEach((transaction: any) => {
-            txs.push(
-                formatTXFromBDK({
-                    confirmed: true,
-                    network: walletData.network,
-                    ...transaction,
-                }),
-            );
-        });
-
-        pending.forEach((transaction: any) => {
-            txs.push(
-                formatTXFromBDK({
-                    confirmed: false,
-                    network: walletData.network,
-                    ...transaction,
-                }),
-            );
-        });
-
-        // Update wallet transactions
-        updateWalletTransactions(currentWalletID, txs);
-    }, [
-        networkState?.isConnected,
-        walletData.secret,
-        walletData.descriptor,
-        walletData.network,
-        walletData.balance,
-        updateWalletTransactions,
-        currentWalletID,
-        updateWalletBalance,
-    ]);
-
     // Refresh control
-    const onRefresh = useCallback(async () => {
+    const refreshWallet = useCallback(async () => {
+        // Avoid duplicate loading
+        if (refreshing || loadingBalance) {
+            return;
+        }
+
         // Set refreshing
         setRefreshing(true);
+        setLoadingBalance(true);
 
         // Only attempt load if connected to network
         if (!networkState?.isConnected) {
             setRefreshing(false);
             return;
-        }
-
-        if (!loadingBalance) {
-            setLoadingBalance(true);
-
-            // Update wallet balance first
-            await syncWallet();
         }
 
         const triggered = await fetchFiatRate(
@@ -197,35 +91,47 @@ const Wallet = () => {
                     rate: rate,
                     lastUpdated: new Date(),
                 });
-
-                // Kill loading
-                setRefreshing(false);
-                setLoadingBalance(false);
             },
         );
 
-        // Kill loading if fiat rate fetch not triggered
         if (!triggered) {
-            setRefreshing(false);
-            setLoadingBalance(false);
+            console.log('[Fiat Rate] Did not fetch fiat rate');
         }
+
+        if (!loadingBalance) {
+            // Update wallet balance first
+            const {balance, transactions} = await syncWallet(walletData);
+
+            // update wallet balance
+            updateWalletBalance(currentWalletID, balance);
+
+            // update wallet transactions
+            updateWalletTransactions(currentWalletID, transactions);
+        }
+
+        // Kill loading if fiat rate fetch not triggered
+        setRefreshing(false);
+        setLoadingBalance(false);
     }, [
-        setRefreshing,
-        syncWallet,
-        loadingBalance,
+        appFiatCurrency.short,
+        currentWalletID,
         fiatRate,
-        appFiatCurrency,
-        updateFiatRate,
+        loadingBalance,
         networkState?.isConnected,
+        refreshing,
+        updateFiatRate,
+        updateWalletBalance,
+        updateWalletTransactions,
+        walletData,
     ]);
 
     useEffect(() => {
         // Attempt to sync balance
         if (!singleLoadLock) {
-            syncWallet();
+            refreshWallet();
             setSingleLoadLock(true);
         }
-    }, [syncWallet, setSingleLoadLock, singleLoadLock]);
+    }, [refreshWallet, setSingleLoadLock, singleLoadLock, loadingBalance]);
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
@@ -437,7 +343,7 @@ const Wallet = () => {
                         ) : (
                             <FlatList
                                 refreshing={refreshing}
-                                onRefresh={onRefresh}
+                                onRefresh={refreshWallet}
                                 scrollEnabled={true}
                                 style={tailwind('w-11/12 mt-4 mb-12')}
                                 data={walletData.transactions}
