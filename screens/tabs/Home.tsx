@@ -107,39 +107,42 @@ const Home = () => {
     );
 
     // Fiat fetch
-    const singleSyncFiatRate = useCallback(async (violate: boolean = false) => {
-        // Avoid fiat rate update call when offline
-        if (!networkState?.isConnected) {
-            return;
-        }
+    const singleSyncFiatRate = useCallback(
+        async (ticker: string, violate: boolean = false) => {
+            // Avoid fiat rate update call when offline
+            if (!networkState?.isConnected) {
+                return;
+            }
 
-        // Only proceed if initial load or if user select new currency in settings
-        if (!initFiatRate || violate) {
-            try {
-                await fetchFiatRate(
-                    appFiatCurrency.short,
-                    fiatRate,
-                    (rate: BalanceType) => {
-                        updateFiatRate({
-                            ...fiatRate,
-                            rate: rate,
-                            lastUpdated: new Date(),
-                        });
-                    },
-                    violate,
-                );
-            } catch (e) {
-                // Report network error
-                liberalAlert('Network', `${e.message}`, 'OK');
+            // Only proceed if initial load or if user select new currency in settings
+            if (!initFiatRate || violate) {
+                try {
+                    await fetchFiatRate(
+                        ticker,
+                        fiatRate,
+                        (rate: BalanceType) => {
+                            updateFiatRate({
+                                ...fiatRate,
+                                rate: rate,
+                                lastUpdated: new Date(),
+                            });
+                        },
+                        violate,
+                    );
+                } catch (e) {
+                    // Report network error
+                    liberalAlert('Network', `${e.message}`, 'OK');
+
+                    // Kill loading
+                    setLoadingBalance(false);
+                }
 
                 // Kill loading
                 setLoadingBalance(false);
             }
-
-            // Kill loading
-            setLoadingBalance(false);
-        }
-    }, []);
+        },
+        [],
+    );
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
@@ -213,7 +216,7 @@ const Home = () => {
 
         // Only call on each change to fiat currency in settings
         setLoadingBalance(true);
-        singleSyncFiatRate(true);
+        singleSyncFiatRate(appFiatCurrency.short, true);
     }, [appFiatCurrency]);
 
     // Fetch the fiat rate on initial load
@@ -223,7 +226,7 @@ const Home = () => {
             setLoadingBalance(true);
 
             // Single shot call to update fiat rate
-            singleSyncFiatRate();
+            singleSyncFiatRate(appFiatCurrency.short);
 
             // Kill initial load lock
             setInitFiatRate(true);
