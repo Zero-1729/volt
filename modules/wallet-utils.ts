@@ -318,6 +318,7 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
         fee: new BigNumber(tx.fee),
         value: new BigNumber(tx.received.length !== '' ? tx.received : tx.sent),
         type: tx.received.length !== '' ? 'inbound' : 'outbound',
+        network: tx.network,
     };
 
     // Returned formatted tx
