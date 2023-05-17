@@ -137,11 +137,23 @@ const Wallet = () => {
 
         // Update transactions list
         confirmed.forEach((transaction: any) => {
-            txs.push(formatTXFromBDK({confirmed: true, ...transaction}));
+            txs.push(
+                formatTXFromBDK({
+                    confirmed: true,
+                    network: walletData.network,
+                    ...transaction,
+                }),
+            );
         });
 
         pending.forEach((transaction: any) => {
-            txs.push(formatTXFromBDK({confirmed: false, ...transaction}));
+            txs.push(
+                formatTXFromBDK({
+                    confirmed: false,
+                    network: walletData.network,
+                    ...transaction,
+                }),
+            );
         });
 
         // Update wallet transactions
