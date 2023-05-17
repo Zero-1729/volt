@@ -33,7 +33,7 @@ const APIFetcher = {
             returnedJSON = await response.json();
         } catch (e) {
             throw new Error(
-                `Error fetching rate for ${ticker} from CoinGecko: ${e}`,
+                `Error fetching rate for ${ticker.toUpperCase()} from CoinGecko: ${e.message}`,
             );
         }
 
@@ -102,6 +102,6 @@ export const fetchFiatRate = async (
         // i.e. rate fetched
         return true;
     } catch (e) {
-        throw new Error(`Error fetching fiat rate: ${e}`);
+        throw e;
     }
 };
