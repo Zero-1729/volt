@@ -1,14 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState, useCallback} from 'react';
 
-import {Platform, Text, useColorScheme, View} from 'react-native';
+import {Platform, Text, useColorScheme, View, FlatList} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
-
-import {FlatList} from 'react-native-gesture-handler';
 
 import BigNumber from 'bignumber.js';
 
@@ -27,11 +25,12 @@ import Font from '../../constants/Font';
 
 import {PlainButton} from '../../components/button';
 import {EmptyCard, WalletCard} from '../../components/card';
+import {TransactionListItem} from '../../components/transaction';
 
 import {normalizeFiat} from '../../modules/transform';
 
 import {BaseWallet} from '../../class/wallet/base';
-import {BalanceType} from '../../types/wallet';
+import {BalanceType, TransactionType} from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
@@ -41,6 +40,20 @@ const Home = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const DarkGrayText = {
+        color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
+    };
+
+    const DarkGreyText = {
+        color: ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA',
+    };
+
+    const svgGrayFill = ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA';
+
+    const topPlatformOffset = {
+        marginTop: Platform.OS === 'android' ? 12 : 0,
+    };
 
     const navigation = useNavigation();
 
@@ -57,6 +70,7 @@ const Home = () => {
     } = useContext(AppStorageContext);
 
     const [initFiatRate, setInitFiatRate] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     // Subscribe
     NetInfo.addEventListener(state => {
@@ -67,6 +81,16 @@ const Home = () => {
         }
     });
 
+    // Get all transactions across wallets
+    const txs: TransactionType[] = [];
+
+    // iterate over all wallets and push transactions to txs
+    wallets.forEach((wallet: BaseWallet) => {
+        wallet.transactions.forEach(tx => {
+            txs.push(tx);
+        });
+    });
+
     // add the total balances of the wallets
     const totalBalance: BalanceType = wallets.reduce(
         (accumulator: BalanceType, currentValue: BaseWallet) =>
@@ -74,19 +98,45 @@ const Home = () => {
         new BigNumber(0),
     );
 
-    const DarkGrayText = {
-        color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
-    };
+    // Refresh control
+    const onRefresh = useCallback(async () => {
+        // Set refreshing
+        setRefreshing(true);
 
-    const DarkGreyText = {
-        color: ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA',
-    };
+        // Only attempt load if connected to network
+        if (!networkState?.isConnected) {
+            setRefreshing(false);
+            return;
+        }
 
-    const svgGrayFill = ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA';
+        const triggered = await fetchFiatRate(
+            appFiatCurrency.short,
+            fiatRate,
+            (rate: BalanceType) => {
+                // Then fetch fiat rate
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: rate,
+                    lastUpdated: new Date(),
+                });
 
-    const topPlatformOffset = {
-        marginTop: Platform.OS === 'android' ? 12 : 0,
-    };
+                // Kill loading
+                setRefreshing(false);
+            },
+        );
+
+        // Kill loading if fiat rate fetch not triggered
+        if (!triggered) {
+            setRefreshing(false);
+            // setLoadingBalance(false);
+        }
+    }, [
+        setRefreshing,
+        fiatRate,
+        appFiatCurrency,
+        updateFiatRate,
+        networkState?.isConnected,
+    ]);
 
     // Fetch the fiat rate on initial load
     useEffect(() => {
@@ -315,27 +365,46 @@ const Home = () => {
                             Latest Transactions
                         </Text>
 
-                        <View
-                            style={[
-                                tailwind(
-                                    'flex justify-around text-justify h-4/6 items-center justify-center',
-                                ),
-                            ]}>
-                            <Box
-                                width={32}
-                                fill={svgGrayFill}
-                                style={tailwind('mb-4')}
-                            />
-                            <Text
+                        {txs.length === 0 ? (
+                            <View
                                 style={[
-                                    tailwind('w-3/5 text-center'),
-                                    DarkGreyText,
-                                    Font.RobotoText,
+                                    tailwind(
+                                        'flex justify-around text-justify h-4/6 items-center justify-center',
+                                    ),
                                 ]}>
-                                A list of all latest transactions will be
-                                displayed here
-                            </Text>
-                        </View>
+                                <Box
+                                    width={32}
+                                    fill={svgGrayFill}
+                                    style={tailwind('mb-4')}
+                                />
+                                <Text
+                                    style={[
+                                        tailwind('w-3/5 text-center'),
+                                        DarkGreyText,
+                                        Font.RobotoText,
+                                    ]}>
+                                    A list of all latest transactions will be
+                                    displayed here
+                                </Text>
+                            </View>
+                        ) : (
+                            <FlatList
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                scrollEnabled={true}
+                                style={tailwind('w-full mb-12')}
+                                data={txs}
+                                renderItem={item => (
+                                    <TransactionListItem
+                                        fiatRate={fiatRate}
+                                        tx={item.item}
+                                    />
+                                )}
+                                keyExtractor={item => item.txid}
+                                initialNumToRender={25}
+                                contentInsetAdjustmentBehavior="automatic"
+                            />
+                        )}
                     </View>
                 </View>
             </View>
