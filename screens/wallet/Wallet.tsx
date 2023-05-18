@@ -411,7 +411,7 @@ const Wallet = () => {
                             <View
                                 style={[
                                     tailwind(
-                                        'flex mt-6 justify-around text-justify h-5/6 items-center justify-center',
+                                        'flex mt-6 justify-around text-justify w-4/5 h-5/6 items-center justify-center',
                                     ),
                                 ]}>
                                 <Box
@@ -421,8 +421,10 @@ const Wallet = () => {
                                 />
                                 <Text
                                     style={[
-                                        tailwind('w-3/5 text-center'),
-                                        {color: ColorScheme.Text.GrayedText},
+                                        tailwind('w-full text-center'),
+                                        {
+                                            color: ColorScheme.Text.GrayedText,
+                                        },
                                     ]}>
                                     A list of all transactions for this wallet
                                     be displayed here
