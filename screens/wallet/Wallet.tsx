@@ -5,12 +5,15 @@ import {useColorScheme, View, Text, FlatList} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import BigNumber from 'bignumber.js';
 import Dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 
 Dayjs.extend(calendar);
 Dayjs.extend(LocalizedFormat);
+
+import {getTxData} from '../../modules/mempool';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -33,7 +36,7 @@ import {Balance} from '../../components/balance';
 import {liberalAlert} from '../../components/alert';
 import {TransactionListItem} from '../../components/transaction';
 
-import {BalanceType} from '../../types/wallet';
+import {BalanceType, TransactionType} from '../../types/wallet';
 
 const Wallet = () => {
     const tailwind = useTailwind();
@@ -112,11 +115,79 @@ const Wallet = () => {
             // Update wallet balance first
             const {balance, transactions} = await syncWallet(walletData);
 
+            // Store newly formatted transactions from mempool.space data
+            const newTxs = [];
+
+            // iterate over all the transactions and include the missing optional fields for the TransactionType
+            for (let i = 0; i < transactions.length; i++) {
+                const tmp: TransactionType = {
+                    ...transactions[i],
+                    address: '',
+                    outputs: [],
+                    rbf: false,
+                    size: 0,
+                    weight: 0,
+                };
+
+                const TxData = await getTxData(
+                    transactions[i].txid,
+                    walletData.network,
+                );
+
+                // if the transaction is not sent, then it is received
+                for (let j = 0; j < TxData.vin.length; j++) {
+                    // Add address we own based on whether we sent
+                    // the transaction and the value received matches
+                    if (
+                        transactions[i].value.eq(TxData.vin[j].prevout.value) &&
+                        transactions[i].type === 'outbound'
+                    ) {
+                        tmp.address =
+                            TxData.vin[j].prevout.scriptpubkey_address;
+                    }
+
+                    // Set if transaction an RBF
+                    if (TxData.vin[j].sequence === '4294967293') {
+                        tmp.rbf = true;
+                    }
+                }
+
+                // if the transaction is not sent, then it is received
+                for (let k = 0; k < TxData.vout.length; k++) {
+                    // Add address we own based on whether we received
+                    // the transaction and the value received matches
+                    if (
+                        transactions[i].value.eq(TxData.vout[k].value) &&
+                        transactions[i].type === 'inbound'
+                    ) {
+                        tmp.address = TxData.vout[k].scriptpubkey_address;
+
+                        // Update transaction UTXOs that we own
+                        tmp.outputs?.push({
+                            txid: transactions[i].txid,
+                            vout: k,
+                            value: new BigNumber(TxData.vout[k].value),
+                            address: TxData.vout[k].scriptpubkey_address,
+                            scriptpubkey: TxData.vout[k].scriptpubkey,
+                            scriptpubkey_asm: TxData.vout[k].scriptpubkey_asm,
+                            scriptpubkey_type: TxData.vout[k].scriptpubkey_type,
+                        });
+                    }
+                }
+
+                // Update new transactions list
+                newTxs.push({
+                    ...tmp,
+                    size: TxData.size,
+                    weight: TxData.weight,
+                });
+            }
+
             // update wallet balance
             updateWalletBalance(currentWalletID, balance);
 
             // update wallet transactions
-            updateWalletTransactions(currentWalletID, transactions);
+            updateWalletTransactions(currentWalletID, newTxs);
         }
 
         // Kill loading if fiat rate fetch not triggered
