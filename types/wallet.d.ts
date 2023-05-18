@@ -24,7 +24,10 @@ export type UTXOType = {
     vout: number; // Transaction output index
     value: BalanceType; // Transaction output value in sats
     address: string; // Transaction output address
-    flagged: boolean; // Whether flagged by user to avoid spending, i.e. dust
+    flagged?: boolean; // Whether flagged by user to avoid spending, i.e. dust
+    scriptpubkey: string;
+    scriptpubkey_asm: string;
+    scriptpubkey_type: string;
 };
 
 // Transaction Type
