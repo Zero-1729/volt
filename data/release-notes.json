@@ -10,5 +10,7 @@
     "Included Wallet information and tools in wallet screen",
     "Added a new Mnemonic screen to show newly created wallet mnemonic for backup",
     "Improved UI error handling",
-    "Added support for fiat price rate fetch from CoinGecko, with pull-to-refresh in Wallet screen"
+    "Added support for fiat price rate fetch from CoinGecko, with pull-to-refresh in Wallet screen",
+    "Transaction history fetched and displayed in wallet and home screen",
+    "Added support for fetching UTXOs and transaction history from Mempool.space"
 ]
