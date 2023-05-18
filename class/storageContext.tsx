@@ -15,7 +15,7 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
-import {Unit, BalanceType, FiatRate} from '../types/wallet';
+import {Unit, BalanceType, FiatRate, UTXOType} from '../types/wallet';
 import {
     BackupMaterialTypes,
     TransactionType,
@@ -64,6 +64,7 @@ type defaultContextType = {
         id: string,
         transactions: TransactionType[],
     ) => void;
+    updateWalletUTXOs: (id: string, utxo: UTXOType[]) => void;
     updateWalletBalance: (id: string, balance: BalanceType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
@@ -113,6 +114,7 @@ const defaultContext: defaultContextType = {
     addWallet: () => {},
     updateWalletUnit: () => {},
     updateWalletTransactions: () => {},
+    updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
@@ -177,13 +179,13 @@ export const AppStorageProvider = ({children}: Props) => {
 
     // |> Create functions for getting, setting, and other data manipulation
     const setNetworkState = useCallback(
-        async (networkState: NetInfoType) => {
+        async (netState: NetInfoType) => {
             try {
-                await _setNetworkState(networkState);
-                await _updateNetworkState(JSON.stringify(networkState));
+                await _setNetworkState(netState);
+                await _updateNetworkState(JSON.stringify(netState));
             } catch (e) {
                 console.error(
-                    `[AsyncStorage] (Network state) Error loading data: ${e} [${networkState}]`,
+                    `[AsyncStorage] (Network state) Error loading data: ${e} [${netState}]`,
                 );
 
                 throw new Error('Error setting network state');
@@ -481,6 +483,22 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const updateWalletUTXOs = useCallback(
+        async (id: string, utxos: UTXOType[]) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            // Get the current wallet
+            // Update the UTXOs in the current wallet
+            const tmp = [...wallets];
+            tmp[index].UTXOs = utxos;
+
+            // Update wallets list
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const updateWalletBalance = useCallback(
         async (id: string, balance: BalanceType) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
@@ -741,6 +759,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 getWalletData,
                 updateWalletUnit,
                 updateWalletTransactions,
+                updateWalletUTXOs,
                 updateWalletBalance,
                 renameWallet,
                 deleteWallet,
