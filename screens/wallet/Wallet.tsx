@@ -316,7 +316,6 @@ const Wallet = () => {
                             <Balance
                                 id={currentWalletID}
                                 BalanceFontSize={'text-4xl'}
-                                fiatRate={fiatRate}
                                 disableFiat={false}
                                 loading={loadingBalance}
                             />
@@ -437,10 +436,7 @@ const Wallet = () => {
                                 style={tailwind('w-11/12 mt-4 mb-12')}
                                 data={walletData.transactions}
                                 renderItem={item => (
-                                    <TransactionListItem
-                                        fiatRate={fiatRate}
-                                        tx={item.item}
-                                    />
+                                    <TransactionListItem tx={item.item} />
                                 )}
                                 keyExtractor={item => item.txid}
                                 initialNumToRender={25}

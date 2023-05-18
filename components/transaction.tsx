@@ -72,7 +72,6 @@ export const TransactionListItem = (props: TxListItemProps) => {
                         <TXBalance
                             balance={new BigNum(props.tx.value)}
                             BalanceFontSize={'text-lg'}
-                            fiatRate={props.fiatRate}
                             fontColor={ColorScheme.Text.Default}
                         />
                         <Text

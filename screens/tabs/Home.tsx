@@ -451,10 +451,7 @@ const Home = () => {
                                 style={tailwind('w-full mb-12')}
                                 data={txs}
                                 renderItem={item => (
-                                    <TransactionListItem
-                                        fiatRate={fiatRate}
-                                        tx={item.item}
-                                    />
+                                    <TransactionListItem tx={item.item} />
                                 )}
                                 keyExtractor={item => item.txid}
                                 initialNumToRender={25}
