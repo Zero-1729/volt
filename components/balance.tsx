@@ -94,15 +94,16 @@ export const Balance = (props: BalanceProps) => {
     const {
         useSatSymbol,
         hideTotalBalance,
-        updateWalletUnit,
         getWalletData,
         appFiatCurrency,
+        appUnit,
+        updateAppUnit,
     } = useContext(AppStorageContext);
 
     const walletData = getWalletData(props.id);
 
     // Use this temporarily from wallet data
-    const [unit, setUnit] = useState(walletData.units);
+    const [unit, setUnit] = useState(appUnit);
 
     // Whether we are displaying fiat or not
     const isFiat =
@@ -130,10 +131,10 @@ export const Balance = (props: BalanceProps) => {
     const toggleBTCtoSats = () => {
         if (unit.name === 'BTC') {
             setUnit({name: 'sats', symbol: 's'});
-            updateWalletUnit(props.id, {name: 'sats', symbol: 's'});
+            updateAppUnit({name: 'sats', symbol: 's'});
         } else {
             setUnit({name: 'BTC', symbol: '₿'});
-            updateWalletUnit(props.id, {name: 'BTC', symbol: '₿'});
+            updateAppUnit({name: 'BTC', symbol: '₿'});
         }
     };
 
