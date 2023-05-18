@@ -57,19 +57,16 @@ export type WalletCardProps = CardProps & {
 
 export type TxListItemProps = BaseProps & {
     tx: TransactionType;
-    fiatRate: FiatRate;
 };
 
 export type TxBalanceProps = BaseProps & {
     balance: BalanceType;
-    fiatRate?: FiatRate;
     BalanceFontSize?: string;
     fontColor?: string;
 };
 
 export type BalanceProps = BaseProps & {
     id: string; // current id of the wallet to show balance
-    fiatRate?: FiatRate;
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
     BalanceFontSize?: string;
     SatsFontSize?: string;
