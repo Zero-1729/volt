@@ -44,6 +44,7 @@ type defaultContextType = {
     networkState: NetInfoType;
     appLanguage: LanguageType;
     appFiatCurrency: CurrencyType;
+    appUnit: Unit;
     fiatRate: FiatRate;
     useSatSymbol: boolean;
     hideTotalBalance: boolean;
@@ -59,7 +60,7 @@ type defaultContextType = {
     updateFiatRate: (fiatObj: FiatRate) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
-    updateWalletUnit: (id: string, unit: Unit) => void;
+    updateAppUnit: (unit: Unit) => void;
     updateWalletTransactions: (
         id: string,
         transactions: TransactionType[],
@@ -91,6 +92,10 @@ const defaultContext: defaultContextType = {
         symbol: '$',
         locale: 'en-US',
     },
+    appUnit: {
+        name: 'sats',
+        symbol: 's',
+    },
     wallets: [],
     fiatRate: {
         rate: new BigNumber(1),
@@ -112,7 +117,7 @@ const defaultContext: defaultContextType = {
     setIsAdvancedMode: () => {},
     restoreWallet: () => {},
     addWallet: () => {},
-    updateWalletUnit: () => {},
+    updateAppUnit: () => {},
     updateWalletTransactions: () => {},
     updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
@@ -135,6 +140,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
     );
+    const [appUnit, _setAppUnit] = useState(defaultContext.appUnit);
     const [fiatRate, _setFiatRate] = useState(defaultContext.fiatRate);
     const [useSatSymbol, _setSatSymbol] = useState(defaultContext.useSatSymbol);
     // Will change to false once app in Beta version
@@ -160,6 +166,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
         useAsyncStorage('appFiatCurrency');
+    const {getItem: _getAppUnit, setItem: _updateAppUnit} =
+        useAsyncStorage('appUnit');
     const {getItem: _getFiatRate, setItem: _updateFiatRate} =
         useAsyncStorage('fiatRate');
     const {getItem: _getUseSatSymbol, setItem: _updateUseSatSymbol} =
@@ -454,18 +462,18 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
-    const updateWalletUnit = useCallback(
-        async (id: string, unit: Unit) => {
-            const index = wallets.findIndex(wallet => wallet.id === id);
+    const updateAppUnit = useCallback(async (unit: Unit) => {
+        try {
+            _setAppUnit(unit);
+            _updateAppUnit(JSON.stringify(unit));
+        } catch (e) {
+            console.error(
+                `[AsyncStorage] (App unit setting) Error loading data: ${e}`,
+            );
 
-            const tmp = [...wallets];
-            tmp[index].units = unit;
-
-            _setWallets(tmp);
-            _updateWallets(JSON.stringify(tmp));
-        },
-        [wallets, _updateWallets, _setWallets],
-    );
+            throw new Error('Unable to set app unit option');
+        }
+    }, []);
 
     const updateWalletTransactions = useCallback(
         async (id: string, transactions: TransactionType[]) => {
@@ -674,6 +682,7 @@ export const AppStorageProvider = ({children}: Props) => {
             await setSatSymbol(true);
             await setAppLanguage(defaultContext.appLanguage);
             await setAppFiatCurrency(defaultContext.appFiatCurrency);
+            await updateAppUnit(defaultContext.appUnit);
             await setTotalBalanceHidden(false);
             await _setWalletInit(false);
             await setWallets([]);
@@ -692,6 +701,10 @@ export const AppStorageProvider = ({children}: Props) => {
     // Load settings from disk on app start
     useEffect(() => {
         _loadAppLanguage();
+    }, []);
+
+    useEffect(() => {
+        _getAppUnit();
     }, []);
 
     useEffect(() => {
@@ -740,6 +753,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 setAppLanguage,
                 appFiatCurrency,
                 setAppFiatCurrency,
+                appUnit,
                 fiatRate,
                 useSatSymbol,
                 setSatSymbol,
@@ -757,7 +771,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 isAdvancedMode,
                 setIsAdvancedMode,
                 getWalletData,
-                updateWalletUnit,
+                updateAppUnit,
                 updateWalletTransactions,
                 updateWalletUTXOs,
                 updateWalletBalance,
