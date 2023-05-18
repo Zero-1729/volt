@@ -4,12 +4,16 @@ import BigNumber from 'bignumber.js';
 
 import * as bip39 from '../../modules/bip39';
 
-import {Unit, BalanceType, UTXOType, NetType, baseWalletArgs} from './../../types/wallet';
-
 import {
-    WalletPaths,
-    descXpubPattern,
-} from '../../modules/wallet-utils';
+    Unit,
+    BalanceType,
+    TransactionType,
+    UTXOType,
+    NetType,
+    baseWalletArgs,
+} from './../../types/wallet';
+
+import {WalletPaths, descXpubPattern} from '../../modules/wallet-utils';
 
 export class BaseWallet {
     id: string;
@@ -29,6 +33,7 @@ export class BaseWallet {
 
     balance: BalanceType;
 
+    transactions: TransactionType[];
     UTXOs: UTXOType[];
 
     addresses: Array<string>;
@@ -64,6 +69,7 @@ export class BaseWallet {
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
 
+        this.transactions = []; // List of wallet transactions
         this.UTXOs = []; // Set of wallet UTXOs
 
         this.hardwareWalletEnabled = false;
@@ -103,7 +109,10 @@ export class BaseWallet {
             // Naively check if extended pub key present
             // i.e. no prv key material in descriptor
             // Make sure descriptor is not empty, else assume no prv key material
-            const noPrivKeyDescriptor = this.descriptor !== '' ? this.descriptor.match(descXpubPattern) : true;
+            const noPrivKeyDescriptor =
+                this.descriptor !== ''
+                    ? this.descriptor.match(descXpubPattern)
+                    : true;
 
             if (noPrivKeys && noPrivKeyDescriptor) {
                 this.isWatchOnly = true;
@@ -120,6 +129,18 @@ export class BaseWallet {
 
     updateName(text: string) {
         this.name = text;
+    }
+
+    buildTx(args: any) {
+        throw new Error('Not implemented');
+    }
+
+    updatedTransaction(tx: TransactionType) {
+        throw new Error('Not implemented');
+    }
+
+    updateTransanctions(transactions: TransactionType[]) {
+        this.transactions = transactions;
     }
 
     setXprv(xprv: string) {

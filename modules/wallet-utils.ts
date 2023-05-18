@@ -2,6 +2,7 @@ import {Buffer} from 'buffer';
 
 import * as b58 from 'bs58';
 import Crypto from 'react-native-quick-crypto';
+import BigNumber from 'bignumber.js';
 
 import {
     descriptorSymbolsType,
@@ -9,6 +10,7 @@ import {
     BDKWalletTypes,
     extendedKeyInfoType,
     accountPaths,
+    TransactionType,
 } from '../types/wallet';
 
 export const WalletTypeNames: {[index: string]: string[]} = {
@@ -116,8 +118,10 @@ export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
 //  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
 // Includes support for optional derivation path suffix (i.e., m/44'/0'/0')
 // TODO: Add support for Bitcoin core format (fingerprint + path prefix)
-const _nativeWalletDescriptorRegex = /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\))$/;
-const _wrappedWalletDescriptorRegex = /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\)\))$/;
+const _nativeWalletDescriptorRegex =
+    /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\))$/;
+const _wrappedWalletDescriptorRegex =
+    /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\)\))$/;
 
 export const isDescriptorPattern = (expression: string) => {
     return (
@@ -142,7 +146,8 @@ export const descriptorSymbols: descriptorSymbolsType = [
 // Extended key regexes
 const _extendedKeyPattern: RegExp =
     /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-export const descXpubPattern: RegExp = /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
+export const descXpubPattern: RegExp =
+    /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
 const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 
@@ -279,16 +284,19 @@ export const getDescriptorParts = (descriptor: string) => {
     // Gather data assuming non-nested script
     const components = {
         key: parts[1].split(')')[0],
-        network: parts.length === 2 ? extendedKeyInfo[parts[1].split(')')[0][0]].network : '',
+        network:
+            parts.length === 2
+                ? extendedKeyInfo[parts[1].split(')')[0][0]].network
+                : '',
         type: parts.length === 2 ? _descriptorType[parts[0].split(')')[0]] : '',
     };
-    
+
     // Handle nested script case
     const prefix = descriptor.split('(')[0];
 
-    if (prefix === "sh" && parts[1] === 'wpkh' && parts.length == 3) {
+    if (prefix === 'sh' && parts[1] === 'wpkh' && parts.length === 3) {
         // Extract embedded key
-        const key = parts[2].split(')')[0]
+        const key = parts[2].split(')')[0];
 
         components.key = key;
 
@@ -298,4 +306,21 @@ export const getDescriptorParts = (descriptor: string) => {
     }
 
     return components;
+};
+
+// Formats transaction data from BDK to format for wallet
+export const formatTXFromBDK = (tx: any): TransactionType => {
+    const formattedTx = {
+        txid: tx.txid,
+        confirmed: tx.confirmed,
+        block_height: tx.block_height,
+        timestamp: tx.block_timestamp,
+        fee: new BigNumber(tx.fee),
+        value: new BigNumber(tx.received.length !== '' ? tx.received : tx.sent),
+        type: tx.received.length !== '' ? 'inbound' : 'outbound',
+        network: tx.network,
+    };
+
+    // Returned formatted tx
+    return formattedTx;
 };

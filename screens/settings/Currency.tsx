@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
@@ -42,19 +42,19 @@ const Currency = () => {
 
     const tailwind = useTailwind();
 
-    const HeadingBar = {
-        height: 2,
-        backgroundColor: ColorScheme.HeadingBar,
-    };
-
-    const {appFiatCurrency, setAppFiatCurrency, networkState, fiatRate} = useContext(AppStorageContext);
+    const {appFiatCurrency, setAppFiatCurrency, networkState, fiatRate} =
+        useContext(AppStorageContext);
 
     const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
                     if (!networkState?.isConnected) {
-                        liberalAlert('Network', 'Unable to fetch currency data, connect to the Internet', 'Cancel');
+                        liberalAlert(
+                            'Network',
+                            'Unable to fetch currency data, connect to the Internet',
+                            'Cancel',
+                        );
                         return;
                     }
 
@@ -125,7 +125,10 @@ const Currency = () => {
 
                     <View
                         style={tailwind('justify-center w-full items-center')}>
-                            <View style={[tailwind('flex-row w-5/6 justify-between')]}>
+                        <View
+                            style={[
+                                tailwind('flex-row w-5/6 justify-between'),
+                            ]}>
                             <Text
                                 style={[
                                     tailwind('text-2xl mb-4 font-medium'),
@@ -137,27 +140,48 @@ const Currency = () => {
 
                             {/* Highlight current select currency here */}
                             <View
-                            style={[
-                                tailwind(
-                                    'px-4 py-0 flex-row items-center h-8 rounded-full',
-                                ),
-                                {backgroundColor: ColorScheme.Background.Inverted},
-                            ]}>
+                                style={[
+                                    tailwind(
+                                        'px-4 py-0 flex-row items-center h-8 rounded-full',
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Inverted,
+                                    },
+                                ]}>
                                 <Text
                                     style={[
                                         tailwind('text-sm font-bold'),
-                                        {color: ColorScheme.Text.Alt, backgroundColor: ColorScheme.Background.Inverted},
+                                        {
+                                            color: ColorScheme.Text.Alt,
+                                            backgroundColor:
+                                                ColorScheme.Background.Inverted,
+                                        },
                                         Font.RobotoText,
                                     ]}>
                                     {`${appFiatCurrency.short} (${appFiatCurrency.symbol})`}
                                 </Text>
                             </View>
-                            </View>
+                        </View>
 
-                        <View style={[tailwind('text-sm py-4 w-full pl-8'), {backgroundColor: ColorScheme.Background.Greyed}]}>
+                        <View
+                            style={[
+                                tailwind('text-sm py-4 w-full pl-8'),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                },
+                            ]}>
                             <Text style={{color: ColorScheme.Text.Default}}>
-                                Price at {`${addCommas(fiatRate.rate.toString())} ${appFiatCurrency.short}`} on
-                                <Text style={[tailwind('font-bold')]}> {fiatRate.source}</Text>
+                                Price at{' '}
+                                {`${addCommas(fiatRate.rate.toString())} ${
+                                    appFiatCurrency.short
+                                }`}{' '}
+                                on
+                                <Text style={[tailwind('font-bold')]}>
+                                    {' '}
+                                    {fiatRate.source}
+                                </Text>
                             </Text>
                         </View>
                     </View>
@@ -172,7 +196,10 @@ const Currency = () => {
                     />
 
                     <View style={[tailwind('w-full items-center mt-2')]}>
-                        <Text style={[{color: ColorScheme.Text.GrayedText}]}>Last updated {DayJS(fiatRate.lastUpdated).calendar()}</Text>
+                        <Text style={[{color: ColorScheme.Text.GrayedText}]}>
+                            Last updated{' '}
+                            {DayJS(fiatRate.lastUpdated).calendar()}
+                        </Text>
                     </View>
                 </View>
             </View>

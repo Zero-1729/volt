@@ -2,7 +2,7 @@
 import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import {BalanceType, FiatRate, Unit} from './wallet';
+import {BalanceType, Unit} from './wallet';
 
 // Base Prop Type
 export type BaseProps = PropsWithChildren<{
@@ -50,16 +50,27 @@ export type WalletCardProps = CardProps & {
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
+    loading: boolean;
     unit: Unit;
     navCallback?: () => void;
 };
 
+export type TxListItemProps = BaseProps & {
+    tx: TransactionType;
+};
+
+export type TxBalanceProps = BaseProps & {
+    balance: BalanceType;
+    BalanceFontSize?: string;
+    fontColor?: string;
+};
+
 export type BalanceProps = BaseProps & {
     id: string; // current id of the wallet to show balance
-    fiatRate?: FiatRate;
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
     BalanceFontSize?: string;
     SatsFontSize?: string;
+    loading: boolean;
     disableFiat: boolean; // false by default
 };
 

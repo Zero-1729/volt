@@ -114,7 +114,11 @@ const About = () => {
                 </View>
 
                 <View style={[tailwind('mb-4')]}>
-                    <Text style={[tailwind('text-center'), {color: ColorScheme.Text.AltGray}]}>
+                    <Text
+                        style={[
+                            tailwind('text-center'),
+                            {color: ColorScheme.Text.AltGray},
+                        ]}>
                         v{Package.version} (Beta)
                     </Text>
                 </View>

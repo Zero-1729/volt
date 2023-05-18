@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {Text, useColorScheme, View} from 'react-native';

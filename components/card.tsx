@@ -147,6 +147,7 @@ export const WalletCard = (props: WalletCardProps) => {
                             id={props.id}
                             BalanceFontSize={'text-3xl'}
                             disableFiat={true}
+                            loading={props.loading}
                         />
                     </View>
 

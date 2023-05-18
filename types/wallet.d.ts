@@ -13,9 +13,9 @@ export type BalanceType = BigNumber;
 
 // Wallet balance fiat rate
 export type FiatRate = {
-    rate: BalanceType,
-    lastUpdated: Date,
-    source: string,
+    rate: BalanceType;
+    lastUpdated: Date;
+    source: string;
 };
 
 // UTXO Type
@@ -24,7 +24,31 @@ export type UTXOType = {
     vout: number; // Transaction output index
     value: BalanceType; // Transaction output value in sats
     address: string; // Transaction output address
-    flagged: boolean; // Whether flagged by user to avoid spending, i.e. dust
+    flagged?: boolean; // Whether flagged by user to avoid spending, i.e. dust
+    scriptpubkey: string;
+    scriptpubkey_asm: string;
+    scriptpubkey_type: string;
+};
+
+// Transaction Type
+export type TransactionType = {
+    network: NetType; // Network type
+    txid: string; // Transaction ID
+    block_height: number; // Block height
+    confirmed: boolean; // Whether transaction is confirmed
+    confirmations?: number; // Number of confirmations
+    size?: number; // Transaction size in bytes
+    vsize?: number; // Transaction size in virtual bytes
+    weight?: number; // Transaction weight
+    fee: BalanceType; // Transaction fee in sats
+    value: BalanceType; // Transaction value in sats
+    timestamp: Date; // Transaction date
+    type: string; // Transaction type, 'outbound' or 'inbound'
+    inputs?: UTXOType[]; // Transaction inputs
+    outputs?: UTXOType[]; // Transaction outputs
+    address?: string; // Transaction address
+    rbf?: boolean; // Whether transaction is RBF
+    memo?: string; // Transaction memo
 };
 
 // Wallet Unit Type

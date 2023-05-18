@@ -27,7 +27,6 @@ const AddressOwnership = () => {
         const isOwnedByYou = false;
 
         // TODO: Check if address is owned by this wallet
-
         if (isOwnedByYou) {
             setResultMessage('Address is owned by this wallet');
         } else {
@@ -103,7 +102,9 @@ const AddressOwnership = () => {
                             INFO:
                         </Text>{' '}
                         This tool allows you to check whether an address is
-                        owned by this wallet or not. If there is a match, the tool will also indicate whether this wallet has the key material to spend from the address.
+                        owned by this wallet or not. If there is a match, the
+                        tool will also indicate whether this wallet has the key
+                        material to spend from the address.
                     </Text>
                 </View>
 
