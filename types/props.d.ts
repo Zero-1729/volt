@@ -2,7 +2,7 @@
 import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import {BalanceType, FiatRate, Unit} from './wallet';
+import {BalanceType, Unit} from './wallet';
 
 // Base Prop Type
 export type BaseProps = PropsWithChildren<{
