@@ -53,6 +53,7 @@ const Wallet = () => {
         updateFiatRate,
         updateWalletBalance,
         updateWalletTransactions,
+        updateWalletUTXOs,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -118,6 +119,9 @@ const Wallet = () => {
             // Store newly formatted transactions from mempool.space data
             const newTxs = [];
 
+            // Store newly fetched UTXOs
+            const newUTXOs = [];
+
             // iterate over all the transactions and include the missing optional fields for the TransactionType
             for (let i = 0; i < transactions.length; i++) {
                 const tmp: TransactionType = {
@@ -163,7 +167,7 @@ const Wallet = () => {
                         tmp.address = TxData.vout[k].scriptpubkey_address;
 
                         // Update transaction UTXOs that we own
-                        tmp.outputs?.push({
+                        newUTXOs.push({
                             txid: transactions[i].txid,
                             vout: k,
                             value: new BigNumber(TxData.vout[k].value),
@@ -188,6 +192,9 @@ const Wallet = () => {
 
             // update wallet transactions
             updateWalletTransactions(currentWalletID, newTxs);
+
+            // update wallet UTXOs
+            updateWalletUTXOs(currentWalletID, newUTXOs);
         }
 
         // Kill loading if fiat rate fetch not triggered
