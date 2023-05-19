@@ -287,7 +287,7 @@ const Home = () => {
                         />
                     </PlainButton>
 
-                    {isWalletInitialized ? (
+                    {wallets.length === 0 ? (
                         <View
                             style={tailwind(
                                 'flex-row justify-between items-center -mr-1',
@@ -321,13 +321,13 @@ const Home = () => {
                         style={[
                             tailwind(
                                 `w-full items-center justify-between ${
-                                    !isWalletInitialized ? 'mb-4' : ''
+                                    !(wallets.length > 0) ? 'mb-4' : ''
                                 }`,
                             ),
                         ]}>
                         <View
                             style={tailwind('justify-around w-full mt-2 mb-4')}>
-                            {isWalletInitialized ? (
+                            {wallets.length > 0 ? (
                                 <>
                                     <Text
                                         style={[
@@ -367,7 +367,7 @@ const Home = () => {
                         </View>
 
                         {/** Create a vertical scroll carousel for 'BaseCard */}
-                        {isWalletInitialized ? (
+                        {wallets.length > 0 ? (
                             <FlatList
                                 style={[tailwind('w-full h-48')]}
                                 data={wallets}
@@ -391,7 +391,7 @@ const Home = () => {
                         style={[
                             tailwind(
                                 `w-full ${
-                                    isWalletInitialized ? 'h-3/5' : 'h-4/6'
+                                    wallets.length > 0 ? 'h-3/5' : 'h-4/6'
                                 } mt-4`,
                             ),
                         ]}>
