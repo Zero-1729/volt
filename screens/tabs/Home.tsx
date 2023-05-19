@@ -29,12 +29,12 @@ import {PlainButton} from '../../components/button';
 import {EmptyCard, WalletCard} from '../../components/card';
 import {TransactionListItem} from '../../components/transaction';
 
-import {normalizeFiat} from '../../modules/transform';
-
 import {BaseWallet} from '../../class/wallet/base';
 import {BalanceType, TransactionType} from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
+
+import {FiatBalance} from '../../components/balance';
 
 import {fetchFiatRate} from '../../modules/currency';
 import {liberalAlert} from '../../components/alert';
@@ -341,28 +341,11 @@ const Home = () => {
                                     </Text>
 
                                     {!hideTotalBalance ? (
-                                        <Text
-                                            style={[
-                                                tailwind(
-                                                    `text-3xl font-medium ${
-                                                        loadingBalance
-                                                            ? 'opacity-40'
-                                                            : ''
-                                                    }`,
-                                                ),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                                Font.RobotoText,
-                                            ]}>
-                                            {`${
-                                                appFiatCurrency.symbol
-                                            } ${normalizeFiat(
-                                                totalBalance,
-                                                fiatRate.rate,
-                                            )}`}
-                                        </Text>
+                                        <FiatBalance
+                                            balance={totalBalance}
+                                            loading={loadingBalance}
+                                            BalanceFontSize={'text-3xl'}
+                                        />
                                     ) : (
                                         <View
                                             style={[
