@@ -15,7 +15,7 @@ import {formatSats, formatBTC} from '../modules/transform';
 
 import {normalizeFiat} from '../modules/transform';
 
-import {BalanceProps, TxBalanceProps} from '../types/props';
+import {BalanceProps, TxBalanceProps, FiatBalanceProps} from '../types/props';
 import {FiatRate, Unit} from '../types/wallet';
 
 const getBalance = (
@@ -221,6 +221,74 @@ export const Balance = (props: BalanceProps) => {
                         )}
                     </View>
                 </PlainButton>
+            ) : (
+                /* Empty view to keep the card height consistent  */
+                <View
+                    style={[
+                        tailwind(
+                            'rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black',
+                        ),
+                    ]}
+                />
+            )}
+        </View>
+    );
+};
+
+export const FiatBalance = (props: FiatBalanceProps) => {
+    const tailwind = useTailwind();
+
+    const {hideTotalBalance, appFiatCurrency, fiatRate} =
+        useContext(AppStorageContext);
+
+    const unit = {name: appFiatCurrency.short, symbol: appFiatCurrency.symbol};
+
+    return (
+        <View>
+            {!hideTotalBalance ? (
+                <View
+                    style={[
+                        tailwind(
+                            `flex-row items-center ${
+                                props.loading ? 'opacity-20' : ''
+                            }`,
+                        ),
+                    ]}>
+                    {/* Display fiat symbol */}
+                    <Text
+                        numberOfLines={1}
+                        style={[
+                            tailwind(
+                                `${
+                                    props.BalanceFontSize
+                                        ? props.BalanceFontSize
+                                        : 'text-2xl'
+                                } self-baseline mr-2 text-white`,
+                            ),
+                        ]}>
+                        {unit.symbol}
+                    </Text>
+
+                    {/* Display balance in sats or BTC */}
+                    <Text
+                        numberOfLines={1}
+                        style={[
+                            tailwind(
+                                `${
+                                    props.BalanceFontSize
+                                        ? props.BalanceFontSize
+                                        : 'text-2xl'
+                                } text-white self-baseline`,
+                            ),
+                        ]}>
+                        {getBalance(
+                            new BigNumber(props.balance),
+                            unit,
+                            fiatRate,
+                            false,
+                        )}
+                    </Text>
+                </View>
             ) : (
                 /* Empty view to keep the card height consistent  */
                 <View
