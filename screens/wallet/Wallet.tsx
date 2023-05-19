@@ -213,6 +213,14 @@ const Wallet = () => {
         walletData,
     ]);
 
+    // Check if wallet balance is empty
+    const isWalletBroke = (balance: BigNumber) => {
+        return new BigNumber(0).eq(balance);
+    };
+
+    const hideSendButton =
+        walletData.isWatchOnly || isWalletBroke(walletData.balance);
+
     useEffect(() => {
         // Attempt to sync balance
         if (!singleLoadLock) {
@@ -329,7 +337,8 @@ const Wallet = () => {
                                 'absolute bottom-4 w-full items-center px-4 justify-around flex-row mt-4 mb-4',
                             ),
                         ]}>
-                        {!walletData.isWatchOnly ? (
+                        {/* Hide send if Balance is empty or it is a watch-only wallet */}
+                        {!hideSendButton ? (
                             <View
                                 style={[
                                     tailwind(
@@ -359,9 +368,7 @@ const Wallet = () => {
                             style={[
                                 tailwind(
                                     `rounded-full py-3 ${
-                                        walletData.isWatchOnly
-                                            ? 'w-5/6'
-                                            : 'w-1/2'
+                                        hideSendButton ? 'w-full' : 'w-1/2'
                                     } opacity-60`,
                                 ),
                                 {
