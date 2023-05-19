@@ -234,13 +234,13 @@ const Wallet = () => {
                 {/* Top panel */}
                 <View
                     style={[
-                        tailwind('relative h-1/3 rounded-b-2xl'),
+                        tailwind('relative h-2/5 items-center justify-center'),
                         {backgroundColor: CardColor},
                     ]}>
                     <View
                         style={[
                             tailwind(
-                                'absolute w-full top-4 flex-row justify-between',
+                                'absolute w-full top-4 flex-row items-center justify-between',
                             ),
                         ]}>
                         <PlainButton
@@ -294,14 +294,12 @@ const Wallet = () => {
                     )}
 
                     {/* Balance */}
-                    <View
-                        style={[
-                            tailwind('absolute self-center w-5/6 bottom-28'),
-                        ]}>
+                    <View style={[tailwind('items-center w-5/6 -mt-8')]}>
                         <Text
                             style={[
-                                tailwind('text-sm text-white opacity-60 mb-1'),
+                                tailwind('text-sm text-white opacity-60 mb-2'),
                             ]}>
+                            Current{' '}
                             {!networkState?.isConnected ? 'Offline ' : ''}
                             Balance
                         </Text>
@@ -310,7 +308,9 @@ const Wallet = () => {
                         <View
                             style={[
                                 tailwind(
-                                    `${loadingBalance ? 'opacity-40' : ''}`,
+                                    `w-full items-center ${
+                                        loadingBalance ? 'opacity-40' : ''
+                                    }`,
                                 ),
                             ]}>
                             <Balance
@@ -395,7 +395,7 @@ const Wallet = () => {
                 </View>
 
                 {/* Transactions List */}
-                <View style={[tailwind('h-2/3 w-full items-center')]}>
+                <View style={[tailwind('h-3/5 w-full items-center')]}>
                     <View style={[tailwind('mt-6 w-11/12')]}>
                         <Text
                             style={[
