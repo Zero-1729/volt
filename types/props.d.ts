@@ -72,6 +72,11 @@ export type BalanceProps = BaseProps & {
     SatsFontSize?: string;
     loading: boolean;
     disableFiat: boolean; // false by default
+
+export type FiatBalanceProps = BaseProps & {
+    balance: BalanceType;
+    BalanceFontSize?: string;
+    loading: boolean;
 };
 
 // Base Text Input Prop Type (for reuse)
