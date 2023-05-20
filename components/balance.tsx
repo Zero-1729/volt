@@ -263,8 +263,9 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                     props.BalanceFontSize
                                         ? props.BalanceFontSize
                                         : 'text-2xl'
-                                } self-baseline mr-2 text-white`,
+                                } self-baseline mr-2`,
                             ),
+                            {color: props.fontColor},
                         ]}>
                         {unit.symbol}
                     </Text>
@@ -278,8 +279,9 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                     props.BalanceFontSize
                                         ? props.BalanceFontSize
                                         : 'text-2xl'
-                                } text-white self-baseline`,
+                                } self-baseline`,
                             ),
+                            {color: props.fontColor},
                         ]}>
                         {getBalance(
                             new BigNumber(props.balance),
