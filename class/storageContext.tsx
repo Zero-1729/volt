@@ -77,6 +77,7 @@ type defaultContextType = {
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => BaseWallet;
+    getAllTransactions: () => TransactionType[];
 };
 
 // Default app context values
@@ -125,6 +126,7 @@ const defaultContext: defaultContextType = {
     deleteWallet: () => {},
     resetAppData: () => {},
     setCurrentWalletID: () => {},
+    getAllTransactions: () => [],
     getWalletData: () => {
         return new BaseWallet({name: 'test wallet', type: 'bech32'});
     }, // Function grabs wallet data through a fetch by index via ids
@@ -421,6 +423,18 @@ export const AppStorageProvider = ({children}: Props) => {
 
         return wallets[index];
     };
+
+    const getAllTransactions = useCallback(() => {
+        const txs: TransactionType[] = [];
+
+        wallets.forEach((wallet: BaseWallet) => {
+            wallet.transactions.forEach(tx => {
+                txs.push(tx);
+            });
+        });
+
+        return txs;
+    }, []);
 
     const _loadWallets = async () => {
         const savedWallets = await _getWallets();
@@ -771,6 +785,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 isAdvancedMode,
                 setIsAdvancedMode,
                 getWalletData,
+                getAllTransactions,
                 updateAppUnit,
                 updateWalletTransactions,
                 updateWalletUTXOs,
