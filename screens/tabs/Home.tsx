@@ -341,6 +341,7 @@ const Home = () => {
                                             balance={totalBalance}
                                             loading={loadingBalance}
                                             BalanceFontSize={'text-3xl'}
+                                            fontColor={ColorScheme.Text.Default}
                                         />
                                     ) : (
                                         <View
