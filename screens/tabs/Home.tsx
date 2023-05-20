@@ -68,6 +68,7 @@ const Home = () => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
+        getAllTransactions,
         setNetworkState,
         networkState,
         fiatRate,
@@ -89,22 +90,15 @@ const Home = () => {
         }
     });
 
-    // Get all transactions across wallets
-    const txs: TransactionType[] = [];
-
-    // iterate over all wallets and push transactions to txs
-    wallets.forEach((wallet: BaseWallet) => {
-        wallet.transactions.forEach(tx => {
-            txs.push(tx);
-        });
-    });
-
     // add the total balances of the wallets
     const totalBalance: BalanceType = wallets.reduce(
         (accumulator: BalanceType, currentValue: BaseWallet) =>
             accumulator.plus(currentValue.balance),
         new BigNumber(0),
     );
+
+    // All transactions across different wallets
+    const allTransactions = getAllTransactions();
 
     // Fiat fetch
     const singleSyncFiatRate = useCallback(
@@ -221,7 +215,9 @@ const Home = () => {
 
     // Fetch the fiat rate on initial load
     useEffect(() => {
-        if (!initFiatRate) {
+        // Only attempt update when initial fiat rate update call
+        // and wallets exists
+        if (!initFiatRate && wallets.length > 0) {
             // Begin loading
             setLoadingBalance(true);
 
@@ -404,7 +400,7 @@ const Home = () => {
                             Latest Transactions
                         </Text>
 
-                        {txs.length === 0 ? (
+                        {allTransactions.length === 0 ? (
                             <View
                                 style={[
                                     tailwind(
@@ -432,7 +428,7 @@ const Home = () => {
                                 onRefresh={refreshWallet}
                                 scrollEnabled={true}
                                 style={tailwind('w-full mb-12')}
-                                data={txs}
+                                data={allTransactions}
                                 renderItem={item => (
                                     <TransactionListItem tx={item.item} />
                                 )}
