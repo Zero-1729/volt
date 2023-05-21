@@ -44,6 +44,7 @@ type defaultContextType = {
     networkState: NetInfoType;
     appLanguage: LanguageType;
     appFiatCurrency: CurrencyType;
+    loadLock: boolean;
     appUnit: Unit;
     fiatRate: FiatRate;
     useSatSymbol: boolean;
@@ -78,10 +79,12 @@ type defaultContextType = {
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => BaseWallet;
     getAllTransactions: () => TransactionType[];
+    setLoadLock: (loadLock: boolean) => void;
 };
 
 // Default app context values
 const defaultContext: defaultContextType = {
+    loadLock: false,
     networkState: null,
     appLanguage: {
         name: 'English',
@@ -130,6 +133,7 @@ const defaultContext: defaultContextType = {
     getWalletData: () => {
         return new BaseWallet({name: 'test wallet', type: 'bech32'});
     }, // Function grabs wallet data through a fetch by index via ids
+    setLoadLock: () => {},
 };
 
 // Note: context 'value' will default to 'defaultContext' if no Provider is found
@@ -137,6 +141,7 @@ export const AppStorageContext =
     createContext<defaultContextType>(defaultContext);
 export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
+    const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [networkState, _setNetworkState] = useState<NetInfoType>(null);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
@@ -162,6 +167,8 @@ export const AppStorageProvider = ({children}: Props) => {
         defaultContext.isAdvancedMode,
     );
 
+    const {getItem: _getLoadLock, setItem: _updateLoadLock} =
+        useAsyncStorage('loadLock');
     const {getItem: _getNetworkState, setItem: _updateNetworkState} =
         useAsyncStorage('networkState');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
@@ -188,6 +195,29 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('currentWalletID');
 
     // |> Create functions for getting, setting, and other data manipulation
+    const _loadLock = async () => {
+        const ll = await _getLoadLock();
+
+        if (ll !== null) {
+            _setLoadLock(JSON.parse(ll));
+        }
+    };
+
+    const setLoadLock = useCallback(
+        async (lock: boolean) => {
+            try {
+                await _setLoadLock(lock);
+                await _updateLoadLock(JSON.stringify(lock));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Load lock) Error loading data: ${e} [${lock}]`,
+                );
+                throw new Error('Error setting load lock');
+            }
+        },
+        [_setLoadLock, _updateLoadLock],
+    );
+
     const setNetworkState = useCallback(
         async (netState: NetInfoType) => {
             try {
@@ -717,6 +747,10 @@ export const AppStorageProvider = ({children}: Props) => {
     // Add effects
     // Load settings from disk on app start
     useEffect(() => {
+        _loadLock();
+    }, []);
+
+    useEffect(() => {
         _loadAppLanguage();
     }, []);
 
@@ -764,6 +798,8 @@ export const AppStorageProvider = ({children}: Props) => {
     return (
         <AppStorageContext.Provider
             value={{
+                loadLock,
+                setLoadLock,
                 networkState,
                 setNetworkState,
                 appLanguage,
