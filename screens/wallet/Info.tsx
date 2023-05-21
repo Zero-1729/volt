@@ -6,7 +6,7 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
-import {DeletionAlert} from '../../components/alert';
+import {DeletionAlert, liberalAlert} from '../../components/alert';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -27,6 +27,7 @@ const Info = () => {
 
     // Get advanced mode flag, current wallet ID and wallet data
     const {
+        loadLock,
         isAdvancedMode,
         currentWalletID,
         getWalletData,
@@ -93,6 +94,16 @@ const Info = () => {
     const [tmpName, setTmpName] = useState(walletName);
 
     const showDialog = () => {
+        // Avoid deletion while loading
+        if (loadLock) {
+            liberalAlert(
+                'Notice',
+                'Cannot delete wallet, the wallet transactions are still loading.',
+                'Cancel',
+            );
+            return;
+        }
+
         DeletionAlert(
             'Delete Wallet',
             'Are you sure you want to delete this wallet?',
@@ -101,14 +112,14 @@ const Info = () => {
         );
     };
 
-    const handleDeleteWallet = () => {
+    const handleDeleteWallet = async () => {
         try {
             // Navigate to HomeScreen
             // Make it clear deleted wallet is no longer in store
             navigation.dispatch(CommonActions.navigate({name: 'HomeScreen'}));
 
             // Delete wallet from store
-            deleteWallet(currentWalletID);
+            await deleteWallet(currentWalletID);
         } catch (e) {
             console.error('[Wallet Screen] Error deleting wallet: ', e);
         }
