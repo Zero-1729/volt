@@ -45,6 +45,7 @@ const Wallet = () => {
 
     // Get current wallet ID and wallet data
     const {
+        setLoadLock,
         currentWalletID,
         getWalletData,
         networkState,
@@ -76,6 +77,9 @@ const Wallet = () => {
         if (refreshing || loadingBalance) {
             return;
         }
+
+        // Lock load to avoid deleting wallet while loading
+        setLoadLock(true);
 
         // Set refreshing
         setRefreshing(true);
@@ -116,90 +120,105 @@ const Wallet = () => {
             // Update wallet balance first
             const {balance, transactions} = await syncWallet(walletData);
 
-            // Store newly formatted transactions from mempool.space data
-            const newTxs = [];
-
-            // Store newly fetched UTXOs
-            const newUTXOs = [];
-
-            // iterate over all the transactions and include the missing optional fields for the TransactionType
-            for (let i = 0; i < transactions.length; i++) {
-                const tmp: TransactionType = {
-                    ...transactions[i],
-                    address: '',
-                    outputs: [],
-                    rbf: false,
-                    size: 0,
-                    weight: 0,
-                };
-
-                const TxData = await getTxData(
-                    transactions[i].txid,
-                    walletData.network,
-                );
-
-                // if the transaction is not sent, then it is received
-                for (let j = 0; j < TxData.vin.length; j++) {
-                    // Add address we own based on whether we sent
-                    // the transaction and the value received matches
-                    if (
-                        transactions[i].value.eq(TxData.vin[j].prevout.value) &&
-                        transactions[i].type === 'outbound'
-                    ) {
-                        tmp.address =
-                            TxData.vin[j].prevout.scriptpubkey_address;
-                    }
-
-                    // Set if transaction an RBF
-                    if (TxData.vin[j].sequence === '4294967293') {
-                        tmp.rbf = true;
-                    }
-                }
-
-                // if the transaction is not sent, then it is received
-                for (let k = 0; k < TxData.vout.length; k++) {
-                    // Add address we own based on whether we received
-                    // the transaction and the value received matches
-                    if (
-                        transactions[i].value.eq(TxData.vout[k].value) &&
-                        transactions[i].type === 'inbound'
-                    ) {
-                        tmp.address = TxData.vout[k].scriptpubkey_address;
-
-                        // Update transaction UTXOs that we own
-                        newUTXOs.push({
-                            txid: transactions[i].txid,
-                            vout: k,
-                            value: new BigNumber(TxData.vout[k].value),
-                            address: TxData.vout[k].scriptpubkey_address,
-                            scriptpubkey: TxData.vout[k].scriptpubkey,
-                            scriptpubkey_asm: TxData.vout[k].scriptpubkey_asm,
-                            scriptpubkey_type: TxData.vout[k].scriptpubkey_type,
-                        });
-                    }
-                }
-
-                // Update new transactions list
-                newTxs.push({
-                    ...tmp,
-                    size: TxData.size,
-                    weight: TxData.weight,
-                });
-            }
-
             // update wallet balance
             updateWalletBalance(currentWalletID, balance);
 
-            // update wallet transactions
-            updateWalletTransactions(currentWalletID, newTxs);
+            try {
+                // Store newly formatted transactions from mempool.space data
+                const newTxs = [];
 
-            // update wallet UTXOs
-            updateWalletUTXOs(currentWalletID, newUTXOs);
+                // Store newly fetched UTXOs
+                const newUTXOs = [];
+
+                // iterate over all the transactions and include the missing optional fields for the TransactionType
+                for (let i = 0; i < transactions.length; i++) {
+                    const tmp: TransactionType = {
+                        ...transactions[i],
+                        address: '',
+                        outputs: [],
+                        rbf: false,
+                        size: 0,
+                        weight: 0,
+                    };
+                    const TxData = await getTxData(
+                        transactions[i].txid,
+                        walletData.network,
+                    );
+
+                    // if the transaction is not sent, then it is received
+                    for (let j = 0; j < TxData.vin.length; j++) {
+                        // Add address we own based on whether we sent
+                        // the transaction and the value received matches
+                        if (
+                            transactions[i].value.eq(
+                                TxData.vin[j].prevout.value,
+                            ) &&
+                            transactions[i].type === 'outbound'
+                        ) {
+                            tmp.address =
+                                TxData.vin[j].prevout.scriptpubkey_address;
+                        }
+
+                        // Set if transaction an RBF
+                        if (TxData.vin[j].sequence === '4294967293') {
+                            tmp.rbf = true;
+                        }
+                    }
+
+                    // if the transaction is not sent, then it is received
+                    for (let k = 0; k < TxData.vout.length; k++) {
+                        // Add address we own based on whether we received
+                        // the transaction and the value received matches
+                        if (
+                            transactions[i].value.eq(TxData.vout[k].value) &&
+                            transactions[i].type === 'inbound'
+                        ) {
+                            tmp.address = TxData.vout[k].scriptpubkey_address;
+
+                            // Update transaction UTXOs that we own
+                            newUTXOs.push({
+                                txid: transactions[i].txid,
+                                vout: k,
+                                value: new BigNumber(TxData.vout[k].value),
+                                address: TxData.vout[k].scriptpubkey_address,
+                                scriptpubkey: TxData.vout[k].scriptpubkey,
+                                scriptpubkey_asm:
+                                    TxData.vout[k].scriptpubkey_asm,
+                                scriptpubkey_type:
+                                    TxData.vout[k].scriptpubkey_type,
+                            });
+                        }
+                    }
+
+                    // Update new transactions list
+                    newTxs.push({
+                        ...tmp,
+                        size: TxData.size,
+                        weight: TxData.weight,
+                    });
+                }
+
+                // update wallet transactions
+                updateWalletTransactions(currentWalletID, newTxs);
+
+                // update wallet UTXOs
+                updateWalletUTXOs(currentWalletID, newUTXOs);
+
+                setLoadLock(false);
+            } catch (e) {
+                liberalAlert('Network', `${e.message}`, 'OK');
+
+                setLoadingBalance(false);
+                setRefreshing(false);
+                setLoadLock(false);
+                return;
+            }
         }
 
         // Kill loading if fiat rate fetch not triggered
         setRefreshing(false);
         setLoadingBalance(false);
+        setLoadLock(false);
     }, [
         appFiatCurrency.short,
         currentWalletID,
