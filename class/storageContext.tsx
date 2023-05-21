@@ -462,6 +462,9 @@ export const AppStorageProvider = ({children}: Props) => {
         async (id: string) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
+            // delete current Wallet index
+            await setCurrentWalletID('');
+
             const tmp = [...wallets];
             tmp.splice(index, 1);
 
