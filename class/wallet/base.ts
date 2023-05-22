@@ -16,6 +16,39 @@ import {
 import {WalletPaths, descXpubPattern} from '../../modules/wallet-utils';
 
 export class BaseWallet {
+    // Use static method to create wallet from JSON
+    static fromJSON(json: string): BaseWallet {
+        const obj = JSON.parse(json);
+
+        const wallet = new BaseWallet({
+            name: obj.name,
+            type: obj.type,
+            descriptor: obj.descriptor,
+            xprv: obj.xprv,
+            xpub: obj.xpub,
+            secret: obj.secret,
+            network: obj.network,
+        });
+
+        wallet.id = obj.id;
+        wallet.addresses = obj.addresses;
+        wallet.address = obj.address;
+        wallet.birthday = obj.birthday;
+        wallet.balance = obj.balance;
+        wallet.transactions = obj.transactions;
+        wallet.UTXOs = obj.UTXOs;
+        wallet.syncedBalance = obj.syncedBalance;
+        wallet.lastSynced = obj.lastSynced;
+        wallet.units = obj.units;
+        wallet.masterFingerprint = obj.masterFingerprint;
+        wallet.hardwareWalletEnabled = obj.hardwareWalletEnabled;
+        wallet.hasBackedUp = obj.hasBackedUp;
+        wallet.derivationPath = obj.derivationPath;
+        wallet.setWatchOnly(obj.isWatchOnly);
+
+        return wallet;
+    }
+
     id: string;
     name: string;
 
