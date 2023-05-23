@@ -30,7 +30,7 @@ import {EmptyCard, WalletCard} from '../../components/card';
 import {TransactionListItem} from '../../components/transaction';
 
 import {BaseWallet} from '../../class/wallet/base';
-import {BalanceType, TransactionType} from '../../types/wallet';
+import {BalanceType} from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
@@ -61,7 +61,6 @@ const Home = () => {
     const navigation = useNavigation();
 
     const {
-        isWalletInitialized,
         wallets,
         hideTotalBalance,
         appFiatCurrency,
@@ -283,7 +282,7 @@ const Home = () => {
                         />
                     </PlainButton>
 
-                    {wallets.length === 0 ? (
+                    {wallets.length > 0 ? (
                         <View
                             style={tailwind(
                                 'flex-row justify-between items-center -mr-1',
