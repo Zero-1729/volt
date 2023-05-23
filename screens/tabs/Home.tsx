@@ -287,13 +287,6 @@ const Home = () => {
                             style={tailwind(
                                 'flex-row justify-between items-center -mr-1',
                             )}>
-                            <PlainButton>
-                                <Bell
-                                    width={22}
-                                    fill={ColorScheme.SVG.Default}
-                                    style={tailwind('mr-4')}
-                                />
-                            </PlainButton>
                             <PlainButton
                                 onPress={() =>
                                     navigation.dispatch(
