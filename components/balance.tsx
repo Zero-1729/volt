@@ -18,7 +18,7 @@ import {normalizeFiat} from '../modules/transform';
 import {BalanceProps, TxBalanceProps, FiatBalanceProps} from '../types/props';
 import {FiatRate, Unit} from '../types/wallet';
 
-const getBalance = (
+const _getBalance = (
     balance: BigNumber,
     unit: Unit,
     fiatRate: FiatRate,
@@ -74,7 +74,7 @@ export const TXBalance = (props: TxBalanceProps) => {
                             ),
                             {color: props.fontColor},
                         ]}>
-                        {getBalance(props.balance, appUnit, fiatRate, false)}
+                        {_getBalance(props.balance, appUnit, fiatRate, false)}
                     </Text>
 
                     {/* Only display 'sats' if we are using satSymbol */}
@@ -197,7 +197,7 @@ export const Balance = (props: BalanceProps) => {
                                     } text-white self-baseline`,
                                 ),
                             ]}>
-                            {getBalance(
+                            {_getBalance(
                                 new BigNumber(walletData.balance),
                                 appUnit,
                                 fiatRate,
@@ -283,7 +283,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                             ),
                             {color: props.fontColor},
                         ]}>
-                        {getBalance(
+                        {_getBalance(
                             new BigNumber(props.balance),
                             unit,
                             fiatRate,
