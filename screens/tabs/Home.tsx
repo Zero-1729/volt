@@ -102,11 +102,6 @@ const Home = () => {
     // Fiat fetch
     const singleSyncFiatRate = useCallback(
         async (ticker: string, violate: boolean = false) => {
-            // Avoid fiat rate update call when offline
-            if (!networkState?.isConnected) {
-                return;
-            }
-
             // Only proceed if initial load or if user select new currency in settings
             if (!initFiatRate || violate) {
                 try {
@@ -217,6 +212,11 @@ const Home = () => {
         // Only attempt update when initial fiat rate update call
         // and wallets exists
         if (!initFiatRate && wallets.length > 0) {
+            // Avoid fiat rate update call when offline
+            if (!networkState?.isConnected) {
+                return;
+            }
+
             // Begin loading
             setLoadingBalance(true);
 
