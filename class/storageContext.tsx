@@ -600,6 +600,7 @@ export const AppStorageProvider = ({children}: Props) => {
         }
 
         // If we have a mnemonic, generate extended key material
+        // TODO: Fallback to generate xprv and fingerprint without BDK when offline
         if (newWallet.secret !== '') {
             // Get extended key material from BDK
             const extendedKeyResponse = await BdkRn.createExtendedKey({
@@ -622,6 +623,7 @@ export const AppStorageProvider = ({children}: Props) => {
         // Only generate if we don't already have one
         // We can only generate one if we have either a mnemonic
         // or an xprv, so check to see if either of those exist
+        // TODO: Fallback to generate descriptor without BDK when offline
         if (newWallet.secret !== '' || newWallet.xprv !== '') {
             // Get descriptor from BDK
             const descriptorResponse = await BdkRn.createDescriptor({
