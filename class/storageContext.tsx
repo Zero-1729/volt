@@ -647,6 +647,17 @@ export const AppStorageProvider = ({children}: Props) => {
         // Determine if watch only wallet
         newWallet.setWatchOnly();
 
+        // Set initial wallet Address
+        const addressResponse = await BdkRn.getNewAddress();
+
+        if (addressResponse.error) {
+            throw new Error(addressResponse.data);
+        }
+
+        const address = addressResponse.data;
+
+        newWallet.setAddress(address);
+
         // Set wallet as initialized
         await _setWalletInit(true);
 
