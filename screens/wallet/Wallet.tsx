@@ -395,7 +395,14 @@ const Wallet = () => {
                                         ColorScheme.Background.Inverted,
                                 },
                             ]}>
-                            <PlainButton>
+                            <PlainButton
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'Receive',
+                                        }),
+                                    );
+                                }}>
                                 <Text
                                     style={[
                                         tailwind(
