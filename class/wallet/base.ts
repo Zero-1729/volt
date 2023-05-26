@@ -191,4 +191,8 @@ export class BaseWallet {
     setDescriptor(descriptor: string) {
         this.descriptor = descriptor;
     }
+
+    setAddress(address: string) {
+        this.address = address;
+    }
 }
