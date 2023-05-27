@@ -52,6 +52,8 @@ export class BaseWallet {
     id: string;
     name: string;
 
+    index: number;
+
     isWatchOnly: boolean;
     type: string;
 
@@ -86,6 +88,8 @@ export class BaseWallet {
     constructor(args: baseWalletArgs) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = args.name; // Wallet name
+
+        this.index = 0; // Wallet address index
 
         this.type = args.type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
