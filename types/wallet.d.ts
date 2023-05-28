@@ -57,6 +57,15 @@ export type Unit = {
     symbol: string; // Unit symbol '₿' or 'sats' (see https://satsymbol.com/)
 };
 
+// Address type
+export type addressType = {
+    address: string; // Address
+    path: string; // Address derivation path
+    index: number; // Address derivation index
+    change: boolean; // Whether address is change
+    memo: string; // Address memo
+};
+
 export type descriptorSymbolsType = string[];
 
 export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
