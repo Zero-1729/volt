@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {useColorScheme, View, Text, Share} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -11,6 +11,8 @@ import Color from '../../constants/Color';
 import {AppStorageContext} from '../../class/storageContext';
 
 import QRCode from 'react-native-qrcode-svg';
+
+import Font from '../../constants/Font';
 
 import ShareIcon from '../../assets/svg/share-android-24.svg';
 
@@ -24,11 +26,20 @@ const Receive = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {currentWalletID, getWalletData} = useContext(AppStorageContext);
+    const {currentWalletID, getWalletData, useSatSymbol} =
+        useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
 
     // Format as Bitcoin URI
     const getFormattedAddress = (address: string) => {
+        let amount = BitcoinAmount;
+
+        if (amount > 0) {
+            // If amount is greater than 0, return a bitcoin payment request URI
+            return `bitcoin:${address}?amount=${amount}`;
+        }
+
+        // If amount is 0, return a plain address
         // return a formatted bitcoin address to include the bitcoin payment request URI
         return `bitcoin:${address}`;
     };
@@ -38,6 +49,8 @@ const Receive = () => {
     const [BitcoinInvoice, setBitcoinInvoice] = useState(
         getFormattedAddress(walletData.address),
     );
+    // Amount in sats
+    const [BitcoinAmount, setBitcoinAmount] = useState(0);
 
     // Copy data to clipboard
     const copyDescToClipboard = () => {
@@ -52,6 +65,10 @@ const Receive = () => {
             setPlainAddress('');
         }, 450);
     };
+
+    useEffect(() => {
+        setBitcoinInvoice(getFormattedAddress(walletData.address));
+    }, [BitcoinAmount]);
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -81,16 +98,52 @@ const Receive = () => {
                     </Text>
                 </View>
 
-                {/* QR code */}
-                <View
-                    style={[
-                        tailwind('rounded -mt-6'),
-                        {
-                            borderWidth: 10,
-                            borderColor: 'white',
-                        },
-                    ]}>
-                    <QRCode value={BitcoinInvoice} size={225} />
+                {/* Click should toggle unit amount or display fiat amount below */}
+                <View style={[tailwind('w-5/6 -mt-8 items-center')]}>
+                    {BitcoinAmount !== 0 ? (
+                        <View
+                            style={[
+                                tailwind(
+                                    'mb-4 flex-row justify-center items-center',
+                                ),
+                            ]}>
+                            {useSatSymbol ? (
+                                <Text
+                                    style={[
+                                        tailwind('font-bold text-xl mr-2'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                            ...Font.SatSymbol,
+                                        },
+                                    ]}>
+                                    S
+                                </Text>
+                            ) : (
+                                <></>
+                            )}
+                            <Text
+                                style={[
+                                    tailwind('font-bold text-xl'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {BitcoinAmount}
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
+
+                    {/* QR code */}
+                    <View
+                        style={[
+                            tailwind('rounded'),
+                            {
+                                borderWidth: 10,
+                                borderColor: 'white',
+                            },
+                        ]}>
+                        <QRCode value={BitcoinInvoice} size={225} />
+                    </View>
                 </View>
 
                 {/* Bitcoin address info */}
@@ -132,41 +185,59 @@ const Receive = () => {
                     <></>
                 )}
 
-                {/* Share Button */}
-                <PlainButton
+                {/* Bottom buttons */}
+                <View
                     style={[
                         tailwind('absolute'),
                         {bottom: bottomOffset.bottom},
-                    ]}
-                    onPress={() => {
-                        Share.share({
-                            message: BitcoinInvoice,
-                            title: 'Share Address',
-                            url: BitcoinInvoice,
-                        });
-                    }}>
-                    <View
-                        style={[
-                            tailwind(
-                                'rounded-full items-center flex-row justify-center px-6 py-3',
-                            ),
-                            {
-                                backgroundColor:
-                                    ColorScheme.Background.Inverted,
-                            },
-                        ]}>
+                    ]}>
+                    {/* Enter receive amount */}
+                    <PlainButton
+                        style={[tailwind('mb-8')]}
+                        onPress={() => {
+                            setBitcoinAmount(2000);
+                        }}>
                         <Text
                             style={[
-                                tailwind('text-sm mr-2 font-bold'),
+                                tailwind('font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            Request Amount
+                        </Text>
+                    </PlainButton>
+
+                    {/* Share Button */}
+                    <PlainButton
+                        onPress={() => {
+                            Share.share({
+                                message: BitcoinInvoice,
+                                title: 'Share Address',
+                                url: BitcoinInvoice,
+                            });
+                        }}>
+                        <View
+                            style={[
+                                tailwind(
+                                    'rounded-full items-center flex-row justify-center px-6 py-3',
+                                ),
                                 {
-                                    color: ColorScheme.Text.Alt,
+                                    backgroundColor:
+                                        ColorScheme.Background.Inverted,
                                 },
                             ]}>
-                            Share
-                        </Text>
-                        <ShareIcon fill={ColorScheme.SVG.Inverted} />
-                    </View>
-                </PlainButton>
+                            <Text
+                                style={[
+                                    tailwind('text-sm mr-2 font-bold'),
+                                    {
+                                        color: ColorScheme.Text.Alt,
+                                    },
+                                ]}>
+                                Share
+                            </Text>
+                            <ShareIcon fill={ColorScheme.SVG.Inverted} />
+                        </View>
+                    </PlainButton>
+                </View>
             </View>
         </SafeAreaView>
     );
