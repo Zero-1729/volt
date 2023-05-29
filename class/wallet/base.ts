@@ -11,6 +11,7 @@ import {
     UTXOType,
     NetType,
     baseWalletArgs,
+    addressType,
 } from './../../types/wallet';
 
 import {WalletPaths, descXpubPattern} from '../../modules/wallet-utils';
@@ -72,7 +73,7 @@ export class BaseWallet {
     UTXOs: UTXOType[];
 
     addresses: Array<string>;
-    address: string;
+    address: addressType;
 
     syncedBalance: number;
     lastSynced: number;
@@ -94,7 +95,13 @@ export class BaseWallet {
         this.type = args.type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
         this.addresses = []; // List of addresses
-        this.address = ''; // Temporarily generated receiving address
+        this.address = {
+            address: '',
+            path: '',
+            index: 0,
+            change: false,
+            memo: '',
+        }; // Temporarily generated receiving address
         this.birthday = Date(); // Timestamp of wallet creation
         this.units = {
             name: 'sats',
@@ -196,7 +203,7 @@ export class BaseWallet {
         this.descriptor = descriptor;
     }
 
-    setAddress(address: string) {
+    setAddress(address: addressType) {
         this.address = address;
     }
 }
