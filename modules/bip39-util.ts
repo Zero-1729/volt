@@ -13,3 +13,7 @@ export const validateMnenomic = (mnemonic: string) => {
 
     return resp;
 };
+
+export const mnemonicToSeedSync = (mnemonic: string) => {
+    return BIP39.mnemonicToSeedSync(mnemonic);
+};
