@@ -2,7 +2,7 @@ import Crypto from 'react-native-quick-crypto';
 
 import BigNumber from 'bignumber.js';
 
-import * as bip39 from '../../modules/bip39';
+import * as bip39 from '../../modules/bip39-util';
 
 import {
     Unit,
