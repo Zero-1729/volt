@@ -2641,6 +2641,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@scure/base@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@scure/base@npm:1.1.1"
+  checksum: b4fc810b492693e7e8d0107313ac74c3646970c198bbe26d7332820886fa4f09441991023ec9aa3a2a51246b74409ab5ebae2e8ef148bbc253da79ac49130309
+  languageName: node
+  linkType: hard
+
 "@sideway/address@npm:^4.1.3":
   version: 4.1.4
   resolution: "@sideway/address@npm:4.1.4"
@@ -3972,6 +3979,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bip32@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "bip32@npm:4.0.0"
+  dependencies:
+    "@noble/hashes": ^1.2.0
+    "@scure/base": ^1.1.1
+    typeforce: ^1.11.5
+    wif: ^2.0.6
+  checksum: a36253ac164db50a25e88effce84aec1eaba2ec2fbd7a19bc1f836f9b1c934fa148c3a01ddece7f136596330074d98c6b2a441e51914c302d130f56f0f893d0d
+  languageName: node
+  linkType: hard
+
 "bip38@npm:^3.1.1":
   version: 3.1.1
   resolution: "bip38@npm:3.1.1"
@@ -3988,7 +4007,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bip39@npm:3.1.0":
+"bip39@npm:^3.1.0":
   version: 3.1.0
   resolution: "bip39@npm:3.1.0"
   dependencies:
@@ -5610,7 +5629,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ecurve@npm:^1.0.0, ecurve@npm:^1.0.6":
+"ecpair@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "ecpair@npm:2.1.0"
+  dependencies:
+    randombytes: ^2.1.0
+    typeforce: ^1.18.0
+    wif: ^2.0.6
+  checksum: 924a776808f91d2fdd33a7033f84e3bbfe668ae98c0b9764c7b923e018accd8de57012bf20e419e0a5ef73ec3ec3738a654e71abe12f537b2fd7bcf02b93659f
+  languageName: node
+  linkType: hard
+
+"ecurve@npm:^1.0.0":
   version: 1.0.6
   resolution: "ecurve@npm:1.0.6"
   dependencies:
@@ -13126,6 +13156,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tiny-secp256k1@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "tiny-secp256k1@npm:2.2.1"
+  dependencies:
+    uint8array-tools: 0.0.7
+  checksum: 89b6cef4020e6d0c39bca5607ac73ba97a9172724574e09c46dc43443d99d03084774342c29e4f9c4af1b78e6357332e2f5551169957475d4c041575f5b98828
+  languageName: node
+  linkType: hard
+
 "tmpl@npm:1.0.5":
   version: 1.0.5
   resolution: "tmpl@npm:1.0.5"
@@ -13346,7 +13385,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeforce@npm:^1.11.3":
+"typeforce@npm:^1.11.3, typeforce@npm:^1.11.5, typeforce@npm:^1.18.0":
   version: 1.18.0
   resolution: "typeforce@npm:1.18.0"
   checksum: e3b21e27e76cb05f32285bef7c30a29760e79c622cfe4aa3c179ce49d1c7895b7154c8deedb9fe4599b1fd0428d35860d43e0776da1c04861168f3ad7ed99c70
@@ -13382,6 +13421,13 @@ __metadata:
   bin:
     uglifyjs: bin/uglifyjs
   checksum: 22b028b6454c4d684c76617e9ac5b8da0e56611b32cd5d89e797225d6f1022f697a5642d9084319436df3aed462225749f8287d37bf67dccda1ac9d0365dd950
+  languageName: node
+  linkType: hard
+
+"uint8array-tools@npm:0.0.7":
+  version: 0.0.7
+  resolution: "uint8array-tools@npm:0.0.7"
+  checksum: 6ffc45c7d2136757d63c6e556eb8345f908948618a9de37c805fec1249d989c265187b3fbef6cffc4ce5129083204829025b3c58800a0f24c8548e243d42ba13
   languageName: node
   linkType: hard
 
@@ -13696,9 +13742,10 @@ __metadata:
     bech32: ^1.1.4
     bignumber.js: ^9.1.1
     bip21: ^2.0.3
+    bip32: ^4.0.0
     bip32-utils: ^0.11.1
     bip38: ^3.1.1
-    bip39: 3.1.0
+    bip39: ^3.1.0
     bip66: ^1.1.5
     bip68: ^1.0.4
     bip69: ^2.1.4
@@ -13709,7 +13756,7 @@ __metadata:
     concurrently: ^7.6.0
     dayjs: ^1.11.7
     detox: ^18.19.0
-    ecurve: ^1.0.6
+    ecpair: ^2.1.0
     electrum-mnemonic: ^2.0.0
     eslint: 8.19.0
     events: ^3.3.0
@@ -13763,6 +13810,7 @@ __metadata:
     stream-browserify: ^3.0.0
     tailwind-rn: ^4.2.0
     tailwindcss: ^3.2.6
+    tiny-secp256k1: ^2.2.1
     typescript: ^5.0.4
     url: ^0.11.0
     util: ^0.12.4
