@@ -111,7 +111,7 @@ export class BaseWallet {
         this.balance = new BigNumber(0); // By default the balance is in sats
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
+        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin' or 'testnet' wallet
 
         this.transactions = []; // List of wallet transactions
         this.UTXOs = []; // Set of wallet UTXOs
@@ -137,6 +137,10 @@ export class BaseWallet {
         if (this.secret.length === 0) {
             this.secret = bip39.generateMnemonic();
         }
+    }
+
+    generateNewAddress(): addressType {
+        throw new Error('Not implemented');
     }
 
     protected _generateID(): string {
