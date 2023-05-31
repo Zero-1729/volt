@@ -15,8 +15,13 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
-import {Unit, BalanceType, FiatRate, UTXOType} from '../types/wallet';
 import {
+    TWalletType,
+    Unit,
+    BalanceType,
+    FiatRate,
+    UTXOType,
+    addressType,
     BackupMaterialTypes,
     TransactionType,
     NetType,
@@ -51,7 +56,7 @@ type defaultContextType = {
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
     isAdvancedMode: boolean;
-    wallets: BaseWallet[];
+    wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
     setNetworkState: (networkState: NetInfoType) => void;
@@ -77,7 +82,7 @@ type defaultContextType = {
     addWallet: (name: string, type: string, network?: NetType) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
-    getWalletData: (id: string) => BaseWallet;
+    getWalletData: (id: string) => TWalletType;
     getAllTransactions: () => TransactionType[];
     setLoadLock: (loadLock: boolean) => void;
 };
@@ -157,9 +162,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [isWalletInitialized, _setWalletInitialized] = useState(
         defaultContext.isWalletInitialized,
     );
-    const [wallets, _setWallets] = useState<BaseWallet[]>(
-        defaultContext.wallets,
-    );
+    const [wallets, _setWallets] = useState<TWalletType[]>(defaultContext.wallets);
     const [currentWalletID, _setCurrentWalletID] = useState(
         defaultContext.currentWalletID,
     );
@@ -448,7 +451,7 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
-    const getWalletData = (id: string): BaseWallet => {
+    const getWalletData = (id: string): TWalletType => {
         const index = wallets.findIndex(wallet => wallet.id === id);
 
         return wallets[index];
@@ -457,7 +460,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const getAllTransactions = useCallback(() => {
         const txs: TransactionType[] = [];
 
-        wallets.forEach((wallet: BaseWallet) => {
+        wallets.forEach((wallet: TWalletType) => {
             wallet.transactions.forEach(tx => {
                 txs.push(tx);
             });
@@ -475,7 +478,7 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const setWallets = useCallback(
-        async (value: BaseWallet[]) => {
+        async (value: TWalletType[]) => {
             try {
                 _setWallets(value);
                 _updateWallets(JSON.stringify(value));
@@ -584,7 +587,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const _addNewWallet = async (
-        newWallet: BaseWallet,
+        newWallet: TWalletType,
         restored: boolean = false,
     ) => {
         // TODO: Ensure we aren't needlessly
@@ -708,7 +711,7 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Handle material according to type
-            const newWallet = new BaseWallet(walletArgs as baseWalletArgs);
+            let newWallet: TWalletType;
 
             await _addNewWallet(newWallet, true);
         },
@@ -718,11 +721,11 @@ export const AppStorageProvider = ({children}: Props) => {
     const addWallet = useCallback(
         async (name: string, type: string, network?: NetType) => {
             try {
-                const newWallet = new BaseWallet({
-                    name: name,
-                    type: type,
-                    network: network,
-                });
+                let newWallet: TWalletType;
+                            name: name,
+                            type: type,
+                            network: network,
+                        });
 
                 await _addNewWallet(newWallet);
             } catch (e) {
