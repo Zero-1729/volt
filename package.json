@@ -17,6 +17,7 @@
     "npm": ">=8.1.0"
   },
   "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.0.2",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@mempool/mempool.js": "^2.3.0",
     "@react-native-async-storage/async-storage": "^1.17.10",
@@ -42,7 +43,7 @@
     "bip66": "^1.1.5",
     "bip68": "^1.0.4",
     "bip69": "^2.1.4",
-    "bitcoinjs-lib": "^3.3.2",
+    "bitcoinjs-lib": "^6.1.1",
     "bitcoinjs-message": "^2.2.0",
     "bs58": "^5.0.0",
     "coinselect": "^3.1.12",
@@ -66,6 +67,7 @@
     "react-native-document-picker": "^5.2.0",
     "react-native-dropdown-picker": "^5.4.4",
     "react-native-eject": "^0.1.2",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.6.0",
     "react-native-gradle-plugin": "^0.0.7",
     "react-native-haptic-feedback": "^1.11.0",
@@ -95,7 +97,6 @@
     "scryptsy": "^2.1.0",
     "stream-browserify": "^3.0.0",
     "tailwind-rn": "^4.2.0",
-    "tiny-secp256k1": "^2.2.1",
     "url": "^0.11.0",
     "util": "^0.12.4",
     "vision-camera-code-scanner-fix-55": "^0.2.1",
