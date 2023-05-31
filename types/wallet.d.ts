@@ -4,9 +4,15 @@ import 'react';
 import BigNumber from 'bignumber.js';
 import {NetInfoState} from '@react-native-community/netinfo';
 
+import {SegWitNativeWallet} from '../class/wallet/segwit/bech32';
+import {SegWitP2SHWallet} from '../class/wallet/segwit/p2sh';
+import {LegacyWallet} from '../class/wallet/legacy';
+
 export type NetType = 'bitcoin' | 'testnet';
 
 export type NetInfoType = NetInfoState | null;
+
+export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
 
 // Wallet balance type
 export type BalanceType = BigNumber;
