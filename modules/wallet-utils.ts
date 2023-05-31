@@ -324,3 +324,25 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
     // Returned formatted tx
     return formattedTx;
 };
+
+// Return a wallet address path from a given index and whether it is a change or receiving address
+export const getAddressPath = (
+    index: number,
+    change: boolean,
+    network: string,
+    type: string,
+): string => {
+    // TODO: getting mainnet somehow
+    // Get network prefix
+    const prefix =
+        network === 'mainnet'
+            ? WalletPaths[type].bitcoin
+            : WalletPaths[type].testnet;
+
+    // Get change prefix
+    const changePrefix = change ? '1' : '0';
+
+    // Return address path
+    // m / purpose' / coin_type' / account' / change / index
+    return `${prefix}/${changePrefix}/${index}`;
+};
