@@ -47,7 +47,7 @@ const Receive = () => {
     // Set the plain address and bitcoin invoice URI
     const [plainAddress, setPlainAddress] = useState('');
     const [BitcoinInvoice, setBitcoinInvoice] = useState(
-        getFormattedAddress(walletData.address),
+        getFormattedAddress(walletData.address.address),
     );
     // Amount in sats
     const [BitcoinAmount, setBitcoinAmount] = useState(0);
@@ -57,7 +57,7 @@ const Receive = () => {
         // Copy backup material to Clipboard
         // Temporarily set copied message
         // and revert after a few seconds
-        Clipboard.setString(walletData.address);
+        Clipboard.setString(walletData.address.address);
 
         setPlainAddress('Copied to Clipboard');
 
@@ -67,7 +67,7 @@ const Receive = () => {
     };
 
     useEffect(() => {
-        setBitcoinInvoice(getFormattedAddress(walletData.address));
+        setBitcoinInvoice(getFormattedAddress(walletData.address.address));
     }, [BitcoinAmount]);
 
     return (
@@ -166,7 +166,7 @@ const Receive = () => {
                             ellipsizeMode="middle"
                             numberOfLines={1}
                             style={[{color: ColorScheme.Text.Default}]}>
-                            {walletData.address}
+                            {walletData.address.address}
                         </Text>
                     </PlainButton>
                 </View>
