@@ -21,7 +21,6 @@ import {
     BalanceType,
     FiatRate,
     UTXOType,
-    addressType,
     BackupMaterialTypes,
     TransactionType,
     NetType,
@@ -30,6 +29,10 @@ import {
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
+import {SegWitNativeWallet} from './wallet/segwit/bech32';
+import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
+import {LegacyWallet} from './wallet/legacy';
+
 import {
     BDKWalletTypeNames,
     extendedKeyInfo,
@@ -650,16 +653,11 @@ export const AppStorageProvider = ({children}: Props) => {
         // Determine if watch only wallet
         newWallet.setWatchOnly();
 
-        // Set initial wallet Address
-        const addressResponse = await BdkRn.getNewAddress();
+        // Generate new initial receive address
+        const newAddress = newWallet.generateNewAddress();
 
-        if (addressResponse.error) {
-            throw new Error(addressResponse.data);
-        }
-
-        const address = addressResponse.data;
-
-        newWallet.setAddress(address);
+        // Update temporary wallet address
+        newWallet.setAddress(newAddress);
 
         // Set wallet as initialized
         await _setWalletInit(true);
@@ -713,6 +711,24 @@ export const AppStorageProvider = ({children}: Props) => {
             // Handle material according to type
             let newWallet: TWalletType;
 
+            switch (walletArgs.type) {
+                case 'bech32':
+                    newWallet = new SegWitNativeWallet(
+                        walletArgs as baseWalletArgs,
+                    );
+                    break;
+
+                case 'p2sh':
+                    newWallet = new SegWitP2SHWallet(
+                        walletArgs as baseWalletArgs,
+                    );
+                    break;
+
+                case 'legacy':
+                    newWallet = new LegacyWallet(walletArgs as baseWalletArgs);
+                    break;
+            }
+
             await _addNewWallet(newWallet, true);
         },
         [],
@@ -722,10 +738,33 @@ export const AppStorageProvider = ({children}: Props) => {
         async (name: string, type: string, network?: NetType) => {
             try {
                 let newWallet: TWalletType;
+
+                switch (type) {
+                    case 'bech32':
+                        newWallet = new SegWitNativeWallet({
                             name: name,
                             type: type,
                             network: network,
                         });
+
+                        break;
+
+                    case 'p2sh':
+                        newWallet = new SegWitP2SHWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                        });
+                        break;
+
+                    case 'legacy':
+                        newWallet = new LegacyWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                        });
+                        break;
+                }
 
                 await _addNewWallet(newWallet);
             } catch (e) {
