@@ -105,9 +105,9 @@ PODS:
   - GoogleUtilitiesComponents (1.1.0):
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (2.3.0)
-  - hermes-engine (0.71.6):
-    - hermes-engine/Pre-built (= 0.71.6)
-  - hermes-engine/Pre-built (0.71.6)
+  - hermes-engine (0.71.8):
+    - hermes-engine/Pre-built (= 0.71.8)
+  - hermes-engine/Pre-built (0.71.8)
   - libevent (2.1.12)
   - MLImage (1.0.0-beta4)
   - MLKitBarcodeScanning (3.0.0):
@@ -504,7 +504,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.10.1):
+  - RNGestureHandler (2.10.2):
     - React-Core
   - RNKeychain (8.1.1):
     - React-Core
@@ -813,7 +813,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 9aa0ad5a7bc171f8bae016300bfcfa3fb8425749
   GoogleUtilitiesComponents: 679b2c881db3b615a2777504623df6122dd20afe
   GTMSessionFetcher: 3a63d75eecd6aa32c2fc79f578064e1214dfdec2
-  hermes-engine: b434cea529ad0152c56c7cb6486b0c4c0b23b5de
+  hermes-engine: 47986d26692ae75ee7a17ab049caee8864f855de
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   MLImage: 7bb7c4264164ade9bf64f679b40fb29c8f33ee9b
   MLKitBarcodeScanning: 04e264482c5f3810cb89ebc134ef6b61e67db505
@@ -863,7 +863,7 @@ SPEC CHECKSUMS:
   RNDefaultPreference: 08bdb06cfa9188d5da97d4642dac745218d7fb31
   RNDeviceInfo: aad3c663b25752a52bf8fce93f2354001dd185aa
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: 42ec7c28dd02d540ed6c9159c57a98ff016492dc
+  RNGestureHandler: f75d81410b40aaa99e71ae8f8bb7a88620c95042
   RNKeychain: ff836453cba46938e0e9e4c22e43d43fa2c90333
   RNQuickAction: 6d404a869dc872cde841ad3147416a670d13fa93
   RNReactNativeHapticFeedback: 1e3efeca9628ff9876ee7cdd9edec1b336913f8c
