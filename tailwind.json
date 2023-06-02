@@ -34,19 +34,9 @@
 			"bottom": 0
 		}
 	},
-	"bottom-2": {
-		"style": {
-			"bottom": 8
-		}
-	},
 	"bottom-3": {
 		"style": {
 			"bottom": 12
-		}
-	},
-	"bottom-4": {
-		"style": {
-			"bottom": 16
 		}
 	},
 	"bottom-6": {
@@ -99,9 +89,9 @@
 			"top": 0
 		}
 	},
-	"top-12": {
+	"top-10": {
 		"style": {
-			"top": 48
+			"top": 40
 		}
 	},
 	"top-14": {
@@ -109,9 +99,9 @@
 			"top": 56
 		}
 	},
-	"top-4": {
+	"top-2": {
 		"style": {
-			"top": 16
+			"top": 8
 		}
 	},
 	"top-5": {
@@ -185,6 +175,11 @@
 			"marginTop": -80
 		}
 	},
+	"-mt-48": {
+		"style": {
+			"marginTop": -192
+		}
+	},
 	"-mt-6": {
 		"style": {
 			"marginTop": -24
@@ -243,6 +238,11 @@
 	"ml-4": {
 		"style": {
 			"marginLeft": 16
+		}
+	},
+	"ml-6": {
+		"style": {
+			"marginLeft": 24
 		}
 	},
 	"mr-16": {
@@ -320,6 +320,11 @@
 			"height": 4
 		}
 	},
+	"h-1/2": {
+		"style": {
+			"height": "50%"
+		}
+	},
 	"h-10": {
 		"style": {
 			"height": 40
@@ -333,11 +338,6 @@
 	"h-16": {
 		"style": {
 			"height": 64
-		}
-	},
-	"h-2/5": {
-		"style": {
-			"height": "40%"
 		}
 	},
 	"h-20": {
@@ -400,14 +400,14 @@
 			"width": 2
 		}
 	},
-	"w-1": {
-		"style": {
-			"width": 4
-		}
-	},
 	"w-1/2": {
 		"style": {
 			"width": "50%"
+		}
+	},
+	"w-1/3": {
+		"style": {
+			"width": "33.333333%"
 		}
 	},
 	"w-10": {
@@ -473,11 +473,6 @@
 	"flex-wrap": {
 		"style": {
 			"flexWrap": "wrap"
-		}
-	},
-	"items-start": {
-		"style": {
-			"alignItems": "flex-start"
 		}
 	},
 	"items-end": {
