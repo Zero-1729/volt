@@ -109,3 +109,9 @@ export type TextLongInputProps = BaseProps &
             | (() => void)
             | React.Dispatch<React.SetStateAction<boolean>>;
     };
+
+// Numpad Input Prop Type
+export type NumpadRequestInputProps = BaseProps & {
+    amount: string;
+    onAmountChange: (amount: string) => void;
+};
