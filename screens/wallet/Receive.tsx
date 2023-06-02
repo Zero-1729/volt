@@ -7,6 +7,8 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import BigNumber from 'bignumber.js';
+
 import {useTailwind} from 'tailwind-rn';
 
 import Color from '../../constants/Color';
@@ -22,6 +24,8 @@ import ShareIcon from '../../assets/svg/share-android-24.svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {PlainButton} from '../../components/button';
+
+import {formatSats} from '../../modules/transform';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
@@ -139,7 +143,7 @@ const Receive = ({route}) => {
                                     tailwind('font-bold text-xl'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {BitcoinAmount}
+                                {formatSats(new BigNumber(BitcoinAmount))}
                             </Text>
                         </View>
                     ) : (
