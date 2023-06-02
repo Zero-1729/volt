@@ -253,21 +253,32 @@ const Wallet = () => {
     return (
         <SafeAreaView
             style={[
-                {flex: 1, backgroundColor: ColorScheme.Background.Default},
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
+            {/* Fake status bar filler */}
+            <View
+                style={[
+                    tailwind('absolute w-full h-16 top-0'),
+                    {backgroundColor: CardColor},
+                ]}
+            />
             {/* adjust styling below to ensure content in View covers entire screen */}
             {/* Adjust styling below to ensure it covers entire app height */}
-            <View style={[tailwind('w-full h-full')]}>
+            <View
+                style={[
+                    tailwind('w-full h-full'),
+                    {backgroundColor: CardColor},
+                ]}>
                 {/* Top panel */}
                 <View
                     style={[
-                        tailwind('relative h-2/5 items-center justify-center'),
+                        tailwind('relative h-1/2 items-center justify-center'),
                         {backgroundColor: CardColor},
                     ]}>
                     <View
                         style={[
                             tailwind(
-                                'absolute w-full top-4 flex-row items-center justify-between',
+                                'absolute w-full top-2 flex-row items-center justify-between',
                             ),
                         ]}>
                         <PlainButton
@@ -306,7 +317,7 @@ const Wallet = () => {
 
                     {/* Watch-only */}
                     {walletData.isWatchOnly ? (
-                        <View style={[tailwind('absolute top-12 right-6')]}>
+                        <View style={[tailwind('absolute top-10 right-6')]}>
                             <Text
                                 style={[
                                     tailwind(
@@ -353,7 +364,7 @@ const Wallet = () => {
                     <View
                         style={[
                             tailwind(
-                                'absolute bottom-4 w-full items-center px-4 justify-around flex-row mt-4 mb-4',
+                                'absolute bottom-6 w-full items-center px-4 justify-around flex-row',
                             ),
                         ]}>
                         {/* Hide send if Balance is empty or it is a watch-only wallet */}
@@ -415,24 +426,22 @@ const Wallet = () => {
                             </PlainButton>
                         </View>
                     </View>
-
-                    {/* Bottom line divider */}
-                    <View
-                        style={[
-                            tailwind(
-                                'w-16 h-1 absolute bottom-2 rounded-full self-center opacity-40',
-                            ),
-                            {backgroundColor: ColorScheme.Background.Inverted},
-                        ]}
-                    />
                 </View>
 
                 {/* Transactions List */}
-                <View style={[tailwind('h-3/5 w-full items-center')]}>
+                <View
+                    style={[
+                        tailwind('h-1/2 w-full items-center z-10'),
+                        {
+                            backgroundColor: ColorScheme.Background.Primary,
+                            borderTopLeftRadius: 32,
+                            borderTopRightRadius: 32,
+                        },
+                    ]}>
                     <View style={[tailwind('mt-6 w-11/12')]}>
                         <Text
                             style={[
-                                tailwind('text-lg font-bold'),
+                                tailwind('ml-6 text-base font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             Transactions
@@ -444,7 +453,7 @@ const Wallet = () => {
                             <View
                                 style={[
                                     tailwind(
-                                        'flex mt-6 justify-around text-justify w-4/5 h-5/6 items-center justify-center',
+                                        'flex justify-around text-justify w-4/5 h-5/6 items-center justify-center',
                                     ),
                                 ]}>
                                 <Box
@@ -468,7 +477,7 @@ const Wallet = () => {
                                 refreshing={refreshing}
                                 onRefresh={refreshWallet}
                                 scrollEnabled={true}
-                                style={tailwind('w-11/12 mt-4 mb-12')}
+                                style={tailwind('w-full mt-4 mb-12 z-30')}
                                 data={walletData.transactions}
                                 renderItem={item => (
                                     <TransactionListItem tx={item.item} />
