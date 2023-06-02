@@ -116,7 +116,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                'bg-black absolute left-6 top-12 rounded-sm opacity-50',
+                                'bg-black absolute left-6 top-14 rounded-sm opacity-50',
                             ),
                         ]}>
                         <Text
