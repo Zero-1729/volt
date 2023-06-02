@@ -1,6 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useState, useEffect} from 'react';
 import {useColorScheme, View, Text, Share} from 'react-native';
+
+import {
+    useNavigation,
+    CommonActions,
+    RouteProp,
+} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -193,9 +200,13 @@ const Receive = () => {
                     ]}>
                     {/* Enter receive amount */}
                     <PlainButton
-                        style={[tailwind('mb-8')]}
+                        style={[tailwind('mb-6')]}
                         onPress={() => {
-                            setBitcoinAmount(2000);
+                            navigation.dispatch(
+                                CommonActions.navigate({
+                                    name: 'RequestAmount',
+                                }),
+                            );
                         }}>
                         <Text
                             style={[
