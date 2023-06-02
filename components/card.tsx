@@ -106,7 +106,7 @@ export const WalletCard = (props: WalletCardProps) => {
                             tailwind(
                                 `pt-4 ${
                                     props.isWatchOnly ? '' : 'mt-1'
-                                } text-2xl w-full text-left font-medium text-white`,
+                                } text-xl w-full text-left font-medium text-white`,
                             ),
                             Font.RobotoText,
                         ]}>
@@ -116,7 +116,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                'bg-black absolute left-6 top-14 rounded-sm opacity-50',
+                                'bg-black absolute left-6 top-12 rounded-sm opacity-50',
                             ),
                         ]}>
                         <Text
@@ -145,7 +145,7 @@ export const WalletCard = (props: WalletCardProps) => {
                         )}>
                         <Balance
                             id={props.id}
-                            BalanceFontSize={'text-3xl'}
+                            BalanceFontSize={'text-2xl'}
                             disableFiat={true}
                             loading={props.loading}
                         />
