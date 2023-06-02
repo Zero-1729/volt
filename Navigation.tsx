@@ -24,6 +24,7 @@ import Receive from './screens/wallet/Receive';
 import Info from './screens/wallet/Info';
 import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
+import RequestAmount from './screens/wallet/RequestAmount';
 
 import Apps from './screens/tabs/Apps';
 
@@ -100,6 +101,10 @@ const WalletRoot = () => {
                     component={Ownership}
                 />
                 <WalletStack.Screen name="Receive" component={Receive} />
+                <WalletStack.Screen
+                    name="RequestAmount"
+                    component={RequestAmount}
+                />
             </WalletStack.Group>
         </WalletStack.Navigator>
     );
