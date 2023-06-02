@@ -3,11 +3,7 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {useColorScheme, View, Text, Share} from 'react-native';
 
-import {
-    useNavigation,
-    CommonActions,
-    RouteProp,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -29,9 +25,19 @@ import {PlainButton} from '../../components/button';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
-const Receive = () => {
+const Receive = ({route}) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        // Update the request amount if it is passed in as a parameter
+        // from the RequeatAmount screen
+        if (route.params?.amount) {
+            setBitcoinAmount(route.params.amount);
+        }
+    }, [route.params]);
 
     const {currentWalletID, getWalletData, useSatSymbol} =
         useContext(AppStorageContext);
