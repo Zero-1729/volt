@@ -12,5 +12,7 @@
     "Improved UI error handling",
     "Added support for fiat price rate fetch from CoinGecko, with pull-to-refresh in Wallet screen",
     "Transaction history fetched and displayed in wallet and home screen",
-    "Added support for fetching UTXOs and transaction history from Mempool.space"
+    "Added support for fetching UTXOs and transaction history from Mempool.space",
+    "Added Receive Address screen with QR and share support",
+    "Added Receive amount screen"
 ]
