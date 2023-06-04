@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -9,6 +9,7 @@ import {PlainButton} from './button';
 
 import {AppStorageContext} from '../class/storageContext';
 
+import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 import {formatSats, formatBTC} from '../modules/transform';
@@ -302,6 +303,63 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                         ),
                     ]}
                 />
+            )}
+        </View>
+    );
+};
+
+export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
+    const ColorScheme = Color(useColorScheme());
+    const tailwind = useTailwind();
+
+    const {useSatSymbol} = useContext(AppStorageContext);
+
+    return (
+        <View style={[tailwind('flex-row')]}>
+            {props.isApprox ? (
+                <Text
+                    style={[
+                        tailwind('self-center'),
+                        {color: ColorScheme.Text.Default},
+                    ]}>
+                    ~{' '}
+                </Text>
+            ) : (
+                <></>
+            )}
+            {useSatSymbol ? (
+                <Text
+                    numberOfLines={1}
+                    style={[
+                        tailwind(
+                            `${props.fontSize} font-bold self-baseline mr-2`,
+                        ),
+                        {color: ColorScheme.Text.Default},
+                        Font.SatSymbol,
+                    ]}>
+                    s
+                </Text>
+            ) : (
+                <></>
+            )}
+            <Text
+                style={[
+                    tailwind(`${props.fontSize} font-bold`),
+                    {color: ColorScheme.Text.Default},
+                ]}>
+                {props.amount.isZero() ? '0' : formatSats(props.amount)}
+            </Text>
+            {!useSatSymbol ? (
+                <Text
+                    style={[
+                        tailwind(`${props.fontSize} font-bold`),
+                        {color: ColorScheme.Text.Default},
+                    ]}>
+                    {' '}
+                    sats
+                </Text>
+            ) : (
+                <></>
             )}
         </View>
     );
