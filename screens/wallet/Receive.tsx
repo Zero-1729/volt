@@ -3,7 +3,11 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {useColorScheme, View, Text, Share} from 'react-native';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -18,6 +22,7 @@ import Color from '../../constants/Color';
 import {AppStorageContext} from '../../class/storageContext';
 
 import QRCode from 'react-native-qrcode-svg';
+import Close from '../../assets/svg/x-24.svg';
 
 import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
 
@@ -103,18 +108,19 @@ const Receive = ({route}) => {
                             'w-5/6 justify-between items-center absolute top-6 flex',
                         ),
                     ]}>
-                    <View
-                        style={[
-                            tailwind('w-16 h-1 rounded-full opacity-40 mb-4'),
-                            {backgroundColor: ColorScheme.Background.Inverted},
-                        ]}
-                    />
+                    <PlainButton
+                        style={[tailwind('absolute left-0 z-10')]}
+                        onPress={() => {
+                            navigation.dispatch(StackActions.popToTop());
+                        }}>
+                        <Close fill={ColorScheme.SVG.Default} width={32} />
+                    </PlainButton>
                     <Text
                         style={[
                             tailwind('text-lg w-full text-center font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Receive Bitcoin
+                        Bitcoin Invoice
                     </Text>
                 </View>
 
