@@ -419,7 +419,7 @@ const Wallet = () => {
                                 onPress={() => {
                                     navigation.dispatch(
                                         CommonActions.navigate({
-                                            name: 'Receive',
+                                            name: 'RequestAmount',
                                         }),
                                     );
                                 }}>
