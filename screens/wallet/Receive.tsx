@@ -231,10 +231,12 @@ const Receive = ({route}) => {
                         }}>
                         <Text
                             style={[
-                                tailwind('font-bold'),
+                                tailwind('font-bold text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Request Amount
+                            {route.params.amount
+                                ? 'Edit Amount'
+                                : 'Request Amount'}
                         </Text>
                     </PlainButton>
 
