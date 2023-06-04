@@ -369,3 +369,31 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
         </View>
     );
 };
+
+export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
+    const ColorScheme = Color(useColorScheme());
+    const tailwind = useTailwind();
+
+    return (
+        <View
+            style={[
+                tailwind('rounded-full items-center flex-row justify-center'),
+            ]}>
+            <Text
+                style={[
+                    tailwind(`mr-2 font-bold ${props.fontSize}`),
+                    {color: ColorScheme.Text.Default},
+                ]}>
+                {props.isApprox ? '~' : ''}
+                {props.symbol}
+            </Text>
+            <Text
+                style={[
+                    tailwind(`font-bold ${props.fontSize}`),
+                    {color: ColorScheme.Text.Default},
+                ]}>
+                {props.amount}
+            </Text>
+        </View>
+    );
+};
