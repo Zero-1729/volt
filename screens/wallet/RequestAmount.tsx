@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {useColorScheme, View, Text, Pressable} from 'react-native';
+import {useColorScheme, View, Text} from 'react-native';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 

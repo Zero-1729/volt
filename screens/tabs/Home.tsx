@@ -17,7 +17,6 @@ import {AppStorageContext} from '../../class/storageContext';
 import {syncWallet} from '../../modules/bdk';
 
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
-import Bell from '../../assets/svg/bell-fill-24.svg';
 import Add from '../../assets/svg/plus-32.svg';
 
 import Box from '../../assets/svg/inbox-24.svg';
