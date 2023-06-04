@@ -11,21 +11,21 @@ import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {formatFiat} from '../../modules/transform';
+
 import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
 import QRCode from 'react-native-qrcode-svg';
 
-import Font from '../../constants/Font';
+import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
 
 import ShareIcon from '../../assets/svg/share-android-24.svg';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {PlainButton} from '../../components/button';
-
-import {formatSats} from '../../modules/transform';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
@@ -35,23 +35,28 @@ const Receive = ({route}) => {
 
     const navigation = useNavigation();
 
+    // Amount in sats
+    const [bitcoinValue, setBitcoinValue] = useState(new BigNumber(0));
+    const [fiatValue, setFiatValue] = useState(new BigNumber(0));
+
     useEffect(() => {
         // Update the request amount if it is passed in as a parameter
-        // from the RequeatAmount screen
+        // from the RequestAmount screen
         if (route.params?.amount) {
-            setBitcoinAmount(route.params.amount);
+            setBitcoinValue(new BigNumber(route.params.sats));
+            setFiatValue(new BigNumber(route.params.fiat));
         }
     }, [route.params]);
 
-    const {currentWalletID, getWalletData, useSatSymbol} =
+    const {currentWalletID, getWalletData, appFiatCurrency} =
         useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
 
     // Format as Bitcoin URI
     const getFormattedAddress = (address: string) => {
-        let amount = BitcoinAmount;
+        let amount = bitcoinValue;
 
-        if (amount > 0) {
+        if (amount.gt(0)) {
             // If amount is greater than 0, return a bitcoin payment request URI
             return `bitcoin:${address}?amount=${amount}`;
         }
@@ -66,8 +71,6 @@ const Receive = ({route}) => {
     const [BitcoinInvoice, setBitcoinInvoice] = useState(
         getFormattedAddress(walletData.address.address),
     );
-    // Amount in sats
-    const [BitcoinAmount, setBitcoinAmount] = useState(0);
 
     // Copy data to clipboard
     const copyDescToClipboard = () => {
@@ -85,7 +88,7 @@ const Receive = ({route}) => {
 
     useEffect(() => {
         setBitcoinInvoice(getFormattedAddress(walletData.address.address));
-    }, [BitcoinAmount]);
+    }, [bitcoinValue]);
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -117,34 +120,36 @@ const Receive = ({route}) => {
 
                 {/* Click should toggle unit amount or display fiat amount below */}
                 <View style={[tailwind('w-5/6 -mt-8 items-center')]}>
-                    {BitcoinAmount !== 0 ? (
+                    {!bitcoinValue.isZero() ? (
                         <View
                             style={[
                                 tailwind(
-                                    'mb-4 flex-row justify-center items-center',
+                                    'mb-4 flex justify-center items-center',
                                 ),
                             ]}>
-                            {useSatSymbol ? (
-                                <Text
-                                    style={[
-                                        tailwind('font-bold text-xl mr-2'),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                            ...Font.SatSymbol,
-                                        },
-                                    ]}>
-                                    S
-                                </Text>
-                            ) : (
-                                <></>
-                            )}
-                            <Text
-                                style={[
-                                    tailwind('font-bold text-xl'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {formatSats(new BigNumber(BitcoinAmount))}
-                            </Text>
+                            <View style={[tailwind('opacity-40 mb-1')]}>
+                                {/* Make it approx if it doesn't match bottom unit value for requested amount */}
+                                <DisplayFiatAmount
+                                    amount={formatFiat(fiatValue)}
+                                    fontSize={'text-base'}
+                                    isApprox={
+                                        route.params.amount !==
+                                        fiatValue.toString()
+                                    }
+                                    symbol={appFiatCurrency.symbol}
+                                />
+                            </View>
+                            <View>
+                                {/* Make it approx if it doesn't match bottom unit value for requested amount */}
+                                <DisplaySatsAmount
+                                    amount={bitcoinValue}
+                                    fontSize={'text-2xl'}
+                                    isApprox={
+                                        route.params.amount !==
+                                        bitcoinValue.toString()
+                                    }
+                                />
+                            </View>
                         </View>
                     ) : (
                         <></>
