@@ -165,7 +165,9 @@ export const AppStorageProvider = ({children}: Props) => {
     const [isWalletInitialized, _setWalletInitialized] = useState(
         defaultContext.isWalletInitialized,
     );
-    const [wallets, _setWallets] = useState<TWalletType[]>(defaultContext.wallets);
+    const [wallets, _setWallets] = useState<TWalletType[]>(
+        defaultContext.wallets,
+    );
     const [currentWalletID, _setCurrentWalletID] = useState(
         defaultContext.currentWalletID,
     );
@@ -476,7 +478,38 @@ export const AppStorageProvider = ({children}: Props) => {
         const savedWallets = await _getWallets();
 
         if (savedWallets !== null) {
-            _setWallets(JSON.parse(savedWallets));
+            const unserializedWallets = JSON.parse(savedWallets);
+
+            let rehydratedWallets: TWalletType[] = [];
+
+            // Restore wallets
+            for (const walletObject of unserializedWallets) {
+                // re-serialize and re-hydrate
+                // ... this is necessary because we want to re-populate
+                // ... the wallet object with the correct class methods
+                const serializedWallet = JSON.stringify(walletObject);
+                let tmp: TWalletType;
+
+                switch (walletObject.type) {
+                    case 'bech32':
+                        tmp = SegWitNativeWallet.fromJSON(serializedWallet);
+                        break;
+                    case 'p2sh':
+                        tmp = SegWitP2SHWallet.fromJSON(serializedWallet);
+                        break;
+                    case 'legacy':
+                        tmp = LegacyWallet.fromJSON(serializedWallet);
+                        break;
+                    default:
+                        throw new Error(
+                            '[AsyncStorage] (Loading wallets) Unknown wallet type',
+                        );
+                }
+
+                rehydratedWallets.push(tmp);
+            }
+
+            _setWallets(rehydratedWallets);
         }
     };
 
