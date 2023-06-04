@@ -14,9 +14,14 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
 import {PlainButton, LongBottomButton} from '../../components/button';
 
 import {TextSingleInput} from '../../components/input';
+
+import Checkbox from 'react-native-bouncy-checkbox';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import ArrowUp from './../../assets/svg/chevron-up-16.svg';
@@ -25,7 +30,10 @@ import Tick from './../../assets/svg/check-16.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
+
 import {errorAlert} from '../../components/alert';
+
+import {NetType} from '../../types/wallet';
 
 const CreateAction = () => {
     const navigation = useNavigation();
@@ -39,6 +47,7 @@ const CreateAction = () => {
 
     const [newWalletName, setNewWalletName] = useState('');
 
+    const [network, setNetwork] = useState<NetType>('testnet'); // Default to testnet
     const [open, setOpen] = useState(false);
     const [account, setAccount] = useState('bech32'); // Default to segwit
     const [accounts, setAccounts] = useState([
@@ -56,6 +65,14 @@ const CreateAction = () => {
         legacy: 'Legacy P2PKH (1...)',
     };
 
+    const toggleNetwork = () => {
+        if (network === 'testnet') {
+            setNetwork('bitcoin');
+        } else {
+            setNetwork('testnet');
+        }
+    };
+
     const updateWalletName = async (walletName: string, type: string) => {
         try {
             // Perform network check to avoid BDK native code error
@@ -69,9 +86,8 @@ const CreateAction = () => {
             // Clear wallet name
             setNewWalletName('');
 
-            // Default wallet type is Segwit bech32
-            // Connects to testnet
-            await addWallet(walletName, type);
+            // Default wallet type is Segwit bech32 on Testnet
+            await addWallet(walletName, type, network);
 
             // Navigate to mnemonic screen
             navigation.dispatch(StackActions.push('Mnemonic'));
@@ -197,6 +213,51 @@ const CreateAction = () => {
                                 setValue={setAccount}
                                 setItems={setAccounts}
                             />
+
+                            {/* Wallet Network */}
+                            <View style={[tailwind('mt-10 flex-row')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    Testnet
+                                </Text>
+                                {/* btn */}
+                                <Checkbox
+                                    fillColor={
+                                        ColorScheme.Background.CheckBoxFilled
+                                    }
+                                    unfillColor={
+                                        ColorScheme.Background.CheckBoxUnfilled
+                                    }
+                                    size={18}
+                                    isChecked={network === 'testnet'}
+                                    iconStyle={{
+                                        borderWidth: 1,
+                                        borderRadius: 2,
+                                    }}
+                                    innerIconStyle={{
+                                        borderWidth: 1,
+                                        borderColor:
+                                            ColorScheme.Background
+                                                .CheckBoxOutline,
+                                        borderRadius: 2,
+                                    }}
+                                    style={[
+                                        tailwind('flex-row absolute -right-4'),
+                                    ]}
+                                    onPress={() => {
+                                        RNHapticFeedback.trigger(
+                                            'rigid',
+                                            RNHapticFeedbackOptions,
+                                        );
+
+                                        toggleNetwork();
+                                    }}
+                                    disableBuiltInState={true}
+                                />
+                            </View>
                         </View>
                     ) : (
                         <></>
