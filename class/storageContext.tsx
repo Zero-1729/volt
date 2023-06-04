@@ -712,6 +712,11 @@ export const AppStorageProvider = ({children}: Props) => {
             // Handle material according to type
             let newWallet: TWalletType;
 
+            // Ensure we have a valid wallet type
+            if (!['bech32', 'p2sh', 'legacy'].includes(walletArgs.type)) {
+                throw new Error('[restoreWallet] Invalid wallet type');
+            }
+
             switch (walletArgs.type) {
                 case 'bech32':
                     newWallet = new SegWitNativeWallet(
@@ -739,6 +744,11 @@ export const AppStorageProvider = ({children}: Props) => {
         async (name: string, type: string, network?: NetType) => {
             try {
                 let newWallet: TWalletType;
+
+                // Ensure we have a valid wallet type
+                if (!['bech32', 'p2sh', 'legacy'].includes(type)) {
+                    throw new Error('[restoreWallet] Invalid wallet type');
+                }
 
                 switch (type) {
                     case 'bech32':
