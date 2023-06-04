@@ -3,6 +3,7 @@ import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
 import {BalanceType, Unit} from './wallet';
+import BigNumber from 'bignumber.js';
 
 // Base Prop Type
 export type BaseProps = PropsWithChildren<{
@@ -115,4 +116,10 @@ export type NumpadRequestInputProps = BaseProps & {
     amount: string;
     isSats?: boolean;
     onAmountChange: (amount: string) => void;
+};
+
+export type DisplaySatsAmountProps = BaseProps & {
+    amount: BigNumber;
+    isApprox?: boolean;
+    fontSize: string;
 };
