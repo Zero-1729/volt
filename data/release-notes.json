@@ -14,5 +14,7 @@
     "Transaction history fetched and displayed in wallet and home screen",
     "Added support for fetching UTXOs and transaction history from Mempool.space",
     "Added Receive Address screen with QR and share support",
-    "Added Receive amount screen"
+    "Added Receive amount screen",
+    "Request amount in sats or fiat",
+    "Display requested amount reflects approximation in either sats or fiat"
 ]
