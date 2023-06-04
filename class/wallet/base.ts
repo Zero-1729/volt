@@ -14,7 +14,12 @@ import {
     addressType,
 } from './../../types/wallet';
 
-import {WalletPaths, descXpubPattern} from '../../modules/wallet-utils';
+import {
+    WalletPaths,
+    descXpubPattern,
+    getAddressPath,
+    generateAddressFromPath,
+} from '../../modules/wallet-utils';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
@@ -140,7 +145,36 @@ export class BaseWallet {
     }
 
     generateNewAddress(): addressType {
-        throw new Error('Not implemented');
+        try {
+            let index = this.index;
+
+            const addressPath = getAddressPath(
+                this.index,
+                false,
+                this.network,
+                this.type,
+            );
+
+            const address = generateAddressFromPath(
+                addressPath,
+                this.network,
+                this.type,
+                this.secret,
+            );
+
+            // Bump address index
+            this.index++;
+
+            return {
+                address: address,
+                path: this.derivationPath,
+                change: false,
+                index: index,
+                memo: '',
+            };
+        } catch (e) {
+            throw e;
+        }
     }
 
     protected _generateID(): string {
