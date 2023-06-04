@@ -17,12 +17,17 @@ import Close from '../../assets/svg/x-24.svg';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
-import Font from '../../constants/Font';
+import {formatFiat} from '../../modules/transform';
 
-import {formatSats} from '../../modules/transform';
+type DisplayUnit = {
+    value: BigNumber;
+    symbol: string;
+    name: string;
+};
 
 import {PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/numpad';
+import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
 
 const RequestAmount = () => {
     const tailwind = useTailwind();
@@ -30,9 +35,54 @@ const RequestAmount = () => {
 
     const navigation = useNavigation();
 
-    const {useSatSymbol} = useContext(AppStorageContext);
+    const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
+
+    const [amount, setAmount] = useState<string>('');
+    const [topUnit, setTopUnit] = useState<DisplayUnit>({
+        value: new BigNumber(0),
+        symbol: 'sats',
+        name: 'sats',
+    });
+    const [bottomUnit, setBottomUnit] = useState<DisplayUnit>({
+        value: new BigNumber(0),
+        symbol: appFiatCurrency.symbol,
+        name: appFiatCurrency.short,
+    });
+    const [satsAmount, setSatsAmount] = useState<DisplayUnit>({
+        value: new BigNumber(0),
+        symbol: 'sats',
+        name: 'sats',
+    });
+    const [fiatAmount, setFiatAmount] = useState<DisplayUnit>({
+        value: new BigNumber(0),
+        symbol: appFiatCurrency.symbol,
+        name: appFiatCurrency.short,
+    });
 
     const [amount, setAmount] = useState('');
+
+    const renderFiatAmount = (fontSize: string) => {
+        return (
+            <>
+                <DisplayFiatAmount
+                    amount={formatFiat(fiatAmount.value)}
+                    isApprox={topUnit?.name !== 'sats' && amount.length > 0}
+                    fontSize={fontSize}
+                    symbol={fiatAmount?.symbol}
+                />
+            </>
+        );
+    };
+
+    const renderSatAmount = (fontSize: string) => {
+        return (
+            <DisplaySatsAmount
+                amount={satsAmount.value}
+                fontSize={fontSize}
+                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
+            />
+        );
+    };
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -64,45 +114,27 @@ const RequestAmount = () => {
                 <View
                     style={[
                         tailwind(
-                            'w-full items-center flex-row justify-center flex -mt-48',
+                            'w-full items-center flex justify-center flex -mt-48',
                         ),
                     ]}>
-                    {useSatSymbol ? (
-                        <Text
-                            numberOfLines={1}
-                            style={[
-                                tailwind(
-                                    'text-3xl font-bold self-baseline mr-2',
-                                ),
-                                {color: ColorScheme.Text.Default},
-                                Font.SatSymbol,
-                            ]}>
-                            s
-                        </Text>
-                    ) : (
-                        <></>
-                    )}
-                    <Text
-                        style={[
-                            tailwind('text-3xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        {amount.length > 0
-                            ? formatSats(new BigNumber(amount))
-                            : '0'}
-                    </Text>
-                    {!useSatSymbol ? (
-                        <Text
-                            style={[
-                                tailwind('text-2xl font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {' '}
-                            sats
-                        </Text>
-                    ) : (
-                        <></>
-                    )}
+                    {/* Top unit */}
+                    <View style={[tailwind('opacity-40 mb-2')]}>
+                        {!(topUnit?.name === 'sats')
+                            ? renderFiatAmount('text-base')
+                            : renderSatAmount('text-base')}
+                    </View>
+
+                    {/* Bottom unit */}
+                    <View>
+                        <PlainButton
+                            onPress={() => {
+                                swapPolarity();
+                            }}>
+                            {bottomUnit?.name === 'sats'
+                                ? renderSatAmount('text-4xl')
+                                : renderFiatAmount('text-4xl')}
+                        </PlainButton>
+                    </View>
                 </View>
 
                 {/* Numerpad for input amount */}
@@ -119,7 +151,11 @@ const RequestAmount = () => {
                             navigation.dispatch(
                                 CommonActions.navigate({
                                     name: 'Receive',
-                                    params: {amount: amount},
+                                    params: {
+                                        sats: satsAmount.value.toString(),
+                                        fiat: fiatAmount.value.toString(),
+                                        amount: amount,
+                                    },
                                 }),
                             );
                         }}>
