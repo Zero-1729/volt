@@ -265,6 +265,16 @@
 			"marginRight": 16
 		}
 	},
+	"mt-0": {
+		"style": {
+			"marginTop": 0
+		}
+	},
+	"mt-0.5": {
+		"style": {
+			"marginTop": 2
+		}
+	},
 	"mt-1": {
 		"style": {
 			"marginTop": 4
@@ -313,11 +323,6 @@
 	"flex": {
 		"style": {
 			"display": "flex"
-		}
-	},
-	"h-1": {
-		"style": {
-			"height": 4
 		}
 	},
 	"h-1/2": {
@@ -423,11 +428,6 @@
 	"w-12": {
 		"style": {
 			"width": 48
-		}
-	},
-	"w-16": {
-		"style": {
-			"width": 64
 		}
 	},
 	"w-2/6": {

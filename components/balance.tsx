@@ -182,7 +182,7 @@ export const Balance = (props: BalanceProps) => {
                                             props.BalanceFontSize
                                                 ? props.BalanceFontSize
                                                 : 'text-2xl'
-                                        } self-baseline mr-2 text-white`,
+                                        } self-center mt-0.5 mr-2 text-white`,
                                     ),
                                     unit.name === 'sats' || props.disableFiat
                                         ? Font.SatSymbol
@@ -203,7 +203,7 @@ export const Balance = (props: BalanceProps) => {
                                         props.BalanceFontSize
                                             ? props.BalanceFontSize
                                             : 'text-2xl'
-                                    } text-white self-baseline`,
+                                    } text-white self-center`,
                                 ),
                             ]}>
                             {_getBalance(
@@ -338,7 +338,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
                     numberOfLines={1}
                     style={[
                         tailwind(
-                            `${props.fontSize} font-bold self-baseline mr-2`,
+                            `${props.fontSize} font-bold self-center mt-0.5 mr-2`,
                         ),
                         {color: ColorScheme.Text.Default},
                         Font.SatSymbol,
@@ -350,7 +350,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
             )}
             <Text
                 style={[
-                    tailwind(`${props.fontSize} font-bold`),
+                    tailwind(`${props.fontSize} self-center font-bold`),
                     {color: ColorScheme.Text.Default},
                 ]}>
                 {props.amount.isZero() ? '0' : formatSats(props.amount)}
