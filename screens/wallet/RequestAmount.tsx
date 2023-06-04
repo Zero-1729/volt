@@ -218,7 +218,7 @@ const RequestAmount = () => {
                     </View>
                 </View>
 
-                {/* Numerpad for input amount */}
+                {/* Number pad for input amount */}
                 <AmountNumpad
                     amount={amount}
                     onAmountChange={updateAmount}
@@ -243,7 +243,8 @@ const RequestAmount = () => {
                                     },
                                 }),
                             );
-                        }}>
+                        }}
+                        disabled={amount === ''}>
                         <View
                             style={[
                                 tailwind(
