@@ -234,9 +234,7 @@ const Receive = ({route}) => {
                                 tailwind('font-bold text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {route.params.amount
-                                ? 'Edit Amount'
-                                : 'Request Amount'}
+                            Edit Amount
                         </Text>
                     </PlainButton>
 
