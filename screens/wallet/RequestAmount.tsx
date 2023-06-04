@@ -59,7 +59,88 @@ const RequestAmount = () => {
         name: appFiatCurrency.short,
     });
 
-    const [amount, setAmount] = useState('');
+    const updateAmount = (value: string) => {
+        // When newly swapped, the value is reset to new number from user
+        // We reset instead of preserve previous top unit value
+        // because we assume the user changes unit to get a new value
+        // in the new bottom unit and not to preserve the previous value
+
+        // I.e. if the previous bottom was $20, and the user swaps to sats
+        // we assume the user wants to set a different value in sats
+        setAmount(value);
+
+        setSatsAmount({
+            value:
+                bottomUnit.name === 'sats'
+                    ? new BigNumber(value || 0)
+                    : new BigNumber(calculateSatsEquivalent(value)),
+            symbol: 'sats',
+            name: 'sats',
+        });
+
+        setFiatAmount({
+            value:
+                bottomUnit.name !== 'sats'
+                    ? new BigNumber(value || 0)
+                    : calculateFiatEquivalent(value),
+            symbol: appFiatCurrency.symbol,
+            name: appFiatCurrency.short,
+        });
+    };
+
+    const calculateSatsEquivalent = (value: string): string => {
+        if (value.length > 0) {
+            const fiat = new BigNumber(value);
+
+            // Remember we don't want to handle sub-sats
+            return fiat
+                .dividedBy(fiatRate.rate.multipliedBy(0.00000001))
+                .toFixed(0);
+        }
+
+        return '0';
+    };
+
+    const calculateFiatEquivalent = (value: string): BigNumber => {
+        if (value.length > 0) {
+            const satoshis = new BigNumber(value);
+
+            return new BigNumber(
+                satoshis
+                    .multipliedBy(0.00000001)
+                    .multipliedBy(fiatRate.rate)
+                    .toFixed(2),
+            );
+        }
+
+        return new BigNumber(0);
+    };
+
+    const swapPolarity = () => {
+        let tU = topUnit;
+        let bU = bottomUnit;
+
+        // Swap top with bottom values
+        updateAmount(amount);
+
+        // Swap top with bottom units
+        if (bottomUnit?.name === 'sats') {
+            setTopUnit(bU);
+            setBottomUnit(tU);
+
+            // Update amounts
+            // Ensure we aren't prepending a 0
+            setAmount(tU.value.toString() === '0' ? '' : tU.value.toString());
+        } else {
+            // Swap top with bottom units
+            setTopUnit(bU);
+            setBottomUnit(tU);
+
+            // Update amounts
+            // Ensure we aren't prepending a 0
+            setAmount(bU.value.toString() === '0' ? '' : bU.value.toString());
+        }
+    };
 
     const renderFiatAmount = (fontSize: string) => {
         return (
