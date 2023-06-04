@@ -26,7 +26,7 @@ type DisplayUnit = {
 };
 
 import {PlainButton} from '../../components/button';
-import {AmountNumpad} from '../../components/numpad';
+import {AmountNumpad} from '../../components/input';
 import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
 
 const RequestAmount = () => {
