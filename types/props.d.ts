@@ -113,5 +113,6 @@ export type TextLongInputProps = BaseProps &
 // Numpad Input Prop Type
 export type NumpadRequestInputProps = BaseProps & {
     amount: string;
+    isSats?: boolean;
     onAmountChange: (amount: string) => void;
 };
