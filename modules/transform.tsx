@@ -80,10 +80,7 @@ const formatWithUnits = (value: number) => {
     return value.toFixed(2);
 };
 
-export const normalizeFiat = (sats: BalanceType, rate: BalanceType) => {
-    // Get BTC to fiat value first
-    const fiat = sats.eq(0) ? new BigNumber(0) : rate.multipliedBy(_getBTCfromSats(sats));
-
+export const formatFiat = (fiat: BalanceType) => {
     // If below a cent, let's attempt to display that
     // 'Bullishly' speaking, Bitcoin will 'always' be worth more than a cent
     if (fiat.lt(0.01) && !fiat.eq(0)) {
@@ -94,7 +91,16 @@ export const normalizeFiat = (sats: BalanceType, rate: BalanceType) => {
 
     // Amount in range of 100,000,000.00
     // (i.e. 14 digit characters)
-    return addCommas(formatWithUnits(fiat.toNumber()));
+    return addCommas(fiat.toFixed(2));
+};
+
+export const normalizeFiat = (sats: BalanceType, rate: BalanceType) => {
+    // Get BTC to fiat value first
+    const fiat = sats.eq(0)
+        ? new BigNumber(0)
+        : rate.multipliedBy(_getBTCfromSats(sats));
+
+    return formatFiat(fiat);
 };
 
 // Format a string of Mnemonic phrases into
