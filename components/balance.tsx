@@ -16,7 +16,12 @@ import {formatSats, formatBTC} from '../modules/transform';
 
 import {normalizeFiat} from '../modules/transform';
 
-import {BalanceProps, TxBalanceProps, FiatBalanceProps} from '../types/props';
+import {
+    BalanceProps,
+    TxBalanceProps,
+    FiatBalanceProps,
+    DisplaySatsAmountProps,
+} from '../types/props';
 import {FiatRate, Unit} from '../types/wallet';
 
 const _getBalance = (
