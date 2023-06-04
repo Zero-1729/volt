@@ -653,6 +653,7 @@ export const AppStorageProvider = ({children}: Props) => {
         // Determine if watch only wallet
         newWallet.setWatchOnly();
 
+        // TODO: need to watch out for address reuse
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
 
