@@ -18,6 +18,12 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
     const ColorScheme = Color(useColorScheme());
 
     const addDecimalPoint = (text: string) => {
+        // Do not allow decimal point to be added if amount in sats
+        if (props.isSats) {
+            return text;
+        }
+
+        // Do not allow decimal point to be added if it already exists
         if (text.includes('.')) {
             return text;
         }
