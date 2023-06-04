@@ -159,6 +159,15 @@ const Wallet = () => {
                                 TxData.vin[j].prevout.scriptpubkey_address;
                         }
 
+                        // Check if receive address is used
+                        // Then push tx index
+                        if (
+                            TxData.vin[j].prevout.scriptpubkey_address ===
+                            walletData.address.address
+                        ) {
+                            walletData.generateNewAddress();
+                        }
+
                         // Set if transaction an RBF
                         if (TxData.vin[j].sequence === '4294967293') {
                             tmp.rbf = true;
