@@ -4,9 +4,15 @@ import 'react';
 import BigNumber from 'bignumber.js';
 import {NetInfoState} from '@react-native-community/netinfo';
 
+import {SegWitNativeWallet} from '../class/wallet/segwit/bech32';
+import {SegWitP2SHWallet} from '../class/wallet/segwit/p2sh';
+import {LegacyWallet} from '../class/wallet/legacy';
+
 export type NetType = 'bitcoin' | 'testnet';
 
 export type NetInfoType = NetInfoState | null;
+
+export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
 
 // Wallet balance type
 export type BalanceType = BigNumber;
@@ -55,6 +61,15 @@ export type TransactionType = {
 export type Unit = {
     name: string; // Unit name, 'sats' or 'BTC'
     symbol: string; // Unit symbol '₿' or 'sats' (see https://satsymbol.com/)
+};
+
+// Address type
+export type addressType = {
+    address: string; // Address
+    path: string; // Address derivation path
+    index: number; // Address derivation index
+    change: boolean; // Whether address is change
+    memo: string; // Address memo
 };
 
 export type descriptorSymbolsType = string[];

@@ -1,5 +1,5 @@
-import React, {useContext} from 'react';
-import {Text, View} from 'react-native';
+import React, {useContext, useState} from 'react';
+import {Text, View, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -9,13 +9,20 @@ import {PlainButton} from './button';
 
 import {AppStorageContext} from '../class/storageContext';
 
+import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 import {formatSats, formatBTC} from '../modules/transform';
 
 import {normalizeFiat} from '../modules/transform';
 
-import {BalanceProps, TxBalanceProps, FiatBalanceProps} from '../types/props';
+import {
+    BalanceProps,
+    TxBalanceProps,
+    FiatBalanceProps,
+    DisplaySatsAmountProps,
+    DisplayFiatAmountProps,
+} from '../types/props';
 import {FiatRate, Unit} from '../types/wallet';
 
 const _getBalance = (
@@ -116,23 +123,23 @@ export const Balance = (props: BalanceProps) => {
         updateAppUnit,
         fiatRate,
     } = useContext(AppStorageContext);
+    const [unit, setUnit] = useState(appUnit);
 
     const walletData = getWalletData(props.id);
 
     // Whether we are displaying fiat or not
     const isFiat =
-        !(appUnit.name === 'BTC') &&
-        !(appUnit.name === 'sats') &&
+        !(unit.name === 'BTC') &&
+        !(unit.name === 'sats') &&
         !props.disableFiat &&
         fiatRate;
 
     // Toggle between BTC and sats
     // and fiat if enabled
     const toggleUnit = () => {
-        if (appUnit.name === 'sats' && !props.disableFiat) {
+        if (unit.name === 'sats' && !props.disableFiat) {
             // NOTE: we do not set the unit to fiat here, as we want to keep the unit as BTC or sats
-            // fiat is an exception, and is only used for display purposes
-            updateAppUnit({
+            setUnit({
                 name: appFiatCurrency.short,
                 symbol: appFiatCurrency.symbol,
             });
@@ -143,9 +150,11 @@ export const Balance = (props: BalanceProps) => {
 
     // Generic function to toggle between BTC and sats
     const toggleBTCtoSats = () => {
-        if (appUnit.name === 'BTC') {
+        if (unit.name === 'BTC') {
+            setUnit({name: 'sats', symbol: 's'});
             updateAppUnit({name: 'sats', symbol: 's'});
         } else {
+            setUnit({name: 'BTC', symbol: '₿'});
             updateAppUnit({name: 'BTC', symbol: '₿'});
         }
     };
@@ -164,7 +173,7 @@ export const Balance = (props: BalanceProps) => {
                         ]}>
                         {/* Display satSymbol if enabled in settings, otherwise display BTC or Fiat symbol (if enabled).
                         Hide and fallback to 'sats' below if unit is sats and satSymbol is disabled in settings */}
-                        {useSatSymbol || isFiat || appUnit.name === 'BTC' ? (
+                        {useSatSymbol || isFiat || unit.name === 'BTC' ? (
                             <Text
                                 numberOfLines={1}
                                 style={[
@@ -175,11 +184,11 @@ export const Balance = (props: BalanceProps) => {
                                                 : 'text-2xl'
                                         } self-baseline mr-2 text-white`,
                                     ),
-                                    appUnit.name === 'sats' || props.disableFiat
+                                    unit.name === 'sats' || props.disableFiat
                                         ? Font.SatSymbol
                                         : {},
                                 ]}>
-                                {appUnit.symbol}
+                                {unit.symbol}
                             </Text>
                         ) : (
                             <></>
@@ -199,14 +208,14 @@ export const Balance = (props: BalanceProps) => {
                             ]}>
                             {_getBalance(
                                 new BigNumber(walletData.balance),
-                                appUnit,
+                                unit,
                                 fiatRate,
                                 props.disableFiat,
                             )}
                         </Text>
 
                         {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
-                        {!useSatSymbol && appUnit.name === 'sats' ? (
+                        {!useSatSymbol && unit.name === 'sats' ? (
                             <Text
                                 style={[
                                     tailwind(
@@ -301,6 +310,91 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                     ]}
                 />
             )}
+        </View>
+    );
+};
+
+export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
+    const ColorScheme = Color(useColorScheme());
+    const tailwind = useTailwind();
+
+    const {useSatSymbol} = useContext(AppStorageContext);
+
+    return (
+        <View style={[tailwind('flex-row')]}>
+            {props.isApprox ? (
+                <Text
+                    style={[
+                        tailwind('self-center'),
+                        {color: ColorScheme.Text.Default},
+                    ]}>
+                    ~{' '}
+                </Text>
+            ) : (
+                <></>
+            )}
+            {useSatSymbol ? (
+                <Text
+                    numberOfLines={1}
+                    style={[
+                        tailwind(
+                            `${props.fontSize} font-bold self-baseline mr-2`,
+                        ),
+                        {color: ColorScheme.Text.Default},
+                        Font.SatSymbol,
+                    ]}>
+                    s
+                </Text>
+            ) : (
+                <></>
+            )}
+            <Text
+                style={[
+                    tailwind(`${props.fontSize} font-bold`),
+                    {color: ColorScheme.Text.Default},
+                ]}>
+                {props.amount.isZero() ? '0' : formatSats(props.amount)}
+            </Text>
+            {!useSatSymbol ? (
+                <Text
+                    style={[
+                        tailwind(`${props.fontSize} font-bold`),
+                        {color: ColorScheme.Text.Default},
+                    ]}>
+                    {' '}
+                    sats
+                </Text>
+            ) : (
+                <></>
+            )}
+        </View>
+    );
+};
+
+export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
+    const ColorScheme = Color(useColorScheme());
+    const tailwind = useTailwind();
+
+    return (
+        <View
+            style={[
+                tailwind('rounded-full items-center flex-row justify-center'),
+            ]}>
+            <Text
+                style={[
+                    tailwind(`mr-2 font-bold ${props.fontSize}`),
+                    {color: ColorScheme.Text.Default},
+                ]}>
+                {props.isApprox ? '~' : ''}
+                {props.symbol}
+            </Text>
+            <Text
+                style={[
+                    tailwind(`font-bold ${props.fontSize}`),
+                    {color: ColorScheme.Text.Default},
+                ]}>
+                {props.amount}
+            </Text>
         </View>
     );
 };

@@ -17,6 +17,7 @@
     "npm": ">=8.1.0"
   },
   "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.0.2",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@mempool/mempool.js": "^2.3.0",
     "@react-native-async-storage/async-storage": "^1.17.10",
@@ -35,19 +36,20 @@
     "bech32": "^1.1.4",
     "bignumber.js": "^9.1.1",
     "bip21": "^2.0.3",
+    "bip32": "^4.0.0",
     "bip32-utils": "^0.11.1",
     "bip38": "^3.1.1",
-    "bip39": "3.1.0",
+    "bip39": "^3.1.0",
     "bip66": "^1.1.5",
     "bip68": "^1.0.4",
     "bip69": "^2.1.4",
-    "bitcoinjs-lib": "^3.3.2",
+    "bitcoinjs-lib": "^6.1.1",
     "bitcoinjs-message": "^2.2.0",
     "bs58": "^5.0.0",
     "coinselect": "^3.1.12",
     "dayjs": "^1.11.7",
     "detox": "^18.19.0",
-    "ecurve": "^1.0.6",
+    "ecpair": "^2.1.0",
     "electrum-mnemonic": "^2.0.0",
     "events": "^3.3.0",
     "junderw-crc32c": "^1.2.0",
@@ -65,6 +67,7 @@
     "react-native-document-picker": "^5.2.0",
     "react-native-dropdown-picker": "^5.4.4",
     "react-native-eject": "^0.1.2",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.6.0",
     "react-native-gradle-plugin": "^0.0.7",
     "react-native-haptic-feedback": "^1.11.0",
@@ -123,6 +126,15 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "react-native": {
+    "crypto": "react-native-quick-crypto",
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
   },
   "packageManager": "yarn@3.4.1"
 }

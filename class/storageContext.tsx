@@ -15,8 +15,12 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
-import {Unit, BalanceType, FiatRate, UTXOType} from '../types/wallet';
 import {
+    TWalletType,
+    Unit,
+    BalanceType,
+    FiatRate,
+    UTXOType,
     BackupMaterialTypes,
     TransactionType,
     NetType,
@@ -25,6 +29,10 @@ import {
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
+import {SegWitNativeWallet} from './wallet/segwit/bech32';
+import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
+import {LegacyWallet} from './wallet/legacy';
+
 import {
     BDKWalletTypeNames,
     extendedKeyInfo,
@@ -51,7 +59,7 @@ type defaultContextType = {
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
     isAdvancedMode: boolean;
-    wallets: BaseWallet[];
+    wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
     setNetworkState: (networkState: NetInfoType) => void;
@@ -77,7 +85,7 @@ type defaultContextType = {
     addWallet: (name: string, type: string, network?: NetType) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
-    getWalletData: (id: string) => BaseWallet;
+    getWalletData: (id: string) => TWalletType;
     getAllTransactions: () => TransactionType[];
     setLoadLock: (loadLock: boolean) => void;
 };
@@ -157,7 +165,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [isWalletInitialized, _setWalletInitialized] = useState(
         defaultContext.isWalletInitialized,
     );
-    const [wallets, _setWallets] = useState<BaseWallet[]>(
+    const [wallets, _setWallets] = useState<TWalletType[]>(
         defaultContext.wallets,
     );
     const [currentWalletID, _setCurrentWalletID] = useState(
@@ -448,7 +456,7 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
-    const getWalletData = (id: string): BaseWallet => {
+    const getWalletData = (id: string): TWalletType => {
         const index = wallets.findIndex(wallet => wallet.id === id);
 
         return wallets[index];
@@ -457,7 +465,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const getAllTransactions = useCallback(() => {
         const txs: TransactionType[] = [];
 
-        wallets.forEach((wallet: BaseWallet) => {
+        wallets.forEach((wallet: TWalletType) => {
             wallet.transactions.forEach(tx => {
                 txs.push(tx);
             });
@@ -470,12 +478,43 @@ export const AppStorageProvider = ({children}: Props) => {
         const savedWallets = await _getWallets();
 
         if (savedWallets !== null) {
-            _setWallets(JSON.parse(savedWallets));
+            const unserializedWallets = JSON.parse(savedWallets);
+
+            let rehydratedWallets: TWalletType[] = [];
+
+            // Restore wallets
+            for (const walletObject of unserializedWallets) {
+                // re-serialize and re-hydrate
+                // ... this is necessary because we want to re-populate
+                // ... the wallet object with the correct class methods
+                const serializedWallet = JSON.stringify(walletObject);
+                let tmp: TWalletType;
+
+                switch (walletObject.type) {
+                    case 'bech32':
+                        tmp = SegWitNativeWallet.fromJSON(serializedWallet);
+                        break;
+                    case 'p2sh':
+                        tmp = SegWitP2SHWallet.fromJSON(serializedWallet);
+                        break;
+                    case 'legacy':
+                        tmp = LegacyWallet.fromJSON(serializedWallet);
+                        break;
+                    default:
+                        throw new Error(
+                            '[AsyncStorage] (Loading wallets) Unknown wallet type',
+                        );
+                }
+
+                rehydratedWallets.push(tmp);
+            }
+
+            _setWallets(rehydratedWallets);
         }
     };
 
     const setWallets = useCallback(
-        async (value: BaseWallet[]) => {
+        async (value: TWalletType[]) => {
             try {
                 _setWallets(value);
                 _updateWallets(JSON.stringify(value));
@@ -584,7 +623,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const _addNewWallet = async (
-        newWallet: BaseWallet,
+        newWallet: TWalletType,
         restored: boolean = false,
     ) => {
         // TODO: Ensure we aren't needlessly
@@ -647,6 +686,13 @@ export const AppStorageProvider = ({children}: Props) => {
         // Determine if watch only wallet
         newWallet.setWatchOnly();
 
+        // TODO: need to watch out for address reuse
+        // Generate new initial receive address
+        const newAddress = newWallet.generateNewAddress();
+
+        // Update temporary wallet address
+        newWallet.setAddress(newAddress);
+
         // Set wallet as initialized
         await _setWalletInit(true);
 
@@ -697,7 +743,30 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Handle material according to type
-            const newWallet = new BaseWallet(walletArgs as baseWalletArgs);
+            let newWallet: TWalletType;
+
+            // Ensure we have a valid wallet type
+            if (!['bech32', 'p2sh', 'legacy'].includes(walletArgs.type)) {
+                throw new Error('[restoreWallet] Invalid wallet type');
+            }
+
+            switch (walletArgs.type) {
+                case 'bech32':
+                    newWallet = new SegWitNativeWallet(
+                        walletArgs as baseWalletArgs,
+                    );
+                    break;
+
+                case 'p2sh':
+                    newWallet = new SegWitP2SHWallet(
+                        walletArgs as baseWalletArgs,
+                    );
+                    break;
+
+                case 'legacy':
+                    newWallet = new LegacyWallet(walletArgs as baseWalletArgs);
+                    break;
+            }
 
             await _addNewWallet(newWallet, true);
         },
@@ -707,11 +776,39 @@ export const AppStorageProvider = ({children}: Props) => {
     const addWallet = useCallback(
         async (name: string, type: string, network?: NetType) => {
             try {
-                const newWallet = new BaseWallet({
-                    name: name,
-                    type: type,
-                    network: network,
-                });
+                let newWallet: TWalletType;
+
+                // Ensure we have a valid wallet type
+                if (!['bech32', 'p2sh', 'legacy'].includes(type)) {
+                    throw new Error('[restoreWallet] Invalid wallet type');
+                }
+
+                switch (type) {
+                    case 'bech32':
+                        newWallet = new SegWitNativeWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                        });
+
+                        break;
+
+                    case 'p2sh':
+                        newWallet = new SegWitP2SHWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                        });
+                        break;
+
+                    case 'legacy':
+                        newWallet = new LegacyWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                        });
+                        break;
+                }
 
                 await _addNewWallet(newWallet);
             } catch (e) {

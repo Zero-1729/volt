@@ -4,6 +4,14 @@ import * as b58 from 'bs58';
 import Crypto from 'react-native-quick-crypto';
 import BigNumber from 'bignumber.js';
 
+import * as bitcoin from 'bitcoinjs-lib';
+import BIP32Factory from 'bip32';
+import ecc from '@bitcoinerlab/secp256k1';
+
+const bip32 = BIP32Factory(ecc);
+
+import * as bip39 from '../modules/bip39-util';
+
 import {
     descriptorSymbolsType,
     BackupMaterialTypes,
@@ -55,6 +63,32 @@ export const WalletPaths: {[index: string]: accountPaths} = {
     bech32: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
     legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
     p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
+};
+
+// BitcoinJS Networks
+export const BJSNetworks: {[index: string]: any} = {
+    bitcoin: {
+        messagePrefix: '\x18Bitcoin Signed Message:\n',
+        bech32: 'bc',
+        bip32: {
+            public: 0x0488b21e,
+            private: 0x0488ade4,
+        },
+        pubKeyHash: 0x00,
+        scriptHash: 0x05,
+        wif: 0x80,
+    },
+    testnet: {
+        messagePrefix: '\x18Bitcoin Signed Message:\n',
+        bech32: 'tb',
+        bip32: {
+            public: 0x043587cf,
+            private: 0x04358394,
+        },
+        pubKeyHash: 0x6f,
+        scriptHash: 0xc4,
+        wif: 0xef,
+    },
 };
 
 // Version bytes as described here:
@@ -323,4 +357,75 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
 
     // Returned formatted tx
     return formattedTx;
+};
+
+// Return a wallet address path from a given index and whether it is a change or receiving address
+export const getAddressPath = (
+    index: number,
+    change: boolean,
+    network: string,
+    type: string,
+): string => {
+    // TODO: getting mainnet somehow
+    // Get network prefix
+    const prefix =
+        network === 'mainnet'
+            ? WalletPaths[type].bitcoin
+            : WalletPaths[type].testnet;
+
+    // Get change prefix
+    const changePrefix = change ? '1' : '0';
+
+    // Return address path
+    // m / purpose' / coin_type' / account' / change / index
+    return `${prefix}/${changePrefix}/${index}`;
+};
+
+export const generateAddressFromPath = (
+    path: string,
+    net: string,
+    type: string,
+    secret: string,
+): string => {
+    let address = '';
+
+    const network = BJSNetworks[net];
+
+    const seed = bip39.mnemonicToSeedSync(secret);
+    const root = bip32.fromSeed(seed, network);
+    const keyPair = root.derivePath(path);
+
+    switch (type) {
+        case 'legacy':
+            const P2PKData = bitcoin.payments.p2pkh({
+                pubkey: keyPair.publicKey,
+                network,
+            });
+
+            address = P2PKData.address;
+            break;
+
+        case 'bech32':
+            const P2WPKHData = bitcoin.payments.p2wpkh({
+                pubkey: keyPair.publicKey,
+                network,
+            });
+
+            address = P2WPKHData.address;
+            break;
+
+        case 'p2sh':
+            const P2SHData = bitcoin.payments.p2sh({
+                redeem: bitcoin.payments.p2wpkh({
+                    pubkey: keyPair.publicKey,
+                    network,
+                }),
+                network,
+            });
+
+            address = P2SHData.address;
+            break;
+    }
+
+    return address;
 };

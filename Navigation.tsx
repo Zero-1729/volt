@@ -20,9 +20,11 @@ import RestoreActions from './screens/wallet/RestoreActions';
 import CreateActions from './screens/wallet/CreateActions';
 import Mnemonic from './screens/wallet/Mnemonic';
 import WalletViewScreen from './screens/wallet/Wallet';
+import Receive from './screens/wallet/Receive';
 import Info from './screens/wallet/Info';
 import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
+import RequestAmount from './screens/wallet/RequestAmount';
 
 import Apps from './screens/tabs/Apps';
 
@@ -97,6 +99,11 @@ const WalletRoot = () => {
                 <WalletStack.Screen
                     name="AddressOwnership"
                     component={Ownership}
+                />
+                <WalletStack.Screen name="Receive" component={Receive} />
+                <WalletStack.Screen
+                    name="RequestAmount"
+                    component={RequestAmount}
                 />
             </WalletStack.Group>
         </WalletStack.Navigator>

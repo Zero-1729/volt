@@ -2,7 +2,7 @@ import Crypto from 'react-native-quick-crypto';
 
 import BigNumber from 'bignumber.js';
 
-import * as bip39 from '../../modules/bip39';
+import * as bip39 from '../../modules/bip39-util';
 
 import {
     Unit,
@@ -11,9 +11,15 @@ import {
     UTXOType,
     NetType,
     baseWalletArgs,
+    addressType,
 } from './../../types/wallet';
 
-import {WalletPaths, descXpubPattern} from '../../modules/wallet-utils';
+import {
+    WalletPaths,
+    descXpubPattern,
+    getAddressPath,
+    generateAddressFromPath,
+} from '../../modules/wallet-utils';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
@@ -52,6 +58,8 @@ export class BaseWallet {
     id: string;
     name: string;
 
+    index: number;
+
     isWatchOnly: boolean;
     type: string;
 
@@ -70,7 +78,7 @@ export class BaseWallet {
     UTXOs: UTXOType[];
 
     addresses: Array<string>;
-    address: string;
+    address: addressType;
 
     syncedBalance: number;
     lastSynced: number;
@@ -87,10 +95,18 @@ export class BaseWallet {
         this.id = this._generateID(); // Unique wallet ID
         this.name = args.name; // Wallet name
 
+        this.index = 0; // Wallet address index
+
         this.type = args.type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
         this.addresses = []; // List of addresses
-        this.address = ''; // Temporarily generated receiving address
+        this.address = {
+            address: '',
+            path: '',
+            index: 0,
+            change: false,
+            memo: '',
+        }; // Temporarily generated receiving address
         this.birthday = Date(); // Timestamp of wallet creation
         this.units = {
             name: 'sats',
@@ -100,7 +116,7 @@ export class BaseWallet {
         this.balance = new BigNumber(0); // By default the balance is in sats
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin', 'testnet', or 'signet' wallets
+        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin' or 'testnet' wallet
 
         this.transactions = []; // List of wallet transactions
         this.UTXOs = []; // Set of wallet UTXOs
@@ -125,6 +141,39 @@ export class BaseWallet {
     generateMnemonic(): void {
         if (this.secret.length === 0) {
             this.secret = bip39.generateMnemonic();
+        }
+    }
+
+    generateNewAddress(): addressType {
+        try {
+            let index = this.index;
+
+            const addressPath = getAddressPath(
+                this.index,
+                false,
+                this.network,
+                this.type,
+            );
+
+            const address = generateAddressFromPath(
+                addressPath,
+                this.network,
+                this.type,
+                this.secret,
+            );
+
+            // Bump address index
+            this.index++;
+
+            return {
+                address: address,
+                path: this.derivationPath,
+                change: false,
+                index: index,
+                memo: '',
+            };
+        } catch (e) {
+            throw e;
         }
     }
 
@@ -190,5 +239,9 @@ export class BaseWallet {
 
     setDescriptor(descriptor: string) {
         this.descriptor = descriptor;
+    }
+
+    setAddress(address: addressType) {
+        this.address = address;
     }
 }
