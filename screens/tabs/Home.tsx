@@ -79,6 +79,9 @@ const Home = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
 
+    // Set current wallet data
+    const wallet = getWalletData(currentWalletID);
+
     // Subscribe
     NetInfo.addEventListener(state => {
         // Limit updates to when connection drops or re-established
@@ -135,9 +138,6 @@ const Home = () => {
     const refreshWallet = useCallback(async () => {
         // start loading
         setLoadingBalance(true);
-
-        // Grab current wallet data
-        const wallet = getWalletData(currentWalletID);
 
         // Set refreshing
         setRefreshing(true);
