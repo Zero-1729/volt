@@ -219,7 +219,11 @@ const RequestAmount = () => {
                 </View>
 
                 {/* Numerpad for input amount */}
-                <AmountNumpad amount={amount} onAmountChange={setAmount} />
+                <AmountNumpad
+                    amount={amount}
+                    onAmountChange={updateAmount}
+                    isSats={bottomUnit.name === 'sats'}
+                />
 
                 {/* Continue button */}
                 <View
