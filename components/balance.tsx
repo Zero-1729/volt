@@ -21,6 +21,7 @@ import {
     TxBalanceProps,
     FiatBalanceProps,
     DisplaySatsAmountProps,
+    DisplayFiatAmountProps,
 } from '../types/props';
 import {FiatRate, Unit} from '../types/wallet';
 
