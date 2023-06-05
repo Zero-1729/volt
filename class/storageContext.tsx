@@ -37,6 +37,7 @@ import {
     BDKWalletTypeNames,
     extendedKeyInfo,
     getDescriptorParts,
+    createDescriptor,
 } from '../modules/wallet-utils';
 
 import {generateMnemonic, getMetaFromMnemonic} from '../modules/bip39-util';
@@ -655,24 +656,16 @@ export const AppStorageProvider = ({children}: Props) => {
         // Only generate if we don't already have one
         // We can only generate one if we have either a mnemonic
         // or an xprv, so check to see if either of those exist
-        // TODO: Fallback to generate descriptor without BDK when offline
         if (newWallet.secret !== '' || newWallet.xprv !== '') {
-            // Get descriptor from BDK
-            const descriptorResponse = await BdkRn.createDescriptor({
-                type: BDKWalletTypeNames[newWallet.type],
-                path: newWallet.derivationPath,
-                mnemonic: !restored ? newWallet.secret : '',
-                network: newWallet.network,
-                password: '',
-                xprv: restored ? newWallet.xprv : '',
-            });
+            const walletDescriptor = createDescriptor(
+                newWallet.type,
+                newWallet.derivationPath,
+                !restored ? newWallet.secret : '',
+                newWallet.network,
+                restored ? newWallet.xprv : '',
+                newWallet.masterFingerprint,
+            );
 
-            // Return an error if BDK descriptor function fails
-            if (descriptorResponse.error) {
-                throw new Error(descriptorResponse.data);
-            }
-
-            const walletDescriptor = descriptorResponse.data;
             newWallet.setDescriptor(walletDescriptor);
         }
 
