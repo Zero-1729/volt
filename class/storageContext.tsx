@@ -39,6 +39,8 @@ import {
     getDescriptorParts,
 } from '../modules/wallet-utils';
 
+import {generateMnemonic, getMetaFromMnemonic} from '../modules/bip39-util';
+
 import BdkRn from 'bdk-rn';
 
 // App context props type
@@ -639,24 +641,15 @@ export const AppStorageProvider = ({children}: Props) => {
         }
 
         // If we have a mnemonic, generate extended key material
-        // TODO: Fallback to generate xprv and fingerprint without BDK when offline
-        if (newWallet.secret !== '') {
-            // Get extended key material from BDK
-            const extendedKeyResponse = await BdkRn.createExtendedKey({
-                mnemonic: newWallet.secret,
-                network: newWallet.network,
-                password: '',
-            });
+        try {
+            const mnemonic = generateMnemonic();
+            const metas = getMetaFromMnemonic(mnemonic, newWallet.network);
 
-            // Return an error if BDK key function fails
-            if (extendedKeyResponse.error) {
-                throw extendedKeyResponse.data;
-            }
-
-            // Update wallet fingerprint & xprv from extended key material
-            const walletKeyInfo = extendedKeyResponse.data;
-            newWallet.setXprv(walletKeyInfo.xprv);
-            newWallet.setFingerprint(walletKeyInfo.fingerprint);
+            newWallet.setXprv(metas.xprv);
+            newWallet.setXpub(metas.xpub);
+            newWallet.setFingerprint(metas.fingerprint);
+        } catch (e) {
+            throw e;
         }
 
         // Only generate if we don't already have one
