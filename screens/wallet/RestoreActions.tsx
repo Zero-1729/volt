@@ -46,6 +46,7 @@ const ImportAction = () => {
         useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
+        // TODO: Read info from assumed text file
         console.info(`[Success] Document Picker: ${data.uri}`);
     };
 
