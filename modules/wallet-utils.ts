@@ -66,7 +66,7 @@ export const WalletPaths: {[index: string]: accountPaths} = {
 };
 
 // BitcoinJS Networks
-export const BJSNetworks: {[index: string]: any} = {
+const BJSNetworks: {[index: string]: any} = {
     bitcoin: {
         messagePrefix: '\x18Bitcoin Signed Message:\n',
         bech32: 'bc',
