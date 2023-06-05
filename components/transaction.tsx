@@ -74,7 +74,9 @@ export const TransactionListItem = (props: TxListItemProps) => {
                                 tailwind('text-xs'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            {getTxTimestamp(props.tx.timestamp)}
+                            {props.tx.confirmed
+                                ? getTxTimestamp(props.tx.timestamp)
+                                : 'Unconfirmed'}
                         </Text>
                     </View>
                 </View>
