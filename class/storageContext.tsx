@@ -110,7 +110,7 @@ const defaultContext: defaultContextType = {
     },
     wallets: [],
     fiatRate: {
-        rate: new BigNumber(1),
+        rate: new BigNumber(26000),
         lastUpdated: new Date(),
         source: 'CoinGecko',
     },
