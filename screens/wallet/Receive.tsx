@@ -219,27 +219,9 @@ const Receive = ({route}) => {
                         tailwind('absolute'),
                         {bottom: bottomOffset.bottom},
                     ]}>
-                    {/* Enter receive amount */}
-                    <PlainButton
-                        style={[tailwind('mb-6')]}
-                        onPress={() => {
-                            navigation.dispatch(
-                                CommonActions.navigate({
-                                    name: 'RequestAmount',
-                                }),
-                            );
-                        }}>
-                        <Text
-                            style={[
-                                tailwind('font-bold text-center'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            Edit Amount
-                        </Text>
-                    </PlainButton>
-
                     {/* Share Button */}
                     <PlainButton
+                        style={[tailwind('mb-6')]}
                         onPress={() => {
                             Share.share({
                                 message: BitcoinInvoice,
@@ -268,6 +250,25 @@ const Receive = ({route}) => {
                             </Text>
                             <ShareIcon fill={ColorScheme.SVG.Inverted} />
                         </View>
+                    </PlainButton>
+
+                    {/* Enter receive amount */}
+                    <PlainButton
+                        style={[tailwind('mb-4')]}
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({
+                                    name: 'RequestAmount',
+                                }),
+                            );
+                        }}>
+                        <Text
+                            style={[
+                                tailwind('font-bold text-center'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            Edit Amount
+                        </Text>
                     </PlainButton>
                 </View>
             </View>
