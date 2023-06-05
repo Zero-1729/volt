@@ -235,7 +235,7 @@ export const Balance = (props: BalanceProps) => {
                 <View
                     style={[
                         tailwind(
-                            'rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black',
+                            'rounded-sm flex-row self-center w-full h-12 bg-black opacity-20',
                         ),
                     ]}
                 />
