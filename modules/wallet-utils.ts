@@ -366,7 +366,6 @@ export const getAddressPath = (
     network: string,
     type: string,
 ): string => {
-    // TODO: getting mainnet somehow
     // Get network prefix
     const prefix =
         network === 'mainnet'
@@ -428,4 +427,106 @@ export const generateAddressFromPath = (
     }
 
     return address;
+};
+
+// Creates a descriptor either from a mnemonic or an xprv
+export const createDescriptor = (
+    type: string,
+    path: string,
+    mnemonic: string,
+    network: string,
+    xprv: string,
+    fingerprint?: string,
+    childPath?: string,
+) => {
+    var descriptor = '';
+    var closeNested = false;
+
+    let _xprv = xprv;
+    let _fingerprint = fingerprint;
+
+    // Panic if multi info given
+    if (xprv.length !== 0 && mnemonic.length !== 0) {
+        throw new Error(
+            '[CreateDescriptor] Must include either mnemonic or xprv, not both.',
+        );
+    }
+
+    // Include wallet type
+    // [SCRIPT]
+    switch (type) {
+        case 'p2sh':
+            descriptor = descriptor.concat('sh(wpkh(');
+            closeNested = true;
+
+            break;
+        case 'bech32':
+            descriptor = descriptor.concat('wpkh(');
+            break;
+        case 'legacy':
+            descriptor = descriptor.concat('pkh(');
+            break;
+    }
+
+    // Include optional fingerprint
+    // [KEY]
+    // key origin
+    descriptor = descriptor.concat('[');
+
+    // Get Mnemonic meta if mnemonic provided
+    if (mnemonic.length > 0) {
+        if (!bip39.validateMnenomic(mnemonic)) {
+            throw new Error('[CreateDescriptor] Invalid Mnemonic.');
+        }
+
+        const meta = bip39.getMetaFromMnemonic(
+            mnemonic,
+            bip39.BJSNetworks[network],
+        );
+
+        _xprv = meta.xprv;
+        _fingerprint = meta.fingerprint;
+    }
+
+    // add optional fingerprint
+    if (_fingerprint) {
+        if (_fingerprint.length !== 8) {
+            throw new Error(
+                '[CreateDescriptor] Fingerprint length invalid, must be 8 hex characters long.',
+            );
+        }
+
+        descriptor = descriptor.concat(_fingerprint);
+    }
+
+    // Add origin path and close key origin info
+    descriptor = descriptor.concat(`/${path.slice(2)}`);
+    descriptor = descriptor.concat(']');
+
+    // Add descriptor key
+    if (!_xprvPattern.test(_xprv)) {
+        throw new Error('[CreateDescriptor] Unsupported xprv.');
+    }
+
+    if (!isValidExtendedKey(_xprv)) {
+        throw new Error(
+            '[CreateDescriptor] Failed checksum check, invalid xprv.',
+        );
+    }
+
+    descriptor = descriptor.concat(_xprv);
+
+    // Add optional hardened or unhardened child path
+    // Note: The usage of hardened derivation steps requires providing the private key.
+    if (childPath) {
+        descriptor = descriptor.concat(childPath);
+    }
+
+    descriptor = descriptor.concat(')');
+
+    if (closeNested) {
+        descriptor = descriptor.concat(')');
+    }
+
+    return descriptor;
 };
