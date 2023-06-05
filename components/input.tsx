@@ -190,7 +190,7 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
                 {bottom: bottomOffset.bottomButtonOffset + 68},
             ]}>
             {/* Row 0 */}
-            <View style={[tailwind('w-full flex-row mb-4')]}>
+            <View style={[tailwind('w-full flex-row mb-6')]}>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
@@ -233,7 +233,7 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
             </View>
 
             {/* Row 1 */}
-            <View style={[tailwind('w-full flex-row mb-4')]}>
+            <View style={[tailwind('w-full flex-row mb-6')]}>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
@@ -276,7 +276,7 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
             </View>
 
             {/* Row 2 */}
-            <View style={[tailwind('w-full flex-row mb-4')]}>
+            <View style={[tailwind('w-full flex-row mb-6')]}>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
