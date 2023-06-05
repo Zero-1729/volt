@@ -1,7 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {useColorScheme, View, Text, FlatList} from 'react-native';
+import {
+    useColorScheme,
+    View,
+    Text,
+    FlatList,
+    StatusBar,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -266,6 +272,7 @@ const Wallet = () => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             {/* Fake status bar filler */}
+            <StatusBar barStyle={'light-content'} />
             <View
                 style={[
                     tailwind('absolute w-full h-16 top-0'),
