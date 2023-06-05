@@ -55,6 +55,7 @@ const Wallet = () => {
         updateWalletBalance,
         updateWalletTransactions,
         updateWalletUTXOs,
+        hideTotalBalance,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -341,7 +342,14 @@ const Wallet = () => {
                     )}
 
                     {/* Balance */}
-                    <View style={[tailwind('items-center w-5/6 -mt-8')]}>
+                    <View
+                        style={[
+                            tailwind(
+                                `items-center w-5/6 ${
+                                    hideTotalBalance ? '-mt-20' : '-mt-8'
+                                }`,
+                            ),
+                        ]}>
                         <Text
                             style={[
                                 tailwind('text-sm text-white opacity-60 mb-2'),
@@ -355,9 +363,11 @@ const Wallet = () => {
                         <View
                             style={[
                                 tailwind(
-                                    `w-full items-center ${
-                                        loadingBalance ? 'opacity-40' : ''
-                                    }`,
+                                    `${
+                                        hideTotalBalance
+                                            ? 'absolute mt-8'
+                                            : 'items-center'
+                                    } w-full`,
                                 ),
                             ]}>
                             <Balance
