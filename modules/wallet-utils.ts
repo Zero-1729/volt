@@ -150,7 +150,7 @@ export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
 // For now, we only support single key descriptors
 // with three specific script types (legacy, P2SH, and Bech32)
 //  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
-// Includes support for optional derivation path suffix (i.e., m/44'/0'/0')
+// Includes support for optional child derivation path suffix (i.e., /0/*)
 // TODO: Add support for Bitcoin core format (fingerprint + path prefix)
 const _nativeWalletDescriptorRegex =
     /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\))$/;
