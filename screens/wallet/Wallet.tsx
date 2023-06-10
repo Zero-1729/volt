@@ -467,7 +467,7 @@ const Wallet = () => {
                     <View style={[tailwind('mt-6 w-11/12')]}>
                         <Text
                             style={[
-                                tailwind('ml-6 text-base font-bold'),
+                                tailwind('ml-4 text-base font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             Transactions
