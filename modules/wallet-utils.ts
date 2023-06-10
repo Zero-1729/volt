@@ -153,9 +153,9 @@ export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
 // Includes support for optional child derivation path suffix (i.e., /0/*)
 // TODO: Add support for Bitcoin core format (fingerprint + path prefix)
 const _nativeWalletDescriptorRegex =
-    /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\))$/;
+    /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}h(\/[0-9]h)*(\/\*)?)?\))$/;
 const _wrappedWalletDescriptorRegex =
-    /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}'(\/[0-9]')*(\/\*)?)?\)\))$/;
+    /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}h(\/[0-9]h)*(\/\*)?)?\)\))$/;
 
 export const isDescriptorPattern = (expression: string) => {
     return (
