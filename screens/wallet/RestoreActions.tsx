@@ -93,19 +93,28 @@ const ImportAction = () => {
     };
 
     const handleDescriptor = async (descriptor: string) => {
-        // TODO: perform descriptor validity check
         try {
-            if (isDescriptorPattern(descriptor)) {
-                await restoreWallet(descriptor, 'descriptor');
-
-                handleSuccessRoute();
-            } else {
-                errorAlert(
-                    'Descriptor',
-                    'Only single key descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))',
+            if (!isAdvancedMode) {
+                conservativeAlert(
+                    'Alert',
+                    'Advanced mode must be enabled to restore from descriptor',
                 );
+
                 return;
             }
+
+            if (!isDescriptorPattern(descriptor)) {
+                errorAlert(
+                    'Descriptor',
+                    'Only single key descriptors are supported (i.e. wpkh([...]...), pkh([...]...), sh(wpkh([...]...))',
+                );
+
+                return;
+            }
+
+            await restoreWallet(descriptor, 'descriptor');
+
+            handleSuccessRoute();
         } catch (e: any) {
             errorAlert('Descriptor', e.message);
         }
