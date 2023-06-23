@@ -150,12 +150,12 @@ export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
 // For now, we only support single key descriptors
 // with three specific script types (legacy, P2SH, and Bech32)
 //  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
+// Includes support fot optional (fingerprint + path prefix, e.g. [abce1234/49h/0h/0h])
 // Includes support for optional child derivation path suffix (i.e., /0/*)
-// TODO: Add support for Bitcoin core format (fingerprint + path prefix)
 const _nativeWalletDescriptorRegex =
-    /^((wpkh|pkh)\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}h(\/[0-9]h)*(\/\*)?)?\))$/;
+    /^((wpkh|pkh)\((\[([a-z0-9]{8})*(\/[1-9]{2}h)*(\/([0-9]h|\*))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[1-9]{2}h(\/[0-9]h)*(\/\*)?)?\))$/;
 const _wrappedWalletDescriptorRegex =
-    /^(sh\(wpkh\(([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(m\/[1-9]{2}h(\/[0-9]h)*(\/\*)?)?\)\))$/;
+    /^(sh\(wpkh\((\[([a-z0-9]{8})*(\/[1-9]{2}h)*(\/([0-9]h|\*))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[1-9]{2}h(\/[0-9]h)*(\/\*)?)?\)\))$/;
 
 export const isDescriptorPattern = (expression: string) => {
     return (
