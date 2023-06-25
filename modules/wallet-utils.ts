@@ -19,6 +19,7 @@ import {
     extendedKeyInfoType,
     accountPaths,
     TransactionType,
+    NetType,
 } from '../types/wallet';
 
 export const WalletTypeNames: {[index: string]: string[]} = {
@@ -309,34 +310,60 @@ const _get256Checksum = (data: string): string => {
 // Descriptor format:
 // {script}({xprv/xpub})
 // E.g. wpkh(tprv8ZgxMBicQKsPd97TPtNtP25LfqmXxDQa4fwJhtWcbc896RTiemtHnQmJNccVQJTH7eU3EpzqdyVJd9JPX1SQy9oKXfhm9o5mAHYEN3rcdV6)
-// TODO: add support for Bitcoin core format pattern
-// TODO: Check that there is no mismatch between attached derivation path and script prefix
 export const getDescriptorParts = (descriptor: string) => {
     // extract descriptor prefix
     const parts = descriptor.split('(');
 
+    // use this to ensure we aren't using defaults but descriptor path
+    let fingerprint = '';
+    let path = '';
+    let key = '';
+    let network = '';
+
+    const scripts = parts.length === 3 ? [parts[0], parts[1]] : [parts[0]];
+
+    const data =
+        parts.length === 3 ? parts[2].split(')')[0] : parts[1].split(')')[0];
+
+    // handle case for fingerprint + path
+    if (data[0] === '[') {
+        if (/([a-e0-9]{8})/.test(data)) {
+            let ret = /([a-e0-9]{8})/.exec(data);
+
+            fingerprint = ret ? ret[0] : '';
+        }
+
+        if (/(\/[1-9]{2}h)(\/[0-9]h|\*)*/.test(data)) {
+            let ret = /(\/[1-9]{2}h)(\/[0-9]h|\*)*/.exec(data);
+
+            path = ret ? ret[0] : '';
+        }
+
+        key = data.split(']')[1];
+        network = extendedKeyInfo[data.split(']')[1][0]].network;
+    }
+
     // Gather data assuming non-nested script
-    const components = {
-        key: parts[1].split(')')[0],
-        network:
-            parts.length === 2
-                ? extendedKeyInfo[parts[1].split(')')[0][0]].network
-                : '',
-        type: parts.length === 2 ? _descriptorType[parts[0].split(')')[0]] : '',
+    let components = {
+        key: data,
+        network: network,
+        type: _descriptorType[scripts[0]],
+        fingerprint: fingerprint,
+        path: 'm/' + path.slice(1),
     };
 
     // Handle nested script case
-    const prefix = descriptor.split('(')[0];
-
-    if (prefix === 'sh' && parts[1] === 'wpkh' && parts.length === 3) {
+    if (scripts[0] === 'sh' && scripts[1] === 'wpkh' && parts.length === 3) {
         // Extract embedded key
-        const key = parts[2].split(')')[0];
+        key = data[0] === '[' ? data.split(']')[1] : data[0];
 
         components.key = key;
 
         // Set network and wallet type from descriptor
         components.network = extendedKeyInfo[key[0]].network;
-        components.type = _descriptorType[prefix];
+        components.type = _descriptorType[scripts[0]];
+        components.fingerprint = fingerprint;
+        components.path = 'm/' + path.slice(1);
     }
 
     return components;
@@ -392,7 +419,7 @@ export const generateAddressFromPath = (
 
     const seed = bip39.mnemonicToSeedSync(secret);
     const root = bip32.fromSeed(seed, network);
-    const keyPair = root.derivePath(path);
+    const keyPair = root.derivePath(path.replace(/h/g, "'"));
 
     switch (type) {
         case 'legacy':
@@ -434,7 +461,7 @@ export const createDescriptor = (
     type: string,
     path: string,
     mnemonic: string,
-    network: string,
+    network: NetType,
     xprv: string,
     fingerprint?: string,
     childPath?: string,
@@ -479,13 +506,10 @@ export const createDescriptor = (
             throw new Error('[CreateDescriptor] Invalid Mnemonic.');
         }
 
-        const meta = bip39.getMetaFromMnemonic(
-            mnemonic,
-            bip39.BJSNetworks[network],
-        );
+        const meta = bip39.getMetaFromMnemonic(mnemonic, network);
 
-        _xprv = meta.xprv;
-        _fingerprint = meta.fingerprint;
+        _xprv = !_xprv ? meta.xprv : _xprv;
+        _fingerprint = !_fingerprint ? meta.fingerprint : _fingerprint;
     }
 
     // add optional fingerprint
@@ -502,6 +526,9 @@ export const createDescriptor = (
     // Add origin path and close key origin info
     descriptor = descriptor.concat(`/${path.slice(2)}`);
     descriptor = descriptor.concat(']');
+
+    // strip all "'" from descriptor with 'h'
+    descriptor = descriptor.replace(/'/g, 'h');
 
     // Add descriptor key
     if (!_xprvPattern.test(_xprv)) {
