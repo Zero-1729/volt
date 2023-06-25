@@ -34,15 +34,12 @@ import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
 import {LegacyWallet} from './wallet/legacy';
 
 import {
-    BDKWalletTypeNames,
     extendedKeyInfo,
     getDescriptorParts,
     createDescriptor,
 } from '../modules/wallet-utils';
 
 import {generateMnemonic, getMetaFromMnemonic} from '../modules/bip39-util';
-
-import BdkRn from 'bdk-rn';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -642,15 +639,17 @@ export const AppStorageProvider = ({children}: Props) => {
         }
 
         // If we have a mnemonic, generate extended key material
-        try {
-            const mnemonic = generateMnemonic();
-            const metas = getMetaFromMnemonic(mnemonic, newWallet.network);
+        if (newWallet.secret !== '') {
+            try {
+                const mnemonic = generateMnemonic();
+                const metas = getMetaFromMnemonic(mnemonic, newWallet.network);
 
-            newWallet.setXprv(metas.xprv);
-            newWallet.setXpub(metas.xpub);
-            newWallet.setFingerprint(metas.fingerprint);
-        } catch (e) {
-            throw e;
+                newWallet.setXprv(metas.xprv);
+                newWallet.setXpub(metas.xpub);
+                newWallet.setFingerprint(metas.fingerprint);
+            } catch (e) {
+                throw e;
+            }
         }
 
         // Only generate if we don't already have one
@@ -697,12 +696,17 @@ export const AppStorageProvider = ({children}: Props) => {
             var net = 'testnet';
             var walletType = 'bech32';
 
+            var fingerprint = '';
+            var path = '';
+
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
                 const desc = getDescriptorParts(backupMaterial);
 
                 net = desc.network;
                 walletType = desc.type;
+                fingerprint = desc.fingerprint;
+                path = desc.path;
             }
 
             const walletArgs = {
@@ -729,7 +733,7 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Handle material according to type
-            let newWallet: TWalletType;
+            var newWallet: TWalletType;
 
             // Ensure we have a valid wallet type
             if (!['bech32', 'p2sh', 'legacy'].includes(walletArgs.type)) {
@@ -753,6 +757,10 @@ export const AppStorageProvider = ({children}: Props) => {
                     newWallet = new LegacyWallet(walletArgs as baseWalletArgs);
                     break;
             }
+
+            // Set fingerprint and path if available
+            newWallet.masterFingerprint = path;
+            newWallet.setFingerprint(fingerprint);
 
             await _addNewWallet(newWallet, true);
         },
