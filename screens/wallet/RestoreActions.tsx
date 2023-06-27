@@ -42,8 +42,7 @@ const ImportAction = () => {
 
     const [importText, setImportText] = useState('');
 
-    const {isAdvancedMode, restoreWallet, networkState} =
-        useContext(AppStorageContext);
+    const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
 
     const handleFolderCallback = (data: any) => {
         // TODO: Read info from assumed text file
@@ -94,19 +93,28 @@ const ImportAction = () => {
     };
 
     const handleDescriptor = async (descriptor: string) => {
-        // TODO: perform descriptor validity check
         try {
-            if (isDescriptorPattern(descriptor)) {
-                await restoreWallet(descriptor, 'descriptor');
-
-                handleSuccessRoute();
-            } else {
-                errorAlert(
-                    'Descriptor',
-                    'Only single key descriptors are supported (i.e. wpkh(...), pkh(...), sh(wpkh(...))',
+            if (!isAdvancedMode) {
+                conservativeAlert(
+                    'Alert',
+                    'Advanced mode must be enabled to restore from descriptor',
                 );
+
                 return;
             }
+
+            if (!isDescriptorPattern(descriptor)) {
+                errorAlert(
+                    'Descriptor',
+                    'Only single key descriptors are supported (i.e. wpkh([...]...), pkh([...]...), sh(wpkh([...]...))',
+                );
+
+                return;
+            }
+
+            await restoreWallet(descriptor, 'descriptor');
+
+            handleSuccessRoute();
         } catch (e: any) {
             errorAlert('Descriptor', e.message);
         }
@@ -155,16 +163,6 @@ const ImportAction = () => {
         // - 12 - 24 word seed
         // - Wallet Descriptor (e.g. pkh(...))
         // - Xpriv / Xpub
-
-        // Perform network check to avoid BDK native code error
-        // Must be connected to network to use bdk-rn fns
-        if (!networkState?.isConnected) {
-            errorAlert(
-                'Alert',
-                'Internet connection offline, re-connect to restore wallet.',
-            );
-            return;
-        }
 
         // Take out any leading or trailing whitespace
         const material = importText.trim();
