@@ -29,7 +29,7 @@ import {EmptyCard, WalletCard} from '../../components/card';
 import {TransactionListItem} from '../../components/transaction';
 
 import {BaseWallet} from '../../class/wallet/base';
-import {BalanceType} from '../../types/wallet';
+import {BalanceType, TWalletType, TransactionType} from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
@@ -66,7 +66,6 @@ const Home = () => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        getAllTransactions,
         setNetworkState,
         networkState,
         fiatRate,
@@ -97,9 +96,6 @@ const Home = () => {
             accumulator.plus(currentValue.balance),
         new BigNumber(0),
     );
-
-    // All transactions across different wallets
-    const allTransactions = getAllTransactions();
 
     // Fiat fetch
     const singleSyncFiatRate = useCallback(
@@ -392,7 +388,21 @@ const Home = () => {
                             Latest Transactions
                         </Text>
 
-                        {allTransactions.length === 0 ? (
+                        {wallet?.transactions.length > 0 ? (
+                            <FlatList
+                                refreshing={refreshing}
+                                onRefresh={refreshWallet}
+                                scrollEnabled={true}
+                                style={tailwind('w-full mb-12')}
+                                data={wallet.transactions}
+                                renderItem={item => (
+                                    <TransactionListItem tx={item.item} />
+                                )}
+                                keyExtractor={item => item.txid}
+                                initialNumToRender={25}
+                                contentInsetAdjustmentBehavior="automatic"
+                            />
+                        ) : (
                             <View
                                 style={[
                                     tailwind(
@@ -414,20 +424,6 @@ const Home = () => {
                                     displayed here
                                 </Text>
                             </View>
-                        ) : (
-                            <FlatList
-                                refreshing={refreshing}
-                                onRefresh={refreshWallet}
-                                scrollEnabled={true}
-                                style={tailwind('w-full mb-12')}
-                                data={allTransactions}
-                                renderItem={item => (
-                                    <TransactionListItem tx={item.item} />
-                                )}
-                                keyExtractor={item => item.txid}
-                                initialNumToRender={25}
-                                contentInsetAdjustmentBehavior="automatic"
-                            />
                         )}
                     </View>
                 </View>
