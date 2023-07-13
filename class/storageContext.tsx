@@ -665,9 +665,11 @@ export const AppStorageProvider = ({children}: Props) => {
         newWallet.setAddress(newAddress);
 
         // Set wallet as initialized
-        await _setWalletInit(true);
+        if (!isWalletInitialized) {
+            await _setWalletInit(true);
+        }
 
-        const tmp = wallets ? [...wallets, newWallet] : [newWallet];
+        const tmp = [...wallets, newWallet];
 
         await _setWallets(tmp);
         await _updateWallets(JSON.stringify(tmp));
@@ -750,7 +752,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
             await _addNewWallet(newWallet, true);
         },
-        [],
+        [wallets, _updateWallets, _setWallets],
     );
 
     const addWallet = useCallback(
