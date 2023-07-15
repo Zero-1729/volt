@@ -15,7 +15,7 @@ import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {formatFiat} from '../../modules/transform';
+import {formatFiat, SATS_TO_BTC_RATE} from '../../modules/transform';
 
 import Color from '../../constants/Color';
 
@@ -63,7 +63,7 @@ const Receive = ({route}) => {
 
         if (amount.gt(0)) {
             // If amount is greater than 0, return a bitcoin payment request URI
-            return `bitcoin:${address}?amount=${amount}`;
+            return `bitcoin:${address}?amount=${amount.div(SATS_TO_BTC_RATE)}`;
         }
 
         // If amount is 0, return a plain address
