@@ -395,7 +395,7 @@ export const getAddressPath = (
 ): string => {
     // Get network prefix
     const prefix =
-        network === 'mainnet'
+        network === 'bitcoin'
             ? WalletPaths[type].bitcoin
             : WalletPaths[type].testnet;
 
