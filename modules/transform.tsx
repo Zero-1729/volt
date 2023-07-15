@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 
 import {BalanceType} from '../types/wallet';
 
-const SATS_TO_BTC_RATE = 100_000_000;
+export const SATS_TO_BTC_RATE = 100_000_000;
 const SEPARATOR = ' ';
 
 export const addCommas = (num: string, separator: string = ',') => {
