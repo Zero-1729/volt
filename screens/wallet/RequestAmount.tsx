@@ -261,7 +261,7 @@ const RequestAmount = () => {
                                         color: ColorScheme.Text.Alt,
                                     },
                                 ]}>
-                                {amount === '' ? 'Skip' : 'Continue'}
+                                {amount === '' ? 'Skip Amount' : 'Continue'}
                             </Text>
                         </View>
                     </PlainButton>
