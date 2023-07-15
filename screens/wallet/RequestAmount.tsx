@@ -243,14 +243,11 @@ const RequestAmount = () => {
                                     },
                                 }),
                             );
-                        }}
-                        disabled={amount === ''}>
+                        }}>
                         <View
                             style={[
                                 tailwind(
-                                    `rounded-full items-center flex-row justify-center px-6 py-3 ${
-                                        amount === '' ? 'opacity-40' : ''
-                                    }`,
+                                    'rounded-full items-center flex-row justify-center px-6 py-3',
                                 ),
                                 {
                                     backgroundColor:
@@ -259,12 +256,12 @@ const RequestAmount = () => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm mr-2 font-bold'),
+                                    tailwind('text-sm font-bold'),
                                     {
                                         color: ColorScheme.Text.Alt,
                                     },
                                 ]}>
-                                Continue
+                                {amount === '' ? 'Skip' : 'Continue'}
                             </Text>
                         </View>
                     </PlainButton>
