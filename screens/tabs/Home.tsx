@@ -72,6 +72,7 @@ const Home = () => {
         updateFiatRate,
         updateWalletTransactions,
         updateWalletBalance,
+        isWalletInitialized,
     } = useContext(AppStorageContext);
 
     const [initFiatRate, setInitFiatRate] = useState(false);
@@ -143,17 +144,22 @@ const Home = () => {
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
-        // start loading
-        setLoadingBalance(true);
-
-        // Set refreshing
-        setRefreshing(true);
+        // Abort load if no wallets yet
+        if (!isWalletInitialized) {
+            return;
+        }
 
         // Only attempt load if connected to network
         if (!networkState?.isConnected) {
             setRefreshing(false);
             return;
         }
+
+        // start loading
+        setLoadingBalance(true);
+
+        // Set refreshing
+        setRefreshing(true);
 
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
