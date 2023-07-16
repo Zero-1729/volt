@@ -29,7 +29,7 @@ import {EmptyCard, WalletCard} from '../../components/card';
 import {TransactionListItem} from '../../components/transaction';
 
 import {BaseWallet} from '../../class/wallet/base';
-import {BalanceType, TWalletType, TransactionType} from '../../types/wallet';
+import {BalanceType, TransactionType} from '../../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
