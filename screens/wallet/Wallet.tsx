@@ -1,13 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {
-    useColorScheme,
-    View,
-    Text,
-    FlatList,
-    StatusBar,
-} from 'react-native';
+import {useColorScheme, View, Text, FlatList, StatusBar} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -85,18 +79,18 @@ const Wallet = () => {
             return;
         }
 
+        // Only attempt load if connected to network
+        if (!networkState?.isConnected) {
+            setRefreshing(false);
+            return;
+        }
+
         // Lock load to avoid deleting wallet while loading
         setLoadLock(true);
 
         // Set refreshing
         setRefreshing(true);
         setLoadingBalance(true);
-
-        // Only attempt load if connected to network
-        if (!networkState?.isConnected) {
-            setRefreshing(false);
-            return;
-        }
 
         try {
             const triggered = await fetchFiatRate(
