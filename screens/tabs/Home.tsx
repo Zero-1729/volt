@@ -97,6 +97,17 @@ const Home = () => {
         new BigNumber(0),
     );
 
+    // List out all transactions across all wallets
+    const extractAllTransactions = (): TransactionType[] => {
+        let transactions: TransactionType[] = [];
+
+        for (const w of wallets) {
+            transactions = transactions.concat(w.transactions);
+        }
+
+        return transactions;
+    };
+
     // Fiat fetch
     const singleSyncFiatRate = useCallback(
         async (ticker: string, violate: boolean = false) => {
@@ -397,13 +408,13 @@ const Home = () => {
                                 contentContainerStyle={[
                                     tailwind(
                                         `${
-                                            wallet.transactions.length > 0
+                                            extractAllTransactions().length > 0
                                                 ? 'w-11/12 self-center'
                                                 : 'w-full'
                                         } h-full items-center`,
                                     ),
                                 ]}
-                                data={wallet.transactions}
+                                data={extractAllTransactions()}
                                 renderItem={item => (
                                     <TransactionListItem tx={item.item} />
                                 )}
