@@ -1,16 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React from 'react';
 
-import {View, useColorScheme} from 'react-native';
-
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-
-import {useTailwind} from 'tailwind-rn';
-
-import HomeIcon from './assets/svg/home-fill-24.svg';
-import DashboardIcon from './assets/svg/dashboard.svg';
-import QRIcon from './assets/svg/scan.svg';
 
 import Home from './screens/tabs/Home';
 
@@ -128,94 +119,11 @@ const AddWalletRoot = () => {
     );
 };
 
-const HomeTabStack = createBottomTabNavigator();
-const HomeTabs = () => {
-    const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
-
-    return (
-        <HomeTabStack.Navigator
-            initialRouteName="HomeScreen"
-            screenOptions={{
-                headerShown: false,
-                tabBarShowLabel: false,
-                tabBarStyle: [
-                    {
-                        position: 'absolute',
-                        bottom: NativeMetrics.navBottom,
-                        margin: 0,
-                        paddingTop: 0,
-                        paddingBottom: 0,
-                        left: NativeMetrics.width / 6, // 65,
-                        right: NativeMetrics.width / 6, // 65,
-                        width: 'auto',
-                        backgroundColor: 'transparent',
-                        borderRadius: 50,
-                        borderTopColor: 'transparent',
-                        elevation: 0,
-                    },
-                ],
-            }}>
-            <HomeTabStack.Screen
-                name="HomeScreen"
-                component={Home}
-                options={{
-                    tabBarIcon: ({focused}) => (
-                        <HomeIcon
-                            fill={
-                                focused
-                                    ? ColorScheme.SVG.Default
-                                    : ColorScheme.SVG.GrayFill
-                            }
-                        />
-                    ),
-                }}
-            />
-            <HomeTabStack.Screen
-                name="Scan"
-                component={Scan}
-                options={{
-                    tabBarIcon: () => (
-                        <View
-                            style={[
-                                tailwind(
-                                    'rounded-full w-12 h-12 items-center justify-center',
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
-                                },
-                            ]}>
-                            <QRIcon fill={ColorScheme.SVG.Inverted} />
-                        </View>
-                    ),
-                }}
-            />
-            <HomeTabStack.Screen
-                name="Apps"
-                component={Apps}
-                options={{
-                    tabBarIcon: ({focused}) => (
-                        <DashboardIcon
-                            fill={
-                                !focused
-                                    ? ColorScheme.SVG.GrayFill
-                                    : ColorScheme.SVG.Default
-                            }
-                        />
-                    ),
-                }}
-            />
-        </HomeTabStack.Navigator>
-    );
-};
-
 const InitScreenStack = createNativeStackNavigator();
 const initScreen = () => {
     return (
         <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
-            <InitScreenStack.Screen name="Home" component={HomeTabs} />
+            <InitScreenStack.Screen name="Home" component={Home} />
             <InitScreenStack.Screen
                 name="AddWalletRoot"
                 component={AddWalletRoot}
@@ -227,6 +135,7 @@ const initScreen = () => {
                 component={SettingsRoot}
             />
             <InitScreenStack.Screen name="ScanQR" component={ScanRoot} />
+            <InitScreenStack.Screen name="Apps" component={Apps} />
         </InitScreenStack.Navigator>
     );
 };
