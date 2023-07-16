@@ -42,9 +42,7 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {addWallet, isAdvancedMode, networkState} =
-        useContext(AppStorageContext);
-
+    const {addWallet, isAdvancedMode} = useContext(AppStorageContext);
     const [newWalletName, setNewWalletName] = useState('');
 
     const [network, setNetwork] = useState<NetType>('testnet'); // Default to testnet
