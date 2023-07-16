@@ -146,7 +146,7 @@ const Wallet = () => {
                         walletData.network,
                     );
 
-                    // if the transaction is not sent, then it is received
+                    // Transaction inputs (remote owned addresses)
                     for (let j = 0; j < TxData.vin.length; j++) {
                         // Add address we own based on whether we sent
                         // the transaction and the value received matches
@@ -175,10 +175,11 @@ const Wallet = () => {
                         }
                     }
 
-                    // if the transaction is not sent, then it is received
+                    // Transaction outputs (local owned addresses)
                     for (let k = 0; k < TxData.vout.length; k++) {
                         // Add address we own based on whether we received
                         // the transaction and the value received matches
+                        console.log('tx case2: ', TxData.vout[k]);
                         if (
                             transactions[i].value.eq(TxData.vout[k].value) &&
                             transactions[i].type === 'inbound'
