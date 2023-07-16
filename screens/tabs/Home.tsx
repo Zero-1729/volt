@@ -299,11 +299,11 @@ const Home = () => {
                     )}
                 </View>
 
-                <View style={[tailwind('w-5/6 h-full justify-around')]}>
+                <View style={[tailwind('w-full h-full justify-around')]}>
                     <View
                         style={[
                             tailwind(
-                                `w-full items-center justify-between ${
+                                `w-5/6 self-center items-center justify-between ${
                                     !(wallets.length > 0) ? 'mb-4' : ''
                                 }`,
                             ),
@@ -381,19 +381,28 @@ const Home = () => {
                         ]}>
                         <Text
                             style={[
-                                tailwind('mb-4 font-medium'),
+                                tailwind('w-5/6 mb-2 font-medium self-center'),
                                 DarkGrayText,
                                 Font.RobotoText,
                             ]}>
                             Latest Transactions
                         </Text>
 
-                        {wallet?.transactions.length > 0 ? (
+                        <View style={[tailwind('w-full h-full items-center')]}>
                             <FlatList
                                 refreshing={refreshing}
                                 onRefresh={refreshWallet}
                                 scrollEnabled={true}
-                                style={tailwind('w-full mb-12')}
+                                style={tailwind('w-full')}
+                                contentContainerStyle={[
+                                    tailwind(
+                                        `${
+                                            wallet.transactions.length > 0
+                                                ? 'w-11/12 self-center'
+                                                : 'w-full'
+                                        } h-full items-center`,
+                                    ),
+                                ]}
                                 data={wallet.transactions}
                                 renderItem={item => (
                                     <TransactionListItem tx={item.item} />
@@ -401,30 +410,31 @@ const Home = () => {
                                 keyExtractor={item => item.txid}
                                 initialNumToRender={25}
                                 contentInsetAdjustmentBehavior="automatic"
+                                ListEmptyComponent={
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'w-5/6 h-5/6 items-center justify-center -mt-12',
+                                            ),
+                                        ]}>
+                                        <Box
+                                            width={32}
+                                            fill={svgGrayFill}
+                                            style={tailwind('mb-4')}
+                                        />
+                                        <Text
+                                            style={[
+                                                tailwind('w-5/6 text-center'),
+                                                DarkGreyText,
+                                                Font.RobotoText,
+                                            ]}>
+                                            A list of all latest transactions
+                                            will be displayed here
+                                        </Text>
+                                    </View>
+                                }
                             />
-                        ) : (
-                            <View
-                                style={[
-                                    tailwind(
-                                        'flex justify-around text-justify h-4/6 items-center justify-center',
-                                    ),
-                                ]}>
-                                <Box
-                                    width={32}
-                                    fill={svgGrayFill}
-                                    style={tailwind('mb-4')}
-                                />
-                                <Text
-                                    style={[
-                                        tailwind('w-3/5 text-center'),
-                                        DarkGreyText,
-                                        Font.RobotoText,
-                                    ]}>
-                                    A list of all latest transactions will be
-                                    displayed here
-                                </Text>
-                            </View>
-                        )}
+                        </View>
                     </View>
                 </View>
             </View>
