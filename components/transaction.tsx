@@ -58,7 +58,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
             <View
                 style={[
                     tailwind(
-                        'flex-row h-20 my-1 justify-between items-center w-full px-6 py-2 rounded-md',
+                        'flex-row h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md',
                     ),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
