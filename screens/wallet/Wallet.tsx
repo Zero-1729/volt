@@ -470,44 +470,47 @@ const Wallet = () => {
                     </View>
 
                     <View style={[tailwind('w-full h-full items-center')]}>
-                        {walletData.transactions.length === 0 ? (
-                            <View
-                                style={[
-                                    tailwind(
-                                        'flex justify-around text-justify w-4/5 h-5/6 items-center justify-center',
-                                    ),
-                                ]}>
-                                <Box
-                                    width={32}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                    style={tailwind('mb-4 -mt-6')}
-                                />
-                                <Text
+                        <FlatList
+                            refreshing={refreshing}
+                            onRefresh={refreshWallet}
+                            scrollEnabled={true}
+                            style={[tailwind('w-full mt-4 mb-12 z-30')]}
+                            contentContainerStyle={tailwind(
+                                'h-full items-center',
+                            )}
+                            data={walletData.transactions}
+                            renderItem={item => (
+                                <TransactionListItem tx={item.item} />
+                            )}
+                            keyExtractor={item => item.txid}
+                            initialNumToRender={25}
+                            contentInsetAdjustmentBehavior="automatic"
+                            ListEmptyComponent={
+                                <View
                                     style={[
-                                        tailwind('w-full text-center'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
+                                        tailwind(
+                                            'w-4/5 h-5/6 items-center justify-center',
+                                        ),
                                     ]}>
-                                    A list of all transactions for this wallet
-                                    be displayed here
-                                </Text>
-                            </View>
-                        ) : (
-                            <FlatList
-                                refreshing={refreshing}
-                                onRefresh={refreshWallet}
-                                scrollEnabled={true}
-                                style={tailwind('w-full mt-4 mb-12 z-30')}
-                                data={walletData.transactions}
-                                renderItem={item => (
-                                    <TransactionListItem tx={item.item} />
-                                )}
-                                keyExtractor={item => item.txid}
-                                initialNumToRender={25}
-                                contentInsetAdjustmentBehavior="automatic"
-                            />
-                        )}
+                                    <Box
+                                        width={32}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                        style={tailwind('mb-4 -mt-6')}
+                                    />
+                                    <Text
+                                        style={[
+                                            tailwind('w-full text-center'),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
+                                        ]}>
+                                        A list of all transactions for this
+                                        wallet be displayed here
+                                    </Text>
+                                </View>
+                            }
+                        />
                     </View>
                 </View>
             </View>
