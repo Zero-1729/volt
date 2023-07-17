@@ -28,7 +28,10 @@ import {
 } from '../../../modules/wallet-utils';
 import {errorAlert} from '../../../components/alert';
 
+import Clipboard from '@react-native-clipboard/clipboard';
+
 const Xpub = () => {
+    const [resultMessageText, setResulteMessageText] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [xpub, setXPUB] = useState('');
 
@@ -49,6 +52,16 @@ const Xpub = () => {
 
     const navigation = useNavigation();
 
+    const copyXpubToClipboard = () => {
+        Clipboard.setString(resultMessage);
+
+        setResulteMessageText('Copied to clipboard!');
+
+        setTimeout(() => {
+            setResulteMessageText(resultMessage);
+        }, 450);
+    };
+
     const convertXpub = () => {
         // Check if it is indeed an xpub and valid
         if (getExtendedKeyPrefix(xpub) !== 'xpub') {
@@ -68,6 +81,7 @@ const Xpub = () => {
             const pub = convertXPUB(xpub, version);
 
             setResultMessage(pub);
+            setResulteMessageText(pub);
         } catch (e: any) {
             errorAlert('XPUB', e);
         }
@@ -78,7 +92,7 @@ const Xpub = () => {
             clearText();
         }
 
-        setXPUB(text);
+        setXPUB(text.trim());
     };
 
     const clearText = () => {
@@ -208,7 +222,7 @@ const Xpub = () => {
                 </View>
 
                 {/* Result */}
-                {resultMessage.length > 0 ? (
+                {resultMessageText.length > 0 ? (
                     <View style={[tailwind('mt-8 w-5/6')]}>
                         <Text
                             style={[
@@ -226,13 +240,15 @@ const Xpub = () => {
                                         ColorScheme.Background.Greyed,
                                 },
                             ]}
-                            onPress={() => {}}>
+                            onPress={() => {
+                                copyXpubToClipboard();
+                            }}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {resultMessage}
+                                {resultMessageText}
                             </Text>
                         </PlainButton>
                     </View>
