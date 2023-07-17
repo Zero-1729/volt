@@ -20,7 +20,12 @@ import ArrowUp from '../../../assets/svg/chevron-up-16.svg';
 import ArrowDown from '../../../assets/svg/chevron-down-16.svg';
 import Tick from '../../../assets/svg/check-16.svg';
 
-import {convertXPUB, xpubVersions} from '../../../modules/wallet-utils';
+import {
+    convertXPUB,
+    xpubVersions,
+    getExtendedKeyPrefix,
+    isValidExtendedKey,
+} from '../../../modules/wallet-utils';
 import {errorAlert} from '../../../components/alert';
 
 const Xpub = () => {
@@ -45,6 +50,20 @@ const Xpub = () => {
     const navigation = useNavigation();
 
     const convertXpub = () => {
+        // Check if it is indeed an xpub and valid
+        if (getExtendedKeyPrefix(xpub) !== 'xpub') {
+            errorAlert('Error', 'Please provide an extended public key (XPUB)');
+            return;
+        }
+
+        if (!isValidExtendedKey(xpub, true)) {
+            errorAlert(
+                'Error',
+                'Please provide a valid extended public key (XPUB)',
+            );
+            return;
+        }
+
         try {
             const pub = convertXPUB(xpub, version);
 
