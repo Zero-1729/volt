@@ -238,7 +238,10 @@ export const getInfoFromXKey = (key: string) => {
     return extendedKeyInfo[prefix];
 };
 
-export const isValidExtendedKey = (key: string): boolean => {
+export const isValidExtendedKey = (
+    key: string,
+    silent: boolean = false,
+): boolean => {
     // Validate an extended key by checking it's checksum matches the data
     const deserializedKey = _deserializeExtendedKey(key);
     // Grab last 4 bytes as checksum
@@ -251,7 +254,7 @@ export const isValidExtendedKey = (key: string): boolean => {
 
     const isValid = hashedChecksum === checksum;
 
-    if (!isValid) {
+    if (!isValid && !silent) {
         throw new Error('Invalid extended key checksum');
     }
 
