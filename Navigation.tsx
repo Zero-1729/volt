@@ -123,7 +123,7 @@ const InitScreenStack = createNativeStackNavigator();
 const initScreen = () => {
     return (
         <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
-            <InitScreenStack.Screen name="Home" component={Home} />
+            <InitScreenStack.Screen name="HomeScreen" component={Home} />
             <InitScreenStack.Screen
                 name="AddWalletRoot"
                 component={AddWalletRoot}
