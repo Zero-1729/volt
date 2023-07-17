@@ -295,15 +295,16 @@ export const convertXPUB = (xpub: string, pub_prefix: string): string => {
 
     try {
         // Get the decoded key from trimmed xpub
-        const decoded = _deserializeExtendedKey(xpub.trim());
+        const decoded = _deserializeExtendedKeyCheck(xpub.trim());
 
         // Cut off prefix to include new xpub version
-        const data = decoded.slice(4);
+        const data = decoded.subarray(4);
+
         // Re-attach data with new prefix
         const nPub = Buffer.concat([Buffer.from(ver, 'hex'), data]);
 
         // Return new Base58 formatted key
-        return b58.encode(nPub);
+        return b58c.encode(nPub);
     } catch (e) {
         // Assume an invalid key if unable to disassemble and re-assemble
         throw new Error('Invalid extended public key');
