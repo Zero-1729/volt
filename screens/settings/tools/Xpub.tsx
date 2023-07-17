@@ -245,6 +245,7 @@ const Xpub = () => {
                     style={[tailwind('mt-12 w-full items-center')]}
                     title={'Convert'}
                     onPress={convertXpub}
+                    disabled={xpub.trim().length === 0}
                     textColor={
                         xpub.trim().length > 0
                             ? ColorScheme.Text.Alt
