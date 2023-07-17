@@ -95,7 +95,7 @@ const Xpub = () => {
                             tailwind('text-lg font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        XPUB Converter
+                        Xpub Converter
                     </Text>
 
                     <PlainButton

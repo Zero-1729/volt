@@ -57,7 +57,7 @@ const Index = () => {
                 <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
                 {/* Wallet Tools */}
-                {/* XPub Converter */}
+                {/* Xpub Converter */}
                 <PlainButton
                     style={[tailwind('w-5/6 mb-6')]}
                     onPress={() => {
@@ -76,7 +76,7 @@ const Index = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            XPUB Converter
+                            Xpub Converter
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
