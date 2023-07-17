@@ -1,6 +1,7 @@
 import {Buffer} from 'buffer';
 
 import * as b58 from 'bs58';
+import * as b58c from 'bs58check';
 import Crypto from 'react-native-quick-crypto';
 import BigNumber from 'bignumber.js';
 
@@ -261,9 +262,15 @@ export const isValidExtendedKey = (
     return isValid;
 };
 
-// Deserialize Extended Key
+// Deserialize Extended Key without Checksum
+const _deserializeExtendedKeyCheck = (key: string): Buffer => {
+    const decodedBuffArray = b58c.decode(key);
+    return Buffer.from(decodedBuffArray);
+};
+
+// Deserialize Extended Key with Checksum
 const _deserializeExtendedKey = (key: string): Buffer => {
-    const decodedBuffArray = b58.decode(key).buffer;
+    const decodedBuffArray = b58.decode(key);
     return Buffer.from(decodedBuffArray);
 };
 
