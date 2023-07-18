@@ -34,12 +34,14 @@ import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
 import {LegacyWallet} from './wallet/legacy';
 
 import {
-    extendedKeyInfo,
     getDescriptorParts,
     createDescriptor,
+    getMetaFromMnemonic,
+    getFingerprintFromXkey,
+    generateMnemonic,
 } from '../modules/wallet-utils';
 
-import {generateMnemonic, getMetaFromMnemonic} from '../modules/bip39-util';
+import {extendedKeyInfo} from '../modules/wallet-defaults';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
