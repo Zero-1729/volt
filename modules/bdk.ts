@@ -1,6 +1,11 @@
 import BigNumber from 'bignumber.js';
 
-import BdkRn from 'bdk-rn';
+import * as BDK from 'bdk-rn';
+import {
+    BlockchainElectrumConfig,
+    Network,
+    KeychainKind,
+} from 'bdk-rn/lib/lib/enums';
 
 import {BaseWallet} from '../class/wallet/base';
 
@@ -11,6 +16,22 @@ import {liberalAlert} from '../components/alert';
 type SyncData = {
     balance: BigNumber;
     transactions: TransactionType[];
+    UTXOs: any[];
+};
+
+const config: BlockchainElectrumConfig = {
+    url: 'ssl://electrum.blockstream.info:60002',
+    retry: 5,
+    timeout: 5,
+    stopGap: 5,
+    sock5: null,
+    validateDomain: false,
+};
+
+export const generateMnemonic = async () => {
+    const mnemonic = await new BDK.Mnemonic().create();
+
+    return mnemonic.asString();
 };
 
 // Formats transaction data from BDK to format for wallet
@@ -32,91 +53,111 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
 
 export const syncWallet = async (wallet: BaseWallet): Promise<SyncData> => {
     // Assumes a network check is performed before call
+    const chain = await new BDK.Blockchain().create(config);
+    const dbConfig = await new BDK.DatabaseConfig().memory();
+    const mnemonic = await new BDK.Mnemonic().fromString(wallet.secret);
 
-    // Create wallet from current wallet data
-    const createResponse = await BdkRn.createWallet({
-        mnemonic: wallet.secret ? wallet.secret : '',
-        descriptor:
-            wallet.descriptor && wallet.secret === '' ? wallet.descriptor : '',
-        password: '',
-        network: wallet.network,
-    });
+    // TODO: Add support for creating descriptor from xprv/xpub and existing descriptor
+    const descriptorSecretKey = await new BDK.DescriptorSecretKey().create(
+        wallet.network as Network,
+        mnemonic,
+    );
 
-    // Report error from wallet creation function
-    if (createResponse.error) {
-        liberalAlert('Error', createResponse.data, 'OK');
+    // Create descriptors
+    let ExternalDescriptor!: BDK.Descriptor;
+    let InternalDescriptor!: BDK.Descriptor;
+
+    switch (wallet.type) {
+        case 'bech32': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip84(
+                descriptorSecretKey,
+                'external' as KeychainKind,
+                wallet.network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip84(
+                descriptorSecretKey,
+                'internal' as KeychainKind,
+                wallet.network as Network,
+            );
+
+            break;
+        }
+        case 'p2sh': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip49(
+                descriptorSecretKey,
+                'external' as KeychainKind,
+                wallet.network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip49(
+                descriptorSecretKey,
+                'internal' as KeychainKind,
+                wallet.network as Network,
+            );
+
+            break;
+        }
+        case 'legacy': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip44(
+                descriptorSecretKey,
+                'external' as KeychainKind,
+                wallet.network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip44(
+                descriptorSecretKey,
+                'internal' as KeychainKind,
+                wallet.network as Network,
+            );
+
+            break;
+        }
     }
 
-    // Sync wallet
-    const syncResponse = await BdkRn.syncWallet();
+    const w = await new BDK.Wallet().create(
+        ExternalDescriptor, // Create a descriptor with BDK and store here
+        InternalDescriptor,
+        wallet.network as Network,
+        dbConfig,
+    );
+
+    const syncStatus = await w.sync(chain);
 
     // report any sync errors
-    if (syncResponse.error) {
-        liberalAlert('Error', syncResponse.data, 'OK');
+    if (!syncStatus) {
+        liberalAlert('Error', 'Could not Sync Wallet', 'OK');
+
         return {
             balance: wallet.balance,
             transactions: wallet.transactions,
+            UTXOs: wallet.UTXOs,
         };
     }
 
-    // Attempt call to get wallet balance
-    const balanceResponse = await BdkRn.getBalance();
-
-    if (balanceResponse.error) {
-        // Report any errors in fetch attempt
-        liberalAlert('Error', balanceResponse.data, 'OK');
-        return {
-            balance: wallet.balance,
-            transactions: wallet.transactions,
-        };
-    }
+    const retrievedBalance = await w.getBalance();
 
     // Update wallet balance
     // Leave untouched if error fetching balance
-    let balance: BigNum = wallet.balance;
+    let balance = new BigNumber(wallet.balance);
 
     // Update balance amount (in sats)
     // only update if balance different from stored version
-    if (balanceResponse.data !== wallet.balance) {
+    if (!balance.eq(retrievedBalance.total)) {
         // Receive balance in sats as string
         // convert to BigNumber
-        balance = new BigNum(balanceResponse.data);
+        balance = new BigNumber(retrievedBalance.total);
     }
 
     // Update transactions list
-    const transactionResponse = await BdkRn.getTransactions();
-
-    if (transactionResponse.error) {
-        liberalAlert(
-            'Error',
-            `Could not fetch transactions ${transactionResponse.error}`,
-            'OK',
-        );
-        return {
-            balance: balance,
-            transactions: wallet.transactions,
-        };
-    }
+    const TXs = await w.listTransactions();
+    const UTXOs = await w.listUnspent();
 
     // Receive transactions from BDK
-    const {confirmed, pending} = transactionResponse.data;
     const tmp: TransactionType[] = [];
 
     // Update transactions list
-    confirmed.forEach((transaction: any) => {
+    TXs.forEach((transaction: any) => {
         tmp.push(
             formatTXFromBDK({
-                confirmed: true,
-                network: wallet.network,
-                ...transaction,
-            }),
-        );
-    });
-
-    pending.forEach((transaction: any) => {
-        tmp.push(
-            formatTXFromBDK({
-                confirmed: false,
+                confirmed: !!transaction.confirmationTime,
                 network: wallet.network,
                 ...transaction,
             }),
@@ -128,5 +169,6 @@ export const syncWallet = async (wallet: BaseWallet): Promise<SyncData> => {
     return {
         balance: balance,
         transactions: tmp,
+        UTXOs: UTXOs,
     };
 };
