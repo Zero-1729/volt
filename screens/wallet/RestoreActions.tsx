@@ -179,14 +179,13 @@ const ImportAction = () => {
         return false;
     };
 
-    const handleImport = () => {
+    const handleImport = (material: string) => {
         // determine if the import text is one of the following:
         // - 12 - 24 word seed
         // - Wallet Descriptor (e.g. pkh(...))
         // - Xpriv / Xpub
-
-        // Take out any leading or trailing whitespace
-        const material = importText.trim();
+        // Clear input
+        setImportText('');
 
         // Check if mnemonic
         if (isMnemonic(material)) {
@@ -226,6 +225,7 @@ const ImportAction = () => {
 
             // Handle import of support valid extended key
             handleExtendedKey(material);
+
             return;
         }
 
@@ -343,7 +343,9 @@ const ImportAction = () => {
 
                 <LongBottomButton
                     disabled={importText.trim().length === 0}
-                    onPress={handleImport}
+                    onPress={() => {
+                        handleImport(importText.trim());
+                    }}
                     title="Continue"
                     textColor={
                         importText.trim().length > 0
