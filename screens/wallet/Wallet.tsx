@@ -180,7 +180,6 @@ const Wallet = () => {
                     for (let k = 0; k < TxData.vout.length; k++) {
                         // Add address we own based on whether we received
                         // the transaction and the value received matches
-                        console.log('tx case2: ', TxData.vout[k]);
                         if (
                             transactions[i].value.eq(TxData.vout[k].value) &&
                             transactions[i].type === 'inbound'
