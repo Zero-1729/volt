@@ -17,6 +17,7 @@ type SyncData = {
     balance: BigNumber;
     transactions: TransactionType[];
     UTXOs: any[];
+    updated: boolean; // whether the balance has been indeed updated
 };
 
 const config: BlockchainElectrumConfig = {
@@ -138,31 +139,41 @@ export const syncWallet = async (wallet: BaseWallet): Promise<SyncData> => {
     // Leave untouched if error fetching balance
     let balance = new BigNumber(wallet.balance);
 
+    let updated = false;
+
     // Update balance amount (in sats)
     // only update if balance different from stored version
     if (!balance.eq(retrievedBalance.total)) {
         // Receive balance in sats as string
         // convert to BigNumber
         balance = new BigNumber(retrievedBalance.total);
+        updated = true;
     }
 
-    // Update transactions list
-    const TXs = await w.listTransactions();
-    const UTXOs = await w.listUnspent();
+    // Only fetch transactions when balance has been updated
+    let TXs: any = wallet.transactions;
+    let UTXOs: any = wallet.UTXOs;
+    let tmp = TXs;
 
-    // Receive transactions from BDK
-    const tmp: TransactionType[] = [];
+    if (updated) {
+        // Update transactions list
+        TXs = await w.listTransactions();
+        UTXOs = await w.listUnspent();
 
-    // Update transactions list
-    TXs.forEach((transaction: any) => {
-        tmp.push(
-            formatTXFromBDK({
-                confirmed: !!transaction.confirmationTime,
-                network: wallet.network,
-                ...transaction,
-            }),
-        );
-    });
+        // Receive transactions from BDK
+        tmp = [];
+
+        // Update transactions list
+        TXs.forEach((transaction: any) => {
+            tmp.push(
+                formatTXFromBDK({
+                    confirmed: !!transaction.confirmationTime,
+                    network: wallet.network,
+                    ...transaction,
+                }),
+            );
+        });
+    }
 
     // Return updated wallet balance and transactions
     // Fallback to original wallet transactions if error fetching transactions
@@ -170,5 +181,6 @@ export const syncWallet = async (wallet: BaseWallet): Promise<SyncData> => {
         balance: balance,
         transactions: tmp,
         UTXOs: UTXOs,
+        updated: updated,
     };
 };
