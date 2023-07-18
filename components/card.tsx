@@ -16,7 +16,7 @@ import {WalletCardProps} from '../types/props';
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
-import {WalletTypeNames} from '../modules/wallet-utils';
+import {WalletTypeNames} from '../modules/wallet-defaults';
 
 export const EmptyCard = () => {
     const navigation = useNavigation();

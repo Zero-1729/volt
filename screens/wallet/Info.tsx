@@ -16,7 +16,7 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {WalletTypeNames} from '../../modules/wallet-utils';
+import {WalletTypeNames} from '../../modules/wallet-defaults';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 

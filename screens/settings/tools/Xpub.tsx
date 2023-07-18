@@ -22,10 +22,10 @@ import Tick from '../../../assets/svg/check-16.svg';
 
 import {
     convertXPUB,
-    xpubVersions,
     getExtendedKeyPrefix,
     isValidExtendedKey,
 } from '../../../modules/wallet-utils';
+import {xpubVersions} from '../../../modules/wallet-defaults';
 import {errorAlert} from '../../../components/alert';
 
 import Clipboard from '@react-native-clipboard/clipboard';

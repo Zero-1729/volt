@@ -26,10 +26,6 @@ import {
     DescriptorType,
 } from './wallet-defaults';
 
-export const generateMnemonic = () => {
-    return bip39.generateMnemonic();
-};
-
 export const validateMnenomic = (mnemonic: string) => {
     const resp = bip39.validateMnemonic(mnemonic);
 

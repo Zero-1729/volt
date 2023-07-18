@@ -7,7 +7,6 @@ import {StackActions, useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {validateMnenomic} from '../../modules/bip39-util';
 import {
     descriptorSymbols,
     isSupportedExtKey,
@@ -15,6 +14,7 @@ import {
     getExtendedKeyPrefix,
     isValidExtendedKey,
     isDescriptorPattern,
+    validateMnenomic,
 } from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
