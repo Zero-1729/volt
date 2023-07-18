@@ -1,16 +1,33 @@
+import BigNumber from 'bignumber.js';
+
 import BdkRn from 'bdk-rn';
-import BigNum from 'bignumber.js';
 
 import {BaseWallet} from '../class/wallet/base';
-import {formatTXFromBDK} from '../modules/wallet-utils';
 
 import {TransactionType} from '../types/wallet';
 
 import {liberalAlert} from '../components/alert';
 
 type SyncData = {
-    balance: BigNum;
+    balance: BigNumber;
     transactions: TransactionType[];
+};
+
+// Formats transaction data from BDK to format for wallet
+export const formatTXFromBDK = (tx: any): TransactionType => {
+    const formattedTx = {
+        txid: tx.txid,
+        confirmed: tx.confirmed,
+        block_height: tx.block_height,
+        timestamp: tx.block_timestamp,
+        fee: new BigNumber(tx.fee),
+        value: new BigNumber(tx.received.length !== '' ? tx.received : tx.sent),
+        type: tx.received.length !== '' ? 'inbound' : 'outbound',
+        network: tx.network,
+    };
+
+    // Returned formatted tx
+    return formattedTx;
 };
 
 export const syncWallet = async (wallet: BaseWallet): Promise<SyncData> => {

@@ -380,23 +380,6 @@ export const getDescriptorParts = (descriptor: string) => {
     return components;
 };
 
-// Formats transaction data from BDK to format for wallet
-export const formatTXFromBDK = (tx: any): TransactionType => {
-    const formattedTx = {
-        txid: tx.txid,
-        confirmed: tx.confirmed,
-        block_height: tx.block_height,
-        timestamp: tx.block_timestamp,
-        fee: new BigNumber(tx.fee),
-        value: new BigNumber(tx.received.length !== '' ? tx.received : tx.sent),
-        type: tx.received.length !== '' ? 'inbound' : 'outbound',
-        network: tx.network,
-    };
-
-    // Returned formatted tx
-    return formattedTx;
-};
-
 // Return a wallet address path from a given index and whether it is a change or receiving address
 export const getAddressPath = (
     index: number,
