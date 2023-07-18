@@ -723,7 +723,7 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Handle material according to type
-            var newWallet: TWalletType;
+            var newWallet!: TWalletType;
 
             // Ensure we have a valid wallet type
             if (!['bech32', 'p2sh', 'legacy'].includes(walletArgs.type)) {
@@ -760,7 +760,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const addWallet = useCallback(
         async (name: string, type: string, network?: NetType) => {
             try {
-                let newWallet: TWalletType;
+                let newWallet!: TWalletType;
 
                 // Ensure we have a valid wallet type
                 if (!['bech32', 'p2sh', 'legacy'].includes(type)) {
