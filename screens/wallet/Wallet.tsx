@@ -141,6 +141,7 @@ const Wallet = () => {
                         size: 0,
                         weight: 0,
                     };
+
                     const TxData = await getTxData(
                         transactions[i].txid,
                         walletData.network,
@@ -474,7 +475,15 @@ const Wallet = () => {
                             refreshing={refreshing}
                             onRefresh={refreshWallet}
                             scrollEnabled={true}
-                            style={[tailwind('w-full mt-4 mb-12 z-30')]}
+                            style={[
+                                tailwind(
+                                    `${
+                                        walletData.transactions.length > 0
+                                            ? 'w-11/12'
+                                            : 'w-full'
+                                    } mt-2 z-30`,
+                                ),
+                            ]}
                             contentContainerStyle={tailwind(
                                 'h-full items-center',
                             )}
