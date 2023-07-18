@@ -27,6 +27,7 @@ import {
     NetType,
     baseWalletArgs,
     NetInfoType,
+    addressType,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -78,6 +79,7 @@ type defaultContextType = {
     ) => void;
     updateWalletUTXOs: (id: string, utxo: UTXOType[]) => void;
     updateWalletBalance: (id: string, balance: BalanceType) => void;
+    updateWalletAddress: (id: string, address: addressType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
@@ -135,6 +137,7 @@ const defaultContext: defaultContextType = {
     updateWalletTransactions: () => {},
     updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
+    updateWalletAddress: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
     resetAppData: () => {},
@@ -598,6 +601,23 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const updateWalletAddress = useCallback(
+        async (id: string, address: addressType) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            // Get the current wallet
+            // Update the address in the current wallet
+            const tmp = [...wallets];
+            tmp[index].address = address;
+            tmp[index].index += address.index;
+
+            // Update wallets list
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const renameWallet = useCallback(
         async (id: string, newName: string) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
@@ -914,6 +934,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 updateWalletTransactions,
                 updateWalletUTXOs,
                 updateWalletBalance,
+                updateWalletAddress,
                 renameWallet,
                 deleteWallet,
             }}>

@@ -56,6 +56,7 @@ const Wallet = () => {
         updateWalletTransactions,
         updateWalletUTXOs,
         hideTotalBalance,
+        updateWalletAddress,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -194,6 +195,20 @@ const Wallet = () => {
                             ) {
                                 tmp.address =
                                     TxData.vout[k].scriptpubkey_address;
+
+                                // Update tmp address
+                                if (
+                                    !addressLock &&
+                                    walletData.address.address ===
+                                        TxData.vout[k].scriptpubkey_address
+                                ) {
+                                    const newAddress =
+                                        walletData.generateNewAddress();
+                                    updateWalletAddress(
+                                        currentWalletID,
+                                        newAddress,
+                                    );
+                                }
 
                                 // Update transaction UTXOs that we own
                                 newUTXOs.push({
