@@ -83,6 +83,7 @@ type defaultContextType = {
     restoreWallet: (
         backupMaterial: string,
         backupType: BackupMaterialTypes,
+        backupNetwork: NetType,
     ) => void;
     addWallet: (name: string, type: string, network?: NetType) => void;
     resetAppData: () => void;
@@ -682,9 +683,10 @@ export const AppStorageProvider = ({children}: Props) => {
         async (
             backupMaterial: string,
             backupMaterialType: BackupMaterialTypes,
+            backupNetwork: NetType,
         ) => {
             // Default network and wallet type
-            var net = 'testnet';
+            var net = backupNetwork;
             var walletType = 'bech32';
 
             var fingerprint = '';
@@ -694,7 +696,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Grab the descriptor network and type
                 const desc = getDescriptorParts(backupMaterial);
 
-                net = desc.network;
+                net = desc.network as NetType;
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
                 path = desc.path;
