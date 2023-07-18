@@ -212,8 +212,8 @@ const ImportAction = () => {
     };
 
     const importInstructions = isAdvancedMode
-        ? 'Enter one of the following:\n\n- 12 - 24 word seed\n- Extended private Key (e.g., x/y/z/tprv)\n- Extended public key (e.g., x/y/z/tpub)\n- Wallet Descriptor (e.g., pkh(tprv...))'
-        : 'Enter your 12 - 24 word seed';
+        ? 'Enter one of the following:\n\n- 12 - 24 word mnemonic\n- Wallet Descriptor (e.g., pkh(tprv...))\n- Extended private Key (e.g., x/y/z/tprv)\n- Extended public key (e.g., x/y/z/tpub)'
+        : 'Enter your 12 - 24 word mnemonic or a single-key wallet descriptor (e.g., pkh(tprv...))';
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
