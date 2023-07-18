@@ -15,6 +15,7 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
+import {generateMnemonic} from '../modules/bdk';
 import {
     TWalletType,
     Unit,
@@ -38,7 +39,6 @@ import {
     createDescriptor,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
-    generateMnemonic,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo} from '../modules/wallet-defaults';
@@ -623,13 +623,14 @@ export const AppStorageProvider = ({children}: Props) => {
 
         // Generate mnemonic and other key material if needed
         if (!restored) {
-            newWallet.generateMnemonic();
+            const mnemonic = await generateMnemonic();
+            newWallet.secret = mnemonic;
         }
 
         // If we have a mnemonic, generate extended key material
         if (newWallet.secret !== '') {
             try {
-                const mnemonic = generateMnemonic();
+                const mnemonic = await generateMnemonic();
                 const metas = getMetaFromMnemonic(mnemonic, newWallet.network);
 
                 newWallet.setXprv(metas.xprv);

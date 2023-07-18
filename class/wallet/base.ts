@@ -1,6 +1,5 @@
-import Crypto from 'react-native-quick-crypto';
+import crypto from 'react-native-quick-crypto';
 
-import * as bip39 from 'bip39';
 import BigNumber from 'bignumber.js';
 
 import {
@@ -138,12 +137,6 @@ export class BaseWallet {
         this.masterFingerprint = ''; // Wallet master fingerprint
     }
 
-    generateMnemonic(): void {
-        if (this.secret.length === 0) {
-            this.secret = bip39.generateMnemonic();
-        }
-    }
-
     generateNewAddress(): addressType {
         try {
             let index = this.index;
@@ -178,7 +171,7 @@ export class BaseWallet {
     }
 
     protected _generateID(): string {
-        return Crypto.randomUUID();
+        return crypto.randomUUID();
     }
 
     setWatchOnly(isWatchOnly?: boolean) {
