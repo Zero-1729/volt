@@ -432,3 +432,20 @@ export const createDescriptor = (
 
     return descriptor;
 };
+
+export const getMetaFromMnemonic = (mnemonic: string, network: NetType) => {
+    const seed = mnemonicToSeedSync(mnemonic);
+    const node = bip32.fromSeed(seed, BJSNetworks[network]);
+
+    return {
+        xprv: node.toBase58(),
+        xpub: node.neutered().toBase58(),
+        fingerprint: node.fingerprint.toString('hex'),
+    };
+};
+
+export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
+    const node = bip32.fromBase58(xkey, BJSNetworks[network]);
+
+    return node.fingerprint.toString('hex');
+};
