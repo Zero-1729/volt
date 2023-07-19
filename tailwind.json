@@ -585,6 +585,14 @@
 			"backgroundColor": "rgb(255 255 255 / var(--tw-bg-opacity))"
 		}
 	},
+	"p-1": {
+		"style": {
+			"paddingTop": 4,
+			"paddingRight": 4,
+			"paddingBottom": 4,
+			"paddingLeft": 4
+		}
+	},
 	"p-2": {
 		"style": {
 			"paddingTop": 8,
@@ -797,6 +805,11 @@
 			"textTransform": "capitalize"
 		}
 	},
+	"italic": {
+		"style": {
+			"fontStyle": "italic"
+		}
+	},
 	"text-black": {
 		"style": {
 			"--tw-text-opacity": 1,
@@ -813,11 +826,6 @@
 		"style": {
 			"--tw-text-opacity": 1,
 			"color": "rgb(255 255 255 / var(--tw-text-opacity))"
-		}
-	},
-	"opacity-10": {
-		"style": {
-			"opacity": 0.1
 		}
 	},
 	"opacity-20": {
