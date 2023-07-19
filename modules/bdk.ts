@@ -44,6 +44,32 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
     return formattedTx;
 };
 
+// Test Electrum server connection
+// TODO: replace this with a better method, and possibly move out to wallet-utils
+export const testElectrumServer = async (url: string, callback: any) => {
+    const config: BlockchainElectrumConfig = {
+        url,
+        retry: 1,
+        timeout: 5,
+        stopGap: 5,
+        sock5: null,
+        validateDomain: false,
+    };
+
+    try {
+        const chain = await new BDK.Blockchain().create(
+            config,
+            BlockChainNames.Electrum,
+        );
+
+        await chain.getHeight();
+
+        callback(true);
+    } catch (e) {
+        callback(false);
+    }
+};
+
 const _sync = async (
     wallet: BaseWallet,
     callback: any,
