@@ -65,6 +65,7 @@ type defaultContextType = {
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
+    electrumServerURL: string;
     setNetworkState: (networkState: NetInfoType) => void;
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
@@ -92,6 +93,7 @@ type defaultContextType = {
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => TWalletType;
     setLoadLock: (loadLock: boolean) => void;
+    setElectrumServerURL: (url: string) => void;
 };
 
 // Default app context values
@@ -124,6 +126,7 @@ const defaultContext: defaultContextType = {
     hideTotalBalance: false,
     isWalletInitialized: false,
     isAdvancedMode: false,
+    electrumServerURL: 'ssl://electrum.blockstream.info:50002',
     setNetworkState: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
@@ -146,6 +149,7 @@ const defaultContext: defaultContextType = {
         return new BaseWallet({name: 'test wallet', type: 'bech32'});
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
+    setElectrumServerURL: () => {},
 };
 
 // Note: context 'value' will default to 'defaultContext' if no Provider is found
@@ -178,6 +182,9 @@ export const AppStorageProvider = ({children}: Props) => {
     const [isAdvancedMode, _setAdvancedMode] = useState(
         defaultContext.isAdvancedMode,
     );
+    const [electrumServerURL, _setElectrumServerURL] = useState(
+        defaultContext.electrumServerURL,
+    );
 
     const {getItem: _getLoadLock, setItem: _updateLoadLock} =
         useAsyncStorage('loadLock');
@@ -205,6 +212,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('isAdvancedMode');
     const {getItem: _getCurrentWalletID, setItem: _updateCurrentWalletID} =
         useAsyncStorage('currentWalletID');
+    const {getItem: _getElectrumServerURL, setItem: _updateElectrumServerURL} =
+        useAsyncStorage('electrumServerURL');
 
     // |> Create functions for getting, setting, and other data manipulation
     const _loadLock = async () => {
@@ -433,6 +442,32 @@ export const AppStorageProvider = ({children}: Props) => {
         // ...otherwise, use default
         if (advanced !== null) {
             _setAdvancedMode(JSON.parse(advanced));
+        }
+    };
+
+    const setElectrumServerURL = useCallback(
+        async (url: string) => {
+            try {
+                _setElectrumServerURL(url);
+                _updateElectrumServerURL(JSON.stringify(url));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Electrum server URL setting) Error loading data: ${e}`,
+                );
+
+                throw new Error('Unable to set electrum server URL');
+            }
+        },
+        [_setElectrumServerURL, _updateElectrumServerURL],
+    );
+
+    const _loadElectrumServerURL = async () => {
+        const url = await _getElectrumServerURL();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (url !== null) {
+            _setElectrumServerURL(JSON.parse(url));
         }
     };
 
@@ -845,6 +880,7 @@ export const AppStorageProvider = ({children}: Props) => {
             await setWallets([]);
             await setCurrentWalletID('');
             await setIsAdvancedMode(false);
+            await setElectrumServerURL(defaultContext.electrumServerURL);
         } catch (e) {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
@@ -904,6 +940,10 @@ export const AppStorageProvider = ({children}: Props) => {
         _loadFiatRate();
     }, []);
 
+    useEffect(() => {
+        _loadElectrumServerURL();
+    }, []);
+
     // Return provider
     return (
         <AppStorageContext.Provider
@@ -912,6 +952,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 setLoadLock,
                 networkState,
                 setNetworkState,
+                electrumServerURL,
+                setElectrumServerURL,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,
