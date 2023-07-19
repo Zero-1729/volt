@@ -18,7 +18,7 @@ const ElectrumURLs: {[index: string]: string} = {
     // Default and alternates for testnet and bitcoin
     // TODO: make this settable in the settings
     testnet: 'ssl://electrum.blockstream.info:60002',
-    bitcoin: 'ssl://electrum.blockstream.info:50002', // ssl://electrum.emzy.de:50002'
+    bitcoin: 'ssl://electrum.blockstream.info:50002',
 };
 
 type SyncData = {
