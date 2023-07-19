@@ -414,11 +414,6 @@
 			"width": "91.666667%"
 		}
 	},
-	"w-12": {
-		"style": {
-			"width": 48
-		}
-	},
 	"w-2/6": {
 		"style": {
 			"width": "33.333333%"
@@ -684,9 +679,19 @@
 			"paddingBottom": 16
 		}
 	},
+	"pb-10": {
+		"style": {
+			"paddingBottom": 40
+		}
+	},
 	"pb-11": {
 		"style": {
 			"paddingBottom": 44
+		}
+	},
+	"pb-16": {
+		"style": {
+			"paddingBottom": 64
 		}
 	},
 	"pl-8": {

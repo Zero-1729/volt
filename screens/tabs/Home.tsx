@@ -405,7 +405,10 @@ const Home = () => {
                             Latest Transactions
                         </Text>
 
-                        <View style={[tailwind('w-full h-full items-center')]}>
+                        <View
+                            style={[
+                                tailwind('w-full h-full items-center pb-16'),
+                            ]}>
                             <FlatList
                                 refreshing={refreshing}
                                 onRefresh={refreshWallet}
@@ -416,8 +419,8 @@ const Home = () => {
                                         `${
                                             extractAllTransactions().length > 0
                                                 ? 'w-11/12 self-center'
-                                                : 'w-full'
-                                        } h-full items-center`,
+                                                : 'w-full h-full'
+                                        } items-center`,
                                     ),
                                 ]}
                                 data={extractAllTransactions()}

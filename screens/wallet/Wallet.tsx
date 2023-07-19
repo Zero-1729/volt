@@ -495,7 +495,8 @@ const Wallet = () => {
                         </Text>
                     </View>
 
-                    <View style={[tailwind('w-full h-full items-center')]}>
+                    <View
+                        style={[tailwind('w-full h-full items-center pb-10')]}>
                         <FlatList
                             refreshing={refreshing}
                             onRefresh={refreshWallet}
@@ -509,9 +510,15 @@ const Wallet = () => {
                                     } mt-2 z-30`,
                                 ),
                             ]}
-                            contentContainerStyle={tailwind(
-                                'h-full items-center',
-                            )}
+                            contentContainerStyle={[
+                                tailwind(
+                                    `${
+                                        walletData.transactions.length > 0
+                                            ? ''
+                                            : 'h-full'
+                                    } items-center`,
+                                ),
+                            ]}
                             data={walletData.transactions}
                             renderItem={item => (
                                 <TransactionListItem tx={item.item} />

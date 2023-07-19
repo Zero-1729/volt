@@ -328,10 +328,6 @@
   width: 91.666667%
 }
 
-.w-12 {
-  width: 3rem
-}
-
 .w-2\/6 {
   width: 33.333333%
 }
@@ -523,8 +519,16 @@
   padding-bottom: 1rem
 }
 
+.pb-10 {
+  padding-bottom: 2.5rem
+}
+
 .pb-11 {
   padding-bottom: 2.75rem
+}
+
+.pb-16 {
+  padding-bottom: 4rem
 }
 
 .pl-8 {
