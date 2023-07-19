@@ -5,6 +5,7 @@ import {
     BlockchainElectrumConfig,
     Network,
     KeychainKind,
+    BlockChainNames,
 } from 'bdk-rn/lib/lib/enums';
 
 import {BaseWallet} from '../class/wallet/base';
@@ -13,20 +14,18 @@ import {TransactionType} from '../types/wallet';
 
 import {liberalAlert} from '../components/alert';
 
+const ElectrumURLs: {[index: string]: string} = {
+    // Default and alternates for testnet and bitcoin
+    // TODO: make this settable in the settings
+    testnet: 'ssl://electrum.blockstream.info:60002',
+    bitcoin: 'ssl://electrum.blockstream.info:50002', // ssl://electrum.emzy.de:50002'
+};
+
 type SyncData = {
     balance: BigNumber;
     transactions: TransactionType[];
     UTXOs: any[];
     updated: boolean; // whether the balance has been indeed updated
-};
-
-const config: BlockchainElectrumConfig = {
-    url: 'ssl://electrum.blockstream.info:60002',
-    retry: 5,
-    timeout: 5,
-    stopGap: 5,
-    sock5: null,
-    validateDomain: false,
 };
 
 export const generateMnemonic = async () => {
@@ -56,9 +55,36 @@ const _sync = async (
     wallet: BaseWallet,
     callback: any,
 ): Promise<BDK.Wallet> => {
+    // Electrum configuration
+    const config: BlockchainElectrumConfig = {
+        url: ElectrumURLs[wallet.network],
+        retry: 5,
+        timeout: 5,
+        stopGap: 5,
+        sock5: null,
+        validateDomain: false,
+    };
+
     // Assumes a network check is performed before call
-    const chain = await new BDK.Blockchain().create(config);
+    const chain = await new BDK.Blockchain().create(
+        config,
+        BlockChainNames.Electrum,
+    );
+
+    // Attempt to connect and get height
+    // If fails, throw error
+    try {
+        await chain.getHeight();
+    } catch (e) {
+        console.info(`[Electrum] Failed to connect to server '${config.url}'`);
+        throw e;
+    }
+
     const dbConfig = await new BDK.DatabaseConfig().memory();
+
+    // Set Network
+    const network =
+        wallet.network === 'bitcoin' ? Network.Bitcoin : Network.Testnet;
 
     // Create descriptors
     let descriptorSecretKey!: BDK.DescriptorSecretKey;
@@ -68,14 +94,14 @@ const _sync = async (
     // Use descriptor from wallet
     if (wallet.secret === '') {
         // Case for descriptor wallet (no secret, just descriptor, xpub, or xprv)
-        console.info('No secret found, using descriptor');
+        console.info('[BDK] No secret found, using descriptor instead');
         return new BDK.Wallet();
     } else {
         // Build descriptor from mnemonic
         const mnemonic = await new BDK.Mnemonic().fromString(wallet.secret);
 
         descriptorSecretKey = await new BDK.DescriptorSecretKey().create(
-            wallet.network as Network,
+            network,
             mnemonic,
         );
 
@@ -84,12 +110,12 @@ const _sync = async (
                 ExternalDescriptor = await new BDK.Descriptor().newBip84(
                     descriptorSecretKey,
                     'external' as KeychainKind,
-                    wallet.network as Network,
+                    network,
                 );
                 InternalDescriptor = await new BDK.Descriptor().newBip84(
                     descriptorSecretKey,
                     'internal' as KeychainKind,
-                    wallet.network as Network,
+                    network,
                 );
 
                 break;
@@ -98,12 +124,12 @@ const _sync = async (
                 ExternalDescriptor = await new BDK.Descriptor().newBip49(
                     descriptorSecretKey,
                     'external' as KeychainKind,
-                    wallet.network as Network,
+                    network,
                 );
                 InternalDescriptor = await new BDK.Descriptor().newBip49(
                     descriptorSecretKey,
                     'internal' as KeychainKind,
-                    wallet.network as Network,
+                    network,
                 );
 
                 break;
@@ -112,12 +138,12 @@ const _sync = async (
                 ExternalDescriptor = await new BDK.Descriptor().newBip44(
                     descriptorSecretKey,
                     'external' as KeychainKind,
-                    wallet.network as Network,
+                    network,
                 );
                 InternalDescriptor = await new BDK.Descriptor().newBip44(
                     descriptorSecretKey,
                     'internal' as KeychainKind,
-                    wallet.network as Network,
+                    network,
                 );
 
                 break;
@@ -128,7 +154,7 @@ const _sync = async (
     const w = await new BDK.Wallet().create(
         ExternalDescriptor, // Create a descriptor with BDK and store here
         InternalDescriptor,
-        wallet.network as Network,
+        network,
         dbConfig,
     );
 
