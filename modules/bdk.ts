@@ -10,16 +10,9 @@ import {
 
 import {BaseWallet} from '../class/wallet/base';
 
-import {TransactionType} from '../types/wallet';
+import {TransactionType, electrumServerURLs} from '../types/wallet';
 
 import {liberalAlert} from '../components/alert';
-
-const ElectrumURLs: {[index: string]: string} = {
-    // Default and alternates for testnet and bitcoin
-    // TODO: make this settable in the settings
-    testnet: 'ssl://electrum.blockstream.info:60002',
-    bitcoin: 'ssl://electrum.blockstream.info:50002',
-};
 
 type SyncData = {
     balance: BigNumber;
@@ -54,10 +47,14 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
 const _sync = async (
     wallet: BaseWallet,
     callback: any,
+    electrumServer: electrumServerURLs,
 ): Promise<BDK.Wallet> => {
     // Electrum configuration
     const config: BlockchainElectrumConfig = {
-        url: ElectrumURLs[wallet.network],
+        url:
+            wallet.network === 'bitcoin'
+                ? electrumServer.bitcoin
+                : electrumServer.testnet,
         retry: 5,
         timeout: 5,
         stopGap: 5,
@@ -65,16 +62,16 @@ const _sync = async (
         validateDomain: false,
     };
 
-    // Assumes a network check is performed before call
-    const chain = await new BDK.Blockchain().create(
-        config,
-        BlockChainNames.Electrum,
-    );
+    let chain!: BDK.Blockchain;
 
     // Attempt to connect and get height
     // If fails, throw error
     try {
-        await chain.getHeight();
+        // Assumes a network check is performed before call
+        chain = await new BDK.Blockchain().create(
+            config,
+            BlockChainNames.Electrum,
+        );
     } catch (e) {
         console.info(`[Electrum] Failed to connect to server '${config.url}'`);
         throw e;
@@ -168,14 +165,19 @@ const _sync = async (
 
 export const getWalletBalance = async (
     wallet: BaseWallet,
+    electrumServer: electrumServerURLs,
 ): Promise<SyncData> => {
-    const w = await _sync(wallet, (status: boolean) => {
-        if (!status) {
-            liberalAlert('Error', 'Could not Sync Wallet', 'OK');
+    const w = await _sync(
+        wallet,
+        (status: boolean) => {
+            if (!status) {
+                liberalAlert('Error', 'Could not Sync Wallet', 'OK');
 
-            return w;
-        }
-    });
+                return w;
+            }
+        },
+        electrumServer,
+    );
 
     const retrievedBalance = await w.getBalance();
 
