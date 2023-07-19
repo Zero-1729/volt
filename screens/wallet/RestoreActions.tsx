@@ -99,6 +99,9 @@ const ImportAction = () => {
         try {
             validateMnenomic(mnemonic);
 
+            // Clear input
+            setImportText('');
+
             // Restore wallet using mnemonic
             await restoreWallet(mnemonic, 'mnemonic', network);
 
@@ -129,6 +132,9 @@ const ImportAction = () => {
                 return;
             }
 
+            // Clear input
+            setImportText('');
+
             await restoreWallet(descriptor, 'descriptor', network);
 
             handleSuccessRoute();
@@ -138,6 +144,9 @@ const ImportAction = () => {
     };
 
     const handleExtendedKey = async (extendedKey: string) => {
+        // Clear input
+        setImportText('');
+
         try {
             await restoreWallet(
                 extendedKey,
@@ -184,8 +193,6 @@ const ImportAction = () => {
         // - 12 - 24 word seed
         // - Wallet Descriptor (e.g. pkh(...))
         // - Xpriv / Xpub
-        // Clear input
-        setImportText('');
 
         // Check if mnemonic
         if (isMnemonic(material)) {
