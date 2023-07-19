@@ -14,7 +14,7 @@ import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {syncWallet} from '../../modules/bdk';
+import {getWalletBalance} from '../../modules/bdk';
 
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Add from '../../assets/svg/plus-32.svg';
@@ -54,7 +54,7 @@ const Home = () => {
     const svgGrayFill = ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA';
 
     const topPlatformOffset = {
-        marginTop: Platform.OS === 'android' ? 12 : 0,
+        marginTop: 6 + (Platform.OS === 'android' ? 12 : 0),
     };
 
     const navigation = useNavigation();
@@ -185,7 +185,7 @@ const Home = () => {
         }
 
         // Sync wallet
-        const {transactions, balance} = await syncWallet(wallet);
+        const {transactions, balance} = await getWalletBalance(wallet);
 
         // Kill refreshing
         setRefreshing(false);
@@ -316,7 +316,7 @@ const Home = () => {
                     )}
                 </View>
 
-                <View style={[tailwind('w-full h-full justify-around')]}>
+                <View style={[tailwind('w-full h-full justify-around mt-2')]}>
                     <View
                         style={[
                             tailwind(
@@ -370,7 +370,7 @@ const Home = () => {
                         {/** Create a vertical scroll carousel for 'BaseCard */}
                         {wallets.length > 0 ? (
                             <FlatList
-                                style={[tailwind('w-full h-48')]}
+                                style={[tailwind('w-full h-48 mb-4')]}
                                 data={wallets}
                                 renderItem={renderCard}
                                 keyExtractor={item => item.id}

@@ -140,7 +140,9 @@ const _sync = async (
     return w;
 };
 
-export const syncWallet = async (wallet: BaseWallet): Promise<SyncData> => {
+export const getWalletBalance = async (
+    wallet: BaseWallet,
+): Promise<SyncData> => {
     const w = await _sync(wallet, (status: boolean) => {
         if (!status) {
             liberalAlert('Error', 'Could not Sync Wallet', 'OK');

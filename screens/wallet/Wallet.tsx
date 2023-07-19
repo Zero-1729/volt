@@ -23,7 +23,7 @@ import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 
-import {syncWallet} from '../../modules/bdk';
+import {getWalletBalance} from '../../modules/bdk';
 
 import {PlainButton} from '../../components/button';
 
@@ -120,7 +120,7 @@ const Wallet = () => {
 
         if (!loadingBalance) {
             // Update wallet balance first
-            const {balance, transactions, updated} = await syncWallet(
+            const {balance, transactions, updated} = await getWalletBalance(
                 walletData,
             );
 
