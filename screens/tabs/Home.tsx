@@ -73,6 +73,7 @@ const Home = () => {
         updateWalletTransactions,
         updateWalletBalance,
         isWalletInitialized,
+        electrumServerURL,
     } = useContext(AppStorageContext);
 
     const [initFiatRate, setInitFiatRate] = useState(false);
@@ -185,7 +186,10 @@ const Home = () => {
         }
 
         // Sync wallet
-        const {transactions, balance} = await getWalletBalance(wallet);
+        const {transactions, balance} = await getWalletBalance(
+            wallet,
+            electrumServerURL,
+        );
 
         // Kill refreshing
         setRefreshing(false);

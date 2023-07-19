@@ -57,6 +57,7 @@ const Wallet = () => {
         updateWalletUTXOs,
         hideTotalBalance,
         updateWalletAddress,
+        electrumServerURL,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -122,6 +123,7 @@ const Wallet = () => {
             // Update wallet balance first
             const {balance, transactions, updated} = await getWalletBalance(
                 walletData,
+                electrumServerURL,
             );
 
             // update wallet balance
