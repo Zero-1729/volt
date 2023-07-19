@@ -740,6 +740,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Set the assumed default network and wallet type based on SLIP132
                 walletArgs.network = network;
                 walletArgs.type = type;
+
+                // Fetch metas from xkey
+                fingerprint = getFingerprintFromXkey(backupMaterial, network);
             }
 
             // Handle material according to type
