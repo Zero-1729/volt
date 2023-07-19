@@ -663,13 +663,17 @@ export const AppStorageProvider = ({children}: Props) => {
         // Only generate if we don't already have one
         // We can only generate one if we have either a mnemonic
         // or an xprv, so check to see if either of those exist
-        if (newWallet.secret !== '' || newWallet.xprv !== '') {
+        if (
+            newWallet.secret !== '' ||
+            newWallet.xprv !== '' ||
+            newWallet.xpub !== ''
+        ) {
             const walletDescriptor = createDescriptor(
                 newWallet.type,
                 newWallet.derivationPath,
                 !restored ? newWallet.secret : '',
                 newWallet.network,
-                restored ? newWallet.xprv : '',
+                restored ? newWallet.xprv || newWallet.xpub : '',
                 newWallet.masterFingerprint,
             );
 
