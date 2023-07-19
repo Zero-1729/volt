@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
@@ -6,8 +7,12 @@ import {StackActions, useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
+import Checkbox from 'react-native-bouncy-checkbox';
+
 import {AppStorageContext} from '../../class/storageContext';
-import {validateMnenomic} from '../../modules/bip39-util';
 import {
     descriptorSymbols,
     isSupportedExtKey,
@@ -15,6 +20,7 @@ import {
     getExtendedKeyPrefix,
     isValidExtendedKey,
     isDescriptorPattern,
+    validateMnenomic,
 } from '../../modules/wallet-utils';
 
 import {useTailwind} from 'tailwind-rn';
@@ -33,6 +39,8 @@ import {
     errorAlert,
 } from '../../components/alert';
 
+import {NetType} from '../../types/wallet';
+
 const ImportAction = () => {
     const navigation = useNavigation();
 
@@ -41,8 +49,17 @@ const ImportAction = () => {
     const tailwind = useTailwind();
 
     const [importText, setImportText] = useState('');
+    const [network, setNetwork] = useState<NetType>('testnet');
 
     const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
+
+    const toggleNetwork = () => {
+        if (network === 'testnet') {
+            setNetwork('bitcoin');
+        } else {
+            setNetwork('testnet');
+        }
+    };
 
     const handleFolderCallback = (data: any) => {
         // TODO: Read info from assumed text file
@@ -82,8 +99,11 @@ const ImportAction = () => {
         try {
             validateMnenomic(mnemonic);
 
+            // Clear input
+            setImportText('');
+
             // Restore wallet using mnemonic
-            await restoreWallet(mnemonic, 'mnemonic');
+            await restoreWallet(mnemonic, 'mnemonic', network);
 
             handleSuccessRoute();
         } catch (e: any) {
@@ -112,7 +132,10 @@ const ImportAction = () => {
                 return;
             }
 
-            await restoreWallet(descriptor, 'descriptor');
+            // Clear input
+            setImportText('');
+
+            await restoreWallet(descriptor, 'descriptor', network);
 
             handleSuccessRoute();
         } catch (e: any) {
@@ -121,8 +144,15 @@ const ImportAction = () => {
     };
 
     const handleExtendedKey = async (extendedKey: string) => {
+        // Clear input
+        setImportText('');
+
         try {
-            await restoreWallet(extendedKey, getExtendedKeyPrefix(extendedKey));
+            await restoreWallet(
+                extendedKey,
+                getExtendedKeyPrefix(extendedKey),
+                network,
+            );
 
             handleSuccessRoute();
         } catch (e: any) {
@@ -158,14 +188,11 @@ const ImportAction = () => {
         return false;
     };
 
-    const handleImport = () => {
+    const handleImport = (material: string) => {
         // determine if the import text is one of the following:
         // - 12 - 24 word seed
         // - Wallet Descriptor (e.g. pkh(...))
         // - Xpriv / Xpub
-
-        // Take out any leading or trailing whitespace
-        const material = importText.trim();
 
         // Check if mnemonic
         if (isMnemonic(material)) {
@@ -205,6 +232,7 @@ const ImportAction = () => {
 
             // Handle import of support valid extended key
             handleExtendedKey(material);
+
             return;
         }
 
@@ -212,8 +240,8 @@ const ImportAction = () => {
     };
 
     const importInstructions = isAdvancedMode
-        ? 'Enter one of the following:\n\n- 12 - 24 word seed\n- Extended private Key (e.g., x/y/z/tprv)\n- Extended public key (e.g., x/y/z/tpub)\n- Wallet Descriptor (e.g., pkh(tprv...))'
-        : 'Enter your 12 - 24 word seed';
+        ? 'Enter one of the following:\n\n- 12 - 24 word mnemonic\n- Wallet Descriptor (e.g., pkh(tprv...))\n- Extended private Key (e.g., x/y/z/tprv)\n- Extended public key (e.g., x/y/z/tpub)'
+        : 'Enter your 12 - 24 word mnemonic\nor wallet descriptor (e.g., pkh(tprv...))';
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -272,10 +300,59 @@ const ImportAction = () => {
                         onError={handleFolderError}
                         onCancel={handleFolderCancel}
                     />
+
+                    {/* Wallet Network */}
+                    {isAdvancedMode ? (
+                        <View style={[tailwind('mt-10 flex-row')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                Testnet
+                            </Text>
+                            {/* btn */}
+                            <Checkbox
+                                fillColor={
+                                    ColorScheme.Background.CheckBoxFilled
+                                }
+                                unfillColor={
+                                    ColorScheme.Background.CheckBoxUnfilled
+                                }
+                                size={18}
+                                isChecked={network === 'testnet'}
+                                iconStyle={{
+                                    borderWidth: 1,
+                                    borderRadius: 2,
+                                }}
+                                innerIconStyle={{
+                                    borderWidth: 1,
+                                    borderColor:
+                                        ColorScheme.Background.CheckBoxOutline,
+                                    borderRadius: 2,
+                                }}
+                                style={[tailwind('flex-row absolute -right-4')]}
+                                onPress={() => {
+                                    RNHapticFeedback.trigger(
+                                        'rigid',
+                                        RNHapticFeedbackOptions,
+                                    );
+
+                                    toggleNetwork();
+                                }}
+                                disableBuiltInState={true}
+                            />
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </View>
+
                 <LongBottomButton
                     disabled={importText.trim().length === 0}
-                    onPress={handleImport}
+                    onPress={() => {
+                        handleImport(importText.trim());
+                    }}
                     title="Continue"
                     textColor={
                         importText.trim().length > 0

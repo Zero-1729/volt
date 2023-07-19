@@ -1,154 +1,46 @@
 import {Buffer} from 'buffer';
 
+import * as bip39 from 'bip39';
 import * as b58 from 'bs58';
 import * as b58c from 'bs58check';
-import Crypto from 'react-native-quick-crypto';
-import BigNumber from 'bignumber.js';
-
 import * as bitcoin from 'bitcoinjs-lib';
+
 import BIP32Factory from 'bip32';
 import ecc from '@bitcoinerlab/secp256k1';
 
 const bip32 = BIP32Factory(ecc);
 
-import * as bip39 from '../modules/bip39-util';
+import Crypto from 'react-native-quick-crypto';
 
 import {
     descriptorSymbolsType,
     BackupMaterialTypes,
-    BDKWalletTypes,
-    extendedKeyInfoType,
-    accountPaths,
-    TransactionType,
     NetType,
 } from '../types/wallet';
 
-export const WalletTypeNames: {[index: string]: string[]} = {
-    bech32: ['Native Segwit', 'Bech32'],
-    legacy: ['Legacy', 'P2PKH'],
-    p2sh: ['Segwit', 'P2SH'],
+import {
+    validExtendedKeyPrefixes,
+    BJSNetworks,
+    extendedKeyInfo,
+    WalletPaths,
+    DescriptorType,
+} from './wallet-defaults';
+
+export const validateMnenomic = (mnemonic: string) => {
+    const resp = bip39.validateMnemonic(mnemonic);
+
+    if (!resp) {
+        throw new Error('Invalid mnemonic');
+    }
+
+    return resp;
 };
 
-// Based on BIP44 definitions
-// See here: https://en.bitcoin.it/wiki/BIP_0044#Registered_coin_types
-/*
-    Coin	            Account	    Chain	      Address	  Path
-    --------------      -------     --------      -------     -------------------------
-    Bitcoin	            first	     external	   first	    m / 44' / 0' / 0' / 0 / 0
-    Bitcoin	            first	     external	   second	   m / 44' / 0' / 0' / 0 / 1
-
-    Bitcoin	            first        change	       first	    m / 44' / 0' / 0' / 1 / 0
-    Bitcoin	            first	     change	       second	   m / 44' / 0' / 0' / 1 / 1
-
-    Bitcoin	            second	    external	  first	       m / 44' / 0' / 1' / 0 / 0
-    Bitcoin	            second	    external	  second	  m / 44' / 0' / 1' / 0 / 1
-
-    Bitcoin	            second	    change	      first	       m / 44' / 0' / 1' / 1 / 0
-    Bitcoin	            second	    change	      second	  m / 44' / 0' / 1' / 1 / 1
-
-
-
-    Bitcoin Testnet	    first	     external	   first	    m / 44' / 1' / 0' / 0 / 0
-    Bitcoin Testnet	    first	     external	   second	   m / 44' / 1' / 0' / 0 / 1
-
-    Bitcoin Testnet	    first	     change	       first	    m / 44' / 1' / 0' / 1 / 0
-    Bitcoin Testnet	    first	     change	       second	   m / 44' / 1' / 0' / 1 / 1
-
-    Bitcoin Testnet	    second	    external	  first	       m / 44' / 1' / 1' / 0 / 0
-    Bitcoin Testnet	    second	    external	  second	  m / 44' / 1' / 1' / 0 / 1
-
-    Bitcoin Testnet	    second	    change	      first	       m / 44' / 1' / 1' / 1 / 0
-    Bitcoin Testnet	    second	    change	      second	  m / 44' / 1' / 1' / 1 / 1
-
-*/
-export const WalletPaths: {[index: string]: accountPaths} = {
-    bech32: {bitcoin: 'm/84h/0h/0h', testnet: 'm/84h/1h/0h'},
-    legacy: {bitcoin: 'm/44h/0h/0h', testnet: 'm/44h/1h/0h'},
-    p2sh: {bitcoin: 'm/49h/0h/0h', testnet: 'm/49h/1h/0h'},
+export const mnemonicToSeedSync = (mnemonic: string) => {
+    return bip39.mnemonicToSeedSync(mnemonic);
 };
 
-// BitcoinJS Networks
-const BJSNetworks: {[index: string]: any} = {
-    bitcoin: {
-        messagePrefix: '\x18Bitcoin Signed Message:\n',
-        bech32: 'bc',
-        bip32: {
-            public: 0x0488b21e,
-            private: 0x0488ade4,
-        },
-        pubKeyHash: 0x00,
-        scriptHash: 0x05,
-        wif: 0x80,
-    },
-    testnet: {
-        messagePrefix: '\x18Bitcoin Signed Message:\n',
-        bech32: 'tb',
-        bip32: {
-            public: 0x043587cf,
-            private: 0x04358394,
-        },
-        pubKeyHash: 0x6f,
-        scriptHash: 0xc4,
-        wif: 0xef,
-    },
-};
-
-// Version bytes as described here:
-// https://github.com/satoshilabs/slips/blob/master/slip-0132.md
-/*
-    Coin	          Public Key	    Private Key	      Address Encoding	                BIP 32 Path
-    --------------    ---------------    ------------     ------------------------------    ------------------------
-    Bitcoin	          0488b21e - xpub   0488ade4 - xprv	  P2PKH  or P2SH	                m/44'/0'
-    Bitcoin	          049d7cb2 - ypub   049d7878 - yprv	  P2WPKH in P2SH	                m/49'/0'
-    Bitcoin	          04b24746 - zpub   04b2430c - zprv	  P2WPKH	                        m/84'/0'
-    Bitcoin	          0295b43f - Ypub   0295b005 - Yprv	  Multi-signature P2WSH in P2SH	    -
-    Bitcoin	          02aa7ed3 - Zpub   02aa7a99 - Zprv	  Multi-signature P2WSH	            -
-
-    Bitcoin Testnet	  043587cf - tpub	04358394 - tprv	  P2PKH  or P2SH	                m/44'/1'
-    Bitcoin Testnet	  044a5262 - upub	044a4e28 - uprv	  P2WPKH in P2SH	                m/49'/1'
-    Bitcoin Testnet	  045f1cf6 - vpub	045f18bc - vprv	  P2WPKH	                        m/84'/1'
-    Bitcoin Testnet	  024289ef - Upub	024285b5 - Uprv	  Multi-signature P2WSH in P2SH     -
-    Bitcoin Testnet	  02575483 - Vpub	02575048 - Vprv   Multi-signature P2WSH	            -
-*/
-// Note: Currently do not support Y/Z and T/U/V privs and pubs
-const _validExtendedKeyPrefixes = new Map([
-    // xpub
-    ['xpub', '0488b21e'],
-    ['ypub', '049d7cb2'],
-    ['zpub', '04b24746'],
-    ['tpub', '043587cf'],
-    ['upub', '044a5262'],
-    ['vpub', '045f1cf6'],
-    // xprv
-    ['xprv', '0488ade4'],
-    ['yprv', '049d7878'],
-    ['zprv', '04b2430c'],
-    ['tprv', '04358394'],
-    ['uprv', '044a4e28'],
-    ['vprv', '045f18bc'],
-]);
-
-export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
-
-export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
-    // mainnet / bitcoin
-    x: {network: 'bitcoin', type: 'legacy'}, // Account path P2PKH (legacy) [1...]
-    y: {network: 'bitcoin', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    z: {network: 'bitcoin', type: 'bech32'}, // Account path P2WPKH [bc1...]
-
-    // testnet
-    t: {network: 'testnet', type: 'legacy'}, // Account path P2PKH (legacy) [1...]
-    u: {network: 'testnet', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    v: {network: 'testnet', type: 'bech32'}, // Account path P2WPKH [bc1...]
-};
-
-export const BackupMaterialType: {[index: string]: BackupMaterialTypes} = {
-    MNEMONIC: 'mnemonic',
-    XPRIV: 'xprv',
-    XPUB: 'xpub',
-    DESCRIPTOR: 'descriptor',
-};
-
+// Descriptor Regex
 // For now, we only support single key descriptors
 // with three specific script types (legacy, P2SH, and Bech32)
 //  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
@@ -166,6 +58,15 @@ export const isDescriptorPattern = (expression: string) => {
     );
 };
 
+// Extended Key Regexes
+const _extendedKeyPattern: RegExp =
+    /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
+export const descXpubPattern: RegExp =
+    /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
+const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
+const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
+
+// Descriptor Symbols
 export const descriptorSymbols: descriptorSymbolsType = [
     '[',
     ']',
@@ -179,26 +80,6 @@ export const descriptorSymbols: descriptorSymbolsType = [
     '*',
 ];
 
-// Extended key regexes
-const _extendedKeyPattern: RegExp =
-    /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-export const descXpubPattern: RegExp =
-    /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
-const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-
-export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
-    bech32: 'wpkh',
-    legacy: 'p2pkh',
-    p2sh: 'shp2wpkh',
-};
-
-const _descriptorType: {[index: string]: string} = {
-    pkh: 'legacy',
-    wpkh: 'bech32',
-    sh: 'p2sh',
-};
-
 const _getPrefix = (key: string): string => {
     return key.slice(0, 4);
 };
@@ -210,7 +91,7 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
         throw new Error('Invalid extended key');
     }
 
-    if (!_validExtendedKeyPrefixes.has(prefix)) {
+    if (!validExtendedKeyPrefixes.has(prefix)) {
         throw new Error('Unsupported extended key');
     }
 
@@ -286,7 +167,7 @@ const _doubleSha256 = (data: Buffer) => {
 // https://github.com/jlopp/xpub-converter
 export const convertXPUB = (xpub: string, pub_prefix: string): string => {
     // Grab new xpub version to convert to
-    const ver = _validExtendedKeyPrefixes.get(pub_prefix);
+    const ver = validExtendedKeyPrefixes.get(pub_prefix);
 
     // Make sure the version is a valid one we support
     if (!ver) {
@@ -358,7 +239,7 @@ export const getDescriptorParts = (descriptor: string) => {
     let components = {
         key: data,
         network: network,
-        type: _descriptorType[scripts[0]],
+        type: DescriptorType[scripts[0]],
         fingerprint: fingerprint,
         path: 'm/' + path.slice(1),
     };
@@ -372,29 +253,12 @@ export const getDescriptorParts = (descriptor: string) => {
 
         // Set network and wallet type from descriptor
         components.network = extendedKeyInfo[key[0]].network;
-        components.type = _descriptorType[scripts[0]];
+        components.type = DescriptorType[scripts[0]];
         components.fingerprint = fingerprint;
         components.path = 'm/' + path.slice(1);
     }
 
     return components;
-};
-
-// Formats transaction data from BDK to format for wallet
-export const formatTXFromBDK = (tx: any): TransactionType => {
-    const formattedTx = {
-        txid: tx.txid,
-        confirmed: tx.confirmed,
-        block_height: tx.block_height,
-        timestamp: tx.block_timestamp,
-        fee: new BigNumber(tx.fee),
-        value: new BigNumber(tx.received.length !== '' ? tx.received : tx.sent),
-        type: tx.received.length !== '' ? 'inbound' : 'outbound',
-        network: tx.network,
-    };
-
-    // Returned formatted tx
-    return formattedTx;
 };
 
 // Return a wallet address path from a given index and whether it is a change or receiving address
@@ -428,7 +292,7 @@ export const generateAddressFromPath = (
 
     const network = BJSNetworks[net];
 
-    const seed = bip39.mnemonicToSeedSync(secret);
+    const seed = mnemonicToSeedSync(secret);
     const root = bip32.fromSeed(seed, network);
     const keyPair = root.derivePath(path.replace(/h/g, "'"));
 
@@ -513,11 +377,11 @@ export const createDescriptor = (
 
     // Get Mnemonic meta if mnemonic provided
     if (mnemonic.length > 0) {
-        if (!bip39.validateMnenomic(mnemonic)) {
+        if (!validateMnenomic(mnemonic)) {
             throw new Error('[CreateDescriptor] Invalid Mnemonic.');
         }
 
-        const meta = bip39.getMetaFromMnemonic(mnemonic, network);
+        const meta = getMetaFromMnemonic(mnemonic, network);
 
         _xprv = !_xprv ? meta.xprv : _xprv;
         _fingerprint = !_fingerprint ? meta.fingerprint : _fingerprint;
@@ -567,4 +431,21 @@ export const createDescriptor = (
     }
 
     return descriptor;
+};
+
+export const getMetaFromMnemonic = (mnemonic: string, network: NetType) => {
+    const seed = mnemonicToSeedSync(mnemonic);
+    const node = bip32.fromSeed(seed, BJSNetworks[network]);
+
+    return {
+        xprv: node.toBase58(),
+        xpub: node.neutered().toBase58(),
+        fingerprint: node.fingerprint.toString('hex'),
+    };
+};
+
+export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
+    const node = bip32.fromBase58(xkey, BJSNetworks[network]);
+
+    return node.fingerprint.toString('hex');
 };

@@ -15,6 +15,7 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
+import {generateMnemonic} from '../modules/bdk';
 import {
     TWalletType,
     Unit,
@@ -26,6 +27,7 @@ import {
     NetType,
     baseWalletArgs,
     NetInfoType,
+    addressType,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -34,12 +36,13 @@ import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
 import {LegacyWallet} from './wallet/legacy';
 
 import {
-    extendedKeyInfo,
     getDescriptorParts,
     createDescriptor,
+    getMetaFromMnemonic,
+    getFingerprintFromXkey,
 } from '../modules/wallet-utils';
 
-import {generateMnemonic, getMetaFromMnemonic} from '../modules/bip39-util';
+import {extendedKeyInfo} from '../modules/wallet-defaults';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -76,11 +79,13 @@ type defaultContextType = {
     ) => void;
     updateWalletUTXOs: (id: string, utxo: UTXOType[]) => void;
     updateWalletBalance: (id: string, balance: BalanceType) => void;
+    updateWalletAddress: (id: string, address: addressType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
         backupMaterial: string,
         backupType: BackupMaterialTypes,
+        backupNetwork: NetType,
     ) => void;
     addWallet: (name: string, type: string, network?: NetType) => void;
     resetAppData: () => void;
@@ -132,6 +137,7 @@ const defaultContext: defaultContextType = {
     updateWalletTransactions: () => {},
     updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
+    updateWalletAddress: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
     resetAppData: () => {},
@@ -595,6 +601,23 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const updateWalletAddress = useCallback(
+        async (id: string, address: addressType) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            // Get the current wallet
+            // Update the address in the current wallet
+            const tmp = [...wallets];
+            tmp[index].address = address;
+            tmp[index].index += address.index;
+
+            // Update wallets list
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const renameWallet = useCallback(
         async (id: string, newName: string) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
@@ -612,23 +635,22 @@ export const AppStorageProvider = ({children}: Props) => {
         newWallet: TWalletType,
         restored: boolean = false,
     ) => {
-        // TODO: Ensure we aren't needlessly
-        // overwriting extended key material for existing
-        // xpub or descriptor
-
         // Set wallet ID
         _setCurrentWalletID(newWallet.id);
 
         // Generate mnemonic and other key material if needed
         if (!restored) {
-            newWallet.generateMnemonic();
+            const mnemonic = await generateMnemonic();
+            newWallet.secret = mnemonic;
         }
 
         // If we have a mnemonic, generate extended key material
         if (newWallet.secret !== '') {
             try {
-                const mnemonic = generateMnemonic();
-                const metas = getMetaFromMnemonic(mnemonic, newWallet.network);
+                const metas = getMetaFromMnemonic(
+                    newWallet.secret,
+                    newWallet.network,
+                );
 
                 newWallet.setXprv(metas.xprv);
                 newWallet.setXpub(metas.xpub);
@@ -641,13 +663,17 @@ export const AppStorageProvider = ({children}: Props) => {
         // Only generate if we don't already have one
         // We can only generate one if we have either a mnemonic
         // or an xprv, so check to see if either of those exist
-        if (newWallet.secret !== '' || newWallet.xprv !== '') {
+        if (
+            newWallet.secret !== '' ||
+            newWallet.xprv !== '' ||
+            newWallet.xpub !== ''
+        ) {
             const walletDescriptor = createDescriptor(
                 newWallet.type,
                 newWallet.derivationPath,
                 !restored ? newWallet.secret : '',
                 newWallet.network,
-                restored ? newWallet.xprv : '',
+                restored ? newWallet.xprv || newWallet.xpub : '',
                 newWallet.masterFingerprint,
             );
 
@@ -657,7 +683,6 @@ export const AppStorageProvider = ({children}: Props) => {
         // Determine if watch only wallet
         newWallet.setWatchOnly();
 
-        // TODO: need to watch out for address reuse
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
 
@@ -679,9 +704,10 @@ export const AppStorageProvider = ({children}: Props) => {
         async (
             backupMaterial: string,
             backupMaterialType: BackupMaterialTypes,
+            backupNetwork: NetType,
         ) => {
             // Default network and wallet type
-            var net = 'testnet';
+            var net = backupNetwork;
             var walletType = 'bech32';
 
             var fingerprint = '';
@@ -691,7 +717,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Grab the descriptor network and type
                 const desc = getDescriptorParts(backupMaterial);
 
-                net = desc.network;
+                net = desc.network as NetType;
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
                 path = desc.path;
@@ -718,10 +744,13 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Set the assumed default network and wallet type based on SLIP132
                 walletArgs.network = network;
                 walletArgs.type = type;
+
+                // Fetch metas from xkey
+                fingerprint = getFingerprintFromXkey(backupMaterial, network);
             }
 
             // Handle material according to type
-            var newWallet: TWalletType;
+            var newWallet!: TWalletType;
 
             // Ensure we have a valid wallet type
             if (!['bech32', 'p2sh', 'legacy'].includes(walletArgs.type)) {
@@ -758,7 +787,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const addWallet = useCallback(
         async (name: string, type: string, network?: NetType) => {
             try {
-                let newWallet: TWalletType;
+                let newWallet!: TWalletType;
 
                 // Ensure we have a valid wallet type
                 if (!['bech32', 'p2sh', 'legacy'].includes(type)) {
@@ -909,6 +938,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 updateWalletTransactions,
                 updateWalletUTXOs,
                 updateWalletBalance,
+                updateWalletAddress,
                 renameWallet,
                 deleteWallet,
             }}>
