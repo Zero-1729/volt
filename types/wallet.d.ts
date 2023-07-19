@@ -99,6 +99,11 @@ export type extendedKeyInfoType = {
     type: string; // Wallet type
 };
 
+export type electrumServerURLs = {
+    bitcoin: string;
+    testnet: string;
+};
+
 export type accountPaths = {
     bitcoin: string;
     testnet: string;

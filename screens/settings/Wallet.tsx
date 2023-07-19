@@ -38,8 +38,14 @@ const Wallet = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {useSatSymbol, setSatSymbol, isAdvancedMode, setIsAdvancedMode} =
-        useContext(AppStorageContext);
+    const {
+        useSatSymbol,
+        setSatSymbol,
+        isAdvancedMode,
+        setIsAdvancedMode,
+        hideTotalBalance,
+        setTotalBalanceHidden,
+    } = useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -160,7 +166,7 @@ const Wallet = () => {
                         {/* Toggle advanced mode */}
                         <View
                             style={tailwind(
-                                'justify-center w-full items-center flex-row',
+                                'justify-center w-full items-center flex-row mb-10',
                             )}>
                             <View style={tailwind('w-5/6')}>
                                 <View
@@ -225,6 +231,67 @@ const Wallet = () => {
                                     </Text>
                                 </View>
                             </View>
+                        </View>
+
+                        {/* Hide wallet balance */}
+                        <View style={tailwind('w-5/6')}>
+                            <View
+                                style={tailwind(
+                                    'w-full flex-row items-center mb-2',
+                                )}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-medium'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    Hide Total Balance
+                                </Text>
+                                <Checkbox
+                                    fillColor={
+                                        ColorScheme.Background.CheckBoxFilled
+                                    }
+                                    unfillColor={
+                                        ColorScheme.Background.CheckBoxUnfilled
+                                    }
+                                    size={18}
+                                    isChecked={hideTotalBalance}
+                                    iconStyle={{
+                                        borderWidth: 1,
+                                        borderRadius: 2,
+                                    }}
+                                    innerIconStyle={{
+                                        borderWidth: 1,
+                                        borderColor:
+                                            ColorScheme.Background
+                                                .CheckBoxOutline,
+                                        borderRadius: 2,
+                                    }}
+                                    style={[
+                                        tailwind('flex-row absolute -right-4'),
+                                    ]}
+                                    onPress={() => {
+                                        RNHapticFeedback.trigger(
+                                            'rigid',
+                                            RNHapticFeedbackOptions,
+                                        );
+
+                                        setTotalBalanceHidden(
+                                            !hideTotalBalance,
+                                        );
+                                    }}
+                                    disableBuiltInState={true}
+                                />
+                            </View>
+
+                            <Text
+                                style={[
+                                    tailwind('text-xs'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                Conceal the total and current wallet balances
+                                {'\n'}
+                                displayed on the home page.
+                            </Text>
                         </View>
                     </View>
                 </View>

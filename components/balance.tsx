@@ -47,66 +47,52 @@ const _getBalance = (
 export const TXBalance = (props: TxBalanceProps) => {
     const tailwind = useTailwind();
 
-    const {useSatSymbol, hideTotalBalance, appUnit, fiatRate} =
-        useContext(AppStorageContext);
+    const {useSatSymbol, appUnit, fiatRate} = useContext(AppStorageContext);
 
     return (
         <>
-            {!hideTotalBalance ? (
-                <View style={[tailwind('flex-row items-center')]}>
-                    {/* Display satSymbol if enabled in settings.
-                    Hide and fallback to 'sats' below if satSymbol is disabled in settings */}
-                    {useSatSymbol ? (
-                        <Text
-                            numberOfLines={1}
-                            style={[
-                                tailwind(
-                                    `${props.BalanceFontSize} font-bold self-baseline mr-2`,
-                                ),
-                                {color: props.fontColor},
-                                Font.SatSymbol,
-                            ]}>
-                            s
-                        </Text>
-                    ) : (
-                        <></>
-                    )}
-
-                    {/* Display balance in sats */}
+            <View style={[tailwind('flex-row items-center')]}>
+                {/* Display satSymbol if enabled in settings.
+                Hide and fallback to 'sats' below if satSymbol is disabled in settings */}
+                {useSatSymbol ? (
                     <Text
                         numberOfLines={1}
                         style={[
                             tailwind(
-                                `${props.BalanceFontSize} font-bold text-white self-baseline`,
+                                `${props.BalanceFontSize} font-bold self-baseline mr-2`,
                             ),
                             {color: props.fontColor},
+                            Font.SatSymbol,
                         ]}>
-                        {_getBalance(props.balance, appUnit, fiatRate, false)}
+                        s
                     </Text>
+                ) : (
+                    <></>
+                )}
 
-                    {/* Only display 'sats' if we are using satSymbol */}
-                    {!useSatSymbol ? (
-                        <Text
-                            style={[
-                                tailwind('text-xl self-baseline text-white'),
-                            ]}>
-                            {' '}
-                            sats
-                        </Text>
-                    ) : (
-                        <></>
-                    )}
-                </View>
-            ) : (
-                /* Empty view to keep the card height consistent  */
-                <View
+                {/* Display balance in sats */}
+                <Text
+                    numberOfLines={1}
                     style={[
                         tailwind(
-                            'rounded flex-row self-center w-full h-6 opacity-10 bg-black mb-1',
+                            `${props.BalanceFontSize} font-bold text-white self-baseline`,
                         ),
-                    ]}
-                />
-            )}
+                        {color: props.fontColor},
+                    ]}>
+                    {_getBalance(props.balance, appUnit, fiatRate, false)}
+                </Text>
+
+                {/* Only display 'sats' if we are using satSymbol */}
+                {!useSatSymbol ? (
+                    <Text
+                        style={[tailwind('text-xl self-baseline text-white')]}>
+                        {' '}
+                        sats
+                    </Text>
+                ) : (
+                    <></>
+                )}
+            </View>
         </>
     );
 };

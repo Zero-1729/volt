@@ -46,6 +46,7 @@ export const TextSingleInput = (props: TextInputProps) => {
             autoCorrect={false}
             autoCapitalize="none"
             selectTextOnFocus={true}
+            value={props.value}
             {...props}
             style={[
                 tailwind(

@@ -28,7 +28,7 @@ import Settings from './screens/settings/Settings';
 import Language from './screens/settings/Language';
 import Currency from './screens/settings/Currency';
 import Wallet from './screens/settings/Wallet';
-import Security from './screens/settings/Security';
+import Network from './screens/settings/Network';
 
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
@@ -38,10 +38,6 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import NativeMetrics from './constants/NativeWindowMetrics';
-
-import Color from './constants/Color';
-
 const SettingsStack = createNativeStackNavigator();
 const SettingsRoot = () => {
     return (
@@ -50,7 +46,7 @@ const SettingsRoot = () => {
             <SettingsStack.Screen name="Currency" component={Currency} />
             <SettingsStack.Screen name="Language" component={Language} />
             <SettingsStack.Screen name="Wallet" component={Wallet} />
-            <SettingsStack.Screen name="Security" component={Security} />
+            <SettingsStack.Screen name="Network" component={Network} />
             <SettingsStack.Screen name="About" component={About} />
             <SettingsStack.Screen
                 name="SettingsTools"

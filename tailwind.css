@@ -454,6 +454,10 @@
   background-color: rgb(255 255 255 / var(--tw-bg-opacity))
 }
 
+.p-1 {
+  padding: 0.25rem
+}
+
 .p-2 {
   padding: 0.5rem
 }
@@ -615,6 +619,10 @@
   text-transform: capitalize
 }
 
+.italic {
+  font-style: italic
+}
+
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity))
@@ -628,10 +636,6 @@
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity))
-}
-
-.opacity-10 {
-  opacity: 0.1
 }
 
 .opacity-20 {
