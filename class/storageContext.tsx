@@ -28,6 +28,7 @@ import {
     baseWalletArgs,
     NetInfoType,
     addressType,
+    electrumServerURLs,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -65,7 +66,7 @@ type defaultContextType = {
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
-    electrumServerURL: string;
+    electrumServerURL: electrumServerURLs;
     setNetworkState: (networkState: NetInfoType) => void;
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
@@ -126,7 +127,11 @@ const defaultContext: defaultContextType = {
     hideTotalBalance: false,
     isWalletInitialized: false,
     isAdvancedMode: false,
-    electrumServerURL: 'ssl://electrum.blockstream.info:50002',
+    electrumServerURL: {
+        // Default and alternates for testnet and bitcoin
+        testnet: 'ssl://electrum.blockstream.info:60002',
+        bitcoin: 'ssl://electrum.blockstream.info:50002',
+    },
     setNetworkState: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
@@ -447,9 +452,14 @@ export const AppStorageProvider = ({children}: Props) => {
 
     const setElectrumServerURL = useCallback(
         async (url: string) => {
+            let electrumServers = {
+                ...electrumServerURL,
+                bitcoin: url,
+            };
+
             try {
-                _setElectrumServerURL(url);
-                _updateElectrumServerURL(JSON.stringify(url));
+                _setElectrumServerURL(electrumServers);
+                _updateElectrumServerURL(JSON.stringify(electrumServers));
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Electrum server URL setting) Error loading data: ${e}`,
@@ -880,7 +890,9 @@ export const AppStorageProvider = ({children}: Props) => {
             await setWallets([]);
             await setCurrentWalletID('');
             await setIsAdvancedMode(false);
-            await setElectrumServerURL(defaultContext.electrumServerURL);
+            await setElectrumServerURL(
+                defaultContext.electrumServerURL.bitcoin,
+            );
         } catch (e) {
             console.error(
                 `[AsyncStorage] (Reset app data) Error loading data: ${e}`,
