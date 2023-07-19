@@ -635,10 +635,6 @@ export const AppStorageProvider = ({children}: Props) => {
         newWallet: TWalletType,
         restored: boolean = false,
     ) => {
-        // TODO: Ensure we aren't needlessly
-        // overwriting extended key material for existing
-        // xpub or descriptor
-
         // Set wallet ID
         _setCurrentWalletID(newWallet.id);
 
@@ -651,8 +647,10 @@ export const AppStorageProvider = ({children}: Props) => {
         // If we have a mnemonic, generate extended key material
         if (newWallet.secret !== '') {
             try {
-                const mnemonic = await generateMnemonic();
-                const metas = getMetaFromMnemonic(mnemonic, newWallet.network);
+                const metas = getMetaFromMnemonic(
+                    newWallet.secret,
+                    newWallet.network,
+                );
 
                 newWallet.setXprv(metas.xprv);
                 newWallet.setXpub(metas.xpub);
@@ -681,7 +679,6 @@ export const AppStorageProvider = ({children}: Props) => {
         // Determine if watch only wallet
         newWallet.setWatchOnly();
 
-        // TODO: need to watch out for address reuse
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
 
