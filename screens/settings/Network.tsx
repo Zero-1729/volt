@@ -74,7 +74,6 @@ const Network = () => {
         await testElectrumServer(
             electrumServerURL.bitcoin,
             (value: boolean) => {
-                console.log('connection');
                 setStatus(value);
             },
         );
