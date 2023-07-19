@@ -498,6 +498,11 @@
   padding-right: 1.5rem
 }
 
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem
+}
+
 .py-0 {
   padding-top: 0px;
   padding-bottom: 0px

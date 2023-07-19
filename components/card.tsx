@@ -5,7 +5,7 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {PlainButton, Button} from './button';
+import {PlainButton} from './button';
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -59,17 +59,27 @@ export const EmptyCard = () => {
                     Click the 'add' button to create a new wallet
                 </Text>
 
-                <Button
-                    style={[tailwind('absolute bottom-0 left-6 w-full')]}
+                <PlainButton
+                    style={[
+                        tailwind('absolute bottom-6 left-6 px-8 py-2 rounded'),
+                        {
+                            backgroundColor: ColorScheme.Background.Inverted,
+                        },
+                    ]}
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({name: 'AddWalletRoot'}),
                         );
-                    }}
-                    title={'Add'}
-                    color={ColorScheme.Text.Alt}
-                    backgroundColor={ColorScheme.Background.Inverted}
-                />
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xs font-medium'),
+                            {color: ColorScheme.Text.Alt},
+                            Font.RobotoText,
+                        ]}>
+                        Add
+                    </Text>
+                </PlainButton>
             </View>
         </View>
     );
