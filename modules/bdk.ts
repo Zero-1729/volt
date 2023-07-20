@@ -10,7 +10,7 @@ import {
 
 import {BaseWallet} from '../class/wallet/base';
 
-import {TransactionType, electrumServerURLs} from '../types/wallet';
+import {NetType, TransactionType, electrumServerURLs} from '../types/wallet';
 
 import {liberalAlert} from '../components/alert';
 
@@ -70,6 +70,85 @@ export const testElectrumServer = async (url: string, callback: any) => {
     }
 };
 
+// Descriptor creation functions
+export const descriptorSecretFromMnemonic = async (
+    secret: string,
+    network: NetType,
+): Promise<BDK.DescriptorSecretKey> => {
+    // Create descriptor from mnemonic
+    const mnemonic = await new BDK.Mnemonic().fromString(secret);
+
+    const descriptorSecretKey = await new BDK.DescriptorSecretKey().create(
+        network as Network,
+        mnemonic,
+    );
+
+    return descriptorSecretKey;
+};
+
+// Return External and Internal Descriptors from wallet DescriptorSecretKey ('from mnemonic')
+export const descriptorFromTemplate = async (
+    descriptorSecretKey: BDK.DescriptorSecretKey,
+    type: string,
+    network: NetType,
+): Promise<{
+    InternalDescriptor: BDK.Descriptor;
+    ExternalDescriptor: BDK.Descriptor;
+}> => {
+    let InternalDescriptor!: BDK.Descriptor;
+    let ExternalDescriptor!: BDK.Descriptor;
+
+    switch (type) {
+        case 'bech32': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip84(
+                descriptorSecretKey,
+                'external' as KeychainKind,
+                network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip84(
+                descriptorSecretKey,
+                'internal' as KeychainKind,
+                network as Network,
+            );
+
+            break;
+        }
+        case 'p2sh': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip49(
+                descriptorSecretKey,
+                'external' as KeychainKind,
+                network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip49(
+                descriptorSecretKey,
+                'internal' as KeychainKind,
+                network as Network,
+            );
+
+            break;
+        }
+        case 'legacy': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip44(
+                descriptorSecretKey,
+                'external' as KeychainKind,
+                network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip44(
+                descriptorSecretKey,
+                'internal' as KeychainKind,
+                network as Network,
+            );
+
+            break;
+        }
+    }
+
+    return {
+        InternalDescriptor,
+        ExternalDescriptor,
+    };
+};
+
 const _sync = async (
     wallet: BaseWallet,
     callback: any,
@@ -110,7 +189,6 @@ const _sync = async (
         wallet.network === 'bitcoin' ? Network.Bitcoin : Network.Testnet;
 
     // Create descriptors
-    let descriptorSecretKey!: BDK.DescriptorSecretKey;
     let ExternalDescriptor!: BDK.Descriptor;
     let InternalDescriptor!: BDK.Descriptor;
 
@@ -121,57 +199,17 @@ const _sync = async (
         return new BDK.Wallet();
     } else {
         // Build descriptor from mnemonic
-        const mnemonic = await new BDK.Mnemonic().fromString(wallet.secret);
-
-        descriptorSecretKey = await new BDK.DescriptorSecretKey().create(
+        const descriptorSecretKey = await descriptorSecretFromMnemonic(
+            wallet.secret,
             network,
-            mnemonic,
         );
 
-        switch (wallet.type) {
-            case 'bech32': {
-                ExternalDescriptor = await new BDK.Descriptor().newBip84(
-                    descriptorSecretKey,
-                    'external' as KeychainKind,
-                    network,
-                );
-                InternalDescriptor = await new BDK.Descriptor().newBip84(
-                    descriptorSecretKey,
-                    'internal' as KeychainKind,
-                    network,
-                );
-
-                break;
-            }
-            case 'p2sh': {
-                ExternalDescriptor = await new BDK.Descriptor().newBip49(
-                    descriptorSecretKey,
-                    'external' as KeychainKind,
-                    network,
-                );
-                InternalDescriptor = await new BDK.Descriptor().newBip49(
-                    descriptorSecretKey,
-                    'internal' as KeychainKind,
-                    network,
-                );
-
-                break;
-            }
-            case 'legacy': {
-                ExternalDescriptor = await new BDK.Descriptor().newBip44(
-                    descriptorSecretKey,
-                    'external' as KeychainKind,
-                    network,
-                );
-                InternalDescriptor = await new BDK.Descriptor().newBip44(
-                    descriptorSecretKey,
-                    'internal' as KeychainKind,
-                    network,
-                );
-
-                break;
-            }
-        }
+        ({InternalDescriptor, ExternalDescriptor} =
+            await descriptorFromTemplate(
+                descriptorSecretKey,
+                wallet.type,
+                network,
+            ));
     }
 
     const w = await new BDK.Wallet().create(
