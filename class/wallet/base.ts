@@ -38,8 +38,8 @@ export class BaseWallet {
 
         wallet.id = obj.id;
 
-        wallet.externalDescriptor = obj.descriptor.external;
-        wallet.internalDescriptor = obj.descriptor.internal;
+        wallet.externalDescriptor = obj.externalDescriptor;
+        wallet.internalDescriptor = obj.internalDescriptor;
 
         wallet.addresses = obj.addresses;
         wallet.address = obj.address;
