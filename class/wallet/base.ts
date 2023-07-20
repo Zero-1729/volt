@@ -10,6 +10,8 @@ import {
     NetType,
     baseWalletArgs,
     addressType,
+    Descriptor,
+    DescriptorObject,
 } from './../../types/wallet';
 
 import {
@@ -28,7 +30,6 @@ export class BaseWallet {
         const wallet = new BaseWallet({
             name: obj.name,
             type: obj.type,
-            descriptor: obj.descriptor,
             xprv: obj.xprv,
             xpub: obj.xpub,
             secret: obj.secret,
@@ -36,6 +37,10 @@ export class BaseWallet {
         });
 
         wallet.id = obj.id;
+
+        wallet.externalDescriptor = obj.descriptor.external;
+        wallet.internalDescriptor = obj.descriptor.internal;
+
         wallet.addresses = obj.addresses;
         wallet.address = obj.address;
         wallet.birthday = obj.birthday;
@@ -62,7 +67,9 @@ export class BaseWallet {
     isWatchOnly: boolean;
     type: string;
 
-    descriptor: string;
+    externalDescriptor: Descriptor;
+    internalDescriptor: Descriptor;
+
     birthday: string | Date;
 
     secret: string;
@@ -125,7 +132,13 @@ export class BaseWallet {
 
         this.derivationPath = WalletPaths[this.type][this.network]; // Wallet derivation path
 
-        this.descriptor = args.descriptor ? args.descriptor : '';
+        this.externalDescriptor = args.descriptor
+            ? args.descriptor.external
+            : '';
+        this.internalDescriptor = args.descriptor
+            ? args.descriptor.internal
+            : '';
+
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
 
@@ -185,8 +198,8 @@ export class BaseWallet {
             // i.e. no prv key material in descriptor
             // Make sure descriptor is not empty, else assume no prv key material
             const noPrivKeyDescriptor =
-                this.descriptor !== ''
-                    ? this.descriptor.match(descXpubPattern)
+                this.externalDescriptor !== ''
+                    ? this.externalDescriptor.match(descXpubPattern)
                     : true;
 
             if (noPrivKeys && noPrivKeyDescriptor) {
@@ -230,8 +243,9 @@ export class BaseWallet {
         this.masterFingerprint = fingerprint;
     }
 
-    setDescriptor(descriptor: string) {
-        this.descriptor = descriptor;
+    setDescriptor(descriptor: DescriptorObject) {
+        this.internalDescriptor = descriptor.internal;
+        this.externalDescriptor = descriptor.external;
     }
 
     setAddress(address: addressType) {

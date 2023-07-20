@@ -73,6 +73,11 @@ export type addressType = {
 };
 
 export type descriptorSymbolsType = string[];
+export type DescriptorObject = {
+    external: Descriptor;
+    internal: Descriptor;
+};
+export type Descriptor = string;
 
 export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
 
@@ -80,7 +85,7 @@ export type baseWalletArgs = {
     name: string;
     type: string;
     secret?: string;
-    descriptor?: string;
+    descriptor?: DescriptorObject;
     xprv?: string;
     xpub?: string;
     network?: NetType;
