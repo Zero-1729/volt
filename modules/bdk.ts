@@ -70,11 +70,15 @@ export const testElectrumServer = async (url: string, callback: any) => {
     }
 };
 
-// Descriptor creation functions
-export const descriptorSecretFromMnemonic = async (
+// Return External and Internal Descriptors from wallet DescriptorSecretKey ('from mnemonic')
+export const descriptorFromTemplate = async (
     secret: string,
+    type: string,
     network: NetType,
-): Promise<BDK.DescriptorSecretKey> => {
+): Promise<{
+    InternalDescriptor: BDK.Descriptor;
+    ExternalDescriptor: BDK.Descriptor;
+}> => {
     // Create descriptor from mnemonic
     const mnemonic = await new BDK.Mnemonic().fromString(secret);
 
@@ -83,18 +87,6 @@ export const descriptorSecretFromMnemonic = async (
         mnemonic,
     );
 
-    return descriptorSecretKey;
-};
-
-// Return External and Internal Descriptors from wallet DescriptorSecretKey ('from mnemonic')
-export const descriptorFromTemplate = async (
-    descriptorSecretKey: BDK.DescriptorSecretKey,
-    type: string,
-    network: NetType,
-): Promise<{
-    InternalDescriptor: BDK.Descriptor;
-    ExternalDescriptor: BDK.Descriptor;
-}> => {
     let InternalDescriptor!: BDK.Descriptor;
     let ExternalDescriptor!: BDK.Descriptor;
 
@@ -199,18 +191,16 @@ const _sync = async (
         return new BDK.Wallet();
     } else {
         // Build descriptor from mnemonic
-        const descriptorSecretKey = await descriptorSecretFromMnemonic(
-            wallet.secret,
-            network,
-        );
-
+        // Update wallet internal & external descriptors
         ({InternalDescriptor, ExternalDescriptor} =
-            await descriptorFromTemplate(
-                descriptorSecretKey,
-                wallet.type,
-                network,
-            ));
+            await descriptorFromTemplate(wallet.secret, wallet.type, network));
     }
+
+    const ExternalDescriptor = await new BDK.Descriptor().create(
+        wallet.externalDescriptor,
+        wallet.network,
+    );
+    */
 
     const w = await new BDK.Wallet().create(
         ExternalDescriptor, // Create a descriptor with BDK and store here
