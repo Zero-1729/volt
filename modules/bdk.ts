@@ -189,21 +189,21 @@ const _sync = async (
         // Case for descriptor wallet (no secret, just descriptor, xpub, or xprv)
         console.info('[BDK] No secret found, using descriptor instead');
         return new BDK.Wallet();
-    } else {
-        // Build descriptor from mnemonic
-        // Update wallet internal & external descriptors
-        ({InternalDescriptor, ExternalDescriptor} =
-            await descriptorFromTemplate(wallet.secret, wallet.type, network));
     }
 
-    const ExternalDescriptor = await new BDK.Descriptor().create(
-        wallet.externalDescriptor,
-        wallet.network,
+    // Use descriptor from wallet
+    InternalDescriptor = await new BDK.Descriptor().create(
+        wallet.internalDescriptor,
+        wallet.network as Network,
     );
-    */
+
+    ExternalDescriptor = await new BDK.Descriptor().create(
+        wallet.externalDescriptor,
+        wallet.network as Network,
+    );
 
     const w = await new BDK.Wallet().create(
-        ExternalDescriptor, // Create a descriptor with BDK and store here
+        ExternalDescriptor,
         InternalDescriptor,
         network,
         dbConfig,
