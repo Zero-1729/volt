@@ -36,6 +36,7 @@ import {SegWitNativeWallet} from './wallet/segwit/bech32';
 import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
 import {LegacyWallet} from './wallet/legacy';
 
+import {descriptorFromTemplate} from '../modules/bdk';
 import {
     getDescriptorParts,
     createDescriptor,
@@ -713,16 +714,28 @@ export const AppStorageProvider = ({children}: Props) => {
             newWallet.xprv !== '' ||
             newWallet.xpub !== ''
         ) {
-            const walletDescriptor = createDescriptor(
-                newWallet.type,
-                newWallet.derivationPath,
-                !restored ? newWallet.secret : '',
-                newWallet.network,
-                restored ? newWallet.xprv || newWallet.xpub : '',
-                newWallet.masterFingerprint,
-            );
+            // Generate descriptors
+            // Handle mnemonic case
+            if (newWallet.secret !== '') {
+                let InternalDescriptor;
+                let ExternalDescriptor;
 
-            newWallet.setDescriptor(walletDescriptor);
+                ({InternalDescriptor, ExternalDescriptor} =
+                    await descriptorFromTemplate(
+                        newWallet.secret,
+                        newWallet.type,
+                        newWallet.network,
+                    ));
+
+                // REM: We only store the string representation of the descriptors
+                const externalString = await ExternalDescriptor.asString();
+                const internalString = await InternalDescriptor.asString();
+
+                newWallet.setDescriptor({
+                    internal: internalString,
+                    external: externalString,
+                });
+            }
         }
 
         // Determine if watch only wallet
