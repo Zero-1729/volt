@@ -132,13 +132,6 @@ export class BaseWallet {
 
         this.derivationPath = WalletPaths[this.type][this.network]; // Wallet derivation path
 
-        this.externalDescriptor = args.descriptor
-            ? args.descriptor.external
-            : '';
-        this.internalDescriptor = args.descriptor
-            ? args.descriptor.internal
-            : '';
-
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
 

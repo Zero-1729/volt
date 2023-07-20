@@ -85,7 +85,6 @@ export type baseWalletArgs = {
     name: string;
     type: string;
     secret?: string;
-    descriptor?: DescriptorObject;
     xprv?: string;
     xpub?: string;
     network?: NetType;
