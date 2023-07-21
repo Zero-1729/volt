@@ -283,13 +283,6 @@ const _sync = async (
     let ExternalDescriptor!: BDK.Descriptor;
     let InternalDescriptor!: BDK.Descriptor;
 
-    // Use descriptor from wallet
-    if (wallet.secret === '') {
-        // Case for descriptor wallet (no secret, just descriptor, xpub, or xprv)
-        console.info('[BDK] No secret found, using descriptor instead');
-        return new BDK.Wallet();
-    }
-
     ({InternalDescriptor, ExternalDescriptor} = await descriptorsFromString(
         wallet,
     ));
