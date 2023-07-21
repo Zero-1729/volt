@@ -283,6 +283,7 @@ export const getAddressPath = (
 };
 
 export const generatePubkeyFromMnemonic = (
+export const generateRootFromMnemonic = (
     secret: string,
     net: string,
 ): BIP32Interface => {
@@ -298,7 +299,7 @@ export const generateAddressFromMnemonic = (
     type: string,
     secret: string,
 ): string => {
-    const pubKey = generatePubkeyFromMnemonic(secret, net);
+    const pubKey = generateRootFromMnemonic(secret, net);
 
     const address = _generateAddressFromPath(addressPath, net, type, pubKey);
 
