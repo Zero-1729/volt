@@ -337,7 +337,12 @@ const _generateAddressFromPath = (
 
     const network = BJSNetworks[net];
 
-    const keyPair = root.derivePath(addressPath.replace(/h/g, "'"));
+    let keyPair = root;
+
+    // Can only derive path when privateKey available
+    if (root.privateKey) {
+        keyPair = root.derivePath(addressPath.replace(/h/g, "'"));
+    }
 
     switch (type) {
         case 'legacy':
