@@ -8,6 +8,7 @@ import {
     BlockChainNames,
 } from 'bdk-rn/lib/lib/enums';
 
+import {TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
 import {BaseWallet} from '../class/wallet/base';
 
 import {
