@@ -145,9 +145,9 @@ export class BaseWallet {
         this.masterFingerprint = ''; // Wallet master fingerprint
     }
 
-    generateNewAddress(): addressType {
+    generateNewAddress(index?: number): addressType {
         try {
-            let index = this.index;
+            let idx = index ? index : this.index;
             let address!: string;
 
             const addressPath = getAddressPath(
@@ -169,13 +169,13 @@ export class BaseWallet {
             }
 
             // Bump address index
-            this.index++;
+            this.index = index ? index : this.index + 1;
 
             return {
                 address: address,
                 path: this.derivationPath,
                 change: false,
-                index: index,
+                index: idx,
                 memo: '',
             };
         } catch (e) {
