@@ -17,6 +17,7 @@ import {
     descXpubPattern,
     getAddressPath,
     generateAddressFromMnemonic,
+    generateAddressFromXKey,
 } from '../../modules/wallet-utils';
 
 import {WalletPaths} from '../../modules/wallet-defaults';
@@ -158,13 +159,19 @@ export class BaseWallet {
             );
 
             // Generate address using either mnemonic or xpub
-            // TODO: handle case for xpub
             if (this.secret.length > 0) {
                 address = generateAddressFromMnemonic(
                     addressPath,
                     this.network,
                     this.type,
                     this.secret,
+                );
+            } else {
+                address = generateAddressFromXKey(
+                    addressPath,
+                    this.network,
+                    this.type,
+                    this.xpub ? this.xpub : this.xprv,
                 );
             }
 
