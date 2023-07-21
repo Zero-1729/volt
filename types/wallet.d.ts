@@ -8,6 +8,8 @@ import {SegWitNativeWallet} from '../class/wallet/segwit/bech32';
 import {SegWitP2SHWallet} from '../class/wallet/segwit/p2sh';
 import {LegacyWallet} from '../class/wallet/legacy';
 
+import {LocalUtxo} from 'bdk-rn/lib/classes/Bindings';
+
 export type NetType = 'bitcoin' | 'testnet';
 
 export type NetInfoType = NetInfoState | null;
@@ -25,7 +27,7 @@ export type FiatRate = {
 };
 
 // UTXO Type
-export type UTXOType = {
+export type UTXOType = LocalUtxo & {
     txid: string; // Transaction ID
     vout: number; // Transaction output index
     value: BalanceType; // Transaction output value in sats
