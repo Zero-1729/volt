@@ -282,7 +282,15 @@ export const getAddressPath = (
     return `${prefix}/${changePrefix}/${index}`;
 };
 
-export const generatePubkeyFromMnemonic = (
+export const generateRootFromXKey = (
+    xkey: string,
+    net: string,
+): BIP32Interface => {
+    let root = bip32.fromBase58(xkey, BJSNetworks[net]);
+
+    return root;
+};
+
 export const generateRootFromMnemonic = (
     secret: string,
     net: string,
@@ -291,6 +299,19 @@ export const generateRootFromMnemonic = (
     const root = bip32.fromSeed(seed, BJSNetworks[net]);
 
     return root;
+};
+
+export const generateAddressFromXKey = (
+    addressPath: string,
+    net: string,
+    type: string,
+    xkey: string,
+): string => {
+    const pubKey = generateRootFromXKey(xkey, net);
+
+    const address = _generateAddressFromPath(addressPath, net, type, pubKey);
+
+    return address;
 };
 
 export const generateAddressFromMnemonic = (
