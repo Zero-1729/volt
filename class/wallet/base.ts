@@ -10,14 +10,13 @@ import {
     NetType,
     baseWalletArgs,
     addressType,
-    Descriptor,
     DescriptorObject,
 } from './../../types/wallet';
 
 import {
     descXpubPattern,
     getAddressPath,
-    generateAddressFromPath,
+    generateAddressFromMnemonic,
 } from '../../modules/wallet-utils';
 
 import {WalletPaths} from '../../modules/wallet-defaults';
@@ -67,8 +66,8 @@ export class BaseWallet {
     isWatchOnly: boolean;
     type: string;
 
-    externalDescriptor: Descriptor;
-    internalDescriptor: Descriptor;
+    externalDescriptor: string;
+    internalDescriptor: string;
 
     birthday: string | Date;
 
@@ -132,6 +131,9 @@ export class BaseWallet {
 
         this.derivationPath = WalletPaths[this.type][this.network]; // Wallet derivation path
 
+        this.internalDescriptor = ''; // Wallet internal descriptor
+        this.externalDescriptor = ''; // Wallet external descriptor
+
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
 
@@ -146,6 +148,7 @@ export class BaseWallet {
     generateNewAddress(): addressType {
         try {
             let index = this.index;
+            let address!: string;
 
             const addressPath = getAddressPath(
                 this.index,
@@ -154,12 +157,16 @@ export class BaseWallet {
                 this.type,
             );
 
-            const address = generateAddressFromPath(
-                addressPath,
-                this.network,
-                this.type,
-                this.secret,
-            );
+            // Generate address using either mnemonic or xpub
+            // TODO: handle case for xpub
+            if (this.secret.length > 0) {
+                address = generateAddressFromMnemonic(
+                    addressPath,
+                    this.network,
+                    this.type,
+                    this.secret,
+                );
+            }
 
             // Bump address index
             this.index++;
