@@ -121,10 +121,8 @@ const Wallet = () => {
 
         if (!loadingBalance) {
             // Update wallet balance first
-            const {balance, transactions, updated} = await getWalletBalance(
-                walletData,
-                electrumServerURL,
-            );
+            const {balance, transactions, updated, UTXOs} =
+                await getWalletBalance(walletData, electrumServerURL);
 
             // update wallet balance
             updateWalletBalance(currentWalletID, balance);
@@ -132,9 +130,6 @@ const Wallet = () => {
             try {
                 // Store newly formatted transactions from mempool.space data
                 const newTxs = [];
-
-                // Store newly fetched UTXOs
-                const newUTXOs = [];
 
                 const addressLock = !updated;
 
@@ -211,20 +206,6 @@ const Wallet = () => {
                                         newAddress,
                                     );
                                 }
-
-                                // Update transaction UTXOs that we own
-                                newUTXOs.push({
-                                    txid: transactions[i].txid,
-                                    vout: k,
-                                    value: new BigNumber(TxData.vout[k].value),
-                                    address:
-                                        TxData.vout[k].scriptpubkey_address,
-                                    scriptpubkey: TxData.vout[k].scriptpubkey,
-                                    scriptpubkey_asm:
-                                        TxData.vout[k].scriptpubkey_asm,
-                                    scriptpubkey_type:
-                                        TxData.vout[k].scriptpubkey_type,
-                                });
                             }
                         }
 
@@ -240,7 +221,7 @@ const Wallet = () => {
                     updateWalletTransactions(currentWalletID, newTxs);
 
                     // update wallet UTXOs
-                    updateWalletUTXOs(currentWalletID, newUTXOs);
+                    updateWalletUTXOs(currentWalletID, UTXOs);
                 }
 
                 setLoadLock(false);
