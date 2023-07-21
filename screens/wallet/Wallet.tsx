@@ -111,7 +111,7 @@ const Wallet = () => {
             if (!triggered) {
                 console.log('[Fiat Rate] Did not fetch fiat rate');
             }
-        } catch (e) {
+        } catch (e: any) {
             liberalAlert('Network', `${e.message}`, 'OK');
 
             setLoadingBalance(false);
@@ -244,7 +244,7 @@ const Wallet = () => {
                 }
 
                 setLoadLock(false);
-            } catch (e) {
+            } catch (e: any) {
                 liberalAlert('Network', `${e.message}`, 'OK');
 
                 setLoadingBalance(false);
