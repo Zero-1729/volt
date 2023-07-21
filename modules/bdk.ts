@@ -149,6 +149,79 @@ export const descriptorFromTemplate = async (
     };
 };
 
+// Return External and Internal Descriptors from wallet DescriptorPublicKey ('i.e. other descriptors or single extended keys')
+export const fromDescriptorTemplatePublic = async (
+    pubKey: string,
+    fingerprint: string,
+    type: string,
+    network: NetType,
+): Promise<{
+    InternalDescriptor: BDK.Descriptor;
+    ExternalDescriptor: BDK.Descriptor;
+}> => {
+    const descriptorPublicKey = await new BDK.DescriptorPublicKey().fromString(
+        pubKey,
+    );
+
+    let InternalDescriptor!: BDK.Descriptor;
+    let ExternalDescriptor!: BDK.Descriptor;
+
+    switch (type) {
+        case 'bech32': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip84Public(
+                descriptorPublicKey,
+                fingerprint,
+                KeychainKind.External,
+                network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip84Public(
+                descriptorPublicKey,
+                fingerprint,
+                KeychainKind.Internal,
+                network as Network,
+            );
+
+            break;
+        }
+        case 'p2sh': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip49Public(
+                descriptorPublicKey,
+                fingerprint,
+                KeychainKind.External,
+                network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip49Public(
+                descriptorPublicKey,
+                fingerprint,
+                KeychainKind.Internal,
+                network as Network,
+            );
+
+            break;
+        }
+        case 'legacy': {
+            ExternalDescriptor = await new BDK.Descriptor().newBip44Public(
+                descriptorPublicKey,
+                fingerprint,
+                KeychainKind.External,
+                network as Network,
+            );
+            InternalDescriptor = await new BDK.Descriptor().newBip44Public(
+                descriptorPublicKey,
+                fingerprint,
+                KeychainKind.Internal,
+                network as Network,
+            );
+
+            break;
+        }
+    }
+
+    return {
+        InternalDescriptor,
+        ExternalDescriptor,
+    };
+};
 
 // Generate External and Internal Descriptors from wallet descriptor strings
 export const descriptorsFromString = async (wallet: TWalletType) => {
