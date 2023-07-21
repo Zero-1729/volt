@@ -812,6 +812,38 @@ export const AppStorageProvider = ({children}: Props) => {
                     break;
             }
 
+            // Generate Descriptor for Extended Keys
+            if (
+                backupMaterialType === 'xprv' ||
+                backupMaterialType === 'xpub'
+            ) {
+                const pubKey =
+                    backupMaterialType === 'xprv'
+                        ? getPubKeyFromXprv(backupMaterial, net)
+                        : backupMaterial;
+
+                try {
+                    const descriptor = await fromDescriptorTemplatePublic(
+                        pubKey,
+                        fingerprint,
+                        walletArgs.type,
+                        net,
+                    );
+
+                    const externalDescriptor =
+                        await descriptor.ExternalDescriptor.asString();
+                    const internalDescriptor =
+                        await descriptor.InternalDescriptor.asString();
+
+                    newWallet.setDescriptor({
+                        external: externalDescriptor,
+                        internal: internalDescriptor,
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+
             // Set fingerprint and path if available
             newWallet.setFingerprint(fingerprint);
 
