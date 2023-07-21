@@ -5,7 +5,7 @@ import * as b58 from 'bs58';
 import * as b58c from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
 
-import BIP32Factory from 'bip32';
+import {BIP32Factory, BIP32Interface} from 'bip32';
 import ecc from '@bitcoinerlab/secp256k1';
 
 const bip32 = BIP32Factory(ecc);
@@ -282,19 +282,40 @@ export const getAddressPath = (
     return `${prefix}/${changePrefix}/${index}`;
 };
 
-export const generateAddressFromPath = (
-    path: string,
+export const generatePubkeyFromMnemonic = (
+    secret: string,
+    net: string,
+): BIP32Interface => {
+    const seed = mnemonicToSeedSync(secret);
+    const root = bip32.fromSeed(seed, BJSNetworks[net]);
+
+    return root;
+};
+
+export const generateAddressFromMnemonic = (
+    addressPath: string,
     net: string,
     type: string,
     secret: string,
+): string => {
+    const pubKey = generatePubkeyFromMnemonic(secret, net);
+
+    const address = _generateAddressFromPath(addressPath, net, type, pubKey);
+
+    return address;
+};
+
+const _generateAddressFromPath = (
+    addressPath: string,
+    net: string,
+    type: string,
+    root: BIP32Interface,
 ): string => {
     let address = '';
 
     const network = BJSNetworks[net];
 
-    const seed = mnemonicToSeedSync(secret);
-    const root = bip32.fromSeed(seed, network);
-    const keyPair = root.derivePath(path.replace(/h/g, "'"));
+    const keyPair = root.derivePath(addressPath.replace(/h/g, "'"));
 
     switch (type) {
         case 'legacy':
