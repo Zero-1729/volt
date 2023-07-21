@@ -10,14 +10,20 @@ import {
 
 import {BaseWallet} from '../class/wallet/base';
 
-import {NetType, TransactionType, electrumServerURLs} from '../types/wallet';
+import {
+    NetType,
+    TransactionType,
+    UTXOType,
+    electrumServerURLs,
+} from '../types/wallet';
 
 import {liberalAlert} from '../components/alert';
+import {Balance} from 'bdk-rn/lib/classes/Bindings';
 
 type SyncData = {
     balance: BigNumber;
     transactions: TransactionType[];
-    UTXOs: any[];
+    UTXOs: UTXOType[];
     updated: boolean; // whether the balance has been indeed updated
 };
 
@@ -70,7 +76,7 @@ export const testElectrumServer = async (url: string, callback: any) => {
     }
 };
 
-// Return External and Internal Descriptors from wallet DescriptorSecretKey ('from mnemonic')
+// Generate External and Internal Descriptors from wallet DescriptorSecretKey ('from mnemonic')
 export const descriptorFromTemplate = async (
     secret: string,
     type: string,
@@ -141,6 +147,7 @@ export const descriptorFromTemplate = async (
     };
 };
 
+// Sync newly created wallet with electrum server
 const _sync = async (
     wallet: BaseWallet,
     callback: any,
@@ -173,8 +180,6 @@ const _sync = async (
         console.info(`[Electrum] Failed to connect to server '${config.url}'`);
         throw e;
     }
-
-    const dbConfig = await new BDK.DatabaseConfig().memory();
 
     // Set Network
     const network =
@@ -233,7 +238,8 @@ export const getWalletBalance = async (
         electrumServer,
     );
 
-    const retrievedBalance = await w.getBalance();
+    // Get wallet balance
+    const retrievedBalance: Balance = await w.getBalance();
 
     // Update wallet balance
     // Leave untouched if error fetching balance
@@ -251,23 +257,24 @@ export const getWalletBalance = async (
     }
 
     // Only fetch transactions when balance has been updated
-    let TXs: any = wallet.transactions;
-    let UTXOs: any = wallet.UTXOs;
-    let tmp = TXs;
+    let TXs = wallet.transactions;
+    let UTXOs: UTXOType[] = wallet.UTXOs;
+    let walletTXs = TXs;
 
     if (updated) {
         // Update transactions list
-        TXs = await w.listTransactions();
-        UTXOs = await w.listUnspent();
+        TXs = (await w.listTransactions(false)) as (TransactionType &
+            TransactionDetails)[];
+        UTXOs = (await w.listUnspent()) as UTXOType[];
 
-        // Receive transactions from BDK
-        tmp = [];
+        // Transactions to store in wallet
+        walletTXs = [];
 
         // Update transactions list
         TXs.forEach((transaction: any) => {
-            tmp.push(
+            walletTXs.push(
                 formatTXFromBDK({
-                    confirmed: !!transaction.confirmationTime,
+                    confirmed: !!transaction.confirmationTime.timestamp,
                     network: wallet.network,
                     ...transaction,
                 }),
@@ -279,7 +286,7 @@ export const getWalletBalance = async (
     // Fallback to original wallet transactions if error fetching transactions
     return {
         balance: balance,
-        transactions: tmp,
+        transactions: walletTXs,
         UTXOs: UTXOs,
         updated: updated,
     };
