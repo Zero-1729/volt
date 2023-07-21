@@ -258,16 +258,18 @@ export const getWalletBalance = async (
 
     // Update wallet balance
     // Leave untouched if error fetching balance
-    let balance = new BigNumber(wallet.balance);
+    let balance = new BigNumber(retrievedBalance.total);
 
     let updated = false;
 
     // Update balance amount (in sats)
-    // only update if balance different from stored version
-    if (!balance.eq(retrievedBalance.total)) {
+    // only update if unconfirmed received or sent balance
+    if (
+        retrievedBalance.untrustedPending !== 0 &&
+        retrievedBalance.trustedPending !== 0
+    ) {
         // Receive balance in sats as string
         // convert to BigNumber
-        balance = new BigNumber(retrievedBalance.total);
         updated = true;
     }
 
