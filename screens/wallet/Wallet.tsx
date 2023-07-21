@@ -133,6 +133,9 @@ const Wallet = () => {
 
                 const addressLock = !updated;
 
+                let tempReceiveAddress = walletData.address;
+                let addressIndexCount = walletData.index;
+
                 // Only attempt wallet address update if wallet balance is updated
                 if (updated) {
                     // iterate over all the transactions and include the missing optional fields for the TransactionType
@@ -193,18 +196,17 @@ const Wallet = () => {
                                 tmp.address =
                                     TxData.vout[k].scriptpubkey_address;
 
-                                // Update tmp address
+                                // Update temp address
                                 if (
                                     !addressLock &&
                                     walletData.address.address ===
                                         TxData.vout[k].scriptpubkey_address
                                 ) {
-                                    const newAddress =
-                                        walletData.generateNewAddress();
-                                    updateWalletAddress(
-                                        currentWalletID,
-                                        newAddress,
-                                    );
+                                    tempReceiveAddress =
+                                        walletData.generateNewAddress(
+                                            addressIndexCount,
+                                        );
+                                    addressIndexCount++;
                                 }
                             }
                         }
@@ -222,6 +224,9 @@ const Wallet = () => {
 
                     // update wallet UTXOs
                     updateWalletUTXOs(currentWalletID, UTXOs);
+
+                    // update wallet address
+                    updateWalletAddress(currentWalletID, tempReceiveAddress);
                 }
 
                 setLoadLock(false);
