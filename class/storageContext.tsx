@@ -36,7 +36,10 @@ import {SegWitNativeWallet} from './wallet/segwit/bech32';
 import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
 import {LegacyWallet} from './wallet/legacy';
 
-import {descriptorFromTemplate} from '../modules/bdk';
+import {
+    descriptorFromTemplate,
+    fromDescriptorTemplatePublic,
+} from '../modules/bdk';
 import {
     getDescriptorParts,
     getMetaFromMnemonic,
@@ -720,12 +723,10 @@ export const AppStorageProvider = ({children}: Props) => {
         newWallet.setWatchOnly();
 
         // Generate new initial receive address
-        if (newWallet.secret !== '') {
-            const newAddress = newWallet.generateNewAddress();
+        const newAddress = newWallet.generateNewAddress();
 
-            // Update temporary wallet address
-            newWallet.setAddress(newAddress);
-        }
+        // Update temporary wallet address
+        newWallet.setAddress(newAddress);
 
         // Set wallet as initialized
         if (!isWalletInitialized) {
