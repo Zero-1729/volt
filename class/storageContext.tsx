@@ -677,18 +677,9 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
-    const _addNewWallet = async (
-        newWallet: TWalletType,
-        restored: boolean = false,
-    ) => {
+    const _addNewWallet = async (newWallet: TWalletType) => {
         // Set wallet ID
         _setCurrentWalletID(newWallet.id);
-
-        // Generate mnemonic and other key material if needed
-        if (!restored) {
-            const mnemonic = await generateMnemonic();
-            newWallet.secret = mnemonic;
-        }
 
         // If we have a mnemonic, generate extended key material
         if (newWallet.secret !== '') {
@@ -769,7 +760,6 @@ export const AppStorageProvider = ({children}: Props) => {
             var walletType = 'bech32';
 
             var fingerprint = '';
-            var path = '';
 
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
@@ -778,7 +768,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 net = desc.network as NetType;
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
-                path = desc.path;
             }
 
             const walletArgs = {
@@ -834,10 +823,9 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Set fingerprint and path if available
-            newWallet.masterFingerprint = path;
             newWallet.setFingerprint(fingerprint);
 
-            await _addNewWallet(newWallet, true);
+            await _addNewWallet(newWallet);
         },
         [wallets, _updateWallets, _setWallets],
     );
@@ -851,6 +839,10 @@ export const AppStorageProvider = ({children}: Props) => {
                 if (!['bech32', 'p2sh', 'legacy'].includes(type)) {
                     throw new Error('[restoreWallet] Invalid wallet type');
                 }
+
+                // Generate mnemonic
+                const mnemonic = await generateMnemonic();
+                newWallet.secret = mnemonic;
 
                 switch (type) {
                     case 'bech32':
