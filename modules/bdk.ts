@@ -12,6 +12,7 @@ import {BaseWallet} from '../class/wallet/base';
 
 import {
     NetType,
+    TWalletType,
     TransactionType,
     UTXOType,
     electrumServerURLs,
@@ -147,6 +148,25 @@ export const descriptorFromTemplate = async (
     };
 };
 
+
+// Generate External and Internal Descriptors from wallet descriptor strings
+export const descriptorsFromString = async (wallet: TWalletType) => {
+    const InternalDescriptor = await new BDK.Descriptor().create(
+        wallet.internalDescriptor,
+        wallet.network as Network,
+    );
+
+    const ExternalDescriptor = await new BDK.Descriptor().create(
+        wallet.externalDescriptor,
+        wallet.network as Network,
+    );
+
+    return {
+        InternalDescriptor,
+        ExternalDescriptor,
+    };
+};
+
 // Sync newly created wallet with electrum server
 const _sync = async (
     wallet: BaseWallet,
@@ -196,22 +216,15 @@ const _sync = async (
         return new BDK.Wallet();
     }
 
-    // Use descriptor from wallet
-    InternalDescriptor = await new BDK.Descriptor().create(
-        wallet.internalDescriptor,
-        wallet.network as Network,
-    );
-
-    ExternalDescriptor = await new BDK.Descriptor().create(
-        wallet.externalDescriptor,
-        wallet.network as Network,
-    );
+    ({InternalDescriptor, ExternalDescriptor} = await descriptorsFromString(
+        wallet,
+    ));
 
     const w = await new BDK.Wallet().create(
         ExternalDescriptor,
         InternalDescriptor,
         network,
-        dbConfig,
+        await new BDK.DatabaseConfig().memory(),
     );
 
     const syncStatus = await w.sync(chain);
@@ -222,10 +235,12 @@ const _sync = async (
     return w;
 };
 
+// Fetch Wallet Balance using wallet descriptor, metas, and electrum server
 export const getWalletBalance = async (
     wallet: BaseWallet,
     electrumServer: electrumServerURLs,
 ): Promise<SyncData> => {
+    // Generate wallet from wallet descriptor and metas
     const w = await _sync(
         wallet,
         (status: boolean) => {
