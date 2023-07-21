@@ -266,8 +266,9 @@ export const getWalletBalance = async (
     // Update balance amount (in sats)
     // only update if unconfirmed received or sent balance
     if (
-        retrievedBalance.untrustedPending !== 0 &&
-        retrievedBalance.trustedPending !== 0
+        (retrievedBalance.untrustedPending !== 0 &&
+            retrievedBalance.trustedPending !== 0) ||
+        !balance.eq(wallet.balance)
     ) {
         // Receive balance in sats as string
         // convert to BigNumber
