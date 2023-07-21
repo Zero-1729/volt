@@ -39,7 +39,6 @@ import {LegacyWallet} from './wallet/legacy';
 import {descriptorFromTemplate} from '../modules/bdk';
 import {
     getDescriptorParts,
-    createDescriptor,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
 } from '../modules/wallet-utils';
@@ -695,48 +694,38 @@ export const AppStorageProvider = ({children}: Props) => {
             } catch (e) {
                 throw e;
             }
-        }
 
-        // Only generate if we don't already have one
-        // We can only generate one if we have either a mnemonic
-        // or an xprv, so check to see if either of those exist
-        if (
-            newWallet.secret !== '' ||
-            newWallet.xprv !== '' ||
-            newWallet.xpub !== ''
-        ) {
-            // Generate descriptors
-            // Handle mnemonic case
-            if (newWallet.secret !== '') {
-                let InternalDescriptor;
-                let ExternalDescriptor;
+            // Generate descriptors for mnemonic
+            let InternalDescriptor;
+            let ExternalDescriptor;
 
-                ({InternalDescriptor, ExternalDescriptor} =
-                    await descriptorFromTemplate(
-                        newWallet.secret,
-                        newWallet.type,
-                        newWallet.network,
-                    ));
+            ({InternalDescriptor, ExternalDescriptor} =
+                await descriptorFromTemplate(
+                    newWallet.secret,
+                    newWallet.type,
+                    newWallet.network,
+                ));
 
-                // REM: We only store the string representation of the descriptors
-                const externalString = await ExternalDescriptor.asString();
-                const internalString = await InternalDescriptor.asString();
+            // REM: We only store the string representation of the descriptors
+            const externalString = await ExternalDescriptor.asString();
+            const internalString = await InternalDescriptor.asString();
 
-                newWallet.setDescriptor({
-                    internal: internalString,
-                    external: externalString,
-                });
-            }
+            newWallet.setDescriptor({
+                internal: internalString,
+                external: externalString,
+            });
         }
 
         // Determine if watch only wallet
         newWallet.setWatchOnly();
 
         // Generate new initial receive address
-        const newAddress = newWallet.generateNewAddress();
+        if (newWallet.secret !== '') {
+            const newAddress = newWallet.generateNewAddress();
 
-        // Update temporary wallet address
-        newWallet.setAddress(newAddress);
+            // Update temporary wallet address
+            newWallet.setAddress(newAddress);
+        }
 
         // Set wallet as initialized
         if (!isWalletInitialized) {
