@@ -135,12 +135,12 @@ export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
 // Supported extended key version metadata definitions
 export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
     // mainnet / bitcoin
-    x: {network: 'bitcoin', type: 'legacy'}, // Account path P2PKH (legacy) [1...]
+    x: {network: 'bitcoin', type: 'bech32'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
     y: {network: 'bitcoin', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
     z: {network: 'bitcoin', type: 'bech32'}, // Account path P2WPKH [bc1...]
 
     // testnet
-    t: {network: 'testnet', type: 'legacy'}, // Account path P2PKH (legacy) [1...]
+    t: {network: 'testnet', type: 'bech32'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
     u: {network: 'testnet', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
     v: {network: 'testnet', type: 'bech32'}, // Account path P2WPKH [bc1...]
 };
