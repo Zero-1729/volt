@@ -864,7 +864,6 @@ export const AppStorageProvider = ({children}: Props) => {
 
                 // Generate mnemonic
                 const mnemonic = await generateMnemonic();
-                newWallet.secret = mnemonic;
 
                 switch (type) {
                     case 'bech32':
@@ -872,6 +871,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
 
                         break;
@@ -881,6 +881,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
                         break;
 
@@ -889,6 +890,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
                         break;
                 }
