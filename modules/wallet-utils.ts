@@ -310,7 +310,9 @@ export const generateAddressFromXKey = (
 ): string => {
     const pubKey = generateRootFromXKey(xkey, net);
 
-    const address = _generateAddressFromPath(addressPath, net, type, pubKey);
+    const pubKeyRoot = pubKey.derivePath(addressPath);
+
+    const address = _generateAddress(net, type, pubKeyRoot);
 
     return address;
 };
@@ -321,15 +323,14 @@ export const generateAddressFromMnemonic = (
     type: string,
     secret: string,
 ): string => {
-    const pubKey = generateRootFromMnemonic(secret, net);
+    const pubKey = generateRootFromMnemonic(secret, addressPath, net);
 
-    const address = _generateAddressFromPath(addressPath, net, type, pubKey);
+    const address = _generateAddress(net, type, pubKey);
 
     return address;
 };
 
-const _generateAddressFromPath = (
-    addressPath: string,
+const _generateAddress = (
     net: string,
     type: string,
     root: BIP32Interface,
@@ -338,12 +339,8 @@ const _generateAddressFromPath = (
 
     const network = BJSNetworks[net];
 
+    // Assumed root includes derivation path
     let keyPair = root;
-
-    // Can only derive path when privateKey available
-    if (root.privateKey) {
-        keyPair = root.derivePath(addressPath.replace(/h/g, "'"));
-    }
 
     switch (type) {
         case 'legacy':
