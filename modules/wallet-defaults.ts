@@ -144,3 +144,6 @@ export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
     u: {network: 'testnet', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
     v: {network: 'testnet', type: 'bech32'}, // Account path P2WPKH [bc1...]
 };
+
+// Wallet Gap Limit
+export const GAP_LIMIT = 20;
