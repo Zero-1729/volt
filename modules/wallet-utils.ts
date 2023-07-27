@@ -498,6 +498,16 @@ export const getMetaFromMnemonic = (
     };
 };
 
+export const getPubKeyFromXprv = (xprv: string) => {
+    const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
+
+    const derivationPath = WalletPaths[keyInfo.type][keyInfo.network];
+
+    const node = bip32.fromBase58(xprv);
+
+    return node.derivePath(derivationPath).neutered().toBase58();
+};
+
 export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
     const node = bip32.fromBase58(xkey, BJSNetworks[network]);
 
