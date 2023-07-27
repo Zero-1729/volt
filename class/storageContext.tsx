@@ -688,6 +688,7 @@ export const AppStorageProvider = ({children}: Props) => {
             try {
                 const metas = getMetaFromMnemonic(
                     newWallet.secret,
+                    newWallet.derivationPath,
                     newWallet.network,
                 );
 
@@ -750,6 +751,7 @@ export const AppStorageProvider = ({children}: Props) => {
             var walletType = 'bech32';
 
             var fingerprint = '';
+            var path = '';
 
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
@@ -758,6 +760,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 net = desc.network as NetType;
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
+                path = desc.path;
             }
 
             const walletArgs = {
@@ -769,6 +772,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 xprv: backupMaterialType === 'xprv' ? backupMaterial : '',
                 xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
                 network: net,
+                path: path,
             };
 
             if (
