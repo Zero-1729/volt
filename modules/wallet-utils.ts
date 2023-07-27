@@ -293,12 +293,13 @@ export const generateRootFromXKey = (
 
 export const generateRootFromMnemonic = (
     secret: string,
+    path: string,
     net: string,
 ): BIP32Interface => {
     const seed = mnemonicToSeedSync(secret);
     const root = bip32.fromSeed(seed, BJSNetworks[net]);
 
-    return root;
+    return root.derivePath(path);
 };
 
 export const generateAddressFromXKey = (
@@ -429,7 +430,7 @@ export const createDescriptor = (
             throw new Error('[CreateDescriptor] Invalid Mnemonic.');
         }
 
-        const meta = getMetaFromMnemonic(mnemonic, network);
+        const meta = getMetaFromMnemonic(mnemonic, path, network);
 
         _xprv = !_xprv ? meta.xprv : _xprv;
         _fingerprint = !_fingerprint ? meta.fingerprint : _fingerprint;
