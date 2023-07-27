@@ -481,13 +481,19 @@ export const createDescriptor = (
     return descriptor;
 };
 
-export const getMetaFromMnemonic = (mnemonic: string, network: NetType) => {
+export const getMetaFromMnemonic = (
+    mnemonic: string,
+    walletPath: string,
+    network: NetType,
+) => {
     const seed = mnemonicToSeedSync(mnemonic);
     const node = bip32.fromSeed(seed, BJSNetworks[network]);
 
+    const xpub = node.derivePath(walletPath).neutered().toBase58();
+
     return {
         xprv: node.toBase58(),
-        xpub: node.neutered().toBase58(),
+        xpub: xpub,
         fingerprint: node.fingerprint.toString('hex'),
     };
 };
