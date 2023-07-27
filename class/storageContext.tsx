@@ -44,6 +44,7 @@ import {
     getDescriptorParts,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
+    getPubKeyFromXprv,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo} from '../modules/wallet-defaults';
@@ -823,7 +824,7 @@ export const AppStorageProvider = ({children}: Props) => {
             ) {
                 const pubKey =
                     backupMaterialType === 'xprv'
-                        ? getPubKeyFromXprv(backupMaterial, net)
+                        ? getPubKeyFromXprv(backupMaterial)
                         : backupMaterial;
 
                 try {
