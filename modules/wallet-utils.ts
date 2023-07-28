@@ -520,14 +520,28 @@ export const getMetaFromMnemonic = (
     };
 };
 
-export const getPubKeyFromXprv = (xprv: string) => {
+export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
     const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
 
-    const derivationPath = WalletPaths[keyInfo.type][keyInfo.network];
+    // TODO: handle zpub/prv case && other exotic prefixes
+    const derivationPath = WalletPaths[keyInfo.type][network];
 
-    const node = bip32.fromBase58(xprv);
+    let node = bip32.fromBase58(xprv, BJSNetworks[network]);
 
-    return node.derivePath(derivationPath).neutered().toBase58();
+    // Report if not master of 3-depth node
+    if (node.depth !== 0 && node.depth !== 3) {
+        throw new Error(
+            'Extended private key must be master or 3-depth child.',
+        );
+    }
+
+    // Generate child 3-depth node if xprv is a master node
+    // Else assume xprv is a 3-depth child node
+    if (node.depth === 0) {
+        node = node.derivePath(derivationPath);
+    }
+
+    return node.neutered().toBase58();
 };
 
 export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
