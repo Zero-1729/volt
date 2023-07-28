@@ -31,9 +31,10 @@ export const TransactionListItem = (props: TxListItemProps) => {
     const ColorScheme = Color(useColorScheme());
 
     const getTxTimestamp = (time: Date) => {
-        const date = +new Date() - +time;
+        const date = +time * 1000;
+        const isToday = Dayjs(date).isSame(Dayjs(), 'day');
 
-        return `${Dayjs(date).calendar()} ${Dayjs(date).format('LT')}`;
+        return isToday ? Dayjs(date).calendar() : Dayjs(date).format('LLL');
     };
 
     // Get URL for mempool.space
