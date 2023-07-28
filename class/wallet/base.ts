@@ -149,8 +149,7 @@ export class BaseWallet {
 
         this.isWatchOnly = false; // Whether wallet is watch only
 
-        // Retrieved and updated from BDK
-        this.masterFingerprint = ''; // Wallet master fingerprint
+        this.masterFingerprint = args.fingerprint ? args.fingerprint : ''; // Wallet master fingerprint
     }
 
     generateNewAddress(index?: number): addressType {
