@@ -269,6 +269,7 @@ export const getAddressPath = (
     type: string,
 ): string => {
     // Get network prefix
+    // Uses unhardened derivation
     const prefix =
         network === 'bitcoin'
             ? WalletPaths[type].bitcoin
