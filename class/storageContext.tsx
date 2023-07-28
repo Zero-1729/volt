@@ -685,6 +685,7 @@ export const AppStorageProvider = ({children}: Props) => {
         _setCurrentWalletID(newWallet.id);
 
         // If we have a mnemonic, generate extended key material
+        // Function applied when newly generated wallet and if mnemonic imported
         if (newWallet.secret !== '') {
             try {
                 const metas = getMetaFromMnemonic(
@@ -751,6 +752,7 @@ export const AppStorageProvider = ({children}: Props) => {
             var fingerprint = '';
             var path = '';
 
+            // Adjust metas from descriptor
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
                 const desc = getDescriptorParts(backupMaterial);
@@ -798,6 +800,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 throw new Error('[restoreWallet] Invalid wallet type');
             }
 
+            // Create wallet based on type
             switch (walletArgs.type) {
                 case 'bech32':
                     newWallet = new SegWitNativeWallet(
