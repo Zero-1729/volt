@@ -752,6 +752,9 @@ export const AppStorageProvider = ({children}: Props) => {
             var fingerprint = '';
             var path = '';
 
+            var xpub = backupMaterialType === 'xpub' ? backupMaterial : '';
+            var xprv = backupMaterialType === 'xprv' ? backupMaterial : '';
+
             // Adjust metas from descriptor
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
@@ -777,6 +780,11 @@ export const AppStorageProvider = ({children}: Props) => {
 
                 // Fetch metas from xkey
                 fingerprint = getFingerprintFromXkey(backupMaterial, network);
+
+                // Set xpub
+                if (backupMaterialType === 'xprv') {
+                    xpub = getPubKeyFromXprv(backupMaterial, network);
+                }
             }
 
             const walletArgs = {
@@ -785,8 +793,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
                 descriptor:
                     backupMaterialType === 'descriptor' ? backupMaterial : '',
-                xprv: backupMaterialType === 'xprv' ? backupMaterial : '',
-                xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
+                xprv: xprv,
+                xpub: xpub,
                 network: net,
                 path: path,
                 fingerprint: fingerprint,
@@ -824,14 +832,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 backupMaterialType === 'xprv' ||
                 backupMaterialType === 'xpub'
             ) {
-                const pubKey =
-                    backupMaterialType === 'xprv'
-                        ? getPubKeyFromXprv(backupMaterial)
-                        : backupMaterial;
-
                 try {
                     const descriptor = await fromDescriptorTemplatePublic(
-                        pubKey,
+                        xpub,
                         fingerprint,
                         walletArgs.type,
                         net,
