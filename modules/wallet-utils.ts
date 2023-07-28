@@ -547,5 +547,15 @@ export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
 export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
     const node = bip32.fromBase58(xkey, BJSNetworks[network]);
 
+    if (node.depth > 0) {
+        return _getParentFingerprintHex(node.toBase58());
+    }
+
     return node.fingerprint.toString('hex');
+};
+
+const _getParentFingerprintHex = (xkey: string): string => {
+    const decoded = b58.decode(xkey);
+
+    return Buffer.from(decoded.slice(5, 9)).toString('hex');
 };
