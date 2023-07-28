@@ -20,7 +20,7 @@ import {
     generateAddressFromXKey,
 } from '../../modules/wallet-utils';
 
-import {WalletPaths} from '../../modules/wallet-defaults';
+import {WalletPaths, GAP_LIMIT} from '../../modules/wallet-defaults';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
@@ -37,6 +37,8 @@ export class BaseWallet {
         });
 
         wallet.id = obj.id;
+
+        wallet.gap_limit = obj.gap_limit;
 
         wallet.externalDescriptor = obj.externalDescriptor;
         wallet.internalDescriptor = obj.internalDescriptor;
@@ -71,6 +73,8 @@ export class BaseWallet {
     internalDescriptor: string;
 
     birthday: string | Date;
+
+    gap_limit: number;
 
     secret: string;
     xprv: string;
@@ -120,6 +124,7 @@ export class BaseWallet {
         }; // Default unit to display wallet balance is sats
 
         this.balance = new BigNumber(0); // By default the balance is in sats
+        this.gap_limit = GAP_LIMIT; // Gap limit for wallet
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin' or 'testnet' wallet
@@ -130,7 +135,9 @@ export class BaseWallet {
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
 
-        this.derivationPath = WalletPaths[this.type][this.network]; // Wallet derivation path
+        this.derivationPath = args.derivationPath
+            ? args.derivationPath
+            : WalletPaths[this.type][this.network]; // Wallet derivation path
 
         this.internalDescriptor = ''; // Wallet internal descriptor
         this.externalDescriptor = ''; // Wallet external descriptor

@@ -269,6 +269,7 @@ export const getAddressPath = (
     type: string,
 ): string => {
     // Get network prefix
+    // Uses unhardened derivation
     const prefix =
         network === 'bitcoin'
             ? WalletPaths[type].bitcoin
@@ -285,20 +286,45 @@ export const getAddressPath = (
 export const generateRootFromXKey = (
     xkey: string,
     net: string,
+    addresPath: string,
 ): BIP32Interface => {
+    const prefix = getExtendedKeyPrefix(xkey);
+
     let root = bip32.fromBase58(xkey, BJSNetworks[net]);
+
+    // Check that xpub given is three levels deep
+    if (prefix === 'xpub') {
+        if (root.depth === 0) {
+            throw new Error(
+                '0-depth xpub missing private to generate hardened child key.',
+            );
+        }
+
+        // derive address path for xpub (i.e. change and index), assume base path included before xpub generated (depth 3)
+        // Then manually derive change and index
+        const [change, index] = addresPath.split('/').slice(-2);
+
+        root = root.derive(Number(change)).derive(Number(index));
+    }
+
+    // Derive root using address path if xprv given
+    // Otherwise, assume xpub given is three level deep
+    if (prefix === 'xprv') {
+        root = root.derivePath(addresPath);
+    }
 
     return root;
 };
 
 export const generateRootFromMnemonic = (
     secret: string,
+    path: string,
     net: string,
 ): BIP32Interface => {
     const seed = mnemonicToSeedSync(secret);
     const root = bip32.fromSeed(seed, BJSNetworks[net]);
 
-    return root;
+    return root.derivePath(path);
 };
 
 export const generateAddressFromXKey = (
@@ -307,9 +333,10 @@ export const generateAddressFromXKey = (
     type: string,
     xkey: string,
 ): string => {
-    const pubKey = generateRootFromXKey(xkey, net);
+    // XPub | Xprv -> Xpub, includes address path (coin/account/chain/change/index)
+    const pubKeyRoot = generateRootFromXKey(xkey, net, addressPath);
 
-    const address = _generateAddressFromPath(addressPath, net, type, pubKey);
+    const address = _generateAddress(net, type, pubKeyRoot);
 
     return address;
 };
@@ -320,15 +347,14 @@ export const generateAddressFromMnemonic = (
     type: string,
     secret: string,
 ): string => {
-    const pubKey = generateRootFromMnemonic(secret, net);
+    const pubKey = generateRootFromMnemonic(secret, addressPath, net);
 
-    const address = _generateAddressFromPath(addressPath, net, type, pubKey);
+    const address = _generateAddress(net, type, pubKey);
 
     return address;
 };
 
-const _generateAddressFromPath = (
-    addressPath: string,
+const _generateAddress = (
     net: string,
     type: string,
     root: BIP32Interface,
@@ -337,12 +363,8 @@ const _generateAddressFromPath = (
 
     const network = BJSNetworks[net];
 
+    // Assumed root includes full derivation path (i.e. m/84'/1'/0'/0/0)
     let keyPair = root;
-
-    // Can only derive path when privateKey available
-    if (root.privateKey) {
-        keyPair = root.derivePath(addressPath.replace(/h/g, "'"));
-    }
 
     switch (type) {
         case 'legacy':
@@ -429,7 +451,7 @@ export const createDescriptor = (
             throw new Error('[CreateDescriptor] Invalid Mnemonic.');
         }
 
-        const meta = getMetaFromMnemonic(mnemonic, network);
+        const meta = getMetaFromMnemonic(mnemonic, path, network);
 
         _xprv = !_xprv ? meta.xprv : _xprv;
         _fingerprint = !_fingerprint ? meta.fingerprint : _fingerprint;
@@ -481,15 +503,31 @@ export const createDescriptor = (
     return descriptor;
 };
 
-export const getMetaFromMnemonic = (mnemonic: string, network: NetType) => {
+export const getMetaFromMnemonic = (
+    mnemonic: string,
+    walletPath: string,
+    network: NetType,
+) => {
     const seed = mnemonicToSeedSync(mnemonic);
     const node = bip32.fromSeed(seed, BJSNetworks[network]);
 
+    const xpub = node.derivePath(walletPath).neutered().toBase58();
+
     return {
         xprv: node.toBase58(),
-        xpub: node.neutered().toBase58(),
+        xpub: xpub,
         fingerprint: node.fingerprint.toString('hex'),
     };
+};
+
+export const getPubKeyFromXprv = (xprv: string) => {
+    const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
+
+    const derivationPath = WalletPaths[keyInfo.type][keyInfo.network];
+
+    const node = bip32.fromBase58(xprv);
+
+    return node.derivePath(derivationPath).neutered().toBase58();
 };
 
 export const getFingerprintFromXkey = (xkey: string, network: NetType) => {

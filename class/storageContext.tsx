@@ -44,6 +44,7 @@ import {
     getDescriptorParts,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
+    getPubKeyFromXprv,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo} from '../modules/wallet-defaults';
@@ -688,6 +689,7 @@ export const AppStorageProvider = ({children}: Props) => {
             try {
                 const metas = getMetaFromMnemonic(
                     newWallet.secret,
+                    newWallet.derivationPath,
                     newWallet.network,
                 );
 
@@ -750,6 +752,7 @@ export const AppStorageProvider = ({children}: Props) => {
             var walletType = 'bech32';
 
             var fingerprint = '';
+            var path = '';
 
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
@@ -758,6 +761,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 net = desc.network as NetType;
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
+                path = desc.path;
             }
 
             const walletArgs = {
@@ -769,6 +773,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 xprv: backupMaterialType === 'xprv' ? backupMaterial : '',
                 xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
                 network: net,
+                path: path,
             };
 
             if (
@@ -819,7 +824,7 @@ export const AppStorageProvider = ({children}: Props) => {
             ) {
                 const pubKey =
                     backupMaterialType === 'xprv'
-                        ? getPubKeyFromXprv(backupMaterial, net)
+                        ? getPubKeyFromXprv(backupMaterial)
                         : backupMaterial;
 
                 try {
@@ -864,7 +869,6 @@ export const AppStorageProvider = ({children}: Props) => {
 
                 // Generate mnemonic
                 const mnemonic = await generateMnemonic();
-                newWallet.secret = mnemonic;
 
                 switch (type) {
                     case 'bech32':
@@ -872,6 +876,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
 
                         break;
@@ -881,6 +886,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
                         break;
 
@@ -889,6 +895,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
                         break;
                 }

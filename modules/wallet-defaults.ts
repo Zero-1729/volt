@@ -61,9 +61,9 @@ export const DescriptorType: {[index: string]: string} = {
 
 */
 export const WalletPaths: {[index: string]: accountPaths} = {
-    bech32: {bitcoin: 'm/84h/0h/0h', testnet: 'm/84h/1h/0h'},
-    legacy: {bitcoin: 'm/44h/0h/0h', testnet: 'm/44h/1h/0h'},
-    p2sh: {bitcoin: 'm/49h/0h/0h', testnet: 'm/49h/1h/0h'},
+    bech32: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
+    legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
+    p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
 };
 
 // Network definitions
@@ -144,3 +144,6 @@ export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
     u: {network: 'testnet', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
     v: {network: 'testnet', type: 'bech32'}, // Account path P2WPKH [bc1...]
 };
+
+// Wallet Gap Limit
+export const GAP_LIMIT = 20;

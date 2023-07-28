@@ -86,6 +86,7 @@ export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
 export type baseWalletArgs = {
     name: string;
     type: string;
+    derivationPath?: string;
     secret?: string;
     xprv?: string;
     xpub?: string;
