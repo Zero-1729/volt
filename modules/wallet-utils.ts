@@ -363,7 +363,7 @@ const _generateAddress = (
 
     const network = BJSNetworks[net];
 
-    // Assumed root includes derivation path
+    // Assumed root includes full derivation path (i.e. m/84'/1'/0'/0/0)
     let keyPair = root;
 
     switch (type) {
