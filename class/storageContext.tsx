@@ -721,9 +721,6 @@ export const AppStorageProvider = ({children}: Props) => {
             });
         }
 
-        // Determine if watch only wallet
-        newWallet.setWatchOnly();
-
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
 
@@ -764,6 +761,22 @@ export const AppStorageProvider = ({children}: Props) => {
                 path = desc.path;
             }
 
+            // Adjust metas from xprv or xpub
+            if (
+                backupMaterialType === 'xprv' ||
+                backupMaterialType === 'xpub'
+            ) {
+                // Get extended key info based on the first letter prefix
+                const {network, type} = extendedKeyInfo[backupMaterial[0]];
+
+                // Set the assumed default network and wallet type based on SLIP132
+                net = network;
+                walletType = type;
+
+                // Fetch metas from xkey
+                fingerprint = getFingerprintFromXkey(backupMaterial, network);
+            }
+
             const walletArgs = {
                 name: 'Restored Wallet',
                 type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
@@ -774,22 +787,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
                 network: net,
                 path: path,
+                fingerprint: fingerprint,
             };
-
-            if (
-                backupMaterialType === 'xprv' ||
-                backupMaterialType === 'xpub'
-            ) {
-                // Get extended key info based on the first letter prefix
-                const {network, type} = extendedKeyInfo[backupMaterial[0]];
-
-                // Set the assumed default network and wallet type based on SLIP132
-                walletArgs.network = network;
-                walletArgs.type = type;
-
-                // Fetch metas from xkey
-                fingerprint = getFingerprintFromXkey(backupMaterial, network);
-            }
 
             // Handle material according to type
             var newWallet!: TWalletType;
@@ -849,8 +848,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 }
             }
 
-            // Set fingerprint and path if available
-            newWallet.setFingerprint(fingerprint);
+            // Determine if watch only wallet
+            newWallet.setWatchOnly();
 
             await _addNewWallet(newWallet);
         },
