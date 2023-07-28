@@ -333,9 +333,8 @@ export const generateAddressFromXKey = (
     type: string,
     xkey: string,
 ): string => {
-    const pubKey = generateRootFromXKey(xkey, net);
-
-    const pubKeyRoot = pubKey.derivePath(addressPath);
+    // XPub | Xprv -> Xpub, includes address path (coin/account/chain/change/index)
+    const pubKeyRoot = generateRootFromXKey(xkey, net, addressPath);
 
     const address = _generateAddress(net, type, pubKeyRoot);
 
