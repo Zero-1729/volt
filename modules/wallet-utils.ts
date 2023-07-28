@@ -286,8 +286,32 @@ export const getAddressPath = (
 export const generateRootFromXKey = (
     xkey: string,
     net: string,
+    addresPath: string,
 ): BIP32Interface => {
+    const prefix = getExtendedKeyPrefix(xkey);
+
     let root = bip32.fromBase58(xkey, BJSNetworks[net]);
+
+    // Check that xpub given is three levels deep
+    if (prefix === 'xpub') {
+        if (root.depth === 0) {
+            throw new Error(
+                '0-depth xpub missing private to generate hardened child key.',
+            );
+        }
+
+        // derive address path for xpub (i.e. change and index), assume base path included before xpub generated (depth 3)
+        // Then manually derive change and index
+        const [change, index] = addresPath.split('/').slice(-2);
+
+        root = root.derive(Number(change)).derive(Number(index));
+    }
+
+    // Derive root using address path if xprv given
+    // Otherwise, assume xpub given is three level deep
+    if (prefix === 'xprv') {
+        root = root.derivePath(addresPath);
+    }
 
     return root;
 };
