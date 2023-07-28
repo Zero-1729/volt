@@ -91,6 +91,7 @@ export type baseWalletArgs = {
     xprv?: string;
     xpub?: string;
     network?: NetType;
+    fingerprint?: string;
 };
 
 export type BDKWalletTypes =
