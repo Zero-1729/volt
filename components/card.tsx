@@ -119,22 +119,26 @@ export const WalletCard = (props: WalletCardProps) => {
                         {props.label}
                     </Text>
 
-                    <View
-                        style={[
-                            tailwind(
-                                'bg-black absolute left-6 top-14 rounded-full opacity-50',
-                            ),
-                        ]}>
-                        <Text
+                    {props.isWatchOnly ? (
+                        <View
                             style={[
                                 tailwind(
-                                    'text-xs text-white font-bold px-4 py-1',
+                                    'bg-black absolute left-6 top-14 rounded-full opacity-50',
                                 ),
-                                Font.RobotoText,
                             ]}>
-                            {`${props.isWatchOnly ? 'Watch only' : ''}`}
-                        </Text>
-                    </View>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-xs text-white font-bold px-4 py-1',
+                                    ),
+                                    Font.RobotoText,
+                                ]}>
+                                {`${props.isWatchOnly ? 'Watch only' : ''}`}
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
 
                     {/* Balance */}
                     <View style={tailwind('w-full absolute mx-6 bottom-6')}>
