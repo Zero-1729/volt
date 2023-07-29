@@ -1,11 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {Text, View, useColorScheme, Linking} from 'react-native';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import {CommonActions} from '@react-navigation/native';
 
 import {useNavigation} from '@react-navigation/core';
+
+import {getBuildIdSync} from 'react-native-device-info';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -37,6 +41,8 @@ const About = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {isAdvancedMode} = useContext(AppStorageContext);
 
     return (
         <SafeAreaView>
@@ -119,7 +125,13 @@ const About = () => {
                             tailwind('text-center'),
                             {color: ColorScheme.Text.AltGray},
                         ]}>
-                        v{Package.version} (Beta)
+                        v{Package.version} (
+                        {`${
+                            isAdvancedMode
+                                ? 'Build ' + getBuildIdSync() + ' '
+                                : ''
+                        }Beta`}
+                        )
                     </Text>
                 </View>
 
