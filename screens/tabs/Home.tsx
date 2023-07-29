@@ -38,6 +38,8 @@ import {FiatBalance} from '../../components/balance';
 import {fetchFiatRate} from '../../modules/currency';
 import {liberalAlert} from '../../components/alert';
 
+import {getUniqueTXs} from '../../modules/wallet-utils';
+
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
 
@@ -107,7 +109,7 @@ const Home = () => {
             transactions = transactions.concat(w.transactions);
         }
 
-        return transactions;
+        return getUniqueTXs(transactions);
     };
 
     // Fiat fetch

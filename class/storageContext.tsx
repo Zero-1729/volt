@@ -37,10 +37,16 @@ import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
 import {LegacyWallet} from './wallet/legacy';
 
 import {
+    descriptorFromTemplate,
+    fromDescriptorTemplatePublic,
+    fromDescriptor,
+} from '../modules/bdk';
+import {
     getDescriptorParts,
-    createDescriptor,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
+    getPubKeyFromXprv,
+    getExtendedKeyPrefix,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo} from '../modules/wallet-defaults';
@@ -676,24 +682,17 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
-    const _addNewWallet = async (
-        newWallet: TWalletType,
-        restored: boolean = false,
-    ) => {
+    const _addNewWallet = async (newWallet: TWalletType) => {
         // Set wallet ID
         _setCurrentWalletID(newWallet.id);
 
-        // Generate mnemonic and other key material if needed
-        if (!restored) {
-            const mnemonic = await generateMnemonic();
-            newWallet.secret = mnemonic;
-        }
-
         // If we have a mnemonic, generate extended key material
+        // Function applied when newly generated wallet and if mnemonic imported
         if (newWallet.secret !== '') {
             try {
                 const metas = getMetaFromMnemonic(
                     newWallet.secret,
+                    newWallet.derivationPath,
                     newWallet.network,
                 );
 
@@ -703,30 +702,27 @@ export const AppStorageProvider = ({children}: Props) => {
             } catch (e) {
                 throw e;
             }
+
+            // Generate descriptors for mnemonic
+            let InternalDescriptor;
+            let ExternalDescriptor;
+
+            ({InternalDescriptor, ExternalDescriptor} =
+                await descriptorFromTemplate(
+                    newWallet.secret,
+                    newWallet.type,
+                    newWallet.network,
+                ));
+
+            // REM: We only store the string representation of the descriptors
+            const externalString = await ExternalDescriptor.asString();
+            const internalString = await InternalDescriptor.asString();
+
+            newWallet.setDescriptor({
+                internal: internalString,
+                external: externalString,
+            });
         }
-
-        // Only generate if we don't already have one
-        // We can only generate one if we have either a mnemonic
-        // or an xprv, so check to see if either of those exist
-        if (
-            newWallet.secret !== '' ||
-            newWallet.xprv !== '' ||
-            newWallet.xpub !== ''
-        ) {
-            const walletDescriptor = createDescriptor(
-                newWallet.type,
-                newWallet.derivationPath,
-                !restored ? newWallet.secret : '',
-                newWallet.network,
-                restored ? newWallet.xprv || newWallet.xpub : '',
-                newWallet.masterFingerprint,
-            );
-
-            newWallet.setDescriptor(walletDescriptor);
-        }
-
-        // Determine if watch only wallet
-        newWallet.setWatchOnly();
 
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
@@ -758,27 +754,45 @@ export const AppStorageProvider = ({children}: Props) => {
             var fingerprint = '';
             var path = '';
 
+            var xpub = backupMaterialType === 'xpub' ? backupMaterial : '';
+            var xprv = backupMaterialType === 'xprv' ? backupMaterial : '';
+
+            // Adjust metas from descriptor
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
                 const desc = getDescriptorParts(backupMaterial);
+
+                // If we have a key missing the trailing path
+                // We artificially include that here
+                // TODO: ugly hack, probably best to require a descriptor with the trailing path
+                if (desc.key === desc.keyOnly) {
+                    backupMaterial = `${desc.scriptPrefix}[${
+                        desc.fingerprint
+                    }${desc.path.slice(1)}]${desc.key}/0/*${desc.scriptSuffix}${
+                        desc.checksum
+                    }`;
+                }
 
                 net = desc.network as NetType;
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
                 path = desc.path;
+                xpub =
+                    getExtendedKeyPrefix(desc.keyOnly) === 'xpub'
+                        ? desc.keyOnly
+                        : '';
+                xprv =
+                    getExtendedKeyPrefix(desc.keyOnly) === 'xprv'
+                        ? desc.keyOnly
+                        : '';
+
+                // Set xpub if we got an xprv
+                if (xpub === '') {
+                    xpub = getPubKeyFromXprv(xprv, net);
+                }
             }
 
-            const walletArgs = {
-                name: 'Restored Wallet',
-                type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
-                secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
-                descriptor:
-                    backupMaterialType === 'descriptor' ? backupMaterial : '',
-                xprv: backupMaterialType === 'xprv' ? backupMaterial : '',
-                xpub: backupMaterialType === 'xpub' ? backupMaterial : '',
-                network: net,
-            };
-
+            // Adjust metas from xprv or xpub
             if (
                 backupMaterialType === 'xprv' ||
                 backupMaterialType === 'xpub'
@@ -787,12 +801,30 @@ export const AppStorageProvider = ({children}: Props) => {
                 const {network, type} = extendedKeyInfo[backupMaterial[0]];
 
                 // Set the assumed default network and wallet type based on SLIP132
-                walletArgs.network = network;
-                walletArgs.type = type;
+                net = network;
+                walletType = type;
 
                 // Fetch metas from xkey
                 fingerprint = getFingerprintFromXkey(backupMaterial, network);
+
+                // Set xpub
+                if (backupMaterialType === 'xprv') {
+                    xpub = getPubKeyFromXprv(backupMaterial, network);
+                }
             }
+
+            const walletArgs = {
+                name: 'Restored Wallet',
+                type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
+                secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
+                descriptor:
+                    backupMaterialType === 'descriptor' ? backupMaterial : '',
+                xprv: xprv,
+                xpub: xpub,
+                network: net,
+                path: path,
+                fingerprint: fingerprint,
+            };
 
             // Handle material according to type
             var newWallet!: TWalletType;
@@ -802,6 +834,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 throw new Error('[restoreWallet] Invalid wallet type');
             }
 
+            // Create wallet based on type
             switch (walletArgs.type) {
                 case 'bech32':
                     newWallet = new SegWitNativeWallet(
@@ -820,11 +853,53 @@ export const AppStorageProvider = ({children}: Props) => {
                     break;
             }
 
-            // Set fingerprint and path if available
-            newWallet.masterFingerprint = path;
-            newWallet.setFingerprint(fingerprint);
+            // Create descriptor from imported descriptor if available
+            if (backupMaterialType === 'descriptor') {
+                const {internal, external} = await fromDescriptor(
+                    backupMaterial,
+                    walletArgs.network,
+                );
 
-            await _addNewWallet(newWallet, true);
+                const externalDescriptor = await external.asString();
+                const internalDescriptor = await internal.asString();
+
+                newWallet.setDescriptor({
+                    internal: internalDescriptor,
+                    external: externalDescriptor,
+                });
+            }
+
+            // Alternatively, generate Descriptor for Extended Keys
+            if (
+                backupMaterialType === 'xprv' ||
+                backupMaterialType === 'xpub'
+            ) {
+                try {
+                    const descriptor = await fromDescriptorTemplatePublic(
+                        xpub,
+                        fingerprint,
+                        walletArgs.type,
+                        net,
+                    );
+
+                    const externalDescriptor =
+                        await descriptor.ExternalDescriptor.asString();
+                    const internalDescriptor =
+                        await descriptor.InternalDescriptor.asString();
+
+                    newWallet.setDescriptor({
+                        external: externalDescriptor,
+                        internal: internalDescriptor,
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+
+            // Determine if watch only wallet
+            newWallet.setWatchOnly();
+
+            await _addNewWallet(newWallet);
         },
         [wallets, _updateWallets, _setWallets],
     );
@@ -839,12 +914,16 @@ export const AppStorageProvider = ({children}: Props) => {
                     throw new Error('[restoreWallet] Invalid wallet type');
                 }
 
+                // Generate mnemonic
+                const mnemonic = await generateMnemonic();
+
                 switch (type) {
                     case 'bech32':
                         newWallet = new SegWitNativeWallet({
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
 
                         break;
@@ -854,6 +933,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
                         break;
 
@@ -862,6 +942,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
+                            secret: mnemonic,
                         });
                         break;
                 }

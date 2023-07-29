@@ -8,6 +8,8 @@ import {SegWitNativeWallet} from '../class/wallet/segwit/bech32';
 import {SegWitP2SHWallet} from '../class/wallet/segwit/p2sh';
 import {LegacyWallet} from '../class/wallet/legacy';
 
+import {LocalUtxo} from 'bdk-rn/lib/classes/Bindings';
+
 export type NetType = 'bitcoin' | 'testnet';
 
 export type NetInfoType = NetInfoState | null;
@@ -25,7 +27,7 @@ export type FiatRate = {
 };
 
 // UTXO Type
-export type UTXOType = {
+export type UTXOType = LocalUtxo & {
     txid: string; // Transaction ID
     vout: number; // Transaction output index
     value: BalanceType; // Transaction output value in sats
@@ -48,6 +50,8 @@ export type TransactionType = {
     weight?: number; // Transaction weight
     fee: BalanceType; // Transaction fee in sats
     value: BalanceType; // Transaction value in sats
+    received: BalanceType; // Transaction received value in sats
+    sent: BalanceType; // Transaction sent value in sats
     timestamp: Date; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
     inputs?: UTXOType[]; // Transaction inputs
@@ -73,17 +77,23 @@ export type addressType = {
 };
 
 export type descriptorSymbolsType = string[];
+export type DescriptorObject = {
+    external: Descriptor;
+    internal: Descriptor;
+};
+export type Descriptor = string;
 
 export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
 
 export type baseWalletArgs = {
     name: string;
     type: string;
+    derivationPath?: string;
     secret?: string;
-    descriptor?: string;
     xprv?: string;
     xpub?: string;
     network?: NetType;
+    fingerprint?: string;
 };
 
 export type BDKWalletTypes =

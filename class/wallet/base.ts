@@ -10,15 +10,20 @@ import {
     NetType,
     baseWalletArgs,
     addressType,
+    DescriptorObject,
 } from './../../types/wallet';
 
 import {
-    descXpubPattern,
     getAddressPath,
-    generateAddressFromPath,
+    generateAddressFromMnemonic,
+    generateAddressFromXKey,
 } from '../../modules/wallet-utils';
 
-import {WalletPaths} from '../../modules/wallet-defaults';
+import {
+    WalletPaths,
+    GAP_LIMIT,
+    descXpubPattern,
+} from '../../modules/wallet-defaults';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
@@ -28,7 +33,6 @@ export class BaseWallet {
         const wallet = new BaseWallet({
             name: obj.name,
             type: obj.type,
-            descriptor: obj.descriptor,
             xprv: obj.xprv,
             xpub: obj.xpub,
             secret: obj.secret,
@@ -36,6 +40,12 @@ export class BaseWallet {
         });
 
         wallet.id = obj.id;
+
+        wallet.gap_limit = obj.gap_limit;
+
+        wallet.externalDescriptor = obj.externalDescriptor;
+        wallet.internalDescriptor = obj.internalDescriptor;
+
         wallet.addresses = obj.addresses;
         wallet.address = obj.address;
         wallet.birthday = obj.birthday;
@@ -62,8 +72,12 @@ export class BaseWallet {
     isWatchOnly: boolean;
     type: string;
 
-    descriptor: string;
+    externalDescriptor: string;
+    internalDescriptor: string;
+
     birthday: string | Date;
+
+    gap_limit: number;
 
     secret: string;
     xprv: string;
@@ -113,6 +127,7 @@ export class BaseWallet {
         }; // Default unit to display wallet balance is sats
 
         this.balance = new BigNumber(0); // By default the balance is in sats
+        this.gap_limit = GAP_LIMIT; // Gap limit for wallet
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin' or 'testnet' wallet
@@ -123,9 +138,13 @@ export class BaseWallet {
         this.hardwareWalletEnabled = false;
         this.hasBackedUp = false; // Whether user has backed up seed
 
-        this.derivationPath = WalletPaths[this.type][this.network]; // Wallet derivation path
+        this.derivationPath = args.derivationPath
+            ? args.derivationPath
+            : WalletPaths[this.type][this.network]; // Wallet derivation path
 
-        this.descriptor = args.descriptor ? args.descriptor : '';
+        this.internalDescriptor = ''; // Wallet internal descriptor
+        this.externalDescriptor = ''; // Wallet external descriptor
+
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
 
@@ -133,13 +152,13 @@ export class BaseWallet {
 
         this.isWatchOnly = false; // Whether wallet is watch only
 
-        // Retrieved and updated from BDK
-        this.masterFingerprint = ''; // Wallet master fingerprint
+        this.masterFingerprint = args.fingerprint ? args.fingerprint : ''; // Wallet master fingerprint
     }
 
-    generateNewAddress(): addressType {
+    generateNewAddress(index?: number): addressType {
         try {
-            let index = this.index;
+            let idx = index ? index : this.index;
+            let address!: string;
 
             const addressPath = getAddressPath(
                 this.index,
@@ -148,21 +167,31 @@ export class BaseWallet {
                 this.type,
             );
 
-            const address = generateAddressFromPath(
-                addressPath,
-                this.network,
-                this.type,
-                this.secret,
-            );
+            // Generate address using either mnemonic or xpub
+            if (this.secret.length > 0) {
+                address = generateAddressFromMnemonic(
+                    addressPath,
+                    this.network,
+                    this.type,
+                    this.secret,
+                );
+            } else {
+                address = generateAddressFromXKey(
+                    addressPath,
+                    this.network,
+                    this.type,
+                    this.xpub ? this.xpub : this.xprv,
+                );
+            }
 
             // Bump address index
-            this.index++;
+            this.index = index ? index : this.index + 1;
 
             return {
                 address: address,
                 path: this.derivationPath,
                 change: false,
-                index: index,
+                index: idx,
                 memo: '',
             };
         } catch (e) {
@@ -185,8 +214,8 @@ export class BaseWallet {
             // i.e. no prv key material in descriptor
             // Make sure descriptor is not empty, else assume no prv key material
             const noPrivKeyDescriptor =
-                this.descriptor !== ''
-                    ? this.descriptor.match(descXpubPattern)
+                this.externalDescriptor !== ''
+                    ? this.externalDescriptor.match(descXpubPattern)
                     : true;
 
             if (noPrivKeys && noPrivKeyDescriptor) {
@@ -230,8 +259,9 @@ export class BaseWallet {
         this.masterFingerprint = fingerprint;
     }
 
-    setDescriptor(descriptor: string) {
-        this.descriptor = descriptor;
+    setDescriptor(descriptor: DescriptorObject) {
+        this.internalDescriptor = descriptor.internal;
+        this.externalDescriptor = descriptor.external;
     }
 
     setAddress(address: addressType) {

@@ -51,8 +51,8 @@ const Info = () => {
     const walletFingerprint = walletData.masterFingerprint
         ? walletData.masterFingerprint.toUpperCase()
         : '-';
-    const walletDescriptor = walletData.descriptor
-        ? walletData.descriptor
+    const walletDescriptor = walletData.externalDescriptor
+        ? walletData.externalDescriptor
         : '-';
 
     const [walletDescriptorText, setWalletDescriptorText] =

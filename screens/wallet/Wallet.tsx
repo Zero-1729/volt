@@ -111,7 +111,7 @@ const Wallet = () => {
             if (!triggered) {
                 console.log('[Fiat Rate] Did not fetch fiat rate');
             }
-        } catch (e) {
+        } catch (e: any) {
             liberalAlert('Network', `${e.message}`, 'OK');
 
             setLoadingBalance(false);
@@ -121,10 +121,8 @@ const Wallet = () => {
 
         if (!loadingBalance) {
             // Update wallet balance first
-            const {balance, transactions, updated} = await getWalletBalance(
-                walletData,
-                electrumServerURL,
-            );
+            const {balance, transactions, updated, UTXOs} =
+                await getWalletBalance(walletData, electrumServerURL);
 
             // update wallet balance
             updateWalletBalance(currentWalletID, balance);
@@ -133,10 +131,10 @@ const Wallet = () => {
                 // Store newly formatted transactions from mempool.space data
                 const newTxs = [];
 
-                // Store newly fetched UTXOs
-                const newUTXOs = [];
-
                 const addressLock = !updated;
+
+                let tempReceiveAddress = walletData.address;
+                let addressIndexCount = walletData.index;
 
                 // Only attempt wallet address update if wallet balance is updated
                 if (updated) {
@@ -198,33 +196,18 @@ const Wallet = () => {
                                 tmp.address =
                                     TxData.vout[k].scriptpubkey_address;
 
-                                // Update tmp address
+                                // Update temp address
                                 if (
                                     !addressLock &&
                                     walletData.address.address ===
                                         TxData.vout[k].scriptpubkey_address
                                 ) {
-                                    const newAddress =
-                                        walletData.generateNewAddress();
-                                    updateWalletAddress(
-                                        currentWalletID,
-                                        newAddress,
-                                    );
+                                    tempReceiveAddress =
+                                        walletData.generateNewAddress(
+                                            addressIndexCount,
+                                        );
+                                    addressIndexCount++;
                                 }
-
-                                // Update transaction UTXOs that we own
-                                newUTXOs.push({
-                                    txid: transactions[i].txid,
-                                    vout: k,
-                                    value: new BigNumber(TxData.vout[k].value),
-                                    address:
-                                        TxData.vout[k].scriptpubkey_address,
-                                    scriptpubkey: TxData.vout[k].scriptpubkey,
-                                    scriptpubkey_asm:
-                                        TxData.vout[k].scriptpubkey_asm,
-                                    scriptpubkey_type:
-                                        TxData.vout[k].scriptpubkey_type,
-                                });
                             }
                         }
 
@@ -240,11 +223,14 @@ const Wallet = () => {
                     updateWalletTransactions(currentWalletID, newTxs);
 
                     // update wallet UTXOs
-                    updateWalletUTXOs(currentWalletID, newUTXOs);
+                    updateWalletUTXOs(currentWalletID, UTXOs);
+
+                    // update wallet address
+                    updateWalletAddress(currentWalletID, tempReceiveAddress);
                 }
 
                 setLoadLock(false);
-            } catch (e) {
+            } catch (e: any) {
                 liberalAlert('Network', `${e.message}`, 'OK');
 
                 setLoadingBalance(false);
@@ -521,7 +507,11 @@ const Wallet = () => {
                                     } items-center`,
                                 ),
                             ]}
-                            data={walletData.transactions}
+                            data={walletData.transactions.sort(
+                                (a: TransactionType, b: TransactionType) => {
+                                    return +b.timestamp - +a.timestamp;
+                                },
+                            )}
                             renderItem={item => (
                                 <TransactionListItem tx={item.item} />
                             )}

@@ -42,7 +42,7 @@ const Backup = () => {
     const walletAvailMaterial: string =
         walletData.secret !== ''
             ? 'Mnemonic'
-            : walletData.descriptor !== ''
+            : walletData.externalDescriptor !== ''
             ? 'Descriptor'
             : 'Extended Public Key (XPUB)';
 
@@ -53,8 +53,8 @@ const Backup = () => {
         }
 
         // Shows descriptor if available or toggled
-        if (walletData.descriptor || material === 'Descriptor') {
-            return walletData.descriptor;
+        if (walletData.externalDescriptor || material === 'Descriptor') {
+            return walletData.externalDescriptor;
         }
 
         // Fallback to xpub, assuming first two unavailable (i.e., in case only watch only xpub restore)

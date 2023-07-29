@@ -5,7 +5,7 @@ import * as b58 from 'bs58';
 import * as b58c from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
 
-import BIP32Factory from 'bip32';
+import {BIP32Factory, BIP32Interface} from 'bip32';
 import ecc from '@bitcoinerlab/secp256k1';
 
 const bip32 = BIP32Factory(ecc);
@@ -16,6 +16,7 @@ import {
     descriptorSymbolsType,
     BackupMaterialTypes,
     NetType,
+    TransactionType,
 } from '../types/wallet';
 
 import {
@@ -24,7 +25,26 @@ import {
     extendedKeyInfo,
     WalletPaths,
     DescriptorType,
+    wrappedWalletDescriptorRegex,
+    nativeWalletDescriptorRegex,
+    xprvPattern,
+    xpubPattern,
+    extendedKeyPattern,
 } from './wallet-defaults';
+
+export const getUniqueTXs = (
+    transactions: TransactionType[],
+): TransactionType[] => {
+    const uniqueTXs: TransactionType[] = [];
+
+    transactions.forEach(tx => {
+        if (!uniqueTXs.some(item => item.txid === tx.txid)) {
+            uniqueTXs.push({...tx});
+        }
+    });
+
+    return uniqueTXs;
+};
 
 export const validateMnenomic = (mnemonic: string) => {
     const resp = bip39.validateMnemonic(mnemonic);
@@ -40,31 +60,12 @@ export const mnemonicToSeedSync = (mnemonic: string) => {
     return bip39.mnemonicToSeedSync(mnemonic);
 };
 
-// Descriptor Regex
-// For now, we only support single key descriptors
-// with three specific script types (legacy, P2SH, and Bech32)
-//  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
-// Includes support fot optional (fingerprint + path prefix, e.g. [abce1234/49h/0h/0h])
-// Includes support for optional child derivation path suffix (i.e., /0/*)
-const _nativeWalletDescriptorRegex =
-    /^((wpkh|pkh)\((\[([a-e0-9]{8})(\/[1-9]{2}h)*(\/([0-9]h|\*))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\))$/;
-const _wrappedWalletDescriptorRegex =
-    /^(sh\(wpkh\((\[([a-e0-9]{8})(\/[1-9]{2}h)*(\/([0-9]h|\*))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)\))$/;
-
 export const isDescriptorPattern = (expression: string) => {
     return (
-        _nativeWalletDescriptorRegex.test(expression) ||
-        _wrappedWalletDescriptorRegex.test(expression)
+        nativeWalletDescriptorRegex.test(expression) ||
+        wrappedWalletDescriptorRegex.test(expression)
     );
 };
-
-// Extended Key Regexes
-const _extendedKeyPattern: RegExp =
-    /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-export const descXpubPattern: RegExp =
-    /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
-const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 
 // Descriptor Symbols
 export const descriptorSymbols: descriptorSymbolsType = [
@@ -99,7 +100,7 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
 };
 
 export const isSupportedExtKey = (key: string): boolean => {
-    return _xprvPattern.test(key) || _xpubPattern.test(key);
+    return xprvPattern.test(key) || xpubPattern.test(key);
 };
 
 export const isExtendedKey = (key: string): boolean => {
@@ -109,7 +110,7 @@ export const isExtendedKey = (key: string): boolean => {
     }
 
     // Pattern check
-    return _extendedKeyPattern.test(key);
+    return extendedKeyPattern.test(key);
 };
 
 // Get network and account path info from extended key
@@ -211,6 +212,8 @@ export const getDescriptorParts = (descriptor: string) => {
     let path = '';
     let key = '';
     let network = '';
+    let scriptPrefix = '';
+    let scriptSuffix = '';
 
     const scripts = parts.length === 3 ? [parts[0], parts[1]] : [parts[0]];
 
@@ -228,20 +231,34 @@ export const getDescriptorParts = (descriptor: string) => {
         if (/(\/[1-9]{2}h)(\/[0-9]h|\*)*/.test(data)) {
             let ret = /(\/[1-9]{2}h)(\/[0-9]h|\*)*/.exec(data);
 
-            path = ret ? ret[0] : '';
+            path = (ret ? ret[0] : '').replace(/h/g, "'");
         }
 
         key = data.split(']')[1];
         network = extendedKeyInfo[data.split(']')[1][0]].network;
+        scriptPrefix = scripts[0] + '(';
+        scriptSuffix = ')';
+    }
+
+    // Extract checksum if any
+    let checksum = '';
+    let checksumArray = scripts.slice(-1)[0].split('#').slice(-1);
+
+    if (checksumArray.length > 0) {
+        checksum = checksumArray[0];
     }
 
     // Gather data assuming non-nested script
     let components = {
-        key: data,
+        key: key,
+        keyOnly: key.split('/')[0],
         network: network,
         type: DescriptorType[scripts[0]],
         fingerprint: fingerprint,
         path: 'm/' + path.slice(1),
+        scriptPrefix: scriptPrefix,
+        scriptSuffix: scriptSuffix,
+        checksum: checksum,
     };
 
     // Handle nested script case
@@ -250,12 +267,15 @@ export const getDescriptorParts = (descriptor: string) => {
         key = data[0] === '[' ? data.split(']')[1] : data[0];
 
         components.key = key;
+        components.keyOnly = key.split('/')[0];
 
         // Set network and wallet type from descriptor
         components.network = extendedKeyInfo[key[0]].network;
         components.type = DescriptorType[scripts[0]];
         components.fingerprint = fingerprint;
         components.path = 'm/' + path.slice(1);
+        components.scriptPrefix = scripts[0] + '(' + scripts[1] + '(';
+        components.scriptSuffix = '))';
     }
 
     return components;
@@ -269,6 +289,7 @@ export const getAddressPath = (
     type: string,
 ): string => {
     // Get network prefix
+    // Uses unhardened derivation
     const prefix =
         network === 'bitcoin'
             ? WalletPaths[type].bitcoin
@@ -282,19 +303,88 @@ export const getAddressPath = (
     return `${prefix}/${changePrefix}/${index}`;
 };
 
-export const generateAddressFromPath = (
+export const generateRootFromXKey = (
+    xkey: string,
+    net: string,
+    addresPath: string,
+): BIP32Interface => {
+    const prefix = getExtendedKeyPrefix(xkey);
+
+    let root = bip32.fromBase58(xkey, BJSNetworks[net]);
+
+    // Check that xpub given is three levels deep
+    if (prefix === 'xpub') {
+        if (root.depth === 0) {
+            throw new Error(
+                '0-depth xpub missing private to generate hardened child key.',
+            );
+        }
+
+        // derive address path for xpub (i.e. change and index), assume base path included before xpub generated (depth 3)
+        // Then manually derive change and index
+        const [change, index] = addresPath.split('/').slice(-2);
+
+        root = root.derive(Number(change)).derive(Number(index));
+    }
+
+    // Derive root using address path if xprv given
+    // Otherwise, assume xpub given is three level deep
+    if (prefix === 'xprv') {
+        root = root.derivePath(addresPath);
+    }
+
+    return root;
+};
+
+export const generateRootFromMnemonic = (
+    secret: string,
     path: string,
+    net: string,
+): BIP32Interface => {
+    const seed = mnemonicToSeedSync(secret);
+    const root = bip32.fromSeed(seed, BJSNetworks[net]);
+
+    return root.derivePath(path);
+};
+
+export const generateAddressFromXKey = (
+    addressPath: string,
+    net: string,
+    type: string,
+    xkey: string,
+): string => {
+    // XPub | Xprv -> Xpub, includes address path (coin/account/chain/change/index)
+    const pubKeyRoot = generateRootFromXKey(xkey, net, addressPath);
+
+    const address = _generateAddress(net, type, pubKeyRoot);
+
+    return address;
+};
+
+export const generateAddressFromMnemonic = (
+    addressPath: string,
     net: string,
     type: string,
     secret: string,
+): string => {
+    const pubKey = generateRootFromMnemonic(secret, addressPath, net);
+
+    const address = _generateAddress(net, type, pubKey);
+
+    return address;
+};
+
+const _generateAddress = (
+    net: string,
+    type: string,
+    root: BIP32Interface,
 ): string => {
     let address = '';
 
     const network = BJSNetworks[net];
 
-    const seed = mnemonicToSeedSync(secret);
-    const root = bip32.fromSeed(seed, network);
-    const keyPair = root.derivePath(path.replace(/h/g, "'"));
+    // Assumed root includes full derivation path (i.e. m/84'/1'/0'/0/0)
+    let keyPair = root;
 
     switch (type) {
         case 'legacy':
@@ -381,7 +471,7 @@ export const createDescriptor = (
             throw new Error('[CreateDescriptor] Invalid Mnemonic.');
         }
 
-        const meta = getMetaFromMnemonic(mnemonic, network);
+        const meta = getMetaFromMnemonic(mnemonic, path, network);
 
         _xprv = !_xprv ? meta.xprv : _xprv;
         _fingerprint = !_fingerprint ? meta.fingerprint : _fingerprint;
@@ -406,7 +496,7 @@ export const createDescriptor = (
     descriptor = descriptor.replace(/'/g, 'h');
 
     // Add descriptor key
-    if (!_xprvPattern.test(_xprv)) {
+    if (!xprvPattern.test(_xprv)) {
         throw new Error('[CreateDescriptor] Unsupported xprv.');
     }
 
@@ -433,19 +523,59 @@ export const createDescriptor = (
     return descriptor;
 };
 
-export const getMetaFromMnemonic = (mnemonic: string, network: NetType) => {
+export const getMetaFromMnemonic = (
+    mnemonic: string,
+    walletPath: string,
+    network: NetType,
+) => {
     const seed = mnemonicToSeedSync(mnemonic);
     const node = bip32.fromSeed(seed, BJSNetworks[network]);
 
+    const xpub = node.derivePath(walletPath).neutered().toBase58();
+
     return {
         xprv: node.toBase58(),
-        xpub: node.neutered().toBase58(),
+        xpub: xpub,
         fingerprint: node.fingerprint.toString('hex'),
     };
+};
+
+export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
+    const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
+
+    // TODO: handle zpub/prv case && other exotic prefixes
+    const derivationPath = WalletPaths[keyInfo.type][network];
+
+    let node = bip32.fromBase58(xprv, BJSNetworks[network]);
+
+    // Report if not master of 3-depth node
+    if (node.depth !== 0 && node.depth !== 3) {
+        throw new Error(
+            'Extended private key must be master or 3-depth child.',
+        );
+    }
+
+    // Generate child 3-depth node if xprv is a master node
+    // Else assume xprv is a 3-depth child node
+    if (node.depth === 0) {
+        node = node.derivePath(derivationPath);
+    }
+
+    return node.neutered().toBase58();
 };
 
 export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
     const node = bip32.fromBase58(xkey, BJSNetworks[network]);
 
+    if (node.depth > 0) {
+        return _getParentFingerprintHex(node.toBase58());
+    }
+
     return node.fingerprint.toString('hex');
+};
+
+const _getParentFingerprintHex = (xkey: string): string => {
+    const decoded = b58.decode(xkey);
+
+    return Buffer.from(decoded.slice(5, 9)).toString('hex');
 };

@@ -98,7 +98,13 @@ const ImportAction = () => {
         // Validate if a valid mnemonic
         try {
             validateMnenomic(mnemonic);
+        } catch {
+            // Let user know the mnemonic is valid
+            errorAlert('Mnemonic', 'This is an invalid mnemonic');
+        }
 
+        // Report any other issues separately
+        try {
             // Clear input
             setImportText('');
 
@@ -108,7 +114,7 @@ const ImportAction = () => {
             handleSuccessRoute();
         } catch (e: any) {
             // Let user know the mnemonic is valid
-            errorAlert('Mnemonic', 'This is an invalid mnemonic');
+            errorAlert('Mnemonic', e.message);
         }
     };
 
