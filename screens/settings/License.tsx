@@ -71,10 +71,7 @@ const License = () => {
 
                 <View
                     style={[
-                        tailwind(
-                            'self-center w-full h-full items-center rounded-t-2xl',
-                        ),
-                        {backgroundColor: ColorScheme.Background.Secondary},
+                        tailwind('self-center w-full h-full items-center'),
                     ]}>
                     <FlatList
                         style={tailwind('w-5/6 pt-8')}

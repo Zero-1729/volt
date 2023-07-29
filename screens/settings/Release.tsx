@@ -28,7 +28,7 @@ const Release = () => {
             <View style={tailwind('mb-2')}>
                 <Text
                     style={[
-                        tailwind('text-xs text-justify'),
+                        tailwind('text-sm text-justify'),
                         {color: ColorScheme.Text.Default},
                         Font.RobotoText,
                     ]}>
@@ -67,13 +67,11 @@ const Release = () => {
 
                 <View
                     style={[
-                        tailwind(
-                            'self-center w-full h-full items-center rounded-t-2xl',
-                        ),
-                        {backgroundColor: ColorScheme.Background.Secondary},
+                        tailwind('self-center w-full h-full items-center'),
                     ]}>
                     <FlatList
-                        style={[tailwind('w-5/6 pt-8')]}
+                        contentContainerStyle={{paddingBottom: 100}}
+                        style={[tailwind('w-5/6 pt-4')]}
                         data={Notes}
                         renderItem={renderItem}
                         keyExtractor={(_item, index) => `${index}`}
