@@ -16,6 +16,7 @@ import {
     descriptorSymbolsType,
     BackupMaterialTypes,
     NetType,
+    TransactionType,
 } from '../types/wallet';
 
 import {
@@ -30,6 +31,20 @@ import {
     xpubPattern,
     extendedKeyPattern,
 } from './wallet-defaults';
+
+export const getUniqueTXs = (
+    transactions: TransactionType[],
+): TransactionType[] => {
+    const uniqueTXs: TransactionType[] = [];
+
+    transactions.forEach(tx => {
+        if (!uniqueTXs.some(item => item.txid === tx.txid)) {
+            uniqueTXs.push({...tx});
+        }
+    });
+
+    return uniqueTXs;
+};
 
 export const validateMnenomic = (mnemonic: string) => {
     const resp = bip39.validateMnemonic(mnemonic);
