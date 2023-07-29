@@ -132,7 +132,7 @@ const ImportAction = () => {
             if (!isDescriptorPattern(descriptor)) {
                 errorAlert(
                     'Descriptor',
-                    'Only single-sig descriptors are supported (i.e. wpkh([...]...), pkh([...]...), sh(wpkh([...]...))',
+                    'Only single-key descriptors are supported (i.e. wpkh([...]...), pkh([...]...), sh(wpkh([...]...))',
                 );
 
                 return;
