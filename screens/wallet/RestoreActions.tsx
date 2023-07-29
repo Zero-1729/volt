@@ -323,7 +323,16 @@ const ImportAction = () => {
 
                     {/* Wallet Network */}
                     {isAdvancedMode ? (
-                        <View style={[tailwind('mt-8 flex-row')]}>
+                        <View
+                            style={[
+                                tailwind(
+                                    `mt-8 flex-row ${
+                                        isExtendedKey(importText.trim())
+                                            ? 'opacity-40'
+                                            : ''
+                                    }`,
+                                ),
+                            ]}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
@@ -333,6 +342,7 @@ const ImportAction = () => {
                             </Text>
                             {/* btn */}
                             <Checkbox
+                                disabled={isExtendedKey(importText.trim())}
                                 fillColor={
                                     ColorScheme.Background.CheckBoxFilled
                                 }
@@ -340,7 +350,11 @@ const ImportAction = () => {
                                     ColorScheme.Background.CheckBoxUnfilled
                                 }
                                 size={18}
-                                isChecked={network === 'testnet'}
+                                isChecked={
+                                    network === 'testnet' &&
+                                    getNetworkIfXkey(importText.trim()) ===
+                                        'testnet'
+                                }
                                 iconStyle={{
                                     borderWidth: 1,
                                     borderRadius: 2,
