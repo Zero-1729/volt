@@ -473,7 +473,10 @@ export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
 };
 
 const _getParentFingerprintHex = (xkey: string): string => {
-    const decoded = b58.decode(xkey);
+    const decoded = _deserializeExtendedKey(xkey);
+
+    return Buffer.from(decoded.subarray(5, 9)).toString('hex');
+};
 
     return Buffer.from(decoded.slice(5, 9)).toString('hex');
 };
