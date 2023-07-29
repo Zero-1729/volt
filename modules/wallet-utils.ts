@@ -214,7 +214,7 @@ export const getDescriptorParts = (descriptor: string) => {
         if (/(\/[1-9]{2}h)(\/[0-9]h|\*)*/.test(data)) {
             let ret = /(\/[1-9]{2}h)(\/[0-9]h|\*)*/.exec(data);
 
-            path = ret ? ret[0] : '';
+            path = (ret ? ret[0] : '').replace(/h/g, "'");
         }
 
         key = data.split(']')[1];
