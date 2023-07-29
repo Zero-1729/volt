@@ -35,6 +35,22 @@ export const generateMnemonic = async () => {
     return mnemonic.asString();
 };
 
+export const fromDescriptor = async (descriptor: string, net: NetType) => {
+    const newDescriptor = await new BDK.Descriptor().create(
+        descriptor,
+        net as Network,
+    );
+
+    // TODO: Find a better way to do this
+    // Return actual internal/external
+    // perhaps manipulate descriptor to '1/*' and '0/*'
+    // including checksums
+    return {
+        external: newDescriptor,
+        internal: newDescriptor,
+    };
+};
+
 // Formats transaction data from BDK to format for wallet
 export const formatTXFromBDK = (tx: any): TransactionType => {
     let value = new BigNumber(Math.abs(tx.sent - tx.received));
