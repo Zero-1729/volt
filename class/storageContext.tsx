@@ -762,6 +762,17 @@ export const AppStorageProvider = ({children}: Props) => {
                 // Grab the descriptor network and type
                 const desc = getDescriptorParts(backupMaterial);
 
+                // If we have a key missing the trailing path
+                // We artificially include that here
+                // TODO: ugly hack, probably best to require a descriptor with the trailing path
+                if (desc.key === desc.keyOnly) {
+                    backupMaterial = `${desc.scriptPrefix}[${
+                        desc.fingerprint
+                    }${desc.path.slice(1)}]${desc.key}/0/*${desc.scriptSuffix}${
+                        desc.checksum
+                    }`;
+                }
+
                 net = desc.network as NetType;
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
