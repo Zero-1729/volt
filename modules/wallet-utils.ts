@@ -478,5 +478,19 @@ const _getParentFingerprintHex = (xkey: string): string => {
     return Buffer.from(decoded.subarray(5, 9)).toString('hex');
 };
 
-    return Buffer.from(decoded.slice(5, 9)).toString('hex');
+export const normalizeXpub = (xpub: string) => {
+    const network = extendedKeyInfo[_getPrefix(xpub)[0]].network;
+
+    // Bitcoinjs-lib supports only tpub and xpub prefixes
+    // Convert exotic prefixes to tpub or xpub
+    if (['u', 'v', 'y', 'z'].includes(xpub[0])) {
+        const convertedXPUB = convertXPUB(
+            xpub,
+            network === 'testnet' ? 'tpub' : 'xpub',
+        );
+
+        return convertedXPUB;
+    }
+
+    return xpub;
 };
