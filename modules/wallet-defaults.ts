@@ -157,9 +157,9 @@ export const GAP_LIMIT = 20;
 // Includes support fot optional (fingerprint + path prefix, e.g. [abce1234/49h/0h/0h])
 // Includes support for optional child derivation path suffix (i.e., /0/*)
 export const nativeWalletDescriptorRegex =
-    /^((wpkh|pkh)\((\[([a-e0-9]{8})(\/[1-9]{2}(h|'))*(\/([0-9](h|'|\*)))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\))$/;
+    /^((wpkh|pkh)\((\[([a-e0-9]{8})(\/[1-9]{2}(h|'))*(\/([0-9](h|'|\*)))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)(#[a-z0-9]{8})?)$/;
 export const wrappedWalletDescriptorRegex =
-    /^(sh\(wpkh\((\[([a-e0-9]{8})(\/[1-9]{2}(h|'))*(\/([0-9](h|'|\*)))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)\))$/;
+    /^(sh\(wpkh\((\[([a-e0-9]{8})(\/[1-9]{2}(h|'))*(\/([0-9](h|'|\*)))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)\)(#[a-z0-9]{8})?)$/;
 
 // Extended Key Regexes
 export const extendedKeyPattern: RegExp =
