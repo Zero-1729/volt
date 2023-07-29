@@ -86,17 +86,22 @@ export const TransactionListItem = (props: TxListItemProps) => {
                         tailwind(
                             'w-10 h-10 rounded-full items-center justify-center',
                         ),
-                        {backgroundColor: ColorScheme.Background.Secondary},
+                        {
+                            backgroundColor:
+                                props.tx.type === 'inbound'
+                                    ? ColorScheme.Background.Received
+                                    : ColorScheme.Background.Sent,
+                        },
                     ]}>
                     {props.tx.type === 'inbound' ? (
                         <ArrowDown
-                            fill={ColorScheme.SVG.Default}
-                            style={[tailwind('opacity-60')]}
+                            fill={ColorScheme.SVG.Received}
+                            style={[tailwind('opacity-80')]}
                         />
                     ) : (
                         <ArrowUp
-                            fill={ColorScheme.SVG.Default}
-                            style={[tailwind('opacity-60')]}
+                            fill={ColorScheme.SVG.Sent}
+                            style={[tailwind('opacity-80')]}
                         />
                     )}
                 </View>
