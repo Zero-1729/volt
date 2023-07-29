@@ -507,7 +507,11 @@ const Wallet = () => {
                                     } items-center`,
                                 ),
                             ]}
-                            data={walletData.transactions}
+                            data={walletData.transactions.sort(
+                                (a: TransactionType, b: TransactionType) => {
+                                    return +b.timestamp - +a.timestamp;
+                                },
+                            )}
                             renderItem={item => (
                                 <TransactionListItem tx={item.item} />
                             )}
