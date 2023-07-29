@@ -343,11 +343,16 @@ const Wallet = () => {
 
                     {/* Watch-only */}
                     {walletData.isWatchOnly ? (
-                        <View style={[tailwind('absolute top-10 right-6')]}>
+                        <View
+                            style={[
+                                tailwind(
+                                    'absolute top-11 rounded-full bg-black opacity-50',
+                                ),
+                            ]}>
                             <Text
                                 style={[
                                     tailwind(
-                                        'text-sm py-1 px-2 self-center text-white font-bold bg-black rounded opacity-40',
+                                        'text-sm py-1 px-6 text-white font-bold',
                                     ),
                                 ]}>
                                 Watch-only
