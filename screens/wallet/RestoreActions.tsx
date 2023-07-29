@@ -156,7 +156,7 @@ const ImportAction = () => {
             await restoreWallet(
                 extendedKey,
                 getExtendedKeyPrefix(extendedKey),
-                network,
+                getNetworkIfXkey(extendedKey),
             );
 
             // Clear input
