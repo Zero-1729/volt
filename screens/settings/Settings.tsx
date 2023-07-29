@@ -319,7 +319,7 @@ const Settings = () => {
                                     } text-red-600`,
                                 ),
                             ]}>
-                            Reset Data
+                            Reset App Data
                         </Text>
                     </PlainButton>
                 ) : (
