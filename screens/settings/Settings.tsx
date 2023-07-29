@@ -303,9 +303,8 @@ const Settings = () => {
                     </View>
                 </View>
 
-                {isDevMode ? (
+                {isDevMode && isWalletInitialized ? (
                     <PlainButton
-                        disabled={!isWalletInitialized}
                         onPress={showDialog}
                         style={[
                             tailwind('absolute items-center'),
@@ -314,9 +313,7 @@ const Settings = () => {
                         <Text
                             style={[
                                 tailwind(
-                                    `text-sm w-full font-bold ${
-                                        !isWalletInitialized ? 'opacity-20' : ''
-                                    } text-red-600`,
+                                    'text-sm w-full font-bold text-red-600',
                                 ),
                             ]}>
                             Reset App Data
