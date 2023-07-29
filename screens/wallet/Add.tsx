@@ -94,7 +94,7 @@ const Add = () => {
 
                         <Text
                             style={[
-                                tailwind('mt-4 text-xs'),
+                                tailwind('mt-4 mb-2 text-xs'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
                             Create a wallet with a new seed.
@@ -110,13 +110,13 @@ const Add = () => {
                                 <View
                                     style={[
                                         tailwind(
-                                            'px-4 py-2 bg-black rounded-sm mt-4',
+                                            'px-6 py-2 bg-black rounded-full mt-4',
                                         ),
                                     ]}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-xs text-white font-medium',
+                                                'text-xs text-white font-bold',
                                             ),
                                             Font.RobotoText,
                                         ]}>
@@ -137,7 +137,7 @@ const Add = () => {
                             Import
                         </Text>
 
-                        <Text style={[tailwind('mt-4 text-white text-xs')]}>
+                        <Text style={[tailwind('mt-4 mb-2 text-white text-xs')]}>
                             Restore wallet from seed or other backup material.
                             Select if you want to import an existing wallet.
                         </Text>
@@ -152,13 +152,13 @@ const Add = () => {
                                 <View
                                     style={[
                                         tailwind(
-                                            'px-4 py-2 bg-black rounded-sm mt-4',
+                                            'px-6 py-2 bg-black rounded-full mt-4',
                                         ),
                                     ]}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-xs text-white font-medium',
+                                                'text-xs text-white font-bold',
                                             ),
                                             Font.RobotoText,
                                         ]}>
