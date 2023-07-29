@@ -110,9 +110,7 @@ export const WalletCard = (props: WalletCardProps) => {
                         ellipsizeMode="middle"
                         style={[
                             tailwind(
-                                `pt-4 ${
-                                    props.isWatchOnly ? '' : 'mt-1'
-                                } text-xl w-full text-left font-medium text-white`,
+                                'pt-4 mt-1 text-xl w-full text-left font-medium text-white',
                             ),
                             Font.RobotoText,
                         ]}>
