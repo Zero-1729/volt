@@ -51,12 +51,7 @@ const Info = () => {
     const walletFingerprint = walletData.masterFingerprint
         ? walletData.masterFingerprint.toUpperCase()
         : '-';
-    const walletDescriptor = walletData.externalDescriptor
-        ? walletData.externalDescriptor
-        : '-';
 
-    const [walletDescriptorText, setWalletDescriptorText] =
-        useState(walletDescriptor);
     const [walletFingerprintText, setWalletFingerprintText] =
         useState(walletFingerprint);
     const [walletPathText, setWalletPathText] = useState(walletPath);
@@ -78,16 +73,6 @@ const Info = () => {
 
         setTimeout(() => {
             setWalletFingerprintText(walletFingerprintText);
-        }, 450);
-    };
-
-    const copyDescToClipboard = () => {
-        Clipboard.setString(walletDescriptor);
-
-        setWalletDescriptorText('Copied to clipboard');
-
-        setTimeout(() => {
-            setWalletDescriptorText(walletDescriptorText);
         }, 450);
     };
 
@@ -271,35 +256,6 @@ const Info = () => {
                             {walletTypeName}
                         </Text>
                     </View>
-                </View>
-
-                {/* Wallet Descriptor */}
-                <View style={[tailwind('w-5/6 mt-6')]}>
-                    <Text
-                        style={[
-                            tailwind('text-sm mb-2'),
-                            {color: ColorScheme.Text.GrayedText},
-                        ]}>
-                        Descriptor
-                    </Text>
-
-                    <PlainButton onPress={copyDescToClipboard}>
-                        <Text
-                            numberOfLines={1}
-                            ellipsizeMode="middle"
-                            style={[
-                                tailwind(
-                                    `text-sm ${
-                                        walletDescriptor !== '-'
-                                            ? 'text-center'
-                                            : 'text-left'
-                                    }`,
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {walletDescriptorText}
-                        </Text>
-                    </PlainButton>
                 </View>
 
                 {/* View Divider */}
