@@ -37,14 +37,19 @@ export const generateMnemonic = async () => {
 
 // Formats transaction data from BDK to format for wallet
 export const formatTXFromBDK = (tx: any): TransactionType => {
+    let value = new BigNumber(Math.abs(tx.sent - tx.received));
+    value = tx.sent > 0 ? value.minus(tx.fee) : value;
+
     const formattedTx = {
         txid: tx.txid,
         confirmed: tx.confirmed,
         block_height: tx.confirmationTime.height,
         timestamp: tx.confirmationTime.timestamp,
         fee: new BigNumber(tx.fee),
-        value: new BigNumber(tx.received.length !== '' ? tx.received : tx.sent),
-        type: tx.received.length !== '' ? 'inbound' : 'outbound',
+        value: value,
+        received: new BigNumber(tx.received),
+        sent: new BigNumber(tx.sent),
+        type: tx.sent - tx.received > 0 ? 'outbound' : 'inbound',
         network: tx.network,
     };
 
