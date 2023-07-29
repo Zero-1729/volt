@@ -309,8 +309,14 @@ export const generateRootFromXKey = (
     addressPath: string,
 ): BIP32Interface => {
     const prefix = getExtendedKeyPrefix(xkey);
+    let key = xkey;
 
-    let root = bip32.fromBase58(xkey, BJSNetworks[net]);
+    // We must normalize the xpub for bitcoinjs-lib
+    if (prefix === 'xpub') {
+        key = normalizeXpub(xkey);
+    }
+
+    let root = bip32.fromBase58(key, BJSNetworks[net]);
 
     // Check that xpub given is three levels deep
     if (prefix === 'xpub') {
@@ -463,7 +469,13 @@ export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
 };
 
 export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
-    const node = bip32.fromBase58(xkey, BJSNetworks[network]);
+    let key = xkey;
+
+    if (getExtendedKeyPrefix(xkey) === 'xpub') {
+        key = normalizeXpub(xkey);
+    }
+
+    const node = bip32.fromBase58(key, BJSNetworks[network]);
 
     if (node.depth > 0) {
         return _getParentFingerprintHex(node.toBase58());
