@@ -24,6 +24,11 @@ import {
     extendedKeyInfo,
     WalletPaths,
     DescriptorType,
+    wrappedWalletDescriptorRegex,
+    nativeWalletDescriptorRegex,
+    xprvPattern,
+    xpubPattern,
+    extendedKeyPattern,
 } from './wallet-defaults';
 
 export const validateMnenomic = (mnemonic: string) => {
@@ -40,31 +45,12 @@ export const mnemonicToSeedSync = (mnemonic: string) => {
     return bip39.mnemonicToSeedSync(mnemonic);
 };
 
-// Descriptor Regex
-// For now, we only support single key descriptors
-// with three specific script types (legacy, P2SH, and Bech32)
-//  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
-// Includes support fot optional (fingerprint + path prefix, e.g. [abce1234/49h/0h/0h])
-// Includes support for optional child derivation path suffix (i.e., /0/*)
-const _nativeWalletDescriptorRegex =
-    /^((wpkh|pkh)\((\[([a-e0-9]{8})(\/[1-9]{2}h)*(\/([0-9]h|\*))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\))$/;
-const _wrappedWalletDescriptorRegex =
-    /^(sh\(wpkh\((\[([a-e0-9]{8})(\/[1-9]{2}h)*(\/([0-9]h|\*))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)\))$/;
-
 export const isDescriptorPattern = (expression: string) => {
     return (
-        _nativeWalletDescriptorRegex.test(expression) ||
-        _wrappedWalletDescriptorRegex.test(expression)
+        nativeWalletDescriptorRegex.test(expression) ||
+        wrappedWalletDescriptorRegex.test(expression)
     );
 };
-
-// Extended Key Regexes
-const _extendedKeyPattern: RegExp =
-    /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-export const descXpubPattern: RegExp =
-    /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
-const _xpubPattern: RegExp = /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-const _xprvPattern: RegExp = /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;
 
 // Descriptor Symbols
 export const descriptorSymbols: descriptorSymbolsType = [
@@ -99,7 +85,7 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
 };
 
 export const isSupportedExtKey = (key: string): boolean => {
-    return _xprvPattern.test(key) || _xpubPattern.test(key);
+    return xprvPattern.test(key) || xpubPattern.test(key);
 };
 
 export const isExtendedKey = (key: string): boolean => {
@@ -109,7 +95,7 @@ export const isExtendedKey = (key: string): boolean => {
     }
 
     // Pattern check
-    return _extendedKeyPattern.test(key);
+    return extendedKeyPattern.test(key);
 };
 
 // Get network and account path info from extended key
@@ -476,7 +462,7 @@ export const createDescriptor = (
     descriptor = descriptor.replace(/'/g, 'h');
 
     // Add descriptor key
-    if (!_xprvPattern.test(_xprv)) {
+    if (!xprvPattern.test(_xprv)) {
         throw new Error('[CreateDescriptor] Unsupported xprv.');
     }
 
