@@ -61,7 +61,9 @@ export const EmptyCard = () => {
 
                 <PlainButton
                     style={[
-                        tailwind('absolute bottom-6 left-6 px-8 py-2 rounded'),
+                        tailwind(
+                            'absolute bottom-6 left-6 px-8 py-2 rounded-full',
+                        ),
                         {
                             backgroundColor: ColorScheme.Background.Inverted,
                         },
@@ -73,7 +75,7 @@ export const EmptyCard = () => {
                     }}>
                     <Text
                         style={[
-                            tailwind('text-xs font-medium'),
+                            tailwind('text-xs font-bold'),
                             {color: ColorScheme.Text.Alt},
                             Font.RobotoText,
                         ]}>
