@@ -338,7 +338,7 @@ const Settings = () => {
                     }}>
                     <View
                         style={[
-                            tailwind('self-center p-3 px-12 rounded-md'),
+                            tailwind('self-center p-3 px-12 rounded-full'),
                             {
                                 backgroundColor:
                                     ColorScheme.Background.Inverted,
@@ -346,7 +346,7 @@ const Settings = () => {
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-sm font-medium'),
+                                tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Alt},
                                 Font.RobotoText,
                             ]}>
