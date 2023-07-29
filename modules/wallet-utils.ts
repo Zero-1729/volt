@@ -223,7 +223,8 @@ export const getDescriptorParts = (descriptor: string) => {
 
     // Gather data assuming non-nested script
     let components = {
-        key: data,
+        key: key,
+        keyOnly: key.split('/')[0],
         network: network,
         type: DescriptorType[scripts[0]],
         fingerprint: fingerprint,
@@ -236,6 +237,7 @@ export const getDescriptorParts = (descriptor: string) => {
         key = data[0] === '[' ? data.split(']')[1] : data[0];
 
         components.key = key;
+        components.keyOnly = key.split('/')[0];
 
         // Set network and wallet type from descriptor
         components.network = extendedKeyInfo[key[0]].network;
