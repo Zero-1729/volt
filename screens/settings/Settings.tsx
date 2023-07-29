@@ -57,8 +57,8 @@ const Settings = () => {
 
     const showDialog = () => {
         DeletionAlert(
-            'Delete Data',
-            'Are you sure you want to reset the App data?',
+            'Reset Data',
+            'Are you sure you want to delete the App data?',
             'Reset',
             handleAppDataReset,
         );
@@ -308,7 +308,7 @@ const Settings = () => {
                         onPress={showDialog}
                         style={[
                             tailwind('absolute items-center'),
-                            {bottom: bottomOffset[device]},
+                            {bottom: bottomOffset[device] + 10},
                         ]}>
                         <Text
                             style={[
@@ -316,7 +316,7 @@ const Settings = () => {
                                     'text-sm w-full font-bold text-red-600',
                                 ),
                             ]}>
-                            Reset App Data
+                            Reset App
                         </Text>
                     </PlainButton>
                 ) : (
