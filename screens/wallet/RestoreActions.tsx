@@ -22,6 +22,7 @@ import {
     isDescriptorPattern,
     validateMnenomic,
 } from '../../modules/wallet-utils';
+import {extendedKeyInfo} from '../../modules/wallet-defaults';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -193,6 +194,18 @@ const ImportAction = () => {
             return true;
         }
         return false;
+    };
+
+    const getNetworkIfXkey = (text: string) => {
+        if (text.length === 0) {
+            return network;
+        }
+
+        if (isExtendedKey(text) && isSupportedExtKey(text)) {
+            return extendedKeyInfo[text[0]].network;
+        }
+
+        return network;
     };
 
     const handleImport = (material: string) => {
