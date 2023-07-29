@@ -70,7 +70,7 @@ const Mnemonic = () => {
                             tailwind('font-bold text-lg'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Successfully Created Wallet
+                        Backup Mnemonic
                     </Text>
                 </View>
 
@@ -92,13 +92,18 @@ const Mnemonic = () => {
                             (tailwind('text-sm'),
                             {color: ColorScheme.Text.Default})
                         }>
-                        <Text style={[tailwind('font-bold text-sm')]}>
+                        <Text
+                            style={[tailwind('font-bold text-sm text-center')]}>
                             NOTE:
                         </Text>{' '}
                         Please, back up your mnemonic phrase. It is the only way
                         to restore your wallet.
                         {'\n\n'}
-                        <Text style={[{color: ColorScheme.Text.GrayedText}]}>
+                        <Text
+                            style={[
+                                tailwind('text-center'),
+                                {color: ColorScheme.Text.GrayedText},
+                            ]}>
                             You can backup your mnemonic phrase by writing it
                             down on a piece of paper and storing it in a safe
                             place. Do not share it with anyone.
