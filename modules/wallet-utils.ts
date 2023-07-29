@@ -242,9 +242,9 @@ export const getDescriptorParts = (descriptor: string) => {
 
     // Extract checksum if any
     let checksum = '';
-    let checksumArray = scripts.slice(-1)[0].split('#').slice(-1);
+    let checksumArray = parts.slice(-1)[0].split('#').slice(-1);
 
-    if (checksumArray.length > 0) {
+    if (checksum.includes('#')) {
         checksum = checksumArray[0];
     }
 
