@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React, {useContext} from 'react';
+import React from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -7,16 +7,12 @@ import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from './button';
 
-import {AppStorageContext} from '../class/storageContext';
-
 import {Balance} from './balance';
 
 import {WalletCardProps} from '../types/props';
 
 import Font from '../constants/Font';
 import Color from '../constants/Color';
-
-import {WalletTypeNames} from '../modules/wallet-defaults';
 
 export const EmptyCard = () => {
     const navigation = useNavigation();
@@ -92,8 +88,6 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const tailwind = useTailwind();
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
-
     return (
         <PlainButton
             onPress={() => {
@@ -128,33 +122,22 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind(
-                                'bg-black absolute left-6 top-14 rounded-sm opacity-50',
+                                'bg-black absolute left-6 top-14 rounded-full opacity-50',
                             ),
                         ]}>
                         <Text
                             style={[
                                 tailwind(
-                                    'text-xs text-white font-bold px-2 py-1',
+                                    'text-xs text-white font-bold px-4 py-1',
                                 ),
                                 Font.RobotoText,
                             ]}>
-                            {`${WalletTypeNames[props.walletType][0]}${
-                                isAdvancedMode
-                                    ? ' (' +
-                                      WalletTypeNames[props.walletType][1] +
-                                      ')'
-                                    : ''
-                            }`}
+                            {`${props.isWatchOnly ? 'Watch only' : ''}`}
                         </Text>
                     </View>
 
                     {/* Balance */}
-                    <View
-                        style={tailwind(
-                            `w-full absolute mx-6 ${
-                                props.isWatchOnly ? 'bottom-9' : 'bottom-6'
-                            }`,
-                        )}>
+                    <View style={tailwind('w-full absolute mx-6 bottom-6')}>
                         <Balance
                             id={props.id}
                             BalanceFontSize={'text-2xl'}
@@ -162,27 +145,6 @@ export const WalletCard = (props: WalletCardProps) => {
                             loading={props.loading}
                         />
                     </View>
-
-                    {props.isWatchOnly ? (
-                        <View
-                            style={[
-                                tailwind(
-                                    'left-0 bg-white w-full py-1 rounded-bl-md rounded-tr-sm absolute bottom-0 self-center opacity-60',
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind(
-                                        'text-xs self-end pr-4 font-medium text-black',
-                                    ),
-                                    Font.RobotoText,
-                                ]}>
-                                Watch-only
-                            </Text>
-                        </View>
-                    ) : (
-                        <></>
-                    )}
                 </View>
             </View>
         </PlainButton>
