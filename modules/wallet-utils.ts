@@ -306,7 +306,7 @@ export const getAddressPath = (
 export const generateRootFromXKey = (
     xkey: string,
     net: string,
-    addresPath: string,
+    addressPath: string,
 ): BIP32Interface => {
     const prefix = getExtendedKeyPrefix(xkey);
 
@@ -322,7 +322,7 @@ export const generateRootFromXKey = (
 
         // derive address path for xpub (i.e. change and index), assume base path included before xpub generated (depth 3)
         // Then manually derive change and index
-        const [change, index] = addresPath.split('/').slice(-2);
+        const [change, index] = addressPath.split('/').slice(-2);
 
         root = root.derive(Number(change)).derive(Number(index));
     }
@@ -330,7 +330,7 @@ export const generateRootFromXKey = (
     // Derive root using address path if xprv given
     // Otherwise, assume xpub given is three level deep
     if (prefix === 'xprv') {
-        root = root.derivePath(addresPath);
+        root = root.derivePath(addressPath);
     }
 
     return root;
