@@ -52,6 +52,13 @@ const Xpub = () => {
 
     const navigation = useNavigation();
 
+    const setAndClear = (value: any) => {
+        setVersion(value);
+
+        setResultMessage('');
+        setResulteMessageText('');
+    };
+
     const copyXpubToClipboard = () => {
         Clipboard.setString(resultMessage);
 
@@ -216,7 +223,7 @@ const Xpub = () => {
                         value={version}
                         items={versions}
                         setOpen={setOpen}
-                        setValue={setVersion}
+                        setValue={setAndClear}
                         setItems={setVersions}
                     />
                 </View>
