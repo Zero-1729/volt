@@ -212,6 +212,8 @@ export const getDescriptorParts = (descriptor: string) => {
     let path = '';
     let key = '';
     let network = '';
+    let scriptPrefix = '';
+    let scriptSuffix = '';
 
     const scripts = parts.length === 3 ? [parts[0], parts[1]] : [parts[0]];
 
@@ -234,6 +236,16 @@ export const getDescriptorParts = (descriptor: string) => {
 
         key = data.split(']')[1];
         network = extendedKeyInfo[data.split(']')[1][0]].network;
+        scriptPrefix = scripts[0] + '(';
+        scriptSuffix = ')';
+    }
+
+    // Extract checksum if any
+    let checksum = '';
+    let checksumArray = scripts.slice(-1)[0].split('#').slice(-1);
+
+    if (checksumArray.length > 0) {
+        checksum = checksumArray[0];
     }
 
     // Gather data assuming non-nested script
@@ -244,6 +256,9 @@ export const getDescriptorParts = (descriptor: string) => {
         type: DescriptorType[scripts[0]],
         fingerprint: fingerprint,
         path: 'm/' + path.slice(1),
+        scriptPrefix: scriptPrefix,
+        scriptSuffix: scriptSuffix,
+        checksum: checksum,
     };
 
     // Handle nested script case
@@ -259,6 +274,8 @@ export const getDescriptorParts = (descriptor: string) => {
         components.type = DescriptorType[scripts[0]];
         components.fingerprint = fingerprint;
         components.path = 'm/' + path.slice(1);
+        components.scriptPrefix = scripts[0] + '(' + scripts[1] + '(';
+        components.scriptSuffix = '))';
     }
 
     return components;
