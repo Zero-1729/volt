@@ -4,7 +4,7 @@ import {Text, View, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-import {PlainButton, LongBottomButton} from '../../components/button';
+import {PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 import {DeletionAlert, liberalAlert} from '../../components/alert';
 
@@ -327,13 +327,22 @@ const Info = () => {
                 </PlainButton>
 
                 {/* Delete Wallet btn */}
-                <LongBottomButton
-                    title="Delete"
+                <PlainButton
                     onPress={showDialog}
-                    textColor={ColorScheme.Text.Alert}
-                    backgroundColor={ColorScheme.Background.Alert}
-                    style={[tailwind('font-bold')]}
-                />
+                    style={[
+                        tailwind('absolute bottom-6 px-8 py-3 rounded-full'),
+                        {
+                            backgroundColor: ColorScheme.Background.Alert,
+                        },
+                    ]}>
+                    <Text
+                        style={[
+                            tailwind('font-bold'),
+                            {color: ColorScheme.Text.Alert},
+                        ]}>
+                        Delete
+                    </Text>
+                </PlainButton>
             </View>
         </SafeAreaView>
     );
