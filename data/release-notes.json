@@ -16,5 +16,6 @@
     "Added Receive Address screen with QR and share support",
     "Added Receive amount screen",
     "Request amount in sats or fiat",
-    "Display requested amount reflects approximation in either sats or fiat"
+    "Display requested amount reflects approximation in either sats or fiat",
+    "Wallets now includes internal and external descriptors"
 ]
