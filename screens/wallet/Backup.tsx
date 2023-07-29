@@ -104,32 +104,37 @@ const Backup = () => {
                     </View>
 
                     {/* Display wallet name */}
-                    <Text
-                        style={[
-                            tailwind(
-                                '-mt-20 mb-1 font-bold self-center text-center text-xl w-5/6',
-                            ),
-                            {color: ColorScheme.Text.Default},
-                        ]}
-                        numberOfLines={1}
-                        ellipsizeMode={'middle'}>
-                        {walletData.name}
-                    </Text>
+                    <View
+                        style={tailwind(
+                            'absolute top-14 justify-center w-full',
+                        )}>
+                        <Text
+                            style={[
+                                tailwind(
+                                    'mb-1 font-bold self-center text-center text-xl w-5/6',
+                                ),
+                                {color: ColorScheme.Text.Default},
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode={'middle'}>
+                            {walletData.name}
+                        </Text>
 
-                    {/* Display wallet type */}
-                    <Text
-                        style={[
-                            tailwind('text-base self-center mb-6'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        {walletTypeName}
-                    </Text>
+                        {/* Display wallet type */}
+                        <Text
+                            style={[
+                                tailwind('text-base self-center mb-10'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {walletTypeName}
+                        </Text>
+                    </View>
 
                     {/* Display wallet seed */}
                     <View
                         style={[
                             tailwind(
-                                'flex-row self-center items-center justify-center rounded-sm p-2 px-4 mb-4 bg-blue-800',
+                                '-mt-10 flex-row self-center items-center justify-center rounded-sm p-2 px-4 mb-4 bg-blue-800',
                             ),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>

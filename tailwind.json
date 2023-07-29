@@ -159,6 +159,11 @@
 			"marginRight": -4
 		}
 	},
+	"-mt-10": {
+		"style": {
+			"marginTop": -40
+		}
+	},
 	"-mt-12": {
 		"style": {
 			"marginTop": -48
