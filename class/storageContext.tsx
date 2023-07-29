@@ -764,6 +764,19 @@ export const AppStorageProvider = ({children}: Props) => {
                 walletType = desc.type;
                 fingerprint = desc.fingerprint;
                 path = desc.path;
+                xpub =
+                    getExtendedKeyPrefix(desc.keyOnly) === 'xpub'
+                        ? desc.keyOnly
+                        : '';
+                xprv =
+                    getExtendedKeyPrefix(desc.keyOnly) === 'xprv'
+                        ? desc.keyOnly
+                        : '';
+
+                // Set xpub if we got an xprv
+                if (xpub === '') {
+                    xpub = getPubKeyFromXprv(xprv, net);
+                }
             }
 
             // Adjust metas from xprv or xpub
