@@ -94,19 +94,7 @@ const Backup = () => {
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}
-                    <View
-                        style={[
-                            tailwind(
-                                'w-full justify-between absolute top-6 flex-row',
-                            ),
-                        ]}>
-                        <Text
-                            style={[
-                                tailwind('text-lg font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            Backup
-                        </Text>
+                    <View style={[tailwind('absolute top-6 right-0')]}>
                         <PlainButton
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
