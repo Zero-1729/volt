@@ -108,7 +108,7 @@ const Wallet = () => {
                                             tailwind('text-sm font-medium'),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Use Sat Symbol
+                                        Enable Sat Symbol
                                     </Text>
                                     <Checkbox
                                         fillColor={
