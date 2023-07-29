@@ -50,6 +50,8 @@ export type TransactionType = {
     weight?: number; // Transaction weight
     fee: BalanceType; // Transaction fee in sats
     value: BalanceType; // Transaction value in sats
+    received: BalanceType; // Transaction received value in sats
+    sent: BalanceType; // Transaction sent value in sats
     timestamp: Date; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
     inputs?: UTXOType[]; // Transaction inputs
