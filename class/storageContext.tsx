@@ -39,12 +39,14 @@ import {LegacyWallet} from './wallet/legacy';
 import {
     descriptorFromTemplate,
     fromDescriptorTemplatePublic,
+    fromDescriptor,
 } from '../modules/bdk';
 import {
     getDescriptorParts,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
     getPubKeyFromXprv,
+    getExtendedKeyPrefix,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo} from '../modules/wallet-defaults';
@@ -840,7 +842,23 @@ export const AppStorageProvider = ({children}: Props) => {
                     break;
             }
 
-            // Generate Descriptor for Extended Keys
+            // Create descriptor from imported descriptor if available
+            if (backupMaterialType === 'descriptor') {
+                const {internal, external} = await fromDescriptor(
+                    backupMaterial,
+                    walletArgs.network,
+                );
+
+                const externalDescriptor = await external.asString();
+                const internalDescriptor = await internal.asString();
+
+                newWallet.setDescriptor({
+                    internal: internalDescriptor,
+                    external: externalDescriptor,
+                });
+            }
+
+            // Alternatively, generate Descriptor for Extended Keys
             if (
                 backupMaterialType === 'xprv' ||
                 backupMaterialType === 'xpub'
