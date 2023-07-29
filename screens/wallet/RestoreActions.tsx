@@ -106,11 +106,11 @@ const ImportAction = () => {
 
         // Report any other issues separately
         try {
-            // Clear input
-            setImportText('');
-
             // Restore wallet using mnemonic
             await restoreWallet(mnemonic, 'mnemonic', network);
+
+            // Clear input
+            setImportText('');
 
             handleSuccessRoute();
         } catch (e: any) {
@@ -139,10 +139,10 @@ const ImportAction = () => {
                 return;
             }
 
+            await restoreWallet(descriptor, 'descriptor', network);
+
             // Clear input
             setImportText('');
-
-            await restoreWallet(descriptor, 'descriptor', network);
 
             handleSuccessRoute();
         } catch (e: any) {
@@ -151,15 +151,15 @@ const ImportAction = () => {
     };
 
     const handleExtendedKey = async (extendedKey: string) => {
-        // Clear input
-        setImportText('');
-
         try {
             await restoreWallet(
                 extendedKey,
                 getExtendedKeyPrefix(extendedKey),
                 network,
             );
+
+            // Clear input
+            setImportText('');
 
             handleSuccessRoute();
         } catch (e: any) {
