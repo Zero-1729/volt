@@ -355,7 +355,7 @@ const Wallet = () => {
                                         'text-sm py-1 px-6 text-white font-bold',
                                     ),
                                 ]}>
-                                Watch-only
+                                Watch only
                             </Text>
                         </View>
                     ) : (
