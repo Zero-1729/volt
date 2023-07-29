@@ -101,6 +101,7 @@ const ImportAction = () => {
         } catch {
             // Let user know the mnemonic is valid
             errorAlert('Mnemonic', 'This is an invalid mnemonic');
+            return;
         }
 
         // Report any other issues separately
@@ -309,7 +310,7 @@ const ImportAction = () => {
 
                     {/* Wallet Network */}
                     {isAdvancedMode ? (
-                        <View style={[tailwind('mt-10 flex-row')]}>
+                        <View style={[tailwind('mt-8 flex-row')]}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
