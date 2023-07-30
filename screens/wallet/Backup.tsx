@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useState} from 'react';
 
 import {Text, View, useColorScheme} from 'react-native';
@@ -8,6 +9,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {useNavigation, CommonActions} from '@react-navigation/core';
 
 import QRCode from 'react-native-qrcode-svg';
+import Checkbox from 'react-native-bouncy-checkbox';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -18,6 +20,9 @@ import {PlainButton} from '../../components/button';
 import {AppStorageContext} from '../../class/storageContext';
 
 import {WalletTypeDetails} from '../../modules/wallet-defaults';
+
+import RNHapticFeedback from 'react-native-haptic-feedback';
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import Close from '../../assets/svg/x-24.svg';
 
@@ -37,6 +42,8 @@ const Backup = () => {
         walletType[0] +
         (isAdvancedMode ? ` (${WalletTypeDetails[walletData.type][1]})` : '');
 
+    const [showPrivateDescriptor, setShowPrivateDescriptor] = useState(false);
+
     // Key material currently stored in wallet
     const isSingleMaterial = walletData.secret === '';
     const walletAvailMaterial: string =
@@ -46,6 +53,20 @@ const Backup = () => {
             ? 'Descriptor'
             : 'Extended Public Key (XPUB)';
 
+    const togglePrivateDescriptor = () => {
+        if (showPrivateDescriptor) {
+            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+
+            setShowPrivateDescriptor(false);
+
+            setBackupData(walletData.externalDescriptor);
+        } else {
+            setShowPrivateDescriptor(true);
+
+            setBackupData(walletData.privateDescriptor);
+        }
+    };
+
     const getQRData = (material: string) => {
         // Only show mnemonic if mnemonic available and toggled
         if (material === 'Mnemonic' && walletData.secret !== '') {
@@ -54,7 +75,9 @@ const Backup = () => {
 
         // Shows descriptor if available or toggled
         if (walletData.externalDescriptor || material === 'Descriptor') {
-            return walletData.externalDescriptor;
+            return showPrivateDescriptor
+                ? walletData.privateDescriptor
+                : walletData.externalDescriptor;
         }
 
         // Fallback to xpub, assuming first two unavailable (i.e., in case only watch only xpub restore)
@@ -69,6 +92,12 @@ const Backup = () => {
 
     // Update the displayed backup data and current backup material type
     const updateData = (material: string) => {
+        // Clear the Private Descriptor toggle
+        // It's super sensitive and should be reset
+        if (material !== 'Descriptor') {
+            setShowPrivateDescriptor(false);
+        }
+
         setBackupData(getQRData(material));
         setBackupMaterial(material);
     };
@@ -86,8 +115,9 @@ const Backup = () => {
         }, 450);
     };
 
-    const warning =
-        'This material is the only way to recover your wallet. If you lose it, you will lose your funds. Please write it down and keep it in a safe place. Do not Screenshot or share it with anyone.';
+    const info =
+        'Keep your wallet safe to protect your funds. Please, write down and secure this backup material.';
+    const warning = 'Do not screenshot or share with anyone.';
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -134,7 +164,7 @@ const Backup = () => {
                     <View
                         style={[
                             tailwind(
-                                '-mt-10 flex-row self-center items-center justify-center rounded-sm p-2 px-4 mb-4 bg-blue-800',
+                                'flex-row self-center items-center justify-center rounded-full p-2 px-6 mb-4 bg-blue-800',
                             ),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
@@ -235,7 +265,7 @@ const Backup = () => {
 
                     {/* Display either seed or descriptor */}
                     <PlainButton
-                        style={[tailwind('items-center')]}
+                        style={[tailwind('items-center mb-4')]}
                         onPress={copyDescToClipboard}>
                         <Text
                             style={[
@@ -256,19 +286,86 @@ const Backup = () => {
                         </Text>
                     </PlainButton>
 
+                    {/* Toggle with private key version */}
+                    {/* Only available if not watch-only */}
+                    {!walletData.isWatchOnly &&
+                        backupMaterial === 'Descriptor' && (
+                            <View
+                                style={[
+                                    tailwind(
+                                        'mb-4 self-center w-11/12 flex-row',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {
+                                            color: showPrivateDescriptor
+                                                ? ColorScheme.Text.Default
+                                                : ColorScheme.Text.GrayedText,
+                                        },
+                                    ]}>
+                                    {!showPrivateDescriptor
+                                        ? 'Display'
+                                        : 'Hide'}{' '}
+                                    Extended Private Key Descriptor
+                                </Text>
+                                {/* btn */}
+                                <Checkbox
+                                    fillColor={
+                                        ColorScheme.Background.CheckBoxFilled
+                                    }
+                                    unfillColor={
+                                        ColorScheme.Background.CheckBoxUnfilled
+                                    }
+                                    size={18}
+                                    isChecked={showPrivateDescriptor}
+                                    iconStyle={{
+                                        borderWidth: 1,
+                                        borderRadius: 2,
+                                    }}
+                                    innerIconStyle={{
+                                        borderWidth: 1,
+                                        borderColor: showPrivateDescriptor
+                                            ? ColorScheme.Background
+                                                  .CheckBoxOutline
+                                            : 'grey',
+                                        borderRadius: 2,
+                                    }}
+                                    style={[
+                                        tailwind('flex-row absolute -right-4'),
+                                    ]}
+                                    onPress={() => {
+                                        RNHapticFeedback.trigger(
+                                            'rigid',
+                                            RNHapticFeedbackOptions,
+                                        );
+
+                                        togglePrivateDescriptor();
+                                    }}
+                                    disableBuiltInState={true}
+                                />
+                            </View>
+                        )}
+
                     <View
                         style={[
-                            tailwind('absolute flex-row justify-center w-full'),
+                            tailwind('absolute flex w-full'),
                             {bottom: NativeWindowMetrics.bottom},
                         ]}>
                         <Text
                             style={[
-                                tailwind('items-center text-sm justify-center'),
+                                tailwind('text-sm text-center mb-4'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {info}
+                        </Text>
+
+                        <Text
+                            style={[
+                                tailwind('text-sm text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            <Text style={[tailwind('font-bold ml-4')]}>
-                                WARNING:{' '}
-                            </Text>
                             <Text>{warning}</Text>
                         </Text>
                     </View>
