@@ -392,6 +392,10 @@
   justify-content: space-around
 }
 
+.self-start {
+  align-self: flex-start
+}
+
 .self-center {
   align-self: center
 }

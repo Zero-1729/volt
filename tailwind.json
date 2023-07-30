@@ -494,6 +494,11 @@
 			"justifyContent": "space-around"
 		}
 	},
+	"self-start": {
+		"style": {
+			"alignSelf": "flex-start"
+		}
+	},
 	"self-center": {
 		"style": {
 			"alignSelf": "center"

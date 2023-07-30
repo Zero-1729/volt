@@ -66,7 +66,6 @@ type defaultContextType = {
     loadLock: boolean;
     appUnit: Unit;
     fiatRate: FiatRate;
-    useSatSymbol: boolean;
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
     isAdvancedMode: boolean;
@@ -77,7 +76,6 @@ type defaultContextType = {
     setNetworkState: (networkState: NetInfoType) => void;
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
-    setSatSymbol: (useSatSymbol: boolean) => void;
     updateFiatRate: (fiatObj: FiatRate) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
@@ -130,7 +128,6 @@ const defaultContext: defaultContextType = {
     },
     currentWalletID: '',
     isDevMode: false,
-    useSatSymbol: true, // To boost adoption and awareness of sat symbol
     hideTotalBalance: false,
     isWalletInitialized: false,
     isAdvancedMode: false,
@@ -142,7 +139,6 @@ const defaultContext: defaultContextType = {
     setNetworkState: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
-    setSatSymbol: () => {},
     updateFiatRate: () => {},
     setTotalBalanceHidden: () => {},
     setIsAdvancedMode: () => {},
@@ -177,7 +173,6 @@ export const AppStorageProvider = ({children}: Props) => {
     );
     const [appUnit, _setAppUnit] = useState(defaultContext.appUnit);
     const [fiatRate, _setFiatRate] = useState(defaultContext.fiatRate);
-    const [useSatSymbol, _setSatSymbol] = useState(defaultContext.useSatSymbol);
     // Will change to false once app in Beta version
     const [hideTotalBalance, _setTotalBalanceHidden] = useState(
         defaultContext.hideTotalBalance,
@@ -210,8 +205,6 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('appUnit');
     const {getItem: _getFiatRate, setItem: _updateFiatRate} =
         useAsyncStorage('fiatRate');
-    const {getItem: _getUseSatSymbol, setItem: _updateUseSatSymbol} =
-        useAsyncStorage('useSatSymbol');
     const {
         getItem: _getTotalBalanceHidden,
         setItem: _updateTotalBalanceHidden,
@@ -359,30 +352,6 @@ export const AppStorageProvider = ({children}: Props) => {
         },
         [_setFiatRate, _updateFiatRate],
     );
-
-    const setSatSymbol = useCallback(
-        async (useSat: boolean) => {
-            try {
-                _setSatSymbol(useSat);
-                _updateUseSatSymbol(JSON.stringify(useSat));
-            } catch (e) {
-                console.error(
-                    `[AsyncStorage] (Use sat symbol setting) Error loading data: ${e}`,
-                );
-
-                throw new Error('Unable to set sat symbol option');
-            }
-        },
-        [_updateUseSatSymbol, _setSatSymbol],
-    );
-
-    const _loadUseSatSymbol = async () => {
-        const useSatSym = await _getUseSatSymbol();
-
-        if (useSatSym !== null) {
-            _setSatSymbol(JSON.parse(useSatSym));
-        }
-    };
 
     const setTotalBalanceHidden = useCallback(
         async (hide: boolean) => {
@@ -1009,10 +978,6 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
-        _loadUseSatSymbol();
-    }, []);
-
-    useEffect(() => {
         _loadTotalBalanceHidden();
     }, []);
 
@@ -1056,8 +1021,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 setAppFiatCurrency,
                 appUnit,
                 fiatRate,
-                useSatSymbol,
-                setSatSymbol,
                 updateFiatRate,
                 hideTotalBalance,
                 setTotalBalanceHidden,

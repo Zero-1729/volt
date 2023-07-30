@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useState} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 
@@ -47,28 +48,24 @@ const _getBalance = (
 export const TXBalance = (props: TxBalanceProps) => {
     const tailwind = useTailwind();
 
-    const {useSatSymbol, appUnit, fiatRate} = useContext(AppStorageContext);
+    const {appUnit, fiatRate} = useContext(AppStorageContext);
 
     return (
         <>
             <View style={[tailwind('flex-row items-center')]}>
-                {/* Display satSymbol if enabled in settings.
-                Hide and fallback to 'sats' below if satSymbol is disabled in settings */}
-                {useSatSymbol ? (
-                    <Text
-                        numberOfLines={1}
-                        style={[
-                            tailwind(
-                                `${props.BalanceFontSize} font-bold self-baseline mr-2`,
-                            ),
-                            {color: props.fontColor},
-                            Font.SatSymbol,
-                        ]}>
-                        s
-                    </Text>
-                ) : (
-                    <></>
-                )}
+                {/* Display Satoshi symbol or Bitcoin symbol */}
+                <Text
+                    numberOfLines={1}
+                    style={[
+                        tailwind(
+                            `${props.BalanceFontSize} font-bold self-start mr-2`,
+                        ),
+                        {color: props.fontColor},
+                        {marginTop: appUnit.name === 'sats' ? 1 : 0},
+                        Font.SatSymbol,
+                    ]}>
+                    {appUnit.symbol}
+                </Text>
 
                 {/* Display balance in sats */}
                 <Text
@@ -81,17 +78,6 @@ export const TXBalance = (props: TxBalanceProps) => {
                     ]}>
                     {_getBalance(props.balance, appUnit, fiatRate, false)}
                 </Text>
-
-                {/* Only display 'sats' if we are using satSymbol */}
-                {!useSatSymbol ? (
-                    <Text
-                        style={[tailwind('text-xl self-baseline text-white')]}>
-                        {' '}
-                        sats
-                    </Text>
-                ) : (
-                    <></>
-                )}
             </View>
         </>
     );
@@ -101,7 +87,6 @@ export const Balance = (props: BalanceProps) => {
     const tailwind = useTailwind();
 
     const {
-        useSatSymbol,
         hideTotalBalance,
         getWalletData,
         appFiatCurrency,
@@ -112,13 +97,6 @@ export const Balance = (props: BalanceProps) => {
     const [unit, setUnit] = useState(appUnit);
 
     const walletData = getWalletData(props.id);
-
-    // Whether we are displaying fiat or not
-    const isFiat =
-        !(unit.name === 'BTC') &&
-        !(unit.name === 'sats') &&
-        !props.disableFiat &&
-        fiatRate;
 
     // Toggle between BTC and sats
     // and fiat if enabled
@@ -157,28 +135,25 @@ export const Balance = (props: BalanceProps) => {
                                 }`,
                             ),
                         ]}>
-                        {/* Display satSymbol if enabled in settings, otherwise display BTC or Fiat symbol (if enabled).
-                        Hide and fallback to 'sats' below if unit is sats and satSymbol is disabled in settings */}
-                        {useSatSymbol || isFiat || unit.name === 'BTC' ? (
-                            <Text
-                                numberOfLines={1}
-                                style={[
-                                    tailwind(
-                                        `${
-                                            props.BalanceFontSize
-                                                ? props.BalanceFontSize
-                                                : 'text-2xl'
-                                        } self-center mt-0.5 mr-2 text-white`,
-                                    ),
-                                    unit.name === 'sats' || props.disableFiat
-                                        ? Font.SatSymbol
-                                        : {},
-                                ]}>
-                                {unit.symbol}
-                            </Text>
-                        ) : (
-                            <></>
-                        )}
+                        {/* Satoshi Symbol */}
+                        <Text
+                            numberOfLines={1}
+                            style={[
+                                tailwind(
+                                    `${
+                                        props.BalanceFontSize
+                                            ? props.BalanceFontSize
+                                            : 'text-2xl'
+                                    } self-center ${
+                                        appUnit.name === 'sats' ? 'mt-0.5' : ''
+                                    } mr-2 text-white`,
+                                ),
+                                unit.name === 'sats' || props.disableFiat
+                                    ? Font.SatSymbol
+                                    : {},
+                            ]}>
+                            {unit.symbol}
+                        </Text>
 
                         {/* Display balance in sats or BTC */}
                         <Text
@@ -199,21 +174,6 @@ export const Balance = (props: BalanceProps) => {
                                 props.disableFiat,
                             )}
                         </Text>
-
-                        {/* Only display 'sats' if we are set to showing sats and not using satSymbol */}
-                        {!useSatSymbol && unit.name === 'sats' ? (
-                            <Text
-                                style={[
-                                    tailwind(
-                                        'text-xl self-baseline text-white',
-                                    ),
-                                ]}>
-                                {' '}
-                                sats
-                            </Text>
-                        ) : (
-                            <></>
-                        )}
                     </View>
                 </PlainButton>
             ) : (
@@ -304,8 +264,6 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
-    const {useSatSymbol} = useContext(AppStorageContext);
-
     return (
         <View style={[tailwind('flex-row')]}>
             {props.isApprox ? (
@@ -319,21 +277,18 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
             ) : (
                 <></>
             )}
-            {useSatSymbol ? (
-                <Text
-                    numberOfLines={1}
-                    style={[
-                        tailwind(
-                            `${props.fontSize} font-bold self-center mt-0.5 mr-2`,
-                        ),
-                        {color: ColorScheme.Text.Default},
-                        Font.SatSymbol,
-                    ]}>
-                    s
-                </Text>
-            ) : (
-                <></>
-            )}
+            <Text
+                numberOfLines={1}
+                style={[
+                    tailwind(
+                        `${props.fontSize} font-bold self-center mt-0.5 mr-2`,
+                    ),
+                    {color: ColorScheme.Text.Default},
+                    Font.SatSymbol,
+                ]}>
+                s
+            </Text>
+
             <Text
                 style={[
                     tailwind(`${props.fontSize} self-center font-bold`),
@@ -341,18 +296,6 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
                 ]}>
                 {props.amount.isZero() ? '0' : formatSats(props.amount)}
             </Text>
-            {!useSatSymbol ? (
-                <Text
-                    style={[
-                        tailwind(`${props.fontSize} font-bold`),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
-                    {' '}
-                    sats
-                </Text>
-            ) : (
-                <></>
-            )}
         </View>
     );
 };
