@@ -80,6 +80,7 @@ export type descriptorSymbolsType = string[];
 export type DescriptorObject = {
     external: Descriptor;
     internal: Descriptor;
+    private: Descriptor;
 };
 export type Descriptor = string;
 
