@@ -3,7 +3,7 @@ import React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import Home from './screens/tabs/Home';
+import Home from './screens/Home';
 
 // Wallet screens
 import Add from './screens/wallet/Add';
@@ -17,10 +17,10 @@ import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
 
-import Apps from './screens/tabs/Apps';
+import Apps from './screens/Apps';
 
 // QR Code Scan screen
-import Scan from './screens/tabs/Scan';
+import Scan from './screens/Scan';
 
 // Main app settings screens
 import Settings from './screens/settings/Settings';

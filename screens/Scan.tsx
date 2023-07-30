@@ -6,7 +6,7 @@ import {useIsFocused, CommonActions} from '@react-navigation/native';
 
 import {runOnJS} from 'react-native-reanimated';
 
-import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {
     useCameraDevices,
@@ -30,10 +30,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {LongButton, PlainButton} from '../../components/button';
+import {LongButton, PlainButton} from '../components/button';
 
-import Close from '../../assets/svg/x-circle-fill-24.svg';
-import Color from '../../constants/Color';
+import Close from '../assets/svg/x-circle-fill-24.svg';
+import Color from '../constants/Color';
 
 const LoadingView = (props: any) => {
     const ColorScheme = Color(useColorScheme());

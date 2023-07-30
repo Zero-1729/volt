@@ -12,33 +12,33 @@ import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {AppStorageContext} from '../../class/storageContext';
+import {AppStorageContext} from '../class/storageContext';
 
-import {getWalletBalance} from '../../modules/bdk';
+import {getWalletBalance} from '../modules/bdk';
 
-import Dots from '../../assets/svg/kebab-horizontal-24.svg';
-import Add from '../../assets/svg/plus-32.svg';
+import Dots from '../assets/svg/kebab-horizontal-24.svg';
+import Add from '../assets/svg/plus-32.svg';
 
-import Box from '../../assets/svg/inbox-24.svg';
+import Box from '../assets/svg/inbox-24.svg';
 
-import Color from '../../constants/Color';
-import Font from '../../constants/Font';
+import Color from '../constants/Color';
+import Font from '../constants/Font';
 
-import {PlainButton} from '../../components/button';
-import {EmptyCard, WalletCard} from '../../components/card';
-import {TransactionListItem} from '../../components/transaction';
+import {PlainButton} from '../components/button';
+import {EmptyCard, WalletCard} from '../components/card';
+import {TransactionListItem} from '../components/transaction';
 
-import {BaseWallet} from '../../class/wallet/base';
-import {BalanceType, TransactionType} from '../../types/wallet';
+import {BaseWallet} from '../class/wallet/base';
+import {BalanceType, TransactionType} from '../types/wallet';
 
 import NetInfo from '@react-native-community/netinfo';
 
-import {FiatBalance} from '../../components/balance';
+import {FiatBalance} from '../components/balance';
 
-import {fetchFiatRate} from '../../modules/currency';
-import {liberalAlert} from '../../components/alert';
+import {fetchFiatRate} from '../modules/currency';
+import {liberalAlert} from '../components/alert';
 
-import {getUniqueTXs} from '../../modules/wallet-utils';
+import {getUniqueTXs} from '../modules/wallet-utils';
 
 const Home = () => {
     const ColorScheme = Color(useColorScheme());
