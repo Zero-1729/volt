@@ -1668,7 +1668,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@craftzdog/react-native-buffer@npm:^6.0.4, @craftzdog/react-native-buffer@npm:^6.0.5":
+"@craftzdog/react-native-buffer@npm:^6.0.5":
   version: 6.0.5
   resolution: "@craftzdog/react-native-buffer@npm:6.0.5"
   dependencies:
@@ -12450,7 +12450,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-quick-base64@npm:^2.0.2, react-native-quick-base64@npm:^2.0.5":
+"react-native-quick-base64@npm:^2.0.5":
   version: 2.0.6
   resolution: "react-native-quick-base64@npm:2.0.6"
   dependencies:
@@ -12462,21 +12462,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-quick-crypto@https://github.com/yfeleke/react-native-quick-crypto":
-  version: 0.5.0
-  resolution: "react-native-quick-crypto@https://github.com/yfeleke/react-native-quick-crypto.git#commit=d7d0ca4e0d0eaee28a0df694c39df110459c1fb8"
+"react-native-quick-crypto@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "react-native-quick-crypto@npm:0.6.1"
   dependencies:
-    "@craftzdog/react-native-buffer": ^6.0.4
+    "@craftzdog/react-native-buffer": ^6.0.5
     "@types/node": ^17.0.31
     crypto-browserify: ^3.12.0
     events: ^3.3.0
-    react-native-quick-base64: ^2.0.2
+    react-native-quick-base64: ^2.0.5
     stream-browserify: ^3.0.0
     string_decoder: ^1.3.0
   peerDependencies:
     react: "*"
-    react-native: "*"
-  checksum: 230f8f30a945f3e3a254e1a5f8a016630c3c13d115b9322b002ae64c61d2f27088060271fbbdf5787a3425e73fdae28edc2a63772177d99c68492423b61292cd
+    react-native: ">=0.71.0"
+  checksum: 47b227c74cef0c9630ce7e91fe2153bcf2492f3fae175352818ca2278779f28c2932611df44cb8a18cb290da6d73aa3a927bcea56c3a9a4a51db6a7f4f72ac4d
   languageName: node
   linkType: hard
 
@@ -14990,7 +14990,7 @@ __metadata:
     react-native-qrcode-svg: ^6.2.0
     react-native-quick-actions: ^0.3.13
     react-native-quick-base64: ^2.0.5
-    react-native-quick-crypto: "https://github.com/yfeleke/react-native-quick-crypto"
+    react-native-quick-crypto: ^0.6.1
     react-native-reanimated: ^2.10.0
     react-native-remote-svg: ^2.0.6
     react-native-safe-area-context: ^4.5.0
