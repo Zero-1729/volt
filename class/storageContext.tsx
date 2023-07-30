@@ -688,9 +688,13 @@ export const AppStorageProvider = ({children}: Props) => {
             const externalString = await ExternalDescriptor.asString();
             const internalString = await InternalDescriptor.asString();
 
+            const privateDescriptor =
+                await ExternalDescriptor.asStringPrivate();
+
             newWallet.setDescriptor({
                 internal: internalString,
                 external: externalString,
+                private: privateDescriptor,
             });
         }
 
@@ -833,9 +837,13 @@ export const AppStorageProvider = ({children}: Props) => {
                 const externalDescriptor = await external.asString();
                 const internalDescriptor = await internal.asString();
 
+                // Displayed in wallet backup screen
+                const privateDescriptor = await external.asStringPrivate();
+
                 newWallet.setDescriptor({
                     internal: internalDescriptor,
                     external: externalDescriptor,
+                    private: privateDescriptor,
                 });
             }
 
@@ -859,9 +867,13 @@ export const AppStorageProvider = ({children}: Props) => {
                     const internalDescriptor =
                         await descriptor.InternalDescriptor.asString();
 
+                    const privateDescriptor =
+                        await descriptor.ExternalDescriptor.asStringPrivate();
+
                     newWallet.setDescriptor({
                         external: externalDescriptor,
                         internal: internalDescriptor,
+                        private: privateDescriptor,
                     });
                 } catch (e) {
                     console.log(e);
@@ -934,7 +946,6 @@ export const AppStorageProvider = ({children}: Props) => {
     // Resets app data
     const resetAppData = useCallback(async () => {
         try {
-            await setSatSymbol(true);
             await setAppLanguage(defaultContext.appLanguage);
             await setAppFiatCurrency(defaultContext.appFiatCurrency);
             await updateAppUnit(defaultContext.appUnit);
