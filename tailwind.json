@@ -39,6 +39,11 @@
 			"bottom": 12
 		}
 	},
+	"bottom-5": {
+		"style": {
+			"bottom": 20
+		}
+	},
 	"bottom-6": {
 		"style": {
 			"bottom": 24
@@ -529,12 +534,6 @@
 			"borderTopRightRadius": 2,
 			"borderBottomRightRadius": 2,
 			"borderBottomLeftRadius": 2
-		}
-	},
-	"rounded-t-2xl": {
-		"style": {
-			"borderTopLeftRadius": 16,
-			"borderTopRightRadius": 16
 		}
 	},
 	"border-gray-400": {

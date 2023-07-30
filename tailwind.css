@@ -30,6 +30,10 @@
   bottom: 0.75rem
 }
 
+.bottom-5 {
+  bottom: 1.25rem
+}
+
 .bottom-6 {
   bottom: 1.5rem
 }
@@ -410,11 +414,6 @@
 
 .rounded-sm {
   border-radius: 0.125rem
-}
-
-.rounded-t-2xl {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem
 }
 
 .border-gray-400 {

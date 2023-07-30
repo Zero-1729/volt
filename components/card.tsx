@@ -139,7 +139,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     )}
 
                     {/* Balance */}
-                    <View style={tailwind('w-full absolute mx-6 bottom-6')}>
+                    <View style={tailwind('w-full absolute mx-6 bottom-5')}>
                         <Balance
                             id={props.id}
                             BalanceFontSize={'text-2xl'}
