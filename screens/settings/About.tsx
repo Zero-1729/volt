@@ -94,7 +94,7 @@ const About = () => {
                     />
                 </View>
 
-                <View style={[tailwind('w-full mb-2')]}>
+                <View style={[tailwind('w-full mb-1')]}>
                     <View
                         style={[
                             tailwind(
@@ -111,15 +111,15 @@ const About = () => {
 
                     <Text
                         style={[
-                            tailwind('w-3/6 text-sm self-center text-center'),
+                            tailwind('w-5/6 text-sm self-center text-center'),
                             {color: ColorScheme.Text.AltGray},
                             Font.RobotoText,
                         ]}>
-                        Built with and on Open Source technologies
+                        Built with open source bitcoin technologies
                     </Text>
                 </View>
 
-                <View style={[tailwind('mb-4')]}>
+                <View style={[tailwind('mb-8')]}>
                     <Text
                         style={[
                             tailwind('text-center'),
