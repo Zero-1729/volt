@@ -220,10 +220,10 @@ export const getDescriptorParts = (descriptor: string) => {
     const data =
         parts.length === 3 ? parts[2].split(')')[0] : parts[1].split(')')[0];
 
-    // handle case for fingerprint + path
+    // handle case for fingerprint + path and key
     if (data[0] === '[') {
-        if (/([a-e0-9]{8})/.test(data)) {
-            let ret = /([a-e0-9]{8})/.exec(data);
+        if (/([a-f0-9]{8})/.test(data)) {
+            let ret = /([a-f0-9]{8})/.exec(data);
 
             fingerprint = ret ? ret[0] : '';
         }
