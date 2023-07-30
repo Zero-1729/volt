@@ -13,8 +13,8 @@ const Color = (currentTheme: ColorThemeType) => {
             Default: isDarkMode ? 'white' : 'black',
             GrayFill: isDarkMode ? '#676767' : '#B1B1B1',
             Inverted: isDarkMode ? 'black' : 'white',
-            Sent: '#760000',
-            Received: '#007600',
+            Sent: '#ff6767',
+            Received: '#76ff76',
         },
         Background: {
             Primary: isDarkMode ? 'black' : 'white',
@@ -26,8 +26,6 @@ const Color = (currentTheme: ColorThemeType) => {
             Greyed: isDarkMode ? '#202020' : '#E5E5E5',
             CardGreyed: isDarkMode ? '#3f3f3f' : '#D5D5D5',
             Alert: '#ff4545',
-            Sent: '#ff6767',
-            Received: '#76ff76',
         },
         HeadingBar: isDarkMode ? '#1b1b1b' : '#F3F3F3',
         Text: {
