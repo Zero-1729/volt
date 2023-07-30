@@ -45,6 +45,7 @@ export class BaseWallet {
 
         wallet.externalDescriptor = obj.externalDescriptor;
         wallet.internalDescriptor = obj.internalDescriptor;
+        wallet.privateDescriptor = obj.privateDescriptor;
 
         wallet.addresses = obj.addresses;
         wallet.address = obj.address;
@@ -74,6 +75,7 @@ export class BaseWallet {
 
     externalDescriptor: string;
     internalDescriptor: string;
+    privateDescriptor: string;
 
     birthday: string | Date;
 
@@ -144,6 +146,7 @@ export class BaseWallet {
 
         this.internalDescriptor = ''; // Wallet internal descriptor
         this.externalDescriptor = ''; // Wallet external descriptor
+        this.privateDescriptor = ''; // Wallet external private descriptor
 
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
@@ -262,6 +265,9 @@ export class BaseWallet {
     setDescriptor(descriptor: DescriptorObject) {
         this.internalDescriptor = descriptor.internal;
         this.externalDescriptor = descriptor.external;
+
+        // The external descriptor with private key
+        this.privateDescriptor = descriptor.private;
     }
 
     setAddress(address: addressType) {
