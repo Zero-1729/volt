@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {Text, View, FlatList, useColorScheme} from 'react-native';
 
@@ -75,6 +76,7 @@ const Release = () => {
                         data={Notes}
                         renderItem={renderItem}
                         keyExtractor={(_item, index) => `${index}`}
+                        showsVerticalScrollIndicator={false}
                     />
                 </View>
             </View>
