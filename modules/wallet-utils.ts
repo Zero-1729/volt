@@ -231,13 +231,32 @@ export const getDescriptorParts = (descriptor: string) => {
         if (/(\/[1-9]{2}h)(\/[0-9]h|\*)*/.test(data)) {
             let ret = /(\/[1-9]{2}h)(\/[0-9]h|\*)*/.exec(data);
 
-            path = (ret ? ret[0] : '').replace(/h/g, "'");
+            path = (ret ? ret[0] : '').replace(/h/g, "'").slice(1);
         }
 
         key = data.split(']')[1];
         network = extendedKeyInfo[data.split(']')[1][0]].network;
         scriptPrefix = scripts[0] + '(';
         scriptSuffix = ')';
+    } else {
+        // Full key, which may include trailing path
+        // i.e. tprv8ZgxMBicQKsPdCaKK9HTNU45tMEbMDugaZc1mPzt9a2Wzdo31zRGMdoeKYKJz6aNg7oz9togxkV62bnGWYZ94VSAeETfPNWNhetjZY7hQPP/84'/1'/0'/0/*
+        key = data;
+
+        // Assuming a private descriptor with terminal path
+        if (data.includes('/')) {
+            path = data.split('/').slice(1, 4).join('/');
+        }
+
+        // Get network from key
+        // No need to strip given we only need the first character
+        network = extendedKeyInfo[key[0]].network;
+
+        // Get fingerprint from stripped key
+        fingerprint = getFingerprintFromXkey(
+            key.split('/')[0],
+            network as NetType,
+        );
     }
 
     // Extract checksum if any
@@ -255,7 +274,7 @@ export const getDescriptorParts = (descriptor: string) => {
         network: network,
         type: DescriptorType[scripts[0]],
         fingerprint: fingerprint,
-        path: 'm/' + path.slice(1),
+        path: 'm/' + path,
         scriptPrefix: scriptPrefix,
         scriptSuffix: scriptSuffix,
         checksum: checksum,
