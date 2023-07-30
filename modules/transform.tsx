@@ -51,7 +51,7 @@ export const formatBTC = (sats: BalanceType) => {
         }
 
         // Limit it to 1 sat - 1 milisats (11 decimals)
-        return addCommas(BTC.toFixed(11), SEPARATOR);
+        return addCommas(BTC.toFixed(8), SEPARATOR);
     }
 
     return addCommas(BTC.toString(), SEPARATOR);
