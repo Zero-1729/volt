@@ -28,7 +28,7 @@ const Release = () => {
             <View style={tailwind('mb-2')}>
                 <Text
                     style={[
-                        tailwind('text-sm text-justify'),
+                        tailwind('text-sm text-left'),
                         {color: ColorScheme.Text.Default},
                         Font.RobotoText,
                     ]}>
