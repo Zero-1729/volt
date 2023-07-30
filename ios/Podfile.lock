@@ -393,7 +393,7 @@ PODS:
     - React-Core
   - react-native-quick-base64 (2.0.6):
     - React-Core
-  - react-native-quick-crypto (0.5.0):
+  - react-native-quick-crypto (0.6.1):
     - OpenSSL-Universal
     - React
     - React-callinvoker
@@ -836,7 +836,7 @@ SPEC CHECKSUMS:
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
   react-native-netinfo: fefd4e98d75cbdd6e85fc530f7111a8afdf2b0c5
   react-native-quick-base64: 62290829c619fbabca4c41cfec75ae759d08fc1c
-  react-native-quick-crypto: b62a7834b26506f3aa7785842069b3722f530f65
+  react-native-quick-crypto: 455c1b411db006dba1026a30681ececb19180187
   react-native-safe-area-context: 9697629f7b2cda43cf52169bb7e0767d330648c2
   react-native-secure-key-store: 910e6df6bc33cb790aba6ee24bc7818df1fe5898
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
