@@ -92,6 +92,9 @@ const ImportAction = () => {
         // Simple helper to show successful import and navigate back home
         conservativeAlert('Success', 'Wallet restored successfully');
 
+        // Vibrate to let user know the action was successful
+        RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+
         navigation.getParent()?.dispatch(StackActions.popToTop());
     };
 
