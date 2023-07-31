@@ -43,10 +43,10 @@ const Color = (currentTheme: ColorThemeType) => {
         },
         // Get index using WalletType
         WalletColors: {
-            bech32: '#5c0931', // Burgundy
-            legacy: '#1E90FF', // Dodgerblue
-            p2sh: '#008000', // Green
-            taproot: '#800080', // Purple
+            bech32: {bitcoin: '#5c0931', testnet: '#5c0946'}, // Burgundy
+            legacy: {bitcoin: '#1E90FF', testnet: '#004b94'}, // Blue
+            p2sh: {bitcoin: '#008000', testnet: '#408000'}, // Green
+            taproot: {bitcoin: '#800080', testnet: '#590059'}, // Purple
         },
     };
 

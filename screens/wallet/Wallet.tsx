@@ -70,7 +70,8 @@ const Wallet = () => {
     const walletData = getWalletData(currentWalletID);
 
     // Get card color from wallet type
-    const CardColor = ColorScheme.WalletColors[walletData.type];
+    const CardColor =
+        ColorScheme.WalletColors[walletData.type][walletData.network];
 
     const walletName = walletData.name;
 

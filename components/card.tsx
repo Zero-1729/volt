@@ -102,7 +102,9 @@ export const WalletCard = (props: WalletCardProps) => {
                         tailwind('w-full h-48 rounded-md z-50 px-6'),
                         {
                             backgroundColor:
-                                ColorScheme.WalletColors[props.walletType],
+                                ColorScheme.WalletColors[props.walletType][
+                                    props.network
+                                ],
                         },
                     ]}>
                     <Text
