@@ -53,6 +53,7 @@ export type WalletCardProps = CardProps & {
     hideBalance: boolean;
     loading: boolean;
     unit: Unit;
+    network: string;
     navCallback?: () => void;
 };
 
