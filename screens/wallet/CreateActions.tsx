@@ -79,6 +79,9 @@ const CreateAction = () => {
             // Default wallet type is Segwit bech32 on Testnet
             await addWallet(walletName, type, network);
 
+            // Vibrate to let user know the action was successful
+            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+
             // Navigate to mnemonic screen
             navigation.dispatch(StackActions.push('Mnemonic'));
         } catch (e: any) {
