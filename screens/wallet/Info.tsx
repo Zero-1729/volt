@@ -56,6 +56,9 @@ const Info = () => {
         useState(walletFingerprint);
     const [walletPathText, setWalletPathText] = useState(walletPath);
 
+    const CardColor =
+        ColorScheme.WalletColors[walletData.type][walletData.network];
+
     const copyPathToClipboard = () => {
         Clipboard.setString(walletPath);
 
@@ -114,7 +117,23 @@ const Info = () => {
     return (
         <SafeAreaView>
             {/* Display Wallet Info, addresses, and other related data / settings */}
-            <View style={[tailwind('w-full h-full items-center relative')]}>
+            <View
+                style={[
+                    tailwind('absolute w-full h-16 top-0'),
+                    {backgroundColor: CardColor},
+                ]}
+            />
+            <View style={[tailwind('w-full h-full items-center')]}>
+                <View
+                    style={[
+                        tailwind('w-full absolute'),
+                        {
+                            backgroundColor: CardColor,
+                            top: 0,
+                            height: 192,
+                        },
+                    ]}
+                />
                 <View
                     style={[
                         tailwind(
@@ -130,32 +149,38 @@ const Info = () => {
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
-                        <Back fill={ColorScheme.SVG.Default} />
+                        <Back fill={'white'} />
                     </PlainButton>
                     {/* Wallet name */}
                     <Text
                         style={[
-                            tailwind('font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        Wallet Information
+                            tailwind('w-4/6 text-center font-bold'),
+                            {color: 'white'},
+                        ]}
+                        ellipsizeMode="middle"
+                        numberOfLines={1}>
+                        {walletData.name}
                     </Text>
                 </View>
 
                 {/* Allow user to change wallet name */}
-                <PlainButton style={[tailwind('w-5/6 mt-12')]}>
+                <View style={[tailwind('w-5/6 mt-12')]}>
                     <View>
                         <Text
                             style={[
                                 tailwind('text-sm text-left mb-2'),
-                                {color: ColorScheme.Text.Default},
+                                {color: 'white'},
                             ]}>
-                            Name
+                            Wallet Name
                         </Text>
                         <View
                             style={[
-                                tailwind('border-gray-400 px-4 w-full'),
-                                {borderWidth: 1, borderRadius: 4},
+                                tailwind('px-4 w-full'),
+                                {
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                    borderColor: 'rgba(rgb(118,118,118,0.6)',
+                                },
                             ]}>
                             <TextSingleInput
                                 placeholderTextColor={
@@ -167,11 +192,11 @@ const Info = () => {
                                 onBlur={() => {
                                     renameWallet(currentWalletID, tmpName);
                                 }}
-                                color={ColorScheme.Text.Default}
+                                color={'white'}
                             />
                         </View>
                     </View>
-                </PlainButton>
+                </View>
 
                 {/* View Divider */}
                 <View style={[tailwind('w-full my-8'), HeadingBar]} />
