@@ -18,7 +18,7 @@ const Color = (currentTheme: ColorThemeType) => {
         },
         Background: {
             Primary: isDarkMode ? 'black' : 'white',
-            Secondary: isDarkMode ? '#2c2c2c' : '#ffffff',
+            Secondary: isDarkMode ? '#2c2c2c' : '#f0f0f0',
             Inverted: isDarkMode ? 'white' : 'black',
             CheckBoxFilled: isDarkMode ? 'black' : 'black',
             CheckBoxOutline: isDarkMode ? 'white' : 'black',
