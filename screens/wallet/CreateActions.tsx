@@ -132,7 +132,7 @@ const CreateAction = () => {
                             tailwind('font-bold text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Create New Wallet
+                        Generate New Wallet
                     </Text>
 
                     <Text
@@ -151,7 +151,7 @@ const CreateAction = () => {
                             {borderWidth: 1, borderRadius: 6},
                         ]}>
                         <TextSingleInput
-                            placeholder={'Enter Wallet name'}
+                            placeholder={'Enter a wallet name'}
                             placeholderTextColor={ColorScheme.Text.GrayedText}
                             onChangeText={setNewWalletName}
                             onBlur={onBlur}
