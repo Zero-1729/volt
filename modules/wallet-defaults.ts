@@ -6,10 +6,10 @@ import {
 } from '../types/wallet';
 
 // Wallet name aliases
-export const WalletTypeNames: {[index: string]: string[]} = {
-    bech32: ['Native Segwit', 'Bech32'],
-    legacy: ['Legacy', 'P2PKH'],
-    p2sh: ['Segwit', 'P2SH'],
+export const WalletTypeDetails: {[index: string]: string[]} = {
+    bech32: ['Native Segwit', 'bc1...'],
+    legacy: ['Legacy', '1...'],
+    p2sh: ['Segwit', '3...'],
 };
 
 // BDK Wallet name aliases
