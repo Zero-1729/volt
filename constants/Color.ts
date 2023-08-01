@@ -13,8 +13,8 @@ const Color = (currentTheme: ColorThemeType) => {
             Default: isDarkMode ? 'white' : 'black',
             GrayFill: isDarkMode ? '#676767' : '#B1B1B1',
             Inverted: isDarkMode ? 'black' : 'white',
-            Sent: '#ff6767',
-            Received: '#76ff76',
+            Sent: isDarkMode ? '#ff6767' : '#a20000',
+            Received: isDarkMode ? '#76ff76' : '#00b100',
         },
         Background: {
             Primary: isDarkMode ? 'black' : 'white',
