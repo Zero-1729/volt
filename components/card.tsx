@@ -40,11 +40,11 @@ export const EmptyCard = () => {
                 style={[tailwind('w-full h-48 p-6 rounded-md z-30'), altGray]}>
                 <Text
                     style={[
-                        tailwind('text-lg w-full text-left mb-2 font-medium'),
+                        tailwind('text-lg w-full text-left mb-1 font-medium'),
                         {color: ColorScheme.Text.Default},
                         Font.RobotoText,
                     ]}>
-                    Add new wallet
+                    New Wallet
                 </Text>
                 <Text
                     style={[
@@ -52,7 +52,7 @@ export const EmptyCard = () => {
                         {color: ColorScheme.Text.DescText},
                         Font.RobotoText,
                     ]}>
-                    Click the 'add' button to create a new wallet
+                    Create or restore a new wallet
                 </Text>
 
                 <PlainButton
