@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
@@ -13,7 +12,7 @@ import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {PlainButton} from '../../components/button';
+import {LongButton, PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import InfoIcon from './../../assets/svg/info-16.svg';
@@ -57,7 +56,7 @@ const Add = () => {
                         </Text>
                     </PlainButton>
 
-                    <View style={[tailwind('mt-20')]}>
+                    <View style={[tailwind('mt-20 mb-10')]}>
                         <Text
                             style={[
                                 tailwind('font-bold text-2xl'),
@@ -74,73 +73,31 @@ const Add = () => {
                         </Text>
                     </View>
 
-                    {/* Create a new Wallet */}
+                    {/* Import an existing Wallet */}
                     <View
                         style={[
-                            tailwind('mt-6 rounded-md p-5 flex'),
+                            tailwind('mb-6 rounded-md p-5'),
                             {
                                 backgroundColor:
-                                    ColorScheme.MiscCardColor.ImportAltCard,
+                                    ColorScheme.MiscCardColor.ImportCard,
                             },
                             styles.cardShadow,
                         ]}>
                         <Text
                             style={[
-                                tailwind('font-bold mt-2'),
+                                tailwind('font-bold mt-2 text-white'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            New
-                        </Text>
-
-                        <Text
-                            style={[
-                                tailwind('mt-4 mb-2 text-xs'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
-                            Create a wallet with a new seed.
-                        </Text>
-
-                        <View style={[tailwind('items-end')]}>
-                            <PlainButton
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        StackActions.push('CreateActions'),
-                                    );
-                                }}>
-                                <View
-                                    style={[
-                                        tailwind(
-                                            'px-6 py-2 bg-black rounded-full mt-4',
-                                        ),
-                                    ]}>
-                                    <Text
-                                        style={[
-                                            tailwind(
-                                                'text-xs text-white font-bold',
-                                            ),
-                                            Font.RobotoText,
-                                        ]}>
-                                        Create
-                                    </Text>
-                                </View>
-                            </PlainButton>
-                        </View>
-                    </View>
-
-                    {/* Import an existing Wallet */}
-                    <View
-                        style={[
-                            tailwind('mt-6 rounded-md p-5'),
-                            {backgroundColor: '#8b8b8b'},
-                        ]}>
-                        <Text style={[tailwind('font-bold mt-2 text-white')]}>
                             Import
                         </Text>
 
                         <Text
-                            style={[tailwind('mt-4 mb-2 text-white text-xs')]}>
+                            style={[
+                                tailwind('mt-4 mb-2 text-white text-xs'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
                             Restore wallet from seed or other backup material.
-                            Select if you want to import an existing wallet.
+                            Select if you want to restore an existing wallet.
                         </Text>
 
                         <View style={[tailwind('items-end')]}>
@@ -152,9 +109,12 @@ const Add = () => {
                                 }}>
                                 <View
                                     style={[
-                                        tailwind(
-                                            'px-6 py-2 bg-black rounded-full mt-4',
-                                        ),
+                                        tailwind('px-6 py-2 rounded-full mt-4'),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.MiscCardColor
+                                                    .ImportCardButton,
+                                        },
                                     ]}>
                                     <Text
                                         style={[
@@ -162,6 +122,7 @@ const Add = () => {
                                                 'text-xs text-white font-bold',
                                             ),
                                             Font.RobotoText,
+                                            {color: ColorScheme.Text.GrayText},
                                         ]}>
                                         Restore
                                     </Text>
@@ -169,6 +130,18 @@ const Add = () => {
                             </PlainButton>
                         </View>
                     </View>
+
+                    {/* Create a new Wallet */}
+                    <LongButton
+                        onPress={() => {
+                            navigation.dispatch(
+                                StackActions.push('CreateActions'),
+                            );
+                        }}
+                        backgroundColor={ColorScheme.Background.Inverted}
+                        textColor={ColorScheme.Text.Alt}
+                        title={'Create New Wallet'}
+                    />
 
                     {isAdvancedMode ? (
                         <View style={[tailwind('mt-6 flex-row')]}>
@@ -181,7 +154,7 @@ const Add = () => {
                                     tailwind('text-xs'),
                                     {color: ColorScheme.Text.GrayText},
                                 ]}>
-                                Supported HD account types: BIP44, BIP46, BIP84
+                                Supported HD accounts: BIP44, BIP46, BIP84
                             </Text>
                         </View>
                     ) : (

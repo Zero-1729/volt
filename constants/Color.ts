@@ -18,7 +18,7 @@ const Color = (currentTheme: ColorThemeType) => {
         },
         Background: {
             Primary: isDarkMode ? 'black' : 'white',
-            Secondary: isDarkMode ? '#2c2c2c' : '#f0f0f0',
+            Secondary: isDarkMode ? '#2c2c2c' : '#ffffff',
             Inverted: isDarkMode ? 'white' : 'black',
             CheckBoxFilled: isDarkMode ? 'black' : 'black',
             CheckBoxOutline: isDarkMode ? 'white' : 'black',
@@ -40,6 +40,8 @@ const Color = (currentTheme: ColorThemeType) => {
         },
         MiscCardColor: {
             ImportAltCard: isDarkMode ? '#2c2c2c' : 'white',
+            ImportCardButton: isDarkMode ? '#3f3f3f' : '#efefef',
+            ImportCard: isDarkMode ? '#1f1f1f' : '#ffffff',
         },
         // Get index using WalletType
         WalletColors: {
