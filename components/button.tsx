@@ -43,7 +43,7 @@ export const LongButton = (props: ButtonProps) => {
         <TouchableOpacity
             {...props}
             style={[
-                tailwind('w-5/6 rounded items-center'),
+                tailwind('w-full rounded-full items-center'),
                 {
                     backgroundColor: props.backgroundColor,
                 },
