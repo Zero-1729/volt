@@ -94,7 +94,7 @@ const Wallet = () => {
                         {/* Toggle advanced mode */}
                         <View
                             style={tailwind(
-                                'justify-center w-full items-center flex-row mb-10',
+                                'justify-center w-full items-center flex-row mt-8 mb-10',
                             )}>
                             <View style={tailwind('w-5/6')}>
                                 <View
