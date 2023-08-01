@@ -16,7 +16,7 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {WalletTypeNames} from '../../modules/wallet-defaults';
+import {WalletTypeDetails} from '../../modules/wallet-defaults';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -44,7 +44,7 @@ const Info = () => {
 
     const walletName = walletData.name;
     const walletPath = walletData.derivationPath;
-    const walletType = WalletTypeNames[walletData.type];
+    const walletType = WalletTypeDetails[walletData.type];
     const walletNetwork = walletData.network;
     const walletTypeName =
         walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');

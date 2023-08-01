@@ -17,7 +17,7 @@ import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {WalletTypeNames} from '../../modules/wallet-defaults';
+import {WalletTypeDetails} from '../../modules/wallet-defaults';
 
 import Close from '../../assets/svg/x-24.svg';
 
@@ -32,10 +32,10 @@ const Backup = () => {
         useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
-    const walletType = WalletTypeNames[walletData.type];
+    const walletType = WalletTypeDetails[walletData.type];
     const walletTypeName =
         walletType[0] +
-        (isAdvancedMode ? ` (${WalletTypeNames[walletData.type][1]})` : '');
+        (isAdvancedMode ? ` (${WalletTypeDetails[walletData.type][1]})` : '');
 
     // Key material currently stored in wallet
     const isSingleMaterial = walletData.secret === '';
