@@ -31,9 +31,11 @@ const APIFetcher = {
             );
 
             returnedJSON = await response.json();
-        } catch (e) {
+        } catch (e: any) {
             throw new Error(
-                `Error fetching rate for ${ticker.toUpperCase()} from CoinGecko: ${e.message}`,
+                `Error fetching rate for ${ticker.toUpperCase()} from CoinGecko: ${
+                    e.message
+                }`,
             );
         }
 
