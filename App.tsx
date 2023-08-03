@@ -1,15 +1,15 @@
+import 'react-native-gesture-handler';
+
 import React, {useEffect} from 'react';
 
 import {StatusBar, useColorScheme} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
-import SplashScreen from 'react-native-splash-screen';
-
-import 'react-native-gesture-handler';
 
 import InitScreen from './Navigation';
-
 import Color from './constants/Color';
+
+import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
     useEffect(() => {
