@@ -3,11 +3,11 @@ import {BaseWallet} from '../base';
 import {TransactionType} from './../../../types/wallet';
 
 export class SegWitP2SHWallet extends BaseWallet {
-    buildTx(args: any) {
+    buildTx() {
         throw new Error('Not implemented');
     }
 
-    updatedTransaction(tx: TransactionType) {
+    updatedTransaction() {
         throw new Error('Not implemented');
     }
 

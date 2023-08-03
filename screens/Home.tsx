@@ -130,7 +130,7 @@ const Home = () => {
                         },
                         violate,
                     );
-                } catch (e) {
+                } catch (e: any) {
                     // Report network error
                     liberalAlert('Network', `${e.message}`, 'OK');
 

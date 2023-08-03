@@ -235,11 +235,11 @@ export class BaseWallet {
         this.name = text;
     }
 
-    buildTx(args: any) {
+    buildTx() {
         throw new Error('Not implemented');
     }
 
-    updatedTransaction(tx: TransactionType) {
+    updatedTransaction() {
         throw new Error('Not implemented');
     }
 
