@@ -154,8 +154,9 @@ export const GAP_LIMIT = 20;
 // For now, we only support single key descriptors
 // with three specific script types (legacy, P2SH, and Bech32)
 //  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
-// Includes support fot optional (fingerprint + path prefix, e.g. [abce1234/49h/0h/0h])
-// Includes support for optional child derivation path suffix (i.e., /0/*)
+// Includes support for optional fingerprint + wallet origin path prefix, (i.e. [abce1234/49h/0h/0h])
+// Includes support for optional key path + wildcard suffix (i.e., /0/*)
+// Includes support for optional wallet origin path and optional wildcard (i.e., /84'/0'/0'/0/*)
 export const nativeWalletDescriptorRegex =
     /^((wpkh|pkh)\((\[([a-e0-9]{8})(\/[1-9]{2}(h|'))*(\/([0-9](h|'|\*)))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)(#[a-z0-9]{8})?)$/;
 export const wrappedWalletDescriptorRegex =
