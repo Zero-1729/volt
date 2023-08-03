@@ -11,4 +11,5 @@ module.exports = {
     ],
     watchPathIgnorePatterns: ['<rootDir>/node_modules'],
     verbose: true,
+    setupFiles: ['./tests/setup.js'],
 };
