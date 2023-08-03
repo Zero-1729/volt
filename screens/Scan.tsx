@@ -4,6 +4,9 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
 import {useIsFocused, CommonActions} from '@react-navigation/native';
 
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {ScanParamList} from '../Navigation';
+
 import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
@@ -98,7 +101,9 @@ const openSettings = () => {
     Linking.openSettings();
 };
 
-const Scan = ({navigation, route}) => {
+type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
+
+const Scan = ({navigation, route}: Props) => {
     const isFocused = useIsFocused();
 
     const tailwind = useTailwind();

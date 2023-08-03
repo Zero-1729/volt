@@ -9,6 +9,9 @@ import {
     StackActions,
 } from '@react-navigation/native';
 
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {WalletParamList} from '../../Navigation';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import BigNumber from 'bignumber.js';
@@ -34,7 +37,11 @@ import {PlainButton} from '../../components/button';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
-const Receive = ({route}) => {
+// Prop type for params passed to this screen
+// from the RequestAmount screen
+type Props = NativeStackScreenProps<WalletParamList, 'Receive'>;
+
+const Receive = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
