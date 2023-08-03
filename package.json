@@ -126,9 +126,6 @@
     "ts-jest": "^29.1.1",
     "typescript": "^5.0.4"
   },
-  "jest": {
-    "preset": "react-native"
-  },
   "react-native": {
     "crypto": "react-native-quick-crypto",
     "_stream_transform": "readable-stream/transform",
