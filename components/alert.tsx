@@ -19,8 +19,14 @@ export const liberalAlert = (
     heading: string,
     msg: string,
     primaryButtonText: string,
+    silent?: boolean,
 ): void => {
-    RNHapticFeedback.trigger('notificationWarning', RNHapticFeedbackOptions);
+    if (!silent) {
+        RNHapticFeedback.trigger(
+            'notificationWarning',
+            RNHapticFeedbackOptions,
+        );
+    }
 
     Alert.alert(heading, msg, [
         {

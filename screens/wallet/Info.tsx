@@ -85,6 +85,7 @@ const Info = () => {
                 'Notice',
                 'Cannot delete wallet, the wallet transactions are still loading.',
                 'Cancel',
+                true,
             );
             return;
         }
