@@ -1,7 +1,7 @@
 {
   "name": "volt",
   "version": "0.2.0",
-  "private": true,
+  "license": "MIT",
   "scripts": {
     "lint": "eslint .",
     "android": "react-native run-android",
@@ -9,8 +9,10 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
+    "dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\"",
     "build:tailwind": "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
-    "dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\""
+    "postinstall": "yarn run build:tailwind; yarn run gitbranch",
+    "gitbranch": "./scripts/git-branch-data.sh > ./data/git-branch-data.json"
   },
   "engines": {
     "node": ">=16.13.0",
