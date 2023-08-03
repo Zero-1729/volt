@@ -239,6 +239,11 @@
 			"marginLeft": 16
 		}
 	},
+	"mr-1": {
+		"style": {
+			"marginRight": 4
+		}
+	},
 	"mr-16": {
 		"style": {
 			"marginRight": 64
