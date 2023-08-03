@@ -121,13 +121,27 @@ const About = () => {
                     </Text>
                 </View>
 
+                <View style={[tailwind('mb-2')]}>
+                    <Text
+                        style={[
+                            tailwind('text-center'),
+                            {color: ColorScheme.Text.AltGray},
+                        ]}>
+                        v{Package.version} (
+                        {`${
+                            isAdvancedMode
+                                ? 'Build ' + getBuildIdSync() + ' '
+                                : ''
+                        }Beta`}
+                        )
+                    </Text>
+                </View>
+
                 <View style={[tailwind('mb-8')]}>
                     {isAdvancedMode ? (
                         <View
                             style={[
-                                tailwind(
-                                    'mb-1 flex-row px-4 py-1 rounded-full',
-                                ),
+                                tailwind('flex-row px-4 py-1 rounded-full'),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
@@ -142,26 +156,15 @@ const About = () => {
                                 style={[
                                     tailwind('text-xs font-bold'),
                                     {color: ColorScheme.Text.AltGray},
-                                ]}>
+                                ]}
+                                numberOfLines={1}
+                                ellipsizeMode="head">
                                 {BranchInfo}
                             </Text>
                         </View>
                     ) : (
                         <></>
                     )}
-                    <Text
-                        style={[
-                            tailwind('text-center'),
-                            {color: ColorScheme.Text.AltGray},
-                        ]}>
-                        v{Package.version} (
-                        {`${
-                            isAdvancedMode
-                                ? 'Build ' + getBuildIdSync() + ' '
-                                : ''
-                        }Beta`}
-                        )
-                    </Text>
                 </View>
 
                 <View style={tailwind('w-5/6')}>
