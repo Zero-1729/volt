@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState, useEffect} from 'react';
+import React, {
+    useContext,
+    useState,
+    useEffect,
+    useMemo,
+    useReducer,
+} from 'react';
 import {useColorScheme, View, Text, Share} from 'react-native';
 
 import {
@@ -47,16 +53,43 @@ const Receive = ({route}: Props) => {
 
     const navigation = useNavigation();
 
-    // Amount in sats
-    const [bitcoinValue, setBitcoinValue] = useState(new BigNumber(0));
-    const [fiatValue, setFiatValue] = useState(new BigNumber(0));
+    const initialState = {
+        // Amount in sats
+        bitcoinValue: new BigNumber(0),
+        fiatValue: new BigNumber(0),
+    };
+
+    const reducer = (state: any, action: any) => {
+        switch (action.type) {
+            case 'SET_BITCOIN_VALUE':
+                return {
+                    ...state,
+                    bitcoinValue: action.payload,
+                };
+            case 'SET_FIAT_VALUE':
+                return {
+                    ...state,
+                    fiatValue: action.payload,
+                };
+            default:
+                return state;
+        }
+    };
+
+    const [state, dispatch] = useReducer(reducer, initialState);
 
     useEffect(() => {
         // Update the request amount if it is passed in as a parameter
         // from the RequestAmount screen
         if (route.params?.amount) {
-            setBitcoinValue(new BigNumber(route.params.sats));
-            setFiatValue(new BigNumber(route.params.fiat));
+            dispatch({
+                type: 'SET_BITCOIN_VALUE',
+                payload: new BigNumber(route.params.sats),
+            });
+            dispatch({
+                type: 'SET_FIAT_VALUE',
+                payload: new BigNumber(route.params.fiat),
+            });
         }
     }, [route.params]);
 
@@ -66,7 +99,7 @@ const Receive = ({route}: Props) => {
 
     // Format as Bitcoin URI
     const getFormattedAddress = (address: string) => {
-        let amount = bitcoinValue;
+        let amount = state.bitcoinValue;
 
         if (amount.gt(0)) {
             // If amount is greater than 0, return a bitcoin payment request URI
@@ -80,8 +113,9 @@ const Receive = ({route}: Props) => {
 
     // Set the plain address and bitcoin invoice URI
     const [plainAddress, setPlainAddress] = useState('');
-    const [BitcoinInvoice, setBitcoinInvoice] = useState(
-        getFormattedAddress(walletData.address.address),
+    const BitcoinInvoice = useMemo(
+        () => getFormattedAddress(walletData.address.address),
+        [state.bitcoinValue],
     );
 
     // Copy data to clipboard
@@ -97,10 +131,6 @@ const Receive = ({route}: Props) => {
             setPlainAddress('');
         }, 450);
     };
-
-    useEffect(() => {
-        setBitcoinInvoice(getFormattedAddress(walletData.address.address));
-    }, [bitcoinValue]);
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -133,7 +163,7 @@ const Receive = ({route}: Props) => {
 
                 {/* Click should toggle unit amount or display fiat amount below */}
                 <View style={[tailwind('w-5/6 -mt-8 items-center')]}>
-                    {!bitcoinValue.isZero() ? (
+                    {!state.bitcoinValue.isZero() ? (
                         <View
                             style={[
                                 tailwind(
@@ -143,11 +173,11 @@ const Receive = ({route}: Props) => {
                             <View style={[tailwind('opacity-40 mb-1')]}>
                                 {/* Make it approx if it doesn't match bottom unit value for requested amount */}
                                 <DisplayFiatAmount
-                                    amount={formatFiat(fiatValue)}
+                                    amount={formatFiat(state.fiatValue)}
                                     fontSize={'text-base'}
                                     isApprox={
                                         route.params.amount !==
-                                        fiatValue.toString()
+                                        state.fiatValue.toString()
                                     }
                                     symbol={appFiatCurrency.symbol}
                                 />
@@ -155,11 +185,11 @@ const Receive = ({route}: Props) => {
                             <View>
                                 {/* Make it approx if it doesn't match bottom unit value for requested amount */}
                                 <DisplaySatsAmount
-                                    amount={bitcoinValue}
+                                    amount={state.bitcoinValue}
                                     fontSize={'text-2xl'}
                                     isApprox={
                                         route.params.amount !==
-                                        bitcoinValue.toString()
+                                        state.bitcoinValue.toString()
                                     }
                                 />
                             </View>
