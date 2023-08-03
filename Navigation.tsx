@@ -38,6 +38,28 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
+// Root Param List for screens
+export type WalletParamList = {
+    Receive: {
+        amount: string;
+        sats: string;
+        fiat: string;
+    };
+    WalletView: undefined;
+    WalletInfo: undefined;
+    WalletBackup: undefined;
+    AddressOwnership: undefined;
+    RequestAmount: undefined;
+};
+
+export type ScanParamList = {
+    Scan:
+        | {
+              key?: string;
+          }
+        | undefined;
+};
+
 const SettingsStack = createNativeStackNavigator();
 const SettingsRoot = () => {
     return (
@@ -62,7 +84,7 @@ const SettingsRoot = () => {
     );
 };
 
-const ScanStack = createNativeStackNavigator();
+const ScanStack = createNativeStackNavigator<ScanParamList>();
 const ScanRoot = () => {
     return (
         <ScanStack.Navigator screenOptions={{headerShown: false}}>
@@ -71,7 +93,7 @@ const ScanRoot = () => {
     );
 };
 
-const WalletStack = createNativeStackNavigator();
+const WalletStack = createNativeStackNavigator<WalletParamList>();
 const WalletRoot = () => {
     return (
         <WalletStack.Navigator screenOptions={{headerShown: false}}>
