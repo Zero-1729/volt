@@ -16,6 +16,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import Package from './../../package.json';
+import BranchInfo from '../../data/git-branch-data.json';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
@@ -31,6 +32,7 @@ import Github from './../../assets/svg/mark-github-24.svg';
 import Squirrel from './../../assets/svg/squirrel-24.svg';
 import VoltLogo from './../../assets/svg/volt-logo.svg';
 import VoltText from './../../assets/svg/volt-text.svg';
+import BranchIcon from './../../assets/svg/git-branch-16.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
@@ -120,6 +122,33 @@ const About = () => {
                 </View>
 
                 <View style={[tailwind('mb-8')]}>
+                    {isAdvancedMode ? (
+                        <View
+                            style={[
+                                tailwind(
+                                    'mb-1 flex-row px-4 py-1 rounded-full',
+                                ),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                },
+                            ]}>
+                            <BranchIcon
+                                style={[tailwind('mr-1')]}
+                                fill={ColorScheme.SVG.GrayFill}
+                                width={12}
+                            />
+                            <Text
+                                style={[
+                                    tailwind('text-xs font-bold'),
+                                    {color: ColorScheme.Text.AltGray},
+                                ]}>
+                                {BranchInfo}
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                     <Text
                         style={[
                             tailwind('text-center'),
