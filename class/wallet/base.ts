@@ -19,11 +19,9 @@ import {
     generateAddressFromXKey,
 } from '../../modules/wallet-utils';
 
-import {
-    WalletPaths,
-    GAP_LIMIT,
-    descXpubPattern,
-} from '../../modules/wallet-defaults';
+import {WalletPaths, GAP_LIMIT} from '../../modules/wallet-defaults';
+
+import {descXpubPattern} from '../../modules/re';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
