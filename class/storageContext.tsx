@@ -698,6 +698,9 @@ export const AppStorageProvider = ({children}: Props) => {
             });
         }
 
+        // Declare and set if watch-only
+        newWallet.setWatchOnly();
+
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
 
@@ -879,9 +882,6 @@ export const AppStorageProvider = ({children}: Props) => {
                     console.log(e);
                 }
             }
-
-            // Determine if watch only wallet
-            newWallet.setWatchOnly();
 
             await _addNewWallet(newWallet);
         },
