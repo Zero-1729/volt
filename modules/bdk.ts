@@ -16,7 +16,7 @@ import {
     TWalletType,
     TransactionType,
     UTXOType,
-    electrumServerURLs,
+    ElectrumServerURLs,
 } from '../types/wallet';
 
 import {liberalAlert} from '../components/alert';
@@ -266,7 +266,7 @@ export const descriptorsFromString = async (wallet: TWalletType) => {
 const _sync = async (
     wallet: BaseWallet,
     callback: any,
-    electrumServer: electrumServerURLs,
+    electrumServer: ElectrumServerURLs,
 ): Promise<BDK.Wallet> => {
     // Electrum configuration
     const config: BlockchainElectrumConfig = {

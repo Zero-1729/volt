@@ -25,10 +25,10 @@ import {
     BackupMaterialTypes,
     TransactionType,
     NetType,
-    baseWalletArgs,
+    BaseWalletArgs,
     NetInfoType,
     addressType,
-    electrumServerURLs,
+    ElectrumServerURLs,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -72,7 +72,7 @@ type defaultContextType = {
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
-    electrumServerURL: electrumServerURLs;
+    electrumServerURL: ElectrumServerURLs;
     setNetworkState: (networkState: NetInfoType) => void;
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
@@ -815,18 +815,18 @@ export const AppStorageProvider = ({children}: Props) => {
             switch (walletArgs.type) {
                 case 'bech32':
                     newWallet = new SegWitNativeWallet(
-                        walletArgs as baseWalletArgs,
+                        walletArgs as BaseWalletArgs,
                     );
                     break;
 
                 case 'p2sh':
                     newWallet = new SegWitP2SHWallet(
-                        walletArgs as baseWalletArgs,
+                        walletArgs as BaseWalletArgs,
                     );
                     break;
 
                 case 'legacy':
-                    newWallet = new LegacyWallet(walletArgs as baseWalletArgs);
+                    newWallet = new LegacyWallet(walletArgs as BaseWalletArgs);
                     break;
             }
 

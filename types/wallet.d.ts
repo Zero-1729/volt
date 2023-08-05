@@ -76,7 +76,7 @@ export type addressType = {
     memo: string; // Address memo
 };
 
-export type descriptorSymbolsType = string[];
+export type DescriptorSymbolsType = string[];
 export type DescriptorObject = {
     external: Descriptor;
     internal: Descriptor;
@@ -86,7 +86,7 @@ export type Descriptor = string;
 
 export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
 
-export type baseWalletArgs = {
+export type BaseWalletArgs = {
     name: string;
     type: string;
     derivationPath?: string;
@@ -105,17 +105,17 @@ export type BDKWalletTypes =
     | 'MULTI'
     | 'p2shp2wpkh';
 
-export type extendedKeyInfoType = {
+export type ExtendedKeyInfoType = {
     network: NetType;
     type: string; // Wallet type
 };
 
-export type electrumServerURLs = {
+export type ElectrumServerURLs = {
     bitcoin: string;
     testnet: string;
 };
 
-export type accountPaths = {
+export type AccountPaths = {
     bitcoin: string;
     testnet: string;
 };

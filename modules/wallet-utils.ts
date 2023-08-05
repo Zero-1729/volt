@@ -13,7 +13,7 @@ const bip32 = BIP32Factory(ecc);
 import Crypto from 'react-native-quick-crypto';
 
 import {
-    descriptorSymbolsType,
+    DescriptorSymbolsType,
     BackupMaterialTypes,
     NetType,
     TransactionType,
@@ -25,12 +25,15 @@ import {
     extendedKeyInfo,
     WalletPaths,
     DescriptorType,
+} from './wallet-defaults';
+
+import {
     wrappedWalletDescriptorRegex,
     nativeWalletDescriptorRegex,
     xprvPattern,
     xpubPattern,
     extendedKeyPattern,
-} from './wallet-defaults';
+} from './re';
 
 export const getUniqueTXs = (
     transactions: TransactionType[],
@@ -68,7 +71,7 @@ export const isDescriptorPattern = (expression: string) => {
 };
 
 // Descriptor Symbols
-export const descriptorSymbols: descriptorSymbolsType = [
+export const descriptorSymbols: DescriptorSymbolsType = [
     '[',
     ']',
     '(',

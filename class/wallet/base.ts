@@ -8,7 +8,7 @@ import {
     TransactionType,
     UTXOType,
     NetType,
-    baseWalletArgs,
+    BaseWalletArgs,
     addressType,
     DescriptorObject,
 } from './../../types/wallet';
@@ -106,7 +106,7 @@ export class BaseWallet {
     hardwareWalletEnabled: boolean;
     hasBackedUp: boolean;
 
-    constructor(args: baseWalletArgs) {
+    constructor(args: BaseWalletArgs) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = args.name; // Wallet name
 

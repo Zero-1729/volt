@@ -1,7 +1,7 @@
 // Set of wallet default aliases, metadata, and types
 import {
-    accountPaths,
-    extendedKeyInfoType,
+    AccountPaths,
+    ExtendedKeyInfoType,
     BDKWalletTypes,
 } from '../types/wallet';
 
@@ -60,7 +60,7 @@ export const DescriptorType: {[index: string]: string} = {
     Bitcoin Testnet	    second	    change	      second	  m / 44' / 1' / 1' / 1 / 1
 
 */
-export const WalletPaths: {[index: string]: accountPaths} = {
+export const WalletPaths: {[index: string]: AccountPaths} = {
     bech32: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
     legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
     p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
@@ -133,7 +133,7 @@ export const validExtendedKeyPrefixes = new Map([
 export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
 
 // Supported extended key version metadata definitions
-export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
+export const extendedKeyInfo: {[index: string]: ExtendedKeyInfoType} = {
     // mainnet / bitcoin
     x: {network: 'bitcoin', type: 'bech32'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
     y: {network: 'bitcoin', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]

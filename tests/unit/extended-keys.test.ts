@@ -1,5 +1,5 @@
 import {getFingerprintFromXkey} from './../../modules/wallet-utils';
-import {extendedKeyPattern} from './../../modules/wallet-defaults';
+import {extendedKeyPattern} from './../../modules/re';
 
 describe('testing Extended key pattern regex', () => {
     test('extended keys patterns match', () => {
