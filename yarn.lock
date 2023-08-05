@@ -3410,9 +3410,9 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 20.4.6
-  resolution: "@types/node@npm:20.4.6"
-  checksum: 28dfc13da87f579264840bc5b8a2cde2dcb93662464a0d58f0fa98eba1aae978e3c73e893474238c4a1226d0b1a14e3936520ff9795e1c4e06fad3282be83d18
+  version: 20.4.7
+  resolution: "@types/node@npm:20.4.7"
+  checksum: a40d7003f66b56220a2028179e49f950b46fa6dbf860a4a6ecbd6ba7976f05b2f0b31ced39689ec88a7d9e32d07e088c6a06d270b99d5bc13a28291ac2f30ca7
   languageName: node
   linkType: hard
 
@@ -3728,13 +3728,13 @@ __metadata:
   linkType: hard
 
 "agentkeepalive@npm:^4.2.1":
-  version: 4.3.0
-  resolution: "agentkeepalive@npm:4.3.0"
+  version: 4.4.0
+  resolution: "agentkeepalive@npm:4.4.0"
   dependencies:
     debug: ^4.1.0
     depd: ^2.0.0
     humanize-ms: ^1.2.1
-  checksum: 982453aa44c11a06826c836025e5162c846e1200adb56f2d075400da7d32d87021b3b0a58768d949d824811f5654223d5a8a3dad120921a2439625eb847c6260
+  checksum: 36e0919a7503dacc863dc216ea6ca176c454724a63fd3d7b215089a1a2c89ee97db377b3af2454f79e5a8e7bb87e5975317734e9b0f9d5898c2269e3d8be05c7
   languageName: node
   linkType: hard
 
@@ -6183,9 +6183,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.477":
-  version: 1.4.482
-  resolution: "electron-to-chromium@npm:1.4.482"
-  checksum: 2eb3f094d10892517081722e1e8a3dc381bd8f1500cb0d4107975bceb37096d63c24256833c92843026a4b921b9f216b2d97975fdaaeb069257f0e85a1a4d83d
+  version: 1.4.485
+  resolution: "electron-to-chromium@npm:1.4.485"
+  checksum: 6f9efc92c18c4c8a16ba6d6004823d7ec893b98a0a0eae372e8cf1fbb61bdd04b9e2edd692dcb2e9d59cec06e3ef899262c52f1eb1e5d0202ee3d0b594fb4bd2
   languageName: node
   linkType: hard
 
@@ -6447,13 +6447,13 @@ __metadata:
   linkType: hard
 
 "eslint-config-prettier@npm:^8.5.0":
-  version: 8.9.0
-  resolution: "eslint-config-prettier@npm:8.9.0"
+  version: 8.10.0
+  resolution: "eslint-config-prettier@npm:8.10.0"
   peerDependencies:
     eslint: ">=7.0.0"
   bin:
     eslint-config-prettier: bin/cli.js
-  checksum: a675d0dabd76b700ef2d062b5ec6a634e105a8e8c070f95281fd2ccb614527fac60b4c758132058c50f0521fd19313f1f5be45ce9ebf081f2e5f77ae6eb7d8db
+  checksum: 153266badd477e49b0759816246b2132f1dbdb6c7f313ca60a9af5822fd1071c2bc5684a3720d78b725452bbac04bb130878b2513aea5e72b1b792de5a69fec8
   languageName: node
   linkType: hard
 
@@ -7126,9 +7126,9 @@ __metadata:
   linkType: hard
 
 "flow-parser@npm:0.*":
-  version: 0.213.1
-  resolution: "flow-parser@npm:0.213.1"
-  checksum: bb953544fc7951e3c7074cfd08cd28e0f9988018560a6aec5598e8b4da9d5701a9f586a8947fc6cd8c9bed8f3cc21cd33e6dac778550e1155dc06d4253380010
+  version: 0.214.0
+  resolution: "flow-parser@npm:0.214.0"
+  checksum: c7aab94b25622e811af65c1f3197f07e4f518266758fadc798847146611bbbd7bb9a423d022efa62e535cc87beb9841023b0650f9cdc725c41c6f84932133cb7
   languageName: node
   linkType: hard
 
@@ -12535,15 +12535,15 @@ __metadata:
   linkType: hard
 
 "react-native-screens@npm:^3.20.0":
-  version: 3.23.0
-  resolution: "react-native-screens@npm:3.23.0"
+  version: 3.24.0
+  resolution: "react-native-screens@npm:3.24.0"
   dependencies:
     react-freeze: ^1.0.0
     warn-once: ^0.1.0
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 7b61f4ab4c041cb77c3223ff334705789b6eef6c57cc9a9a6f9564788976d6a83ddea56e884e1fa4982cd5f7a92f57becb9ae4890a5fbd4183ae3ee89033d244
+  checksum: e6eedf2f57eccd22ee9c0ec7a6cd92603db71f22206985b219b88b28f1db5d0e599df68a427ee31b171dcbf8adf23db9b98ffb38f12ffb1a59ec53e1a5a0bc0d
   languageName: node
   linkType: hard
 
@@ -12876,11 +12876,11 @@ __metadata:
   linkType: hard
 
 "regenerator-transform@npm:^0.15.1":
-  version: 0.15.1
-  resolution: "regenerator-transform@npm:0.15.1"
+  version: 0.15.2
+  resolution: "regenerator-transform@npm:0.15.2"
   dependencies:
     "@babel/runtime": ^7.8.4
-  checksum: 2d15bdeadbbfb1d12c93f5775493d85874dbe1d405bec323da5c61ec6e701bc9eea36167483e1a5e752de9b2df59ab9a2dfff6bf3784f2b28af2279a673d29a4
+  checksum: 20b6f9377d65954980fe044cfdd160de98df415b4bff38fbade67b3337efaf078308c4fed943067cd759827cc8cfeca9cb28ccda1f08333b85d6a2acbd022c27
   languageName: node
   linkType: hard
 
