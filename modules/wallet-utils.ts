@@ -208,7 +208,8 @@ const _get256Checksum = (data: string): string => {
 // E.g. wpkh(tprv8ZgxMBicQKsPd97TPtNtP25LfqmXxDQa4fwJhtWcbc896RTiemtHnQmJNccVQJTH7eU3EpzqdyVJd9JPX1SQy9oKXfhm9o5mAHYEN3rcdV6)
 export const getDescriptorParts = (descriptor: string) => {
     // extract descriptor prefix
-    const parts = descriptor.split('(');
+    const partsByLeftBrace = descriptor.split('(');
+    const partsByRightBrace = descriptor.split(')');
 
     // use this to ensure we aren't using defaults but descriptor path
     let fingerprint = '';
@@ -218,10 +219,15 @@ export const getDescriptorParts = (descriptor: string) => {
     let scriptPrefix = '';
     let scriptSuffix = '';
 
-    const scripts = parts.length === 3 ? [parts[0], parts[1]] : [parts[0]];
+    const scripts =
+        partsByLeftBrace.length === 3
+            ? [partsByLeftBrace[0], partsByLeftBrace[1]]
+            : [partsByLeftBrace[0]];
 
     const data =
-        parts.length === 3 ? parts[2].split(')')[0] : parts[1].split(')')[0];
+        partsByLeftBrace.length === 3
+            ? partsByLeftBrace[2].split(')')[0]
+            : partsByLeftBrace[1].split(')')[0];
 
     // handle case for fingerprint + path and key
     if (data[0] === '[') {
@@ -263,12 +269,7 @@ export const getDescriptorParts = (descriptor: string) => {
     }
 
     // Extract checksum if any
-    let checksum = '';
-    let checksumArray = parts.slice(-1)[0].split('#').slice(-1);
-
-    if (checksum.includes('#')) {
-        checksum = checksumArray[0];
-    }
+    let checksum = partsByRightBrace.slice(-1)[0];
 
     // Gather data assuming non-nested script
     let components = {
@@ -284,7 +285,11 @@ export const getDescriptorParts = (descriptor: string) => {
     };
 
     // Handle nested script case
-    if (scripts[0] === 'sh' && scripts[1] === 'wpkh' && parts.length === 3) {
+    if (
+        scripts[0] === 'sh' &&
+        scripts[1] === 'wpkh' &&
+        partsByLeftBrace.length === 3
+    ) {
         // Extract embedded key
         key = data[0] === '[' ? data.split(']')[1] : data[0];
 
