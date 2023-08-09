@@ -121,7 +121,7 @@ export const isExtendedKey = (key: string): boolean => {
 export const getInfoFromXKey = (key: string) => {
     const prefix = _getPrefix(key);
 
-    return extendedKeyInfo[prefix];
+    return extendedKeyInfo[prefix[0]];
 };
 
 export const isValidExtendedKey = (
@@ -200,112 +200,6 @@ const _get256Checksum = (data: string): string => {
     const hashed_data = _doubleSha256(Buffer.from(data, 'hex'));
 
     return hashed_data.slice(0, 4).toString('hex');
-};
-
-// Get descriptor components
-// Descriptor format:
-// {script}({xprv/xpub})
-// E.g. wpkh(tprv8ZgxMBicQKsPd97TPtNtP25LfqmXxDQa4fwJhtWcbc896RTiemtHnQmJNccVQJTH7eU3EpzqdyVJd9JPX1SQy9oKXfhm9o5mAHYEN3rcdV6)
-export const getDescriptorParts = (descriptor: string) => {
-    // extract descriptor prefix
-    const partsByLeftBrace = descriptor.split('(');
-    const partsByRightBrace = descriptor.split(')');
-
-    // use this to ensure we aren't using defaults but descriptor path
-    let fingerprint = '';
-    let path = '';
-    let key = '';
-    let network = '';
-    let scriptPrefix = '';
-    let scriptSuffix = '';
-
-    const scripts =
-        partsByLeftBrace.length === 3
-            ? [partsByLeftBrace[0], partsByLeftBrace[1]]
-            : [partsByLeftBrace[0]];
-
-    const data =
-        partsByLeftBrace.length === 3
-            ? partsByLeftBrace[2].split(')')[0]
-            : partsByLeftBrace[1].split(')')[0];
-
-    // handle case for fingerprint + path and key
-    if (data[0] === '[') {
-        if (/([a-f0-9]{8})/.test(data)) {
-            let ret = /([a-f0-9]{8})/.exec(data);
-
-            fingerprint = ret ? ret[0] : '';
-        }
-
-        if (/(\/[1-9]{2}h)(\/[0-9]h|\*)*/.test(data)) {
-            let ret = /(\/[1-9]{2}h)(\/[0-9]h|\*)*/.exec(data);
-
-            path = (ret ? ret[0] : '').replace(/h/g, "'").slice(1);
-        }
-
-        key = data.split(']')[1];
-        network = extendedKeyInfo[data.split(']')[1][0]].network;
-        scriptPrefix = scripts[0] + '(';
-        scriptSuffix = ')';
-    } else {
-        // Full key, which may include trailing path
-        // i.e. tprv8ZgxMBicQKsPdCaKK9HTNU45tMEbMDugaZc1mPzt9a2Wzdo31zRGMdoeKYKJz6aNg7oz9togxkV62bnGWYZ94VSAeETfPNWNhetjZY7hQPP/84'/1'/0'/0/*
-        key = data;
-
-        // Assuming a private descriptor with terminal path
-        if (data.includes('/')) {
-            path = data.split('/').slice(1, 4).join('/');
-        }
-
-        // Get network from key
-        // No need to strip given we only need the first character
-        network = extendedKeyInfo[key[0]].network;
-
-        // Get fingerprint from stripped key
-        fingerprint = getFingerprintFromXkey(
-            key.split('/')[0],
-            network as NetType,
-        );
-    }
-
-    // Extract checksum if any
-    let checksum = partsByRightBrace.slice(-1)[0];
-
-    // Gather data assuming non-nested script
-    let components = {
-        key: key,
-        keyOnly: key.split('/')[0],
-        network: network,
-        type: DescriptorType[scripts[0]],
-        fingerprint: fingerprint,
-        path: 'm/' + path,
-        scriptPrefix: scriptPrefix,
-        scriptSuffix: scriptSuffix,
-        checksum: checksum,
-    };
-
-    // Handle nested script case
-    if (
-        scripts[0] === 'sh' &&
-        scripts[1] === 'wpkh' &&
-        partsByLeftBrace.length === 3
-    ) {
-        // Extract embedded key
-        key = data[0] === '[' ? data.split(']')[1] : data[0];
-
-        components.key = key;
-        components.keyOnly = key.split('/')[0];
-
-        // Set network and wallet type from descriptor
-        components.network = extendedKeyInfo[key[0]].network;
-        components.type = DescriptorType[scripts[0]];
-        components.fingerprint = fingerprint;
-        components.path = 'm/' + path.slice(1);
-        components.scriptPrefix = scripts[0] + '(' + scripts[1] + '(';
-        components.scriptSuffix = '))';
-    }
-
-    return components;
 };
 
 // Return a wallet address path from a given index and whether it is a change or receiving address
