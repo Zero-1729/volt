@@ -19,6 +19,7 @@
     "npm": ">=8.1.0"
   },
   "dependencies": {
+    "@bitcoinerlab/descriptors": "^1.0.2",
     "@bitcoinerlab/secp256k1": "^1.0.2",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@mempool/mempool.js": "^2.3.0",
@@ -55,6 +56,7 @@
     "electrum-mnemonic": "^2.0.0",
     "events": "^3.3.0",
     "junderw-crc32c": "^1.2.0",
+    "ledger-bitcoin": "^0.2.3",
     "merkle-lib": "^2.0.10",
     "minimaldata": "^1.0.2",
     "node-fetch": "^3.2.10",

@@ -1658,7 +1658,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bitcoinerlab/secp256k1@npm:^1.0.2":
+"@bitcoinerlab/descriptors@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@bitcoinerlab/descriptors@npm:1.0.2"
+  dependencies:
+    "@bitcoinerlab/miniscript": ^1.2.1
+    "@bitcoinerlab/secp256k1": ^1.0.5
+    bip32: ^4.0.0
+    bitcoinjs-lib: ^6.1.3
+    ecpair: ^2.1.0
+  peerDependencies:
+    ledger-bitcoin: ^0.2.2
+  peerDependenciesMeta:
+    ledger-bitcoin:
+      optional: true
+  checksum: ca6b08fe2bfad316d0eb70fb39fab75a598b087af70a5d23492de4329a5c39238cd1f5cd5f58b191dad37f492fa900198b91fd3fc8fd378426e32da4d618ec38
+  languageName: node
+  linkType: hard
+
+"@bitcoinerlab/miniscript@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@bitcoinerlab/miniscript@npm:1.2.1"
+  dependencies:
+    bip68: ^1.0.4
+  checksum: 172d9a31af32dbb38bb15a4dd712f03eb45e994741cd246092cb6afbca940d32769066c508a23f268c989f34398c54b47d769e2b38b995682fb5c01fdad9bee3
+  languageName: node
+  linkType: hard
+
+"@bitcoinerlab/secp256k1@npm:^1.0.2, @bitcoinerlab/secp256k1@npm:^1.0.5":
   version: 1.0.5
   resolution: "@bitcoinerlab/secp256k1@npm:1.0.5"
   dependencies:
@@ -2111,6 +2138,43 @@ __metadata:
     "@jridgewell/resolve-uri": 3.1.0
     "@jridgewell/sourcemap-codec": 1.4.14
   checksum: 0572669f855260808c16fe8f78f5f1b4356463b11d3f2c7c0b5580c8ba1cbf4ae53efe9f627595830856e57dbac2325ac17eb0c3dd0ec42102e6f227cc289c02
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/devices@npm:^8.0.6":
+  version: 8.0.6
+  resolution: "@ledgerhq/devices@npm:8.0.6"
+  dependencies:
+    "@ledgerhq/errors": ^6.13.1
+    "@ledgerhq/logs": ^6.10.1
+    rxjs: 6
+    semver: ^7.3.5
+  checksum: 1ada6361a5476f199a9d031d4f9a22c6cfec0f7727cf0ad8a180ee398f40625cf360fc149d5bd73d89e964de8cb18a2b6a7849146b96e4b7776921947b7e62b9
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/errors@npm:^6.13.1":
+  version: 6.13.1
+  resolution: "@ledgerhq/errors@npm:6.13.1"
+  checksum: 7c07edf71bdfb4a905dc0ce259bb3860aaa2d3b4130acbaf2626c45d0bbd1a447076f7fb495801e8fbe724b0849e9bbf0756f6ea9e5ebab6acd50020c4d383cc
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport@npm:^6.20.0":
+  version: 6.28.7
+  resolution: "@ledgerhq/hw-transport@npm:6.28.7"
+  dependencies:
+    "@ledgerhq/devices": ^8.0.6
+    "@ledgerhq/errors": ^6.13.1
+    events: ^3.3.0
+  checksum: 34b3694ddd8ce9a1eab144d830ae9c5d71d97d2d443cd0423f445eabf2be4eb03e8afb24bcdcb6fa17004f41337c23ea6981bdb1c08a3c1d9ea71f4f1766b7f9
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/logs@npm:^6.10.1":
+  version: 6.10.1
+  resolution: "@ledgerhq/logs@npm:6.10.1"
+  checksum: 4dde46557d9daa6028f7040d26585aaa7260445212ad8348ae4a01463b7d76a1592dfc36921e47f5fc477c50b5d73e840070ac167e3cbe5b45123f36a4f96b08
   languageName: node
   linkType: hard
 
@@ -4481,6 +4545,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bip32-path@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "bip32-path@npm:0.4.2"
+  checksum: 4d5ad2e6f235b79f7552ab4c46f8238cd5f453993889b87935b3cf4c5dec281c145afe0e96f029c094a61a7c96ad45793988e31a83bc4bd7fceabd3aee188917
+  languageName: node
+  linkType: hard
+
 "bip32-utils@npm:^0.11.1":
   version: 0.11.1
   resolution: "bip32-utils@npm:0.11.1"
@@ -4559,7 +4630,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bitcoinjs-lib@npm:^6.1.1":
+"bitcoinjs-lib@npm:^6.1.1, bitcoinjs-lib@npm:^6.1.3":
   version: 6.1.3
   resolution: "bitcoinjs-lib@npm:6.1.3"
   dependencies:
@@ -9369,6 +9440,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ledger-bitcoin@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "ledger-bitcoin@npm:0.2.3"
+  dependencies:
+    "@bitcoinerlab/descriptors": ^1.0.2
+    "@bitcoinerlab/secp256k1": ^1.0.5
+    "@ledgerhq/hw-transport": ^6.20.0
+    bip32-path: ^0.4.2
+    bitcoinjs-lib: ^6.1.3
+  checksum: da54d4a88f29b1f2e1b61207456495eb7cb319cc525d6c9272b120915b7a7113205e0318d9c958610bebac3a2f2a3f9b3fe4a748dacfacc5edc9b6858ab0938f
+  languageName: node
+  linkType: hard
+
 "leven@npm:^3.1.0":
   version: 3.1.0
   resolution: "leven@npm:3.1.0"
@@ -13218,6 +13302,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rxjs@npm:6":
+  version: 6.6.7
+  resolution: "rxjs@npm:6.6.7"
+  dependencies:
+    tslib: ^1.9.0
+  checksum: bc334edef1bb8bbf56590b0b25734ba0deaf8825b703256a93714308ea36dff8a11d25533671adf8e104e5e8f256aa6fdfe39b2e248cdbd7a5f90c260acbbd1b
+  languageName: node
+  linkType: hard
+
 "rxjs@npm:^7.0.0":
   version: 7.8.1
   resolution: "rxjs@npm:7.8.1"
@@ -14484,7 +14577,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.8.1":
+"tslib@npm:^1.8.1, tslib@npm:^1.9.0":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
@@ -14959,8 +15052,10 @@ __metadata:
   resolution: "volt@workspace:."
   dependencies:
     "@babel/core": ^7.20.0
+    "@babel/plugin-transform-modules-commonjs": ^7.22.5
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@bitcoinerlab/descriptors": ^1.0.2
     "@bitcoinerlab/secp256k1": ^1.0.2
     "@craftzdog/react-native-buffer": ^6.0.5
     "@mempool/mempool.js": ^2.3.0
@@ -15009,6 +15104,7 @@ __metadata:
     events: ^3.3.0
     jest: ^29.6.2
     junderw-crc32c: ^1.2.0
+    ledger-bitcoin: ^0.2.3
     merkle-lib: ^2.0.10
     metro-react-native-babel-preset: ^0.73.9
     minimaldata: ^1.0.2
