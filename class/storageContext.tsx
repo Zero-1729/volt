@@ -15,6 +15,8 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
+
+import {parseDescriptor} from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
 import {
     TWalletType,
@@ -737,30 +739,35 @@ export const AppStorageProvider = ({children}: Props) => {
             // Adjust metas from descriptor
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
-                const desc = getDescriptorParts(backupMaterial);
+                // const parsedDescriptor = getDescriptorParts(backupMaterial);
+                const parsedDescriptor = parseDescriptor(backupMaterial);
 
                 // If we have a key missing the trailing path
                 // We artificially include that here
                 // TODO: ugly hack, probably best to require a descriptor with the trailing path
-                if (desc.key === desc.keyOnly) {
-                    backupMaterial = `${desc.scriptPrefix}[${
-                        desc.fingerprint
-                    }${desc.path.slice(1)}]${desc.key}/0/*${desc.scriptSuffix}${
-                        desc.checksum
+                if (parsedDescriptor.key === parsedDescriptor.keyOnly) {
+                    backupMaterial = `${parsedDescriptor.scriptPrefix}[${
+                        parsedDescriptor.fingerprint
+                    }${parsedDescriptor.path.slice(1)}]${
+                        parsedDescriptor.key
+                    }/0/*${parsedDescriptor.scriptSuffix}${
+                        parsedDescriptor.checksum
                     }`;
                 }
 
-                net = desc.network as NetType;
-                walletType = desc.type;
-                fingerprint = desc.fingerprint;
-                path = desc.path;
+                console.log(parsedDescriptor.keyOnly);
+
+                net = parsedDescriptor.network as NetType;
+                walletType = parsedDescriptor.type;
+                fingerprint = parsedDescriptor.fingerprint;
+                path = parsedDescriptor.path;
                 xpub =
-                    getExtendedKeyPrefix(desc.keyOnly) === 'xpub'
-                        ? desc.keyOnly
+                    getExtendedKeyPrefix(parsedDescriptor.keyOnly) === 'xpub'
+                        ? parsedDescriptor.keyOnly
                         : '';
                 xprv =
-                    getExtendedKeyPrefix(desc.keyOnly) === 'xprv'
-                        ? desc.keyOnly
+                    getExtendedKeyPrefix(parsedDescriptor.keyOnly) === 'xprv'
+                        ? parsedDescriptor.keyOnly
                         : '';
 
                 // Set xpub if we got an xprv
