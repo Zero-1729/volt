@@ -17,6 +17,8 @@ export const wrappedWalletDescriptorRegex: RegExp =
 // Extended Keys
 export const extendedKeyPattern: RegExp =
     /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
+export const extendedKeyPatternG: RegExp =
+    /([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})/g;
 export const descXpubPattern: RegExp =
     /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
 export const xpubPattern: RegExp =
