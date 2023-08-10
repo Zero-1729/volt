@@ -3,7 +3,7 @@
 
 # About
 
-A Sovereign Bitcoin Wallet
+A Modern Descriptor based Sovereign Bitcoin Wallet
 
 # Build
 
