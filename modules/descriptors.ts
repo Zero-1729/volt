@@ -56,10 +56,14 @@ export const parseDescriptor = (expression: string) => {
     const partsByRightBrace = expression.split(')');
 
     var descriptorType!: string;
+    var extractedPath = descObjmap?.path
+        ?.split('/')
+        .splice(0, 4)
+        .join('/')
+        .replace(/h/g, "'");
 
     try {
-        descriptorType =
-            validPathTypes[descObjmap?.path?.split('/').splice(0, 4).join('/')];
+        descriptorType = validPathTypes[extractedPath];
     } catch (e: any) {
         throw new Error('Descriptor contains an invalid wallet type');
     }
