@@ -16,7 +16,10 @@ import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
 
-import {parseDescriptor} from '../modules/descriptors';
+import {
+    parseDescriptor,
+    includeDescriptorKeyPath,
+} from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
 import {
     TWalletType,
@@ -743,15 +746,10 @@ export const AppStorageProvider = ({children}: Props) => {
 
                 // If we have a key missing the trailing path
                 // We artificially include that here
-                // TODO: ugly hack, probably best to require a descriptor with the trailing path
+                // TODO: Probably best to require a descriptor with the trailing path
+                // in regex check from Restore screen
                 if (parsedDescriptor.key === parsedDescriptor.keyOnly) {
-                    backupMaterial = `${parsedDescriptor.scriptPrefix}[${
-                        parsedDescriptor.fingerprint
-                    }${parsedDescriptor.path.slice(1)}]${
-                        parsedDescriptor.key
-                    }/0/*${parsedDescriptor.scriptSuffix}${
-                        parsedDescriptor.checksum
-                    }`;
+                    backupMaterial = includeDescriptorKeyPath(parsedDescriptor);
                 }
 
                 net = parsedDescriptor.network as NetType;
@@ -855,7 +853,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 });
             }
 
-            // Alternatively, generate Descriptor for Extended Keys
+            // Alternatively, generate Descriptor from Extended Keys
             if (
                 backupMaterialType === 'xprv' ||
                 backupMaterialType === 'xpub'
