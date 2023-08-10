@@ -1,8 +1,8 @@
-import {BaseWallet} from './../base';
+import {BaseWallet} from '../base';
 
-import {TransactionType} from './../../../types/wallet';
+import {TransactionType} from '../../../types/wallet';
 
-export class SegWitNativeWallet extends BaseWallet {
+export class SegWitP2SHWallet extends BaseWallet {
     buildTx() {
         throw new Error('Not implemented');
     }
