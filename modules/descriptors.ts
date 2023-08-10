@@ -16,7 +16,7 @@ const validPathTypes: {[index: string]: string} = {
 
 const _getDescriptorNetwork = (expression: string) => {
     // extract descriptor key
-    const keyMaterial = extendedKeyPatternG.exec(expression);
+    const keyMaterial = expression.match(extendedKeyPatternG);
 
     if (!keyMaterial) {
         throw new Error('Could not get network from descriptor');
