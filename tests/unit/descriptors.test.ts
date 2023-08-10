@@ -5,7 +5,7 @@ describe('testing descriptor type extraction', () => {
     test('descriptor type matches', () => {
         const descriptor =
             'wpkh([188ed79c/84h/1h/0h]tpubD6NzVbkrYhZ4XopgwuDUxX9FnNeZUfidCDusmRfUkzLaVKY2zNNYtqj1frtBbqTSBcHKxsbtUjD4WSDGBwiMn7mLuuWEf5WzvJKMamGNGgG/0/*)';
-        const descriptor_type = 'bech32';
+        const descriptor_type = 'wpkh';
 
         const parts = parseDescriptor(descriptor);
 
