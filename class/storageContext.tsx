@@ -861,9 +861,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 backupMaterialType === 'xpub'
             ) {
                 try {
-                    // BDK expects a tpub or xpub, so we need to convert it
-                    // if it's an exotic prefix
                     const descriptor = await fromDescriptorTemplatePublic(
+                        // BDK expects a tpub or xpub, so we need to convert it
+                        // if it's an exotic prefix
                         normalizeXpub(walletArgs.xpub),
                         walletArgs.fingerprint,
                         walletArgs.type,
@@ -884,7 +884,8 @@ export const AppStorageProvider = ({children}: Props) => {
                         private: privateDescriptor,
                     });
                 } catch (e) {
-                    console.log(e);
+                    // Report any other related BDK errors
+                    throw e;
                 }
             }
 
