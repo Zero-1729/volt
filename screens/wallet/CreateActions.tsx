@@ -47,20 +47,20 @@ const CreateAction = () => {
 
     const [network, setNetwork] = useState<NetType>('testnet'); // Default to testnet
     const [open, setOpen] = useState(false);
-    const [account, setAccount] = useState('bech32'); // Default to segwit
+    const [account, setAccount] = useState('wpkh'); // Default to segwit
     const [accounts, setAccounts] = useState([
         {
-            value: 'bech32',
+            value: 'wpkh',
             label: 'Native SegWit (BIP84)',
         },
-        {value: 'p2sh', label: 'Segwit Wrapped (BIP49)'},
-        {value: 'legacy', label: 'Legacy (BIP44)'},
+        {value: 'shp2wpkh', label: 'Segwit Wrapped (BIP49)'},
+        {value: 'p2pkh', label: 'Legacy (BIP44)'},
     ]);
 
     const accountInfo: {[index: string]: string} = {
-        bech32: 'Native SegWit Bech32 (bc1...)',
-        p2sh: 'Segwit Wrapped P2SH (3...)',
-        legacy: 'Legacy P2PKH (1...)',
+        wpkh: 'Native SegWit Bech32 (bc1...)',
+        shp2wpkh: 'Segwit Wrapped P2SH (3...)',
+        p2pkh: 'Legacy P2PKH (1...)',
     };
 
     const toggleNetwork = () => {
@@ -76,7 +76,7 @@ const CreateAction = () => {
             // Clear wallet name
             setNewWalletName('');
 
-            // Default wallet type is Segwit bech32 on Testnet
+            // Default wallet type is Segwit wpkh on Testnet
             await addWallet(walletName, type, network);
 
             // Vibrate to let user know the action was successful
