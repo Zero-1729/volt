@@ -34,9 +34,9 @@ import {
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
-import {SegWitNativeWallet} from './wallet/segwit/bech32';
-import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
-import {LegacyWallet} from './wallet/legacy';
+import {SegWitNativeWallet} from './wallet/segwit/wpkh';
+import {SegWitP2SHWallet} from './wallet/segwit/shp2wpkh';
+import {LegacyWallet} from './wallet/p2pkh';
 
 import {
     descriptorFromTemplate,

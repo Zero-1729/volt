@@ -4,9 +4,9 @@ import 'react';
 import BigNumber from 'bignumber.js';
 import {NetInfoState} from '@react-native-community/netinfo';
 
-import {SegWitNativeWallet} from '../class/wallet/segwit/bech32';
-import {SegWitP2SHWallet} from '../class/wallet/segwit/p2sh';
-import {LegacyWallet} from '../class/wallet/legacy';
+import {SegWitNativeWallet} from '../class/wallet/segwit/wpkh';
+import {SegWitP2SHWallet} from '../class/wallet/segwit/shp2wpkh';
+import {LegacyWallet} from '../class/wallet/p2pkh';
 
 import {LocalUtxo} from 'bdk-rn/lib/classes/Bindings';
 
