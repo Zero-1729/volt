@@ -326,7 +326,7 @@ const _sync = async (
 // Fetch Wallet Balance using wallet descriptor, metas, and electrum server
 export const getWalletBalance = async (
     wallet: BaseWallet,
-    electrumServer: electrumServerURLs,
+    electrumServer: ElectrumServerURLs,
 ): Promise<SyncData> => {
     // Generate wallet from wallet descriptor and metas
     const w = await _sync(
