@@ -179,12 +179,12 @@ const Info = () => {
                                 {
                                     borderWidth: 1,
                                     borderRadius: 4,
-                                    borderColor: 'rgba(rgb(118,118,118,0.6)',
+                                    borderColor: 'rgba(0, 0, 0, 0.4)',
                                 },
                             ]}>
                             <TextSingleInput
                                 placeholderTextColor={
-                                    ColorScheme.Text.GrayedText
+                                    'rgba(255, 255, 255, 0.6)'
                                 }
                                 shavedHeight={true}
                                 placeholder={walletName}
