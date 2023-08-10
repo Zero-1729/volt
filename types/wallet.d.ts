@@ -90,7 +90,7 @@ export type BaseWalletArgs = {
     name: string;
     type: string;
     derivationPath?: string;
-    secret?: string;
+    mnemonic?: string;
     xprv?: string;
     xpub?: string;
     network?: NetType;

@@ -660,10 +660,10 @@ export const AppStorageProvider = ({children}: Props) => {
 
         // If we have a mnemonic, generate extended key material
         // Function applied when newly generated wallet and if mnemonic imported
-        if (newWallet.secret !== '') {
+        if (newWallet.mnemonic !== '') {
             try {
                 const metas = getMetaFromMnemonic(
-                    newWallet.secret,
+                    newWallet.mnemonic,
                     newWallet.derivationPath,
                     newWallet.network,
                 );
@@ -681,7 +681,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
             ({InternalDescriptor, ExternalDescriptor} =
                 await descriptorFromTemplate(
-                    newWallet.secret,
+                    newWallet.mnemonic,
                     newWallet.type,
                     newWallet.network,
                 ));
@@ -800,7 +800,8 @@ export const AppStorageProvider = ({children}: Props) => {
             const walletArgs = {
                 name: 'Restored Wallet',
                 type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
-                secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
+                mnemonic:
+                    backupMaterialType === 'mnemonic' ? backupMaterial : '',
                 descriptor:
                     backupMaterialType === 'descriptor' ? backupMaterial : '',
                 xprv: xprv,
@@ -914,7 +915,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
-                            secret: mnemonic,
+                            mnemonic: mnemonic,
                         });
 
                         break;
@@ -924,7 +925,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
-                            secret: mnemonic,
+                            mnemonic: mnemonic,
                         });
                         break;
 
@@ -933,7 +934,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             name: name,
                             type: type,
                             network: network,
-                            secret: mnemonic,
+                            mnemonic: mnemonic,
                         });
                         break;
                 }

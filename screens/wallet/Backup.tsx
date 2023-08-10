@@ -45,9 +45,9 @@ const Backup = () => {
     const [showPrivateDescriptor, setShowPrivateDescriptor] = useState(false);
 
     // Key material currently stored in wallet
-    const isSingleMaterial = walletData.secret === '';
+    const isSingleMaterial = walletData.mnemonic === '';
     const walletAvailMaterial: string =
-        walletData.secret !== ''
+        walletData.mnemonic !== ''
             ? 'Mnemonic'
             : walletData.externalDescriptor !== ''
             ? 'Descriptor'
@@ -69,8 +69,8 @@ const Backup = () => {
 
     const getQRData = (material: string) => {
         // Only show mnemonic if mnemonic available and toggled
-        if (material === 'Mnemonic' && walletData.secret !== '') {
-            return walletData.secret;
+        if (material === 'Mnemonic' && walletData.mnemonic !== '') {
+            return walletData.mnemonic;
         }
 
         // Shows descriptor if available or toggled
@@ -188,7 +188,7 @@ const Backup = () => {
                                     style={[tailwind('mr-4')]}
                                     disabled={
                                         backupMaterial === 'Mnemonic' ||
-                                        walletData.secret === ''
+                                        walletData.mnemonic === ''
                                     }
                                     onPress={() => {
                                         updateData('Mnemonic');

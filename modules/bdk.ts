@@ -101,7 +101,7 @@ export const testElectrumServer = async (url: string, callback: any) => {
 
 // Generate External and Internal Descriptors from wallet DescriptorSecretKey ('from mnemonic')
 export const descriptorFromTemplate = async (
-    secret: string,
+    mnemonic: string,
     type: string,
     network: NetType,
 ): Promise<{
@@ -109,11 +109,11 @@ export const descriptorFromTemplate = async (
     ExternalDescriptor: BDK.Descriptor;
 }> => {
     // Create descriptor from mnemonic
-    const mnemonic = await new BDK.Mnemonic().fromString(secret);
+    const bdkMnemonic = await new BDK.Mnemonic().fromString(mnemonic);
 
     const descriptorSecretKey = await new BDK.DescriptorSecretKey().create(
         network as Network,
-        mnemonic,
+        bdkMnemonic,
     );
 
     let InternalDescriptor!: BDK.Descriptor;

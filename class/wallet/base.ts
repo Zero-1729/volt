@@ -33,7 +33,7 @@ export class BaseWallet {
             type: obj.type,
             xprv: obj.xprv,
             xpub: obj.xpub,
-            secret: obj.secret,
+            mnemonic: obj.mnemonic,
             network: obj.network,
         });
 
@@ -79,7 +79,7 @@ export class BaseWallet {
 
     gap_limit: number;
 
-    secret: string;
+    mnemonic: string;
     xprv: string;
     xpub: string;
 
@@ -149,7 +149,7 @@ export class BaseWallet {
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
 
-        this.secret = args.secret ? args.secret : '';
+        this.mnemonic = args.mnemonic ? args.mnemonic : '';
 
         this.isWatchOnly = false; // Whether wallet is watch only
 
@@ -169,12 +169,12 @@ export class BaseWallet {
             );
 
             // Generate address using either mnemonic or xpub
-            if (this.secret.length > 0) {
+            if (this.mnemonic.length > 0) {
                 address = generateAddressFromMnemonic(
                     addressPath,
                     this.network,
                     this.type,
-                    this.secret,
+                    this.mnemonic,
                 );
             } else {
                 address = generateAddressFromXKey(
@@ -209,7 +209,7 @@ export class BaseWallet {
         // i.e. no mnemonic, xprv, or descriptor with xprv
         if (isWatchOnly === undefined) {
             const noPrivKeys =
-                this.secret.length === 0 && this.xprv.length === 0;
+                this.mnemonic.length === 0 && this.xprv.length === 0;
 
             // Naively check if extended pub key present
             // i.e. no prv key material in descriptor
