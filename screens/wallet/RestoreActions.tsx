@@ -12,6 +12,8 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import Checkbox from 'react-native-bouncy-checkbox';
 
+import RNFS from 'react-native-fs';
+
 import {AppStorageContext} from '../../class/storageContext';
 import {
     descriptorSymbols,
@@ -62,19 +64,42 @@ const ImportAction = () => {
         }
     };
 
-    const handleFolderCallback = (data: any) => {
-        // TODO: Read info from assumed text file
-        console.info(`[Success] Document Picker: ${data.uri}`);
+    const handleFolderCallback = async (data: any) => {
+        await RNFS.readFile(data.uri, 'utf8')
+            .then(res => {
+                // We only support single line imports with the import action
+                // so we split the data by lines and only take the first line
+                // as the import material
+                const dataByLines = res.split('\n');
+                const importMaterial = dataByLines[0];
+                const lines = dataByLines.length;
+
+                if (lines > 1) {
+                    conservativeAlert(
+                        'Error',
+                        'Import supports only one line of text with material to import',
+                    );
+
+                    return;
+                }
+
+                handleImport(importMaterial);
+            })
+            .catch(e => {
+                handleFolderError(e);
+            });
     };
 
     const handleFolderError = (e: Error) => {
         // Handle when any error in the folder action is reported
-        console.error(`[Error] Document Picker: ${e.message}`);
+        conservativeAlert('Error', e.message);
+
+        return;
     };
 
-    const handleFolderCancel = (e: Error) => {
+    const handleFolderCancel = () => {
         // Handle when user cancels folder action
-        console.warn(`[Warn] Document Picker: ${e.message}`);
+        return;
     };
 
     const onBlur = () => {
@@ -184,12 +209,11 @@ const ImportAction = () => {
         }
     };
 
-    const isDescriptor = (text: string) => {
+    const isLooslyDescriptor = (text: string) => {
         const hasDigits = /\d/.test(text);
 
         // Assume it is a descriptor if it has both
         // numbers or descriptor symbols
-        // TODO: implement a stricter pattern check
         if (
             descriptorSymbols.some((symbol: string) => text.includes(symbol)) &&
             hasDigits
@@ -225,7 +249,7 @@ const ImportAction = () => {
         }
 
         // Check if descriptor
-        if (isDescriptor(material)) {
+        if (isLooslyDescriptor(material)) {
             // Handle import of descriptor
             handleDescriptor(material);
             return;
