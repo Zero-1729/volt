@@ -14,6 +14,20 @@ const validPathTypes: {[index: string]: string} = {
     "m/49'/1'/0'": 'shp2wpkh',
 };
 
+type DescriptorParts = {
+    key: string;
+    keyOnly: string;
+    type: string;
+    network: string;
+    fingerprint: string;
+    path: string;
+    keyPath: string;
+    scriptPrefix: string;
+    scriptSuffix: string;
+    checksum: string;
+    isPublic: boolean;
+};
+
 const _getDescriptorNetwork = (expression: string) => {
     // extract descriptor key
     const keyMaterial = expression.match(extendedKeyPatternG);
@@ -46,6 +60,10 @@ export const parseDescriptor = (expression: string) => {
             network: network,
         });
     } catch (e: any) {
+        if (e.message.includes('invalid descriptor checksum')) {
+            throw new Error('Invalid descriptor checksum');
+        }
+
         throw new Error('Could not parse descriptor');
     }
 
@@ -90,4 +108,12 @@ export const parseDescriptor = (expression: string) => {
                 : '',
         isPublic: descObjmap?.bip32?.privateKey === undefined,
     };
+};
+
+export const includeDescriptorKeyPath = (descriptorObject: DescriptorParts) => {
+    return `${descriptorObject.scriptPrefix}[${
+        descriptorObject.fingerprint
+    }${descriptorObject.path.slice(1)}]${descriptorObject.key}/0/*${
+        descriptorObject.scriptSuffix
+    }${descriptorObject.checksum}`;
 };
