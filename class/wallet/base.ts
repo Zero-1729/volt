@@ -21,7 +21,7 @@ import {
 
 import {WalletPaths, GAP_LIMIT} from '../../modules/wallet-defaults';
 
-import {descXpubPattern} from '../../modules/re';
+import {parseDescriptor} from '../../modules/descriptors';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
@@ -144,7 +144,7 @@ export class BaseWallet {
 
         this.internalDescriptor = ''; // Wallet internal descriptor
         this.externalDescriptor = ''; // Wallet external descriptor
-        this.privateDescriptor = ''; // Wallet external private descriptor
+        this.privateDescriptor = ''; // Wallet external private descriptor (default to external public descriptor if no private key material)
 
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
@@ -211,17 +211,17 @@ export class BaseWallet {
             const noPrivKeys =
                 this.mnemonic.length === 0 && this.xprv.length === 0;
 
-            // Naively check if extended pub key present
-            // i.e. no prv key material in descriptor
-            // Make sure descriptor is not empty, else assume no prv key material
-            const noPrivKeyDescriptor =
-                this.externalDescriptor !== ''
-                    ? this.externalDescriptor.match(descXpubPattern)
-                    : true;
+            // Get private descriptor info and check
+            // if it contains a private extended key
+            const privateDescriptorInfo = parseDescriptor(
+                this.privateDescriptor,
+            );
 
-            if (noPrivKeys && noPrivKeyDescriptor) {
+            // If no private keys and descriptor is public, then watch-only
+            if (noPrivKeys && privateDescriptorInfo.isPublic) {
                 this.isWatchOnly = true;
             }
+
             return;
         }
 
