@@ -296,7 +296,6 @@ const ImportAction = () => {
                 style={[
                     tailwind('w-full h-full items-center'),
                     {backgroundColor: ColorScheme.Background.Primary},
-                    Font.RobotoText,
                 ]}>
                 <View style={[tailwind('w-5/6 mt-8')]}>
                     <PlainButton
