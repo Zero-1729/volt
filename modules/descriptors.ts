@@ -6,12 +6,12 @@ import {getInfoFromXKey} from './wallet-utils';
 import {extendedKeyPatternG} from './re';
 
 const validPathTypes: {[index: string]: string} = {
-    "m/84'/0'/0'": 'bech32',
-    "m/84'/1'/0'": 'bech32',
-    "m/44'/0'/0'": 'legacy',
-    "m/44'/1'/0'": 'legacy',
-    "m/49'/0'/0'": 'p2sh',
-    "m/49'/1'/0'": 'p2sh',
+    "m/84'/0'/0'": 'wpkh',
+    "m/84'/1'/0'": 'wpkh',
+    "m/44'/0'/0'": 'p2pkh',
+    "m/44'/1'/0'": 'p2pkh',
+    "m/49'/0'/0'": 'shp2wpkh',
+    "m/49'/1'/0'": 'shp2wpkh',
 };
 
 const _getDescriptorNetwork = (expression: string) => {

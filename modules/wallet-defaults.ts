@@ -1,29 +1,18 @@
 // Set of wallet default aliases, metadata, and types
-import {
-    AccountPaths,
-    ExtendedKeyInfoType,
-    BDKWalletTypes,
-} from '../types/wallet';
+import {AccountPaths, ExtendedKeyInfoType} from '../types/wallet';
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
-    bech32: ['Native Segwit', 'bc1...'],
-    legacy: ['Legacy', '1...'],
-    p2sh: ['Segwit', '3...'],
-};
-
-// BDK Wallet name aliases
-export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
-    bech32: 'wpkh',
-    legacy: 'p2pkh',
-    p2sh: 'shp2wpkh',
+    wpkh: ['Native Segwit', 'bc1...'],
+    p2pkh: ['Legacy', '1...'],
+    shp2wpkh: ['Segwit', '3...'],
 };
 
 // Descriptor type reverse aliases
 export const DescriptorType: {[index: string]: string} = {
-    pkh: 'legacy',
-    wpkh: 'bech32',
-    sh: 'p2sh',
+    p2pkh: 'P2PKH',
+    wpkh: 'WPKH',
+    shp2wpkh: 'P2SH-P2WPKH',
 };
 
 // PATH DEFINITIONS
@@ -61,9 +50,9 @@ export const DescriptorType: {[index: string]: string} = {
 
 */
 export const WalletPaths: {[index: string]: AccountPaths} = {
-    bech32: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
-    legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
-    p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
+    wpkh: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
+    p2pkh: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
+    shp2wpkh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
 };
 
 // Network definitions
@@ -135,14 +124,14 @@ export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
 // Supported extended key version metadata definitions
 export const extendedKeyInfo: {[index: string]: ExtendedKeyInfoType} = {
     // mainnet / bitcoin
-    x: {network: 'bitcoin', type: 'bech32'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    y: {network: 'bitcoin', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    z: {network: 'bitcoin', type: 'bech32'}, // Account path P2WPKH [bc1...]
+    x: {network: 'bitcoin', type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    y: {network: 'bitcoin', type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    z: {network: 'bitcoin', type: 'wpkh'}, // Account path P2WPKH [bc1...]
 
     // testnet
-    t: {network: 'testnet', type: 'bech32'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    u: {network: 'testnet', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    v: {network: 'testnet', type: 'bech32'}, // Account path P2WPKH [bc1...]
+    t: {network: 'testnet', type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    u: {network: 'testnet', type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    v: {network: 'testnet', type: 'wpkh'}, // Account path P2WPKH [bc1...]
 };
 
 // Wallet Gap Limit

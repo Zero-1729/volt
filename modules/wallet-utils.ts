@@ -24,7 +24,6 @@ import {
     BJSNetworks,
     extendedKeyInfo,
     WalletPaths,
-    DescriptorType,
 } from './wallet-defaults';
 
 import {
@@ -314,7 +313,7 @@ const _generateAddress = (
     let keyPair = root;
 
     switch (type) {
-        case 'legacy':
+        case 'p2pkh':
             const P2PKData = bitcoin.payments.p2pkh({
                 pubkey: keyPair.publicKey,
                 network,
@@ -323,7 +322,7 @@ const _generateAddress = (
             address = P2PKData.address;
             break;
 
-        case 'bech32':
+        case 'wpkh':
             const P2WPKHData = bitcoin.payments.p2wpkh({
                 pubkey: keyPair.publicKey,
                 network,
@@ -332,7 +331,7 @@ const _generateAddress = (
             address = P2WPKHData.address;
             break;
 
-        case 'p2sh':
+        case 'shp2wpkh':
             const P2SHData = bitcoin.payments.p2sh({
                 redeem: bitcoin.payments.p2wpkh({
                     pubkey: keyPair.publicKey,

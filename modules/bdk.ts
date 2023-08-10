@@ -120,7 +120,7 @@ export const descriptorFromTemplate = async (
     let ExternalDescriptor!: BDK.Descriptor;
 
     switch (type) {
-        case 'bech32': {
+        case 'wpkh': {
             ExternalDescriptor = await new BDK.Descriptor().newBip84(
                 descriptorSecretKey,
                 'external' as KeychainKind,
@@ -134,7 +134,7 @@ export const descriptorFromTemplate = async (
 
             break;
         }
-        case 'p2sh': {
+        case 'shp2wpkh': {
             ExternalDescriptor = await new BDK.Descriptor().newBip49(
                 descriptorSecretKey,
                 'external' as KeychainKind,
@@ -148,7 +148,7 @@ export const descriptorFromTemplate = async (
 
             break;
         }
-        case 'legacy': {
+        case 'p2pkh': {
             ExternalDescriptor = await new BDK.Descriptor().newBip44(
                 descriptorSecretKey,
                 'external' as KeychainKind,
@@ -188,7 +188,7 @@ export const fromDescriptorTemplatePublic = async (
     let ExternalDescriptor!: BDK.Descriptor;
 
     switch (type) {
-        case 'bech32': {
+        case 'wpkh': {
             ExternalDescriptor = await new BDK.Descriptor().newBip84Public(
                 descriptorPublicKey,
                 fingerprint,
@@ -204,7 +204,7 @@ export const fromDescriptorTemplatePublic = async (
 
             break;
         }
-        case 'p2sh': {
+        case 'shp2wpkh': {
             ExternalDescriptor = await new BDK.Descriptor().newBip49Public(
                 descriptorPublicKey,
                 fingerprint,
@@ -220,7 +220,7 @@ export const fromDescriptorTemplatePublic = async (
 
             break;
         }
-        case 'legacy': {
+        case 'p2pkh': {
             ExternalDescriptor = await new BDK.Descriptor().newBip44Public(
                 descriptorPublicKey,
                 fingerprint,
