@@ -44,7 +44,6 @@ import {
     fromDescriptor,
 } from '../modules/bdk';
 import {
-    getDescriptorParts,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
     getPubKeyFromXprv,
@@ -156,7 +155,7 @@ const defaultContext: defaultContextType = {
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
-        return new BaseWallet({name: 'test wallet', type: 'bech32'});
+        return new BaseWallet({name: 'test wallet', type: 'wpkh'});
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
     setElectrumServerURL: () => {},
@@ -506,13 +505,13 @@ export const AppStorageProvider = ({children}: Props) => {
                 let tmp: TWalletType;
 
                 switch (walletObject.type) {
-                    case 'bech32':
+                    case 'wpkh':
                         tmp = SegWitNativeWallet.fromJSON(serializedWallet);
                         break;
-                    case 'p2sh':
+                    case 'shp2wpkh':
                         tmp = SegWitP2SHWallet.fromJSON(serializedWallet);
                         break;
-                    case 'legacy':
+                    case 'p2pkh':
                         tmp = LegacyWallet.fromJSON(serializedWallet);
                         break;
                     default:
@@ -728,7 +727,7 @@ export const AppStorageProvider = ({children}: Props) => {
         ) => {
             // Default network and wallet type
             var net = backupNetwork;
-            var walletType = 'bech32';
+            var walletType = 'wpkh';
 
             var fingerprint = '';
             var path = '';
@@ -754,8 +753,6 @@ export const AppStorageProvider = ({children}: Props) => {
                         parsedDescriptor.checksum
                     }`;
                 }
-
-                console.log(parsedDescriptor.keyOnly);
 
                 net = parsedDescriptor.network as NetType;
                 walletType = parsedDescriptor.type;
@@ -815,25 +812,25 @@ export const AppStorageProvider = ({children}: Props) => {
             var newWallet!: TWalletType;
 
             // Ensure we have a valid wallet type
-            if (!['bech32', 'p2sh', 'legacy'].includes(walletArgs.type)) {
+            if (!['wpkh', 'shp2wpkh', 'p2pkh'].includes(walletArgs.type)) {
                 throw new Error('[restoreWallet] Invalid wallet type');
             }
 
             // Create wallet based on type
             switch (walletArgs.type) {
-                case 'bech32':
+                case 'wpkh':
                     newWallet = new SegWitNativeWallet(
                         walletArgs as BaseWalletArgs,
                     );
                     break;
 
-                case 'p2sh':
+                case 'shp2wpkh':
                     newWallet = new SegWitP2SHWallet(
                         walletArgs as BaseWalletArgs,
                     );
                     break;
 
-                case 'legacy':
+                case 'p2pkh':
                     newWallet = new LegacyWallet(walletArgs as BaseWalletArgs);
                     break;
             }
@@ -902,7 +899,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 let newWallet!: TWalletType;
 
                 // Ensure we have a valid wallet type
-                if (!['bech32', 'p2sh', 'legacy'].includes(type)) {
+                if (!['wpkh', 'shp2wpkh', 'p2pkh'].includes(type)) {
                     throw new Error('[restoreWallet] Invalid wallet type');
                 }
 
@@ -910,7 +907,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 const mnemonic = await generateMnemonic();
 
                 switch (type) {
-                    case 'bech32':
+                    case 'wpkh':
                         newWallet = new SegWitNativeWallet({
                             name: name,
                             type: type,
@@ -920,7 +917,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
                         break;
 
-                    case 'p2sh':
+                    case 'shp2wpkh':
                         newWallet = new SegWitP2SHWallet({
                             name: name,
                             type: type,
@@ -929,7 +926,7 @@ export const AppStorageProvider = ({children}: Props) => {
                         });
                         break;
 
-                    case 'legacy':
+                    case 'p2pkh':
                         newWallet = new LegacyWallet({
                             name: name,
                             type: type,
