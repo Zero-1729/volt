@@ -29,12 +29,12 @@ import {
     FiatRate,
     UTXOType,
     TransactionType,
-    NetType,
     BaseWalletArgs,
     NetInfoType,
     AddressType,
     ElectrumServerURLs,
 } from '../types/wallet';
+import {Net} from '../types/enums';
 
 import {BaseWallet} from './wallet/base';
 import {SegWitNativeWallet} from './wallet/segwit/wpkh';
@@ -96,9 +96,9 @@ type defaultContextType = {
     restoreWallet: (
         backupMaterial: string,
         backupType: BackupMaterial,
-        backupNetwork: NetType,
+        backupNetwork: Net,
     ) => void;
-    addWallet: (name: string, type: string, network?: NetType) => void;
+    addWallet: (name: string, type: string, network?: Net) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => TWalletType;
@@ -726,7 +726,7 @@ export const AppStorageProvider = ({children}: Props) => {
         async (
             backupMaterial: string,
             backupMaterialType: BackupMaterial,
-            backupNetwork: NetType,
+            backupNetwork: Net,
         ) => {
             // Default network and wallet type
             var net = backupNetwork;
@@ -752,7 +752,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     backupMaterial = includeDescriptorKeyPath(parsedDescriptor);
                 }
 
-                net = parsedDescriptor.network as NetType;
+                net = parsedDescriptor.network as Net;
                 walletType = parsedDescriptor.type;
                 fingerprint = parsedDescriptor.fingerprint;
                 path = parsedDescriptor.path;
@@ -893,7 +893,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const addWallet = useCallback(
-        async (name: string, type: string, network?: NetType) => {
+        async (name: string, type: string, network?: Net) => {
             try {
                 let newWallet!: TWalletType;
 

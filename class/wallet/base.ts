@@ -7,11 +7,12 @@ import {
     BalanceType,
     TransactionType,
     UTXOType,
-    NetType,
     BaseWalletArgs,
     AddressType,
     DescriptorObject,
+    TNetwork,
 } from './../../types/wallet';
+import {Net} from './../../types/enums';
 
 import {
     getAddressPath,
@@ -99,7 +100,7 @@ export class BaseWallet {
 
     derivationPath: string;
 
-    network: NetType;
+    network: TNetwork;
 
     hardwareWalletEnabled: boolean;
     hasBackedUp: boolean;
@@ -130,7 +131,7 @@ export class BaseWallet {
         this.gap_limit = GAP_LIMIT; // Gap limit for wallet
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin' or 'testnet' wallet
+        this.network = args.network ? args.network : Net.Testnet; // Can have 'bitcoin' or 'testnet' wallet
 
         this.transactions = []; // List of wallet transactions
         this.UTXOs = []; // Set of wallet UTXOs
