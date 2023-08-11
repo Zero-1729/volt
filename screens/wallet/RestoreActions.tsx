@@ -42,7 +42,7 @@ import {
     errorAlert,
 } from '../../components/alert';
 
-import {NetType} from '../../types/wallet';
+import {BackupMaterial, Net} from '../../types/enums';
 
 const ImportAction = () => {
     const navigation = useNavigation();
@@ -52,15 +52,15 @@ const ImportAction = () => {
     const tailwind = useTailwind();
 
     const [importText, setImportText] = useState('');
-    const [network, setNetwork] = useState<NetType>('testnet');
+    const [network, setNetwork] = useState<Net>(Net.Testnet);
 
     const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
 
     const toggleNetwork = () => {
-        if (network === 'testnet') {
-            setNetwork('bitcoin');
+        if (network === Net.Testnet) {
+            setNetwork(Net.Bitcoin);
         } else {
-            setNetwork('testnet');
+            setNetwork(Net.Testnet);
         }
     };
 
@@ -136,7 +136,7 @@ const ImportAction = () => {
         // Report any other issues separately
         try {
             // Restore wallet using mnemonic
-            await restoreWallet(mnemonic, 'mnemonic', network);
+            await restoreWallet(mnemonic, BackupMaterial.Mnemonic, network);
 
             // Clear input
             setImportText('');
@@ -168,7 +168,7 @@ const ImportAction = () => {
                 return;
             }
 
-            await restoreWallet(descriptor, 'descriptor', network);
+            await restoreWallet(descriptor, BackupMaterial.Descriptor, network);
 
             // Clear input
             setImportText('');
@@ -367,7 +367,7 @@ const ImportAction = () => {
                                     ColorScheme.Background.CheckBoxUnfilled
                                 }
                                 size={18}
-                                isChecked={network === 'testnet'}
+                                isChecked={network === Net.Testnet}
                                 iconStyle={{
                                     borderWidth: 1,
                                     borderRadius: 2,

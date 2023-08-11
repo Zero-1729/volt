@@ -30,6 +30,8 @@ import {errorAlert} from '../../../components/alert';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
+import {BackupMaterial} from '../../../types/enums';
+
 const Xpub = () => {
     const [resultMessageText, setResulteMessageText] = useState('');
     const [resultMessage, setResultMessage] = useState('');
@@ -71,7 +73,7 @@ const Xpub = () => {
 
     const convertXpub = () => {
         // Check if it is indeed an xpub and valid
-        if (getExtendedKeyPrefix(xpub) !== 'xpub') {
+        if (getExtendedKeyPrefix(xpub) !== BackupMaterial.Xpub) {
             errorAlert('Error', 'Please provide an extended public key (XPUB)');
             return;
         }

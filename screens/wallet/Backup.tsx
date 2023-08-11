@@ -28,6 +28,8 @@ import Close from '../../assets/svg/x-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
+import {BackupMaterial} from '../../types/enums';
+
 const Backup = () => {
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -48,9 +50,9 @@ const Backup = () => {
     const isSingleMaterial = walletData.mnemonic === '';
     const walletAvailMaterial: string =
         walletData.mnemonic !== ''
-            ? 'Mnemonic'
+            ? BackupMaterial.Mnemonic
             : walletData.externalDescriptor !== ''
-            ? 'Descriptor'
+            ? BackupMaterial.Descriptor
             : 'Extended Public Key (XPUB)';
 
     const togglePrivateDescriptor = () => {
@@ -69,12 +71,18 @@ const Backup = () => {
 
     const getQRData = (material: string) => {
         // Only show mnemonic if mnemonic available and toggled
-        if (material === 'Mnemonic' && walletData.mnemonic !== '') {
+        if (
+            material === BackupMaterial.Mnemonic &&
+            walletData.mnemonic !== ''
+        ) {
             return walletData.mnemonic;
         }
 
         // Shows descriptor if available or toggled
-        if (walletData.externalDescriptor || material === 'Descriptor') {
+        if (
+            walletData.externalDescriptor ||
+            material === BackupMaterial.Descriptor
+        ) {
             return showPrivateDescriptor
                 ? walletData.privateDescriptor
                 : walletData.externalDescriptor;
@@ -94,7 +102,7 @@ const Backup = () => {
     const updateData = (material: string) => {
         // Clear the Private Descriptor toggle
         // It's super sensitive and should be reset
-        if (material !== 'Descriptor') {
+        if (material !== BackupMaterial.Descriptor) {
             setShowPrivateDescriptor(false);
         }
 
@@ -187,18 +195,19 @@ const Backup = () => {
                                 <PlainButton
                                     style={[tailwind('mr-4')]}
                                     disabled={
-                                        backupMaterial === 'Mnemonic' ||
+                                        backupMaterial ===
+                                            BackupMaterial.Mnemonic ||
                                         walletData.mnemonic === ''
                                     }
                                     onPress={() => {
-                                        updateData('Mnemonic');
+                                        updateData(BackupMaterial.Mnemonic);
                                     }}>
                                     <Text
                                         style={[
                                             tailwind(
                                                 `text-sm ${
                                                     backupMaterial ===
-                                                    'Mnemonic'
+                                                    BackupMaterial.Mnemonic
                                                         ? 'font-bold'
                                                         : ''
                                                 }`,
@@ -206,7 +215,7 @@ const Backup = () => {
                                             {
                                                 color:
                                                     backupMaterial ===
-                                                    'Mnemonic'
+                                                    BackupMaterial.Mnemonic
                                                         ? ColorScheme.Text
                                                               .Default
                                                         : ColorScheme.Text
@@ -227,16 +236,19 @@ const Backup = () => {
                                     ]}
                                 />
                                 <PlainButton
-                                    disabled={backupMaterial === 'Descriptor'}
+                                    disabled={
+                                        backupMaterial ===
+                                        BackupMaterial.Descriptor
+                                    }
                                     onPress={() => {
-                                        updateData('Descriptor');
+                                        updateData(BackupMaterial.Descriptor);
                                     }}>
                                     <Text
                                         style={[
                                             tailwind(
                                                 `text-sm ${
                                                     backupMaterial ===
-                                                    'Descriptor'
+                                                    BackupMaterial.Descriptor
                                                         ? 'font-bold'
                                                         : ''
                                                 }`,
@@ -244,7 +256,7 @@ const Backup = () => {
                                             {
                                                 color:
                                                     backupMaterial ===
-                                                    'Descriptor'
+                                                    BackupMaterial.Descriptor
                                                         ? ColorScheme.Text
                                                               .Default
                                                         : ColorScheme.Text
@@ -279,7 +291,9 @@ const Backup = () => {
                                 },
                             ]}
                             numberOfLines={
-                                backupMaterial === 'Mnemonic' ? 2 : 1
+                                backupMaterial === BackupMaterial.Mnemonic
+                                    ? 2
+                                    : 1
                             }
                             ellipsizeMode={'middle'}>
                             {backupData}
@@ -289,7 +303,7 @@ const Backup = () => {
                     {/* Toggle with private key version */}
                     {/* Only available if not watch-only */}
                     {!walletData.isWatchOnly &&
-                        backupMaterial === 'Descriptor' && (
+                        backupMaterial === BackupMaterial.Descriptor && (
                             <View
                                 style={[
                                     tailwind(
