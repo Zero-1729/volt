@@ -9,7 +9,7 @@ import {
     UTXOType,
     NetType,
     BaseWalletArgs,
-    addressType,
+    AddressType,
     DescriptorObject,
 } from './../../types/wallet';
 
@@ -91,7 +91,7 @@ export class BaseWallet {
     UTXOs: UTXOType[];
 
     addresses: Array<string>;
-    address: addressType;
+    address: AddressType;
 
     syncedBalance: number;
     lastSynced: number;
@@ -156,7 +156,7 @@ export class BaseWallet {
         this.masterFingerprint = args.fingerprint ? args.fingerprint : ''; // Wallet master fingerprint
     }
 
-    generateNewAddress(index?: number): addressType {
+    generateNewAddress(index?: number): AddressType {
         try {
             let idx = index ? index : this.index;
             let address!: string;
@@ -268,7 +268,7 @@ export class BaseWallet {
         this.privateDescriptor = descriptor.private;
     }
 
-    setAddress(address: addressType) {
+    setAddress(address: AddressType) {
         this.address = address;
     }
 }

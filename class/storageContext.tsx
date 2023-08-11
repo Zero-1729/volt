@@ -21,18 +21,18 @@ import {
     includeDescriptorKeyPath,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
+import {BackupMaterial} from '../types/enums';
 import {
     TWalletType,
     Unit,
     BalanceType,
     FiatRate,
     UTXOType,
-    BackupMaterialTypes,
     TransactionType,
     NetType,
     BaseWalletArgs,
     NetInfoType,
-    addressType,
+    AddressType,
     ElectrumServerURLs,
 } from '../types/wallet';
 
@@ -90,12 +90,12 @@ type defaultContextType = {
     ) => void;
     updateWalletUTXOs: (id: string, utxo: UTXOType[]) => void;
     updateWalletBalance: (id: string, balance: BalanceType) => void;
-    updateWalletAddress: (id: string, address: addressType) => void;
+    updateWalletAddress: (id: string, address: AddressType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
         backupMaterial: string,
-        backupType: BackupMaterialTypes,
+        backupType: BackupMaterial,
         backupNetwork: NetType,
     ) => void;
     addWallet: (name: string, type: string, network?: NetType) => void;
@@ -627,7 +627,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletAddress = useCallback(
-        async (id: string, address: addressType) => {
+        async (id: string, address: AddressType) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             // Get the current wallet
@@ -725,7 +725,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const restoreWallet = useCallback(
         async (
             backupMaterial: string,
-            backupMaterialType: BackupMaterialTypes,
+            backupMaterialType: BackupMaterial,
             backupNetwork: NetType,
         ) => {
             // Default network and wallet type
