@@ -4,3 +4,8 @@ export const enum BackupMaterial {
     Xprv = 'xprv',
     Descriptor = 'descriptor',
 }
+
+export const enum Net {
+    Bitcoin = 'bitcoin',
+    Testnet = 'testnet',
+}
