@@ -1,6 +1,8 @@
 import {getFingerprintFromXkey} from './../../modules/wallet-utils';
 import {extendedKeyPattern} from './../../modules/re';
 
+import {Net} from '../../types/enums';
+
 describe('testing Extended key pattern regex', () => {
     test('extended keys patterns match', () => {
         const xpub =
@@ -22,6 +24,6 @@ describe('testing fingerprint extraction from xpub', () => {
             'tpubD6NzVbkrYhZ4XopgwuDUxX9FnNeZUfidCDusmRfUkzLaVKY2zNNYtqj1frtBbqTSBcHKxsbtUjD4WSDGBwiMn7mLuuWEf5WzvJKMamGNGgG';
         const fingerprint = '188ed79c';
 
-        expect(getFingerprintFromXkey(xpub, 'testnet')).toBe(fingerprint);
+        expect(getFingerprintFromXkey(xpub, Net.Testnet)).toBe(fingerprint);
     });
 });
