@@ -84,8 +84,6 @@ export type DescriptorObject = {
 };
 export type Descriptor = string;
 
-export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
-
 export type BaseWalletArgs = {
     name: string;
     type: string;
