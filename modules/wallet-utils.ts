@@ -12,12 +12,8 @@ const bip32 = BIP32Factory(ecc);
 
 import Crypto from 'react-native-quick-crypto';
 
-import {
-    DescriptorSymbolsType,
-    BackupMaterialTypes,
-    NetType,
-    TransactionType,
-} from '../types/wallet';
+import {DescriptorSymbolsType, NetType, TransactionType} from '../types/wallet';
+import {BackupMaterial} from '../types/enums';
 
 import {
     validExtendedKeyPrefixes,
@@ -87,7 +83,7 @@ const _getPrefix = (key: string): string => {
     return key.slice(0, 4);
 };
 
-export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
+export const getExtendedKeyPrefix = (key: string): BackupMaterial => {
     const prefix = _getPrefix(key);
 
     if (!isExtendedKey(key)) {
@@ -98,7 +94,9 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
         throw new Error('Unsupported extended key');
     }
 
-    return prefix.slice(1) === 'pub' ? 'xpub' : 'xprv';
+    return prefix.slice(1) === 'pub'
+        ? BackupMaterial.Xpub
+        : BackupMaterial.Xprv;
 };
 
 export const isSupportedExtKey = (key: string): boolean => {
@@ -232,14 +230,14 @@ export const generateRootFromXKey = (
     let key = xkey;
 
     // We must normalize the xpub for bitcoinjs-lib
-    if (prefix === 'xpub') {
+    if (prefix === BackupMaterial.Xpub) {
         key = normalizeXpub(xkey);
     }
 
     let root = bip32.fromBase58(key, BJSNetworks[net]);
 
     // Check that xpub given is three levels deep
-    if (prefix === 'xpub') {
+    if (prefix === BackupMaterial.Xpub) {
         if (root.depth === 0) {
             throw new Error(
                 '0-depth xpub missing private to generate hardened child key.',
@@ -255,7 +253,7 @@ export const generateRootFromXKey = (
 
     // Derive root using address path if xprv given
     // Otherwise, assume xpub given is three level deep
-    if (prefix === 'xprv') {
+    if (prefix === BackupMaterial.Xprv) {
         root = root.derivePath(addressPath);
     }
 
@@ -391,7 +389,7 @@ export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
 export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
     let key = xkey;
 
-    if (getExtendedKeyPrefix(xkey) === 'xpub') {
+    if (getExtendedKeyPrefix(xkey) === BackupMaterial.Xpub) {
         key = normalizeXpub(xkey);
     }
 
