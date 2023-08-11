@@ -12,11 +12,11 @@ import {TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
 import {BaseWallet} from '../class/wallet/base';
 
 import {
-    NetType,
     TWalletType,
     TransactionType,
     UTXOType,
     ElectrumServerURLs,
+    TNetwork,
 } from '../types/wallet';
 
 import {liberalAlert} from '../components/alert';
@@ -35,7 +35,7 @@ export const generateMnemonic = async () => {
     return mnemonic.asString();
 };
 
-export const fromDescriptor = async (descriptor: string, net: NetType) => {
+export const fromDescriptor = async (descriptor: string, net: TNetwork) => {
     const newDescriptor = await new BDK.Descriptor().create(
         descriptor,
         net as Network,
@@ -103,7 +103,7 @@ export const testElectrumServer = async (url: string, callback: any) => {
 export const descriptorFromTemplate = async (
     mnemonic: string,
     type: string,
-    network: NetType,
+    network: TNetwork,
 ): Promise<{
     InternalDescriptor: BDK.Descriptor;
     ExternalDescriptor: BDK.Descriptor;
@@ -175,7 +175,7 @@ export const fromDescriptorTemplatePublic = async (
     pubKey: string,
     fingerprint: string,
     type: string,
-    network: NetType,
+    network: TNetwork,
 ): Promise<{
     InternalDescriptor: BDK.Descriptor;
     ExternalDescriptor: BDK.Descriptor;

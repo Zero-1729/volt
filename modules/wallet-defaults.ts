@@ -1,5 +1,6 @@
 // Set of wallet default aliases, metadata, and types
 import {AccountPaths, ExtendedKeyInfoType} from '../types/wallet';
+import {Net} from '../types/enums';
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
@@ -124,14 +125,14 @@ export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
 // Supported extended key version metadata definitions
 export const extendedKeyInfo: {[index: string]: ExtendedKeyInfoType} = {
     // mainnet / bitcoin
-    x: {network: 'bitcoin', type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    y: {network: 'bitcoin', type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    z: {network: 'bitcoin', type: 'wpkh'}, // Account path P2WPKH [bc1...]
+    x: {network: Net.Bitcoin, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    y: {network: Net.Bitcoin, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    z: {network: Net.Bitcoin, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 
     // testnet
-    t: {network: 'testnet', type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    u: {network: 'testnet', type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    v: {network: 'testnet', type: 'wpkh'}, // Account path P2WPKH [bc1...]
+    t: {network: Net.Testnet, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    u: {network: Net.Testnet, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    v: {network: Net.Testnet, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 };
 
 // Wallet Gap Limit

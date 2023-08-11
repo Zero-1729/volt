@@ -12,8 +12,12 @@ const bip32 = BIP32Factory(ecc);
 
 import Crypto from 'react-native-quick-crypto';
 
-import {DescriptorSymbolsType, NetType, TransactionType} from '../types/wallet';
-import {BackupMaterial} from '../types/enums';
+import {
+    DescriptorSymbolsType,
+    TNetwork,
+    TransactionType,
+} from '../types/wallet';
+import {BackupMaterial, Net} from '../types/enums';
 
 import {
     validExtendedKeyPrefixes,
@@ -348,7 +352,7 @@ const _generateAddress = (
 export const getMetaFromMnemonic = (
     mnemonic: string,
     walletPath: string,
-    network: NetType,
+    network: TNetwork,
 ) => {
     const seed = mnemonicToSeedSync(mnemonic);
     const node = bip32.fromSeed(seed, BJSNetworks[network]);
@@ -362,7 +366,7 @@ export const getMetaFromMnemonic = (
     };
 };
 
-export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
+export const getPubKeyFromXprv = (xprv: string, network: Net) => {
     const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
 
     // TODO: handle zprv case && other exotic prefixes
@@ -386,7 +390,7 @@ export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
     return node.neutered().toBase58();
 };
 
-export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
+export const getFingerprintFromXkey = (xkey: string, network: Net) => {
     let key = xkey;
 
     if (getExtendedKeyPrefix(xkey) === BackupMaterial.Xpub) {
