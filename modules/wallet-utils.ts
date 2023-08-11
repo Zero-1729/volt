@@ -367,7 +367,7 @@ export const getMetaFromMnemonic = (
 export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
     const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
 
-    // TODO: handle zpub/prv case && other exotic prefixes
+    // TODO: handle zprv case && other exotic prefixes
     const derivationPath = WalletPaths[keyInfo.type][network];
 
     let node = bip32.fromBase58(xprv, BJSNetworks[network]);

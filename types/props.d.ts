@@ -105,7 +105,9 @@ export type TextLongInputProps = BaseProps &
         folderColor?: string;
         showScanIcon?: boolean;
         showTestnetToggle?: boolean;
-        onSuccess: (data: any) => void | boolean | Promise<boolean> | Promise<void>;
+        onSuccess: (
+            data: any,
+        ) => void | boolean | Promise<boolean> | Promise<void>;
         onCancel: (error) => void;
         onError: (error) => void;
         toggleSwitch?:

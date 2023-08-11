@@ -46,7 +46,7 @@ const _getDescriptorNetwork = (expression: string) => {
 
 // Get descriptor components
 // Descriptor format:
-// {script}({fingerprint/path}?{xprv/xpub}{key path | path})#checksum
+// {script}({fingerprint/path}?{xprv/xpub}{key path | (key path + path)})#checksum
 export const parseDescriptor = (expression: string) => {
     const descriptor = descriptors.DescriptorsFactory(secp256k1);
 
