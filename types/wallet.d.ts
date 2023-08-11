@@ -10,7 +10,10 @@ import {LegacyWallet} from '../class/wallet/p2pkh';
 
 import {LocalUtxo} from 'bdk-rn/lib/classes/Bindings';
 
-export type NetType = 'bitcoin' | 'testnet';
+import {Network} from 'bdk-rn/lib/lib/enums';
+import {Net} from './enums';
+
+export type TNetwork = Net | Network;
 
 export type NetInfoType = NetInfoState | null;
 
@@ -91,12 +94,12 @@ export type BaseWalletArgs = {
     mnemonic?: string;
     xprv?: string;
     xpub?: string;
-    network?: NetType;
+    network?: Net;
     fingerprint?: string;
 };
 
 export type ExtendedKeyInfoType = {
-    network: NetType;
+    network: Net;
     type: string; // Wallet type
 };
 
