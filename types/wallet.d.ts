@@ -68,7 +68,7 @@ export type Unit = {
 };
 
 // Address type
-export type addressType = {
+export type AddressType = {
     address: string; // Address
     path: string; // Address derivation path
     index: number; // Address derivation index
@@ -96,14 +96,6 @@ export type BaseWalletArgs = {
     network?: NetType;
     fingerprint?: string;
 };
-
-export type BDKWalletTypes =
-    | 'wpkh'
-    | 'pkh'
-    | 'p2pkh'
-    | 'shp2wpkh'
-    | 'MULTI'
-    | 'p2shp2wpkh';
 
 export type ExtendedKeyInfoType = {
     network: NetType;
