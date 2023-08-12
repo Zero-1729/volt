@@ -81,6 +81,13 @@ const Info = () => {
 
     const [tmpName, setTmpName] = useState(walletName);
 
+    const updateTmpName = (name: string) => {
+        // Only update if name is not empty
+        if (name.trim().length > 1) {
+            setTmpName(name);
+        }
+    };
+
     const showDialog = () => {
         // Avoid deletion while loading
         if (loadLock) {
@@ -188,7 +195,7 @@ const Info = () => {
                                 }
                                 shavedHeight={true}
                                 placeholder={walletName}
-                                onChangeText={setTmpName}
+                                onChangeText={updateTmpName}
                                 onBlur={() => {
                                     renameWallet(currentWalletID, tmpName);
                                 }}
