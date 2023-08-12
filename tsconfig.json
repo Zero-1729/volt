@@ -4,7 +4,7 @@
       "allowJs": true,
       "allowSyntheticDefaultImports": true,
       "esModuleInterop": true,
-      "isolatedModules": false,
+      "isolatedModules": true,
       "jsx": "react",
       "lib": ["es6"],
       "moduleResolution": "node",
@@ -12,8 +12,7 @@
       "strict": true,
       "target": "esnext",
       "skipLibCheck": true,
-      "resolveJsonModule": true,
-      "preserveConstEnums": true
+      "resolveJsonModule": true
     },
     "exclude": [
       "node_modules",
