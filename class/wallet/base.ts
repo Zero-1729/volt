@@ -191,7 +191,7 @@ export class BaseWallet {
 
             return {
                 address: address,
-                path: this.derivationPath,
+                path: addressPath,
                 change: false,
                 index: idx,
                 memo: '',
