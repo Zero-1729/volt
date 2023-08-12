@@ -21,7 +21,7 @@ import {
     includeDescriptorKeyPath,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
-import {BackupMaterial} from '../types/enums';
+import {BackupMaterial, Net} from '../types/enums';
 import {
     TWalletType,
     Unit,
@@ -34,7 +34,6 @@ import {
     AddressType,
     ElectrumServerURLs,
 } from '../types/wallet';
-import {Net} from '../types/enums';
 
 import {BaseWallet} from './wallet/base';
 import {SegWitNativeWallet} from './wallet/segwit/wpkh';

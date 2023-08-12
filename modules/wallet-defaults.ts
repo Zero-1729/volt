@@ -1,6 +1,6 @@
 // Set of wallet default aliases, metadata, and types
+import {Net} from './../types/enums';
 import {AccountPaths, ExtendedKeyInfoType} from '../types/wallet';
-import {Net} from '../types/enums';
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
