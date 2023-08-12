@@ -5,6 +5,8 @@ import {useColorScheme, View, Text, FlatList, StatusBar} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import BDK from 'bdk-rn';
+
 import BigNumber from 'bignumber.js';
 import Dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
@@ -23,7 +25,7 @@ import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 
-import {getWalletBalance} from '../../modules/bdk';
+import {syncWallet, getWalletBalance, createBDKWallet} from '../../modules/bdk';
 
 import {PlainButton} from '../../components/button';
 
@@ -42,6 +44,8 @@ const Wallet = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
 
     // Get current wallet ID and wallet data
     const {
@@ -62,7 +66,6 @@ const Wallet = () => {
 
     // For loading effect on balance
     const [loadingBalance, setLoadingBalance] = useState(false);
-
     const [singleLoadLock, setSingleLoadLock] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -74,6 +77,32 @@ const Wallet = () => {
         ColorScheme.WalletColors[walletData.type][walletData.network];
 
     const walletName = walletData.name;
+
+    const initWallet = useCallback(async () => {
+        const w = await createBDKWallet(walletData);
+
+        return w;
+    }, []);
+
+    const syncBdkWallet = useCallback(async () => {
+        // initWallet only called one time
+        // subsequent call is from 'bdkWallet' state
+        // set in Balance fetch
+        const w = bdkWallet ? bdkWallet : await initWallet();
+
+        const W = await syncWallet(
+            w,
+            (status: boolean) => {
+                if (status) {
+                    setSingleLoadLock(true);
+                }
+            },
+            walletData.network,
+            electrumServerURL,
+        );
+
+        return W;
+    }, []);
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
@@ -94,6 +123,8 @@ const Wallet = () => {
         // Set refreshing
         setRefreshing(true);
         setLoadingBalance(true);
+
+        const w = await syncBdkWallet();
 
         try {
             const triggered = await fetchFiatRate(
@@ -123,7 +154,12 @@ const Wallet = () => {
         if (!loadingBalance) {
             // Update wallet balance first
             const {balance, transactions, updated, UTXOs} =
-                await getWalletBalance(walletData, electrumServerURL);
+                await getWalletBalance(
+                    w,
+                    walletData.balance,
+                    walletData.transactions,
+                    walletData.UTXOs,
+                );
 
             // update wallet balance
             updateWalletBalance(currentWalletID, balance);
@@ -245,6 +281,12 @@ const Wallet = () => {
         setRefreshing(false);
         setLoadingBalance(false);
         setLoadLock(false);
+
+        // Update wallet, so we avoid wallet creation
+        // for every call to this function
+        if (!bdkWallet) {
+            setBdkWallet(w);
+        }
     }, [
         appFiatCurrency.short,
         currentWalletID,

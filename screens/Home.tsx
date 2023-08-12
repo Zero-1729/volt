@@ -8,13 +8,14 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import {getWalletBalance} from '../modules/bdk';
+import {createBDKWallet, getWalletBalance, syncWallet} from '../modules/bdk';
 
 import Dots from '../assets/svg/kebab-horizontal-24.svg';
 import Add from '../assets/svg/plus-32.svg';
@@ -81,6 +82,7 @@ const Home = () => {
     const [initFiatRate, setInitFiatRate] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
+    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
@@ -111,6 +113,21 @@ const Home = () => {
 
         return getUniqueTXs(transactions);
     };
+
+    const initWallet = useCallback(async () => {
+        const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
+
+        await syncWallet(
+            w,
+            (status: boolean) => {
+                console.log('[BDK] synced wallet', status);
+            },
+            wallet.network,
+            electrumServerURL,
+        );
+
+        return w;
+    }, []);
 
     // Fiat fetch
     const singleSyncFiatRate = useCallback(
@@ -164,6 +181,8 @@ const Home = () => {
         // Set refreshing
         setRefreshing(true);
 
+        const w = await initWallet();
+
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
             fiatRate,
@@ -189,8 +208,10 @@ const Home = () => {
 
         // Sync wallet
         const {transactions, balance} = await getWalletBalance(
-            wallet,
-            electrumServerURL,
+            w,
+            wallet.balance,
+            wallet.transactions,
+            wallet.UTXOs,
         );
 
         // Kill refreshing
@@ -204,6 +225,9 @@ const Home = () => {
 
         // Kill loading
         setLoadingBalance(false);
+
+        // set bdk wallet
+        setBdkWallet(w);
     }, [
         setRefreshing,
         fiatRate,
