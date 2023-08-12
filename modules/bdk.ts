@@ -9,7 +9,6 @@ import {
 } from 'bdk-rn/lib/lib/enums';
 
 import {TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
-import {BaseWallet} from '../class/wallet/base';
 
 import {
     TWalletType,
@@ -17,9 +16,9 @@ import {
     UTXOType,
     ElectrumServerURLs,
     TNetwork,
+    BalanceType,
 } from '../types/wallet';
 
-import {liberalAlert} from '../components/alert';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
 
 type SyncData = {
@@ -262,16 +261,41 @@ export const descriptorsFromString = async (wallet: TWalletType) => {
     };
 };
 
+// create a BDK wallet from a descriptor and metas
+export const createBDKWallet = async (wallet: TWalletType) => {
+    // Set Network
+    const network =
+        wallet.network === 'bitcoin' ? Network.Bitcoin : Network.Testnet;
+
+    // Create descriptors
+    let ExternalDescriptor!: BDK.Descriptor;
+    let InternalDescriptor!: BDK.Descriptor;
+
+    ({InternalDescriptor, ExternalDescriptor} = await descriptorsFromString(
+        wallet,
+    ));
+
+    const bdkWallet = await new BDK.Wallet().create(
+        ExternalDescriptor,
+        InternalDescriptor,
+        network,
+        await new BDK.DatabaseConfig().memory(),
+    );
+
+    return bdkWallet;
+};
+
 // Sync newly created wallet with electrum server
-const _sync = async (
-    wallet: BaseWallet,
+export const syncWallet = async (
+    wallet: BDK.Wallet,
     callback: any,
+    network: TNetwork,
     electrumServer: ElectrumServerURLs,
 ): Promise<BDK.Wallet> => {
     // Electrum configuration
     const config: BlockchainElectrumConfig = {
         url:
-            wallet.network === 'bitcoin'
+            network === 'bitcoin'
                 ? electrumServer.bitcoin
                 : electrumServer.testnet,
         retry: 5,
@@ -296,53 +320,23 @@ const _sync = async (
         throw e;
     }
 
-    // Set Network
-    const network =
-        wallet.network === 'bitcoin' ? Network.Bitcoin : Network.Testnet;
-
-    // Create descriptors
-    let ExternalDescriptor!: BDK.Descriptor;
-    let InternalDescriptor!: BDK.Descriptor;
-
-    ({InternalDescriptor, ExternalDescriptor} = await descriptorsFromString(
-        wallet,
-    ));
-
-    const w = await new BDK.Wallet().create(
-        ExternalDescriptor,
-        InternalDescriptor,
-        network,
-        await new BDK.DatabaseConfig().memory(),
-    );
-
-    const syncStatus = await w.sync(chain);
+    const syncStatus = await wallet.sync(chain);
 
     // report any sync errors
     callback(syncStatus);
 
-    return w;
+    return wallet;
 };
 
 // Fetch Wallet Balance using wallet descriptor, metas, and electrum server
 export const getWalletBalance = async (
-    wallet: BaseWallet,
-    electrumServer: ElectrumServerURLs,
+    wallet: BDK.Wallet,
+    oldBalance: BalanceType,
+    cachedTransactions: TransactionType[],
+    cachedUTXOs: UTXOType[],
 ): Promise<SyncData> => {
-    // Generate wallet from wallet descriptor and metas
-    const w = await _sync(
-        wallet,
-        (status: boolean) => {
-            if (!status) {
-                liberalAlert('Error', 'Could not Sync Wallet', 'OK');
-
-                return w;
-            }
-        },
-        electrumServer,
-    );
-
     // Get wallet balance
-    const retrievedBalance: Balance = await w.getBalance();
+    const retrievedBalance: Balance = await wallet.getBalance();
 
     // Update wallet balance
     // Leave untouched if error fetching balance
@@ -355,7 +349,7 @@ export const getWalletBalance = async (
     if (
         (retrievedBalance.untrustedPending !== 0 &&
             retrievedBalance.trustedPending !== 0) ||
-        !balance.eq(wallet.balance)
+        !balance.eq(oldBalance)
     ) {
         // Receive balance in sats as string
         // convert to BigNumber
@@ -363,15 +357,15 @@ export const getWalletBalance = async (
     }
 
     // Only fetch transactions when balance has been updated
-    let TXs = wallet.transactions;
-    let UTXOs: UTXOType[] = wallet.UTXOs;
+    let TXs = cachedTransactions;
+    let UTXOs: UTXOType[] = cachedUTXOs;
     let walletTXs = TXs;
 
     if (updated) {
         // Update transactions list
-        TXs = (await w.listTransactions(false)) as (TransactionType &
+        TXs = (await wallet.listTransactions(false)) as (TransactionType &
             TransactionDetails)[];
-        UTXOs = (await w.listUnspent()) as UTXOType[];
+        UTXOs = (await wallet.listUnspent()) as UTXOType[];
 
         // Transactions to store in wallet
         walletTXs = [];
