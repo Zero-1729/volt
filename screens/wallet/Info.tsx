@@ -210,89 +210,102 @@ const Info = () => {
 
                 {/* Wallet Info */}
                 {/* Wallet Type Path and Master Fingerprint */}
-                <View style={[tailwind('w-5/6 flex-row justify-start')]}>
-                    <View style={[tailwind('w-1/2')]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm mr-16 mb-2'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
-                            Derivation Path
-                        </Text>
-
-                        <PlainButton onPress={copyPathToClipboard}>
+                {isAdvancedMode ? (
+                    <View
+                        style={[tailwind('w-5/6 mb-6 flex-row justify-start')]}>
+                        <View style={[tailwind('w-1/2')]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
+                                    tailwind('text-sm mr-16 mb-2'),
+                                    {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                {walletPathText}
+                                Derivation Path
                             </Text>
-                        </PlainButton>
-                    </View>
 
-                    <View style={[tailwind('w-1/2')]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm mb-2'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
-                            Master Fingerprint
-                        </Text>
+                            <PlainButton onPress={copyPathToClipboard}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {walletPathText}
+                                </Text>
+                            </PlainButton>
+                        </View>
 
-                        <PlainButton onPress={copyFingerToClipboard}>
+                        <View style={[tailwind('w-1/2')]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
+                                    tailwind('text-sm mb-2'),
+                                    {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                {walletFingerprintText}
+                                Master Fingerprint
                             </Text>
-                        </PlainButton>
+
+                            <PlainButton onPress={copyFingerToClipboard}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {walletFingerprintText}
+                                </Text>
+                            </PlainButton>
+                        </View>
                     </View>
-                </View>
+                ) : (
+                    <></>
+                )}
 
                 {/* Wallet Network and Type */}
-                <View style={[tailwind('w-5/6 mt-6 flex-row justify-start')]}>
-                    <View style={[tailwind('w-1/2')]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm mb-2'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
-                            Network
-                        </Text>
+                {isAdvancedMode ? (
+                    <View style={[tailwind('w-5/6 flex-row justify-start')]}>
+                        <View style={[tailwind('w-1/2')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm mb-2'),
+                                    {color: ColorScheme.Text.GrayedText},
+                                ]}>
+                                Network
+                            </Text>
 
-                        <Text
-                            style={[
-                                tailwind('text-sm capitalize'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {walletNetwork}
-                        </Text>
+                            <Text
+                                style={[
+                                    tailwind('text-sm capitalize'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {walletNetwork}
+                            </Text>
+                        </View>
+
+                        <View style={[tailwind('w-1/2')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm mr-16 mb-2'),
+                                    {color: ColorScheme.Text.GrayedText},
+                                ]}>
+                                Type
+                            </Text>
+
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {walletTypeName}
+                            </Text>
+                        </View>
                     </View>
-
-                    <View style={[tailwind('w-1/2')]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm mr-16 mb-2'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
-                            Type
-                        </Text>
-
-                        <Text
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {walletTypeName}
-                        </Text>
-                    </View>
-                </View>
+                ) : (
+                    <></>
+                )}
 
                 {/* View Divider */}
-                <View style={[tailwind('w-full my-8'), HeadingBar]} />
+                {isAdvancedMode ? (
+                    <View style={[tailwind('w-full my-8'), HeadingBar]} />
+                ) : (
+                    <></>
+                )}
 
                 {/* Wallet Tools */}
                 {/* Backup / Export material - Seed and Descriptor */}
