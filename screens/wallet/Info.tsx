@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import React, {useContext, useRef, useState} from 'react';
+import {Text, View, TextInput, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -24,6 +24,9 @@ const Info = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    // To control input elm
+    const nameInput = useRef<TextInput>();
 
     // Get advanced mode flag, current wallet ID and wallet data
     const {
@@ -193,11 +196,23 @@ const Info = () => {
                                 placeholderTextColor={
                                     'rgba(255, 255, 255, 0.6)'
                                 }
+                                refs={nameInput}
                                 shavedHeight={true}
                                 placeholder={walletName}
                                 onChangeText={updateTmpName}
                                 onBlur={() => {
-                                    renameWallet(currentWalletID, tmpName);
+                                    // Only set new name if name is not empty
+                                    // and name is different from current name
+                                    if (
+                                        tmpName.trim() !== walletName &&
+                                        tmpName.trim().length > 1
+                                    ) {
+                                        renameWallet(currentWalletID, tmpName);
+                                    } else {
+                                        // Otherwise, reset tmpName and clear input
+                                        setTmpName('');
+                                        nameInput.current?.clear();
+                                    }
                                 }}
                                 color={'white'}
                             />
