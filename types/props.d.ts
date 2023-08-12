@@ -92,6 +92,7 @@ export type TextInputProps = BaseProps & {
     placeholderTextColor?: string;
     onBlur?: () => void;
     value?: string;
+    refs?: React.RefObject<TextInput>;
     onChangeText?:
         | ((text: string) => void)
         | React.Dispatch<React.SetStateAction<string>>;
