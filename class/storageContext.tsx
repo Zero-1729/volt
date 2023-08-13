@@ -745,8 +745,6 @@ export const AppStorageProvider = ({children}: Props) => {
 
                 // If we have a key missing the trailing path
                 // We artificially include that here
-                // TODO: Probably best to require a descriptor with the trailing path
-                // in regex check from Restore screen
                 if (parsedDescriptor.key === parsedDescriptor.keyOnly) {
                     backupMaterial = includeDescriptorKeyPath(parsedDescriptor);
                 }

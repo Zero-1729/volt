@@ -91,8 +91,14 @@ export const parseDescriptor = (expression: string) => {
             ? [partsByLeftBrace[0], partsByLeftBrace[1]]
             : [partsByLeftBrace[0]];
 
+    // Take out fingerprint + path prefix
+    const prefixStrippedKey = descObjmap?.keyExpression
+        .split(']')
+        .slice(1)
+        .join('');
+
     return {
-        key: descObjmap?.keyExpression,
+        key: prefixStrippedKey,
         keyOnly: descObjmap?.bip32?.toBase58(),
         type: descriptorType,
         network:
