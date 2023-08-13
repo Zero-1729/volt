@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useState} from 'react';
 
-import {Text, View, useColorScheme} from 'react-native';
+import {Text, View, useColorScheme, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -12,6 +12,9 @@ import QRCode from 'react-native-qrcode-svg';
 import Checkbox from 'react-native-bouncy-checkbox';
 
 import {useTailwind} from 'tailwind-rn';
+
+import RNFS from 'react-native-fs';
+import Share from 'react-native-share';
 
 import Color from '../../constants/Color';
 
@@ -24,11 +27,13 @@ import {WalletTypeDetails} from '../../modules/wallet-defaults';
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
-import Close from '../../assets/svg/x-24.svg';
+import CloseIcon from '../../assets/svg/x-24.svg';
+import ShareIcon from '../../assets/svg/share-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import {BackupMaterial} from '../../types/enums';
+import {conservativeAlert} from '../../components/alert';
 
 const Backup = () => {
     const navigation = useNavigation();
@@ -98,6 +103,38 @@ const Backup = () => {
         getQRData(walletAvailMaterial),
     );
 
+    // Write public descriptor file to device
+    const writeDescriptorToFile = async () => {
+        let pathData =
+            RNFS.TemporaryDirectoryPath +
+            `/${walletData.name}-wallet_descriptor_backup.txt`;
+
+        const fileBackupData = getQRData(BackupMaterial.Descriptor);
+
+        if (Platform.OS === 'ios') {
+            await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
+                conservativeAlert('Error', e.message);
+            });
+            await Share.open({
+                url: 'file://' + pathData,
+                type: 'text/plain',
+                title: 'Volt Wallet Descriptor Backup',
+            })
+                .catch(e => {
+                    if (e.message !== 'User did not share') {
+                        conservativeAlert('Error', e.message);
+                    }
+                })
+                .finally(() => {
+                    RNFS.unlink(pathData);
+                });
+        } else {
+            console.log(
+                '[Backup Descriptor to file] not yet implemented on Android',
+            );
+        }
+    };
+
     // Update the displayed backup data and current backup material type
     const updateData = (material: string) => {
         // Clear the Private Descriptor toggle
@@ -132,12 +169,34 @@ const Backup = () => {
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}
+                    <View style={[tailwind('absolute top-6  w-full left-0')]}>
+                        {/* Allow exporting public descriptor to file */}
+                        {backupMaterial === BackupMaterial.Descriptor &&
+                        !showPrivateDescriptor ? (
+                            <PlainButton
+                                style={[tailwind('absolute w-full left-0')]}
+                                onPress={() => {
+                                    writeDescriptorToFile();
+                                }}>
+                                <ShareIcon
+                                    width={32}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </PlainButton>
+                        ) : (
+                            <></>
+                        )}
+                    </View>
+
                     <View style={[tailwind('absolute top-6 right-0')]}>
                         <PlainButton
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
-                            <Close width={32} fill={ColorScheme.SVG.Default} />
+                            <CloseIcon
+                                width={32}
+                                fill={ColorScheme.SVG.Default}
+                            />
                         </PlainButton>
                     </View>
 
