@@ -12638,6 +12638,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-share@npm:^9.2.3":
+  version: 9.2.3
+  resolution: "react-native-share@npm:9.2.3"
+  checksum: 8794b63ef981580f747cded2b0e13246ac5fa1efdf70042a0fbe3228d16a4a9875971febcb788a796e118a99f73cc2a1c037a25e6e65eab3aba75282a7639a76
+  languageName: node
+  linkType: hard
+
 "react-native-splash-screen@npm:^3.2.0":
   version: 3.3.0
   resolution: "react-native-splash-screen@npm:3.3.0"
@@ -15143,6 +15150,7 @@ __metadata:
     react-native-safe-area-context: ^4.5.0
     react-native-screens: ^3.20.0
     react-native-secure-key-store: ^2.0.9
+    react-native-share: ^9.2.3
     react-native-splash-screen: ^3.2.0
     react-native-svg: ^12.3.0
     react-native-svg-transformer: ^1.0.0
