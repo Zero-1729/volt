@@ -121,6 +121,7 @@ export const validExtendedKeyPrefixes = new Map([
 
 // Supported extended key versions
 export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
+export const xprvVersions = ['xprv', 'yprv', 'zprv', 'tprv', 'uprv', 'vprv'];
 
 // Supported extended key version metadata definitions
 export const extendedKeyInfo: {[index: string]: ExtendedKeyInfoType} = {
