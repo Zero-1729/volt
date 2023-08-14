@@ -170,30 +170,31 @@ const _doubleSha256 = (data: Buffer) => {
 
 // Based on Jlopp's code here:
 // https://github.com/jlopp/xpub-converter
-export const convertXPUB = (xpub: string, pub_prefix: string): string => {
-    // Grab new xpub version to convert to
-    const ver = validExtendedKeyPrefixes.get(pub_prefix);
+export const convertXKey = (xkey: string, key_prefix: string): string => {
+    // Grab new xkey version to convert to
+    const ver = validExtendedKeyPrefixes.get(key_prefix);
+    const keyType = key_prefix === 'pub' ? 'public' : 'private';
 
     // Make sure the version is a valid one we support
     if (!ver) {
-        throw new Error('Invalid extended public key version');
+        throw new Error(`Invalid extended ${keyType} key version`);
     }
 
     try {
-        // Get the decoded key from trimmed xpub
-        const decoded = _deserializeExtendedKeyCheck(xpub.trim());
+        // Get the decoded key from trimmed xkey
+        const decoded = _deserializeExtendedKeyCheck(xkey.trim());
 
-        // Cut off prefix to include new xpub version
+        // Cut off prefix to include new xkey version
         const data = decoded.subarray(4);
 
         // Re-attach data with new prefix
-        const nPub = Buffer.concat([Buffer.from(ver, 'hex'), data]);
+        const xKey = Buffer.concat([Buffer.from(ver, 'hex'), data]);
 
         // Return new Base58 formatted key
-        return b58c.encode(nPub);
+        return b58c.encode(xKey);
     } catch (e) {
         // Assume an invalid key if unable to disassemble and re-assemble
-        throw new Error('Invalid extended public key');
+        throw new Error(`Invalid extended ${keyType} key`);
     }
 };
 
@@ -418,7 +419,7 @@ export const normalizeXpub = (xpub: string) => {
     // Bitcoinjs-lib supports only tpub and xpub prefixes
     // Convert exotic prefixes to tpub or xpub
     if (['u', 'v', 'y', 'z'].includes(xpub[0])) {
-        const convertedXPUB = convertXPUB(
+        const convertedXPUB = convertXKey(
             xpub,
             network === 'testnet' ? 'tpub' : 'xpub',
         );
