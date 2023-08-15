@@ -21,11 +21,11 @@ import ArrowDown from '../../../assets/svg/chevron-down-16.svg';
 import Tick from '../../../assets/svg/check-16.svg';
 
 import {
-    convertXPUB,
+    convertXKey,
     getExtendedKeyPrefix,
     isValidExtendedKey,
 } from '../../../modules/wallet-utils';
-import {xpubVersions} from '../../../modules/wallet-defaults';
+import {supportedExtVersions} from '../../../modules/wallet-defaults';
 import {errorAlert} from '../../../components/alert';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -35,19 +35,19 @@ import {BackupMaterial} from '../../../types/enums';
 const Xpub = () => {
     const [resultMessageText, setResulteMessageText] = useState('');
     const [resultMessage, setResultMessage] = useState('');
-    const [xpub, setXPUB] = useState('');
+    const [xkey, setXKey] = useState('');
 
-    const xpubVersionsSet = [];
-    for (const item of xpubVersions) {
-        xpubVersionsSet.push({
+    const xKeyVersionsSet = [];
+    for (const item of supportedExtVersions) {
+        xKeyVersionsSet.push({
             value: item,
-            label: item,
+            label: `${item}pub / ${item}prv`,
         });
     }
 
     const [open, setOpen] = useState(false);
-    const [version, setVersion] = useState('xpub');
-    const [versions, setVersions] = useState(xpubVersionsSet);
+    const [version, setVersion] = useState('x');
+    const [versions, setVersions] = useState(xKeyVersionsSet);
 
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
@@ -71,28 +71,34 @@ const Xpub = () => {
         }, 450);
     };
 
-    const convertXpub = () => {
+    const convertKey = () => {
+        const extKeyPrefix = getExtendedKeyPrefix(xkey);
+
         // Check if it is indeed an xpub and valid
-        if (getExtendedKeyPrefix(xpub) !== BackupMaterial.Xpub) {
-            errorAlert('Error', 'Please provide an extended public key (XPUB)');
+        if (
+            extKeyPrefix !== BackupMaterial.Xpub &&
+            extKeyPrefix !== BackupMaterial.Xprv
+        ) {
+            errorAlert('Error', 'Please provide an extended key');
             return;
         }
 
-        if (!isValidExtendedKey(xpub, true)) {
-            errorAlert(
-                'Error',
-                'Please provide a valid extended public key (XPUB)',
-            );
+        if (!isValidExtendedKey(xkey, true)) {
+            errorAlert('Error', 'Please provide a valid extended key');
             return;
         }
 
         try {
-            const pub = convertXPUB(xpub, version);
+            // quick hack
+            // switch to prv/pub
+            const conversionVersion = version + extKeyPrefix.slice(1);
 
-            setResultMessage(pub);
-            setResulteMessageText(pub);
+            const key = convertXKey(xkey, conversionVersion);
+
+            setResultMessage(key);
+            setResulteMessageText(key);
         } catch (e: any) {
-            errorAlert('XPUB', e);
+            errorAlert('Extended Key', e);
         }
     };
 
@@ -101,24 +107,25 @@ const Xpub = () => {
             clearText();
         }
 
-        setXPUB(text.trim());
+        setXKey(text.trim());
     };
 
     const clearText = () => {
         // Clear xpub
-        setXPUB('');
+        setXKey('');
 
         // Clear result message
         setResultMessage('');
+        setResulteMessageText('');
     };
 
     const onBlur = () => {
-        const valueWithSingleWhitespace = xpub.replace(
+        const valueWithSingleWhitespace = xkey.replace(
             /^\s+|\s+$|\s+(?=\s)/g,
             '',
         );
 
-        setXPUB(valueWithSingleWhitespace);
+        setXKey(valueWithSingleWhitespace);
 
         return valueWithSingleWhitespace;
     };
@@ -137,7 +144,7 @@ const Xpub = () => {
                             tailwind('text-lg font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Xpub Converter
+                        Extended Key Converter
                     </Text>
 
                     <PlainButton
@@ -153,7 +160,7 @@ const Xpub = () => {
                 <View style={tailwind('mt-20 w-5/6')}>
                     <Text
                         style={[
-                            tailwind('text-sm text-justify'),
+                            tailwind('text-sm'),
                             {color: ColorScheme.Text.GrayedText},
                         ]}>
                         <Text
@@ -163,8 +170,8 @@ const Xpub = () => {
                             ]}>
                             INFO:
                         </Text>{' '}
-                        This tool allows you to convert extended public keys
-                        between different versions.
+                        [EXPERIMENTAL] This tool allows you to convert extended
+                        keys between different versions.
                     </Text>
                 </View>
 
@@ -175,7 +182,7 @@ const Xpub = () => {
                         {borderWidth: 1, borderRadius: 6},
                     ]}>
                     <TextSingleInput
-                        placeholder="Enter an extended public key here..."
+                        placeholder="Enter an extended key here..."
                         placeholderTextColor={ColorScheme.Text.GrayedText}
                         isEnabled={true}
                         color={ColorScheme.Text.Default}
@@ -269,15 +276,15 @@ const Xpub = () => {
                 <LongBottomButton
                     style={[tailwind('mt-12 w-full items-center')]}
                     title={'Convert'}
-                    onPress={convertXpub}
-                    disabled={xpub.trim().length === 0}
+                    onPress={convertKey}
+                    disabled={xkey.trim().length === 0}
                     textColor={
-                        xpub.trim().length > 0
+                        xkey.trim().length > 0
                             ? ColorScheme.Text.Alt
                             : ColorScheme.Text.GrayedText
                     }
                     backgroundColor={
-                        xpub.trim().length > 0
+                        xkey.trim().length > 0
                             ? ColorScheme.Background.Inverted
                             : ColorScheme.Background.Secondary
                     }

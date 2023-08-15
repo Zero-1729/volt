@@ -75,7 +75,7 @@ const Index = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Xpub Converter
+                            Extended Key Converter
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
