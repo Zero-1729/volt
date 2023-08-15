@@ -45,8 +45,8 @@ export const fromDescriptor = async (descriptor: string, net: TNetwork) => {
     // perhaps manipulate descriptor to '1/*' and '0/*'
     // including checksums
     return {
-        external: newDescriptor,
-        internal: newDescriptor,
+        ExternalDescriptor: newDescriptor,
+        InternalDescriptor: newDescriptor,
     };
 };
 
