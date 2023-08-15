@@ -50,7 +50,7 @@ import {
     getFingerprintFromXkey,
     getPubKeyFromXprv,
     getExtendedKeyPrefix,
-    normalizeXpub,
+    normalizeExtKey,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo} from '../modules/wallet-defaults';
@@ -859,7 +859,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     const descriptor = await fromDescriptorTemplatePublic(
                         // BDK expects a tpub or xpub, so we need to convert it
                         // if it's an exotic prefix
-                        normalizeXpub(walletArgs.xpub),
+                        normalizeExtKey(walletArgs.xpub, 'pub'),
                         walletArgs.fingerprint,
                         walletArgs.type,
                         walletArgs.network,
