@@ -369,11 +369,11 @@ export const getMetaFromMnemonic = (
 
 export const getPubKeyFromXprv = (xprv: string, network: Net) => {
     const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
+    const key = normalizeExtKey(xprv, 'prv');
 
-    // TODO: handle zprv case && other exotic prefixes
     const derivationPath = WalletPaths[keyInfo.type][network];
 
-    let node = bip32.fromBase58(xprv, BJSNetworks[network]);
+    let node = bip32.fromBase58(key, BJSNetworks[network]);
 
     // Report if not master of 3-depth node
     if (node.depth !== 0 && node.depth !== 3) {
@@ -392,11 +392,10 @@ export const getPubKeyFromXprv = (xprv: string, network: Net) => {
 };
 
 export const getFingerprintFromXkey = (xkey: string, network: Net) => {
-    let key = xkey;
-
-    if (getExtendedKeyPrefix(xkey) === BackupMaterial.Xpub) {
-        key = normalizeExtKey(xkey, 'pub');
-    }
+    // Normalize ext key in case of exotic key
+    const normalizeSuffix =
+        getExtendedKeyPrefix(xkey) === BackupMaterial.Xpub ? 'pub' : 'prv';
+    const key = normalizeExtKey(xkey, normalizeSuffix);
 
     const node = bip32.fromBase58(key, BJSNetworks[network]);
 
