@@ -236,7 +236,7 @@ export const generateRootFromXKey = (
 
     // We must normalize the xpub for bitcoinjs-lib
     if (prefix === BackupMaterial.Xpub) {
-        key = normalizeXpub(xkey);
+        key = normalizeExtKey(xkey, 'pub');
     }
 
     let root = bip32.fromBase58(key, BJSNetworks[net]);
@@ -395,7 +395,7 @@ export const getFingerprintFromXkey = (xkey: string, network: Net) => {
     let key = xkey;
 
     if (getExtendedKeyPrefix(xkey) === BackupMaterial.Xpub) {
-        key = normalizeXpub(xkey);
+        key = normalizeExtKey(xkey, 'pub');
     }
 
     const node = bip32.fromBase58(key, BJSNetworks[network]);
@@ -413,19 +413,19 @@ const _getParentFingerprintHex = (xkey: string): string => {
     return Buffer.from(decoded.subarray(5, 9)).toString('hex');
 };
 
-export const normalizeXpub = (xpub: string) => {
-    const network = extendedKeyInfo[_getPrefix(xpub)[0]].network;
+export const normalizeExtKey = (xkey: string, key_type: string) => {
+    const network = extendedKeyInfo[_getPrefix(xkey)[0]].network;
 
-    // Bitcoinjs-lib supports only tpub and xpub prefixes
-    // Convert exotic prefixes to tpub or xpub
-    if (['u', 'v', 'y', 'z'].includes(xpub[0])) {
-        const convertedXPUB = convertXKey(
-            xpub,
-            network === 'testnet' ? 'tpub' : 'xpub',
+    // Bitcoinjs-lib & BDK only support tpub/prv and xpub/prv prefixes
+    // Convert exotic prefixes to tpub/prv or xpub/prv
+    if (['u', 'v', 'y', 'z'].includes(xkey[0])) {
+        const convertedKey = convertXKey(
+            xkey,
+            network === 'testnet' ? `t${key_type}` : `x${key_type}`,
         );
 
-        return convertedXPUB;
+        return convertedKey;
     }
 
-    return xpub;
+    return xkey;
 };
