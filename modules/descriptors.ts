@@ -1,8 +1,8 @@
 import * as secp256k1 from '@bitcoinerlab/secp256k1';
 import * as descriptors from '@bitcoinerlab/descriptors';
 
-import {BJSNetworks} from './wallet-defaults';
-import {getInfoFromXKey} from './wallet-utils';
+import {BJSNetworks, extendedKeyInfo} from './wallet-defaults';
+import {getInfoFromXKey, getRawRootFromXprv} from './wallet-utils';
 import {extendedKeyPatternG} from './re';
 
 const validPathTypes: {[index: string]: string} = {
@@ -42,6 +42,55 @@ const _getDescriptorNetwork = (expression: string) => {
     const network = getInfoFromXKey(key).network;
 
     return BJSNetworks[network];
+};
+
+// Create a descriptor from ext private key
+export const createDescriptorFromXprv = (xprv: string) => {
+    // Expects to be given 'xprv' or 'tprv'
+    const root = getRawRootFromXprv(xprv);
+    const keyInfo = extendedKeyInfo[xprv[0]];
+
+    let descriptor!: string;
+
+    try {
+        switch (keyInfo.type) {
+            case 'wpkh':
+                descriptor = descriptors.scriptExpressions.wpkhBIP32({
+                    masterNode: root,
+                    network: BJSNetworks[keyInfo.network],
+                    account: 0,
+                    keyPath: '/0/*',
+                    isPublic: false,
+                });
+
+                break;
+            case 'shp2wpkh':
+                descriptor = descriptors.scriptExpressions.shWpkhBIP32({
+                    masterNode: root,
+                    network: BJSNetworks[keyInfo.network],
+                    account: 0,
+                    keyPath: '/0/*',
+                    isPublic: false,
+                });
+
+                break;
+        }
+
+        // Clean up descriptor to fit BDK format
+        const parsedDescriptor = parseDescriptor(descriptor);
+
+        // wpkh(xprv.../84'/0'/0'/0/*)
+        const finalDescriptor =
+            parsedDescriptor.scriptPrefix +
+            parsedDescriptor.keyOnly +
+            parsedDescriptor.path.slice(1) +
+            parsedDescriptor.keyPath +
+            parsedDescriptor.scriptSuffix;
+
+        return finalDescriptor;
+    } catch (e: any) {
+        throw new Error(e.message);
+    }
 };
 
 // Get descriptor components
@@ -105,7 +154,7 @@ export const parseDescriptor = (expression: string) => {
             descObjmap?.bip32?.network.bech32 === 'bc' ? 'bitcoin' : 'testnet',
         fingerprint: descObjmap?.bip32?.fingerprint.toString('hex'),
         path: descObjmap?.path.split('/').splice(0, 4).join('/'),
-        keyPath: descObjmap?.path.split('/').splice(4).join('/'),
+        keyPath: '/' + descObjmap?.path.split('/').splice(4).join('/'),
         scriptPrefix: scripts.join('(') + '(',
         scriptSuffix: scripts.length === 3 ? '))' : ')',
         checksum:
