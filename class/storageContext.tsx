@@ -19,6 +19,7 @@ import {LanguageType, CurrencyType} from '../types/settings';
 import {
     parseDescriptor,
     includeDescriptorKeyPath,
+    createDescriptorFromXprv,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
 import {BackupMaterial, Net} from '../types/enums';
@@ -34,6 +35,7 @@ import {
     AddressType,
     ElectrumServerURLs,
 } from '../types/wallet';
+import {Descriptor} from 'bdk-rn/lib/classes/Descriptor';
 
 import {BaseWallet} from './wallet/base';
 import {SegWitNativeWallet} from './wallet/segwit/wpkh';
@@ -677,8 +679,8 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Generate descriptors for mnemonic
-            let InternalDescriptor;
-            let ExternalDescriptor;
+            let InternalDescriptor!: Descriptor;
+            let ExternalDescriptor!: Descriptor;
 
             ({InternalDescriptor, ExternalDescriptor} =
                 await descriptorFromTemplate(
@@ -832,16 +834,15 @@ export const AppStorageProvider = ({children}: Props) => {
 
             // Create descriptor from imported descriptor if available
             if (backupMaterialType === 'descriptor') {
-                const {internal, external} = await fromDescriptor(
-                    backupMaterial,
-                    walletArgs.network,
-                );
+                const {InternalDescriptor, ExternalDescriptor} =
+                    await fromDescriptor(backupMaterial, walletArgs.network);
 
-                const externalDescriptor = await external.asString();
-                const internalDescriptor = await internal.asString();
+                const externalDescriptor = await ExternalDescriptor.asString();
+                const internalDescriptor = await InternalDescriptor.asString();
 
                 // Displayed in wallet backup screen
-                const privateDescriptor = await external.asStringPrivate();
+                const privateDescriptor =
+                    await ExternalDescriptor.asStringPrivate();
 
                 newWallet.setDescriptor({
                     internal: internalDescriptor,
@@ -856,14 +857,36 @@ export const AppStorageProvider = ({children}: Props) => {
                 backupMaterialType === 'xpub'
             ) {
                 try {
-                    const descriptor = await fromDescriptorTemplatePublic(
-                        // BDK expects a tpub or xpub, so we need to convert it
-                        // if it's an exotic prefix
-                        normalizeExtKey(walletArgs.xpub, 'pub'),
-                        walletArgs.fingerprint,
-                        walletArgs.type,
-                        walletArgs.network,
-                    );
+                    let descriptor!: {
+                        InternalDescriptor: Descriptor;
+                        ExternalDescriptor: Descriptor;
+                    };
+
+                    switch (backupMaterialType) {
+                        case BackupMaterial.Xpub:
+                            descriptor = await fromDescriptorTemplatePublic(
+                                // BDK expects a tpub or xpub, so we need to convert it
+                                // if it's an exotic prefix
+                                normalizeExtKey(walletArgs.xpub, 'pub'),
+                                walletArgs.fingerprint,
+                                walletArgs.type,
+                                walletArgs.network,
+                            );
+
+                            break;
+
+                        case BackupMaterial.Xprv:
+                            const xprvDescriptor = createDescriptorFromXprv(
+                                walletArgs.xprv,
+                            );
+
+                            descriptor = await fromDescriptor(
+                                xprvDescriptor,
+                                walletArgs.network,
+                            );
+
+                            break;
+                    }
 
                     const externalDescriptor =
                         await descriptor.ExternalDescriptor.asString();
