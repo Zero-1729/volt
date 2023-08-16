@@ -32,8 +32,6 @@ import {TransactionListItem} from '../components/transaction';
 import {BaseWallet} from '../class/wallet/base';
 import {BalanceType, TransactionType} from '../types/wallet';
 
-import NetInfo from '@react-native-community/netinfo';
-
 import {FiatBalance} from '../components/balance';
 
 import {fetchFiatRate} from '../modules/currency';
@@ -69,7 +67,6 @@ const Home = () => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        setNetworkState,
         networkState,
         fiatRate,
         updateFiatRate,
@@ -86,15 +83,6 @@ const Home = () => {
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
-
-    // Subscribe
-    NetInfo.addEventListener(state => {
-        // Limit updates to when connection drops or re-established
-        // or initial load
-        if (state.isConnected !== networkState?.isConnected || !networkState) {
-            setNetworkState(state);
-        }
-    });
 
     // add the total balances of the wallets
     const totalBalance: BalanceType = wallets.reduce(
@@ -170,7 +158,7 @@ const Home = () => {
         }
 
         // Only attempt load if connected to network
-        if (!networkState?.isConnected) {
+        if (!networkState?.isInternetReachable) {
             setRefreshing(false);
             return;
         }
@@ -201,7 +189,7 @@ const Home = () => {
         }
 
         // Check net again, just in case there is a drop mid execution
-        if (!networkState?.isConnected) {
+        if (!networkState?.isInternetReachable) {
             setRefreshing(false);
             return;
         }
@@ -233,14 +221,14 @@ const Home = () => {
         fiatRate,
         appFiatCurrency,
         updateFiatRate,
-        networkState?.isConnected,
+        networkState?.isInternetReachable,
     ]);
 
     // Fetch the fiat rate on currency change
     useEffect(() => {
         // Avoid fiat rate update call when offline
         // or when newly loaded screen to avoid dup call
-        if (!networkState?.isConnected || !initFiatRate) {
+        if (!networkState?.isInternetReachable || !initFiatRate) {
             return;
         }
 
@@ -255,7 +243,7 @@ const Home = () => {
         // and wallets exists
         if (!initFiatRate && wallets.length > 0) {
             // Avoid fiat rate update call when offline
-            if (!networkState?.isConnected) {
+            if (!networkState?.isInternetReachable) {
                 return;
             }
 

@@ -112,7 +112,7 @@ const Wallet = () => {
         }
 
         // Only attempt load if connected to network
-        if (!networkState?.isConnected) {
+        if (!networkState?.isInternetReachable) {
             setRefreshing(false);
             return;
         }
@@ -292,7 +292,7 @@ const Wallet = () => {
         currentWalletID,
         fiatRate,
         loadingBalance,
-        networkState?.isConnected,
+        networkState?.isInternetReachable,
         refreshing,
         updateFiatRate,
         updateWalletBalance,
@@ -419,7 +419,9 @@ const Wallet = () => {
                                 tailwind('text-sm text-white opacity-60 mb-2'),
                             ]}>
                             Current{' '}
-                            {!networkState?.isConnected ? 'Offline ' : ''}
+                            {!networkState?.isInternetReachable
+                                ? 'Offline '
+                                : ''}
                             Balance
                         </Text>
 

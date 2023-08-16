@@ -49,7 +49,7 @@ const Currency = () => {
         return (
             <PlainButton
                 onPress={() => {
-                    if (!networkState?.isConnected) {
+                    if (!networkState?.isInternetReachable) {
                         liberalAlert(
                             'Network',
                             'Unable to fetch currency data, connect to the Internet',
