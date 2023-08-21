@@ -188,62 +188,82 @@ export const fromDescriptorTemplatePublic = async (
     type: string,
     network: TNetwork,
 ): Promise<{
-    InternalDescriptor: BDK.Descriptor;
-    ExternalDescriptor: BDK.Descriptor;
+    InternalDescriptor: string;
+    ExternalDescriptor: string;
+    PrivateDescriptor: string;
 }> => {
     const descriptorPublicKey = await new BDK.DescriptorPublicKey().fromString(
         pubKey,
     );
 
-    let InternalDescriptor!: BDK.Descriptor;
-    let ExternalDescriptor!: BDK.Descriptor;
+    let InternalDescriptor!: string;
+    let ExternalDescriptor!: string;
+    let PrivateDescriptor!: string;
 
     switch (type) {
         case 'wpkh': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip84Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.External,
-                network as Network,
-            );
-            InternalDescriptor = await new BDK.Descriptor().newBip84Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.Internal,
-                network as Network,
-            );
+            const externalDescriptor =
+                await new BDK.Descriptor().newBip84Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.External,
+                    network as Network,
+                );
+            const internalDescriptor =
+                await new BDK.Descriptor().newBip84Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.Internal,
+                    network as Network,
+                );
+
+            ExternalDescriptor = await externalDescriptor.asString();
+            InternalDescriptor = await internalDescriptor.asString();
+            PrivateDescriptor = await externalDescriptor.asStringPrivate();
 
             break;
         }
         case 'shp2wpkh': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip49Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.External,
-                network as Network,
-            );
-            InternalDescriptor = await new BDK.Descriptor().newBip49Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.Internal,
-                network as Network,
-            );
+            const externalDescriptor =
+                await new BDK.Descriptor().newBip49Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.External,
+                    network as Network,
+                );
+            const internalDescriptor =
+                await new BDK.Descriptor().newBip49Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.Internal,
+                    network as Network,
+                );
+
+            ExternalDescriptor = await externalDescriptor.asString();
+            InternalDescriptor = await internalDescriptor.asString();
+            PrivateDescriptor = await externalDescriptor.asStringPrivate();
 
             break;
         }
         case 'p2pkh': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip44Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.External,
-                network as Network,
-            );
-            InternalDescriptor = await new BDK.Descriptor().newBip44Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.Internal,
-                network as Network,
-            );
+            const externalDescriptor =
+                await new BDK.Descriptor().newBip44Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.External,
+                    network as Network,
+                );
+            const internalDescriptor =
+                await new BDK.Descriptor().newBip44Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.Internal,
+                    network as Network,
+                );
+
+            ExternalDescriptor = await externalDescriptor.asString();
+            InternalDescriptor = await internalDescriptor.asString();
+            PrivateDescriptor = await externalDescriptor.asStringPrivate();
 
             break;
         }
@@ -252,6 +272,7 @@ export const fromDescriptorTemplatePublic = async (
     return {
         InternalDescriptor,
         ExternalDescriptor,
+        PrivateDescriptor,
     };
 };
 
