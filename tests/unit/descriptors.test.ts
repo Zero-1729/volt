@@ -1,6 +1,7 @@
 // Tests to check that descriptors are imported and generated correctly
 import {
     parseDescriptor,
+    createDescriptorFromXprv,
     createDescriptorfromString,
 } from './../../modules/descriptors';
 import {descriptorRegex} from '../../modules/re';
@@ -130,6 +131,23 @@ describe('generated descriptor from string', () => {
 
         const {internal, external} =
             createDescriptorfromString(descriptorExternal);
+
+        expect(external).toEqual(descriptorExternal);
+        expect(internal).toEqual(descriptorInternal);
+    });
+});
+
+describe('generated descriptor from xprv', () => {
+    test('descriptor from xprv tests passed', () => {
+        const xprv =
+            'tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr';
+
+        const descriptorExternal =
+            "wpkh(tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr/84'/1'/0'/0/*)#wcm6z32h";
+        const descriptorInternal =
+            "wpkh(tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr/84'/1'/0'/1/*)#lv7mly60";
+
+        const {internal, external} = createDescriptorFromXprv(xprv);
 
         expect(external).toEqual(descriptorExternal);
         expect(internal).toEqual(descriptorInternal);
