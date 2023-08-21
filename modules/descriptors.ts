@@ -72,6 +72,45 @@ const reformatDescriptorToBDK = (expression: string) => {
         );
     }
 };
+
+export const createDescriptorfromString = (
+    expression: string,
+): {external: string; internal: string} => {
+    const parsedDescriptor = parseDescriptor(expression);
+
+    if (!parsedDescriptor.keyPath) {
+        throw new Error('Decsriptor must have a key path');
+    }
+
+    if (parsedDescriptor.keyPath.includes('1')) {
+        throw new Error('Descriptor must be external key path (0/*)');
+    }
+
+    let strippedDescriptor: string = expression;
+    let external: string = expression;
+    let internal: string = expression;
+
+    // Remove checksum if available to manipulate internal descriptor key path
+    if (strippedDescriptor.includes('#')) {
+        strippedDescriptor = strippedDescriptor.slice(0, -9);
+    }
+
+    // Re-include checksums
+    internal = strippedDescriptor.replace('0/*', '1/*');
+    internal = internal + '#' + descriptors.checksum(internal);
+    external = expression.includes('#')
+        ? expression
+        : expression + '#' + descriptors.checksum(expression);
+
+    // Reformat to private descriptor format if xprv-based descriptor
+    // We assume the descriptor has keypath in it
+    // wpkh(xprv.../84'/0'/0'/0/*)
+    return {
+        external: reformatDescriptorToBDK(external),
+        internal: reformatDescriptorToBDK(internal),
+    };
+};
+
 // Create a descriptor from ext private key
 export const createDescriptorFromXprv = (xprv: string) => {
     // Expects to be given 'xprv' or 'tprv'
