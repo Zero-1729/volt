@@ -1,5 +1,8 @@
 // Tests to check that descriptors are imported and generated correctly
-import {parseDescriptor} from './../../modules/descriptors';
+import {
+    parseDescriptor,
+    createDescriptorfromString,
+} from './../../modules/descriptors';
 import {descriptorRegex} from '../../modules/re';
 
 describe('testing descriptor checksum extraction', () => {
@@ -115,5 +118,20 @@ describe('testing parsed descriptor parts', () => {
         expect(parsedDescriptor.keyPath).toEqual('/0/*');
         expect(parsedDescriptor.path.replace(/'/g, 'h')).toEqual('m/84h/0h/0h');
         expect(parsedDescriptor.fingerprint).toEqual('c65d79d8');
+    });
+});
+
+describe('generated descriptor from string', () => {
+    test('descriptor from string tests passed', () => {
+        const descriptorExternal =
+            "wpkh([c65d79d8/84'/0'/0']xpub6CmNYqKyLZdq1BsTyixhuNkKoa3Dt6J9pgUXjA742t7b44xAwjXZak6GvYBPda15ZqKkWippbVkCHYvHMQGuuhVsu2ohkgaVioYcNxZmEvH/0/*)#ur90lsda";
+        const descriptorInternal =
+            "wpkh([c65d79d8/84'/0'/0']xpub6CmNYqKyLZdq1BsTyixhuNkKoa3Dt6J9pgUXjA742t7b44xAwjXZak6GvYBPda15ZqKkWippbVkCHYvHMQGuuhVsu2ohkgaVioYcNxZmEvH/1/*)#dhqwz9a9";
+
+        const {internal, external} =
+            createDescriptorfromString(descriptorExternal);
+
+        expect(external).toEqual(descriptorExternal);
+        expect(internal).toEqual(descriptorInternal);
     });
 });
