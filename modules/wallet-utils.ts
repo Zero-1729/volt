@@ -27,8 +27,7 @@ import {
 } from './wallet-defaults';
 
 import {
-    wrappedWalletDescriptorRegex,
-    nativeWalletDescriptorRegex,
+    descriptorRegex,
     xprvPattern,
     xpubPattern,
     extendedKeyPattern,
@@ -63,10 +62,7 @@ export const mnemonicToSeedSync = (mnemonic: string) => {
 };
 
 export const isDescriptorPattern = (expression: string) => {
-    return (
-        nativeWalletDescriptorRegex.test(expression) ||
-        wrappedWalletDescriptorRegex.test(expression)
-    );
+    return descriptorRegex.test(expression);
 };
 
 // Descriptor Symbols
