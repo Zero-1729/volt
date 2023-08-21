@@ -333,7 +333,7 @@ export const syncWallet = async (
                 : electrumServer.testnet,
         retry: 5,
         timeout: 5,
-        stopGap: 5,
+        stopGap: 100,
         sock5: null,
         validateDomain: false,
     };
