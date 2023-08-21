@@ -44,6 +44,34 @@ const _getDescriptorNetwork = (expression: string) => {
     return BJSNetworks[network];
 };
 
+const reformatDescriptorToBDK = (expression: string) => {
+    const parsedDescriptor = parseDescriptor(expression);
+
+    if (parsedDescriptor.isPublic) {
+        // script([fingerprint+origin path]xkey/keypath)
+        return (
+            parsedDescriptor.scriptPrefix +
+            '[' +
+            parsedDescriptor.fingerprint +
+            parsedDescriptor.originPath +
+            ']' +
+            parsedDescriptor.keyOnly +
+            parsedDescriptor.keyPath +
+            parsedDescriptor.scriptSuffix +
+            parsedDescriptor.checksum
+        );
+    } else {
+        // script(xkey/key origin/keypath)
+        return (
+            parsedDescriptor.scriptPrefix +
+            parsedDescriptor.keyOnly +
+            parsedDescriptor.path.slice(1) +
+            parsedDescriptor.keyPath +
+            parsedDescriptor.scriptSuffix +
+            parsedDescriptor.checksum
+        );
+    }
+};
 // Create a descriptor from ext private key
 export const createDescriptorFromXprv = (xprv: string) => {
     // Expects to be given 'xprv' or 'tprv'
