@@ -20,6 +20,7 @@ import {
     parseDescriptor,
     includeDescriptorKeyPath,
     createDescriptorFromXprv,
+    createDescriptorfromString,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
 import {BackupMaterial, Net} from '../types/enums';
@@ -679,10 +680,11 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Generate descriptors for mnemonic
-            let InternalDescriptor!: Descriptor;
-            let ExternalDescriptor!: Descriptor;
+            let InternalDescriptor!: string;
+            let ExternalDescriptor!: string;
+            let PrivateDescriptor!: string;
 
-            ({InternalDescriptor, ExternalDescriptor} =
+            ({InternalDescriptor, ExternalDescriptor, PrivateDescriptor} =
                 await descriptorFromTemplate(
                     newWallet.mnemonic,
                     newWallet.type,
@@ -690,16 +692,10 @@ export const AppStorageProvider = ({children}: Props) => {
                 ));
 
             // REM: We only store the string representation of the descriptors
-            const externalString = await ExternalDescriptor.asString();
-            const internalString = await InternalDescriptor.asString();
-
-            const privateDescriptor =
-                await ExternalDescriptor.asStringPrivate();
-
             newWallet.setDescriptor({
-                internal: internalString,
-                external: externalString,
-                private: privateDescriptor,
+                internal: InternalDescriptor,
+                external: ExternalDescriptor,
+                private: PrivateDescriptor,
             });
         }
 
@@ -834,20 +830,23 @@ export const AppStorageProvider = ({children}: Props) => {
 
             // Create descriptor from imported descriptor if available
             if (backupMaterialType === 'descriptor') {
-                const {InternalDescriptor, ExternalDescriptor} =
-                    await fromDescriptor(backupMaterial, walletArgs.network);
+                const retreivedDescriptors =
+                    createDescriptorfromString(backupMaterial);
 
-                const externalDescriptor = await ExternalDescriptor.asString();
-                const internalDescriptor = await InternalDescriptor.asString();
-
-                // Displayed in wallet backup screen
-                const privateDescriptor =
-                    await ExternalDescriptor.asStringPrivate();
+                const {
+                    InternalDescriptor,
+                    ExternalDescriptor,
+                    PrivateDescriptor,
+                } = await fromDescriptor(
+                    retreivedDescriptors.external,
+                    retreivedDescriptors.internal,
+                    walletArgs.network,
+                );
 
                 newWallet.setDescriptor({
-                    internal: internalDescriptor,
-                    external: externalDescriptor,
-                    private: privateDescriptor,
+                    internal: InternalDescriptor,
+                    external: ExternalDescriptor,
+                    private: PrivateDescriptor,
                 });
             }
 
@@ -858,8 +857,9 @@ export const AppStorageProvider = ({children}: Props) => {
             ) {
                 try {
                     let descriptor!: {
-                        InternalDescriptor: Descriptor;
-                        ExternalDescriptor: Descriptor;
+                        InternalDescriptor: string;
+                        ExternalDescriptor: string;
+                        PrivateDescriptor: string;
                     };
 
                     switch (backupMaterialType) {
@@ -876,30 +876,22 @@ export const AppStorageProvider = ({children}: Props) => {
                             break;
 
                         case BackupMaterial.Xprv:
-                            const xprvDescriptor = createDescriptorFromXprv(
-                                walletArgs.xprv,
-                            );
+                            const {internal, external} =
+                                createDescriptorFromXprv(walletArgs.xprv);
 
                             descriptor = await fromDescriptor(
-                                xprvDescriptor,
+                                external,
+                                internal,
                                 walletArgs.network,
                             );
 
                             break;
                     }
 
-                    const externalDescriptor =
-                        await descriptor.ExternalDescriptor.asString();
-                    const internalDescriptor =
-                        await descriptor.InternalDescriptor.asString();
-
-                    const privateDescriptor =
-                        await descriptor.ExternalDescriptor.asStringPrivate();
-
                     newWallet.setDescriptor({
-                        external: externalDescriptor,
-                        internal: internalDescriptor,
-                        private: privateDescriptor,
+                        external: descriptor.ExternalDescriptor,
+                        internal: descriptor.InternalDescriptor,
+                        private: descriptor.PrivateDescriptor,
                     });
                 } catch (e) {
                     // Report any other related BDK errors
