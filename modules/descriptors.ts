@@ -152,7 +152,10 @@ export const parseDescriptor = (expression: string) => {
         type: descriptorType,
         network:
             descObjmap?.bip32?.network.bech32 === 'bc' ? 'bitcoin' : 'testnet',
-        fingerprint: descObjmap?.bip32?.fingerprint.toString('hex'),
+        // get fingerprint provided by descriptor
+        fingerprint: descObjmap?.masterFingerprint
+            ? descObjmap?.masterFingerprint.toString('hex')
+            : descObjmap?.bip32?.fingerprint.toString('hex'),
         path: descObjmap?.path.split('/').splice(0, 4).join('/'),
         keyPath: '/' + descObjmap?.path.split('/').splice(4).join('/'),
         scriptPrefix: scripts.join('(') + '(',
