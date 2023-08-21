@@ -34,19 +34,25 @@ export const generateMnemonic = async () => {
     return mnemonic.asString();
 };
 
-export const fromDescriptor = async (descriptor: string, net: TNetwork) => {
-    const newDescriptor = await new BDK.Descriptor().create(
-        descriptor,
+export const fromDescriptor = async (
+    externalDescriptor: string,
+    internalDescriptor: string,
+    net: TNetwork,
+) => {
+    const external = await new BDK.Descriptor().create(
+        externalDescriptor,
+        net as Network,
+    );
+    const internal = await new BDK.Descriptor().create(
+        internalDescriptor,
         net as Network,
     );
 
-    // TODO: Find a better way to do this
-    // Return actual internal/external
-    // perhaps manipulate descriptor to '1/*' and '0/*'
-    // including checksums
+    // Used to rehydrate an external/internal descriptor from string
     return {
-        ExternalDescriptor: newDescriptor,
-        InternalDescriptor: newDescriptor,
+        ExternalDescriptor: await external.asString(),
+        InternalDescriptor: await internal.asString(),
+        PrivateDescriptor: await external.asStringPrivate(),
     };
 };
 
