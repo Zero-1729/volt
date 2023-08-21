@@ -1,7 +1,7 @@
 import * as secp256k1 from '@bitcoinerlab/secp256k1';
 import * as descriptors from '@bitcoinerlab/descriptors';
 
-import {BJSNetworks, extendedKeyInfo} from './wallet-defaults';
+import {BJSNetworks, extendedKeyInfo, WalletPaths} from './wallet-defaults';
 import {getInfoFromXKey, getRawRootFromXprv} from './wallet-utils';
 import {extendedKeyPatternG} from './re';
 
@@ -112,52 +112,114 @@ export const createDescriptorfromString = (
 };
 
 // Create a descriptor from ext private key
-export const createDescriptorFromXprv = (xprv: string) => {
+export const createDescriptorFromXprv = (
+    xprv: string,
+): {external: string; internal: string} => {
     // Expects to be given 'xprv' or 'tprv'
     const root = getRawRootFromXprv(xprv);
     const keyInfo = extendedKeyInfo[xprv[0]];
 
-    let descriptor!: string;
+    let descriptorExternal!: string;
+    let descriptorInternal!: string;
 
-    try {
+    let External!: string;
+    let Internal!: string;
+
+    // Only push it through
+    if (root.depth === 0) {
+        try {
+            switch (keyInfo.type) {
+                case 'wpkh':
+                    descriptorExternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.wpkh[keyInfo.network],
+                        keyPath: '/0/*',
+                        isPublic: false,
+                    });
+
+                    descriptorInternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.wpkh[keyInfo.network],
+                        keyPath: '/1/*',
+                        isPublic: false,
+                    });
+
+                    break;
+                case 'shp2wpkh':
+                    descriptorExternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.shp2wpkh[keyInfo.network],
+                        keyPath: '/0/*',
+                        isPublic: false,
+                    });
+
+                    descriptorInternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.shp2wpkh[keyInfo.network],
+                        keyPath: '/1/*',
+                        isPublic: false,
+                    });
+
+                    break;
+            }
+
+            // Clean up descriptor to fit BDK format
+            // wpkh(xprv.../84'/0'/0'/0/*)
+            External = reformatDescriptorToBDK(descriptorExternal);
+            Internal = reformatDescriptorToBDK(descriptorInternal);
+        } catch (e: any) {
+            throw new Error(e.message);
+        }
+    } else {
+        // Reformat single Shot
         switch (keyInfo.type) {
             case 'wpkh':
-                descriptor = descriptors.scriptExpressions.wpkhBIP32({
-                    masterNode: root,
-                    network: BJSNetworks[keyInfo.network],
-                    account: 0,
-                    keyPath: '/0/*',
-                    isPublic: false,
-                });
+                descriptorExternal =
+                    'wpkh' +
+                    '(' +
+                    xprv +
+                    WalletPaths.wpkh[keyInfo.network].slice(1) +
+                    '/0/*)';
+                descriptorInternal =
+                    'wpkh' +
+                    '(' +
+                    xprv +
+                    WalletPaths.wpkh[keyInfo.network].slice(1) +
+                    '/1/*)';
 
                 break;
             case 'shp2wpkh':
-                descriptor = descriptors.scriptExpressions.shWpkhBIP32({
-                    masterNode: root,
-                    network: BJSNetworks[keyInfo.network],
-                    account: 0,
-                    keyPath: '/0/*',
-                    isPublic: false,
-                });
+                descriptorExternal =
+                    'sh(wpkh' +
+                    '(' +
+                    xprv +
+                    WalletPaths.shp2wpkh[keyInfo.network].slice(1) +
+                    '/0/*))';
+                descriptorInternal =
+                    'sh(wpkh' +
+                    '(' +
+                    xprv +
+                    WalletPaths.shp2wpkh[keyInfo.network].slice(1) +
+                    '/1/*))';
 
                 break;
         }
 
-        // Clean up descriptor to fit BDK format
-        const parsedDescriptor = parseDescriptor(descriptor);
+        // Re-include checksums
+        descriptorExternal =
+            descriptorExternal + '#' + descriptors.checksum(descriptorExternal);
+        descriptorInternal =
+            descriptorInternal + '#' + descriptors.checksum(descriptorInternal);
 
-        // wpkh(xprv.../84'/0'/0'/0/*)
-        const finalDescriptor =
-            parsedDescriptor.scriptPrefix +
-            parsedDescriptor.keyOnly +
-            parsedDescriptor.path.slice(1) +
-            parsedDescriptor.keyPath +
-            parsedDescriptor.scriptSuffix;
-
-        return finalDescriptor;
-    } catch (e: any) {
-        throw new Error(e.message);
+        // Ready to shoot
+        External = descriptorExternal;
+        Internal = descriptorInternal;
     }
+
+    return {
+        external: External,
+        internal: Internal,
+    };
 };
 
 // Get descriptor components
