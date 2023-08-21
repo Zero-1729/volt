@@ -55,7 +55,8 @@ export const extendedKeyPattern: RegExp = RegExp(
     String.raw`^(${xpubRegex}|${xprvRegex})$`,
 );
 export const extendedKeyPatternG: RegExp = RegExp(
-    String.raw`(${xpubRegex}|${xprvRegex})g`,
+    String.raw`(${xpubRegex}|${xprvRegex})`,
+    'g',
 );
 export const xpubPattern: RegExp = RegExp(String.raw`^${xpubRegex}$`);
 export const xprvPattern: RegExp = RegExp(String.raw`^${xprvRegex}$`);
