@@ -46,8 +46,7 @@ const Backup = () => {
     const walletData = getWalletData(currentWalletID);
     const walletType = WalletTypeDetails[walletData.type];
     const walletTypeName =
-        walletType[0] +
-        (isAdvancedMode ? ` (${WalletTypeDetails[walletData.type][1]})` : '');
+        walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
 
     const [showPrivateDescriptor, setShowPrivateDescriptor] = useState(false);
 
@@ -223,7 +222,7 @@ const Backup = () => {
                                 tailwind('text-base self-center mb-10'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {walletTypeName}
+                            {isAdvancedMode ? walletTypeName : 'Backup'}
                         </Text>
                     </View>
 
