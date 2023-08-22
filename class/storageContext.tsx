@@ -796,6 +796,7 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Create descriptor from imported descriptor if available
+            // TODO: needs plumbing, corresponding xpub from xprv bad
             if (backupMaterialType === 'descriptor') {
                 const retreivedDescriptors =
                     createDescriptorfromString(backupMaterial);

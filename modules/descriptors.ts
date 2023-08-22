@@ -73,6 +73,8 @@ const reformatDescriptorToBDK = (expression: string) => {
     }
 };
 
+// TODO: if xprv descriptor get xpub descriptor
+// and only save xprv version (derive 3-depth if masterNode is 0-depth xprv)
 export const createDescriptorfromString = (
     expression: string,
 ): {external: string; internal: string} => {
