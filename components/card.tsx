@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import React from 'react';
 
@@ -13,6 +14,9 @@ import {WalletCardProps} from '../types/props';
 
 import Font from '../constants/Font';
 import Color from '../constants/Color';
+
+import BITCOIN from '../assets/svg/btc.svg';
+import SIM from '../assets/svg/sim.svg';
 
 export const EmptyCard = () => {
     const navigation = useNavigation();
@@ -105,15 +109,57 @@ export const WalletCard = (props: WalletCardProps) => {
                                 ColorScheme.WalletColors[props.walletType][
                                     props.network
                                 ],
+                            overflow: 'hidden',
                         },
                     ]}>
+                    <View
+                        style={[
+                            tailwind(
+                                'absolute right-0 z-50 h-full rounded-br opacity-60',
+                            ),
+                            {width: 6},
+                        ]}>
+                        <View
+                            style={[
+                                tailwind(
+                                    'h-4/6 rounded-tr rounded-bl rounded-br-none absolute right-0',
+                                ),
+                                {width: 10},
+                            ]}
+                        />
+                    </View>
+
+                    <View
+                        style={[
+                            tailwind('absolute h-auto w-auto opacity-40 z-0'),
+                            {top: -16, right: -24},
+                        ]}>
+                        <BITCOIN fill={'black'} width={148} height={148} />
+                    </View>
+
+                    {!props.isWatchOnly ? (
+                        <View
+                            style={[
+                                tailwind('absolute opacity-80 h-auto w-auto'),
+                                {
+                                    left: 24,
+                                    top: 18,
+                                },
+                            ]}>
+                            <SIM fill={'white'} width={42} height={42} />
+                        </View>
+                    ) : (
+                        <></>
+                    )}
+
                     <Text
                         numberOfLines={1}
                         ellipsizeMode="middle"
                         style={[
                             tailwind(
-                                'pt-4 mt-1 text-xl w-full text-left text-white',
+                                'absolute pt-4 mt-1 text-base w-4/6 text-left text-white opacity-60',
                             ),
+                            {bottom: 54, left: 24, fontWeight: 100},
                             Font.RobotoText,
                         ]}>
                         {props.label}
@@ -123,8 +169,12 @@ export const WalletCard = (props: WalletCardProps) => {
                         <View
                             style={[
                                 tailwind(
-                                    'bg-black absolute left-6 top-14 rounded-full opacity-50',
+                                    'bg-black absolute rounded-full opacity-60',
                                 ),
+                                {
+                                    top: 24,
+                                    left: 20,
+                                },
                             ]}>
                             <Text
                                 style={[
@@ -133,7 +183,7 @@ export const WalletCard = (props: WalletCardProps) => {
                                     ),
                                     Font.RobotoText,
                                 ]}>
-                                {`${props.isWatchOnly ? 'Watch only' : ''}`}
+                                Watch only
                             </Text>
                         </View>
                     ) : (

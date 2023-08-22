@@ -94,6 +94,10 @@
   top: 1.5rem
 }
 
+.z-0 {
+  z-index: 0
+}
+
 .z-10 {
   z-index: 10
 }
@@ -256,6 +260,10 @@
   display: flex
 }
 
+.hidden {
+  display: none
+}
+
 .h-1\/2 {
   height: 50%
 }
@@ -308,6 +316,10 @@
   height: 2rem
 }
 
+.h-auto {
+  height: auto
+}
+
 .h-full {
   height: 100%
 }
@@ -354,6 +366,10 @@
 
 .w-5\/6 {
   width: 83.333333%
+}
+
+.w-auto {
+  width: auto
 }
 
 .w-full {
@@ -422,6 +438,22 @@
 
 .rounded-sm {
   border-radius: 0.125rem
+}
+
+.rounded-bl {
+  border-bottom-left-radius: 0.25rem
+}
+
+.rounded-br {
+  border-bottom-right-radius: 0.25rem
+}
+
+.rounded-br-none {
+  border-bottom-right-radius: 0px
+}
+
+.rounded-tr {
+  border-top-right-radius: 0.25rem
 }
 
 .border-gray-400 {
