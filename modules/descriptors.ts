@@ -114,91 +114,156 @@ export const createDescriptorfromString = (
 // Create a descriptor from ext private key
 export const createDescriptorFromXprv = (
     xprv: string,
-): {external: string; internal: string} => {
+): {external: string; internal: string; priv: string} => {
     // Expects to be given 'xprv' or 'tprv'
     const root = getRawRootFromXprv(xprv);
     const keyInfo = extendedKeyInfo[xprv[0]];
 
     let descriptorExternal!: string;
     let descriptorInternal!: string;
+    let descriptorPrivate!: string;
 
     let External!: string;
     let Internal!: string;
+    let Private!: string;
 
     // Only push it through
     if (root.depth === 0) {
         try {
             switch (keyInfo.type) {
                 case 'wpkh':
-                    descriptorExternal = descriptors.keyExpressionBIP32({
+                    descriptorPrivate = descriptors.keyExpressionBIP32({
                         masterNode: root,
-                        originPath: WalletPaths.wpkh[keyInfo.network],
+                        originPath: WalletPaths.wpkh[keyInfo.network].slice(1),
                         keyPath: '/0/*',
                         isPublic: false,
                     });
 
+                    descriptorExternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.wpkh[keyInfo.network].slice(1),
+                        keyPath: '/0/*',
+                        isPublic: true,
+                    });
+
                     descriptorInternal = descriptors.keyExpressionBIP32({
                         masterNode: root,
-                        originPath: WalletPaths.wpkh[keyInfo.network],
+                        originPath: WalletPaths.wpkh[keyInfo.network].slice(1),
                         keyPath: '/1/*',
-                        isPublic: false,
+                        isPublic: true,
                     });
+
+                    // wrap descriptor in script
+                    descriptorPrivate = `wpkh(${descriptorPrivate})`;
+                    descriptorExternal = `wpkh(${descriptorExternal})`;
+                    descriptorInternal = `wpkh(${descriptorInternal})`;
 
                     break;
                 case 'shp2wpkh':
-                    descriptorExternal = descriptors.keyExpressionBIP32({
+                    descriptorPrivate = descriptors.keyExpressionBIP32({
                         masterNode: root,
-                        originPath: WalletPaths.shp2wpkh[keyInfo.network],
+                        originPath:
+                            WalletPaths.shp2wpkh[keyInfo.network].slice(1),
                         keyPath: '/0/*',
                         isPublic: false,
                     });
 
+                    descriptorExternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath:
+                            WalletPaths.shp2wpkh[keyInfo.network].slice(1),
+                        keyPath: '/0/*',
+                        isPublic: true,
+                    });
+
                     descriptorInternal = descriptors.keyExpressionBIP32({
                         masterNode: root,
-                        originPath: WalletPaths.shp2wpkh[keyInfo.network],
+                        originPath:
+                            WalletPaths.shp2wpkh[keyInfo.network].slice(1),
                         keyPath: '/1/*',
-                        isPublic: false,
+                        isPublic: true,
                     });
+
+                    // wrap descriptor in script
+                    descriptorPrivate = `sh(wpkh(${descriptorPrivate}))`;
+                    descriptorExternal = `sh(wpkh(${descriptorExternal}))`;
+                    descriptorInternal = `sh(wpkh(${descriptorInternal}))`;
 
                     break;
             }
 
             // Clean up descriptor to fit BDK format
             // wpkh(xprv.../84'/0'/0'/0/*)
-            External = reformatDescriptorToBDK(descriptorExternal);
-            Internal = reformatDescriptorToBDK(descriptorInternal);
+            descriptorPrivate = reformatDescriptorToBDK(descriptorPrivate);
+
+            // Re-include checksums
+            descriptorPrivate = descriptorPrivate.includes('#')
+                ? descriptorPrivate.slice(0, -9)
+                : descriptorPrivate;
+
+            // Re-include appropriate checksums
+            descriptorPrivate =
+                descriptorPrivate +
+                '#' +
+                descriptors.checksum(descriptorPrivate);
+            descriptorExternal =
+                descriptorExternal +
+                '#' +
+                descriptors.checksum(descriptorExternal);
+            descriptorInternal =
+                descriptorInternal +
+                '#' +
+                descriptors.checksum(descriptorInternal);
+
+            Private = descriptorPrivate;
+            External = descriptorExternal;
+            Internal = descriptorInternal;
         } catch (e: any) {
             throw new Error(e.message);
         }
     } else {
         // Reformat single Shot
+        const xpub = root.neutered().toBase58();
+
         switch (keyInfo.type) {
             case 'wpkh':
-                descriptorExternal =
+                descriptorPrivate =
                     'wpkh' +
                     '(' +
                     xprv +
                     WalletPaths.wpkh[keyInfo.network].slice(1) +
                     '/0/*)';
+                descriptorExternal =
+                    'wpkh' +
+                    '(' +
+                    xpub +
+                    WalletPaths.wpkh[keyInfo.network].slice(1) +
+                    '/0/*)';
                 descriptorInternal =
                     'wpkh' +
                     '(' +
-                    xprv +
+                    xpub +
                     WalletPaths.wpkh[keyInfo.network].slice(1) +
                     '/1/*)';
 
                 break;
             case 'shp2wpkh':
-                descriptorExternal =
+                descriptorPrivate = 
                     'sh(wpkh' +
                     '(' +
                     xprv +
                     WalletPaths.shp2wpkh[keyInfo.network].slice(1) +
                     '/0/*))';
+                descriptorExternal =
+                    'sh(wpkh' +
+                    '(' +
+                    xpub +
+                    WalletPaths.shp2wpkh[keyInfo.network].slice(1) +
+                    '/0/*))';
                 descriptorInternal =
                     'sh(wpkh' +
                     '(' +
-                    xprv +
+                    xpub +
                     WalletPaths.shp2wpkh[keyInfo.network].slice(1) +
                     '/1/*))';
 
@@ -206,17 +271,22 @@ export const createDescriptorFromXprv = (
         }
 
         // Re-include checksums
+        descriptorPrivate = descriptorPrivate.includes('#')
+            ? descriptorPrivate.slice(0, -9)
+            : descriptorPrivate;
         descriptorExternal =
             descriptorExternal + '#' + descriptors.checksum(descriptorExternal);
         descriptorInternal =
             descriptorInternal + '#' + descriptors.checksum(descriptorInternal);
 
         // Ready to shoot
+        Private = descriptorExternal;
         External = descriptorExternal;
         Internal = descriptorInternal;
     }
 
     return {
+        priv: Private,
         external: External,
         internal: Internal,
     };
