@@ -358,7 +358,9 @@ export const parseDescriptor = (expression: string) => {
             ? descObjmap?.masterFingerprint.toString('hex')
             : descObjmap?.bip32?.fingerprint.toString('hex'),
         path: descObjmap?.path.split('/').splice(0, 4).join('/'),
-        originPath: descObjmap?.originPath,
+        originPath: descObjmap?.originPath
+            ? descObjmap?.originPath
+            : descObjmap?.path.split('/').splice(0, 4).join('/').slice(1),
         keyPath: '/' + descObjmap?.path.split('/').splice(4).join('/'),
         scriptPrefix: scripts.join('(') + '(',
         scriptSuffix: scripts.length === 3 ? '))' : ')',
