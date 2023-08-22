@@ -80,7 +80,7 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
 
 // Test Electrum server connection
 // TODO: replace this with a better method, and possibly move out to wallet-utils
-export const testElectrumServer = async (url: string, callback: any) => {
+export const getBlockHeight = async (url: string, callback: any) => {
     const config: BlockchainElectrumConfig = {
         url,
         retry: 1,
@@ -90,17 +90,19 @@ export const testElectrumServer = async (url: string, callback: any) => {
         validateDomain: false,
     };
 
+    let height!: number;
+
     try {
         const chain = await new BDK.Blockchain().create(
             config,
             BlockChainNames.Electrum,
         );
 
-        await chain.getHeight();
+        height = await chain.getHeight();
 
-        callback(true);
+        callback({status: true, blockHeight: height});
     } catch (e) {
-        callback(false);
+        callback({status: false, blockHeight: height});
     }
 };
 
