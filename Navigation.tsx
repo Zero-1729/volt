@@ -16,6 +16,8 @@ import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
 
+import TransactionDetailsView from './screens/wallet/TransactionDetails';
+
 import Apps from './screens/Apps';
 
 // QR Code Scan screen
@@ -37,6 +39,8 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
+import {TransactionType} from './types/wallet';
+
 // Root Param List for screens
 export type WalletParamList = {
     Receive: {
@@ -49,6 +53,9 @@ export type WalletParamList = {
     WalletBackup: undefined;
     AddressOwnership: undefined;
     RequestAmount: undefined;
+    TransactionView: {
+        tx: TransactionType;
+    };
 };
 
 export type ScanParamList = {
@@ -107,6 +114,10 @@ const WalletRoot = () => {
                 <WalletStack.Screen
                     name="AddressOwnership"
                     component={Ownership}
+                />
+                <WalletStack.Screen
+                    name="TransactionView"
+                    component={TransactionDetailsView}
                 />
                 <WalletStack.Screen name="Receive" component={Receive} />
                 <WalletStack.Screen
