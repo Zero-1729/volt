@@ -178,7 +178,7 @@ const Wallet = () => {
                 );
 
                 // Store newly formatted transactions from mempool.space data
-                const newTxs = [];
+                const newTxs = updated ? [] : transactions;
 
                 const addressLock = !updated;
 
@@ -256,15 +256,17 @@ const Wallet = () => {
                         newTxs.push({...tmp});
                     }
 
-                    // update wallet transactions
-                    updateWalletTransactions(currentWalletID, newTxs);
-
-                    // update wallet UTXOs
-                    updateWalletUTXOs(currentWalletID, UTXOs);
-
                     // update wallet address
                     updateWalletAddress(currentWalletID, tempReceiveAddress);
                 }
+
+                // We make this update in case of pending txs
+                // and because we already have this data from the balance update BDK call
+                // update wallet transactions
+                updateWalletTransactions(currentWalletID, newTxs);
+
+                // update wallet UTXOs
+                updateWalletUTXOs(currentWalletID, UTXOs);
 
                 setLoadLock(false);
             } catch (e: any) {
