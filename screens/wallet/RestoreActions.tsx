@@ -150,15 +150,6 @@ const ImportAction = () => {
 
     const handleDescriptor = async (descriptor: string) => {
         try {
-            if (!isAdvancedMode) {
-                conservativeAlert(
-                    'Alert',
-                    'Advanced mode must be enabled to restore from descriptor',
-                );
-
-                return;
-            }
-
             if (!isDescriptorPattern(descriptor)) {
                 errorAlert(
                     'Descriptor',
