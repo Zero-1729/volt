@@ -48,10 +48,10 @@ export type TransactionType = {
     size: number; // Transaction size in bytes
     vsize: number; // Transaction size in virtual bytes
     weight: number; // Transaction weight
-    fee?: BalanceType; // Transaction fee in sats
-    value: BalanceType; // Transaction value in sats
-    received: BalanceType; // Transaction received value in sats
-    sent: BalanceType; // Transaction sent value in sats
+    fee: number; // Transaction fee in sats
+    value: number; // Transaction value in sats
+    received: number; // Transaction received value in sats
+    sent: number; // Transaction sent value in sats
     timestamp: Date; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
     inputs?: UTXOType[]; // Transaction inputs
