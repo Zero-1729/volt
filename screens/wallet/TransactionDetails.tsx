@@ -97,7 +97,9 @@ const TransactionDetailsView = ({route}: Props) => {
                         tailwind('text-sm w-full text-center absolute top-16'),
                         {color: ColorScheme.Text.GrayedText},
                     ]}>
-                    {getTxTimestamp(route.params.tx.timestamp)}
+                    {route.params.tx.confirmed
+                        ? getTxTimestamp(route.params.tx.timestamp)
+                        : 'Pending confirmation'}
                 </Text>
 
                 <View style={[tailwind('-mt-8 justify-center px-4')]}>
@@ -113,7 +115,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         ) : (
                             <></>
                         )}
-                        {route.params.tx.confirmations === 1 ? (
+                        {!route.params.tx.confirmed ? (
                             <Broadcasted
                                 style={[tailwind('self-center mb-6')]}
                                 fill={ColorScheme.SVG.Default}
