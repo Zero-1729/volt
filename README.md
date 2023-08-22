@@ -1,9 +1,38 @@
-![Logo](./assets/volt-logo.png)
+# Volt
 
-
-# About
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+![](https://camo.githubusercontent.com/bb4c8c469821e7b1e3f2998bf0c183f700a6597106e2c28c0e62f44b2f53e710/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d3233323332332e7376673f7374796c653d666c61742d737175617265)
 
 A Modern Descriptor based Sovereign Bitcoin Wallet
+
+> What are descriptors? [Read more](https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md).
+
+# Features
+
+- [x] Descriptor-based HD wallet (wpkh(), pkh(), sh(wpkh()))
+- [x] Watch Only (public descriptor / extended public key)
+- [x] Multi-wallet support
+- [ ] Multi-lingual
+- [ ] Coin Control
+- [ ] Tor Network Support
+- [ ] Multi-Signature Descriptors
+- [ ] Lightning Network
+- [ ] Hardware Wallets (BitBox)
+- [ ] BIP86 Taproot
+- [ ] Nostr key signing & management
+
+#### Supported BIPs
+
+- [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) Mnemonic code for generating deterministic keys
+- [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) Hierarchical Deterministic Wallets
+- [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) Multi-Account Hierarchy for Deterministic Wallets
+- [BIP49](https://github.com/bitcoin/bips/blob/master/bip-0049.mediawiki) Derivation scheme for P2WPKH-nested-in-P2SH based accounts
+- [BIP84](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki) Derivation scheme for P2WPKH based accounts
+- [BIP173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki) Base32 address format for native v0-16 witness outputs
+- [BIP174](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki) Partially Signed Bitcoin Transactions
+- [BIP21](https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki) URI Scheme
+- [BIP70](https://github.com/bitcoin/bips/blob/master/bip-0070.mediawiki) Payment Protocol
+
 
 # Build
 
