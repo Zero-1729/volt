@@ -11,6 +11,8 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
+import {useNetInfo} from '@react-native-community/netinfo';
+
 import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../class/storageContext';
@@ -60,6 +62,8 @@ const Home = () => {
 
     const navigation = useNavigation();
 
+    const networkState = useNetInfo();
+
     const {
         wallets,
         hideTotalBalance,
@@ -67,7 +71,6 @@ const Home = () => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        networkState,
         fiatRate,
         updateFiatRate,
         updateWalletTransactions,

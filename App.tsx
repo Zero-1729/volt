@@ -1,15 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import 'react-native-gesture-handler';
 
-import React, {useEffect, useContext} from 'react';
+import React, {useEffect} from 'react';
 
 import {StatusBar, useColorScheme} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
-
-import {AppStorageContext} from './class/storageContext';
-
-import NetInfo from '@react-native-community/netinfo';
 
 import InitScreen from './Navigation';
 import Color from './constants/Color';
@@ -17,27 +13,8 @@ import Color from './constants/Color';
 import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
-    const {setNetworkState, networkState} = useContext(AppStorageContext);
-
-    // Subscribe
-    const unsubscribeNetInfo = NetInfo.addEventListener(state => {
-        // Limit updates to when connection drops or re-established
-        // or initial load
-        if (
-            state.isInternetReachable !== networkState?.isInternetReachable ||
-            !networkState
-        ) {
-            setNetworkState(state);
-        }
-    });
-
     useEffect(() => {
         SplashScreen.hide();
-
-        // Unmount hook
-        () => {
-            unsubscribeNetInfo();
-        };
     }, []);
 
     const ColorScheme = Color(useColorScheme());

@@ -66,7 +66,6 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
-    networkState: NetInfoType;
     appLanguage: LanguageType;
     appFiatCurrency: CurrencyType;
     loadLock: boolean;
@@ -79,7 +78,6 @@ type defaultContextType = {
     currentWalletID: string;
     isDevMode: boolean;
     electrumServerURL: ElectrumServerURLs;
-    setNetworkState: (networkState: NetInfoType) => void;
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
     updateFiatRate: (fiatObj: FiatRate) => void;
@@ -111,7 +109,6 @@ type defaultContextType = {
 // Default app context values
 const defaultContext: defaultContextType = {
     loadLock: false,
-    networkState: null,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -142,7 +139,6 @@ const defaultContext: defaultContextType = {
         testnet: 'ssl://electrum.blockstream.info:60002',
         bitcoin: 'ssl://electrum.blockstream.info:50002',
     },
-    setNetworkState: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -172,7 +168,6 @@ export const AppStorageContext =
 export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
-    const [networkState, _setNetworkState] = useState<NetInfoType>(null);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -201,8 +196,6 @@ export const AppStorageProvider = ({children}: Props) => {
 
     const {getItem: _getLoadLock, setItem: _updateLoadLock} =
         useAsyncStorage('loadLock');
-    const {getItem: _getNetworkState, setItem: _updateNetworkState} =
-        useAsyncStorage('networkState');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -250,22 +243,6 @@ export const AppStorageProvider = ({children}: Props) => {
         [_setLoadLock, _updateLoadLock],
     );
 
-    const setNetworkState = useCallback(
-        async (netState: NetInfoType) => {
-            try {
-                await _setNetworkState(netState);
-                await _updateNetworkState(JSON.stringify(netState));
-            } catch (e) {
-                console.error(
-                    `[AsyncStorage] (Network state) Error loading data: ${e} [${netState}]`,
-                );
-
-                throw new Error('Error setting network state');
-            }
-        },
-        [_setNetworkState, _updateNetworkState],
-    );
-
     const setAppLanguage = useCallback(
         async (languageObject: LanguageType) => {
             try {
@@ -289,16 +266,6 @@ export const AppStorageProvider = ({children}: Props) => {
         // ...otherwise, use default
         if (lang !== null) {
             _setAppLanguage(JSON.parse(lang));
-        }
-    };
-
-    const _loadNetworkState = async () => {
-        const netState = await _getNetworkState();
-
-        // Only update setting if a value already exists
-        // ...otherwise, use default
-        if (netState !== null) {
-            _setNetworkState(JSON.parse(netState));
         }
     };
 
@@ -997,10 +964,6 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
-        _loadNetworkState();
-    }, []);
-
-    useEffect(() => {
         _loadFiatCurrency();
     }, []);
 
@@ -1038,8 +1001,6 @@ export const AppStorageProvider = ({children}: Props) => {
             value={{
                 loadLock,
                 setLoadLock,
-                networkState,
-                setNetworkState,
                 electrumServerURL,
                 setElectrumServerURL,
                 appLanguage,

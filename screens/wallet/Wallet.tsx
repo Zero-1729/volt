@@ -15,6 +15,8 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 Dayjs.extend(calendar);
 Dayjs.extend(LocalizedFormat);
 
+import {useNetInfo} from '@react-native-community/netinfo';
+
 import {getTxData} from '../../modules/mempool';
 
 import {useTailwind} from 'tailwind-rn';
@@ -47,12 +49,13 @@ const Wallet = () => {
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
 
+    const networkState = useNetInfo();
+
     // Get current wallet ID and wallet data
     const {
         setLoadLock,
         currentWalletID,
         getWalletData,
-        networkState,
         fiatRate,
         appFiatCurrency,
         updateFiatRate,
