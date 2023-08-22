@@ -27,7 +27,12 @@ import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 
-import {syncWallet, getWalletBalance, createBDKWallet} from '../../modules/bdk';
+import {
+    syncBdkWallet,
+    getBdkWalletBalance,
+    createBDKWallet,
+    getBdkWalletTransactions,
+} from '../../modules/bdk';
 
 import {PlainButton} from '../../components/button';
 
@@ -87,13 +92,13 @@ const Wallet = () => {
         return w;
     }, []);
 
-    const syncBdkWallet = useCallback(async () => {
+    const syncWallet = useCallback(async () => {
         // initWallet only called one time
         // subsequent call is from 'bdkWallet' state
         // set in Balance fetch
         const w = bdkWallet ? bdkWallet : await initWallet();
 
-        const W = await syncWallet(
+        const W = await syncBdkWallet(
             w,
             (status: boolean) => {
                 if (status) {
@@ -127,7 +132,7 @@ const Wallet = () => {
         setRefreshing(true);
         setLoadingBalance(true);
 
-        const w = await syncBdkWallet();
+        const w = await syncWallet();
 
         try {
             const triggered = await fetchFiatRate(
@@ -156,18 +161,22 @@ const Wallet = () => {
 
         if (!loadingBalance) {
             // Update wallet balance first
-            const {balance, transactions, updated, UTXOs} =
-                await getWalletBalance(
-                    w,
-                    walletData.balance,
-                    walletData.transactions,
-                    walletData.UTXOs,
-                );
+            const {balance, updated} = await getBdkWalletBalance(
+                w,
+                walletData.balance,
+            );
 
             // update wallet balance
             updateWalletBalance(currentWalletID, balance);
 
             try {
+                const {transactions, UTXOs} = await getBdkWalletTransactions(
+                    w,
+                    walletData.network === 'testnet'
+                        ? electrumServerURL.testnet
+                        : electrumServerURL.bitcoin,
+                );
+
                 // Store newly formatted transactions from mempool.space data
                 const newTxs = [];
 
@@ -177,21 +186,18 @@ const Wallet = () => {
                 let addressIndexCount = walletData.index;
 
                 // Only attempt wallet address update if wallet balance is updated
+                // TODO: avoid mempool for now and scrap this from BDK raw tx info (Script)
                 if (updated) {
                     // iterate over all the transactions and include the missing optional fields for the TransactionType
                     for (let i = 0; i < transactions.length; i++) {
                         const tmp: TransactionType = {
                             ...transactions[i],
                             address: '',
-                            outputs: [],
-                            rbf: false,
-                            size: 0,
-                            weight: 0,
                         };
 
                         const TxData = await getTxData(
                             transactions[i].txid,
-                            walletData.network,
+                            transactions[i].network,
                         );
 
                         // Transaction inputs (remote owned addresses)
@@ -215,11 +221,6 @@ const Wallet = () => {
                                 walletData.address.address
                             ) {
                                 walletData.generateNewAddress();
-                            }
-
-                            // Set if transaction an RBF
-                            if (TxData.vin[j].sequence === '4294967293') {
-                                tmp.rbf = true;
                             }
                         }
 
@@ -252,11 +253,7 @@ const Wallet = () => {
                         }
 
                         // Update new transactions list
-                        newTxs.push({
-                            ...tmp,
-                            size: TxData.size,
-                            weight: TxData.weight,
-                        });
+                        newTxs.push({...tmp});
                     }
 
                     // update wallet transactions
