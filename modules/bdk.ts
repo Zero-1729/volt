@@ -8,7 +8,7 @@ import {
     BlockChainNames,
 } from 'bdk-rn/lib/lib/enums';
 
-import {TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
+import {LocalUtxo, TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
 
 import {
     TWalletType,
@@ -18,15 +18,8 @@ import {
     TNetwork,
     BalanceType,
 } from '../types/wallet';
-
+import {Net} from '../types/enums';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
-
-type SyncData = {
-    balance: BigNumber;
-    transactions: TransactionType[];
-    UTXOs: UTXOType[];
-    updated: boolean; // whether the balance has been indeed updated
-};
 
 export const generateMnemonic = async () => {
     const mnemonic = await new BDK.Mnemonic().create();
@@ -56,22 +49,49 @@ export const fromDescriptor = async (
     };
 };
 
+type formatTXFromBDKArgs = TransactionDetails & {
+    network: string;
+    confirmed: boolean;
+    currentBlockHeight: number;
+};
+
 // Formats transaction data from BDK to format for wallet
-export const formatTXFromBDK = (tx: any): TransactionType => {
+export const formatTXFromBDK = async (
+    tx: formatTXFromBDKArgs,
+): Promise<TransactionType> => {
     let value = new BigNumber(Math.abs(tx.sent - tx.received));
-    value = tx.sent > 0 ? value.minus(tx.fee) : value;
+    value = tx.sent > 0 ? value.minus(tx.fee as number) : value;
+
+    const txRawData = tx.transaction;
+    const rawInfo = {
+        weight: await txRawData?.weight(),
+        vsize: await txRawData?.vsize(),
+        size: await txRawData?.size(),
+        version: await txRawData?.version(),
+        isLockTimeEnabled: await txRawData?.isLockTimeEnabled(),
+        isRbf: await txRawData?.isExplicitlyRbf(),
+    };
+
+    const blockConfirms =
+        tx.currentBlockHeight - (tx.confirmationTime?.height as number);
 
     const formattedTx = {
         txid: tx.txid,
         confirmed: tx.confirmed,
-        block_height: tx.confirmationTime.height,
-        timestamp: tx.confirmationTime.timestamp,
-        fee: new BigNumber(tx.fee),
+        confirmations: blockConfirms > 0 ? blockConfirms + 1 : 0,
+        block_height: tx.confirmationTime?.height as number,
+        timestamp: tx.confirmationTime?.timestamp as any,
+        fee: new BigNumber(tx.fee as number),
         value: value,
         received: new BigNumber(tx.received),
         sent: new BigNumber(tx.sent),
         type: tx.sent - tx.received > 0 ? 'outbound' : 'inbound',
-        network: tx.network,
+        network: tx.network === 'testnet' ? Net.Testnet : Net.Bitcoin,
+        size: rawInfo.size,
+        vsize: rawInfo.vsize,
+        weight: rawInfo.weight,
+        rbf: rawInfo.isRbf,
+        memo: '',
     };
 
     // Returned formatted tx
@@ -364,12 +384,13 @@ export const syncWallet = async (
 };
 
 // Fetch Wallet Balance using wallet descriptor, metas, and electrum server
-export const getWalletBalance = async (
+export const getBdkWalletBalance = async (
     wallet: BDK.Wallet,
     oldBalance: BalanceType,
-    cachedTransactions: TransactionType[],
-    cachedUTXOs: UTXOType[],
-): Promise<SyncData> => {
+): Promise<{
+    balance: BigNumber;
+    updated: boolean;
+}> => {
     // Get wallet balance
     const retrievedBalance: Balance = await wallet.getBalance();
 
@@ -391,38 +412,56 @@ export const getWalletBalance = async (
         updated = true;
     }
 
-    // Only fetch transactions when balance has been updated
-    let TXs = cachedTransactions;
-    let UTXOs: UTXOType[] = cachedUTXOs;
-    let walletTXs = TXs;
-
-    if (updated) {
-        // Update transactions list
-        TXs = (await wallet.listTransactions(false)) as (TransactionType &
-            TransactionDetails)[];
-        UTXOs = (await wallet.listUnspent()) as UTXOType[];
-
-        // Transactions to store in wallet
-        walletTXs = [];
-
-        // Update transactions list
-        TXs.forEach((transaction: any) => {
-            walletTXs.push(
-                formatTXFromBDK({
-                    confirmed: !!transaction.confirmationTime.timestamp,
-                    network: wallet.network,
-                    ...transaction,
-                }),
-            );
-        });
-    }
-
-    // Return updated wallet balance and transactions
-    // Fallback to original wallet transactions if error fetching transactions
+    // Return updated wallet balance
     return {
         balance: balance,
-        transactions: walletTXs,
-        UTXOs: UTXOs,
         updated: updated,
     };
+};
+
+// Get transactions from BDK wallet
+// Assumes 'syncWallet' has been called
+export const getBdkWalletTransactions = async (
+    wallet: BDK.Wallet,
+    url: string,
+): Promise<{
+    transactions: TransactionType[];
+    UTXOs: UTXOType[];
+}> => {
+    let network = await wallet.network();
+
+    // Get current block height
+    let currentBlockHeight!: number;
+
+    await getBlockHeight(
+        url,
+        (args: {status: boolean; blockHeight: number}) => {
+            currentBlockHeight = args.blockHeight;
+        },
+    );
+
+    // Only fetch transactions when balance has been updated
+    let bdkTxs: TransactionDetails[] = [];
+    let bdkUtxos: LocalUtxo[] = [];
+
+    let walletTXs: TransactionType[] = [];
+
+    // Update transactions list
+    bdkTxs = await wallet.listTransactions(true);
+    bdkUtxos = await wallet.listUnspent();
+
+    // Update transactions list
+    for (const tx of bdkTxs) {
+        let reformattedData = await formatTXFromBDK({
+            confirmed: !!tx.confirmationTime?.timestamp,
+            network: network,
+            currentBlockHeight: currentBlockHeight,
+            ...tx,
+        });
+
+        walletTXs.push(reformattedData);
+    }
+
+    // Fallback to original wallet transactions if error fetching transactions
+    return {transactions: walletTXs, UTXOs: bdkUtxos as UTXOType[]};
 };
