@@ -2,7 +2,7 @@
 import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import {BalanceType, Unit} from './wallet';
+import {BalanceType, Unit, TransactionType} from './wallet';
 import BigNumber from 'bignumber.js';
 
 // Base Prop Type
