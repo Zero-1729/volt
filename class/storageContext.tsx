@@ -36,7 +36,6 @@ import {
     AddressType,
     ElectrumServerURLs,
 } from '../types/wallet';
-import {Descriptor} from 'bdk-rn/lib/classes/Descriptor';
 
 import {BaseWallet} from './wallet/base';
 import {SegWitNativeWallet} from './wallet/segwit/wpkh';
@@ -46,7 +45,6 @@ import {LegacyWallet} from './wallet/p2pkh';
 import {
     descriptorFromTemplate,
     fromDescriptorTemplatePublic,
-    fromDescriptor,
 } from '../modules/bdk';
 import {
     getMetaFromMnemonic,
@@ -796,25 +794,14 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Create descriptor from imported descriptor if available
-            // TODO: needs plumbing, corresponding xpub from xprv bad
             if (backupMaterialType === 'descriptor') {
                 const retreivedDescriptors =
                     createDescriptorfromString(backupMaterial);
 
-                const {
-                    InternalDescriptor,
-                    ExternalDescriptor,
-                    PrivateDescriptor,
-                } = await fromDescriptor(
-                    retreivedDescriptors.external,
-                    retreivedDescriptors.internal,
-                    walletArgs.network,
-                );
-
                 newWallet.setDescriptor({
-                    internal: InternalDescriptor,
-                    external: ExternalDescriptor,
-                    priv: PrivateDescriptor,
+                    internal: retreivedDescriptors.internal, // InternalDescriptor,
+                    external: retreivedDescriptors.external, // ExternalDescriptor,
+                    priv: retreivedDescriptors.priv, // PrivateDescriptor,
                 });
             }
 
