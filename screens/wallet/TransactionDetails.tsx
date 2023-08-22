@@ -104,8 +104,8 @@ const TransactionDetailsView = ({route}: Props) => {
 
                 <View style={[tailwind('-mt-8 justify-center px-4')]}>
                     <View style={[tailwind('items-center')]}>
-                        {route.params.tx.confirmations > 1 &&
-                        route.params.tx.confirmations < 6 ? (
+                        {route.params.tx.confirmations > 0 &&
+                        route.params.tx.confirmations <= 6 ? (
                             <Pending
                                 style={[tailwind('self-center mb-6')]}
                                 fill={ColorScheme.SVG.Default}

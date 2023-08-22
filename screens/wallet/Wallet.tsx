@@ -578,7 +578,7 @@ const Wallet = () => {
                                             CommonActions.navigate({
                                                 name: 'TransactionView',
                                                 params: {
-                                                    tx: item.item,
+                                                    tx: {...item.item},
                                                 },
                                             }),
                                         );
