@@ -341,7 +341,7 @@ export const createBDKWallet = async (wallet: TWalletType) => {
 };
 
 // Sync newly created wallet with electrum server
-export const syncWallet = async (
+export const syncBdkWallet = async (
     wallet: BDK.Wallet,
     callback: any,
     network: TNetwork,
