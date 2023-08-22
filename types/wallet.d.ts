@@ -48,7 +48,7 @@ export type TransactionType = {
     size: number; // Transaction size in bytes
     vsize: number; // Transaction size in virtual bytes
     weight: number; // Transaction weight
-    fee: BalanceType; // Transaction fee in sats
+    fee?: BalanceType; // Transaction fee in sats
     value: BalanceType; // Transaction value in sats
     received: BalanceType; // Transaction received value in sats
     sent: BalanceType; // Transaction sent value in sats
