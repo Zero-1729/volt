@@ -35,6 +35,7 @@ import {
 } from '../../modules/bdk';
 
 import {PlainButton} from '../../components/button';
+import {TransactionDetailsView} from '../../components/transactionDetails';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -79,6 +80,7 @@ const Wallet = () => {
 
     // Get current wallet data
     const walletData = getWalletData(currentWalletID);
+    const [currentTx, setCurrentTx] = useState<TransactionType>();
 
     // Get card color from wallet type
     const CardColor =
@@ -325,6 +327,10 @@ const Wallet = () => {
         };
     }, []);
 
+    const dropTxDetailsView = () => {
+        setCurrentTx(undefined);
+    };
+
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
     return (
@@ -522,6 +528,23 @@ const Wallet = () => {
                     </View>
                 </View>
 
+                {/* Transaction Details */}
+                {currentTx ? (
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full absolute z-50 bottom-0 h-3/5 items-center justify-center',
+                            ),
+                        ]}>
+                        <TransactionDetailsView
+                            cancelCallback={dropTxDetailsView}
+                            tx={currentTx}
+                        />
+                    </View>
+                ) : (
+                    <></>
+                )}
+
                 {/* Transactions List */}
                 <View
                     style={[
@@ -572,7 +595,12 @@ const Wallet = () => {
                                 },
                             )}
                             renderItem={item => (
-                                <TransactionListItem tx={item.item} />
+                                <TransactionListItem
+                                    callback={() => {
+                                        setCurrentTx(item.item);
+                                    }}
+                                    tx={item.item}
+                                />
                             )}
                             keyExtractor={item => item.txid}
                             initialNumToRender={25}
