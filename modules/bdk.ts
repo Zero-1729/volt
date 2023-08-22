@@ -50,8 +50,9 @@ export const formatTXFromBDK = async (
         isRbf: await txRawData?.isExplicitlyRbf(),
     };
 
+    const txBlockHeight = tx.confirmationTime?.height as number;
     const blockConfirms =
-        tx.currentBlockHeight - (tx.confirmationTime?.height as number);
+        txBlockHeight > 0 ? tx.currentBlockHeight - txBlockHeight : 0;
 
     const formattedTx = {
         txid: tx.txid,
