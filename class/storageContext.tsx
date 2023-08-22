@@ -32,7 +32,6 @@ import {
     UTXOType,
     TransactionType,
     BaseWalletArgs,
-    NetInfoType,
     AddressType,
     ElectrumServerURLs,
 } from '../types/wallet';

@@ -2,7 +2,6 @@
 import 'react';
 
 import BigNumber from 'bignumber.js';
-import {NetInfoState} from '@react-native-community/netinfo';
 
 import {SegWitNativeWallet} from '../class/wallet/segwit/wpkh';
 import {SegWitP2SHWallet} from '../class/wallet/segwit/shp2wpkh';
@@ -14,8 +13,6 @@ import {Network} from 'bdk-rn/lib/lib/enums';
 import {Net} from './enums';
 
 export type TNetwork = Net | Network;
-
-export type NetInfoType = NetInfoState | null;
 
 export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
 
