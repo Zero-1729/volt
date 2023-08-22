@@ -316,6 +316,13 @@ const Wallet = () => {
             refreshWallet();
             setSingleLoadLock(true);
         }
+
+        // Kill all loading effects
+        () => {
+            setRefreshing(false);
+            setLoadingBalance(false);
+            setLoadLock(false);
+        };
     }, []);
 
     // Receive Wallet ID and fetch wallet data to display
