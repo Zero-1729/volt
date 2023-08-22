@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import 'react-native-gesture-handler';
 
 import React, {useEffect} from 'react';
@@ -14,7 +15,7 @@ import SplashScreen from 'react-native-splash-screen';
 const App = () => {
     useEffect(() => {
         SplashScreen.hide();
-    });
+    }, []);
 
     const ColorScheme = Color(useColorScheme());
 

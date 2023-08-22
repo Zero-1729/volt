@@ -7,11 +7,12 @@ import {
     BalanceType,
     TransactionType,
     UTXOType,
-    NetType,
-    baseWalletArgs,
-    addressType,
+    BaseWalletArgs,
+    AddressType,
     DescriptorObject,
+    TNetwork,
 } from './../../types/wallet';
+import {Net} from './../../types/enums';
 
 import {
     getAddressPath,
@@ -19,11 +20,9 @@ import {
     generateAddressFromXKey,
 } from '../../modules/wallet-utils';
 
-import {
-    WalletPaths,
-    GAP_LIMIT,
-    descXpubPattern,
-} from '../../modules/wallet-defaults';
+import {WalletPaths, GAP_LIMIT} from '../../modules/wallet-defaults';
+
+import {parseDescriptor} from '../../modules/descriptors';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
@@ -35,7 +34,7 @@ export class BaseWallet {
             type: obj.type,
             xprv: obj.xprv,
             xpub: obj.xpub,
-            secret: obj.secret,
+            mnemonic: obj.mnemonic,
             network: obj.network,
         });
 
@@ -45,6 +44,7 @@ export class BaseWallet {
 
         wallet.externalDescriptor = obj.externalDescriptor;
         wallet.internalDescriptor = obj.internalDescriptor;
+        wallet.privateDescriptor = obj.privateDescriptor;
 
         wallet.addresses = obj.addresses;
         wallet.address = obj.address;
@@ -74,12 +74,13 @@ export class BaseWallet {
 
     externalDescriptor: string;
     internalDescriptor: string;
+    privateDescriptor: string;
 
     birthday: string | Date;
 
     gap_limit: number;
 
-    secret: string;
+    mnemonic: string;
     xprv: string;
     xpub: string;
 
@@ -91,7 +92,7 @@ export class BaseWallet {
     UTXOs: UTXOType[];
 
     addresses: Array<string>;
-    address: addressType;
+    address: AddressType;
 
     syncedBalance: number;
     lastSynced: number;
@@ -99,12 +100,12 @@ export class BaseWallet {
 
     derivationPath: string;
 
-    network: NetType;
+    network: TNetwork;
 
     hardwareWalletEnabled: boolean;
     hasBackedUp: boolean;
 
-    constructor(args: baseWalletArgs) {
+    constructor(args: BaseWalletArgs) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = args.name; // Wallet name
 
@@ -130,7 +131,7 @@ export class BaseWallet {
         this.gap_limit = GAP_LIMIT; // Gap limit for wallet
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = args.network ? args.network : 'testnet'; // Can have 'bitcoin' or 'testnet' wallet
+        this.network = args.network ? args.network : Net.Testnet; // Can have 'bitcoin' or 'testnet' wallet
 
         this.transactions = []; // List of wallet transactions
         this.UTXOs = []; // Set of wallet UTXOs
@@ -144,18 +145,19 @@ export class BaseWallet {
 
         this.internalDescriptor = ''; // Wallet internal descriptor
         this.externalDescriptor = ''; // Wallet external descriptor
+        this.privateDescriptor = ''; // Wallet external private descriptor (default to external public descriptor if no private key material)
 
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
 
-        this.secret = args.secret ? args.secret : '';
+        this.mnemonic = args.mnemonic ? args.mnemonic : '';
 
         this.isWatchOnly = false; // Whether wallet is watch only
 
         this.masterFingerprint = args.fingerprint ? args.fingerprint : ''; // Wallet master fingerprint
     }
 
-    generateNewAddress(index?: number): addressType {
+    generateNewAddress(index?: number): AddressType {
         try {
             let idx = index ? index : this.index;
             let address!: string;
@@ -168,12 +170,12 @@ export class BaseWallet {
             );
 
             // Generate address using either mnemonic or xpub
-            if (this.secret.length > 0) {
+            if (this.mnemonic.length > 0) {
                 address = generateAddressFromMnemonic(
                     addressPath,
                     this.network,
                     this.type,
-                    this.secret,
+                    this.mnemonic,
                 );
             } else {
                 address = generateAddressFromXKey(
@@ -189,7 +191,7 @@ export class BaseWallet {
 
             return {
                 address: address,
-                path: this.derivationPath,
+                path: addressPath,
                 change: false,
                 index: idx,
                 memo: '',
@@ -208,19 +210,19 @@ export class BaseWallet {
         // i.e. no mnemonic, xprv, or descriptor with xprv
         if (isWatchOnly === undefined) {
             const noPrivKeys =
-                this.secret.length === 0 && this.xprv.length === 0;
+                this.mnemonic.length === 0 && this.xprv.length === 0;
 
-            // Naively check if extended pub key present
-            // i.e. no prv key material in descriptor
-            // Make sure descriptor is not empty, else assume no prv key material
-            const noPrivKeyDescriptor =
-                this.externalDescriptor !== ''
-                    ? this.externalDescriptor.match(descXpubPattern)
-                    : true;
+            // Get private descriptor info and check
+            // if it contains a private extended key
+            const privateDescriptorInfo = parseDescriptor(
+                this.privateDescriptor,
+            );
 
-            if (noPrivKeys && noPrivKeyDescriptor) {
+            // If no private keys and descriptor is public, then watch-only
+            if (noPrivKeys && privateDescriptorInfo.isPublic) {
                 this.isWatchOnly = true;
             }
+
             return;
         }
 
@@ -262,9 +264,12 @@ export class BaseWallet {
     setDescriptor(descriptor: DescriptorObject) {
         this.internalDescriptor = descriptor.internal;
         this.externalDescriptor = descriptor.external;
+
+        // The external descriptor with private key
+        this.privateDescriptor = descriptor.priv;
     }
 
-    setAddress(address: addressType) {
+    setAddress(address: AddressType) {
         this.address = address;
     }
 }

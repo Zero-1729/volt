@@ -13,24 +13,25 @@ const bip32 = BIP32Factory(ecc);
 import Crypto from 'react-native-quick-crypto';
 
 import {
-    descriptorSymbolsType,
-    BackupMaterialTypes,
-    NetType,
+    DescriptorSymbolsType,
+    TNetwork,
     TransactionType,
 } from '../types/wallet';
+import {BackupMaterial, Net} from '../types/enums';
 
 import {
     validExtendedKeyPrefixes,
     BJSNetworks,
     extendedKeyInfo,
     WalletPaths,
-    DescriptorType,
-    wrappedWalletDescriptorRegex,
-    nativeWalletDescriptorRegex,
+} from './wallet-defaults';
+
+import {
+    descriptorRegex,
     xprvPattern,
     xpubPattern,
     extendedKeyPattern,
-} from './wallet-defaults';
+} from './re';
 
 export const getUniqueTXs = (
     transactions: TransactionType[],
@@ -61,14 +62,11 @@ export const mnemonicToSeedSync = (mnemonic: string) => {
 };
 
 export const isDescriptorPattern = (expression: string) => {
-    return (
-        nativeWalletDescriptorRegex.test(expression) ||
-        wrappedWalletDescriptorRegex.test(expression)
-    );
+    return descriptorRegex.test(expression);
 };
 
 // Descriptor Symbols
-export const descriptorSymbols: descriptorSymbolsType = [
+export const descriptorSymbols: DescriptorSymbolsType = [
     '[',
     ']',
     '(',
@@ -85,7 +83,7 @@ const _getPrefix = (key: string): string => {
     return key.slice(0, 4);
 };
 
-export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
+export const getExtendedKeyPrefix = (key: string): BackupMaterial => {
     const prefix = _getPrefix(key);
 
     if (!isExtendedKey(key)) {
@@ -96,7 +94,9 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterialTypes => {
         throw new Error('Unsupported extended key');
     }
 
-    return prefix.slice(1) === 'pub' ? 'xpub' : 'xprv';
+    return prefix.slice(1) === 'pub'
+        ? BackupMaterial.Xpub
+        : BackupMaterial.Xprv;
 };
 
 export const isSupportedExtKey = (key: string): boolean => {
@@ -118,7 +118,7 @@ export const isExtendedKey = (key: string): boolean => {
 export const getInfoFromXKey = (key: string) => {
     const prefix = _getPrefix(key);
 
-    return extendedKeyInfo[prefix];
+    return extendedKeyInfo[prefix[0]];
 };
 
 export const isValidExtendedKey = (
@@ -166,30 +166,31 @@ const _doubleSha256 = (data: Buffer) => {
 
 // Based on Jlopp's code here:
 // https://github.com/jlopp/xpub-converter
-export const convertXPUB = (xpub: string, pub_prefix: string): string => {
-    // Grab new xpub version to convert to
-    const ver = validExtendedKeyPrefixes.get(pub_prefix);
+export const convertXKey = (xkey: string, key_prefix: string): string => {
+    // Grab new xkey version to convert to
+    const ver = validExtendedKeyPrefixes.get(key_prefix);
+    const keyType = key_prefix === 'pub' ? 'public' : 'private';
 
     // Make sure the version is a valid one we support
     if (!ver) {
-        throw new Error('Invalid extended public key version');
+        throw new Error(`Invalid extended ${keyType} key version`);
     }
 
     try {
-        // Get the decoded key from trimmed xpub
-        const decoded = _deserializeExtendedKeyCheck(xpub.trim());
+        // Get the decoded key from trimmed xkey
+        const decoded = _deserializeExtendedKeyCheck(xkey.trim());
 
-        // Cut off prefix to include new xpub version
+        // Cut off prefix to include new xkey version
         const data = decoded.subarray(4);
 
         // Re-attach data with new prefix
-        const nPub = Buffer.concat([Buffer.from(ver, 'hex'), data]);
+        const xKey = Buffer.concat([Buffer.from(ver, 'hex'), data]);
 
         // Return new Base58 formatted key
-        return b58c.encode(nPub);
+        return b58c.encode(xKey);
     } catch (e) {
         // Assume an invalid key if unable to disassemble and re-assemble
-        throw new Error('Invalid extended public key');
+        throw new Error(`Invalid extended ${keyType} key`);
     }
 };
 
@@ -197,88 +198,6 @@ const _get256Checksum = (data: string): string => {
     const hashed_data = _doubleSha256(Buffer.from(data, 'hex'));
 
     return hashed_data.slice(0, 4).toString('hex');
-};
-
-// Get descriptor components
-// Descriptor format:
-// {script}({xprv/xpub})
-// E.g. wpkh(tprv8ZgxMBicQKsPd97TPtNtP25LfqmXxDQa4fwJhtWcbc896RTiemtHnQmJNccVQJTH7eU3EpzqdyVJd9JPX1SQy9oKXfhm9o5mAHYEN3rcdV6)
-export const getDescriptorParts = (descriptor: string) => {
-    // extract descriptor prefix
-    const parts = descriptor.split('(');
-
-    // use this to ensure we aren't using defaults but descriptor path
-    let fingerprint = '';
-    let path = '';
-    let key = '';
-    let network = '';
-    let scriptPrefix = '';
-    let scriptSuffix = '';
-
-    const scripts = parts.length === 3 ? [parts[0], parts[1]] : [parts[0]];
-
-    const data =
-        parts.length === 3 ? parts[2].split(')')[0] : parts[1].split(')')[0];
-
-    // handle case for fingerprint + path
-    if (data[0] === '[') {
-        if (/([a-e0-9]{8})/.test(data)) {
-            let ret = /([a-e0-9]{8})/.exec(data);
-
-            fingerprint = ret ? ret[0] : '';
-        }
-
-        if (/(\/[1-9]{2}h)(\/[0-9]h|\*)*/.test(data)) {
-            let ret = /(\/[1-9]{2}h)(\/[0-9]h|\*)*/.exec(data);
-
-            path = (ret ? ret[0] : '').replace(/h/g, "'");
-        }
-
-        key = data.split(']')[1];
-        network = extendedKeyInfo[data.split(']')[1][0]].network;
-        scriptPrefix = scripts[0] + '(';
-        scriptSuffix = ')';
-    }
-
-    // Extract checksum if any
-    let checksum = '';
-    let checksumArray = parts.slice(-1)[0].split('#').slice(-1);
-
-    if (checksum.includes('#')) {
-        checksum = checksumArray[0];
-    }
-
-    // Gather data assuming non-nested script
-    let components = {
-        key: key,
-        keyOnly: key.split('/')[0],
-        network: network,
-        type: DescriptorType[scripts[0]],
-        fingerprint: fingerprint,
-        path: 'm/' + path.slice(1),
-        scriptPrefix: scriptPrefix,
-        scriptSuffix: scriptSuffix,
-        checksum: checksum,
-    };
-
-    // Handle nested script case
-    if (scripts[0] === 'sh' && scripts[1] === 'wpkh' && parts.length === 3) {
-        // Extract embedded key
-        key = data[0] === '[' ? data.split(']')[1] : data[0];
-
-        components.key = key;
-        components.keyOnly = key.split('/')[0];
-
-        // Set network and wallet type from descriptor
-        components.network = extendedKeyInfo[key[0]].network;
-        components.type = DescriptorType[scripts[0]];
-        components.fingerprint = fingerprint;
-        components.path = 'm/' + path.slice(1);
-        components.scriptPrefix = scripts[0] + '(' + scripts[1] + '(';
-        components.scriptSuffix = '))';
-    }
-
-    return components;
 };
 
 // Return a wallet address path from a given index and whether it is a change or receiving address
@@ -303,6 +222,12 @@ export const getAddressPath = (
     return `${prefix}/${changePrefix}/${index}`;
 };
 
+export const getRawRootFromXprv = (xprv: string) => {
+    const network = extendedKeyInfo[xprv[0]].network;
+
+    return bip32.fromBase58(xprv, BJSNetworks[network]);
+};
+
 export const generateRootFromXKey = (
     xkey: string,
     net: string,
@@ -312,14 +237,14 @@ export const generateRootFromXKey = (
     let key = xkey;
 
     // We must normalize the xpub for bitcoinjs-lib
-    if (prefix === 'xpub') {
-        key = normalizeXpub(xkey);
+    if (prefix === BackupMaterial.Xpub) {
+        key = normalizeExtKey(xkey, 'pub');
     }
 
     let root = bip32.fromBase58(key, BJSNetworks[net]);
 
     // Check that xpub given is three levels deep
-    if (prefix === 'xpub') {
+    if (prefix === BackupMaterial.Xpub) {
         if (root.depth === 0) {
             throw new Error(
                 '0-depth xpub missing private to generate hardened child key.',
@@ -335,7 +260,7 @@ export const generateRootFromXKey = (
 
     // Derive root using address path if xprv given
     // Otherwise, assume xpub given is three level deep
-    if (prefix === 'xprv') {
+    if (prefix === BackupMaterial.Xprv) {
         root = root.derivePath(addressPath);
     }
 
@@ -343,11 +268,11 @@ export const generateRootFromXKey = (
 };
 
 export const generateRootFromMnemonic = (
-    secret: string,
+    mnemonic: string,
     path: string,
     net: string,
 ): BIP32Interface => {
-    const seed = mnemonicToSeedSync(secret);
+    const seed = mnemonicToSeedSync(mnemonic);
     const root = bip32.fromSeed(seed, BJSNetworks[net]);
 
     return root.derivePath(path);
@@ -371,9 +296,9 @@ export const generateAddressFromMnemonic = (
     addressPath: string,
     net: string,
     type: string,
-    secret: string,
+    mnemonic: string,
 ): string => {
-    const pubKey = generateRootFromMnemonic(secret, addressPath, net);
+    const pubKey = generateRootFromMnemonic(mnemonic, addressPath, net);
 
     const address = _generateAddress(net, type, pubKey);
 
@@ -393,7 +318,7 @@ const _generateAddress = (
     let keyPair = root;
 
     switch (type) {
-        case 'legacy':
+        case 'p2pkh':
             const P2PKData = bitcoin.payments.p2pkh({
                 pubkey: keyPair.publicKey,
                 network,
@@ -402,7 +327,7 @@ const _generateAddress = (
             address = P2PKData.address;
             break;
 
-        case 'bech32':
+        case 'wpkh':
             const P2WPKHData = bitcoin.payments.p2wpkh({
                 pubkey: keyPair.publicKey,
                 network,
@@ -411,7 +336,7 @@ const _generateAddress = (
             address = P2WPKHData.address;
             break;
 
-        case 'p2sh':
+        case 'shp2wpkh':
             const P2SHData = bitcoin.payments.p2sh({
                 redeem: bitcoin.payments.p2wpkh({
                     pubkey: keyPair.publicKey,
@@ -430,7 +355,7 @@ const _generateAddress = (
 export const getMetaFromMnemonic = (
     mnemonic: string,
     walletPath: string,
-    network: NetType,
+    network: TNetwork,
 ) => {
     const seed = mnemonicToSeedSync(mnemonic);
     const node = bip32.fromSeed(seed, BJSNetworks[network]);
@@ -444,13 +369,13 @@ export const getMetaFromMnemonic = (
     };
 };
 
-export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
+export const getPubKeyFromXprv = (xprv: string, network: Net) => {
     const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
+    const key = normalizeExtKey(xprv, 'prv');
 
-    // TODO: handle zpub/prv case && other exotic prefixes
     const derivationPath = WalletPaths[keyInfo.type][network];
 
-    let node = bip32.fromBase58(xprv, BJSNetworks[network]);
+    let node = bip32.fromBase58(key, BJSNetworks[network]);
 
     // Report if not master of 3-depth node
     if (node.depth !== 0 && node.depth !== 3) {
@@ -468,12 +393,11 @@ export const getPubKeyFromXprv = (xprv: string, network: NetType) => {
     return node.neutered().toBase58();
 };
 
-export const getFingerprintFromXkey = (xkey: string, network: NetType) => {
-    let key = xkey;
-
-    if (getExtendedKeyPrefix(xkey) === 'xpub') {
-        key = normalizeXpub(xkey);
-    }
+export const getFingerprintFromXkey = (xkey: string, network: Net) => {
+    // Normalize ext key in case of exotic key
+    const normalizeSuffix =
+        getExtendedKeyPrefix(xkey) === BackupMaterial.Xpub ? 'pub' : 'prv';
+    const key = normalizeExtKey(xkey, normalizeSuffix);
 
     const node = bip32.fromBase58(key, BJSNetworks[network]);
 
@@ -490,19 +414,19 @@ const _getParentFingerprintHex = (xkey: string): string => {
     return Buffer.from(decoded.subarray(5, 9)).toString('hex');
 };
 
-export const normalizeXpub = (xpub: string) => {
-    const network = extendedKeyInfo[_getPrefix(xpub)[0]].network;
+export const normalizeExtKey = (xkey: string, key_type: string) => {
+    const network = extendedKeyInfo[_getPrefix(xkey)[0]].network;
 
-    // Bitcoinjs-lib supports only tpub and xpub prefixes
-    // Convert exotic prefixes to tpub or xpub
-    if (['u', 'v', 'y', 'z'].includes(xpub[0])) {
-        const convertedXPUB = convertXPUB(
-            xpub,
-            network === 'testnet' ? 'tpub' : 'xpub',
+    // Bitcoinjs-lib & BDK only support tpub/prv and xpub/prv prefixes
+    // Convert exotic prefixes to tpub/prv or xpub/prv
+    if (['u', 'v', 'y', 'z'].includes(xkey[0])) {
+        const convertedKey = convertXKey(
+            xkey,
+            network === 'testnet' ? `t${key_type}` : `x${key_type}`,
         );
 
-        return convertedXPUB;
+        return convertedKey;
     }
 
-    return xpub;
+    return xkey;
 };

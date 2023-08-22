@@ -128,10 +128,6 @@
   margin-right: -0.25rem
 }
 
-.-mt-10 {
-  margin-top: -2.5rem
-}
-
 .-mt-12 {
   margin-top: -3rem
 }
@@ -346,6 +342,10 @@
 
 .w-4\/5 {
   width: 80%
+}
+
+.w-4\/6 {
+  width: 66.666667%
 }
 
 .w-5\/6 {

@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
 import React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -32,7 +31,7 @@ import Network from './screens/settings/Network';
 
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
-import Xpub from './screens/settings/tools/Xpub';
+import ExtendedKey from './screens/settings/tools/ExtendedKey';
 
 import About from './screens/settings/About';
 import License from './screens/settings/License';
@@ -78,7 +77,7 @@ const SettingsRoot = () => {
             <SettingsStack.Group screenOptions={{presentation: 'modal'}}>
                 <SettingsStack.Screen name="License" component={License} />
                 <SettingsStack.Screen name="Release" component={Release} />
-                <SettingsStack.Screen name="XpubTool" component={Xpub} />
+                <SettingsStack.Screen name="XKeyTool" component={ExtendedKey} />
             </SettingsStack.Group>
         </SettingsStack.Navigator>
     );

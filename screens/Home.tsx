@@ -8,13 +8,21 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
+
+import {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import {getWalletBalance} from '../modules/bdk';
+import {
+    createBDKWallet,
+    getBdkWalletBalance,
+    getBdkWalletTransactions,
+    syncBdkWallet,
+} from '../modules/bdk';
 
 import Dots from '../assets/svg/kebab-horizontal-24.svg';
 import Add from '../assets/svg/plus-32.svg';
@@ -30,8 +38,6 @@ import {TransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
 import {BalanceType, TransactionType} from '../types/wallet';
-
-import NetInfo from '@react-native-community/netinfo';
 
 import {FiatBalance} from '../components/balance';
 
@@ -61,6 +67,8 @@ const Home = () => {
 
     const navigation = useNavigation();
 
+    const networkState = useNetInfo();
+
     const {
         wallets,
         hideTotalBalance,
@@ -68,8 +76,6 @@ const Home = () => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        setNetworkState,
-        networkState,
         fiatRate,
         updateFiatRate,
         updateWalletTransactions,
@@ -78,21 +84,12 @@ const Home = () => {
         electrumServerURL,
     } = useContext(AppStorageContext);
 
-    const [initFiatRate, setInitFiatRate] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
+    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
-
-    // Subscribe
-    NetInfo.addEventListener(state => {
-        // Limit updates to when connection drops or re-established
-        // or initial load
-        if (state.isConnected !== networkState?.isConnected || !networkState) {
-            setNetworkState(state);
-        }
-    });
 
     // add the total balances of the wallets
     const totalBalance: BalanceType = wallets.reduce(
@@ -112,11 +109,26 @@ const Home = () => {
         return getUniqueTXs(transactions);
     };
 
+    const initWallet = useCallback(async () => {
+        const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
+
+        await syncBdkWallet(
+            w,
+            (status: boolean) => {
+                console.log('[BDK] synced wallet', status);
+            },
+            wallet.network,
+            electrumServerURL,
+        );
+
+        return w;
+    }, []);
+
     // Fiat fetch
     const singleSyncFiatRate = useCallback(
         async (ticker: string, violate: boolean = false) => {
             // Only proceed if initial load or if user select new currency in settings
-            if (!initFiatRate || violate) {
+            if (violate) {
                 try {
                     await fetchFiatRate(
                         ticker,
@@ -153,7 +165,7 @@ const Home = () => {
         }
 
         // Only attempt load if connected to network
-        if (!networkState?.isConnected) {
+        if (!networkState?.isInternetReachable) {
             setRefreshing(false);
             return;
         }
@@ -163,6 +175,8 @@ const Home = () => {
 
         // Set refreshing
         setRefreshing(true);
+
+        const w = await initWallet();
 
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
@@ -182,15 +196,18 @@ const Home = () => {
         }
 
         // Check net again, just in case there is a drop mid execution
-        if (!networkState?.isConnected) {
+        if (!networkState?.isInternetReachable) {
             setRefreshing(false);
             return;
         }
 
         // Sync wallet
-        const {transactions, balance} = await getWalletBalance(
-            wallet,
-            electrumServerURL,
+        const {balance} = await getBdkWalletBalance(w, wallet.balance);
+        const {transactions} = await getBdkWalletTransactions(
+            w,
+            wallet.network === 'testnet'
+                ? electrumServerURL.testnet
+                : electrumServerURL.bitcoin,
         );
 
         // Kill refreshing
@@ -204,19 +221,22 @@ const Home = () => {
 
         // Kill loading
         setLoadingBalance(false);
+
+        // set bdk wallet
+        setBdkWallet(w);
     }, [
         setRefreshing,
         fiatRate,
         appFiatCurrency,
         updateFiatRate,
-        networkState?.isConnected,
+        networkState?.isInternetReachable,
     ]);
 
     // Fetch the fiat rate on currency change
     useEffect(() => {
         // Avoid fiat rate update call when offline
         // or when newly loaded screen to avoid dup call
-        if (!networkState?.isConnected || !initFiatRate) {
+        if (!networkState?.isInternetReachable) {
             return;
         }
 
@@ -229,9 +249,9 @@ const Home = () => {
     useEffect(() => {
         // Only attempt update when initial fiat rate update call
         // and wallets exists
-        if (!initFiatRate && wallets.length > 0) {
+        if (wallets.length > 0) {
             // Avoid fiat rate update call when offline
-            if (!networkState?.isConnected) {
+            if (!networkState?.isInternetReachable) {
                 return;
             }
 
@@ -240,11 +260,8 @@ const Home = () => {
 
             // Single shot call to update fiat rate
             singleSyncFiatRate(appFiatCurrency.short);
-
-            // Kill initial load lock
-            setInitFiatRate(true);
         }
-    });
+    }, []);
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (

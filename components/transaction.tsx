@@ -17,6 +17,7 @@ import {RNHapticFeedbackOptions} from '../constants/Haptic';
 import {PlainButton} from './button';
 
 import {TXBalance} from './balance';
+import {Net} from '../types/enums';
 
 import {TxListItemProps} from '../types/props';
 
@@ -40,7 +41,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
     // Get URL for mempool.space
     const getURL = (txid: string) => {
         return `https://mempool.space/${
-            props.tx.network === 'testnet' ? 'testnet/' : ''
+            props.tx.network === Net.Testnet ? 'testnet/' : ''
         }tx/${txid}`;
     };
 

@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -57,13 +56,13 @@ const Index = () => {
                 <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
                 {/* Wallet Tools */}
-                {/* Xpub Converter */}
+                {/* Extended Key Converter */}
                 <PlainButton
                     style={[tailwind('w-5/6 mb-6')]}
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({
-                                name: 'XpubTool',
+                                name: 'XKeyTool',
                             }),
                         );
                     }}>
@@ -76,7 +75,7 @@ const Index = () => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Xpub Converter
+                            Extended Key Converter
                         </Text>
 
                         <View style={[tailwind('items-center')]}>

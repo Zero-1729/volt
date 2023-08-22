@@ -1,29 +1,19 @@
 // Set of wallet default aliases, metadata, and types
-import {
-    accountPaths,
-    extendedKeyInfoType,
-    BDKWalletTypes,
-} from '../types/wallet';
+import {Net} from './../types/enums';
+import {AccountPaths, ExtendedKeyInfoType} from '../types/wallet';
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
-    bech32: ['Native Segwit', 'bc1...'],
-    legacy: ['Legacy', '1...'],
-    p2sh: ['Segwit', '3...'],
-};
-
-// BDK Wallet name aliases
-export const BDKWalletTypeNames: {[index: string]: BDKWalletTypes} = {
-    bech32: 'wpkh',
-    legacy: 'p2pkh',
-    p2sh: 'shp2wpkh',
+    wpkh: ['Native Segwit', 'bc1...'],
+    p2pkh: ['Legacy', '1...'],
+    shp2wpkh: ['Segwit', '3...'],
 };
 
 // Descriptor type reverse aliases
 export const DescriptorType: {[index: string]: string} = {
-    pkh: 'legacy',
-    wpkh: 'bech32',
-    sh: 'p2sh',
+    p2pkh: 'P2PKH',
+    wpkh: 'WPKH',
+    shp2wpkh: 'P2SH-P2WPKH',
 };
 
 // PATH DEFINITIONS
@@ -60,10 +50,10 @@ export const DescriptorType: {[index: string]: string} = {
     Bitcoin Testnet	    second	    change	      second	  m / 44' / 1' / 1' / 1 / 1
 
 */
-export const WalletPaths: {[index: string]: accountPaths} = {
-    bech32: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
-    legacy: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
-    p2sh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
+export const WalletPaths: {[index: string]: AccountPaths} = {
+    wpkh: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
+    p2pkh: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
+    shp2wpkh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
 };
 
 // Network definitions
@@ -130,44 +120,20 @@ export const validExtendedKeyPrefixes = new Map([
 ]);
 
 // Supported extended key versions
-export const xpubVersions = ['xpub', 'ypub', 'zpub', 'tpub', 'upub', 'vpub'];
+export const supportedExtVersions = ['x', 'y', 'z', 't', 'u', 'v'];
 
 // Supported extended key version metadata definitions
-export const extendedKeyInfo: {[index: string]: extendedKeyInfoType} = {
+export const extendedKeyInfo: {[index: string]: ExtendedKeyInfoType} = {
     // mainnet / bitcoin
-    x: {network: 'bitcoin', type: 'bech32'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    y: {network: 'bitcoin', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    z: {network: 'bitcoin', type: 'bech32'}, // Account path P2WPKH [bc1...]
+    x: {network: Net.Bitcoin, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    y: {network: Net.Bitcoin, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    z: {network: Net.Bitcoin, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 
     // testnet
-    t: {network: 'testnet', type: 'bech32'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    u: {network: 'testnet', type: 'p2sh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    v: {network: 'testnet', type: 'bech32'}, // Account path P2WPKH [bc1...]
+    t: {network: Net.Testnet, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    u: {network: Net.Testnet, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    v: {network: Net.Testnet, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 };
 
 // Wallet Gap Limit
 export const GAP_LIMIT = 20;
-
-// Regexes
-// -----------------
-// Descriptor Regexes
-// For now, we only support single key descriptors
-// with three specific script types (legacy, P2SH, and Bech32)
-//  i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’
-// Includes support for optional fingerprint + wallet origin path prefix, (i.e. [abce1234/49h/0h/0h])
-// Includes support for optional key path + wildcard suffix (i.e., /0/*)
-// Includes support for optional wallet origin path and optional wildcard (i.e., /84'/0'/0'/0/*)
-export const nativeWalletDescriptorRegex =
-    /^((wpkh|pkh)\((\[([a-e0-9]{8})(\/[1-9]{2}(h|'))*(\/([0-9](h|'|\*)))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)(#[a-z0-9]{8})?)$/;
-export const wrappedWalletDescriptorRegex =
-    /^(sh\(wpkh\((\[([a-e0-9]{8})(\/[1-9]{2}(h|'))*(\/([0-9](h|'|\*)))*\])*([xyztuv]((pub|prv))[1-9A-HJ-NP-Za-km-z]{79,108})(\/[0-9]+)*(\/\*)?\)\)(#[a-z0-9]{8})?)$/;
-
-// Extended Key Regexes
-export const extendedKeyPattern: RegExp =
-    /^([XxyYzZtuUvV](pub|prv)[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-export const descXpubPattern: RegExp =
-    /([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})/g;
-export const xpubPattern: RegExp =
-    /^([xyztuv]pub[1-9A-HJ-NP-Za-km-z]{79,108})$/;
-export const xprvPattern: RegExp =
-    /^([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})$/;

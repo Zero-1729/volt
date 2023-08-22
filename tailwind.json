@@ -164,11 +164,6 @@
 			"marginRight": -4
 		}
 	},
-	"-mt-10": {
-		"style": {
-			"marginTop": -40
-		}
-	},
 	"-mt-12": {
 		"style": {
 			"marginTop": -48
@@ -437,6 +432,11 @@
 	"w-4/5": {
 		"style": {
 			"width": "80%"
+		}
+	},
+	"w-4/6": {
+		"style": {
+			"width": "66.666667%"
 		}
 	},
 	"w-5/6": {

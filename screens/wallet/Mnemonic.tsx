@@ -33,7 +33,7 @@ const Mnemonic = () => {
         const components: JSX.Element[] = [];
 
         // iterate over seed words and create a styled component for each
-        displayNumberedSeed(walletData.secret).forEach((word, index) => {
+        displayNumberedSeed(walletData.mnemonic).forEach((word, index) => {
             components.push(
                 <View style={[tailwind('m-1 rounded-sm')]} key={index}>
                     <Text

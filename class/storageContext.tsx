@@ -15,39 +15,42 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 
 import {LanguageType, CurrencyType} from '../types/settings';
+
+import {
+    parseDescriptor,
+    includeDescriptorKeyPath,
+    createDescriptorFromXprv,
+    createDescriptorfromString,
+} from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
+import {BackupMaterial, Net} from '../types/enums';
 import {
     TWalletType,
     Unit,
     BalanceType,
     FiatRate,
     UTXOType,
-    BackupMaterialTypes,
     TransactionType,
-    NetType,
-    baseWalletArgs,
-    NetInfoType,
-    addressType,
-    electrumServerURLs,
+    BaseWalletArgs,
+    AddressType,
+    ElectrumServerURLs,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
-import {SegWitNativeWallet} from './wallet/segwit/bech32';
-import {SegWitP2SHWallet} from './wallet/segwit/p2sh';
-import {LegacyWallet} from './wallet/legacy';
+import {SegWitNativeWallet} from './wallet/segwit/wpkh';
+import {SegWitP2SHWallet} from './wallet/segwit/shp2wpkh';
+import {LegacyWallet} from './wallet/p2pkh';
 
 import {
     descriptorFromTemplate,
     fromDescriptorTemplatePublic,
-    fromDescriptor,
 } from '../modules/bdk';
 import {
-    getDescriptorParts,
     getMetaFromMnemonic,
     getFingerprintFromXkey,
     getPubKeyFromXprv,
     getExtendedKeyPrefix,
-    normalizeXpub,
+    normalizeExtKey,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo} from '../modules/wallet-defaults';
@@ -60,7 +63,6 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
-    networkState: NetInfoType;
     appLanguage: LanguageType;
     appFiatCurrency: CurrencyType;
     loadLock: boolean;
@@ -72,8 +74,7 @@ type defaultContextType = {
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
-    electrumServerURL: electrumServerURLs;
-    setNetworkState: (networkState: NetInfoType) => void;
+    electrumServerURL: ElectrumServerURLs;
     setAppLanguage: (languageObject: LanguageType) => void;
     setAppFiatCurrency: (currencyObject: CurrencyType) => void;
     updateFiatRate: (fiatObj: FiatRate) => void;
@@ -86,15 +87,15 @@ type defaultContextType = {
     ) => void;
     updateWalletUTXOs: (id: string, utxo: UTXOType[]) => void;
     updateWalletBalance: (id: string, balance: BalanceType) => void;
-    updateWalletAddress: (id: string, address: addressType) => void;
+    updateWalletAddress: (id: string, address: AddressType) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
         backupMaterial: string,
-        backupType: BackupMaterialTypes,
-        backupNetwork: NetType,
+        backupType: BackupMaterial,
+        backupNetwork: Net,
     ) => void;
-    addWallet: (name: string, type: string, network?: NetType) => void;
+    addWallet: (name: string, type: string, network?: Net) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => TWalletType;
@@ -105,7 +106,6 @@ type defaultContextType = {
 // Default app context values
 const defaultContext: defaultContextType = {
     loadLock: false,
-    networkState: null,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -136,7 +136,6 @@ const defaultContext: defaultContextType = {
         testnet: 'ssl://electrum.blockstream.info:60002',
         bitcoin: 'ssl://electrum.blockstream.info:50002',
     },
-    setNetworkState: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -154,7 +153,7 @@ const defaultContext: defaultContextType = {
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
-        return new BaseWallet({name: 'test wallet', type: 'bech32'});
+        return new BaseWallet({name: 'test wallet', type: 'wpkh'});
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
     setElectrumServerURL: () => {},
@@ -166,7 +165,6 @@ export const AppStorageContext =
 export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
-    const [networkState, _setNetworkState] = useState<NetInfoType>(null);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -195,8 +193,6 @@ export const AppStorageProvider = ({children}: Props) => {
 
     const {getItem: _getLoadLock, setItem: _updateLoadLock} =
         useAsyncStorage('loadLock');
-    const {getItem: _getNetworkState, setItem: _updateNetworkState} =
-        useAsyncStorage('networkState');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -244,22 +240,6 @@ export const AppStorageProvider = ({children}: Props) => {
         [_setLoadLock, _updateLoadLock],
     );
 
-    const setNetworkState = useCallback(
-        async (netState: NetInfoType) => {
-            try {
-                await _setNetworkState(netState);
-                await _updateNetworkState(JSON.stringify(netState));
-            } catch (e) {
-                console.error(
-                    `[AsyncStorage] (Network state) Error loading data: ${e} [${netState}]`,
-                );
-
-                throw new Error('Error setting network state');
-            }
-        },
-        [_setNetworkState, _updateNetworkState],
-    );
-
     const setAppLanguage = useCallback(
         async (languageObject: LanguageType) => {
             try {
@@ -283,16 +263,6 @@ export const AppStorageProvider = ({children}: Props) => {
         // ...otherwise, use default
         if (lang !== null) {
             _setAppLanguage(JSON.parse(lang));
-        }
-    };
-
-    const _loadNetworkState = async () => {
-        const netState = await _getNetworkState();
-
-        // Only update setting if a value already exists
-        // ...otherwise, use default
-        if (netState !== null) {
-            _setNetworkState(JSON.parse(netState));
         }
     };
 
@@ -504,13 +474,13 @@ export const AppStorageProvider = ({children}: Props) => {
                 let tmp: TWalletType;
 
                 switch (walletObject.type) {
-                    case 'bech32':
+                    case 'wpkh':
                         tmp = SegWitNativeWallet.fromJSON(serializedWallet);
                         break;
-                    case 'p2sh':
+                    case 'shp2wpkh':
                         tmp = SegWitP2SHWallet.fromJSON(serializedWallet);
                         break;
-                    case 'legacy':
+                    case 'p2pkh':
                         tmp = LegacyWallet.fromJSON(serializedWallet);
                         break;
                     default:
@@ -623,7 +593,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletAddress = useCallback(
-        async (id: string, address: addressType) => {
+        async (id: string, address: AddressType) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             // Get the current wallet
@@ -658,10 +628,10 @@ export const AppStorageProvider = ({children}: Props) => {
 
         // If we have a mnemonic, generate extended key material
         // Function applied when newly generated wallet and if mnemonic imported
-        if (newWallet.secret !== '') {
+        if (newWallet.mnemonic !== '') {
             try {
                 const metas = getMetaFromMnemonic(
-                    newWallet.secret,
+                    newWallet.mnemonic,
                     newWallet.derivationPath,
                     newWallet.network,
                 );
@@ -674,25 +644,27 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             // Generate descriptors for mnemonic
-            let InternalDescriptor;
-            let ExternalDescriptor;
+            let InternalDescriptor!: string;
+            let ExternalDescriptor!: string;
+            let PrivateDescriptor!: string;
 
-            ({InternalDescriptor, ExternalDescriptor} =
+            ({InternalDescriptor, ExternalDescriptor, PrivateDescriptor} =
                 await descriptorFromTemplate(
-                    newWallet.secret,
+                    newWallet.mnemonic,
                     newWallet.type,
                     newWallet.network,
                 ));
 
             // REM: We only store the string representation of the descriptors
-            const externalString = await ExternalDescriptor.asString();
-            const internalString = await InternalDescriptor.asString();
-
             newWallet.setDescriptor({
-                internal: internalString,
-                external: externalString,
+                internal: InternalDescriptor,
+                external: ExternalDescriptor,
+                priv: PrivateDescriptor,
             });
         }
+
+        // Declare and set if watch-only
+        newWallet.setWatchOnly();
 
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
@@ -709,17 +681,20 @@ export const AppStorageProvider = ({children}: Props) => {
 
         await _setWallets(tmp);
         await _updateWallets(JSON.stringify(tmp));
+
+        // Update current walled ID
+        await setCurrentWalletID(newWallet.id);
     };
 
     const restoreWallet = useCallback(
         async (
             backupMaterial: string,
-            backupMaterialType: BackupMaterialTypes,
-            backupNetwork: NetType,
+            backupMaterialType: BackupMaterial,
+            backupNetwork: Net,
         ) => {
             // Default network and wallet type
             var net = backupNetwork;
-            var walletType = 'bech32';
+            var walletType = 'wpkh';
 
             var fingerprint = '';
             var path = '';
@@ -730,30 +705,26 @@ export const AppStorageProvider = ({children}: Props) => {
             // Adjust metas from descriptor
             if (backupMaterialType === 'descriptor') {
                 // Grab the descriptor network and type
-                const desc = getDescriptorParts(backupMaterial);
+                // const parsedDescriptor = getDescriptorParts(backupMaterial);
+                const parsedDescriptor = parseDescriptor(backupMaterial);
 
                 // If we have a key missing the trailing path
                 // We artificially include that here
-                // TODO: ugly hack, probably best to require a descriptor with the trailing path
-                if (desc.key === desc.keyOnly) {
-                    backupMaterial = `${desc.scriptPrefix}[${
-                        desc.fingerprint
-                    }${desc.path.slice(1)}]${desc.key}/0/*${desc.scriptSuffix}${
-                        desc.checksum
-                    }`;
+                if (parsedDescriptor.key === parsedDescriptor.keyOnly) {
+                    backupMaterial = includeDescriptorKeyPath(parsedDescriptor);
                 }
 
-                net = desc.network as NetType;
-                walletType = desc.type;
-                fingerprint = desc.fingerprint;
-                path = desc.path;
+                net = parsedDescriptor.network as Net;
+                walletType = parsedDescriptor.type;
+                fingerprint = parsedDescriptor.fingerprint;
+                path = parsedDescriptor.path;
                 xpub =
-                    getExtendedKeyPrefix(desc.keyOnly) === 'xpub'
-                        ? desc.keyOnly
+                    getExtendedKeyPrefix(parsedDescriptor.keyOnly) === 'xpub'
+                        ? parsedDescriptor.keyOnly
                         : '';
                 xprv =
-                    getExtendedKeyPrefix(desc.keyOnly) === 'xprv'
-                        ? desc.keyOnly
+                    getExtendedKeyPrefix(parsedDescriptor.keyOnly) === 'xprv'
+                        ? parsedDescriptor.keyOnly
                         : '';
 
                 // Set xpub if we got an xprv
@@ -786,7 +757,8 @@ export const AppStorageProvider = ({children}: Props) => {
             const walletArgs = {
                 name: 'Restored Wallet',
                 type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
-                secret: backupMaterialType === 'mnemonic' ? backupMaterial : '',
+                mnemonic:
+                    backupMaterialType === 'mnemonic' ? backupMaterial : '',
                 descriptor:
                     backupMaterialType === 'descriptor' ? backupMaterial : '',
                 xprv: xprv,
@@ -800,76 +772,89 @@ export const AppStorageProvider = ({children}: Props) => {
             var newWallet!: TWalletType;
 
             // Ensure we have a valid wallet type
-            if (!['bech32', 'p2sh', 'legacy'].includes(walletArgs.type)) {
+            if (!['wpkh', 'shp2wpkh', 'p2pkh'].includes(walletArgs.type)) {
                 throw new Error('[restoreWallet] Invalid wallet type');
             }
 
             // Create wallet based on type
             switch (walletArgs.type) {
-                case 'bech32':
+                case 'wpkh':
                     newWallet = new SegWitNativeWallet(
-                        walletArgs as baseWalletArgs,
+                        walletArgs as BaseWalletArgs,
                     );
                     break;
 
-                case 'p2sh':
+                case 'shp2wpkh':
                     newWallet = new SegWitP2SHWallet(
-                        walletArgs as baseWalletArgs,
+                        walletArgs as BaseWalletArgs,
                     );
                     break;
 
-                case 'legacy':
-                    newWallet = new LegacyWallet(walletArgs as baseWalletArgs);
+                case 'p2pkh':
+                    newWallet = new LegacyWallet(walletArgs as BaseWalletArgs);
                     break;
             }
 
             // Create descriptor from imported descriptor if available
             if (backupMaterialType === 'descriptor') {
-                const {internal, external} = await fromDescriptor(
-                    backupMaterial,
-                    walletArgs.network,
-                );
-
-                const externalDescriptor = await external.asString();
-                const internalDescriptor = await internal.asString();
+                const retreivedDescriptors =
+                    createDescriptorfromString(backupMaterial);
 
                 newWallet.setDescriptor({
-                    internal: internalDescriptor,
-                    external: externalDescriptor,
+                    internal: retreivedDescriptors.internal, // InternalDescriptor,
+                    external: retreivedDescriptors.external, // ExternalDescriptor,
+                    priv: retreivedDescriptors.priv, // PrivateDescriptor,
                 });
             }
 
-            // Alternatively, generate Descriptor for Extended Keys
+            // Alternatively, generate Descriptor from Extended Keys
             if (
                 backupMaterialType === 'xprv' ||
                 backupMaterialType === 'xpub'
             ) {
                 try {
-                    // BDK expects a tpub or xpub, so we need to convert it
-                    // if it's an exotic prefix
-                    const descriptor = await fromDescriptorTemplatePublic(
-                        normalizeXpub(walletArgs.xpub),
-                        walletArgs.fingerprint,
-                        walletArgs.type,
-                        walletArgs.network,
-                    );
+                    let descriptor!: {
+                        InternalDescriptor: string;
+                        ExternalDescriptor: string;
+                        PrivateDescriptor: string;
+                    };
 
-                    const externalDescriptor =
-                        await descriptor.ExternalDescriptor.asString();
-                    const internalDescriptor =
-                        await descriptor.InternalDescriptor.asString();
+                    switch (backupMaterialType) {
+                        case BackupMaterial.Xpub:
+                            descriptor = await fromDescriptorTemplatePublic(
+                                // BDK expects a tpub or xpub, so we need to convert it
+                                // if it's an exotic prefix
+                                normalizeExtKey(walletArgs.xpub, 'pub'),
+                                walletArgs.fingerprint,
+                                walletArgs.type,
+                                walletArgs.network,
+                            );
+
+                            break;
+
+                        case BackupMaterial.Xprv:
+                            const {internal, external, priv} =
+                                createDescriptorFromXprv(walletArgs.xprv);
+
+                            descriptor = {
+                                InternalDescriptor: internal,
+                                ExternalDescriptor: external,
+                                PrivateDescriptor: priv,
+                            };
+
+                            break;
+                    }
 
                     newWallet.setDescriptor({
-                        external: externalDescriptor,
-                        internal: internalDescriptor,
+                        external: descriptor.ExternalDescriptor,
+                        internal: descriptor.InternalDescriptor,
+                        priv: descriptor.PrivateDescriptor,
                     });
                 } catch (e) {
-                    console.log(e);
+                    // Report any other related BDK errors
+                    throw e;
                 }
             }
-
-            // Determine if watch only wallet
-            newWallet.setWatchOnly();
 
             await _addNewWallet(newWallet);
         },
@@ -877,12 +862,12 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const addWallet = useCallback(
-        async (name: string, type: string, network?: NetType) => {
+        async (name: string, type: string, network?: Net) => {
             try {
                 let newWallet!: TWalletType;
 
                 // Ensure we have a valid wallet type
-                if (!['bech32', 'p2sh', 'legacy'].includes(type)) {
+                if (!['wpkh', 'shp2wpkh', 'p2pkh'].includes(type)) {
                     throw new Error('[restoreWallet] Invalid wallet type');
                 }
 
@@ -890,31 +875,31 @@ export const AppStorageProvider = ({children}: Props) => {
                 const mnemonic = await generateMnemonic();
 
                 switch (type) {
-                    case 'bech32':
+                    case 'wpkh':
                         newWallet = new SegWitNativeWallet({
                             name: name,
                             type: type,
                             network: network,
-                            secret: mnemonic,
+                            mnemonic: mnemonic,
                         });
 
                         break;
 
-                    case 'p2sh':
+                    case 'shp2wpkh':
                         newWallet = new SegWitP2SHWallet({
                             name: name,
                             type: type,
                             network: network,
-                            secret: mnemonic,
+                            mnemonic: mnemonic,
                         });
                         break;
 
-                    case 'legacy':
+                    case 'p2pkh':
                         newWallet = new LegacyWallet({
                             name: name,
                             type: type,
                             network: network,
-                            secret: mnemonic,
+                            mnemonic: mnemonic,
                         });
                         break;
                 }
@@ -934,7 +919,6 @@ export const AppStorageProvider = ({children}: Props) => {
     // Resets app data
     const resetAppData = useCallback(async () => {
         try {
-            await setSatSymbol(true);
             await setAppLanguage(defaultContext.appLanguage);
             await setAppFiatCurrency(defaultContext.appFiatCurrency);
             await updateAppUnit(defaultContext.appUnit);
@@ -967,10 +951,6 @@ export const AppStorageProvider = ({children}: Props) => {
 
     useEffect(() => {
         _getAppUnit();
-    }, []);
-
-    useEffect(() => {
-        _loadNetworkState();
     }, []);
 
     useEffect(() => {
@@ -1011,8 +991,6 @@ export const AppStorageProvider = ({children}: Props) => {
             value={{
                 loadLock,
                 setLoadLock,
-                networkState,
-                setNetworkState,
                 electrumServerURL,
                 setElectrumServerURL,
                 appLanguage,

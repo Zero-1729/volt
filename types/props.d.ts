@@ -2,7 +2,7 @@
 import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import {BalanceType, Unit} from './wallet';
+import {BalanceType, Unit, TransactionType} from './wallet';
 import BigNumber from 'bignumber.js';
 
 // Base Prop Type
@@ -92,6 +92,7 @@ export type TextInputProps = BaseProps & {
     placeholderTextColor?: string;
     onBlur?: () => void;
     value?: string;
+    refs?: React.RefObject<TextInput>;
     onChangeText?:
         | ((text: string) => void)
         | React.Dispatch<React.SetStateAction<string>>;
@@ -105,7 +106,9 @@ export type TextLongInputProps = BaseProps &
         folderColor?: string;
         showScanIcon?: boolean;
         showTestnetToggle?: boolean;
-        onSuccess: (data) => void | boolean;
+        onSuccess: (
+            data: any,
+        ) => void | boolean | Promise<boolean> | Promise<void>;
         onCancel: (error) => void;
         onError: (error) => void;
         toggleSwitch?:

@@ -8,26 +8,18 @@ import {
     BlockChainNames,
 } from 'bdk-rn/lib/lib/enums';
 
-import {TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
-import {BaseWallet} from '../class/wallet/base';
+import {LocalUtxo, TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
 
 import {
-    NetType,
     TWalletType,
     TransactionType,
     UTXOType,
-    electrumServerURLs,
+    ElectrumServerURLs,
+    TNetwork,
+    BalanceType,
 } from '../types/wallet';
-
-import {liberalAlert} from '../components/alert';
+import {Net} from '../types/enums';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
-
-type SyncData = {
-    balance: BigNumber;
-    transactions: TransactionType[];
-    UTXOs: UTXOType[];
-    updated: boolean; // whether the balance has been indeed updated
-};
 
 export const generateMnemonic = async () => {
     const mnemonic = await new BDK.Mnemonic().create();
@@ -35,38 +27,49 @@ export const generateMnemonic = async () => {
     return mnemonic.asString();
 };
 
-export const fromDescriptor = async (descriptor: string, net: NetType) => {
-    const newDescriptor = await new BDK.Descriptor().create(
-        descriptor,
-        net as Network,
-    );
-
-    // TODO: Find a better way to do this
-    // Return actual internal/external
-    // perhaps manipulate descriptor to '1/*' and '0/*'
-    // including checksums
-    return {
-        external: newDescriptor,
-        internal: newDescriptor,
-    };
+type formatTXFromBDKArgs = TransactionDetails & {
+    network: string;
+    confirmed: boolean;
+    currentBlockHeight: number;
 };
 
 // Formats transaction data from BDK to format for wallet
-export const formatTXFromBDK = (tx: any): TransactionType => {
+export const formatTXFromBDK = async (
+    tx: formatTXFromBDKArgs,
+): Promise<TransactionType> => {
     let value = new BigNumber(Math.abs(tx.sent - tx.received));
-    value = tx.sent > 0 ? value.minus(tx.fee) : value;
+    value = tx.sent > 0 ? value.minus(tx.fee as number) : value;
+
+    const txRawData = tx.transaction;
+    const rawInfo = {
+        weight: await txRawData?.weight(),
+        vsize: await txRawData?.vsize(),
+        size: await txRawData?.size(),
+        version: await txRawData?.version(),
+        isLockTimeEnabled: await txRawData?.isLockTimeEnabled(),
+        isRbf: await txRawData?.isExplicitlyRbf(),
+    };
+
+    const blockConfirms =
+        tx.currentBlockHeight - (tx.confirmationTime?.height as number);
 
     const formattedTx = {
         txid: tx.txid,
         confirmed: tx.confirmed,
-        block_height: tx.confirmationTime.height,
-        timestamp: tx.confirmationTime.timestamp,
-        fee: new BigNumber(tx.fee),
+        confirmations: blockConfirms > 0 ? blockConfirms + 1 : 0,
+        block_height: tx.confirmationTime?.height as number,
+        timestamp: tx.confirmationTime?.timestamp as any,
+        fee: new BigNumber(tx.fee as number),
         value: value,
         received: new BigNumber(tx.received),
         sent: new BigNumber(tx.sent),
         type: tx.sent - tx.received > 0 ? 'outbound' : 'inbound',
-        network: tx.network,
+        network: tx.network === 'testnet' ? Net.Testnet : Net.Bitcoin,
+        size: rawInfo.size,
+        vsize: rawInfo.vsize,
+        weight: rawInfo.weight,
+        rbf: rawInfo.isRbf,
+        memo: '',
     };
 
     // Returned formatted tx
@@ -75,7 +78,7 @@ export const formatTXFromBDK = (tx: any): TransactionType => {
 
 // Test Electrum server connection
 // TODO: replace this with a better method, and possibly move out to wallet-utils
-export const testElectrumServer = async (url: string, callback: any) => {
+export const getBlockHeight = async (url: string, callback: any) => {
     const config: BlockchainElectrumConfig = {
         url,
         retry: 1,
@@ -85,48 +88,51 @@ export const testElectrumServer = async (url: string, callback: any) => {
         validateDomain: false,
     };
 
+    let height!: number;
+
     try {
         const chain = await new BDK.Blockchain().create(
             config,
             BlockChainNames.Electrum,
         );
 
-        await chain.getHeight();
+        height = await chain.getHeight();
 
-        callback(true);
+        callback({status: true, blockHeight: height});
     } catch (e) {
-        callback(false);
+        callback({status: false, blockHeight: height});
     }
 };
 
 // Generate External and Internal Descriptors from wallet DescriptorSecretKey ('from mnemonic')
 export const descriptorFromTemplate = async (
-    secret: string,
+    mnemonic: string,
     type: string,
-    network: NetType,
+    network: TNetwork,
 ): Promise<{
-    InternalDescriptor: BDK.Descriptor;
-    ExternalDescriptor: BDK.Descriptor;
+    InternalDescriptor: string;
+    ExternalDescriptor: string;
+    PrivateDescriptor: string;
 }> => {
     // Create descriptor from mnemonic
-    const mnemonic = await new BDK.Mnemonic().fromString(secret);
+    const bdkMnemonic = await new BDK.Mnemonic().fromString(mnemonic);
 
     const descriptorSecretKey = await new BDK.DescriptorSecretKey().create(
         network as Network,
-        mnemonic,
+        bdkMnemonic,
     );
 
-    let InternalDescriptor!: BDK.Descriptor;
-    let ExternalDescriptor!: BDK.Descriptor;
+    let internalDescriptor!: BDK.Descriptor;
+    let externalDescriptor!: BDK.Descriptor;
 
     switch (type) {
-        case 'bech32': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip84(
+        case 'wpkh': {
+            externalDescriptor = await new BDK.Descriptor().newBip84(
                 descriptorSecretKey,
                 'external' as KeychainKind,
                 network as Network,
             );
-            InternalDescriptor = await new BDK.Descriptor().newBip84(
+            internalDescriptor = await new BDK.Descriptor().newBip84(
                 descriptorSecretKey,
                 'internal' as KeychainKind,
                 network as Network,
@@ -134,13 +140,13 @@ export const descriptorFromTemplate = async (
 
             break;
         }
-        case 'p2sh': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip49(
+        case 'shp2wpkh': {
+            externalDescriptor = await new BDK.Descriptor().newBip49(
                 descriptorSecretKey,
                 'external' as KeychainKind,
                 network as Network,
             );
-            InternalDescriptor = await new BDK.Descriptor().newBip49(
+            internalDescriptor = await new BDK.Descriptor().newBip49(
                 descriptorSecretKey,
                 'internal' as KeychainKind,
                 network as Network,
@@ -148,13 +154,13 @@ export const descriptorFromTemplate = async (
 
             break;
         }
-        case 'legacy': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip44(
+        case 'p2pkh': {
+            externalDescriptor = await new BDK.Descriptor().newBip44(
                 descriptorSecretKey,
                 'external' as KeychainKind,
                 network as Network,
             );
-            InternalDescriptor = await new BDK.Descriptor().newBip44(
+            internalDescriptor = await new BDK.Descriptor().newBip44(
                 descriptorSecretKey,
                 'internal' as KeychainKind,
                 network as Network,
@@ -164,9 +170,14 @@ export const descriptorFromTemplate = async (
         }
     }
 
+    const PrivateDescriptor = await externalDescriptor.asStringPrivate();
+    const ExternalDescriptor = await externalDescriptor.asString();
+    const InternalDescriptor = await internalDescriptor.asString();
+
     return {
-        InternalDescriptor,
         ExternalDescriptor,
+        InternalDescriptor,
+        PrivateDescriptor,
     };
 };
 
@@ -175,64 +186,84 @@ export const fromDescriptorTemplatePublic = async (
     pubKey: string,
     fingerprint: string,
     type: string,
-    network: NetType,
+    network: TNetwork,
 ): Promise<{
-    InternalDescriptor: BDK.Descriptor;
-    ExternalDescriptor: BDK.Descriptor;
+    InternalDescriptor: string;
+    ExternalDescriptor: string;
+    PrivateDescriptor: string;
 }> => {
     const descriptorPublicKey = await new BDK.DescriptorPublicKey().fromString(
         pubKey,
     );
 
-    let InternalDescriptor!: BDK.Descriptor;
-    let ExternalDescriptor!: BDK.Descriptor;
+    let InternalDescriptor!: string;
+    let ExternalDescriptor!: string;
+    let PrivateDescriptor!: string;
 
     switch (type) {
-        case 'bech32': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip84Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.External,
-                network as Network,
-            );
-            InternalDescriptor = await new BDK.Descriptor().newBip84Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.Internal,
-                network as Network,
-            );
+        case 'wpkh': {
+            const externalDescriptor =
+                await new BDK.Descriptor().newBip84Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.External,
+                    network as Network,
+                );
+            const internalDescriptor =
+                await new BDK.Descriptor().newBip84Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.Internal,
+                    network as Network,
+                );
+
+            ExternalDescriptor = await externalDescriptor.asString();
+            InternalDescriptor = await internalDescriptor.asString();
+            PrivateDescriptor = await externalDescriptor.asStringPrivate();
 
             break;
         }
-        case 'p2sh': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip49Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.External,
-                network as Network,
-            );
-            InternalDescriptor = await new BDK.Descriptor().newBip49Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.Internal,
-                network as Network,
-            );
+        case 'shp2wpkh': {
+            const externalDescriptor =
+                await new BDK.Descriptor().newBip49Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.External,
+                    network as Network,
+                );
+            const internalDescriptor =
+                await new BDK.Descriptor().newBip49Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.Internal,
+                    network as Network,
+                );
+
+            ExternalDescriptor = await externalDescriptor.asString();
+            InternalDescriptor = await internalDescriptor.asString();
+            PrivateDescriptor = await externalDescriptor.asStringPrivate();
 
             break;
         }
-        case 'legacy': {
-            ExternalDescriptor = await new BDK.Descriptor().newBip44Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.External,
-                network as Network,
-            );
-            InternalDescriptor = await new BDK.Descriptor().newBip44Public(
-                descriptorPublicKey,
-                fingerprint,
-                KeychainKind.Internal,
-                network as Network,
-            );
+        case 'p2pkh': {
+            const externalDescriptor =
+                await new BDK.Descriptor().newBip44Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.External,
+                    network as Network,
+                );
+            const internalDescriptor =
+                await new BDK.Descriptor().newBip44Public(
+                    descriptorPublicKey,
+                    fingerprint,
+                    KeychainKind.Internal,
+                    network as Network,
+                );
+
+            ExternalDescriptor = await externalDescriptor.asString();
+            InternalDescriptor = await internalDescriptor.asString();
+            PrivateDescriptor = await externalDescriptor.asStringPrivate();
 
             break;
         }
@@ -241,6 +272,7 @@ export const fromDescriptorTemplatePublic = async (
     return {
         InternalDescriptor,
         ExternalDescriptor,
+        PrivateDescriptor,
     };
 };
 
@@ -262,21 +294,46 @@ export const descriptorsFromString = async (wallet: TWalletType) => {
     };
 };
 
+// create a BDK wallet from a descriptor and metas
+export const createBDKWallet = async (wallet: TWalletType) => {
+    // Set Network
+    const network =
+        wallet.network === 'bitcoin' ? Network.Bitcoin : Network.Testnet;
+
+    // Create descriptors
+    let ExternalDescriptor!: BDK.Descriptor;
+    let InternalDescriptor!: BDK.Descriptor;
+
+    ({InternalDescriptor, ExternalDescriptor} = await descriptorsFromString(
+        wallet,
+    ));
+
+    const bdkWallet = await new BDK.Wallet().create(
+        ExternalDescriptor,
+        InternalDescriptor,
+        network,
+        await new BDK.DatabaseConfig().memory(),
+    );
+
+    return bdkWallet;
+};
+
 // Sync newly created wallet with electrum server
-const _sync = async (
-    wallet: BaseWallet,
+export const syncBdkWallet = async (
+    wallet: BDK.Wallet,
     callback: any,
-    electrumServer: electrumServerURLs,
+    network: TNetwork,
+    electrumServer: ElectrumServerURLs,
 ): Promise<BDK.Wallet> => {
     // Electrum configuration
     const config: BlockchainElectrumConfig = {
         url:
-            wallet.network === 'bitcoin'
+            network === 'bitcoin'
                 ? electrumServer.bitcoin
                 : electrumServer.testnet,
         retry: 5,
         timeout: 5,
-        stopGap: 5,
+        stopGap: 100,
         sock5: null,
         validateDomain: false,
     };
@@ -296,53 +353,24 @@ const _sync = async (
         throw e;
     }
 
-    // Set Network
-    const network =
-        wallet.network === 'bitcoin' ? Network.Bitcoin : Network.Testnet;
-
-    // Create descriptors
-    let ExternalDescriptor!: BDK.Descriptor;
-    let InternalDescriptor!: BDK.Descriptor;
-
-    ({InternalDescriptor, ExternalDescriptor} = await descriptorsFromString(
-        wallet,
-    ));
-
-    const w = await new BDK.Wallet().create(
-        ExternalDescriptor,
-        InternalDescriptor,
-        network,
-        await new BDK.DatabaseConfig().memory(),
-    );
-
-    const syncStatus = await w.sync(chain);
+    const syncStatus = await wallet.sync(chain);
 
     // report any sync errors
     callback(syncStatus);
 
-    return w;
+    return wallet;
 };
 
 // Fetch Wallet Balance using wallet descriptor, metas, and electrum server
-export const getWalletBalance = async (
-    wallet: BaseWallet,
-    electrumServer: electrumServerURLs,
-): Promise<SyncData> => {
-    // Generate wallet from wallet descriptor and metas
-    const w = await _sync(
-        wallet,
-        (status: boolean) => {
-            if (!status) {
-                liberalAlert('Error', 'Could not Sync Wallet', 'OK');
-
-                return w;
-            }
-        },
-        electrumServer,
-    );
-
+export const getBdkWalletBalance = async (
+    wallet: BDK.Wallet,
+    oldBalance: BalanceType,
+): Promise<{
+    balance: BigNumber;
+    updated: boolean;
+}> => {
     // Get wallet balance
-    const retrievedBalance: Balance = await w.getBalance();
+    const retrievedBalance: Balance = await wallet.getBalance();
 
     // Update wallet balance
     // Leave untouched if error fetching balance
@@ -355,45 +383,63 @@ export const getWalletBalance = async (
     if (
         (retrievedBalance.untrustedPending !== 0 &&
             retrievedBalance.trustedPending !== 0) ||
-        !balance.eq(wallet.balance)
+        !balance.eq(oldBalance)
     ) {
         // Receive balance in sats as string
         // convert to BigNumber
         updated = true;
     }
 
-    // Only fetch transactions when balance has been updated
-    let TXs = wallet.transactions;
-    let UTXOs: UTXOType[] = wallet.UTXOs;
-    let walletTXs = TXs;
-
-    if (updated) {
-        // Update transactions list
-        TXs = (await w.listTransactions(false)) as (TransactionType &
-            TransactionDetails)[];
-        UTXOs = (await w.listUnspent()) as UTXOType[];
-
-        // Transactions to store in wallet
-        walletTXs = [];
-
-        // Update transactions list
-        TXs.forEach((transaction: any) => {
-            walletTXs.push(
-                formatTXFromBDK({
-                    confirmed: !!transaction.confirmationTime.timestamp,
-                    network: wallet.network,
-                    ...transaction,
-                }),
-            );
-        });
-    }
-
-    // Return updated wallet balance and transactions
-    // Fallback to original wallet transactions if error fetching transactions
+    // Return updated wallet balance
     return {
         balance: balance,
-        transactions: walletTXs,
-        UTXOs: UTXOs,
         updated: updated,
     };
+};
+
+// Get transactions from BDK wallet
+// Assumes 'syncWallet' has been called
+export const getBdkWalletTransactions = async (
+    wallet: BDK.Wallet,
+    url: string,
+): Promise<{
+    transactions: TransactionType[];
+    UTXOs: UTXOType[];
+}> => {
+    let network = await wallet.network();
+
+    // Get current block height
+    let currentBlockHeight!: number;
+
+    await getBlockHeight(
+        url,
+        (args: {status: boolean; blockHeight: number}) => {
+            currentBlockHeight = args.blockHeight;
+        },
+    );
+
+    // Only fetch transactions when balance has been updated
+    let bdkTxs: TransactionDetails[] = [];
+    let bdkUtxos: LocalUtxo[] = [];
+
+    let walletTXs: TransactionType[] = [];
+
+    // Update transactions list
+    bdkTxs = await wallet.listTransactions(true);
+    bdkUtxos = await wallet.listUnspent();
+
+    // Update transactions list
+    for (const tx of bdkTxs) {
+        let reformattedData = await formatTXFromBDK({
+            confirmed: !!tx.confirmationTime?.timestamp,
+            network: network,
+            currentBlockHeight: currentBlockHeight,
+            ...tx,
+        });
+
+        walletTXs.push(reformattedData);
+    }
+
+    // Fallback to original wallet transactions if error fetching transactions
+    return {transactions: walletTXs, UTXOs: bdkUtxos as UTXOType[]};
 };

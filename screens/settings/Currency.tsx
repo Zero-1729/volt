@@ -14,6 +14,8 @@ import DayJS from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 DayJS.extend(calendar);
 
+import {useNetInfo} from '@react-native-community/netinfo';
+
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {useTailwind} from 'tailwind-rn';
@@ -42,14 +44,16 @@ const Currency = () => {
 
     const tailwind = useTailwind();
 
-    const {appFiatCurrency, setAppFiatCurrency, networkState, fiatRate} =
+    const {appFiatCurrency, setAppFiatCurrency, fiatRate} =
         useContext(AppStorageContext);
+
+    const networkState = useNetInfo();
 
     const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    if (!networkState?.isConnected) {
+                    if (!networkState?.isInternetReachable) {
                         liberalAlert(
                             'Network',
                             'Unable to fetch currency data, connect to the Internet',

@@ -2,17 +2,17 @@
 import 'react';
 
 import BigNumber from 'bignumber.js';
-import {NetInfoState} from '@react-native-community/netinfo';
 
-import {SegWitNativeWallet} from '../class/wallet/segwit/bech32';
-import {SegWitP2SHWallet} from '../class/wallet/segwit/p2sh';
-import {LegacyWallet} from '../class/wallet/legacy';
+import {SegWitNativeWallet} from '../class/wallet/segwit/wpkh';
+import {SegWitP2SHWallet} from '../class/wallet/segwit/shp2wpkh';
+import {LegacyWallet} from '../class/wallet/p2pkh';
 
 import {LocalUtxo} from 'bdk-rn/lib/classes/Bindings';
 
-export type NetType = 'bitcoin' | 'testnet';
+import {Network} from 'bdk-rn/lib/lib/enums';
+import {Net} from './enums';
 
-export type NetInfoType = NetInfoState | null;
+export type TNetwork = Net | Network;
 
 export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
 
@@ -40,7 +40,7 @@ export type UTXOType = LocalUtxo & {
 
 // Transaction Type
 export type TransactionType = {
-    network: NetType; // Network type
+    network: Net; // Network type
     txid: string; // Transaction ID
     block_height: number; // Block height
     confirmed: boolean; // Whether transaction is confirmed
@@ -68,7 +68,7 @@ export type Unit = {
 };
 
 // Address type
-export type addressType = {
+export type AddressType = {
     address: string; // Address
     path: string; // Address derivation path
     index: number; // Address derivation index
@@ -76,45 +76,36 @@ export type addressType = {
     memo: string; // Address memo
 };
 
-export type descriptorSymbolsType = string[];
+export type DescriptorSymbolsType = string[];
 export type DescriptorObject = {
     external: Descriptor;
     internal: Descriptor;
+    priv: Descriptor;
 };
 export type Descriptor = string;
 
-export type BackupMaterialTypes = 'mnemonic' | 'xprv' | 'xpub' | 'descriptor';
-
-export type baseWalletArgs = {
+export type BaseWalletArgs = {
     name: string;
     type: string;
     derivationPath?: string;
-    secret?: string;
+    mnemonic?: string;
     xprv?: string;
     xpub?: string;
-    network?: NetType;
+    network?: Net;
     fingerprint?: string;
 };
 
-export type BDKWalletTypes =
-    | 'wpkh'
-    | 'pkh'
-    | 'p2pkh'
-    | 'shp2wpkh'
-    | 'MULTI'
-    | 'p2shp2wpkh';
-
-export type extendedKeyInfoType = {
-    network: NetType;
+export type ExtendedKeyInfoType = {
+    network: Net;
     type: string; // Wallet type
 };
 
-export type electrumServerURLs = {
+export type ElectrumServerURLs = {
     bitcoin: string;
     testnet: string;
 };
 
-export type accountPaths = {
+export type AccountPaths = {
     bitcoin: string;
     testnet: string;
 };

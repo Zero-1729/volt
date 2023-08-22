@@ -12,6 +12,8 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import Checkbox from 'react-native-bouncy-checkbox';
 
+import RNFS from 'react-native-fs';
+
 import {AppStorageContext} from '../../class/storageContext';
 import {
     descriptorSymbols,
@@ -40,7 +42,7 @@ import {
     errorAlert,
 } from '../../components/alert';
 
-import {NetType} from '../../types/wallet';
+import {BackupMaterial, Net} from '../../types/enums';
 
 const ImportAction = () => {
     const navigation = useNavigation();
@@ -50,31 +52,54 @@ const ImportAction = () => {
     const tailwind = useTailwind();
 
     const [importText, setImportText] = useState('');
-    const [network, setNetwork] = useState<NetType>('testnet');
+    const [network, setNetwork] = useState<Net>(Net.Testnet);
 
     const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
 
     const toggleNetwork = () => {
-        if (network === 'testnet') {
-            setNetwork('bitcoin');
+        if (network === Net.Testnet) {
+            setNetwork(Net.Bitcoin);
         } else {
-            setNetwork('testnet');
+            setNetwork(Net.Testnet);
         }
     };
 
-    const handleFolderCallback = (data: any) => {
-        // TODO: Read info from assumed text file
-        console.info(`[Success] Document Picker: ${data.uri}`);
+    const handleFolderCallback = async (data: any) => {
+        await RNFS.readFile(data.uri, 'utf8')
+            .then(res => {
+                // We only support single line imports with the import action
+                // so we split the data by lines and only take the first line
+                // as the import material
+                const dataByLines = res.split('\n');
+                const importMaterial = dataByLines[0];
+                const lines = dataByLines.length;
+
+                if (lines > 1) {
+                    conservativeAlert(
+                        'Error',
+                        'Import supports only one line of text with material to import',
+                    );
+
+                    return;
+                }
+
+                handleImport(importMaterial);
+            })
+            .catch(e => {
+                handleFolderError(e);
+            });
     };
 
     const handleFolderError = (e: Error) => {
         // Handle when any error in the folder action is reported
-        console.error(`[Error] Document Picker: ${e.message}`);
+        conservativeAlert('Error', e.message);
+
+        return;
     };
 
-    const handleFolderCancel = (e: Error) => {
+    const handleFolderCancel = () => {
         // Handle when user cancels folder action
-        console.warn(`[Warn] Document Picker: ${e.message}`);
+        return;
     };
 
     const onBlur = () => {
@@ -111,7 +136,7 @@ const ImportAction = () => {
         // Report any other issues separately
         try {
             // Restore wallet using mnemonic
-            await restoreWallet(mnemonic, 'mnemonic', network);
+            await restoreWallet(mnemonic, BackupMaterial.Mnemonic, network);
 
             // Clear input
             setImportText('');
@@ -143,7 +168,7 @@ const ImportAction = () => {
                 return;
             }
 
-            await restoreWallet(descriptor, 'descriptor', network);
+            await restoreWallet(descriptor, BackupMaterial.Descriptor, network);
 
             // Clear input
             setImportText('');
@@ -184,12 +209,11 @@ const ImportAction = () => {
         }
     };
 
-    const isDescriptor = (text: string) => {
+    const isLooslyDescriptor = (text: string) => {
         const hasDigits = /\d/.test(text);
 
         // Assume it is a descriptor if it has both
         // numbers or descriptor symbols
-        // TODO: implement a stricter pattern check
         if (
             descriptorSymbols.some((symbol: string) => text.includes(symbol)) &&
             hasDigits
@@ -225,7 +249,7 @@ const ImportAction = () => {
         }
 
         // Check if descriptor
-        if (isDescriptor(material)) {
+        if (isLooslyDescriptor(material)) {
             // Handle import of descriptor
             handleDescriptor(material);
             return;
@@ -272,7 +296,6 @@ const ImportAction = () => {
                 style={[
                     tailwind('w-full h-full items-center'),
                     {backgroundColor: ColorScheme.Background.Primary},
-                    Font.RobotoText,
                 ]}>
                 <View style={[tailwind('w-5/6 mt-8')]}>
                     <PlainButton
@@ -344,7 +367,7 @@ const ImportAction = () => {
                                     ColorScheme.Background.CheckBoxUnfilled
                                 }
                                 size={18}
-                                isChecked={network === 'testnet'}
+                                isChecked={network === Net.Testnet}
                                 iconStyle={{
                                     borderWidth: 1,
                                     borderRadius: 2,

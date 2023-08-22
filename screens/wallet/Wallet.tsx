@@ -5,6 +5,8 @@ import {useColorScheme, View, Text, FlatList, StatusBar} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import BDK from 'bdk-rn';
+
 import BigNumber from 'bignumber.js';
 import Dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
@@ -12,6 +14,8 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 
 Dayjs.extend(calendar);
 Dayjs.extend(LocalizedFormat);
+
+import {useNetInfo} from '@react-native-community/netinfo';
 
 import {getTxData} from '../../modules/mempool';
 
@@ -23,7 +27,12 @@ import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 
-import {getWalletBalance} from '../../modules/bdk';
+import {
+    syncBdkWallet,
+    getBdkWalletBalance,
+    createBDKWallet,
+    getBdkWalletTransactions,
+} from '../../modules/bdk';
 
 import {PlainButton} from '../../components/button';
 
@@ -43,12 +52,15 @@ const Wallet = () => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
+    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
+
+    const networkState = useNetInfo();
+
     // Get current wallet ID and wallet data
     const {
         setLoadLock,
         currentWalletID,
         getWalletData,
-        networkState,
         fiatRate,
         appFiatCurrency,
         updateFiatRate,
@@ -62,7 +74,6 @@ const Wallet = () => {
 
     // For loading effect on balance
     const [loadingBalance, setLoadingBalance] = useState(false);
-
     const [singleLoadLock, setSingleLoadLock] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -75,6 +86,32 @@ const Wallet = () => {
 
     const walletName = walletData.name;
 
+    const initWallet = useCallback(async () => {
+        const w = await createBDKWallet(walletData);
+
+        return w;
+    }, []);
+
+    const syncWallet = useCallback(async () => {
+        // initWallet only called one time
+        // subsequent call is from 'bdkWallet' state
+        // set in Balance fetch
+        const w = bdkWallet ? bdkWallet : await initWallet();
+
+        const W = await syncBdkWallet(
+            w,
+            (status: boolean) => {
+                if (status) {
+                    setSingleLoadLock(true);
+                }
+            },
+            walletData.network,
+            electrumServerURL,
+        );
+
+        return W;
+    }, []);
+
     // Refresh control
     const refreshWallet = useCallback(async () => {
         // Avoid duplicate loading
@@ -83,7 +120,7 @@ const Wallet = () => {
         }
 
         // Only attempt load if connected to network
-        if (!networkState?.isConnected) {
+        if (!networkState?.isInternetReachable) {
             setRefreshing(false);
             return;
         }
@@ -94,6 +131,8 @@ const Wallet = () => {
         // Set refreshing
         setRefreshing(true);
         setLoadingBalance(true);
+
+        const w = await syncWallet();
 
         try {
             const triggered = await fetchFiatRate(
@@ -122,15 +161,24 @@ const Wallet = () => {
 
         if (!loadingBalance) {
             // Update wallet balance first
-            const {balance, transactions, updated, UTXOs} =
-                await getWalletBalance(walletData, electrumServerURL);
+            const {balance, updated} = await getBdkWalletBalance(
+                w,
+                walletData.balance,
+            );
 
             // update wallet balance
             updateWalletBalance(currentWalletID, balance);
 
             try {
+                const {transactions, UTXOs} = await getBdkWalletTransactions(
+                    w,
+                    walletData.network === 'testnet'
+                        ? electrumServerURL.testnet
+                        : electrumServerURL.bitcoin,
+                );
+
                 // Store newly formatted transactions from mempool.space data
-                const newTxs = [];
+                const newTxs = updated ? [] : transactions;
 
                 const addressLock = !updated;
 
@@ -138,21 +186,18 @@ const Wallet = () => {
                 let addressIndexCount = walletData.index;
 
                 // Only attempt wallet address update if wallet balance is updated
+                // TODO: avoid mempool for now and scrap this from BDK raw tx info (Script)
                 if (updated) {
                     // iterate over all the transactions and include the missing optional fields for the TransactionType
                     for (let i = 0; i < transactions.length; i++) {
                         const tmp: TransactionType = {
                             ...transactions[i],
                             address: '',
-                            outputs: [],
-                            rbf: false,
-                            size: 0,
-                            weight: 0,
                         };
 
                         const TxData = await getTxData(
                             transactions[i].txid,
-                            walletData.network,
+                            transactions[i].network,
                         );
 
                         // Transaction inputs (remote owned addresses)
@@ -176,11 +221,6 @@ const Wallet = () => {
                                 walletData.address.address
                             ) {
                                 walletData.generateNewAddress();
-                            }
-
-                            // Set if transaction an RBF
-                            if (TxData.vin[j].sequence === '4294967293') {
-                                tmp.rbf = true;
                             }
                         }
 
@@ -213,22 +253,20 @@ const Wallet = () => {
                         }
 
                         // Update new transactions list
-                        newTxs.push({
-                            ...tmp,
-                            size: TxData.size,
-                            weight: TxData.weight,
-                        });
+                        newTxs.push({...tmp});
                     }
-
-                    // update wallet transactions
-                    updateWalletTransactions(currentWalletID, newTxs);
-
-                    // update wallet UTXOs
-                    updateWalletUTXOs(currentWalletID, UTXOs);
 
                     // update wallet address
                     updateWalletAddress(currentWalletID, tempReceiveAddress);
                 }
+
+                // We make this update in case of pending txs
+                // and because we already have this data from the balance update BDK call
+                // update wallet transactions
+                updateWalletTransactions(currentWalletID, newTxs);
+
+                // update wallet UTXOs
+                updateWalletUTXOs(currentWalletID, UTXOs);
 
                 setLoadLock(false);
             } catch (e: any) {
@@ -245,12 +283,18 @@ const Wallet = () => {
         setRefreshing(false);
         setLoadingBalance(false);
         setLoadLock(false);
+
+        // Update wallet, so we avoid wallet creation
+        // for every call to this function
+        if (!bdkWallet) {
+            setBdkWallet(w);
+        }
     }, [
         appFiatCurrency.short,
         currentWalletID,
         fiatRate,
         loadingBalance,
-        networkState?.isConnected,
+        networkState?.isInternetReachable,
         refreshing,
         updateFiatRate,
         updateWalletBalance,
@@ -272,6 +316,13 @@ const Wallet = () => {
             refreshWallet();
             setSingleLoadLock(true);
         }
+
+        // Kill all loading effects
+        () => {
+            setRefreshing(false);
+            setLoadingBalance(false);
+            setLoadLock(false);
+        };
     }, []);
 
     // Receive Wallet ID and fetch wallet data to display
@@ -377,7 +428,9 @@ const Wallet = () => {
                                 tailwind('text-sm text-white opacity-60 mb-2'),
                             ]}>
                             Current{' '}
-                            {!networkState?.isConnected ? 'Offline ' : ''}
+                            {!networkState?.isInternetReachable
+                                ? 'Offline '
+                                : ''}
                             Balance
                         </Text>
 
