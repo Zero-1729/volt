@@ -843,14 +843,14 @@ export const AppStorageProvider = ({children}: Props) => {
                             break;
 
                         case BackupMaterial.Xprv:
-                            const {internal, external} =
+                            const {internal, external, priv} =
                                 createDescriptorFromXprv(walletArgs.xprv);
 
-                            descriptor = await fromDescriptor(
-                                external,
-                                internal,
-                                walletArgs.network,
-                            );
+                            descriptor = {
+                                InternalDescriptor: internal,
+                                ExternalDescriptor: external,
+                                PrivateDescriptor: priv,
+                            };
 
                             break;
                     }
