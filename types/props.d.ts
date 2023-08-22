@@ -59,6 +59,7 @@ export type WalletCardProps = CardProps & {
 
 export type TxListItemProps = BaseProps & {
     tx: TransactionType;
+    callback?: () => void;
 };
 
 export type TxBalanceProps = BaseProps & {
