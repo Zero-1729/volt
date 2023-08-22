@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, Linking, useColorScheme} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -11,13 +11,9 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 Dayjs.extend(calendar);
 Dayjs.extend(LocalizedFormat);
 
-import RNHapticFeedback from 'react-native-haptic-feedback';
-import {RNHapticFeedbackOptions} from '../constants/Haptic';
-
 import {PlainButton} from './button';
 
 import {TXBalance} from './balance';
-import {Net} from '../types/enums';
 
 import {TxListItemProps} from '../types/props';
 
@@ -38,24 +34,10 @@ export const TransactionListItem = (props: TxListItemProps) => {
         return isToday ? Dayjs(date).calendar() : Dayjs(date).format('LLL');
     };
 
-    // Get URL for mempool.space
-    const getURL = (txid: string) => {
-        return `https://mempool.space/${
-            props.tx.network === Net.Testnet ? 'testnet/' : ''
-        }tx/${txid}`;
-    };
-
     return (
         <PlainButton
             onPress={() => {
-                RNHapticFeedback.trigger(
-                    'impactLight',
-                    RNHapticFeedbackOptions,
-                );
-
-                const URL = getURL(props.tx.txid);
-
-                Linking.openURL(URL);
+                props.callback ? props.callback() : null;
             }}>
             <View
                 style={[
