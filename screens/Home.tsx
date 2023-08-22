@@ -79,7 +79,6 @@ const Home = () => {
         electrumServerURL,
     } = useContext(AppStorageContext);
 
-    const [initFiatRate, setInitFiatRate] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
@@ -124,7 +123,7 @@ const Home = () => {
     const singleSyncFiatRate = useCallback(
         async (ticker: string, violate: boolean = false) => {
             // Only proceed if initial load or if user select new currency in settings
-            if (!initFiatRate || violate) {
+            if (violate) {
                 try {
                     await fetchFiatRate(
                         ticker,
@@ -231,7 +230,7 @@ const Home = () => {
     useEffect(() => {
         // Avoid fiat rate update call when offline
         // or when newly loaded screen to avoid dup call
-        if (!networkState?.isInternetReachable || !initFiatRate) {
+        if (!networkState?.isInternetReachable) {
             return;
         }
 
@@ -244,7 +243,7 @@ const Home = () => {
     useEffect(() => {
         // Only attempt update when initial fiat rate update call
         // and wallets exists
-        if (!initFiatRate && wallets.length > 0) {
+        if (wallets.length > 0) {
             // Avoid fiat rate update call when offline
             if (!networkState?.isInternetReachable) {
                 return;
@@ -255,11 +254,8 @@ const Home = () => {
 
             // Single shot call to update fiat rate
             singleSyncFiatRate(appFiatCurrency.short);
-
-            // Kill initial load lock
-            setInitFiatRate(true);
         }
-    });
+    }, []);
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
