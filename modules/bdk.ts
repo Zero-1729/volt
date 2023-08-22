@@ -77,7 +77,6 @@ export const formatTXFromBDK = async (
 };
 
 // Test Electrum server connection
-// TODO: replace this with a better method, and possibly move out to wallet-utils
 export const getBlockHeight = async (url: string, callback: any) => {
     const config: BlockchainElectrumConfig = {
         url,
