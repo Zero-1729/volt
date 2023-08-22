@@ -83,7 +83,7 @@ export type DescriptorSymbolsType = string[];
 export type DescriptorObject = {
     external: Descriptor;
     internal: Descriptor;
-    private: Descriptor;
+    priv: Descriptor;
 };
 export type Descriptor = string;
 
