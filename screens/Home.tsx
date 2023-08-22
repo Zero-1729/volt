@@ -17,7 +17,12 @@ import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import {createBDKWallet, getWalletBalance, syncWallet} from '../modules/bdk';
+import {
+    createBDKWallet,
+    getBdkWalletBalance,
+    getBdkWalletTransactions,
+    syncBdkWallet,
+} from '../modules/bdk';
 
 import Dots from '../assets/svg/kebab-horizontal-24.svg';
 import Add from '../assets/svg/plus-32.svg';
@@ -107,7 +112,7 @@ const Home = () => {
     const initWallet = useCallback(async () => {
         const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
 
-        await syncWallet(
+        await syncBdkWallet(
             w,
             (status: boolean) => {
                 console.log('[BDK] synced wallet', status);
@@ -197,11 +202,12 @@ const Home = () => {
         }
 
         // Sync wallet
-        const {transactions, balance} = await getWalletBalance(
+        const {balance} = await getBdkWalletBalance(w, wallet.balance);
+        const {transactions} = await getBdkWalletTransactions(
             w,
-            wallet.balance,
-            wallet.transactions,
-            wallet.UTXOs,
+            wallet.network === 'testnet'
+                ? electrumServerURL.testnet
+                : electrumServerURL.bitcoin,
         );
 
         // Kill refreshing
