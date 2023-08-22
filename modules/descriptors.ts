@@ -197,11 +197,8 @@ export const createDescriptorFromXprv = (
             // Clean up descriptor to fit BDK format
             // wpkh(xprv.../84'/0'/0'/0/*)
             descriptorPrivate = reformatDescriptorToBDK(descriptorPrivate);
-
-            // Re-include checksums
-            descriptorPrivate = descriptorPrivate.includes('#')
-                ? descriptorPrivate.slice(0, -9)
-                : descriptorPrivate;
+            descriptorExternal = reformatDescriptorToBDK(descriptorExternal);
+            descriptorInternal = reformatDescriptorToBDK(descriptorInternal);
 
             // Re-include appropriate checksums
             descriptorPrivate =
@@ -250,7 +247,7 @@ export const createDescriptorFromXprv = (
 
                 break;
             case 'shp2wpkh':
-                descriptorPrivate = 
+                descriptorPrivate =
                     'sh(wpkh' +
                     '(' +
                     xprv +
@@ -272,17 +269,21 @@ export const createDescriptorFromXprv = (
                 break;
         }
 
+        // Reformat to BDK format
+        descriptorPrivate = reformatDescriptorToBDK(descriptorPrivate);
+        descriptorExternal = reformatDescriptorToBDK(descriptorExternal);
+        descriptorInternal = reformatDescriptorToBDK(descriptorInternal);
+
         // Re-include checksums
-        descriptorPrivate = descriptorPrivate.includes('#')
-            ? descriptorPrivate.slice(0, -9)
-            : descriptorPrivate;
+        descriptorPrivate =
+            descriptorPrivate + '#' + descriptors.checksum(descriptorPrivate);
         descriptorExternal =
             descriptorExternal + '#' + descriptors.checksum(descriptorExternal);
         descriptorInternal =
             descriptorInternal + '#' + descriptors.checksum(descriptorInternal);
 
         // Ready to shoot
-        Private = descriptorExternal;
+        Private = descriptorPrivate;
         External = descriptorExternal;
         Internal = descriptorInternal;
     }
