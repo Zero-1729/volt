@@ -142,14 +142,17 @@ describe('generated descriptor from xprv', () => {
         const xprv =
             'tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr';
 
-        const descriptorExternal =
+        const descriptorPrivate =
             "wpkh(tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr/84'/1'/0'/0/*)#wcm6z32h";
+        const descriptorExternal =
+            "wpkh([b5c34791/84'/1'/0']tpubDDBVgMeGwNw4nF48bznPJgxe91iovKF7h6459cnY6UoJawokFr3G2yFvNrkiouzTjN65PzvwY1HiuL9dY7EXwZ5DHRZ9yD9mH9eXmBZtTyn/0/*)#zx87kdp7";
         const descriptorInternal =
-            "wpkh(tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr/84'/1'/0'/1/*)#lv7mly60";
+            "wpkh([b5c34791/84'/1'/0']tpubDDBVgMeGwNw4nF48bznPJgxe91iovKF7h6459cnY6UoJawokFr3G2yFvNrkiouzTjN65PzvwY1HiuL9dY7EXwZ5DHRZ9yD9mH9eXmBZtTyn/1/*)#njzltc3x";
 
-        const {internal, external} = createDescriptorFromXprv(xprv);
+        const {internal, external, priv} = createDescriptorFromXprv(xprv);
 
         expect(external).toEqual(descriptorExternal);
         expect(internal).toEqual(descriptorInternal);
+        expect(priv).toEqual(descriptorPrivate);
     });
 });
