@@ -3,6 +3,7 @@
   "version": "0.2.1",
   "license": "MIT",
   "scripts": {
+    "reset": "react-native start --resetCache",
     "lint": "eslint .",
     "android": "react-native run-android",
     "android:clean": "cd android; ./gradlew clean; cd ../; npm run android",
