@@ -87,7 +87,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         tailwind(
                             'text-lg font-bold absolute text-center w-full top-6 px-4',
                         ),
-                        {color: ColorScheme.Text.Primary},
+                        {color: ColorScheme.Text.Default},
                     ]}>
                     Summary
                 </Text>
