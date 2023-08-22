@@ -13,7 +13,7 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
-import {testElectrumServer} from '../../modules/bdk';
+import {getBlockHeight} from '../../modules/bdk';
 
 import {TextSingleInput} from '../../components/input';
 
@@ -71,10 +71,10 @@ const Network = () => {
 
     // TODO: fix race conditions
     setInterval(async () => {
-        await testElectrumServer(
+        await getBlockHeight(
             electrumServerURL.bitcoin,
-            (value: boolean) => {
-                setStatus(value);
+            (args: {status: boolean; blockHeight: number}) => {
+                setStatus(args.status);
             },
         );
     }, 30 * 1000);
