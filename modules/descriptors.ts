@@ -73,36 +73,65 @@ const reformatDescriptorToBDK = (expression: string) => {
     }
 };
 
-// TODO: if xprv descriptor get xpub descriptor
 // and only save xprv version (derive 3-depth if masterNode is 0-depth xprv)
 export const createDescriptorfromString = (
     expression: string,
-): {external: string; internal: string} => {
+): {external: string; internal: string; priv: string} => {
     const parsedDescriptor = parseDescriptor(expression);
+    let xpub!: string;
 
     if (!parsedDescriptor.keyPath) {
-        throw new Error('Decsriptor must have a key path');
+        throw new Error('Descriptor must have a key path');
     }
 
     if (parsedDescriptor.keyPath.includes('1')) {
         throw new Error('Descriptor must be external key path (0/*)');
     }
 
-    let strippedDescriptor: string = expression;
-    let external: string = expression;
-    let internal: string = expression;
+    let strippedDescriptor: string = expression.includes('#')
+        ? expression.slice(0, -9)
+        : expression;
+    let external: string = strippedDescriptor;
+    let internal: string = strippedDescriptor;
+    let priv: string = strippedDescriptor;
 
-    // Remove checksum if available to manipulate internal descriptor key path
-    if (strippedDescriptor.includes('#')) {
-        strippedDescriptor = strippedDescriptor.slice(0, -9);
+    // Get the public key if xprv descriptor
+    if (!parsedDescriptor.isPublic) {
+        const xprv = getRawRootFromXprv(parsedDescriptor.keyOnly);
+
+        if (xprv.depth > 3) {
+            throw new Error('xprv descriptor must be depth of 3 or 0');
+        }
+
+        // Clean up derivation path
+        if (xprv.depth === 0) {
+            xpub = xprv.derivePath(parsedDescriptor.path).neutered().toBase58();
+        }
+
+        if (xprv.depth === 3) {
+            xpub = xprv.neutered().toBase58();
+        }
+
+        // Replace xprv with xpub
+        strippedDescriptor = strippedDescriptor.replace(
+            extendedKeyPatternG,
+            xpub,
+        );
+
+        // Reformat to public descriptor format
+        // script(xpub/key origin/keypath)
+        strippedDescriptor = reformatDescriptorToBDK(strippedDescriptor);
     }
 
-    // Re-include checksums
+    // Update external if xpub-based
+    external = strippedDescriptor;
+    // Manipulate internal descriptor key path
     internal = strippedDescriptor.replace('0/*', '1/*');
+
+    // Re-include checksums
     internal = internal + '#' + descriptors.checksum(internal);
-    external = expression.includes('#')
-        ? expression
-        : expression + '#' + descriptors.checksum(expression);
+    external = external + '#' + descriptors.checksum(external);
+    priv = priv + '#' + descriptors.checksum(priv);
 
     // Reformat to private descriptor format if xprv-based descriptor
     // We assume the descriptor has keypath in it
@@ -110,6 +139,7 @@ export const createDescriptorfromString = (
     return {
         external: reformatDescriptorToBDK(external),
         internal: reformatDescriptorToBDK(internal),
+        priv: reformatDescriptorToBDK(priv),
     };
 };
 
