@@ -681,6 +681,9 @@ export const AppStorageProvider = ({children}: Props) => {
 
         await _setWallets(tmp);
         await _updateWallets(JSON.stringify(tmp));
+
+        // Update current walled ID
+        await setCurrentWalletID(newWallet.id);
     };
 
     const restoreWallet = useCallback(
