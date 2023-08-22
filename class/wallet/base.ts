@@ -266,7 +266,7 @@ export class BaseWallet {
         this.externalDescriptor = descriptor.external;
 
         // The external descriptor with private key
-        this.privateDescriptor = descriptor.private;
+        this.privateDescriptor = descriptor.priv;
     }
 
     setAddress(address: AddressType) {

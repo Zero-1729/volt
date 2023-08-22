@@ -662,7 +662,7 @@ export const AppStorageProvider = ({children}: Props) => {
             newWallet.setDescriptor({
                 internal: InternalDescriptor,
                 external: ExternalDescriptor,
-                private: PrivateDescriptor,
+                priv: PrivateDescriptor,
             });
         }
 
@@ -813,7 +813,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 newWallet.setDescriptor({
                     internal: InternalDescriptor,
                     external: ExternalDescriptor,
-                    private: PrivateDescriptor,
+                    priv: PrivateDescriptor,
                 });
             }
 
@@ -858,7 +858,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     newWallet.setDescriptor({
                         external: descriptor.ExternalDescriptor,
                         internal: descriptor.InternalDescriptor,
-                        private: descriptor.PrivateDescriptor,
+                        priv: descriptor.PrivateDescriptor,
                     });
                 } catch (e) {
                     // Report any other related BDK errors
