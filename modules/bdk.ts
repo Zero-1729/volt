@@ -27,28 +27,6 @@ export const generateMnemonic = async () => {
     return mnemonic.asString();
 };
 
-export const fromDescriptor = async (
-    externalDescriptor: string,
-    internalDescriptor: string,
-    net: TNetwork,
-) => {
-    const external = await new BDK.Descriptor().create(
-        externalDescriptor,
-        net as Network,
-    );
-    const internal = await new BDK.Descriptor().create(
-        internalDescriptor,
-        net as Network,
-    );
-
-    // Used to rehydrate an external/internal descriptor from string
-    return {
-        ExternalDescriptor: await external.asString(),
-        InternalDescriptor: await internal.asString(),
-        PrivateDescriptor: await external.asStringPrivate(),
-    };
-};
-
 type formatTXFromBDKArgs = TransactionDetails & {
     network: string;
     confirmed: boolean;
