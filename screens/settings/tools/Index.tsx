@@ -56,13 +56,13 @@ const Index = () => {
                 <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
                 {/* Wallet Tools */}
-                {/* Xpub Converter */}
+                {/* Extended Key Converter */}
                 <PlainButton
                     style={[tailwind('w-5/6 mb-6')]}
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({
-                                name: 'XpubTool',
+                                name: 'XKeyTool',
                             }),
                         );
                     }}>

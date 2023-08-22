@@ -32,7 +32,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {BackupMaterial} from '../../../types/enums';
 
-const Xpub = () => {
+const ExtendedKey = () => {
     const [resultMessageText, setResulteMessageText] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [xkey, setXKey] = useState('');
@@ -294,4 +294,4 @@ const Xpub = () => {
     );
 };
 
-export default Xpub;
+export default ExtendedKey;
