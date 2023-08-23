@@ -366,7 +366,7 @@ const Home = () => {
 
                                     {!hideTotalBalance ? (
                                         <FiatBalance
-                                            balance={totalBalance}
+                                            balance={totalBalance.toNumber()}
                                             loading={loadingBalance}
                                             BalanceFontSize={'text-3xl'}
                                             fontColor={ColorScheme.Text.Default}
