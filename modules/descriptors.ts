@@ -383,7 +383,14 @@ export const parseDescriptor = (expression: string) => {
         networkFromPath = splitDescriptorType[1];
         descriptorType = splitDescriptorType[0];
     } catch (e: any) {
-        throw new Error('Descriptor contains an invalid wallet type');
+        // Report error if no valid path type is found
+        // e.g. malformed path like m/0/* or m/84'/0/* from above step
+        if (!extractedPath.includes('h') && !extractedPath.includes("'")) {
+            throw new Error('Detected a missing wallet path');
+        } else {
+            // If descriptor type is not supported
+            throw new Error('Detected an invalid wallet path');
+        }
     }
 
     // Report if there is a mismatch between the descriptor's path network
