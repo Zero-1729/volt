@@ -132,7 +132,10 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View
                         style={[
                             tailwind('absolute h-auto w-auto opacity-40 z-0'),
-                            {top: -16, right: -24},
+                            {
+                                top: props.hideBalance ? -34 : -16,
+                                right: props.hideBalance ? -34 : -24,
+                            },
                         ]}>
                         <BITCOIN fill={'black'} width={148} height={148} />
                     </View>
@@ -159,7 +162,11 @@ export const WalletCard = (props: WalletCardProps) => {
                             tailwind(
                                 'absolute pt-4 mt-1 text-base w-4/6 text-left text-white opacity-60',
                             ),
-                            {bottom: 54, left: 24, fontWeight: 100},
+                            {
+                                bottom: props.hideBalance ? 72 : 54,
+                                left: 24,
+                                fontWeight: 100,
+                            },
                             Font.RobotoText,
                         ]}>
                         {props.label}
