@@ -20,7 +20,7 @@ import {
     parseDescriptor,
     includeDescriptorKeyPath,
     createDescriptorFromXprv,
-    createDescriptorfromString,
+    createDescriptorFromString,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
 import {BackupMaterial, Net} from '../types/enums';
@@ -797,13 +797,13 @@ export const AppStorageProvider = ({children}: Props) => {
 
             // Create descriptor from imported descriptor if available
             if (backupMaterialType === 'descriptor') {
-                const retreivedDescriptors =
-                    createDescriptorfromString(backupMaterial);
+                const retrievedDescriptors =
+                    createDescriptorFromString(backupMaterial);
 
                 newWallet.setDescriptor({
-                    internal: retreivedDescriptors.internal, // InternalDescriptor,
-                    external: retreivedDescriptors.external, // ExternalDescriptor,
-                    priv: retreivedDescriptors.priv, // PrivateDescriptor,
+                    internal: retrievedDescriptors.internal, // InternalDescriptor,
+                    external: retrievedDescriptors.external, // ExternalDescriptor,
+                    priv: retrievedDescriptors.priv, // PrivateDescriptor,
                 });
             }
 

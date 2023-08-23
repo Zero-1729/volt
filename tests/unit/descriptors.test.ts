@@ -2,7 +2,7 @@
 import {
     parseDescriptor,
     createDescriptorFromXprv,
-    createDescriptorfromString,
+    createDescriptorFromString,
 } from './../../modules/descriptors';
 import {descriptorRegex} from '../../modules/re';
 
@@ -130,7 +130,7 @@ describe('generated descriptor from string', () => {
             "wpkh([c65d79d8/84'/0'/0']xpub6CmNYqKyLZdq1BsTyixhuNkKoa3Dt6J9pgUXjA742t7b44xAwjXZak6GvYBPda15ZqKkWippbVkCHYvHMQGuuhVsu2ohkgaVioYcNxZmEvH/1/*)#dhqwz9a9";
 
         const {internal, external} =
-            createDescriptorfromString(descriptorExternal);
+            createDescriptorFromString(descriptorExternal);
 
         expect(external).toEqual(descriptorExternal);
         expect(internal).toEqual(descriptorInternal);

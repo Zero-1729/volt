@@ -74,7 +74,7 @@ const reformatDescriptorToBDK = (expression: string) => {
 };
 
 // and only save xprv version (derive 3-depth if masterNode is 0-depth xprv)
-export const createDescriptorfromString = (
+export const createDescriptorFromString = (
     expression: string,
 ): {external: string; internal: string; priv: string} => {
     const parsedDescriptor = parseDescriptor(expression);
