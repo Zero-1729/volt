@@ -6,12 +6,12 @@ import {getInfoFromXKey, getRawRootFromXprv} from './wallet-utils';
 import {extendedKeyPatternG} from './re';
 
 const validPathTypes: {[index: string]: string} = {
-    "m/84'/0'/0'": 'wpkh',
-    "m/84'/1'/0'": 'wpkh',
-    "m/44'/0'/0'": 'p2pkh',
-    "m/44'/1'/0'": 'p2pkh',
-    "m/49'/0'/0'": 'shp2wpkh',
-    "m/49'/1'/0'": 'shp2wpkh',
+    "m/84'/0'/0'": 'wpkh:bitcoin',
+    "m/84'/1'/0'": 'wpkh:testnet',
+    "m/44'/0'/0'": 'p2pkh:bitcoin',
+    "m/44'/1'/0'": 'p2pkh:testnet',
+    "m/49'/0'/0'": 'shp2wpkh:bitcoin',
+    "m/49'/1'/0'": 'shp2wpkh:testnet',
 };
 
 type DescriptorParts = {
