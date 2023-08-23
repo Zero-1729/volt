@@ -6,6 +6,7 @@ import {
     Network,
     KeychainKind,
     BlockChainNames,
+    AddressIndex,
 } from 'bdk-rn/lib/lib/enums';
 
 import {LocalUtxo, TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
@@ -442,4 +443,22 @@ export const getBdkWalletTransactions = async (
 
     // Fallback to original wallet transactions if error fetching transactions
     return {transactions: walletTXs, UTXOs: bdkUtxos as UTXOType[]};
+};
+
+// generate address from BDK wallet
+export const generateAddress = async (
+    wallet: BDK.Wallet,
+    change: boolean,
+): Promise<{address: BDK.Address; asString: string; index: number}> => {
+    const address = change
+        ? await wallet.getInternalAddress(AddressIndex.New)
+        : await wallet.getAddress(AddressIndex.New);
+
+    const addressString = await address.address.asString();
+
+    return {
+        address: address.address,
+        asString: addressString,
+        index: address.index,
+    };
 };
