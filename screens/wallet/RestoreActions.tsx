@@ -46,7 +46,6 @@ import {BackupMaterial, Net} from '../../types/enums';
 
 const ImportAction = () => {
     const navigation = useNavigation();
-
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
@@ -100,6 +99,13 @@ const ImportAction = () => {
     const handleFolderCancel = () => {
         // Handle when user cancels folder action
         return;
+    };
+
+    const mutateInputText = (text: string) => {
+        // TODO: display properly formatted single quotes in input field [ios]
+        // This is a 50% hack to ensure the user can use single quotes
+        // for wallet paths in descriptors and they'll be interpreted properly
+        setImportText(text.replace(/[‘’]/g, "'"));
     };
 
     const onBlur = () => {
@@ -327,7 +333,7 @@ const ImportAction = () => {
                     <TextMultiInput
                         placeholder={importInstructions}
                         placeholderTextColor={ColorScheme.Text.GrayedText}
-                        onChangeText={setImportText}
+                        onChangeText={mutateInputText}
                         onBlur={onBlur}
                         color={ColorScheme.Text.Default}
                         borderColor={ColorScheme.Text.LightGreyText}

@@ -95,6 +95,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 autoCorrect={false}
                 autoCapitalize="none"
                 selectTextOnFocus={false}
+                onChangeText={props.onChange}
                 enablesReturnKeyAutomatically={true}
                 inputAccessoryViewID={InputAccessoryViewID}
                 {...props}

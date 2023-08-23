@@ -107,6 +107,7 @@ export type TextLongInputProps = BaseProps &
         folderColor?: string;
         showScanIcon?: boolean;
         showTestnetToggle?: boolean;
+        onChange?: React.Dispatch<React.SetStateAction>;
         onSuccess: (
             data: any,
         ) => void | boolean | Promise<boolean> | Promise<void>;
