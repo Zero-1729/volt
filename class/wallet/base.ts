@@ -221,6 +221,9 @@ export class BaseWallet {
             // If no private keys and descriptor is public, then watch-only
             if (noPrivKeys && privateDescriptorInfo.isPublic) {
                 this.isWatchOnly = true;
+
+                // Zero out master fingerprint if watch-only
+                this.masterFingerprint = '00000000';
             }
 
             return;
