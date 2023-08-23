@@ -173,7 +173,7 @@ const Backup = () => {
                         {backupMaterial === BackupMaterial.Descriptor &&
                         !showPrivateDescriptor ? (
                             <PlainButton
-                                style={[tailwind('absolute w-full left-0')]}
+                                style={[tailwind('absolute left-0')]}
                                 onPress={() => {
                                     writeDescriptorToFile();
                                 }}>
