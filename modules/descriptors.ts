@@ -329,8 +329,13 @@ export const createDescriptorFromXprv = (
 // Descriptor format:
 // {script}({fingerprint/path}?{xprv/xpub}{key path | (key path + path)})#checksum
 export const parseDescriptor = (expression: string) => {
+    // Rule of thumb is to always use the info from the descriptor
+    // such as network, fingerprint, and path
+    // before we look into meta info from extended keys.
     const descriptor = descriptors.DescriptorsFactory(secp256k1);
 
+    // To check for network mismatch
+    let networkFromPath = '';
     const network = _getDescriptorNetwork(expression);
 
     var descriptorObj!: any;
@@ -362,9 +367,18 @@ export const parseDescriptor = (expression: string) => {
         .replace(/h/g, "'");
 
     try {
-        descriptorType = validPathTypes[extractedPath];
+        const splitDescriptorType = validPathTypes[extractedPath].split(':');
+
+        networkFromPath = splitDescriptorType[1];
+        descriptorType = splitDescriptorType[0];
     } catch (e: any) {
         throw new Error('Descriptor contains an invalid wallet type');
+    }
+
+    // Report if there is a mismatch between the descriptor's path network
+    // and the network decoded from its extended key
+    if (networkFromPath[0] !== network.bech32[0]) {
+        throw new Error('Descriptor extended key and path network mismatch');
     }
 
     const scripts =
