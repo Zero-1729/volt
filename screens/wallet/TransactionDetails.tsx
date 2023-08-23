@@ -5,6 +5,7 @@ import React, {useContext} from 'react';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -44,6 +45,8 @@ const TransactionDetailsView = ({route}: Props) => {
 
     const {isAdvancedMode} = useContext(AppStorageContext);
 
+    const [txIdText, setTxIdText] = React.useState<string>('');
+
     const buttonText = isAdvancedMode ? 'View on Mempool.space' : 'See more';
 
     const getTxTimestamp = (time: Date) => {
@@ -62,6 +65,19 @@ const TransactionDetailsView = ({route}: Props) => {
                 route.params.tx.network === Net.Testnet ? 'testnet/' : ''
             }tx/${txid}`,
         );
+    };
+
+    const copyIdToClipboard = () => {
+        // Copy backup material to Clipboard
+        // Temporarily set copied message
+        // and revert after a few seconds
+        Clipboard.setString(route.params.tx.txid);
+
+        setTxIdText('Copied Transaction Id!');
+
+        setTimeout(() => {
+            setTxIdText('');
+        }, 450);
     };
 
     return (
@@ -193,7 +209,9 @@ const TransactionDetailsView = ({route}: Props) => {
                                             ColorScheme.Background.Greyed,
                                     },
                                 ]}>
-                                <PlainButton style={[tailwind('w-full mb-6')]}>
+                                <PlainButton
+                                    onPress={copyIdToClipboard}
+                                    style={[tailwind('w-full mb-6')]}>
                                     <Text
                                         numberOfLines={1}
                                         ellipsizeMode="middle"
@@ -301,6 +319,18 @@ const TransactionDetailsView = ({route}: Props) => {
                                     </Text>
                                 </View>
                             </View>
+
+                            {txIdText.length > 0 ? (
+                                <Text
+                                    style={[
+                                        tailwind('text-sm text-center mt-4'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {txIdText}
+                                </Text>
+                            ) : (
+                                <></>
+                            )}
                         </View>
                     ) : (
                         <></>
