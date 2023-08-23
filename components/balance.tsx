@@ -181,8 +181,12 @@ export const Balance = (props: BalanceProps) => {
                 <View
                     style={[
                         tailwind(
-                            'rounded-sm flex-row self-center w-full h-12 bg-black opacity-20',
+                            'rounded-sm flex-row self-center rounded w-full h-12',
                         ),
+                        {
+                            opacity: props.loading ? 0.15 : 0.3,
+                            backgroundColor: 'darkgrey',
+                        },
                     ]}
                 />
             )}
