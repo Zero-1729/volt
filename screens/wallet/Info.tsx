@@ -4,6 +4,9 @@ import {Text, View, TextInput, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
 import {PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 import {DeletionAlert, liberalAlert} from '../../components/alert';
@@ -88,6 +91,8 @@ const Info = () => {
         // Only update if name is not empty
         if (name.trim().length > 1) {
             setTmpName(name);
+
+            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
         }
     };
 
