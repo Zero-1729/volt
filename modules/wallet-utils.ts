@@ -225,7 +225,7 @@ export const getAddressPath = (
 export const getRawRootFromXprv = (xprv: string) => {
     const network = extendedKeyInfo[xprv[0]].network;
 
-    return bip32.fromBase58(xprv, BJSNetworks[network]);
+    return bip32.fromBase58(normalizeExtKey(xprv, 'prv'), BJSNetworks[network]);
 };
 
 export const generateRootFromXKey = (
