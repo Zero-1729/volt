@@ -226,7 +226,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                             ),
                             {color: props.fontColor},
                         ]}>
-                        {unit.symbol}
+                        {(props.showMinus ? '- ' : '') + unit.symbol}
                     </Text>
 
                     {/* Display balance in sats or BTC */}

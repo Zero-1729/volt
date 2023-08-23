@@ -32,6 +32,7 @@ import CloseIcon from '../../assets/svg/x-24.svg';
 import Success from '../../assets/svg/check-circle-fill-24.svg';
 import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
+import CopyIcon from '../../assets/svg/copy-16.svg';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionView'>;
 
@@ -43,7 +44,7 @@ const TransactionDetailsView = ({route}: Props) => {
 
     const {isAdvancedMode} = useContext(AppStorageContext);
 
-    const buttonText = isAdvancedMode ? 'Open on Mempool' : 'See more';
+    const buttonText = isAdvancedMode ? 'View on Mempool.space' : 'See more';
 
     const getTxTimestamp = (time: Date) => {
         const date = +time * 1000;
@@ -138,10 +139,172 @@ const TransactionDetailsView = ({route}: Props) => {
                         <FiatBalance
                             balance={route.params.tx.value}
                             loading={false}
+                            showMinus={route.params.tx.type === 'outbound'}
                             BalanceFontSize={'text-2xl'}
                             fontColor={ColorScheme.Text.Default}
                         />
                     </View>
+                    <Text
+                        style={[
+                            tailwind('text-sm text-center'),
+                            {color: ColorScheme.Text.GrayedText},
+                        ]}>
+                        {route.params.tx.confirmations > 6
+                            ? '6+'
+                            : route.params.tx.confirmations}{' '}
+                        confirmations
+                    </Text>
+
+                    {isAdvancedMode && route.params.tx.rbf ? (
+                        <View
+                            style={[
+                                tailwind(
+                                    'rounded-full px-4 py-1 self-center mt-4',
+                                ),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.CardGreyed,
+                                },
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind('font-bold'),
+                                    {
+                                        color: ColorScheme.Text.GrayText,
+                                    },
+                                ]}>
+                                RBF Enabled
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
+
+                    {/* More dev info */}
+                    {isAdvancedMode ? (
+                        <View style={[tailwind('w-full mt-4')]}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'w-4/5 relative self-center rounded p-6',
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <PlainButton style={[tailwind('w-full mb-6')]}>
+                                    <Text
+                                        numberOfLines={1}
+                                        ellipsizeMode="middle"
+                                        style={[
+                                            tailwind('font-bold w-full'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        <Text style={[tailwind('font-normal')]}>
+                                            Tx ID:{' '}
+                                        </Text>
+                                        {route.params.tx.txid}
+                                        <CopyIcon
+                                            style={[tailwind('ml-4 mr-0')]}
+                                            width={16}
+                                            height={16}
+                                            fill={ColorScheme.SVG.GrayFill}
+                                        />
+                                    </Text>
+                                </PlainButton>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'w-full flex-row items-center justify-between',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-normal'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        size
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            tailwind('font-bold'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        {route.params.tx.size + ' B'}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'w-full flex-row items-center justify-between',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-normal'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        virtual size
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            tailwind('font-bold'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        {route.params.tx.vsize + ' vB'}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'w-full flex-row items-center justify-between',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-normal'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        weight units
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            tailwind('font-bold'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        {route.params.tx.weight + ' WU'}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'w-full flex-row items-center justify-between',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-normal'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        fee
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            tailwind('font-bold'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        {route.params.tx.fee}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </View>
 
                 <View

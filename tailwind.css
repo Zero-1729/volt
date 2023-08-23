@@ -192,6 +192,10 @@
   margin-left: 1rem
 }
 
+.mr-0 {
+  margin-right: 0px
+}
+
 .mr-1 {
   margin-right: 0.25rem
 }
@@ -636,6 +640,10 @@
 
 .font-medium {
   font-weight: 500
+}
+
+.font-normal {
+  font-weight: 400
 }
 
 .capitalize {
