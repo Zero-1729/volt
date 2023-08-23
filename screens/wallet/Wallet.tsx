@@ -205,9 +205,8 @@ const Wallet = () => {
                             // Add address we own based on whether we sent
                             // the transaction and the value received matches
                             if (
-                                transactions[i].value.eq(
-                                    TxData.vin[j].prevout.value,
-                                ) &&
+                                transactions[i].value ===
+                                    TxData.vin[j].prevout.value &&
                                 transactions[i].type === 'outbound'
                             ) {
                                 tmp.address =
@@ -229,9 +228,8 @@ const Wallet = () => {
                             // Add address we own based on whether we received
                             // the transaction and the value received matches
                             if (
-                                transactions[i].value.eq(
-                                    TxData.vout[k].value,
-                                ) &&
+                                transactions[i].value ===
+                                    TxData.vout[k].value &&
                                 transactions[i].type === 'inbound'
                             ) {
                                 tmp.address =
