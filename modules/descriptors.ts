@@ -350,6 +350,17 @@ export const parseDescriptor = (expression: string) => {
             throw new Error('Invalid descriptor checksum');
         }
 
+        // Check if descriptor has a malformed checksum
+        // i.e. whether too long or short
+        if (expression.includes('#')) {
+            // We report accordingly based on the length of the checksum
+            const checksumLength = expression.split('#')[1].length;
+
+            throw new Error(
+                `Checksum is ${checksumLength < 9 ? 'incomplete' : 'too long'}`,
+            );
+        }
+
         throw new Error('Could not parse descriptor');
     }
 

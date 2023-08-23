@@ -26,7 +26,7 @@ const fingerprintRegex: string = String.raw`([a-fA-F0-9]{8})`;
 // [fingerprint/NUM/]
 const keyOriginRegex: string = String.raw`(\[${fingerprintRegex}${pathLevelRegex}*\])`;
 // Trailing checksum
-const checksumRegex: string = String.raw`(#[${_checksumCharset}]{8})`;
+const checksumRegex: string = String.raw`(#([${_checksumCharset}]+)?)`;
 
 // Isolated regexes for each supported extended key
 const xprvRegex: string = String.raw`([xyztuv]prv[1-9A-HJ-NP-Za-km-z]{79,108})`;
