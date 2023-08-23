@@ -53,8 +53,6 @@ export const DeletionAlert = (
     primaryButtonText: string,
     onSuccess: () => void,
 ): void => {
-    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
-
     Alert.alert(heading, msg, [
         {
             text: 'Cancel',
