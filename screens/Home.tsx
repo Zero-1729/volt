@@ -94,7 +94,14 @@ const Home = () => {
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
         (accumulator: TBalance, currentValue: BaseWallet) =>
-            accumulator.plus(currentValue.balance),
+            // Only show balances from bitcoin mainnet
+            // Don't want user tot think their testnet money
+            // is spendable
+            accumulator.plus(
+                currentValue.network === 'bitcoin'
+                    ? currentValue.balance
+                    : new BigNumber(0),
+            ),
         new BigNumber(0),
     );
 
