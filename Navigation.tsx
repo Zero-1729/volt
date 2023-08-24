@@ -15,6 +15,7 @@ import Info from './screens/wallet/Info';
 import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
+import Send from './screens/wallet/Send';
 
 import TransactionDetailsView from './screens/wallet/TransactionDetails';
 
@@ -39,7 +40,7 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import {TTransaction} from './types/wallet';
+import {TTransaction, TWalletType} from './types/wallet';
 
 // Root Param List for screens
 export type WalletParamList = {
@@ -47,6 +48,10 @@ export type WalletParamList = {
         amount: string;
         sats: string;
         fiat: string;
+    };
+    Send: {
+        invoiceData: any;
+        wallet: TWalletType;
     };
     WalletView: undefined;
     WalletInfo: undefined;
@@ -62,6 +67,7 @@ export type WalletParamList = {
 export type ScanParamList = {
     Scan: {
         screen: string;
+        wallet: TWalletType;
     };
 };
 
@@ -118,6 +124,7 @@ const WalletRoot = () => {
                     name="TransactionView"
                     component={TransactionDetailsView}
                 />
+                <WalletStack.Screen name="Send" component={Send} />
                 <WalletStack.Screen name="Receive" component={Receive} />
                 <WalletStack.Screen
                     name="RequestAmount"
