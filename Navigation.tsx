@@ -161,7 +161,9 @@ const initScreen = () => {
                 name="SettingsRoot"
                 component={SettingsRoot}
             />
-            <InitScreenStack.Screen name="ScanQR" component={ScanRoot} />
+            <InitScreenStack.Group screenOptions={{presentation: 'modal'}}>
+                <InitScreenStack.Screen name="ScanRoot" component={ScanRoot} />
+            </InitScreenStack.Group>
             <InitScreenStack.Screen name="Apps" component={Apps} />
         </InitScreenStack.Navigator>
     );
