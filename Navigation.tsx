@@ -42,6 +42,9 @@ import {actionAlert} from './components/alert';
 import Home from './screens/Home';
 import PayInvoice from './screens/wallet/PayInvoice';
 
+// Biometrics Screen
+import Lock from './screens/Lock';
+
 // Wallet screens
 import Add from './screens/wallet/Add';
 import RestoreActions from './screens/wallet/RestoreActions';
@@ -679,6 +682,24 @@ const RootNavigator = (): ReactElement => {
                 <InitScreenStack.Screen name="Apps" component={Apps} />
             </InitScreenStack.Navigator>
         </NavigationContainer>
+        <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
+            <InitScreenStack.Screen name="Lock" component={Lock} />
+            <InitScreenStack.Screen name="HomeScreen" component={Home} />
+            <InitScreenStack.Screen
+                name="AddWalletRoot"
+                component={AddWalletRoot}
+                options={{headerShown: false, presentation: 'modal'}}
+            />
+            <InitScreenStack.Screen name="WalletRoot" component={WalletRoot} />
+            <InitScreenStack.Screen
+                name="SettingsRoot"
+                component={SettingsRoot}
+            />
+            <InitScreenStack.Group screenOptions={{presentation: 'modal'}}>
+                <InitScreenStack.Screen name="ScanRoot" component={ScanRoot} />
+            </InitScreenStack.Group>
+            <InitScreenStack.Screen name="Apps" component={Apps} />
+        </InitScreenStack.Navigator>
     );
 };
 
