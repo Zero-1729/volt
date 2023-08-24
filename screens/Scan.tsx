@@ -93,16 +93,19 @@ const RequestPermView = () => {
                 ]}>
                 Camera Permission Denied
             </Text>
-            <LongButton
-                style={[
-                    {color: ColorScheme.Text.DescText},
-                    tailwind('text-sm text-center'),
-                ]}
-                onPress={openSettings}
-                backgroundColor={ColorScheme.Background.Inverted}
-                textColor={ColorScheme.Text.Alt}
-                title={'Open Settings'}
-            />
+
+            <View style={[tailwind('w-4/5')]}>
+                <LongButton
+                    style={[
+                        {color: ColorScheme.Text.DescText},
+                        tailwind('text-sm text-center'),
+                    ]}
+                    onPress={openSettings}
+                    backgroundColor={ColorScheme.Background.Inverted}
+                    textColor={ColorScheme.Text.Alt}
+                    title={'Open Settings'}
+                />
+            </View>
         </SafeAreaView>
     );
 };
