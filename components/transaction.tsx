@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
@@ -10,6 +10,8 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 
 Dayjs.extend(calendar);
 Dayjs.extend(LocalizedFormat);
+
+import {AppStorageContext} from '../class/storageContext';
 
 import {PlainButton} from './button';
 
@@ -24,8 +26,9 @@ import ArrowDown from '../assets/svg/arrow-down-left-24.svg';
 
 export const TransactionListItem = (props: TxListItemProps) => {
     const tailwind = useTailwind();
-
     const ColorScheme = Color(useColorScheme());
+
+    const {isAdvancedMode} = useContext(AppStorageContext);
 
     const getTxTimestamp = (time: Date) => {
         const date = +time * 1000;
@@ -48,11 +51,23 @@ export const TransactionListItem = (props: TxListItemProps) => {
                 ]}>
                 <View style={[tailwind('flex-row items-center w-5/6')]}>
                     <View style={[tailwind('w-full ml-1')]}>
-                        <TXBalance
-                            balance={new BigNum(props.tx.value)}
-                            BalanceFontSize={'text-lg'}
-                            fontColor={ColorScheme.Text.Default}
-                        />
+                        {props.tx.cpfp ? (
+                            <View style={[tailwind('')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-lg font-bold'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {isAdvancedMode ? 'CPFP' : 'Fee Boost'}
+                                </Text>
+                            </View>
+                        ) : (
+                            <TXBalance
+                                balance={new BigNum(props.tx.value)}
+                                BalanceFontSize={'text-lg'}
+                                fontColor={ColorScheme.Text.Default}
+                            />
+                        )}
                         <Text
                             style={[
                                 tailwind('text-xs'),
