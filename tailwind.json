@@ -359,6 +359,11 @@
 			"height": 64
 		}
 	},
+	"h-2/5": {
+		"style": {
+			"height": "40%"
+		}
+	},
 	"h-20": {
 		"style": {
 			"height": 80
@@ -589,6 +594,14 @@
 	"rounded-tr": {
 		"style": {
 			"borderTopRightRadius": 4
+		}
+	},
+	"border": {
+		"style": {
+			"borderTopWidth": 1,
+			"borderRightWidth": 1,
+			"borderBottomWidth": 1,
+			"borderLeftWidth": 1
 		}
 	},
 	"border-gray-400": {

@@ -1,7 +1,15 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
+import {
+    Text,
+    View,
+    StyleSheet,
+    useColorScheme,
+    Linking,
+    StatusBar,
+} from 'react-native';
 import {useIsFocused, CommonActions} from '@react-navigation/native';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -10,6 +18,8 @@ import {ScanParamList} from '../Navigation';
 import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
+
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import {
     useCameraDevices,
@@ -33,9 +43,9 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {LongButton, PlainButton} from '../components/button';
+import {LongBottomButton, LongButton, PlainButton} from '../components/button';
 
-import Close from '../assets/svg/x-circle-fill-24.svg';
+import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
 
 const LoadingView = (props: any) => {
@@ -105,8 +115,8 @@ type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
 
 const Scan = ({navigation, route}: Props) => {
     const isFocused = useIsFocused();
-
     const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -148,7 +158,7 @@ const Scan = ({navigation, route}: Props) => {
 
     const closeScreen = () => {
         // If from Wallet, go back to Wallet
-        if (route.params?.key === 'Wallet') {
+        if (route.params?.screen === 'Wallet') {
             navigation.dispatch(
                 CommonActions.navigate('WalletRoot', {screen: 'WalletView'}),
             );
@@ -222,25 +232,36 @@ const Scan = ({navigation, route}: Props) => {
         return <LoadingView isCamAvailable={isCamAvailable} />;
     }
 
+    const forwardClipboard = async () => {
+        const data = await Clipboard.getString();
+
+        if (data) {
+            console.log('[Scan Clipboard]: ', data);
+        }
+    };
+
     // Display Camera view if camera available
     return (
         <SafeAreaView style={[styles.flexed]}>
-            <View style={styles.flexed}>
-                <Camera
-                    style={[styles.flexed]}
-                    device={camera}
-                    isActive={isFocused}
-                    frameProcessor={frameProcessor}
-                    frameProcessorFps={1}
-                    onError={onError}
-                />
+            {/* Fake status bar filler */}
+            <StatusBar barStyle={'light-content'} />
+            <View
+                style={[
+                    tailwind('absolute w-full h-16 top-0'),
+                    {backgroundColor: ColorScheme.Background.Inverted},
+                ]}
+            />
+            <View
+                style={[
+                    tailwind('items-center justify-center'),
+                    styles.flexed,
+                    {backgroundColor: ColorScheme.Background.Inverted},
+                ]}>
                 <PlainButton
                     onPress={closeScreen}
                     style={[tailwind('absolute right-8 top-5 z-10')]}>
                     <Close fill={'white'} />
                 </PlainButton>
-
-                {/* TODO: Reduce focus frame to middle of screen */}
                 {/* Screen header */}
                 <View
                     style={[
@@ -250,16 +271,57 @@ const Scan = ({navigation, route}: Props) => {
                         styles.flexed,
                     ]}>
                     <Text style={[tailwind('text-lg text-white')]}>
-                        Scan QR
+                        Scan Invoice QR
                     </Text>
                 </View>
 
-                {/* Screen footer */}
+                {/* Scan midsection */}
                 <View
                     style={[
                         tailwind(
-                            'absolute bottom-0 h-28 w-full bg-black opacity-70',
+                            'items-center justify-center w-full h-full -mt-8',
                         ),
+                    ]}>
+                    <Text
+                        style={[
+                            tailwind('text-sm mb-4'),
+                            {color: ColorScheme.Text.Alt},
+                        ]}>
+                        Scan a Bitcoin invoice or address to pay
+                    </Text>
+
+                    {/* Scan Area */}
+                    <View
+                        style={[
+                            tailwind('h-2/5 w-4/5 border'),
+                            {
+                                borderWidth: 2,
+                                borderColor: 'white',
+                                borderRadius: 12,
+                            },
+                        ]}>
+                        <Camera
+                            style={[styles.flexed]}
+                            device={camera}
+                            isActive={isFocused}
+                            frameProcessor={frameProcessor}
+                            frameProcessorFps={1}
+                            onError={onError}
+                        />
+                    </View>
+                </View>
+
+                <LongBottomButton
+                    onPress={forwardClipboard}
+                    title={'Paste'}
+                    textColor={ColorScheme.Text.Default}
+                    backgroundColor={ColorScheme.Background.Primary}
+                />
+
+                <View
+                    style={[
+                        tailwind('absolute bottom-0 h-28 w-full bg-black'),
+                        {zIndex: -1},
                     ]}
                 />
             </View>
@@ -270,6 +332,7 @@ const Scan = ({navigation, route}: Props) => {
 const styles = StyleSheet.create({
     flexed: {
         flex: 1,
+        borderRadius: 11,
     },
 });
 

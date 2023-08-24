@@ -284,6 +284,10 @@
   height: 4rem
 }
 
+.h-2\/5 {
+  height: 40%
+}
+
 .h-20 {
   height: 5rem
 }
@@ -458,6 +462,10 @@
 
 .rounded-tr {
   border-top-right-radius: 0.25rem
+}
+
+.border {
+  border-width: 1px
 }
 
 .border-gray-400 {
