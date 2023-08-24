@@ -48,6 +48,8 @@ import {LongBottomButton, LongButton, PlainButton} from '../components/button';
 import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
 
+type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
+
 const LoadingView = (props: any) => {
     const ColorScheme = Color(useColorScheme());
 
@@ -114,9 +116,7 @@ const openSettings = () => {
     Linking.openSettings();
 };
 
-type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
-
-const Scan = ({navigation, route}: Props) => {
+const Scan = ({route}: Props) => {
     const isFocused = useIsFocused();
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
