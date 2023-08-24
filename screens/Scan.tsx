@@ -2,15 +2,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useCallback, useEffect, useState} from 'react';
 
+import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
 import {
-    Text,
-    View,
-    StyleSheet,
-    useColorScheme,
-    Linking,
-    StatusBar,
-} from 'react-native';
-import {useIsFocused, CommonActions} from '@react-navigation/native';
+    useIsFocused,
+    CommonActions,
+    useNavigation,
+} from '@react-navigation/native';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
@@ -19,7 +16,7 @@ import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
-import Clipboard from '@react-native-clipboard/clipboard';
+import decodeURI from 'bip21';
 
 import {
     useCameraDevices,
@@ -47,6 +44,9 @@ import {LongBottomButton, LongButton, PlainButton} from '../components/button';
 
 import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
+
+import {conservativeAlert} from '../components/alert';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
 
@@ -119,7 +119,7 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const isFocused = useIsFocused();
     const tailwind = useTailwind();
-    const ColorScheme = Color(useColorScheme());
+    const navigation = useNavigation();
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -130,45 +130,34 @@ const Scan = ({route}: Props) => {
     const [isCamAvailable, setCamAvailable] = useState<boolean | null>(null);
 
     const onError = useCallback(async (error: CameraRuntimeError) => {
-        // TODO: Push to handle in UI, maybe as modal or something similar
-        console.error(
-            `[Scanner] Camera Error: (${error.code}) ${error.message}`,
-        );
+        conservativeAlert('QR Scan', error.message);
     }, []);
 
-    const onQRDetected = useCallback(async (data: Barcode[]) => {
-        // TODO: Handle only first item detected
-        for (let qr of data) {
-            console.info(`[Scanner] Detected QR Raw Data: ${qr.rawValue}`);
+    const onQRDetected = useCallback(async (QR: Barcode[]) => {
+        const rawQRData = QR[0].content.data as string;
+
+        const decodedQR = handleInvalidInvoice(rawQRData);
+
+        if (decodedQR) {
+            // To highlight the successful scan, we'll trigger a success haptic
+            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+
+            // Gracefully return with scanned data
+            // head to wallet send screen
+            runOnJS(navigation.dispatch)(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'Send',
+                    params: {
+                        invoiceData: decodedQR,
+                        wallet: route.params.wallet,
+                    },
+                }),
+            );
         }
-
-        // To highlight the successful scan, we'll trigger a success haptic
-        RNHapticFeedback.trigger(
-            'notificationSuccess',
-            RNHapticFeedbackOptions,
-        );
-
-        // Head back home after attempted scan
-        // TODO: Gracefully return with scanned data
-        // Ideally, we'd head to a wallet screen with scanned data
-        runOnJS(navigation.dispatch)(
-            CommonActions.navigate({
-                name: 'HomeScreen',
-                params: {QR: data},
-            }),
-        );
     }, []);
 
     const closeScreen = () => {
-        // If from Wallet, go back to Wallet
-        if (route.params?.screen === 'Wallet') {
-            navigation.dispatch(
-                CommonActions.navigate('WalletRoot', {screen: 'WalletView'}),
-            );
-        } else {
-            // Otherwise, go back to Home
-            navigation.dispatch(CommonActions.goBack());
-        }
+        navigation.dispatch(CommonActions.goBack());
     };
 
     // Update permission state when permission changes.
@@ -235,46 +224,75 @@ const Scan = ({route}: Props) => {
         return <LoadingView isCamAvailable={isCamAvailable} />;
     }
 
-    const forwardClipboard = async () => {
-        const data = await Clipboard.getString();
+    const handleInvalidInvoice = (invoice: string) => {
+        // TODO: check that wallet network matches address network
+        // TODO: check if wallet too broke for tx, if amount encoded
+        try {
+            const decodedInvoice = decodeURI.decode(invoice);
 
-        if (data) {
-            console.log('[Scan Clipboard]: ', data);
+            return decodedInvoice;
+        } catch (e) {
+            conservativeAlert(
+                'Invalid Invoice',
+                `The following invoice is invalid: ${invoice}`,
+            );
         }
     };
 
+    const handleClipboard = async () => {
+        const clipboardData = await Clipboard.getString();
+
+        const decodedInvoice = handleInvalidInvoice(clipboardData);
+
+        if (decodedInvoice) {
+            // To highlight the successful scan, we'll trigger a success haptic
+            RNHapticFeedback.trigger(
+                'notificationSuccess',
+                RNHapticFeedbackOptions,
+            );
+
+            // Return clipboard data
+            runOnJS(navigation.dispatch)(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'Send',
+                    params: {
+                        invoiceData: clipboardData,
+                        wallet: route.params.wallet,
+                    },
+                }),
+            );
+        }
+    };
+
+    const dynamicHeading =
+        route.params.screen === 'send' ? 'Scan Invoice QR' : 'Scan QR Code';
+
     // Display Camera view if camera available
     return (
-        <SafeAreaView style={[styles.flexed]}>
-            {/* Fake status bar filler */}
-            <StatusBar barStyle={'light-content'} />
+        <SafeAreaView
+            style={[styles.flexed]}
+            edges={['bottom', 'left', 'right']}>
             <View
                 style={[
-                    tailwind('absolute w-full h-16 top-0'),
-                    {backgroundColor: ColorScheme.Background.Inverted},
-                ]}
-            />
-            <View
-                style={[
-                    tailwind('items-center justify-center'),
+                    tailwind(
+                        'items-center bg-black justify-center h-full w-full',
+                    ),
                     styles.flexed,
-                    {backgroundColor: ColorScheme.Background.Inverted},
                 ]}>
-                <PlainButton
-                    onPress={closeScreen}
-                    style={[tailwind('absolute right-8 top-5 z-10')]}>
-                    <Close fill={'white'} />
-                </PlainButton>
-                {/* Screen header */}
                 <View
                     style={[
                         tailwind(
-                            'absolute top-0 h-16 w-full bg-black opacity-70 items-center justify-center',
+                            'absolute top-6 z-10 w-full flex-row items-center justify-center',
                         ),
-                        styles.flexed,
                     ]}>
-                    <Text style={[tailwind('text-lg text-white')]}>
-                        Scan Invoice QR
+                    <PlainButton
+                        onPress={closeScreen}
+                        style={[tailwind('absolute z-10 left-6')]}>
+                        <Close fill={'white'} />
+                    </PlainButton>
+                    {/* Screen header */}
+                    <Text style={[tailwind('text-sm text-white font-bold')]}>
+                        {dynamicHeading}
                     </Text>
                 </View>
 
@@ -285,11 +303,7 @@ const Scan = ({route}: Props) => {
                             'items-center justify-center w-full h-full -mt-8',
                         ),
                     ]}>
-                    <Text
-                        style={[
-                            tailwind('text-sm mb-4'),
-                            {color: ColorScheme.Text.Alt},
-                        ]}>
+                    <Text style={[tailwind('text-sm mb-4'), {color: 'white'}]}>
                         Scan a Bitcoin invoice or address to pay
                     </Text>
 
@@ -304,7 +318,7 @@ const Scan = ({route}: Props) => {
                             },
                         ]}>
                         <Camera
-                            style={[styles.flexed]}
+                            style={[styles.flexed, {borderRadius: 11}]}
                             device={camera}
                             isActive={isFocused}
                             frameProcessor={frameProcessor}
@@ -315,10 +329,10 @@ const Scan = ({route}: Props) => {
                 </View>
 
                 <LongBottomButton
-                    onPress={forwardClipboard}
-                    title={'Manual'}
-                    textColor={ColorScheme.Text.Alt}
-                    backgroundColor={ColorScheme.Background.Inverted}
+                    onPress={handleClipboard}
+                    title={'Paste'}
+                    textColor={'black'}
+                    backgroundColor={'white'}
                 />
             </View>
         </SafeAreaView>
@@ -328,7 +342,6 @@ const Scan = ({route}: Props) => {
 const styles = StyleSheet.create({
     flexed: {
         flex: 1,
-        borderRadius: 11,
     },
 });
 
