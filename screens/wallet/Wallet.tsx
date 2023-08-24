@@ -577,6 +577,7 @@ const Wallet = () => {
                                                 name: 'TransactionView',
                                                 params: {
                                                     tx: {...item.item},
+                                                    source: 'conservative',
                                                 },
                                             }),
                                         );

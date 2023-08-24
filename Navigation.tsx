@@ -55,6 +55,7 @@ export type WalletParamList = {
     RequestAmount: undefined;
     TransactionView: {
         tx: TransactionType;
+        source: string;
     };
 };
 

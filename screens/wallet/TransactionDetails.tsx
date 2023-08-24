@@ -9,7 +9,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Edges, SafeAreaView} from 'react-native-safe-area-context';
 
 import Dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
@@ -80,8 +80,16 @@ const TransactionDetailsView = ({route}: Props) => {
         }, 450);
     };
 
+    // We need to make adjustments to the screen based on the source caller.
+    // conservative - from the wallet view
+    // liberal - from home screen
+    const edges: Edges =
+        route.params.source === 'liberal'
+            ? ['top', 'bottom', 'left', 'right']
+            : ['bottom', 'right', 'left'];
+
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView edges={edges}>
             <View
                 style={[
                     tailwind('w-full h-full relative justify-center'),

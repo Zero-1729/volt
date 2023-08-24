@@ -449,7 +449,23 @@ const Home = () => {
                                 ]}
                                 data={extractAllTransactions()}
                                 renderItem={item => (
-                                    <TransactionListItem tx={item.item} />
+                                    <TransactionListItem
+                                        callback={() => {
+                                            navigation.dispatch(
+                                                CommonActions.navigate(
+                                                    'WalletRoot',
+                                                    {
+                                                        screen: 'TransactionView',
+                                                        params: {
+                                                            tx: {...item.item},
+                                                            source: 'liberal',
+                                                        },
+                                                    },
+                                                ),
+                                            );
+                                        }}
+                                        tx={item.item}
+                                    />
                                 )}
                                 keyExtractor={item => item.txid}
                                 initialNumToRender={25}
