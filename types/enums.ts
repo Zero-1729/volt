@@ -1,11 +1,11 @@
-export const enum BackupMaterial {
+export const enum EBackupMaterial {
     Mnemonic = 'mnemonic',
     Xpub = 'xpub',
     Xprv = 'xprv',
     Descriptor = 'descriptor',
 }
 
-export const enum Net {
+export const enum ENet {
     Bitcoin = 'bitcoin',
     Testnet = 'testnet',
 }

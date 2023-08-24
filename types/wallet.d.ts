@@ -10,27 +10,27 @@ import {LegacyWallet} from '../class/wallet/p2pkh';
 import {LocalUtxo} from 'bdk-rn/lib/classes/Bindings';
 
 import {Network} from 'bdk-rn/lib/lib/enums';
-import {Net} from './enums';
+import {ENet} from './enums';
 
-export type TNetwork = Net | Network;
+export type TNetwork = ENet | Network;
 
 export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
 
 // Wallet balance type
-export type BalanceType = BigNumber;
+export type TBalance = BigNumber;
 
 // Wallet balance fiat rate
-export type FiatRate = {
-    rate: BalanceType;
+export type TFiatRate = {
+    rate: TBalance;
     lastUpdated: Date;
     source: string;
 };
 
 // UTXO Type
-export type UTXOType = LocalUtxo & {
+export type TUtxo = LocalUtxo & {
     txid: string; // Transaction ID
     vout: number; // Transaction output index
-    value: BalanceType; // Transaction output value in sats
+    value: TBalance; // Transaction output value in sats
     address: string; // Transaction output address
     flagged?: boolean; // Whether flagged by user to avoid spending, i.e. dust
     scriptpubkey: string;
@@ -39,36 +39,36 @@ export type UTXOType = LocalUtxo & {
 };
 
 // Transaction Type
-export type TransactionType = {
-    network: Net; // Network type
+export type TTransaction = {
+    network: NetType; // Network type
     txid: string; // Transaction ID
     block_height: number; // Block height
     confirmed: boolean; // Whether transaction is confirmed
-    confirmations: number; // Number of confirmations
-    size: number; // Transaction size in bytes
-    vsize: number; // Transaction size in virtual bytes
-    weight: number; // Transaction weight
-    fee: number; // Transaction fee in sats
-    value: number; // Transaction value in sats
-    received: number; // Transaction received value in sats
-    sent: number; // Transaction sent value in sats
+    confirmations?: number; // Number of confirmations
+    size?: number; // Transaction size in bytes
+    vsize?: number; // Transaction size in virtual bytes
+    weight?: number; // Transaction weight
+    fee: BalanceType; // Transaction fee in sats
+    value: BalanceType; // Transaction value in sats
+    received: BalanceType; // Transaction received value in sats
+    sent: BalanceType; // Transaction sent value in sats
     timestamp: Date; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
-    inputs?: UTXOType[]; // Transaction inputs
-    outputs?: UTXOType[]; // Transaction outputs
+    inputs?: TUTXO[]; // Transaction inputs
+    outputs?: TUTXO[]; // Transaction outputs
     address?: string; // Transaction address
     rbf: boolean; // Whether transaction is RBF
     memo?: string; // Transaction memo
 };
 
 // Wallet Unit Type
-export type Unit = {
+export type TUnit = {
     name: string; // Unit name, 'sats' or 'BTC'
     symbol: string; // Unit symbol '₿' or 'sats' (see https://satsymbol.com/)
 };
 
 // Address type
-export type AddressType = {
+export type TAddress = {
     address: string; // Address
     path: string; // Address derivation path
     index: number; // Address derivation index
@@ -76,36 +76,36 @@ export type AddressType = {
     memo: string; // Address memo
 };
 
-export type DescriptorSymbolsType = string[];
-export type DescriptorObject = {
+export type TDescriptorSymbols = string[];
+export type TDescriptorObject = {
     external: Descriptor;
     internal: Descriptor;
     priv: Descriptor;
 };
-export type Descriptor = string;
+export type TDescriptor = string;
 
-export type BaseWalletArgs = {
+export type TBaseWalletArgs = {
     name: string;
     type: string;
     derivationPath?: string;
     mnemonic?: string;
     xprv?: string;
     xpub?: string;
-    network?: Net;
+    network?: ENet;
     fingerprint?: string;
 };
 
-export type ExtendedKeyInfoType = {
-    network: Net;
+export type TExtendedKeyInfo = {
+    network: ENet;
     type: string; // Wallet type
 };
 
-export type ElectrumServerURLs = {
+export type TElectrumServerURLs = {
     bitcoin: string;
     testnet: string;
 };
 
-export type AccountPaths = {
+export type TAccountPaths = {
     bitcoin: string;
     testnet: string;
 };
