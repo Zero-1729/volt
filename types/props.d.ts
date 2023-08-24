@@ -64,15 +64,14 @@ export type TxListItemProps = BaseProps & {
 
 export type TxBalanceProps = BaseProps & {
     balance: BalanceType;
-    BalanceFontSize?: string;
+    balanceFontSize?: string;
     fontColor?: string;
 };
 
 export type BalanceProps = BaseProps & {
     id: string; // current id of the wallet to show balance
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
-    BalanceFontSize?: string;
-    SatsFontSize?: string;
+    balanceFontSize?: string;
     loading: boolean;
     disableFiat: boolean; // false by default
 };

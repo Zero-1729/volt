@@ -201,7 +201,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     <View style={tailwind('w-full absolute mx-6 bottom-5')}>
                         <Balance
                             id={props.id}
-                            BalanceFontSize={'text-2xl'}
+                            balanceFontSize={'text-2xl'}
                             disableFiat={true}
                             loading={props.loading}
                         />

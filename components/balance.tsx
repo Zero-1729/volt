@@ -58,7 +58,7 @@ export const TXBalance = (props: TxBalanceProps) => {
                     numberOfLines={1}
                     style={[
                         tailwind(
-                            `${props.BalanceFontSize} font-bold self-start mr-2`,
+                            `${props.balanceFontSize} font-bold self-start mr-2`,
                         ),
                         {color: props.fontColor},
                         {marginTop: appUnit.name === 'sats' ? 1 : 0},
@@ -72,7 +72,7 @@ export const TXBalance = (props: TxBalanceProps) => {
                     numberOfLines={1}
                     style={[
                         tailwind(
-                            `${props.BalanceFontSize} font-bold text-white self-baseline`,
+                            `${props.balanceFontSize} font-bold text-white self-baseline`,
                         ),
                         {color: props.fontColor},
                     ]}>
@@ -141,8 +141,8 @@ export const Balance = (props: BalanceProps) => {
                             style={[
                                 tailwind(
                                     `${
-                                        props.BalanceFontSize
-                                            ? props.BalanceFontSize
+                                        props.balanceFontSize
+                                            ? props.balanceFontSize
                                             : 'text-2xl'
                                     } self-center ${
                                         appUnit.name === 'sats' ? 'mt-0.5' : ''
@@ -161,8 +161,8 @@ export const Balance = (props: BalanceProps) => {
                             style={[
                                 tailwind(
                                     `${
-                                        props.BalanceFontSize
-                                            ? props.BalanceFontSize
+                                        props.balanceFontSize
+                                            ? props.balanceFontSize
                                             : 'text-2xl'
                                     } text-white self-center`,
                                 ),
@@ -219,8 +219,8 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                         style={[
                             tailwind(
                                 `${
-                                    props.BalanceFontSize
-                                        ? props.BalanceFontSize
+                                    props.balanceFontSize
+                                        ? props.balanceFontSize
                                         : 'text-2xl'
                                 } self-baseline mr-2`,
                             ),
@@ -236,8 +236,8 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                         style={[
                             tailwind(
                                 `${
-                                    props.BalanceFontSize
-                                        ? props.BalanceFontSize
+                                    props.balanceFontSize
+                                        ? props.balanceFontSize
                                         : 'text-2xl'
                                 } self-baseline`,
                             ),
