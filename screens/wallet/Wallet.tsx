@@ -471,7 +471,17 @@ const Wallet = () => {
                                             ColorScheme.Background.Inverted,
                                     },
                                 ]}>
-                                <PlainButton>
+                                <PlainButton
+                                    onPress={() => {
+                                        navigation.dispatch(
+                                            CommonActions.navigate('ScanQR', {
+                                                name: 'Scan',
+                                                params: {
+                                                    source: 'send',
+                                                },
+                                            }),
+                                        );
+                                    }}>
                                     <Text
                                         style={[
                                             tailwind(
