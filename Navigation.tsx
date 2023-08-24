@@ -39,7 +39,7 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import {TransactionType} from './types/wallet';
+import {TTransaction} from './types/wallet';
 
 // Root Param List for screens
 export type WalletParamList = {
@@ -54,7 +54,7 @@ export type WalletParamList = {
     AddressOwnership: undefined;
     RequestAmount: undefined;
     TransactionView: {
-        tx: TransactionType;
+        tx: TTransaction;
         source: string;
     };
 };
