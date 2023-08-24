@@ -60,11 +60,9 @@ export type WalletParamList = {
 };
 
 export type ScanParamList = {
-    Scan:
-        | {
-              key?: string;
-          }
-        | undefined;
+    Scan: {
+        screen: string;
+    };
 };
 
 const SettingsStack = createNativeStackNavigator();
