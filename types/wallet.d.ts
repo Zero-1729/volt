@@ -58,6 +58,7 @@ export type TTransaction = {
     outputs?: TUTXO[]; // Transaction outputs
     address?: string; // Transaction address
     rbf: boolean; // Whether transaction is RBF
+    cpfp: boolean; // Whether transaction is CPFP
     memo?: string; // Transaction memo
 };
 
