@@ -166,8 +166,12 @@ const TransactionDetailsView = ({route}: Props) => {
                                 style={[tailwind('mt-6')]}
                                 balance={route.params.tx.value}
                                 loading={false}
-                                showMinus={route.params.tx.type === 'outbound'}
-                                BalanceFontSize={'text-2xl'}
+                                amountSign={
+                                    route.params.tx.type === 'inbound'
+                                        ? '+'
+                                        : '-'
+                                }
+                                balanceFontSize={'text-2xl'}
                                 fontColor={ColorScheme.Text.Default}
                             />
                         ) : !isAdvancedMode ? (

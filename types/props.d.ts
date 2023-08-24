@@ -79,8 +79,8 @@ export type BalanceProps = BaseProps & {
 
 export type FiatBalanceProps = BaseProps & {
     balance: number;
-    BalanceFontSize?: string;
-    showMinus?: boolean;
+    balanceFontSize?: string;
+    amountSign?: string;
     loading: boolean;
     fontColor: string;
 };
