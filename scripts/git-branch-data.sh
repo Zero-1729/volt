@@ -32,4 +32,4 @@ GIT_HEAD_REF=$(git symbolic-ref --short HEAD 2>/dev/null)
 GIT_COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null)
 
 # Return json format friendly output
-echo \"$GIT_HEAD_REF \($GIT_COMMIT_HASH\)\"
+echo \"$GIT_HEAD_REF \(\#$GIT_COMMIT_HASH\)\"
