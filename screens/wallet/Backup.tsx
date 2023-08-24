@@ -32,7 +32,7 @@ import ShareIcon from '../../assets/svg/share-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
-import {BackupMaterial} from '../../types/enums';
+import {EBackupMaterial} from '../../types/enums';
 import {conservativeAlert} from '../../components/alert';
 
 const Backup = () => {
@@ -54,9 +54,9 @@ const Backup = () => {
     const isSingleMaterial = walletData.mnemonic === '';
     const walletAvailMaterial: string =
         walletData.mnemonic !== ''
-            ? BackupMaterial.Mnemonic
+            ? EBackupMaterial.Mnemonic
             : walletData.externalDescriptor !== ''
-            ? BackupMaterial.Descriptor
+            ? EBackupMaterial.Descriptor
             : 'Extended Public Key (XPUB)';
 
     const togglePrivateDescriptor = () => {
@@ -76,7 +76,7 @@ const Backup = () => {
     const getQRData = (material: string) => {
         // Only show mnemonic if mnemonic available and toggled
         if (
-            material === BackupMaterial.Mnemonic &&
+            material === EBackupMaterial.Mnemonic &&
             walletData.mnemonic !== ''
         ) {
             return walletData.mnemonic;
@@ -85,7 +85,7 @@ const Backup = () => {
         // Shows descriptor if available or toggled
         if (
             walletData.externalDescriptor ||
-            material === BackupMaterial.Descriptor
+            material === EBackupMaterial.Descriptor
         ) {
             return showPrivateDescriptor
                 ? walletData.privateDescriptor
@@ -108,7 +108,7 @@ const Backup = () => {
             RNFS.TemporaryDirectoryPath +
             `/${walletData.name}-wallet_descriptor_backup.txt`;
 
-        const fileBackupData = getQRData(BackupMaterial.Descriptor);
+        const fileBackupData = getQRData(EBackupMaterial.Descriptor);
 
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
@@ -138,7 +138,7 @@ const Backup = () => {
     const updateData = (material: string) => {
         // Clear the Private Descriptor toggle
         // It's super sensitive and should be reset
-        if (material !== BackupMaterial.Descriptor) {
+        if (material !== EBackupMaterial.Descriptor) {
             setShowPrivateDescriptor(false);
         }
 
@@ -170,7 +170,7 @@ const Backup = () => {
                     {/* Top panel */}
                     <View style={[tailwind('absolute top-6  w-full left-0')]}>
                         {/* Allow exporting public descriptor to file */}
-                        {backupMaterial === BackupMaterial.Descriptor &&
+                        {backupMaterial === EBackupMaterial.Descriptor &&
                         !showPrivateDescriptor ? (
                             <PlainButton
                                 style={[tailwind('absolute left-0')]}
@@ -254,18 +254,18 @@ const Backup = () => {
                                     style={[tailwind('mr-4')]}
                                     disabled={
                                         backupMaterial ===
-                                            BackupMaterial.Mnemonic ||
+                                            EBackupMaterial.Mnemonic ||
                                         walletData.mnemonic === ''
                                     }
                                     onPress={() => {
-                                        updateData(BackupMaterial.Mnemonic);
+                                        updateData(EBackupMaterial.Mnemonic);
                                     }}>
                                     <Text
                                         style={[
                                             tailwind(
                                                 `text-sm ${
                                                     backupMaterial ===
-                                                    BackupMaterial.Mnemonic
+                                                    EBackupMaterial.Mnemonic
                                                         ? 'font-bold'
                                                         : ''
                                                 }`,
@@ -273,7 +273,7 @@ const Backup = () => {
                                             {
                                                 color:
                                                     backupMaterial ===
-                                                    BackupMaterial.Mnemonic
+                                                    EBackupMaterial.Mnemonic
                                                         ? ColorScheme.Text
                                                               .Default
                                                         : ColorScheme.Text
@@ -296,17 +296,17 @@ const Backup = () => {
                                 <PlainButton
                                     disabled={
                                         backupMaterial ===
-                                        BackupMaterial.Descriptor
+                                        EBackupMaterial.Descriptor
                                     }
                                     onPress={() => {
-                                        updateData(BackupMaterial.Descriptor);
+                                        updateData(EBackupMaterial.Descriptor);
                                     }}>
                                     <Text
                                         style={[
                                             tailwind(
                                                 `text-sm ${
                                                     backupMaterial ===
-                                                    BackupMaterial.Descriptor
+                                                    EBackupMaterial.Descriptor
                                                         ? 'font-bold'
                                                         : ''
                                                 }`,
@@ -314,7 +314,7 @@ const Backup = () => {
                                             {
                                                 color:
                                                     backupMaterial ===
-                                                    BackupMaterial.Descriptor
+                                                    EBackupMaterial.Descriptor
                                                         ? ColorScheme.Text
                                                               .Default
                                                         : ColorScheme.Text
@@ -349,7 +349,7 @@ const Backup = () => {
                                 },
                             ]}
                             numberOfLines={
-                                backupMaterial === BackupMaterial.Mnemonic
+                                backupMaterial === EBackupMaterial.Mnemonic
                                     ? 2
                                     : 1
                             }
@@ -361,7 +361,7 @@ const Backup = () => {
                     {/* Toggle with private key version */}
                     {/* Only available if not watch-only */}
                     {!walletData.isWatchOnly &&
-                        backupMaterial === BackupMaterial.Descriptor && (
+                        backupMaterial === EBackupMaterial.Descriptor && (
                             <View
                                 style={[
                                     tailwind(

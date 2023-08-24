@@ -37,7 +37,7 @@ import {EmptyCard, WalletCard} from '../components/card';
 import {TransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
-import {BalanceType, TransactionType} from '../types/wallet';
+import {TBalance, TTransaction} from '../types/wallet';
 
 import {FiatBalance} from '../components/balance';
 
@@ -92,15 +92,15 @@ const Home = () => {
     const wallet = getWalletData(currentWalletID);
 
     // add the total balances of the wallets
-    const totalBalance: BalanceType = wallets.reduce(
-        (accumulator: BalanceType, currentValue: BaseWallet) =>
+    const totalBalance: TBalance = wallets.reduce(
+        (accumulator: TBalance, currentValue: BaseWallet) =>
             accumulator.plus(currentValue.balance),
         new BigNumber(0),
     );
 
     // List out all transactions across all wallets
-    const extractAllTransactions = (): TransactionType[] => {
-        let transactions: TransactionType[] = [];
+    const extractAllTransactions = (): TTransaction[] => {
+        let transactions: TTransaction[] = [];
 
         for (const w of wallets) {
             transactions = transactions.concat(w.transactions);
@@ -133,7 +133,7 @@ const Home = () => {
                     await fetchFiatRate(
                         ticker,
                         fiatRate,
-                        (rate: BalanceType) => {
+                        (rate: TBalance) => {
                             updateFiatRate({
                                 ...fiatRate,
                                 rate: rate,
@@ -181,7 +181,7 @@ const Home = () => {
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
             fiatRate,
-            (rate: BalanceType) => {
+            (rate: TBalance) => {
                 // Then fetch fiat rate
                 updateFiatRate({
                     ...fiatRate,

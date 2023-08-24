@@ -12,12 +12,8 @@ const bip32 = BIP32Factory(ecc);
 
 import Crypto from 'react-native-quick-crypto';
 
-import {
-    DescriptorSymbolsType,
-    TNetwork,
-    TransactionType,
-} from '../types/wallet';
-import {BackupMaterial, Net} from '../types/enums';
+import {TDescriptorSymbols, TNetwork, TTransaction} from '../types/wallet';
+import {EBackupMaterial, ENet} from '../types/enums';
 
 import {
     validExtendedKeyPrefixes,
@@ -33,10 +29,8 @@ import {
     extendedKeyPattern,
 } from './re';
 
-export const getUniqueTXs = (
-    transactions: TransactionType[],
-): TransactionType[] => {
-    const uniqueTXs: TransactionType[] = [];
+export const getUniqueTXs = (transactions: TTransaction[]): TTransaction[] => {
+    const uniqueTXs: TTransaction[] = [];
 
     transactions.forEach(tx => {
         if (!uniqueTXs.some(item => item.txid === tx.txid)) {
@@ -66,7 +60,7 @@ export const isDescriptorPattern = (expression: string) => {
 };
 
 // Descriptor Symbols
-export const descriptorSymbols: DescriptorSymbolsType = [
+export const descriptorSymbols: TDescriptorSymbols = [
     '[',
     ']',
     '(',
@@ -83,7 +77,7 @@ const _getPrefix = (key: string): string => {
     return key.slice(0, 4);
 };
 
-export const getExtendedKeyPrefix = (key: string): BackupMaterial => {
+export const getExtendedKeyPrefix = (key: string): EBackupMaterial => {
     const prefix = _getPrefix(key);
 
     if (!isExtendedKey(key)) {
@@ -95,8 +89,8 @@ export const getExtendedKeyPrefix = (key: string): BackupMaterial => {
     }
 
     return prefix.slice(1) === 'pub'
-        ? BackupMaterial.Xpub
-        : BackupMaterial.Xprv;
+        ? EBackupMaterial.Xpub
+        : EBackupMaterial.Xprv;
 };
 
 export const isSupportedExtKey = (key: string): boolean => {
@@ -237,14 +231,14 @@ export const generateRootFromXKey = (
     let key = xkey;
 
     // We must normalize the xpub for bitcoinjs-lib
-    if (prefix === BackupMaterial.Xpub) {
+    if (prefix === EBackupMaterial.Xpub) {
         key = normalizeExtKey(xkey, 'pub');
     }
 
     let root = bip32.fromBase58(key, BJSNetworks[net]);
 
     // Check that xpub given is three levels deep
-    if (prefix === BackupMaterial.Xpub) {
+    if (prefix === EBackupMaterial.Xpub) {
         if (root.depth === 0) {
             throw new Error(
                 '0-depth xpub missing private to generate hardened child key.',
@@ -260,7 +254,7 @@ export const generateRootFromXKey = (
 
     // Derive root using address path if xprv given
     // Otherwise, assume xpub given is three level deep
-    if (prefix === BackupMaterial.Xprv) {
+    if (prefix === EBackupMaterial.Xprv) {
         root = root.derivePath(addressPath);
     }
 
@@ -369,7 +363,7 @@ export const getMetaFromMnemonic = (
     };
 };
 
-export const getPubKeyFromXprv = (xprv: string, network: Net) => {
+export const getPubKeyFromXprv = (xprv: string, network: ENet) => {
     const keyInfo = extendedKeyInfo[_getPrefix(xprv)[0]];
     const key = normalizeExtKey(xprv, 'prv');
 
@@ -393,10 +387,10 @@ export const getPubKeyFromXprv = (xprv: string, network: Net) => {
     return node.neutered().toBase58();
 };
 
-export const getFingerprintFromXkey = (xkey: string, network: Net) => {
+export const getFingerprintFromXkey = (xkey: string, network: ENet) => {
     // Normalize ext key in case of exotic key
     const normalizeSuffix =
-        getExtendedKeyPrefix(xkey) === BackupMaterial.Xpub ? 'pub' : 'prv';
+        getExtendedKeyPrefix(xkey) === EBackupMaterial.Xpub ? 'pub' : 'prv';
     const key = normalizeExtKey(xkey, normalizeSuffix);
 
     const node = bip32.fromBase58(key, BJSNetworks[network]);

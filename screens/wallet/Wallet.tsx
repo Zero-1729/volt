@@ -45,7 +45,7 @@ import {Balance} from '../../components/balance';
 import {liberalAlert} from '../../components/alert';
 import {TransactionListItem} from '../../components/transaction';
 
-import {BalanceType, TransactionType} from '../../types/wallet';
+import {TBalance, TTransaction} from '../../types/wallet';
 
 const Wallet = () => {
     const tailwind = useTailwind();
@@ -138,7 +138,7 @@ const Wallet = () => {
             const triggered = await fetchFiatRate(
                 appFiatCurrency.short,
                 fiatRate,
-                (rate: BalanceType) => {
+                (rate: TBalance) => {
                     // Then fetch fiat rate
                     updateFiatRate({
                         ...fiatRate,
@@ -188,9 +188,9 @@ const Wallet = () => {
                 // Only attempt wallet address update if wallet balance is updated
                 // TODO: avoid mempool for now and scrap this from BDK raw tx info (Script)
                 if (updated) {
-                    // iterate over all the transactions and include the missing optional fields for the TransactionType
+                    // iterate over all the transactions and include the missing optional fields for the TTransaction
                     for (let i = 0; i < transactions.length; i++) {
-                        const tmp: TransactionType = {
+                        const tmp: TTransaction = {
                             ...transactions[i],
                             address: '',
                         };
@@ -565,7 +565,7 @@ const Wallet = () => {
                                 ),
                             ]}
                             data={walletData.transactions.sort(
-                                (a: TransactionType, b: TransactionType) => {
+                                (a: TTransaction, b: TTransaction) => {
                                     return +b.timestamp - +a.timestamp;
                                 },
                             )}

@@ -14,8 +14,6 @@ import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 
 import BigNumber from 'bignumber.js';
 
-import {LanguageType, CurrencyType} from '../types/settings';
-
 import {
     parseDescriptor,
     includeDescriptorKeyPath,
@@ -23,17 +21,19 @@ import {
     createDescriptorFromString,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
-import {BackupMaterial, Net} from '../types/enums';
+
+import {TLanguage, TCurrency} from '../types/settings';
+import {EBackupMaterial, ENet} from '../types/enums';
 import {
     TWalletType,
-    Unit,
-    BalanceType,
-    FiatRate,
-    UTXOType,
-    TransactionType,
-    BaseWalletArgs,
-    AddressType,
-    ElectrumServerURLs,
+    TUnit,
+    TBalance,
+    TFiatRate,
+    TUtxo,
+    TTransaction,
+    TBaseWalletArgs,
+    TAddress,
+    TElectrumServerURLs,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -63,39 +63,39 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
-    appLanguage: LanguageType;
-    appFiatCurrency: CurrencyType;
+    appLanguage: TLanguage;
+    appFiatCurrency: TCurrency;
     loadLock: boolean;
-    appUnit: Unit;
-    fiatRate: FiatRate;
+    appUnit: TUnit;
+    fiatRate: TFiatRate;
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
     isAdvancedMode: boolean;
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
-    electrumServerURL: ElectrumServerURLs;
-    setAppLanguage: (languageObject: LanguageType) => void;
-    setAppFiatCurrency: (currencyObject: CurrencyType) => void;
-    updateFiatRate: (fiatObj: FiatRate) => void;
+    electrumServerURL: TElectrumServerURLs;
+    setAppLanguage: (languageObject: TLanguage) => void;
+    setAppFiatCurrency: (currencyObject: TCurrency) => void;
+    updateFiatRate: (fiatObj: TFiatRate) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
-    updateAppUnit: (unit: Unit) => void;
+    updateAppUnit: (unit: TUnit) => void;
     updateWalletTransactions: (
         id: string,
-        transactions: TransactionType[],
+        transactions: TTransaction[],
     ) => void;
-    updateWalletUTXOs: (id: string, utxo: UTXOType[]) => void;
-    updateWalletBalance: (id: string, balance: BalanceType) => void;
-    updateWalletAddress: (id: string, address: AddressType) => void;
+    updateWalletUTXOs: (id: string, utxo: TUtxo[]) => void;
+    updateWalletBalance: (id: string, balance: TBalance) => void;
+    updateWalletAddress: (id: string, address: TAddress) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
         backupMaterial: string,
-        backupType: BackupMaterial,
-        backupNetwork: Net,
+        backupType: EBackupMaterial,
+        backupNetwork: ENet,
     ) => void;
-    addWallet: (name: string, type: string, network?: Net) => void;
+    addWallet: (name: string, type: string, network?: ENet) => void;
     resetAppData: () => void;
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => TWalletType;
@@ -241,7 +241,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const setAppLanguage = useCallback(
-        async (languageObject: LanguageType) => {
+        async (languageObject: TLanguage) => {
             try {
                 await _setAppLanguage(languageObject);
                 await _updateAppLanguage(JSON.stringify(languageObject));
@@ -267,7 +267,7 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const setAppFiatCurrency = useCallback(
-        async (currency: CurrencyType) => {
+        async (currency: TCurrency) => {
             try {
                 _setFiatCurrency(currency);
                 _updateFiatCurrency(JSON.stringify(currency));
@@ -310,7 +310,7 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const updateFiatRate = useCallback(
-        async (fiat: FiatRate) => {
+        async (fiat: TFiatRate) => {
             try {
                 _setFiatRate(fiat);
                 _updateFiatRate(JSON.stringify(fiat));
@@ -531,7 +531,7 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
-    const updateAppUnit = useCallback(async (unit: Unit) => {
+    const updateAppUnit = useCallback(async (unit: TUnit) => {
         try {
             _setAppUnit(unit);
             _updateAppUnit(JSON.stringify(unit));
@@ -545,7 +545,7 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     const updateWalletTransactions = useCallback(
-        async (id: string, transactions: TransactionType[]) => {
+        async (id: string, transactions: TTransaction[]) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             // Get the current wallet
@@ -561,7 +561,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletUTXOs = useCallback(
-        async (id: string, utxos: UTXOType[]) => {
+        async (id: string, utxos: TUtxo[]) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             // Get the current wallet
@@ -577,7 +577,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletBalance = useCallback(
-        async (id: string, balance: BalanceType) => {
+        async (id: string, balance: TBalance) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             // Get the current wallet
@@ -593,7 +593,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletAddress = useCallback(
-        async (id: string, address: AddressType) => {
+        async (id: string, address: TAddress) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
 
             // Get the current wallet
@@ -689,8 +689,8 @@ export const AppStorageProvider = ({children}: Props) => {
     const restoreWallet = useCallback(
         async (
             backupMaterial: string,
-            backupMaterialType: BackupMaterial,
-            backupNetwork: Net,
+            backupMaterialType: EBackupMaterial,
+            backupNetwork: ENet,
         ) => {
             // Default network and wallet type
             var net = backupNetwork;
@@ -714,7 +714,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     backupMaterial = includeDescriptorKeyPath(parsedDescriptor);
                 }
 
-                net = parsedDescriptor.network as Net;
+                net = parsedDescriptor.network as ENet;
                 walletType = parsedDescriptor.type;
                 fingerprint = parsedDescriptor.fingerprint;
                 path = parsedDescriptor.path;
@@ -780,18 +780,18 @@ export const AppStorageProvider = ({children}: Props) => {
             switch (walletArgs.type) {
                 case 'wpkh':
                     newWallet = new SegWitNativeWallet(
-                        walletArgs as BaseWalletArgs,
+                        walletArgs as TBaseWalletArgs,
                     );
                     break;
 
                 case 'shp2wpkh':
                     newWallet = new SegWitP2SHWallet(
-                        walletArgs as BaseWalletArgs,
+                        walletArgs as TBaseWalletArgs,
                     );
                     break;
 
                 case 'p2pkh':
-                    newWallet = new LegacyWallet(walletArgs as BaseWalletArgs);
+                    newWallet = new LegacyWallet(walletArgs as TBaseWalletArgs);
                     break;
             }
 
@@ -820,7 +820,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     };
 
                     switch (backupMaterialType) {
-                        case BackupMaterial.Xpub:
+                        case EBackupMaterial.Xpub:
                             descriptor = await fromDescriptorTemplatePublic(
                                 // BDK expects a tpub or xpub, so we need to convert it
                                 // if it's an exotic prefix
@@ -832,7 +832,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
                             break;
 
-                        case BackupMaterial.Xprv:
+                        case EBackupMaterial.Xprv:
                             const {internal, external, priv} =
                                 createDescriptorFromXprv(walletArgs.xprv);
 
@@ -862,7 +862,7 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const addWallet = useCallback(
-        async (name: string, type: string, network?: Net) => {
+        async (name: string, type: string, network?: ENet) => {
             try {
                 let newWallet!: TWalletType;
 

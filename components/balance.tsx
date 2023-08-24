@@ -24,12 +24,12 @@ import {
     DisplaySatsAmountProps,
     DisplayFiatAmountProps,
 } from '../types/props';
-import {FiatRate, Unit} from '../types/wallet';
+import {TFiatRate, TUnit} from '../types/wallet';
 
 const _getBalance = (
     balance: BigNumber,
-    unit: Unit,
-    fiatRate: FiatRate,
+    unit: TUnit,
+    fiatRate: TFiatRate,
     disableFiat: boolean,
 ) => {
     if (unit.name === 'sats') {

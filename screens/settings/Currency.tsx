@@ -20,7 +20,7 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {CurrencyType} from '../../types/settings';
+import {TCurrency} from '../../types/settings';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -49,7 +49,7 @@ const Currency = () => {
 
     const networkState = useNetInfo();
 
-    const renderItem = ({item, index}: {item: CurrencyType; index: number}) => {
+    const renderItem = ({item, index}: {item: TCurrency; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {

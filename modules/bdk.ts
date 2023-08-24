@@ -13,13 +13,13 @@ import {LocalUtxo, TransactionDetails} from 'bdk-rn/lib/classes/Bindings';
 
 import {
     TWalletType,
-    TransactionType,
-    UTXOType,
-    ElectrumServerURLs,
+    TTransaction,
+    TUtxo,
+    TElectrumServerURLs,
     TNetwork,
-    BalanceType,
+    TBalance,
 } from '../types/wallet';
-import {Net} from '../types/enums';
+import {ENet} from '../types/enums';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
 
 export const generateMnemonic = async () => {
@@ -37,7 +37,7 @@ type formatTXFromBDKArgs = TransactionDetails & {
 // Formats transaction data from BDK to format for wallet
 export const formatTXFromBDK = async (
     tx: formatTXFromBDKArgs,
-): Promise<TransactionType> => {
+): Promise<TTransaction> => {
     let value = new BigNumber(Math.abs(tx.sent - tx.received));
     value = tx.sent > 0 ? value.minus(tx.fee as number) : value;
 
@@ -66,7 +66,7 @@ export const formatTXFromBDK = async (
         received: tx.received,
         sent: tx.sent,
         type: tx.sent - tx.received > 0 ? 'outbound' : 'inbound',
-        network: tx.network === 'testnet' ? Net.Testnet : Net.Bitcoin,
+        network: tx.network === 'testnet' ? ENet.Testnet : ENet.Bitcoin,
         size: rawInfo.size as number,
         vsize: rawInfo.vsize as number,
         weight: rawInfo.weight as number,
@@ -324,7 +324,7 @@ export const syncBdkWallet = async (
     wallet: BDK.Wallet,
     callback: any,
     network: TNetwork,
-    electrumServer: ElectrumServerURLs,
+    electrumServer: TElectrumServerURLs,
 ): Promise<BDK.Wallet> => {
     // Electrum configuration
     const config: BlockchainElectrumConfig = {
@@ -365,7 +365,7 @@ export const syncBdkWallet = async (
 // Fetch Wallet Balance using wallet descriptor, metas, and electrum server
 export const getBdkWalletBalance = async (
     wallet: BDK.Wallet,
-    oldBalance: BalanceType,
+    oldBalance: TBalance,
 ): Promise<{
     balance: BigNumber;
     updated: boolean;
@@ -404,8 +404,8 @@ export const getBdkWalletTransactions = async (
     wallet: BDK.Wallet,
     url: string,
 ): Promise<{
-    transactions: TransactionType[];
-    UTXOs: UTXOType[];
+    transactions: TTransaction[];
+    UTXOs: TUtxo[];
 }> => {
     let network = await wallet.network();
 
@@ -423,7 +423,7 @@ export const getBdkWalletTransactions = async (
     let bdkTxs: TransactionDetails[] = [];
     let bdkUtxos: LocalUtxo[] = [];
 
-    let walletTXs: TransactionType[] = [];
+    let walletTXs: TTransaction[] = [];
 
     // Update transactions list
     bdkTxs = await wallet.listTransactions(true);
@@ -442,7 +442,7 @@ export const getBdkWalletTransactions = async (
     }
 
     // Fallback to original wallet transactions if error fetching transactions
-    return {transactions: walletTXs, UTXOs: bdkUtxos as UTXOType[]};
+    return {transactions: walletTXs, UTXOs: bdkUtxos as TUtxo[]};
 };
 
 // generate address from BDK wallet

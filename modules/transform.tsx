@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import {BalanceType} from '../types/wallet';
+import {TBalance} from '../types/wallet';
 
 export const SATS_TO_BTC_RATE = 100_000_000;
 const SEPARATOR = ' ';
@@ -9,11 +9,11 @@ export const addCommas = (num: string, separator: string = ',') => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 };
 
-export const _getBTCfromSats = (sats: BalanceType) => {
+export const _getBTCfromSats = (sats: TBalance) => {
     return sats.toNumber() / SATS_TO_BTC_RATE;
 };
 
-export const formatSats = (sats: BalanceType) => {
+export const formatSats = (sats: TBalance) => {
     // REM: Based on: https://bitcoin.design/guide/designing-products/units-and-symbols/
     if (sats.lt(0.1) && !sats.eq(0)) {
         // Limit display to eight decimals
@@ -37,7 +37,7 @@ export const formatSats = (sats: BalanceType) => {
     return addCommas(sats.toString(), SEPARATOR);
 };
 
-export const formatBTC = (sats: BalanceType) => {
+export const formatBTC = (sats: TBalance) => {
     // REM: Based on: https://bitcoin.design/guide/designing-products/units-and-symbols/
     const BTC = _getBTCfromSats(sats);
 
@@ -80,7 +80,7 @@ const formatWithUnits = (value: number) => {
     return value.toFixed(2);
 };
 
-export const formatFiat = (fiat: BalanceType) => {
+export const formatFiat = (fiat: TBalance) => {
     // If below a cent, let's attempt to display that
     // 'Bullishly' speaking, Bitcoin will 'always' be worth more than a cent
     if (fiat.lt(0.01) && !fiat.eq(0)) {
@@ -94,7 +94,7 @@ export const formatFiat = (fiat: BalanceType) => {
     return addCommas(fiat.toFixed(2));
 };
 
-export const normalizeFiat = (sats: BalanceType, rate: BalanceType) => {
+export const normalizeFiat = (sats: TBalance, rate: TBalance) => {
     // Get BTC to fiat value first
     const fiat = sats.eq(0)
         ? new BigNumber(0)

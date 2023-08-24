@@ -42,7 +42,7 @@ import {
     errorAlert,
 } from '../../components/alert';
 
-import {BackupMaterial, Net} from '../../types/enums';
+import {EBackupMaterial, ENet} from '../../types/enums';
 
 const ImportAction = () => {
     const navigation = useNavigation();
@@ -51,15 +51,15 @@ const ImportAction = () => {
     const tailwind = useTailwind();
 
     const [importText, setImportText] = useState('');
-    const [network, setNetwork] = useState<Net>(Net.Testnet);
+    const [network, setNetwork] = useState<ENet>(ENet.Testnet);
 
     const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
 
     const toggleNetwork = () => {
-        if (network === Net.Testnet) {
-            setNetwork(Net.Bitcoin);
+        if (network === ENet.Testnet) {
+            setNetwork(ENet.Bitcoin);
         } else {
-            setNetwork(Net.Testnet);
+            setNetwork(ENet.Testnet);
         }
     };
 
@@ -142,7 +142,7 @@ const ImportAction = () => {
         // Report any other issues separately
         try {
             // Restore wallet using mnemonic
-            await restoreWallet(mnemonic, BackupMaterial.Mnemonic, network);
+            await restoreWallet(mnemonic, EBackupMaterial.Mnemonic, network);
 
             // Clear input
             setImportText('');
@@ -165,7 +165,11 @@ const ImportAction = () => {
                 return;
             }
 
-            await restoreWallet(descriptor, BackupMaterial.Descriptor, network);
+            await restoreWallet(
+                descriptor,
+                EBackupMaterial.Descriptor,
+                network,
+            );
 
             // Clear input
             setImportText('');
@@ -364,7 +368,7 @@ const ImportAction = () => {
                                     ColorScheme.Background.CheckBoxUnfilled
                                 }
                                 size={18}
-                                isChecked={network === Net.Testnet}
+                                isChecked={network === ENet.Testnet}
                                 iconStyle={{
                                     borderWidth: 1,
                                     borderRadius: 2,

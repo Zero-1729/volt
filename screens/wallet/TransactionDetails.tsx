@@ -24,7 +24,7 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
-import {Net} from '../../types/enums';
+import {ENet} from '../../types/enums';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance} from '../../components/balance';
@@ -62,7 +62,7 @@ const TransactionDetailsView = ({route}: Props) => {
 
         Linking.openURL(
             `https://mempool.space/${
-                route.params.tx.network === Net.Testnet ? 'testnet/' : ''
+                route.params.tx.network === ENet.Testnet ? 'testnet/' : ''
             }tx/${txid}`,
         );
     };

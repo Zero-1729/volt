@@ -3,16 +3,16 @@ import crypto from 'react-native-quick-crypto';
 import BigNumber from 'bignumber.js';
 
 import {
-    Unit,
-    BalanceType,
-    TransactionType,
-    UTXOType,
-    BaseWalletArgs,
-    AddressType,
-    DescriptorObject,
+    TUnit,
+    TBalance,
+    TTransaction,
+    TUtxo,
+    TBaseWalletArgs,
+    TAddress,
+    TDescriptorObject,
     TNetwork,
 } from './../../types/wallet';
-import {Net} from './../../types/enums';
+import {ENet} from './../../types/enums';
 
 import {
     getAddressPath,
@@ -86,17 +86,17 @@ export class BaseWallet {
 
     masterFingerprint: string;
 
-    balance: BalanceType;
+    balance: TBalance;
 
-    transactions: TransactionType[];
-    UTXOs: UTXOType[];
+    transactions: TTransaction[];
+    UTXOs: TUtxo[];
 
     addresses: Array<string>;
-    address: AddressType;
+    address: TAddress;
 
     syncedBalance: number;
     lastSynced: number;
-    units: Unit;
+    units: TUnit;
 
     derivationPath: string;
 
@@ -105,7 +105,7 @@ export class BaseWallet {
     hardwareWalletEnabled: boolean;
     hasBackedUp: boolean;
 
-    constructor(args: BaseWalletArgs) {
+    constructor(args: TBaseWalletArgs) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = args.name; // Wallet name
 
@@ -131,7 +131,7 @@ export class BaseWallet {
         this.gap_limit = GAP_LIMIT; // Gap limit for wallet
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
-        this.network = args.network ? args.network : Net.Testnet; // Can have 'bitcoin' or 'testnet' wallet
+        this.network = args.network ? args.network : ENet.Testnet; // Can have 'bitcoin' or 'testnet' wallet
 
         this.transactions = []; // List of wallet transactions
         this.UTXOs = []; // Set of wallet UTXOs
@@ -157,7 +157,7 @@ export class BaseWallet {
         this.masterFingerprint = args.fingerprint ? args.fingerprint : ''; // Wallet master fingerprint
     }
 
-    generateNewAddress(index?: number): AddressType {
+    generateNewAddress(index?: number): TAddress {
         try {
             let idx = index ? index : this.index;
             let address!: string;
@@ -232,7 +232,7 @@ export class BaseWallet {
         this.isWatchOnly = isWatchOnly;
     }
 
-    updateBalance(sats: BalanceType) {
+    updateBalance(sats: TBalance) {
         this.balance = sats;
     }
 
@@ -248,7 +248,7 @@ export class BaseWallet {
         throw new Error('Not implemented');
     }
 
-    updateTransanctions(transactions: TransactionType[]) {
+    updateTransanctions(transactions: TTransaction[]) {
         this.transactions = transactions;
     }
 
@@ -264,7 +264,7 @@ export class BaseWallet {
         this.masterFingerprint = fingerprint;
     }
 
-    setDescriptor(descriptor: DescriptorObject) {
+    setDescriptor(descriptor: TDescriptorObject) {
         this.internalDescriptor = descriptor.internal;
         this.externalDescriptor = descriptor.external;
 
@@ -272,7 +272,7 @@ export class BaseWallet {
         this.privateDescriptor = descriptor.priv;
     }
 
-    setAddress(address: AddressType) {
+    setAddress(address: TAddress) {
         this.address = address;
     }
 }

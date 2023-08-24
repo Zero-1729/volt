@@ -1,6 +1,6 @@
 import {BaseWallet} from '../base';
 
-import {TransactionType} from '../../../types/wallet';
+import {TTransaction} from '../../../types/wallet';
 
 export class SegWitP2SHWallet extends BaseWallet {
     buildTx() {
@@ -11,7 +11,7 @@ export class SegWitP2SHWallet extends BaseWallet {
         throw new Error('Not implemented');
     }
 
-    updateTransanctions(transactions: TransactionType[]) {
+    updateTransanctions(transactions: TTransaction[]) {
         this.transactions = transactions;
     }
 }

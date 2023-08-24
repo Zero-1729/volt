@@ -1,6 +1,6 @@
 // Set of wallet default aliases, metadata, and types
-import {Net} from './../types/enums';
-import {AccountPaths, ExtendedKeyInfoType} from '../types/wallet';
+import {ENet} from './../types/enums';
+import {TAccountPaths, TExtendedKeyInfo} from '../types/wallet';
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
@@ -50,7 +50,7 @@ export const DescriptorType: {[index: string]: string} = {
     Bitcoin Testnet	    second	    change	      second	  m / 44' / 1' / 1' / 1 / 1
 
 */
-export const WalletPaths: {[index: string]: AccountPaths} = {
+export const WalletPaths: {[index: string]: TAccountPaths} = {
     wpkh: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
     p2pkh: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
     shp2wpkh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
@@ -123,16 +123,16 @@ export const validExtendedKeyPrefixes = new Map([
 export const supportedExtVersions = ['x', 'y', 'z', 't', 'u', 'v'];
 
 // Supported extended key version metadata definitions
-export const extendedKeyInfo: {[index: string]: ExtendedKeyInfoType} = {
+export const extendedKeyInfo: {[index: string]: TExtendedKeyInfo} = {
     // mainnet / bitcoin
-    x: {network: Net.Bitcoin, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    y: {network: Net.Bitcoin, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    z: {network: Net.Bitcoin, type: 'wpkh'}, // Account path P2WPKH [bc1...]
+    x: {network: ENet.Bitcoin, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    y: {network: ENet.Bitcoin, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    z: {network: ENet.Bitcoin, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 
     // testnet
-    t: {network: Net.Testnet, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
-    u: {network: Net.Testnet, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
-    v: {network: Net.Testnet, type: 'wpkh'}, // Account path P2WPKH [bc1...]
+    t: {network: ENet.Testnet, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    u: {network: ENet.Testnet, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
+    v: {network: ENet.Testnet, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 };
 
 // Wallet Gap Limit

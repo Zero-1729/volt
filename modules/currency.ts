@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import {BalanceType, FiatRate} from '../types/wallet';
+import {TBalance, TFiatRate} from '../types/wallet';
 
 const sourcesAPI = {
     coingecko: {
@@ -14,7 +14,7 @@ export const sourceNames = {
 
 const APIFetcher = {
     // Default source is coingecko given currency ticker support
-    coingecko: async (ticker: string): Promise<BalanceType> => {
+    coingecko: async (ticker: string): Promise<TBalance> => {
         const {url} = sourcesAPI.coingecko;
 
         let returnedJSON;
@@ -52,7 +52,7 @@ const APIFetcher = {
 };
 
 // Make single fire call to CoinGecko
-const fetchPrice = async (ticker: string): Promise<BalanceType> => {
+const fetchPrice = async (ticker: string): Promise<TBalance> => {
     const response = await APIFetcher.coingecko(ticker.toLowerCase());
 
     // return fetched rate
@@ -61,8 +61,8 @@ const fetchPrice = async (ticker: string): Promise<BalanceType> => {
 
 export const fetchFiatRate = async (
     ticker: string,
-    fiatRate: FiatRate,
-    onSuccess: (rate: BalanceType) => void,
+    fiatRate: TFiatRate,
+    onSuccess: (rate: TBalance) => void,
     violate = false,
 ) => {
     const {lastUpdated} = fiatRate;

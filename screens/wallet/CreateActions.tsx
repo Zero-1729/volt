@@ -33,7 +33,7 @@ import Color from '../../constants/Color';
 
 import {errorAlert} from '../../components/alert';
 
-import {Net} from '../../types/enums';
+import {ENet} from '../../types/enums';
 
 const CreateAction = () => {
     const navigation = useNavigation();
@@ -45,7 +45,7 @@ const CreateAction = () => {
     const {addWallet, isAdvancedMode} = useContext(AppStorageContext);
     const [newWalletName, setNewWalletName] = useState('');
 
-    const [network, setNetwork] = useState<Net>(Net.Testnet); // Default to testnet
+    const [network, setNetwork] = useState<ENet>(ENet.Testnet); // Default to testnet
     const [open, setOpen] = useState(false);
     const [account, setAccount] = useState('wpkh'); // Default to segwit
     const [accounts, setAccounts] = useState([
@@ -64,10 +64,10 @@ const CreateAction = () => {
     };
 
     const toggleNetwork = () => {
-        if (network === Net.Testnet) {
-            setNetwork(Net.Bitcoin);
+        if (network === ENet.Testnet) {
+            setNetwork(ENet.Bitcoin);
         } else {
-            setNetwork(Net.Testnet);
+            setNetwork(ENet.Testnet);
         }
     };
 
@@ -225,7 +225,7 @@ const CreateAction = () => {
                                         ColorScheme.Background.CheckBoxUnfilled
                                     }
                                     size={18}
-                                    isChecked={network === Net.Testnet}
+                                    isChecked={network === ENet.Testnet}
                                     iconStyle={{
                                         borderWidth: 1,
                                         borderRadius: 2,

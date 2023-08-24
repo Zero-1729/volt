@@ -4,7 +4,7 @@ import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
 import languages from '../../loc/languages';
 
-import {LanguageType} from '../../types/settings';
+import {TLanguage} from '../../types/settings';
 
 import {useNavigation} from '@react-navigation/core';
 
@@ -41,7 +41,7 @@ const Language = () => {
     // Retrieved from general App context provider
     const {appLanguage, setAppLanguage} = useContext(AppStorageContext);
 
-    const renderItem = ({item, index}: {item: LanguageType; index: number}) => {
+    const renderItem = ({item, index}: {item: TLanguage; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {

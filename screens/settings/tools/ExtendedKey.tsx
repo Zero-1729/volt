@@ -30,7 +30,7 @@ import {errorAlert} from '../../../components/alert';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {BackupMaterial} from '../../../types/enums';
+import {EBackupMaterial} from '../../../types/enums';
 
 const ExtendedKey = () => {
     const [resultMessageText, setResulteMessageText] = useState('');
@@ -76,8 +76,8 @@ const ExtendedKey = () => {
 
         // Check if it is indeed an xpub and valid
         if (
-            extKeyPrefix !== BackupMaterial.Xpub &&
-            extKeyPrefix !== BackupMaterial.Xprv
+            extKeyPrefix !== EBackupMaterial.Xpub &&
+            extKeyPrefix !== EBackupMaterial.Xprv
         ) {
             errorAlert('Error', 'Please provide an extended key');
             return;
