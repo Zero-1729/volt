@@ -51,6 +51,9 @@ export const formatTXFromBDK = async (
         isRbf: await txRawData?.isExplicitlyRbf(),
     };
 
+    // Determine whether CPFP transaction
+    const isCpfp = rawInfo.isRbf && value.isZero();
+
     const txBlockHeight = tx.confirmationTime?.height as number;
     const blockConfirms =
         txBlockHeight > 0 ? tx.currentBlockHeight - txBlockHeight : 0;
@@ -71,7 +74,7 @@ export const formatTXFromBDK = async (
         vsize: rawInfo.vsize as number,
         weight: rawInfo.weight as number,
         rbf: rawInfo.isRbf as boolean,
-        cpfp: rawInfo.isRbf && value.isZero(),
+        cpfp: isCpfp as boolean,
         memo: '',
     };
 
