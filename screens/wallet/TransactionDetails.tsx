@@ -132,7 +132,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         {route.params.tx.confirmations > 0 &&
                         route.params.tx.confirmations <= 6 ? (
                             <Pending
-                                style={[tailwind('self-center mb-6')]}
+                                style={[tailwind('self-center')]}
                                 fill={ColorScheme.SVG.Default}
                                 height={128}
                                 width={128}
@@ -142,7 +142,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         )}
                         {!route.params.tx.confirmed ? (
                             <Broadcasted
-                                style={[tailwind('self-center mb-6')]}
+                                style={[tailwind('self-center')]}
                                 fill={ColorScheme.SVG.Default}
                                 height={128}
                                 width={128}
@@ -152,7 +152,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         )}
                         {route.params.tx.confirmations > 6 ? (
                             <Success
-                                style={[tailwind('self-center mb-6')]}
+                                style={[tailwind('self-center')]}
                                 fill={ColorScheme.SVG.Default}
                                 height={128}
                                 width={128}
@@ -160,17 +160,41 @@ const TransactionDetailsView = ({route}: Props) => {
                         ) : (
                             <></>
                         )}
-                        <FiatBalance
-                            balance={route.params.tx.value}
-                            loading={false}
-                            showMinus={route.params.tx.type === 'outbound'}
-                            BalanceFontSize={'text-2xl'}
-                            fontColor={ColorScheme.Text.Default}
-                        />
+                        {/* We only show the amount if it is not a CPFP, which shows zero */}
+                        {!route.params.tx.cpfp ? (
+                            <FiatBalance
+                                style={[tailwind('mt-6')]}
+                                balance={route.params.tx.value}
+                                loading={false}
+                                showMinus={route.params.tx.type === 'outbound'}
+                                BalanceFontSize={'text-2xl'}
+                                fontColor={ColorScheme.Text.Default}
+                            />
+                        ) : !isAdvancedMode ? (
+                            <View style={[tailwind('flex-row mt-6 ')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-base font-bold'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    Fee boost transaction
+                                </Text>
+                            </View>
+                        ) : (
+                            <></>
+                        )}
                     </View>
                     <Text
                         style={[
-                            tailwind('text-sm text-center'),
+                            tailwind(
+                                `text-sm text-center ${
+                                    route.params.tx.cpfp && isAdvancedMode
+                                        ? 'mt-1 mb-2'
+                                        : ''
+                                }`,
+                            ),
                             {color: ColorScheme.Text.GrayedText},
                         ]}>
                         {route.params.tx.confirmations > 6
@@ -179,26 +203,54 @@ const TransactionDetailsView = ({route}: Props) => {
                         confirmations
                     </Text>
 
+                    {/* Transaction type flags for RBF and CPFP */}
                     {isAdvancedMode && route.params.tx.rbf ? (
-                        <View
-                            style={[
-                                tailwind(
-                                    'rounded-full px-4 py-1 self-center mt-4',
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.CardGreyed,
-                                },
-                            ]}>
-                            <Text
+                        <View style={[tailwind('flex-row self-center')]}>
+                            {route.params.tx.cpfp ? (
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'rounded-full px-4 py-1 self-center mt-4 mr-2',
+                                        ),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .CardGreyed,
+                                        },
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('font-bold'),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayText,
+                                            },
+                                        ]}>
+                                        CPFP
+                                    </Text>
+                                </View>
+                            ) : (
+                                <></>
+                            )}
+
+                            <View
                                 style={[
-                                    tailwind('font-bold'),
+                                    tailwind('rounded-full px-4 py-1 mt-4'),
                                     {
-                                        color: ColorScheme.Text.GrayText,
+                                        backgroundColor:
+                                            ColorScheme.Background.CardGreyed,
                                     },
                                 ]}>
-                                RBF Enabled
-                            </Text>
+                                <Text
+                                    style={[
+                                        tailwind('font-bold'),
+                                        {
+                                            color: ColorScheme.Text.GrayText,
+                                        },
+                                    ]}>
+                                    RBF Enabled
+                                </Text>
+                            </View>
                         </View>
                     ) : (
                         <></>
