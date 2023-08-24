@@ -17,5 +17,7 @@
     "Added Receive amount screen",
     "Request amount in sats or fiat",
     "Display requested amount reflects approximation in either sats or fiat",
-    "Wallets now includes internal and external descriptors"
+    "All import and created wallets contain internal, external, and private descriptors",
+    "Added support for displaying transaction information",
+    "Add support for for flagging transactions as RBF and CPFP"
 ]
