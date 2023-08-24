@@ -316,16 +316,9 @@ const Scan = ({route}: Props) => {
 
                 <LongBottomButton
                     onPress={forwardClipboard}
-                    title={'Paste'}
-                    textColor={ColorScheme.Text.Default}
-                    backgroundColor={ColorScheme.Background.Primary}
-                />
-
-                <View
-                    style={[
-                        tailwind('absolute bottom-0 h-28 w-full bg-black'),
-                        {zIndex: -1},
-                    ]}
+                    title={'Manual'}
+                    textColor={ColorScheme.Text.Alt}
+                    backgroundColor={ColorScheme.Background.Inverted}
                 />
             </View>
         </SafeAreaView>
