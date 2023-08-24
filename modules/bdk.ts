@@ -58,12 +58,19 @@ export const formatTXFromBDK = async (
     const blockConfirms =
         txBlockHeight > 0 ? tx.currentBlockHeight - txBlockHeight : 0;
 
+    // Calculate time stamp
+    // Note: we bump the time by 1 second so it shows up in the correct order
+    // for CPFPs
+    // TODO: handle timing calculation for multiple sequential CPFPs
+    const timestamp =
+        (tx.confirmationTime?.timestamp as number) + (isCpfp ? 1 : 0);
+
     const formattedTx = {
         txid: tx.txid,
         confirmed: tx.confirmed,
         confirmations: blockConfirms > 0 ? blockConfirms + 1 : 0,
         block_height: tx.confirmationTime?.height as number,
-        timestamp: tx.confirmationTime?.timestamp as any,
+        timestamp: timestamp as any,
         fee: tx.fee as number,
         value: value.toNumber(),
         received: tx.received,
