@@ -62,6 +62,20 @@ It is expected to commits pre-fixed with one of the following areas or component
 
 For example, if your change affects the ios build folders `./ios`, your commit message can be: `build: rebuilt ios dir files with RN69`.
 
+### Naming Conventions
+
+File names:
+- Use `camelCase` for class file names.
+- Use `lowercase` for component file names, e.g. `alert.tsx`.
+- Use `PascalCase` for screen and constant file names.
+- Use `lowercase` or `kebab-case` for module and scripts file names.
+
+Variables, Classes, Interfaces, Enums, and Types:
+- Use `camelCase` for variable names and `PascalCase` for class names.
+- Use `E[EnumName]` for enum types, where `EnumName` is the enum name in `PascalCase`.
+- Use `I[InterfaceName]` for interface types, where `InterfaceName` is the interface name in `PascalCase`.
+- Use `T[TypeName]` for type aliases, where `TypeName` is the type name in `PascalCase`.
+
 ## Contributing and Review Process
 
 The review process is as follows:
