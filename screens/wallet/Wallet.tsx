@@ -474,10 +474,11 @@ const Wallet = () => {
                                 <PlainButton
                                     onPress={() => {
                                         navigation.dispatch(
-                                            CommonActions.navigate('ScanQR', {
-                                                name: 'Scan',
+                                            CommonActions.navigate('ScanRoot', {
+                                                screen: 'Scan',
                                                 params: {
-                                                    source: 'send',
+                                                    screen: 'send',
+                                                    wallet: walletData,
                                                 },
                                             }),
                                         );
