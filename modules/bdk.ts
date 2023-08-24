@@ -71,6 +71,7 @@ export const formatTXFromBDK = async (
         vsize: rawInfo.vsize as number,
         weight: rawInfo.weight as number,
         rbf: rawInfo.isRbf as boolean,
+        cpfp: rawInfo.isRbf && value.isZero(),
         memo: '',
     };
 
