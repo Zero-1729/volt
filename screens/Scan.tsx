@@ -16,7 +16,11 @@ import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
+import BigNumber from 'bignumber.js';
+
 import decodeURI from 'bip21';
+
+import {canSendToInvoice} from '../modules/wallet-utils';
 
 import {
     useCameraDevices,
@@ -155,6 +159,43 @@ const Scan = ({route}: Props) => {
         }, 1000 * 5);
     };
 
+    const handleInvalidInvoice = (invoice: string) => {
+        let decodedInvoice;
+        let amount!: BigNumber;
+
+        try {
+            decodedInvoice = decodeURI.decode(invoice);
+
+            amount = new BigNumber(
+                decodedInvoice.options ? decodedInvoice.options.amount : '0',
+            );
+        } catch (e) {
+            updateScannerAlert('Detected an invalid invoice');
+            return;
+        }
+
+        // Check whether too broke for tx
+        if (
+            amount
+                .multipliedBy(100000000)
+                .isGreaterThan(route.params.wallet.balance)
+        ) {
+            updateScannerAlert(
+                'You do not have enough funds to send this transaction',
+            );
+            return;
+        }
+
+        // Check can send to address
+        if (!canSendToInvoice(decodedInvoice, route.params.wallet)) {
+            updateScannerAlert(
+                'Selected wallet cannot send to invoice address type',
+            );
+            return;
+        }
+
+        return decodedInvoice;
+    };
     const onQRDetected = useCallback(async (QR: Barcode[]) => {
         const rawQRData = QR[0].content.data as string;
 
@@ -245,21 +286,6 @@ const Scan = ({route}: Props) => {
     if (isLoading || camera === undefined) {
         return <LoadingView isCamAvailable={isCamAvailable} />;
     }
-
-    const handleInvalidInvoice = (invoice: string) => {
-        // TODO: check that wallet network matches address network
-        // TODO: check if wallet too broke for tx, if amount encoded
-        try {
-            const decodedInvoice = decodeURI.decode(invoice);
-
-            return decodedInvoice;
-        } catch (e) {
-            conservativeAlert(
-                'Invalid Invoice',
-                `The following invoice is invalid: ${invoice}`,
-            );
-        }
-    };
 
     const handleClipboard = async () => {
         const clipboardData = await Clipboard.getString();
