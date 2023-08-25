@@ -44,6 +44,7 @@ import {LongBottomButton, LongButton, PlainButton} from '../components/button';
 
 import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
+import InfoIcon from '../assets/svg/info-16.svg';
 
 import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -133,6 +134,26 @@ const Scan = ({route}: Props) => {
     const onError = useCallback(async (error: CameraRuntimeError) => {
         conservativeAlert('QR Scan', error.message);
     }, []);
+
+    // We want to make sure it the scanner isn't constantly scanning the frame
+    // in the background, so we'll lock it until the user closes the alert
+    const [scanLock, setScanLock] = useState(false);
+    const [scannerAlertMsg, setScannerAlertMsg] = useState('');
+
+    const clearScannerAlert = () => {
+        setScannerAlertMsg('');
+        setScanLock(false);
+    };
+
+    const updateScannerAlert = (message: string) => {
+        setScannerAlertMsg(message);
+        setScanLock(true);
+
+        // Lock for 5 seconds
+        setTimeout(() => {
+            clearScannerAlert();
+        }, 1000 * 5);
+    };
 
     const onQRDetected = useCallback(async (QR: Barcode[]) => {
         const rawQRData = QR[0].content.data as string;
@@ -307,7 +328,49 @@ const Scan = ({route}: Props) => {
                             'items-center justify-center w-full h-full -mt-8',
                         ),
                     ]}>
-                    <Text style={[tailwind('text-sm mb-4'), {color: 'white'}]}>
+                    {/* Scan description */}
+                    {scannerAlertMsg ? (
+                        <PlainButton
+                            style={[
+                                tailwind('absolute w-full items-center'),
+                                {top: 90},
+                            ]}
+                            onPress={clearScannerAlert}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'w-4/5 flex-row items-center justify-around rounded px-1 py-3',
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Inverted,
+                                    },
+                                ]}>
+                                <InfoIcon
+                                    height={18}
+                                    width={18}
+                                    fill={ColorScheme.SVG.Inverted}
+                                />
+                                <Text
+                                    style={[
+                                        tailwind('text-sm w-5/6'),
+                                        {
+                                            color: ColorScheme.Text.Alt,
+                                        },
+                                    ]}>
+                                    {scannerAlertMsg}
+                                </Text>
+                            </View>
+                        </PlainButton>
+                    ) : (
+                        <></>
+                    )}
+
+                    <Text
+                        style={[
+                            tailwind('text-sm mb-4'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
                         Scan a Bitcoin invoice or address to pay
                     </Text>
 
