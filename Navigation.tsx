@@ -16,6 +16,7 @@ import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
 import Send from './screens/wallet/Send';
+import SendAmount from './screens/wallet/SendAmount';
 
 import TransactionDetailsView from './screens/wallet/TransactionDetails';
 
@@ -40,7 +41,7 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import {TTransaction, TWalletType} from './types/wallet';
+import {TTransaction, TMiniWallet} from './types/wallet';
 
 // Root Param List for screens
 export type WalletParamList = {
@@ -51,13 +52,17 @@ export type WalletParamList = {
     };
     Send: {
         invoiceData: any;
-        wallet: TWalletType;
+        wallet: TMiniWallet;
     };
     WalletView: undefined;
     WalletInfo: undefined;
     WalletBackup: undefined;
     AddressOwnership: undefined;
     RequestAmount: undefined;
+    SendAmount: {
+        invoiceData: any;
+        wallet: TMiniWallet;
+    };
     TransactionView: {
         tx: TTransaction;
         source: string;
@@ -67,7 +72,7 @@ export type WalletParamList = {
 export type ScanParamList = {
     Scan: {
         screen: string;
-        wallet: TWalletType;
+        wallet: TMiniWallet;
     };
 };
 
@@ -115,6 +120,7 @@ const WalletRoot = () => {
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
+                <WalletStack.Screen name="Send" component={Send} />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
@@ -124,12 +130,12 @@ const WalletRoot = () => {
                     name="TransactionView"
                     component={TransactionDetailsView}
                 />
-                <WalletStack.Screen name="Send" component={Send} />
                 <WalletStack.Screen name="Receive" component={Receive} />
                 <WalletStack.Screen
                     name="RequestAmount"
                     component={RequestAmount}
                 />
+                <WalletStack.Screen name="SendAmount" component={SendAmount} />
             </WalletStack.Group>
         </WalletStack.Navigator>
     );
