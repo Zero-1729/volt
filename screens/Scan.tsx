@@ -120,6 +120,7 @@ const Scan = ({route}: Props) => {
     const isFocused = useIsFocused();
     const tailwind = useTailwind();
     const navigation = useNavigation();
+    const ColorScheme = Color(useColorScheme());
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -274,10 +275,9 @@ const Scan = ({route}: Props) => {
             edges={['bottom', 'left', 'right']}>
             <View
                 style={[
-                    tailwind(
-                        'items-center bg-black justify-center h-full w-full',
-                    ),
+                    tailwind('items-center justify-center h-full w-full'),
                     styles.flexed,
+                    {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View
                     style={[
@@ -288,10 +288,14 @@ const Scan = ({route}: Props) => {
                     <PlainButton
                         onPress={closeScreen}
                         style={[tailwind('absolute z-10 left-6')]}>
-                        <Close fill={'white'} />
+                        <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                     {/* Screen header */}
-                    <Text style={[tailwind('text-sm text-white font-bold')]}>
+                    <Text
+                        style={[
+                            tailwind('text-sm font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
                         {dynamicHeading}
                     </Text>
                 </View>
@@ -313,7 +317,7 @@ const Scan = ({route}: Props) => {
                             tailwind('h-2/5 w-4/5 border'),
                             {
                                 borderWidth: 2,
-                                borderColor: 'white',
+                                borderColor: ColorScheme.Background.Inverted,
                                 borderRadius: 12,
                             },
                         ]}>
@@ -331,8 +335,8 @@ const Scan = ({route}: Props) => {
                 <LongBottomButton
                     onPress={handleClipboard}
                     title={'Paste'}
-                    textColor={'black'}
-                    backgroundColor={'white'}
+                    textColor={ColorScheme.Text.Alt}
+                    backgroundColor={ColorScheme.Background.Inverted}
                 />
             </View>
         </SafeAreaView>
