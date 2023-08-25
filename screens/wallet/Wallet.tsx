@@ -33,6 +33,7 @@ import {
     createBDKWallet,
     getBdkWalletTransactions,
 } from '../../modules/bdk';
+import {getMiniWallet} from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
 
@@ -473,12 +474,15 @@ const Wallet = () => {
                                 ]}>
                                 <PlainButton
                                     onPress={() => {
+                                        const miniwallet =
+                                            getMiniWallet(walletData);
+
                                         navigation.dispatch(
                                             CommonActions.navigate('ScanRoot', {
                                                 screen: 'Scan',
                                                 params: {
                                                     screen: 'send',
-                                                    wallet: walletData,
+                                                    wallet: miniwallet,
                                                 },
                                             }),
                                         );
@@ -620,7 +624,7 @@ const Wallet = () => {
                                             },
                                         ]}>
                                         A list of all transactions for this
-                                        wallet be displayed here
+                                        wallet will be displayed here
                                     </Text>
                                 </View>
                             }
