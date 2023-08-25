@@ -98,7 +98,7 @@
     "react-native-svg": "^12.3.0",
     "react-native-svg-transformer": "^1.0.0",
     "react-native-tooltip": "^5.2.0",
-    "react-native-vision-camera": "^2.15.4",
+    "react-native-vision-camera": "^v2.15.6",
     "rn-nodeify": "^10.3.0",
     "scryptsy": "^2.1.0",
     "stream-browserify": "^3.0.0",
