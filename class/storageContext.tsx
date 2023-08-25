@@ -452,9 +452,29 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const getWalletData = (id: string): TWalletType => {
-        const index = wallets.findIndex(wallet => wallet.id === id);
+        let w!: TWalletType;
 
-        return wallets[index];
+        const index = wallets.findIndex(wallet => wallet.id === id);
+        const stringyW = wallets[index];
+
+        // Silently just fail and return null
+        if (index !== -1) {
+            switch (stringyW.type) {
+                case 'wpkh':
+                    w = SegWitNativeWallet.fromJSON(JSON.stringify(stringyW));
+                    break;
+                case 'shp2wpkh':
+                    w = SegWitP2SHWallet.fromJSON(JSON.stringify(stringyW));
+                    break;
+                case 'p2pkh':
+                    w = LegacyWallet.fromJSON(JSON.stringify(stringyW));
+                    break;
+            }
+
+            return w;
+        } else {
+            return stringyW;
+        }
     };
 
     const _loadWallets = async () => {
