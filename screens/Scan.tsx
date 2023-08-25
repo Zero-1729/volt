@@ -257,7 +257,7 @@ const Scan = ({route}: Props) => {
                 CommonActions.navigate('WalletRoot', {
                     screen: 'Send',
                     params: {
-                        invoiceData: clipboardData,
+                        invoiceData: decodedInvoice,
                         wallet: route.params.wallet,
                     },
                 }),
