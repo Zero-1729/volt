@@ -62,10 +62,6 @@
   right: 1.5rem
 }
 
-.right-8 {
-  right: 2rem
-}
-
 .top-0 {
   top: 0px
 }
@@ -84,10 +80,6 @@
 
 .top-2 {
   top: 0.5rem
-}
-
-.top-5 {
-  top: 1.25rem
 }
 
 .top-6 {
@@ -510,6 +502,11 @@
 
 .p-6 {
   padding: 1.5rem
+}
+
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem
 }
 
 .px-12 {

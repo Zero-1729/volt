@@ -196,6 +196,11 @@ const Scan = ({route}: Props) => {
 
         return decodedInvoice;
     };
+
+    const convertBTCtoSats = (btc: string) => {
+        return (parseFloat(btc) * 100000000).toString();
+    };
+
     const onQRDetected = useCallback(async (QR: Barcode[]) => {
         const rawQRData = QR[0].content.data as string;
 
@@ -205,17 +210,34 @@ const Scan = ({route}: Props) => {
             // To highlight the successful scan, we'll trigger a success haptic
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
 
-            // Gracefully return with scanned data
-            // head to wallet send screen
-            runOnJS(navigation.dispatch)(
-                CommonActions.navigate('WalletRoot', {
-                    screen: 'Send',
-                    params: {
-                        invoiceData: decodedQR,
-                        wallet: route.params.wallet,
-                    },
-                }),
-            );
+            const amount = decodedQR.options.amount;
+
+            if (amount) {
+                // Route to Send screen with amount
+                // Update amount to sats
+                decodedQR.options.amount = convertBTCtoSats(amount);
+
+                runOnJS(navigation.dispatch)(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'Send',
+                        params: {
+                            invoiceData: decodedQR,
+                            wallet: route.params.wallet,
+                        },
+                    }),
+                );
+            } else {
+                // Route to SendAmount screen
+                runOnJS(navigation.dispatch)(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'SendAmount',
+                        params: {
+                            invoiceData: decodedQR,
+                            wallet: route.params.wallet,
+                        },
+                    }),
+                );
+            }
         }
     }, []);
 
@@ -265,12 +287,17 @@ const Scan = ({route}: Props) => {
         frame => {
             'worklet';
 
-            const digestedFrame = scanBarcodes(frame, [BarcodeFormat.QR_CODE]);
+            // If scan lock is true, we'll skip processing
+            if (!scanLock) {
+                const digestedFrame = scanBarcodes(frame, [
+                    BarcodeFormat.QR_CODE,
+                ]);
 
-            // Only attempt to handle QR if any detected in-frame
-            if (digestedFrame.length > 0) {
-                // Pass detected QR to processing function
-                runOnJS(onQRDetected)(digestedFrame);
+                // Only attempt to handle QR if any detected in-frame
+                if (digestedFrame.length > 0) {
+                    // Pass detected QR to processing function
+                    runOnJS(onQRDetected)(digestedFrame);
+                }
             }
         },
         [onQRDetected],
