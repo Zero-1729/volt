@@ -12,7 +12,13 @@ const bip32 = BIP32Factory(ecc);
 
 import Crypto from 'react-native-quick-crypto';
 
-import {TDescriptorSymbols, TNetwork, TTransaction} from '../types/wallet';
+import {
+    TDescriptorSymbols,
+    TMiniWallet,
+    TNetwork,
+    TTransaction,
+    TWalletType,
+} from '../types/wallet';
 import {EBackupMaterial, ENet} from '../types/enums';
 
 import {
@@ -423,4 +429,17 @@ export const normalizeExtKey = (xkey: string, key_type: string) => {
     }
 
     return xkey;
+};
+
+export const getMiniWallet = (wallet: TWalletType) => {
+    const balance = wallet.balance.toNumber();
+
+    return {
+        name: wallet.name,
+        type: wallet.type,
+        network: wallet.network,
+        balance: balance,
+        privateDescriptor: wallet.privateDescriptor,
+        xpub: wallet.xpub,
+    };
 };
