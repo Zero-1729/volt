@@ -16,6 +16,24 @@ export type TNetwork = ENet | Network;
 
 export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
 
+export type TMiniWallet = {
+    name: string;
+    type: string;
+    network: string;
+    balance: number;
+    privateDescriptor: string;
+    xpub: string;
+};
+
+export type TInvoiceData = {
+    address: string;
+    options?: {
+        amount?: number;
+        message?: string;
+        label?: string;
+    };
+};
+
 // Wallet balance type
 export type TBalance = BigNumber;
 
