@@ -23,9 +23,7 @@ import {WalletParamList} from '../../Navigation';
 
 import {SingleBDKSend} from '../../modules/bdk';
 import {getPrivateDescriptors} from '../../modules/descriptors';
-import {TMiniWallet, TWalletType} from '../../types/wallet';
-
-type TComboWallet = TWalletType & TMiniWallet;
+import {TComboWallet} from '../../types/wallet';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -58,12 +56,12 @@ const SendView = ({route}: Props) => {
             ...route.params.wallet,
             externalDescriptor: descriptors.external,
             internalDescriptor: descriptors.internal,
-        } as TComboWallet;
+        };
 
         const {broadcasted, psbt, errorMessage} = await SingleBDKSend(
             sats,
             route.params.invoiceData.address,
-            wallet,
+            wallet as TComboWallet,
             electrumServerURL,
             msg => {
                 setStatuseMessage(msg);
