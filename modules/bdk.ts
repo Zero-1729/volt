@@ -306,6 +306,25 @@ export const descriptorsFromString = async (wallet: TWalletType) => {
     };
 };
 
+// Config for chain
+const _getConfig = (
+    network: string,
+    electrumServer: TElectrumServerURLs,
+    stopGap: number,
+): BlockchainElectrumConfig => {
+    return {
+        url:
+            network === ENet.Bitcoin
+                ? electrumServer.bitcoin
+                : electrumServer.testnet,
+        retry: 5,
+        timeout: 5,
+        stopGap: stopGap,
+        sock5: null,
+        validateDomain: false,
+    };
+};
+
 // create a BDK wallet from a descriptor and metas
 export const createBDKWallet = async (wallet: TWalletType) => {
     // Set Network
