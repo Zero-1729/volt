@@ -589,7 +589,7 @@ const Wallet = () => {
                                     callback={() => {
                                         navigation.dispatch(
                                             CommonActions.navigate({
-                                                name: 'TransactionView',
+                                                name: 'TransactionDetails',
                                                 params: {
                                                     tx: {...item.item},
                                                     source: 'conservative',

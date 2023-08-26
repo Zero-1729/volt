@@ -35,7 +35,7 @@ import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
 
-type Props = NativeStackScreenProps<WalletParamList, 'TransactionView'>;
+type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
 const TransactionDetailsView = ({route}: Props) => {
     const tailwind = useTailwind();
