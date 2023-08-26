@@ -132,7 +132,11 @@ const SendView = ({route}: Props) => {
                     </Text>
 
                     {statusMessage ? (
-                        <Text style={[tailwind('mt-4 text-sm font-bold')]}>
+                        <Text
+                            style={[
+                                tailwind('mt-4 text-sm font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
                             Status: {statusMessage}
                         </Text>
                     ) : (
