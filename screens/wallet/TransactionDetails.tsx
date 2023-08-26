@@ -93,7 +93,7 @@ const TransactionDetailsView = ({route}: Props) => {
               route.params.tx.confirmations > 6
                   ? '6+'
                   : route.params.tx.confirmations
-          } confirmation{route.params.tx.confirmations === 1 ? '' : 's'}`
+          } confirmation${route.params.tx.confirmations === 1 ? '' : 's'}`
         : isAdvancedMode
         ? 'Waiting in Mempool'
         : '';
