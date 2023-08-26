@@ -62,8 +62,10 @@ export const formatTXFromBDK = async (
     // Note: we bump the time by 1 second so it shows up in the correct order
     // for CPFPs
     // TODO: handle timing calculation for multiple sequential CPFPs
-    const timestamp =
-        (tx.confirmationTime?.timestamp as number) + (isCpfp ? 1 : 0);
+    // Place current time for recently broadcasted txs as now
+    const timestamp = tx.confirmationTime
+        ? (tx.confirmationTime.timestamp as number) + (isCpfp ? 1 : 0)
+        : +new Date();
 
     const formattedTx = {
         txid: tx.txid,
