@@ -51,8 +51,13 @@ export const formatTXFromBDK = async (
         isRbf: await txRawData?.isExplicitlyRbf(),
     };
 
+    // Determine if self send from RBF or
     // Determine whether CPFP transaction
-    const isCpfp = rawInfo.isRbf && value.isZero();
+    const isSelfOrBoost =
+        rawInfo.isRbf &&
+        value.isZero() &&
+        tx.sent - tx.received === tx.fee &&
+        value.toNumber() === 0;
 
     const txBlockHeight = tx.confirmationTime?.height as number;
     const blockConfirms =
@@ -61,10 +66,10 @@ export const formatTXFromBDK = async (
     // Calculate time stamp
     // Note: we bump the time by 1 second so it shows up in the correct order
     // for CPFPs
-    // TODO: handle timing calculation for multiple sequential CPFPs
     // Place current time for recently broadcasted txs as now
+    // TODO: handle timing calculation for multiple sequential 'isSelfOrBoost' txs
     const timestamp = tx.confirmed
-        ? (tx.confirmationTime?.timestamp as number) + (isCpfp ? 1 : 0)
+        ? (tx.confirmationTime?.timestamp as number) + (isSelfOrBoost ? 1 : 0)
         : +new Date();
 
     const formattedTx = {
@@ -83,7 +88,7 @@ export const formatTXFromBDK = async (
         vsize: rawInfo.vsize as number,
         weight: rawInfo.weight as number,
         rbf: rawInfo.isRbf as boolean,
-        cpfp: isCpfp as boolean,
+        isSelfOrBoost: isSelfOrBoost as boolean,
         memo: '',
     };
 

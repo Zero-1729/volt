@@ -171,7 +171,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             <></>
                         )}
                         {/* We only show the amount if it is not a CPFP, which shows zero */}
-                        {!route.params.tx.cpfp ? (
+                        {!route.params.tx.isSelfOrBoost ? (
                             <FiatBalance
                                 style={[tailwind('mt-6')]}
                                 balance={route.params.tx.value}

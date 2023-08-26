@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 
@@ -49,16 +50,28 @@ export const TransactionListItem = (props: TxListItemProps) => {
                     ),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
-                <View style={[tailwind('flex-row items-center w-5/6')]}>
+                <View
+                    style={[
+                        tailwind(
+                            `flex-row items-center ${
+                                props.tx.isSelfOrBoost ? 'w-full' : 'w-5/6'
+                            }`,
+                        ),
+                        {
+                            marginLeft: props.tx.isSelfOrBoost ? -12 : 0,
+                        },
+                    ]}>
                     <View style={[tailwind('w-full ml-1')]}>
-                        {props.tx.cpfp ? (
+                        {props.tx.isSelfOrBoost ? (
                             <View style={[tailwind('')]}>
                                 <Text
                                     style={[
                                         tailwind('text-lg font-bold'),
                                         {color: ColorScheme.Text.GrayedText},
                                     ]}>
-                                    {isAdvancedMode ? 'CPFP' : 'Fee Boost'}
+                                    {isAdvancedMode
+                                        ? 'RBF Fee Boost'
+                                        : 'Fee Boost'}
                                 </Text>
                             </View>
                         ) : (
@@ -79,21 +92,26 @@ export const TransactionListItem = (props: TxListItemProps) => {
                         </Text>
                     </View>
                 </View>
-                <View
-                    style={[
-                        tailwind(
-                            'w-10 h-10 rounded-full items-center justify-center opacity-80',
-                        ),
-                        {
-                            backgroundColor: ColorScheme.Background.Secondary,
-                        },
-                    ]}>
-                    {props.tx.type === 'inbound' ? (
-                        <ArrowDown fill={ColorScheme.SVG.Received} />
-                    ) : (
-                        <ArrowUp fill={ColorScheme.SVG.Sent} />
-                    )}
-                </View>
+                {!props.tx.isSelfOrBoost ? (
+                    <View
+                        style={[
+                            tailwind(
+                                'w-10 h-10 rounded-full items-center justify-center opacity-80',
+                            ),
+                            {
+                                backgroundColor:
+                                    ColorScheme.Background.Secondary,
+                            },
+                        ]}>
+                        {props.tx.type === 'inbound' ? (
+                            <ArrowDown fill={ColorScheme.SVG.Received} />
+                        ) : (
+                            <ArrowUp fill={ColorScheme.SVG.Sent} />
+                        )}
+                    </View>
+                ) : (
+                    <></>
+                )}
             </View>
         </PlainButton>
     );
