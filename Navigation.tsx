@@ -58,7 +58,9 @@ export type WalletParamList = {
     WalletView: undefined;
     WalletInfo: undefined;
     WalletBackup: undefined;
-    AddressOwnership: undefined;
+    AddressOwnership: {
+        wallet: TMiniWallet;
+    };
     RequestAmount: undefined;
     SendAmount: {
         invoiceData: any;
