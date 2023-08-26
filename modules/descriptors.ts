@@ -77,6 +77,7 @@ const reformatDescriptorToBDK = (expression: string) => {
 export const createDescriptorFromString = (
     expression: string,
 ): {external: string; internal: string; priv: string} => {
+    // TODO: store the private versions of the descriptors
     const parsedDescriptor = parseDescriptor(expression);
     let xpub!: string;
 
@@ -147,6 +148,7 @@ export const createDescriptorFromString = (
 export const createDescriptorFromXprv = (
     xprv: string,
 ): {external: string; internal: string; priv: string} => {
+    // TODO: store the private versions of the descriptors
     // Expects to be given 'xprv' or 'tprv'
     const root = getRawRootFromXprv(xprv);
     const keyInfo = extendedKeyInfo[xprv[0]];

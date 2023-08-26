@@ -126,6 +126,7 @@ export const descriptorFromTemplate = async (
     ExternalDescriptor: string;
     PrivateDescriptor: string;
 }> => {
+    // TODO: store the private versions of the internal and external descriptors
     // Create descriptor from mnemonic
     const bdkMnemonic = await new BDK.Mnemonic().fromString(mnemonic);
 
@@ -204,6 +205,7 @@ export const fromDescriptorTemplatePublic = async (
     ExternalDescriptor: string;
     PrivateDescriptor: string;
 }> => {
+    // TODO: get and store private versions of the external and internal descriptors
     const descriptorPublicKey = await new BDK.DescriptorPublicKey().fromString(
         pubKey,
     );
@@ -290,6 +292,7 @@ export const fromDescriptorTemplatePublic = async (
 
 // Generate External and Internal Descriptors from wallet descriptor strings
 export const descriptorsFromString = async (wallet: TWalletType) => {
+    // TODO: Include the private versions of the External and Internal Descriptors if available
     const InternalDescriptor = await new BDK.Descriptor().create(
         wallet.internalDescriptor,
         wallet.network as Network,
