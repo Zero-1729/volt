@@ -47,6 +47,7 @@ const Settings = () => {
         resetAppData,
         isDevMode,
         isWalletInitialized,
+        isAdvancedMode,
     } = useContext(AppStorageContext);
 
     const handleAppDataReset = () => {
@@ -303,7 +304,7 @@ const Settings = () => {
                     </View>
                 </View>
 
-                {isDevMode && isWalletInitialized ? (
+                {isDevMode && isWalletInitialized && isAdvancedMode ? (
                     <PlainButton
                         onPress={showDialog}
                         style={[
