@@ -74,6 +74,7 @@ const SendView = ({route}: Props) => {
             txid = await psbt.txid();
         }
 
+        let message = errorMessage ? errorMessage : statusMessage;
         // Unlock load
         setLoaing(false);
 
@@ -83,7 +84,7 @@ const SendView = ({route}: Props) => {
                 name: 'TransactionStatus',
                 params: {
                     status: broadcasted ? 'success' : 'failed',
-                    message: statusMessage,
+                    message: message,
                     txId: txid,
                     network: route.params.wallet.network,
                 },
