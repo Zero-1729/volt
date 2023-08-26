@@ -19,6 +19,7 @@ import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
+import TransactionStatus from './screens/wallet/TransactionStatus';
 
 import Apps from './screens/Apps';
 
@@ -66,6 +67,12 @@ export type WalletParamList = {
     TransactionDetails: {
         tx: TTransaction;
         source: string;
+    };
+    TransactionStatus: {
+        status: string;
+        message: string;
+        txId: string;
+        network: string;
     };
 };
 
@@ -129,6 +136,10 @@ const WalletRoot = () => {
                 <WalletStack.Screen
                     name="TransactionDetails"
                     component={TransactionDetails}
+                />
+                <WalletStack.Screen
+                    name="TransactionStatus"
+                    component={TransactionStatus}
                 />
                 <WalletStack.Screen name="Receive" component={Receive} />
                 <WalletStack.Screen
