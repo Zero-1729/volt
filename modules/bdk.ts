@@ -531,6 +531,11 @@ export const fullsendBDKTransaction = async (
     // Fetch recommended feerate here
     // Can skip and just use from user in UI
     // Displayed from Mempool.space 'fetch'
+    const recommendedFeeRate = (await chain.estimateFee(1)).asSatPerVb();
+    const effectiveRate =
+        network === ENet.Bitcoin
+            ? Math.max(feeRate, recommendedFeeRate)
+            : feeRate;
 
     // Create transaction builder
     let tx = await new BDK.TxBuilder().create();
@@ -564,7 +569,7 @@ export const fullsendBDKTransaction = async (
         // 3. Recipient and amount to send them
         // Note: can use 'tx.setRecipients([{script, amount: Number(amount)}])' for multiple recipients and mounts
         tx = await tx.enableRbf();
-        tx = await tx.feeRate(feeRate);
+        tx = await tx.feeRate(effectiveRate);
         tx = await tx.addRecipient(script, Number(amount));
 
         statusCallback('Finaled transaction.');
