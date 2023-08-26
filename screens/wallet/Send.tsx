@@ -1,9 +1,14 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
+import {AppStorageContext} from '../../class/storageContext';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useNavigation, StackActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    StackActions,
+    CommonActions,
+} from '@react-navigation/native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -16,6 +21,12 @@ import Close from '../../assets/svg/x-24.svg';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
+import {SingleBDKSend} from '../../modules/bdk';
+import {getPrivateDescriptors} from '../../modules/descriptors';
+import {TMiniWallet, TWalletType} from '../../types/wallet';
+
+type TComboWallet = TWalletType & TMiniWallet;
+
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
 const SendView = ({route}: Props) => {
@@ -23,12 +34,64 @@ const SendView = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
+    const {electrumServerURL} = useContext(AppStorageContext);
+    const [loading, setLoaing] = useState(false);
+    const [statusMessage, setStatuseMessage] = useState('');
+
     const sats = route.params?.invoiceData?.options?.amount;
 
     const amt =
         sats === route.params.wallet.balance.toString()
             ? 'max'
             : sats + ' sats';
+
+    const createTransaction = async () => {
+        // Lock load
+        setLoaing(true);
+
+        // Update wallet descriptors to private version
+        const descriptors = await getPrivateDescriptors(
+            route.params.wallet.privateDescriptor,
+        );
+
+        let wallet = {
+            ...route.params.wallet,
+            externalDescriptor: descriptors.external,
+            internalDescriptor: descriptors.internal,
+        } as TComboWallet;
+
+        const {broadcasted, psbt, errorMessage} = await SingleBDKSend(
+            sats,
+            route.params.invoiceData.address,
+            wallet,
+            electrumServerURL,
+            msg => {
+                setStatuseMessage(msg);
+            },
+        );
+
+        // Set txid
+        let txid!: string;
+        if (!errorMessage && psbt) {
+            txid = await psbt.txid();
+        }
+
+        // Unlock load
+        setLoaing(false);
+
+        // Navigate to status screen
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'TransactionStatus',
+                params: {
+                    status: broadcasted ? 'success' : 'failed',
+                    message: statusMessage,
+                    txId: txid,
+                    network: route.params.wallet.network,
+                },
+            }),
+        );
+    };
 
     return (
         <SafeAreaView edges={['bottom', 'left', 'right']}>
@@ -68,10 +131,20 @@ const SendView = ({route}: Props) => {
                         Sending {sats ? `'${amt}'` : ''} to address:{' '}
                         {route.params?.invoiceData?.address}{' '}
                     </Text>
+
+                    {statusMessage ? (
+                        <Text style={[tailwind('mt-4 text-sm font-bold')]}>
+                            Status: {statusMessage}
+                        </Text>
+                    ) : (
+                        <></>
+                    )}
                 </View>
 
                 <LongBottomButton
-                    title={'Continue'}
+                    disabled={loading}
+                    onPress={createTransaction}
+                    title={'Send'}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />
