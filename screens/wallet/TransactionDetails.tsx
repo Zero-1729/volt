@@ -140,7 +140,8 @@ const TransactionDetailsView = ({route}: Props) => {
                         ) : (
                             <></>
                         )}
-                        {!route.params.tx.confirmed ? (
+                        {!route.params.tx.confirmed &&
+                        route.params.tx.confirmations === 0 ? (
                             <Broadcasted
                                 style={[tailwind('self-center')]}
                                 fill={ColorScheme.SVG.Default}
@@ -204,7 +205,8 @@ const TransactionDetailsView = ({route}: Props) => {
                         {route.params.tx.confirmations > 6
                             ? '6+'
                             : route.params.tx.confirmations}{' '}
-                        confirmations
+                        confirmation
+                        {route.params.tx.confirmations > 1 ? 's' : ''}
                     </Text>
 
                     {/* Transaction type flags for RBF and CPFP */}
