@@ -88,6 +88,16 @@ const TransactionDetailsView = ({route}: Props) => {
             ? ['top', 'bottom', 'left', 'right']
             : ['bottom', 'right', 'left'];
 
+    const confirmationText = route.params.tx.confirmed
+        ? `${
+              route.params.tx.confirmations > 6
+                  ? '6+'
+                  : route.params.tx.confirmations
+          } confirmation{route.params.tx.confirmations === 1 ? '' : 's'}`
+        : isAdvancedMode
+        ? 'Waiting in Mempool'
+        : '';
+
     return (
         <SafeAreaView edges={edges}>
             <View
@@ -129,7 +139,7 @@ const TransactionDetailsView = ({route}: Props) => {
 
                 <View style={[tailwind('-mt-8 justify-center px-4')]}>
                     <View style={[tailwind('items-center')]}>
-                        {route.params.tx.confirmations >= 0 &&
+                        {route.params.tx.confirmations > 0 &&
                         route.params.tx.confirmations <= 6 ? (
                             <Pending
                                 style={[tailwind('self-center')]}
@@ -202,11 +212,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             ),
                             {color: ColorScheme.Text.GrayedText},
                         ]}>
-                        {route.params.tx.confirmations > 6
-                            ? '6+'
-                            : route.params.tx.confirmations}{' '}
-                        confirmation
-                        {route.params.tx.confirmations > 1 ? 's' : ''}
+                        {confirmationText}
                     </Text>
 
                     {/* Transaction type flags for RBF and CPFP */}
