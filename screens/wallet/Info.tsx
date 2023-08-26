@@ -20,6 +20,7 @@ import Right from './../../assets/svg/chevron-right-24.svg';
 
 import {AppStorageContext} from '../../class/storageContext';
 import {WalletTypeDetails} from '../../modules/wallet-defaults';
+import {getMiniWallet} from '../../modules/wallet-utils';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -364,9 +365,14 @@ const Info = () => {
                 <PlainButton
                     style={[tailwind('w-5/6')]}
                     onPress={() => {
+                        const miniwallet = getMiniWallet(walletData);
+
                         navigation.dispatch(
                             CommonActions.navigate({
                                 name: 'AddressOwnership',
+                                params: {
+                                    wallet: miniwallet,
+                                },
                             }),
                         );
                     }}>
