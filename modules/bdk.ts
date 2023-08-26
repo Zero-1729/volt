@@ -495,6 +495,7 @@ export const fullsendBDKTransaction = async (
     bdkWallet: BDK.Wallet,
     network: string,
     electrumServer: TElectrumServerURLs,
+    statusCallback: (message: string) => void,
     opReturnData?: string,
 ) => {
     // Get the scripts by converting each address to a BDK address
@@ -608,7 +609,9 @@ export const SingleBDKSend = async (
     address: string,
     wallet: TWalletType,
     electrumServerUrl: TElectrumServerURLs,
+    statusCallback: (message: string) => void,
 ) => {
+    // Expects the wallet to contain private internal and external descriptors
     const _w = await createBDKWallet(wallet);
 
     const hardCodedFeeRate = 5;
@@ -620,5 +623,6 @@ export const SingleBDKSend = async (
         _w,
         wallet.network,
         electrumServerUrl,
+        statusCallback,
     );
 };
