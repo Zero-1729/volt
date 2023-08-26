@@ -347,13 +347,16 @@ const Scan = ({route}: Props) => {
     // Display Camera view if camera available
     return (
         <SafeAreaView
-            style={[styles.flexed]}
+            style={[
+                styles.flexed,
+                {backgroundColor: ColorScheme.Background.Inverted},
+            ]}
             edges={['bottom', 'left', 'right']}>
             <View
                 style={[
                     tailwind('items-center justify-center h-full w-full'),
                     styles.flexed,
-                    {backgroundColor: ColorScheme.Background.Primary},
+                    {backgroundColor: ColorScheme.Background.Inverted},
                 ]}>
                 <View
                     style={[
@@ -364,13 +367,13 @@ const Scan = ({route}: Props) => {
                     <PlainButton
                         onPress={closeScreen}
                         style={[tailwind('absolute z-10 left-6')]}>
-                        <Close fill={ColorScheme.SVG.Default} />
+                        <Close fill={ColorScheme.SVG.Inverted} />
                     </PlainButton>
                     {/* Screen header */}
                     <Text
                         style={[
                             tailwind('text-sm font-bold'),
-                            {color: ColorScheme.Text.Default},
+                            {color: ColorScheme.Text.Alt},
                         ]}>
                         {dynamicHeading}
                     </Text>
@@ -398,19 +401,19 @@ const Scan = ({route}: Props) => {
                                     ),
                                     {
                                         backgroundColor:
-                                            ColorScheme.Background.Inverted,
+                                            ColorScheme.Background.Primary,
                                     },
                                 ]}>
                                 <InfoIcon
                                     height={18}
                                     width={18}
-                                    fill={ColorScheme.SVG.Inverted}
+                                    fill={ColorScheme.SVG.Default}
                                 />
                                 <Text
                                     style={[
                                         tailwind('text-sm w-5/6'),
                                         {
-                                            color: ColorScheme.Text.Alt,
+                                            color: ColorScheme.Text.Default,
                                         },
                                     ]}>
                                     {scannerAlertMsg}
@@ -424,7 +427,7 @@ const Scan = ({route}: Props) => {
                     <Text
                         style={[
                             tailwind('text-sm mb-4'),
-                            {color: ColorScheme.Text.Default},
+                            {color: ColorScheme.Text.Alt},
                         ]}>
                         Scan a Bitcoin invoice or address to pay
                     </Text>
@@ -435,7 +438,7 @@ const Scan = ({route}: Props) => {
                             tailwind('h-2/5 w-4/5 border'),
                             {
                                 borderWidth: 2,
-                                borderColor: ColorScheme.Background.Inverted,
+                                borderColor: ColorScheme.Background.Primary,
                                 borderRadius: 12,
                             },
                         ]}>
@@ -453,8 +456,8 @@ const Scan = ({route}: Props) => {
                 <LongBottomButton
                     onPress={handleClipboard}
                     title={'Paste'}
-                    textColor={ColorScheme.Text.Alt}
-                    backgroundColor={ColorScheme.Background.Inverted}
+                    textColor={ColorScheme.Text.Default}
+                    backgroundColor={ColorScheme.Background.Primary}
                 />
             </View>
         </SafeAreaView>
