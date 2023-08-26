@@ -181,7 +181,7 @@ const Scan = ({route}: Props) => {
                 .isGreaterThan(route.params.wallet.balance)
         ) {
             updateScannerAlert(
-                'You do not have enough funds to send this transaction',
+                'You do not have sufficient funds to pay this invoice',
             );
             return;
         }
@@ -189,7 +189,7 @@ const Scan = ({route}: Props) => {
         // Check can send to address
         if (!canSendToInvoice(decodedInvoice, route.params.wallet)) {
             updateScannerAlert(
-                'Selected wallet cannot send to invoice address type',
+                'Selected wallet cannot pay to invoice address type',
             );
             return;
         }
