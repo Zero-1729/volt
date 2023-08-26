@@ -198,7 +198,9 @@ const Scan = ({route}: Props) => {
     };
 
     const convertBTCtoSats = (btc: string) => {
-        return (parseFloat(btc) * 100000000).toString();
+        const btcAmount = new BigNumber(btc);
+
+        return btcAmount.multipliedBy(100000000).toString();
     };
 
     const onQRDetected = useCallback(async (QR: Barcode[]) => {
