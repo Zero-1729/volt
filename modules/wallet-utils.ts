@@ -461,7 +461,7 @@ export const canSendToInvoice = (
 
     const invoicePrefixInfo = prefixInfo[invoice.address[0]];
 
-    switch (invoicePrefixInfo.type) {
+    switch (invoicePrefixInfo?.type) {
         case 'p2pkh':
             // Can send to P2PKH if wallet is Segwit Wrapped ('shp2wpkh') or Legacy ('p2pkh')
             return (
