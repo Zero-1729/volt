@@ -588,6 +588,7 @@ export const fullsendBDKTransaction = async (
             return {
                 broadcasted: broadcasted,
                 psbt: signedPsbt,
+                errorMessage: '',
             };
         } else {
             console.error(
@@ -597,10 +598,15 @@ export const fullsendBDKTransaction = async (
             return {
                 broadcasted: false,
                 psbt: signedPsbt,
+                errorMessage: 'Failed to get transaction id.',
             };
         }
     } catch (e: any) {
-        throw new Error(e.message);
+        return {
+            broadcasted: false,
+            psbt: null,
+            errorMessage: e.message,
+        };
     }
 };
 
