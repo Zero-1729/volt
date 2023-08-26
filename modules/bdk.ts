@@ -602,3 +602,23 @@ export const fullsendBDKTransaction = async (
         throw new Error(e.message);
     }
 };
+
+export const SingleBDKSend = async (
+    amount: string,
+    address: string,
+    wallet: TWalletType,
+    electrumServerUrl: TElectrumServerURLs,
+) => {
+    const _w = await createBDKWallet(wallet);
+
+    const hardCodedFeeRate = 5;
+
+    return await fullsendBDKTransaction(
+        amount,
+        address,
+        hardCodedFeeRate,
+        _w,
+        wallet.network,
+        electrumServerUrl,
+    );
+};
