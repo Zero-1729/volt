@@ -79,7 +79,7 @@ export type TTransaction = {
     outputs?: TUTXO[]; // Transaction outputs
     address?: string; // Transaction address
     rbf: boolean; // Whether transaction is RBF
-    cpfp: boolean; // Whether transaction is CPFP
+    isSelfOrBoost: boolean; // Whether transaction is CPFP, or RBF tx payed to self
     memo?: string; // Transaction memo
 };
 
