@@ -15,6 +15,7 @@ import {ENet} from './enums';
 export type TNetwork = ENet | Network;
 
 export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
+export type TComboWallet = TWalletType & TMiniWallet;
 
 export type TMiniWallet = {
     name: string;
@@ -22,6 +23,8 @@ export type TMiniWallet = {
     network: string;
     balance: number;
     privateDescriptor: string;
+    externalDescriptor?: string;
+    internalDescriptor?: string;
     xpub: string;
 };
 
