@@ -441,6 +441,8 @@ export const getMiniWallet = (wallet: TWalletType) => {
         network: wallet.network,
         balance: balance,
         privateDescriptor: wallet.privateDescriptor,
+        externalDescriptor: wallet.externalDescriptor,
+        internalDescriptor: wallet.internalDescriptor,
         xpub: wallet.xpub,
     };
 };

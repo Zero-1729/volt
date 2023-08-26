@@ -22,6 +22,8 @@ export type TMiniWallet = {
     network: string;
     balance: number;
     privateDescriptor: string;
+    externalDescriptor: string;
+    internalDescriptor: string;
     xpub: string;
 };
 
