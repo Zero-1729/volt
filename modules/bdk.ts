@@ -521,16 +521,9 @@ export const fullsendBDKTransaction = async (
         electrumServer,
     );
 
-    // Get balance here and make sure can still spend
-    const balance = await w.getBalance();
-    console.log('[Balance] Current wallet balance pre-tx: ', balance);
-    console.log('[FeeRate] getting fee rate...');
-
     // Fetch recommended feerate here
     // Can skip and just use from user in UI
     // Displayed from Mempool.space 'fetch'
-
-    console.log(`[FeeRate] setting rate of: '${feeRate}'`);
 
     // Create transaction builder
     let tx = await new BDK.TxBuilder().create();
@@ -539,6 +532,8 @@ export const fullsendBDKTransaction = async (
     // Only allow single text with length limit
     // Char limit and strict check in UI
     try {
+        statusCallback('Setting OP_RETRUN Data');
+
         // Create actual transaction
         if (opReturnData) {
             // Create a Uint8Array from utf-8 string 'opReturnData'
@@ -553,12 +548,9 @@ export const fullsendBDKTransaction = async (
             const dataArray = Array.from(dataList);
 
             tx = await tx.addData(dataArray);
-            console.log(
-                `[OP_RETRUN] wrote: '${opReturnData}' as array: `,
-                dataArray,
-            );
         }
 
+        statusCallback('Building transaction...');
         // Add essential tx data to tx builder
         // 1. Enable RBF always by default
         // 2. Fee rate
@@ -568,9 +560,11 @@ export const fullsendBDKTransaction = async (
         tx = await tx.feeRate(feeRate);
         tx = await tx.addRecipient(script, Number(amount));
 
+        statusCallback('Finaled transaction.');
         // Finish building tx
         const finalTx = await tx.finish(w);
 
+        statusCallback('Signing transaction...');
         // Sign the Psbt
         const signedPsbt = await w.sign(finalTx.psbt);
 
@@ -583,7 +577,9 @@ export const fullsendBDKTransaction = async (
         // Always check that the transaction id exists
         if (finalTxId) {
             // Broadcast transaction
+            statusCallback('Broadcasting transaction...');
             const broadcasted = await chain.broadcast(transaction);
+            statusCallback('Sent transaction!');
 
             return {
                 broadcasted: broadcasted,
@@ -591,9 +587,7 @@ export const fullsendBDKTransaction = async (
                 errorMessage: '',
             };
         } else {
-            console.error(
-                '[Transaction] failed to create and broadcast transaction',
-            );
+            statusCallback('Failed to send transaction.');
 
             return {
                 broadcasted: false,
@@ -602,6 +596,8 @@ export const fullsendBDKTransaction = async (
             };
         }
     } catch (e: any) {
+        statusCallback('Failed to send transaction.');
+
         return {
             broadcasted: false,
             psbt: null,
@@ -621,6 +617,8 @@ export const SingleBDKSend = async (
     const _w = await createBDKWallet(wallet);
 
     const hardCodedFeeRate = 5;
+
+    statusCallback('Preparing wallet...');
 
     return await fullsendBDKTransaction(
         amount,
