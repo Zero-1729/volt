@@ -486,3 +486,119 @@ export const generateAddress = async (
         index: address.index,
     };
 };
+
+// Creates a PSBT created a given address and sats amount, and returns the singed Psbt and broadcast status
+export const fullsendBDKTransaction = async (
+    amount: string,
+    address: string,
+    feeRate: number,
+    bdkWallet: BDK.Wallet,
+    network: string,
+    electrumServer: TElectrumServerURLs,
+    opReturnData?: string,
+) => {
+    // Get the scripts by converting each address to a BDK address
+    // and extract the scripts from the BDK address
+    const addr = await new BDK.Address().create(address);
+
+    const script = await addr.scriptPubKey();
+
+    // chain config chain before broadcasting
+    const config = _getConfig(network, electrumServer, 5);
+
+    // Create chain to use for broadcast of signed psbt
+    const chain = await new BDK.Blockchain().create(
+        config,
+        BlockChainNames.Electrum,
+    );
+
+    // Sync wallet before any tx creation
+    const w = await syncBdkWallet(
+        bdkWallet,
+        () => {},
+        network as TNetwork,
+        electrumServer,
+    );
+
+    // Get balance here and make sure can still spend
+    const balance = await w.getBalance();
+    console.log('[Balance] Current wallet balance pre-tx: ', balance);
+    console.log('[FeeRate] getting fee rate...');
+
+    // Fetch recommended feerate here
+    // Can skip and just use from user in UI
+    // Displayed from Mempool.space 'fetch'
+
+    console.log(`[FeeRate] setting rate of: '${feeRate}'`);
+
+    // Create transaction builder
+    let tx = await new BDK.TxBuilder().create();
+
+    // Reformat data for OP_RETURN
+    // Only allow single text with length limit
+    // Char limit and strict check in UI
+    try {
+        // Create actual transaction
+        if (opReturnData) {
+            // Create a Uint8Array from utf-8 string 'opReturnData'
+            let dataList = new Uint8Array(opReturnData.length);
+
+            // Fill each array element with the data
+            for (let i = 0; i < opReturnData.length; i++) {
+                dataList[i] = opReturnData.charCodeAt(i);
+            }
+
+            // Convert to array
+            const dataArray = Array.from(dataList);
+
+            tx = await tx.addData(dataArray);
+            console.log(
+                `[OP_RETRUN] wrote: '${opReturnData}' as array: `,
+                dataArray,
+            );
+        }
+
+        // Add essential tx data to tx builder
+        // 1. Enable RBF always by default
+        // 2. Fee rate
+        // 3. Recipient and amount to send them
+        // Note: can use 'tx.setRecipients([{script, amount: Number(amount)}])' for multiple recipients and mounts
+        tx = await tx.enableRbf();
+        tx = await tx.feeRate(feeRate);
+        tx = await tx.addRecipient(script, Number(amount));
+
+        // Finish building tx
+        const finalTx = await tx.finish(w);
+
+        // Sign the Psbt
+        const signedPsbt = await w.sign(finalTx.psbt);
+
+        // Extract the newly signed BDK transaction from the Psbt
+        const transaction = await signedPsbt.extractTx();
+
+        // Retrieve final tx id to check if it exists and move to broadcast tx
+        const finalTxId = await transaction.txid();
+
+        // Always check that the transaction id exists
+        if (finalTxId) {
+            // Broadcast transaction
+            const broadcasted = await chain.broadcast(transaction);
+
+            return {
+                broadcasted: broadcasted,
+                psbt: signedPsbt,
+            };
+        } else {
+            console.error(
+                '[Transaction] failed to create and broadcast transaction',
+            );
+
+            return {
+                broadcasted: false,
+                psbt: signedPsbt,
+            };
+        }
+    } catch (e: any) {
+        throw new Error(e.message);
+    }
+};
