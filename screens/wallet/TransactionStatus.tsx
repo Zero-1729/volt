@@ -124,8 +124,8 @@ const TransactionStatus = ({route}: Props) => {
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
                                 {route.params.status === 'success'
-                                    ? `Successfully Sent Tranasction with id: ${route.params.txId}`
-                                    : `Failed to send transaction: ${route.params.message}`}
+                                    ? route.params.txId
+                                    : route.params.message}
                             </Text>
                         </View>
                     ) : (
