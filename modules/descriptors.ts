@@ -77,7 +77,6 @@ const reformatDescriptorToBDK = (expression: string) => {
 export const createDescriptorFromString = (
     expression: string,
 ): {external: string; internal: string; priv: string} => {
-    // TODO: store the private versions of the descriptors
     const parsedDescriptor = parseDescriptor(expression);
     let xpub!: string;
 
@@ -148,7 +147,6 @@ export const createDescriptorFromString = (
 export const createDescriptorFromXprv = (
     xprv: string,
 ): {external: string; internal: string; priv: string} => {
-    // TODO: store the private versions of the descriptors
     // Expects to be given 'xprv' or 'tprv'
     const root = getRawRootFromXprv(xprv);
     const keyInfo = extendedKeyInfo[xprv[0]];
@@ -443,4 +441,27 @@ export const includeDescriptorKeyPath = (descriptorObject: DescriptorParts) => {
     }${descriptorObject.path.slice(1)}]${descriptorObject.key}/0/*${
         descriptorObject.scriptSuffix
     }${descriptorObject.checksum}`;
+};
+
+// Get the internal and external private descriptor pairs from an external private descriptor
+export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
+    let strippedDescriptor: string = privateExternalDescriptor.includes('#')
+        ? privateExternalDescriptor.slice(0, -9)
+        : privateExternalDescriptor;
+
+    // Rebuild internal descriptor
+    let privateInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
+    // re-include checksum
+    privateInternalDescriptor =
+        privateInternalDescriptor +
+        '#' +
+        descriptors.checksum(privateInternalDescriptor);
+    privateInternalDescriptor = reformatDescriptorToBDK(
+        privateInternalDescriptor,
+    );
+
+    return {
+        external: privateExternalDescriptor,
+        internal: privateInternalDescriptor,
+    };
 };
