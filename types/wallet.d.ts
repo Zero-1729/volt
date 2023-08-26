@@ -62,10 +62,10 @@ export type TTransaction = {
     txid: string; // Transaction ID
     block_height: number; // Block height
     confirmed: boolean; // Whether transaction is confirmed
-    confirmations?: number; // Number of confirmations
-    size?: number; // Transaction size in bytes
-    vsize?: number; // Transaction size in virtual bytes
-    weight?: number; // Transaction weight
+    confirmations: number; // Number of confirmations
+    size: number; // Transaction size in bytes
+    vsize: number; // Transaction size in virtual bytes
+    weight: number; // Transaction weight
     fee: BalanceType; // Transaction fee in sats
     value: BalanceType; // Transaction value in sats
     received: BalanceType; // Transaction received value in sats
