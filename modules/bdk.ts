@@ -357,17 +357,11 @@ export const syncBdkWallet = async (
     electrumServer: TElectrumServerURLs,
 ): Promise<BDK.Wallet> => {
     // Electrum configuration
-    const config: BlockchainElectrumConfig = {
-        url:
-            network === 'bitcoin'
-                ? electrumServer.bitcoin
-                : electrumServer.testnet,
-        retry: 5,
-        timeout: 5,
-        stopGap: 100,
-        sock5: null,
-        validateDomain: false,
-    };
+    const config: BlockchainElectrumConfig = _getConfig(
+        network,
+        electrumServer,
+        100,
+    );
 
     let chain!: BDK.Blockchain;
 
