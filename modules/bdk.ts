@@ -63,8 +63,8 @@ export const formatTXFromBDK = async (
     // for CPFPs
     // TODO: handle timing calculation for multiple sequential CPFPs
     // Place current time for recently broadcasted txs as now
-    const timestamp = tx.confirmationTime
-        ? (tx.confirmationTime.timestamp as number) + (isCpfp ? 1 : 0)
+    const timestamp = tx.confirmed
+        ? (tx.confirmationTime?.timestamp as number) + (isCpfp ? 1 : 0)
         : +new Date();
 
     const formattedTx = {
@@ -632,3 +632,7 @@ export const SingleBDKSend = async (
         statusCallback,
     );
 };
+
+// Special tx to drain all funds from wallet
+// to recipient
+export const drainBDKSend = async () => {};
