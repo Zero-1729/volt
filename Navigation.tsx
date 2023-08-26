@@ -18,7 +18,7 @@ import RequestAmount from './screens/wallet/RequestAmount';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 
-import TransactionDetailsView from './screens/wallet/TransactionDetails';
+import TransactionDetails from './screens/wallet/TransactionDetails';
 
 import Apps from './screens/Apps';
 
@@ -63,7 +63,7 @@ export type WalletParamList = {
         invoiceData: any;
         wallet: TMiniWallet;
     };
-    TransactionView: {
+    TransactionDetails: {
         tx: TTransaction;
         source: string;
     };
@@ -127,8 +127,8 @@ const WalletRoot = () => {
                     component={Ownership}
                 />
                 <WalletStack.Screen
-                    name="TransactionView"
-                    component={TransactionDetailsView}
+                    name="TransactionDetails"
+                    component={TransactionDetails}
                 />
                 <WalletStack.Screen name="Receive" component={Receive} />
                 <WalletStack.Screen
