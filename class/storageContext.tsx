@@ -457,7 +457,7 @@ export const AppStorageProvider = ({children}: Props) => {
         const index = wallets.findIndex(wallet => wallet.id === id);
         const stringyW = wallets[index];
 
-        // Silently just fail and return null
+        // Silently just fail and return undefined
         if (index !== -1) {
             switch (stringyW.type) {
                 case 'wpkh':
