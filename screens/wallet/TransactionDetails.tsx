@@ -150,8 +150,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         ) : (
                             <></>
                         )}
-                        {!route.params.tx.confirmed &&
-                        route.params.tx.confirmations === 0 ? (
+                        {route.params.tx.confirmations === 0 ? (
                             <Broadcasted
                                 style={[tailwind('self-center')]}
                                 fill={ColorScheme.SVG.Default}
