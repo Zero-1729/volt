@@ -56,7 +56,7 @@ export const formatTXFromBDK = async (
 
     const txBlockHeight = tx.confirmationTime?.height as number;
     const blockConfirms =
-        txBlockHeight > 0 ? tx.currentBlockHeight - txBlockHeight : 1;
+        txBlockHeight > 0 ? tx.currentBlockHeight - txBlockHeight : 0;
 
     // Calculate time stamp
     // Note: we bump the time by 1 second so it shows up in the correct order
