@@ -70,7 +70,11 @@ export const LongBottomButton = (props: ButtonProps) => {
         <TouchableOpacity
             {...props}
             style={[
-                tailwind('w-5/6 absolute rounded-full'),
+                tailwind(
+                    `w-5/6 absolute rounded-full ${
+                        props.disabled ? 'opacity-20' : ''
+                    }`,
+                ),
                 {
                     bottom: NativeWindowMetrics.bottomButtonOffset,
                     backgroundColor: props.backgroundColor,

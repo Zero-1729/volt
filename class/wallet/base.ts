@@ -35,10 +35,11 @@ export class BaseWallet {
             xprv: obj.xprv,
             xpub: obj.xpub,
             mnemonic: obj.mnemonic,
-            network: obj.network,
+            network: obj.network as ENet,
         });
 
         wallet.id = obj.id;
+        wallet.index = obj.index as number;
 
         wallet.gap_limit = obj.gap_limit;
 
@@ -47,14 +48,14 @@ export class BaseWallet {
         wallet.privateDescriptor = obj.privateDescriptor;
 
         wallet.addresses = obj.addresses;
-        wallet.address = obj.address;
-        wallet.birthday = obj.birthday;
-        wallet.balance = obj.balance;
-        wallet.transactions = obj.transactions;
-        wallet.UTXOs = obj.UTXOs;
-        wallet.syncedBalance = obj.syncedBalance;
+        wallet.address = obj.address as TAddress;
+        wallet.birthday = obj.birthday as Date;
+        wallet.balance = new BigNumber(obj.balance);
+        wallet.transactions = obj.transactions as TTransaction[];
+        wallet.UTXOs = obj.UTXOs as TUtxo[];
+        wallet.syncedBalance = obj.syncedBalance as number;
         wallet.lastSynced = obj.lastSynced;
-        wallet.units = obj.units;
+        wallet.units = obj.units as TUnit;
         wallet.masterFingerprint = obj.masterFingerprint;
         wallet.hardwareWalletEnabled = obj.hardwareWalletEnabled;
         wallet.hasBackedUp = obj.hasBackedUp;

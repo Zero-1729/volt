@@ -113,7 +113,12 @@ const Home = () => {
             transactions = transactions.concat(w.transactions);
         }
 
-        return getUniqueTXs(transactions);
+        const txs = getUniqueTXs(transactions);
+
+        // Sort by timestamp
+        return txs.sort((a: TTransaction, b: TTransaction) => {
+            return +b.timestamp - +a.timestamp;
+        });
     };
 
     const initWallet = useCallback(async () => {
@@ -268,6 +273,11 @@ const Home = () => {
             // Single shot call to update fiat rate
             singleSyncFiatRate(appFiatCurrency.short);
         }
+
+        () => {
+            setRefreshing(false);
+            setLoadingBalance(false);
+        };
     }, []);
 
     const renderCard = ({item}: {item: BaseWallet}) => {
@@ -462,7 +472,7 @@ const Home = () => {
                                                 CommonActions.navigate(
                                                     'WalletRoot',
                                                     {
-                                                        screen: 'TransactionView',
+                                                        screen: 'TransactionDetails',
                                                         params: {
                                                             tx: {...item.item},
                                                             source: 'liberal',

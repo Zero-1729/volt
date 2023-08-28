@@ -12,7 +12,14 @@ const bip32 = BIP32Factory(ecc);
 
 import Crypto from 'react-native-quick-crypto';
 
-import {TDescriptorSymbols, TNetwork, TTransaction} from '../types/wallet';
+import {
+    TDescriptorSymbols,
+    TMiniWallet,
+    TNetwork,
+    TTransaction,
+    TWalletType,
+    TInvoiceData,
+} from '../types/wallet';
 import {EBackupMaterial, ENet} from '../types/enums';
 
 import {
@@ -423,4 +430,62 @@ export const normalizeExtKey = (xkey: string, key_type: string) => {
     }
 
     return xkey;
+};
+
+export const getMiniWallet = (wallet: TWalletType) => {
+    const balance = wallet.balance.toNumber();
+
+    return {
+        name: wallet.name,
+        type: wallet.type,
+        network: wallet.network,
+        balance: balance,
+        privateDescriptor: wallet.privateDescriptor,
+        externalDescriptor: wallet.externalDescriptor,
+        internalDescriptor: wallet.internalDescriptor,
+        xpub: wallet.xpub,
+    };
+};
+
+export const canSendToInvoice = (
+    invoice: TInvoiceData,
+    miniWallet: TMiniWallet,
+): Boolean => {
+    // check that network matches
+    const prefixInfo: {[index: string]: {network: string; type: string}} = {
+        '1': {network: 'bitcoin', type: 'p2pkh'},
+        b: {network: 'bitcoin', type: 'wpkh'},
+        '3': {network: 'bitcoin', type: 'shp2wpkh'},
+        m: {network: 'testnet', type: 'p2pkh'},
+        t: {network: 'testnet', type: 'wpkh'},
+        '2': {network: 'testnet', type: 'shp2wpkh'},
+    };
+
+    const invoicePrefixInfo = prefixInfo[invoice.address[0]];
+
+    switch (invoicePrefixInfo?.type) {
+        case 'p2pkh':
+            // Can send to P2PKH if wallet is Segwit Wrapped ('shp2wpkh') or Legacy ('p2pkh')
+            return (
+                miniWallet.network === invoicePrefixInfo.network &&
+                (miniWallet.type === invoicePrefixInfo.type ||
+                    miniWallet.type === 'shp2wpkh')
+            );
+        case 'wpkh':
+            // Can send to WPKH if wallet is Segwit Wrapped ('shp2wpkh') or Native Segwit ('wpkh')
+            return (
+                miniWallet.network === invoicePrefixInfo.network &&
+                (miniWallet.type === invoicePrefixInfo.type ||
+                    miniWallet.type === 'shp2wpkh')
+            );
+        case 'shp2wpkh':
+            // Can send to Segwit Wrapped if wallet is Native Segwit ('wpkh') or Segwit Wrapped ('shp2wpkh')
+            return (
+                miniWallet.network === invoicePrefixInfo.network &&
+                (miniWallet.type === invoicePrefixInfo.type ||
+                    miniWallet.type === 'wpkh')
+            );
+    }
+
+    return false;
 };

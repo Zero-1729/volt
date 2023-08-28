@@ -1,10 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Text, useColorScheme, View} from 'react-native';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
@@ -12,26 +16,54 @@ import Color from '../../constants/Color';
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 
-import Close from '../../assets/svg/x-24.svg';
+import {ENet} from '../../types/enums';
+import {TComboWallet} from '../../types/wallet';
+import {createBDKWallet, syncBdkWallet} from '../../modules/bdk';
+import {Address} from 'bdk-rn';
 
-const AddressOwnership = () => {
+import Close from '../../assets/svg/x-24.svg';
+import {WalletParamList} from '../../Navigation';
+
+type Props = NativeStackScreenProps<WalletParamList, 'AddressOwnership'>;
+
+const AddressOwnership = ({route}: Props) => {
     const [resultMessage, setResultMessage] = useState('');
     const [address, setAddress] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
 
-    const checkAddressOwnership = () => {
-        const isOwnedByYou = false;
+    const {electrumServerURL} = useContext(AppStorageContext);
 
-        // TODO: Check if address is owned by this wallet
+    const checkAddressOwnership = async () => {
+        setLoading(true);
+
+        const wallet = route.params.wallet;
+        const network =
+            route.params.wallet.network === 'testnet'
+                ? ENet.Testnet
+                : ENet.Bitcoin;
+
+        setResultMessage('Scanning wallet addresses...');
+
+        let _w = await createBDKWallet(wallet as TComboWallet);
+        _w = await syncBdkWallet(_w, () => {}, network, electrumServerURL);
+
+        const bdkAddr = await new Address().create(address);
+        const script = await bdkAddr.scriptPubKey();
+
+        const isOwnedByYou = await _w.isMine(script);
+
         if (isOwnedByYou) {
             setResultMessage('Address is owned by this wallet');
         } else {
             setResultMessage('Address is not owned by this wallet');
         }
+
+        setLoading(false);
     };
 
     const updateText = (text: string) => {
@@ -137,6 +169,7 @@ const AddressOwnership = () => {
 
                 {/* Checker Button */}
                 <LongBottomButton
+                    disabled={loading}
                     style={[tailwind('mt-12 w-full items-center')]}
                     title={'Check Address'}
                     onPress={checkAddressOwnership}

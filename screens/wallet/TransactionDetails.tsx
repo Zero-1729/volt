@@ -35,7 +35,7 @@ import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
 
-type Props = NativeStackScreenProps<WalletParamList, 'TransactionView'>;
+type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
 const TransactionDetailsView = ({route}: Props) => {
     const tailwind = useTailwind();
@@ -87,6 +87,16 @@ const TransactionDetailsView = ({route}: Props) => {
         route.params.source === 'liberal'
             ? ['top', 'bottom', 'left', 'right']
             : ['bottom', 'right', 'left'];
+
+    const confirmationText = route.params.tx.confirmed
+        ? `${
+              route.params.tx.confirmations > 6
+                  ? '6+'
+                  : route.params.tx.confirmations
+          } confirmation${route.params.tx.confirmations === 1 ? '' : 's'}`
+        : isAdvancedMode
+        ? 'Waiting in Mempool'
+        : '';
 
     return (
         <SafeAreaView edges={edges}>
@@ -140,7 +150,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         ) : (
                             <></>
                         )}
-                        {!route.params.tx.confirmed ? (
+                        {route.params.tx.confirmations === 0 ? (
                             <Broadcasted
                                 style={[tailwind('self-center')]}
                                 fill={ColorScheme.SVG.Default}
@@ -161,7 +171,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             <></>
                         )}
                         {/* We only show the amount if it is not a CPFP, which shows zero */}
-                        {!route.params.tx.cpfp ? (
+                        {!route.params.tx.isSelfOrBoost ? (
                             <FiatBalance
                                 style={[tailwind('mt-6')]}
                                 balance={route.params.tx.value}
@@ -201,10 +211,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             ),
                             {color: ColorScheme.Text.GrayedText},
                         ]}>
-                        {route.params.tx.confirmations > 6
-                            ? '6+'
-                            : route.params.tx.confirmations}{' '}
-                        confirmations
+                        {confirmationText}
                     </Text>
 
                     {/* Transaction type flags for RBF and CPFP */}

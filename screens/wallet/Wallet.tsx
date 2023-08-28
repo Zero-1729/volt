@@ -33,6 +33,7 @@ import {
     createBDKWallet,
     getBdkWalletTransactions,
 } from '../../modules/bdk';
+import {getMiniWallet} from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
 
@@ -471,7 +472,21 @@ const Wallet = () => {
                                             ColorScheme.Background.Inverted,
                                     },
                                 ]}>
-                                <PlainButton>
+                                <PlainButton
+                                    onPress={() => {
+                                        const miniwallet =
+                                            getMiniWallet(walletData);
+
+                                        navigation.dispatch(
+                                            CommonActions.navigate('ScanRoot', {
+                                                screen: 'Scan',
+                                                params: {
+                                                    screen: 'send',
+                                                    wallet: miniwallet,
+                                                },
+                                            }),
+                                        );
+                                    }}>
                                     <Text
                                         style={[
                                             tailwind(
@@ -574,7 +589,7 @@ const Wallet = () => {
                                     callback={() => {
                                         navigation.dispatch(
                                             CommonActions.navigate({
-                                                name: 'TransactionView',
+                                                name: 'TransactionDetails',
                                                 params: {
                                                     tx: {...item.item},
                                                     source: 'conservative',
@@ -609,7 +624,7 @@ const Wallet = () => {
                                             },
                                         ]}>
                                         A list of all transactions for this
-                                        wallet be displayed here
+                                        wallet will be displayed here
                                     </Text>
                                 </View>
                             }

@@ -442,3 +442,26 @@ export const includeDescriptorKeyPath = (descriptorObject: DescriptorParts) => {
         descriptorObject.scriptSuffix
     }${descriptorObject.checksum}`;
 };
+
+// Get the internal and external private descriptor pairs from an external private descriptor
+export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
+    let strippedDescriptor: string = privateExternalDescriptor.includes('#')
+        ? privateExternalDescriptor.slice(0, -9)
+        : privateExternalDescriptor;
+
+    // Rebuild internal descriptor
+    let privateInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
+    // re-include checksum
+    privateInternalDescriptor =
+        privateInternalDescriptor +
+        '#' +
+        descriptors.checksum(privateInternalDescriptor);
+    privateInternalDescriptor = reformatDescriptorToBDK(
+        privateInternalDescriptor,
+    );
+
+    return {
+        external: privateExternalDescriptor,
+        internal: privateInternalDescriptor,
+    };
+};

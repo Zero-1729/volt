@@ -15,6 +15,27 @@ import {ENet} from './enums';
 export type TNetwork = ENet | Network;
 
 export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
+export type TComboWallet = TWalletType & TMiniWallet;
+
+export type TMiniWallet = {
+    name: string;
+    type: string;
+    network: string;
+    balance: number;
+    privateDescriptor: string;
+    externalDescriptor?: string;
+    internalDescriptor?: string;
+    xpub: string;
+};
+
+export type TInvoiceData = {
+    address: string;
+    options?: {
+        amount?: number;
+        message?: string;
+        label?: string;
+    };
+};
 
 // Wallet balance type
 export type TBalance = BigNumber;
@@ -44,10 +65,10 @@ export type TTransaction = {
     txid: string; // Transaction ID
     block_height: number; // Block height
     confirmed: boolean; // Whether transaction is confirmed
-    confirmations?: number; // Number of confirmations
-    size?: number; // Transaction size in bytes
-    vsize?: number; // Transaction size in virtual bytes
-    weight?: number; // Transaction weight
+    confirmations: number; // Number of confirmations
+    size: number; // Transaction size in bytes
+    vsize: number; // Transaction size in virtual bytes
+    weight: number; // Transaction weight
     fee: BalanceType; // Transaction fee in sats
     value: BalanceType; // Transaction value in sats
     received: BalanceType; // Transaction received value in sats
@@ -58,7 +79,7 @@ export type TTransaction = {
     outputs?: TUTXO[]; // Transaction outputs
     address?: string; // Transaction address
     rbf: boolean; // Whether transaction is RBF
-    cpfp: boolean; // Whether transaction is CPFP
+    isSelfOrBoost: boolean; // Whether transaction is CPFP, or RBF tx payed to self
     memo?: string; // Transaction memo
 };
 

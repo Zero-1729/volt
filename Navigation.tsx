@@ -15,8 +15,11 @@ import Info from './screens/wallet/Info';
 import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
+import Send from './screens/wallet/Send';
+import SendAmount from './screens/wallet/SendAmount';
 
-import TransactionDetailsView from './screens/wallet/TransactionDetails';
+import TransactionDetails from './screens/wallet/TransactionDetails';
+import TransactionStatus from './screens/wallet/TransactionStatus';
 
 import Apps from './screens/Apps';
 
@@ -39,7 +42,7 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import {TTransaction} from './types/wallet';
+import {TTransaction, TMiniWallet} from './types/wallet';
 
 // Root Param List for screens
 export type WalletParamList = {
@@ -48,23 +51,38 @@ export type WalletParamList = {
         sats: string;
         fiat: string;
     };
+    Send: {
+        invoiceData: any;
+        wallet: TMiniWallet;
+    };
     WalletView: undefined;
     WalletInfo: undefined;
     WalletBackup: undefined;
-    AddressOwnership: undefined;
+    AddressOwnership: {
+        wallet: TMiniWallet;
+    };
     RequestAmount: undefined;
-    TransactionView: {
+    SendAmount: {
+        invoiceData: any;
+        wallet: TMiniWallet;
+    };
+    TransactionDetails: {
         tx: TTransaction;
         source: string;
+    };
+    TransactionStatus: {
+        status: string;
+        message: string;
+        txId: string;
+        network: string;
     };
 };
 
 export type ScanParamList = {
-    Scan:
-        | {
-              key?: string;
-          }
-        | undefined;
+    Scan: {
+        screen: string;
+        wallet: TMiniWallet;
+    };
 };
 
 const SettingsStack = createNativeStackNavigator();
@@ -111,20 +129,26 @@ const WalletRoot = () => {
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
+                <WalletStack.Screen name="Send" component={Send} />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
                     component={Ownership}
                 />
                 <WalletStack.Screen
-                    name="TransactionView"
-                    component={TransactionDetailsView}
+                    name="TransactionDetails"
+                    component={TransactionDetails}
+                />
+                <WalletStack.Screen
+                    name="TransactionStatus"
+                    component={TransactionStatus}
                 />
                 <WalletStack.Screen name="Receive" component={Receive} />
                 <WalletStack.Screen
                     name="RequestAmount"
                     component={RequestAmount}
                 />
+                <WalletStack.Screen name="SendAmount" component={SendAmount} />
             </WalletStack.Group>
         </WalletStack.Navigator>
     );
@@ -163,7 +187,9 @@ const initScreen = () => {
                 name="SettingsRoot"
                 component={SettingsRoot}
             />
-            <InitScreenStack.Screen name="ScanQR" component={ScanRoot} />
+            <InitScreenStack.Group screenOptions={{presentation: 'modal'}}>
+                <InitScreenStack.Screen name="ScanRoot" component={ScanRoot} />
+            </InitScreenStack.Group>
             <InitScreenStack.Screen name="Apps" component={Apps} />
         </InitScreenStack.Navigator>
     );

@@ -51,8 +51,13 @@ export const formatTXFromBDK = async (
         isRbf: await txRawData?.isExplicitlyRbf(),
     };
 
+    // Determine if self send from RBF or
     // Determine whether CPFP transaction
-    const isCpfp = rawInfo.isRbf && value.isZero();
+    const isSelfOrBoost =
+        rawInfo.isRbf &&
+        value.isZero() &&
+        tx.sent - tx.received === tx.fee &&
+        value.toNumber() === 0;
 
     const txBlockHeight = tx.confirmationTime?.height as number;
     const blockConfirms =
@@ -61,14 +66,15 @@ export const formatTXFromBDK = async (
     // Calculate time stamp
     // Note: we bump the time by 1 second so it shows up in the correct order
     // for CPFPs
-    // TODO: handle timing calculation for multiple sequential CPFPs
-    const timestamp =
-        (tx.confirmationTime?.timestamp as number) + (isCpfp ? 1 : 0);
+    // Place current time for recently broadcasted txs as now
+    const timestamp = tx.confirmed
+        ? (tx.confirmationTime?.timestamp as number) + (isSelfOrBoost ? 1 : 0)
+        : +new Date();
 
     const formattedTx = {
         txid: tx.txid,
         confirmed: tx.confirmed,
-        confirmations: blockConfirms > 0 ? blockConfirms + 1 : 0,
+        confirmations: blockConfirms > 0 ? blockConfirms + 1 : 1,
         block_height: tx.confirmationTime?.height as number,
         timestamp: timestamp as any,
         fee: tx.fee as number,
@@ -81,7 +87,7 @@ export const formatTXFromBDK = async (
         vsize: rawInfo.vsize as number,
         weight: rawInfo.weight as number,
         rbf: rawInfo.isRbf as boolean,
-        cpfp: isCpfp as boolean,
+        isSelfOrBoost: isSelfOrBoost as boolean,
         memo: '',
     };
 
@@ -306,6 +312,25 @@ export const descriptorsFromString = async (wallet: TWalletType) => {
     };
 };
 
+// Config for chain
+const _getConfig = (
+    network: string,
+    electrumServer: TElectrumServerURLs,
+    stopGap: number,
+): BlockchainElectrumConfig => {
+    return {
+        url:
+            network === ENet.Bitcoin
+                ? electrumServer.bitcoin
+                : electrumServer.testnet,
+        retry: 5,
+        timeout: 5,
+        stopGap: stopGap,
+        sock5: null,
+        validateDomain: false,
+    };
+};
+
 // create a BDK wallet from a descriptor and metas
 export const createBDKWallet = async (wallet: TWalletType) => {
     // Set Network
@@ -338,17 +363,11 @@ export const syncBdkWallet = async (
     electrumServer: TElectrumServerURLs,
 ): Promise<BDK.Wallet> => {
     // Electrum configuration
-    const config: BlockchainElectrumConfig = {
-        url:
-            network === 'bitcoin'
-                ? electrumServer.bitcoin
-                : electrumServer.testnet,
-        retry: 5,
-        timeout: 5,
-        stopGap: 100,
-        sock5: null,
-        validateDomain: false,
-    };
+    const config: BlockchainElectrumConfig = _getConfig(
+        network,
+        electrumServer,
+        100,
+    );
 
     let chain!: BDK.Blockchain;
 
@@ -473,3 +492,156 @@ export const generateAddress = async (
         index: address.index,
     };
 };
+
+// Creates a PSBT created a given address and sats amount, and returns the singed Psbt and broadcast status
+export const fullsendBDKTransaction = async (
+    amount: string,
+    address: string,
+    feeRate: number,
+    bdkWallet: BDK.Wallet,
+    network: string,
+    electrumServer: TElectrumServerURLs,
+    statusCallback: (message: string) => void,
+    opReturnData?: string,
+) => {
+    // Get the scripts by converting each address to a BDK address
+    // and extract the scripts from the BDK address
+    const addr = await new BDK.Address().create(address);
+
+    const script = await addr.scriptPubKey();
+
+    // chain config chain before broadcasting
+    const config = _getConfig(network, electrumServer, 5);
+
+    // Create chain to use for broadcast of signed psbt
+    const chain = await new BDK.Blockchain().create(
+        config,
+        BlockChainNames.Electrum,
+    );
+
+    // Sync wallet before any tx creation
+    const w = await syncBdkWallet(
+        bdkWallet,
+        () => {},
+        network as TNetwork,
+        electrumServer,
+    );
+
+    // Fetch recommended feerate here
+    // Can skip and just use from user in UI
+    // Displayed from Mempool.space 'fetch'
+    const recommendedFeeRate = (await chain.estimateFee(1)).asSatPerVb();
+    const effectiveRate =
+        network === ENet.Bitcoin
+            ? Math.max(feeRate, recommendedFeeRate)
+            : feeRate;
+
+    // Create transaction builder
+    let tx = await new BDK.TxBuilder().create();
+
+    // Reformat data for OP_RETURN
+    // Only allow single text with length limit
+    // Char limit and strict check in UI
+    try {
+        statusCallback('Setting OP_RETRUN Data');
+
+        // Create actual transaction
+        if (opReturnData) {
+            // Create a Uint8Array from utf-8 string 'opReturnData'
+            let dataList = new Uint8Array(opReturnData.length);
+
+            // Fill each array element with the data
+            for (let i = 0; i < opReturnData.length; i++) {
+                dataList[i] = opReturnData.charCodeAt(i);
+            }
+
+            // Convert to array
+            const dataArray = Array.from(dataList);
+
+            tx = await tx.addData(dataArray);
+        }
+
+        statusCallback('Building transaction...');
+        // Add essential tx data to tx builder
+        // 1. Enable RBF always by default
+        // 2. Fee rate
+        // 3. Recipient and amount to send them
+        // Note: can use 'tx.setRecipients([{script, amount: Number(amount)}])' for multiple recipients and mounts
+        tx = await tx.enableRbf();
+        tx = await tx.feeRate(effectiveRate);
+        tx = await tx.addRecipient(script, Number(amount));
+
+        statusCallback('Finaled transaction.');
+        // Finish building tx
+        const finalTx = await tx.finish(w);
+
+        statusCallback('Signing transaction...');
+        // Sign the Psbt
+        const signedPsbt = await w.sign(finalTx.psbt);
+
+        // Extract the newly signed BDK transaction from the Psbt
+        const transaction = await signedPsbt.extractTx();
+
+        // Retrieve final tx id to check if it exists and move to broadcast tx
+        const finalTxId = await transaction.txid();
+
+        // Always check that the transaction id exists
+        if (finalTxId) {
+            // Broadcast transaction
+            statusCallback('Broadcasting transaction...');
+            const broadcasted = await chain.broadcast(transaction);
+            statusCallback('Sent transaction!');
+
+            return {
+                broadcasted: broadcasted,
+                psbt: signedPsbt,
+                errorMessage: '',
+            };
+        } else {
+            statusCallback('Failed to send transaction.');
+
+            return {
+                broadcasted: false,
+                psbt: signedPsbt,
+                errorMessage: 'Failed to get transaction id.',
+            };
+        }
+    } catch (e: any) {
+        statusCallback('Failed to send transaction.');
+
+        return {
+            broadcasted: false,
+            psbt: null,
+            errorMessage: e.message,
+        };
+    }
+};
+
+export const SingleBDKSend = async (
+    amount: string,
+    address: string,
+    wallet: TWalletType,
+    electrumServerUrl: TElectrumServerURLs,
+    statusCallback: (message: string) => void,
+) => {
+    // Expects the wallet to contain private internal and external descriptors
+    const _w = await createBDKWallet(wallet);
+
+    const hardCodedFeeRate = 5;
+
+    statusCallback('Preparing wallet...');
+
+    return await fullsendBDKTransaction(
+        amount,
+        address,
+        hardCodedFeeRate,
+        _w,
+        wallet.network,
+        electrumServerUrl,
+        statusCallback,
+    );
+};
+
+// Special tx to drain all funds from wallet
+// to recipient
+export const drainBDKSend = async () => {};

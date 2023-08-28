@@ -12689,13 +12689,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@npm:^2.15.4":
-  version: 2.15.5
-  resolution: "react-native-vision-camera@npm:2.15.5"
+"react-native-vision-camera@npm:^v2.15.6":
+  version: 2.15.6
+  resolution: "react-native-vision-camera@npm:2.15.6"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: cf5e126f1b2499f866a6731ba0b94d8b29f1dc985238b4d8c8743b98ba9eb1e089d47634e761b6ea240963e1881a9558e2b5b543bfacbdfc1c65da00d2b322dd
+  checksum: 275e919491569fdc26ce2a0261d614b4a0afdc82f4650519d113cbcb7d8b7656b3160075367bd4e0d521e74d58e85040c62cab244c0f8c004a61ff6ae9e3ca36
   languageName: node
   linkType: hard
 
@@ -15155,7 +15155,7 @@ __metadata:
     react-native-svg: ^12.3.0
     react-native-svg-transformer: ^1.0.0
     react-native-tooltip: ^5.2.0
-    react-native-vision-camera: ^2.15.4
+    react-native-vision-camera: ^v2.15.6
     react-test-renderer: 18.1.0
     rn-nodeify: ^10.3.0
     scryptsy: ^2.1.0
