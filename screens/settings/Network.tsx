@@ -69,15 +69,22 @@ const Network = () => {
         return valueWithSingleWhitespace;
     };
 
-    // TODO: fix race conditions
-    setInterval(async () => {
-        await getBlockHeight(
-            electrumServerURL.bitcoin,
-            (args: {status: boolean; blockHeight: number}) => {
-                setStatus(args.status);
-            },
-        );
-    }, 30 * 1000);
+    // Attempt to periodically connect to Electrum server
+    useEffect(() => {
+        const intervalCheck = setInterval(() => {
+            getBlockHeight(
+                electrumServerURL.bitcoin,
+                (args: {status: boolean; blockHeight: number}) => {
+                    console.log('[electrum] status: ', args.status);
+                    setStatus(args.status);
+                },
+            );
+        }, 1000 * 15);
+
+        return () => {
+            clearInterval(intervalCheck);
+        };
+    }, []);
 
     return (
         <SafeAreaView>
