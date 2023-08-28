@@ -60,10 +60,16 @@ const CreateAction = () => {
         {value: 'p2pkh', label: 'Legacy (BIP44)'},
     ]);
 
-    const accountInfo: {[index: string]: string} = {
-        wpkh: 'Native SegWit Bech32 (bc1...)',
-        shp2wpkh: 'Segwit Wrapped P2SH (3...)',
-        p2pkh: 'Legacy P2PKH (1...)',
+    const accountInfo: {[index: string]: string[]} = {
+        wpkh: [
+            'Native SegWit Bech32 (bc1...)',
+            'Native SegWit Testnet Bech32 (tb1...)',
+        ],
+        shp2wpkh: [
+            'Segwit Wrapped P2SH (3...)',
+            'Segwit Wrapped Testnet P2SH (2...)',
+        ],
+        p2pkh: ['Legacy P2PKH (1...)', 'Legacy Testnet P2PKH (m...)'],
     };
 
     const toggleNetwork = () => {
@@ -144,8 +150,12 @@ const CreateAction = () => {
                             {color: ColorScheme.Text.GrayText},
                         ]}>
                         {isAdvancedMode
-                            ? accountInfo[account]
-                            : "Defaults to SegWit Native (address starts with 'bc1...')"}
+                            ? accountInfo[account][
+                                  network === ENet.Testnet ? 1 : 0
+                              ]
+                            : `Defaults to SegWit Native (address starts with '${
+                                  network === ENet.Testnet ? 'tb1' : 'bc1'
+                              }...')`}
                     </Text>
 
                     <View
