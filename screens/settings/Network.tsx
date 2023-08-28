@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
@@ -18,6 +19,8 @@ import {getBlockHeight} from '../../modules/bdk';
 import {TextSingleInput} from '../../components/input';
 
 import {useTailwind} from 'tailwind-rn';
+
+import Checkbox from 'react-native-bouncy-checkbox';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -40,8 +43,12 @@ const Network = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {electrumServerURL, setElectrumServerURL} =
-        useContext(AppStorageContext);
+    const {
+        electrumServerURL,
+        setElectrumServerURL,
+        defaultToTestnet,
+        setDefaultToTestnet,
+    } = useContext(AppStorageContext);
 
     const [url, setURL] = useState('');
     const [status, setStatus] = useState(true);
@@ -283,6 +290,72 @@ const Network = () => {
                                 using a public server makes all your
                                 transactions visible to them.
                             </Text>
+                        </View>
+                    </View>
+
+                    {/* Toggle advanced mode */}
+                    <View
+                        style={tailwind(
+                            'justify-center w-full items-center flex-row mt-10 mb-10',
+                        )}>
+                        <View style={tailwind('w-5/6')}>
+                            <View
+                                style={tailwind(
+                                    'w-full flex-row items-center mb-2',
+                                )}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-medium'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    Default to Testnet
+                                </Text>
+                                <Checkbox
+                                    fillColor={
+                                        ColorScheme.Background.CheckBoxFilled
+                                    }
+                                    unfillColor={
+                                        ColorScheme.Background.CheckBoxUnfilled
+                                    }
+                                    size={18}
+                                    isChecked={defaultToTestnet}
+                                    iconStyle={{
+                                        borderWidth: 1,
+                                        borderRadius: 2,
+                                    }}
+                                    innerIconStyle={{
+                                        borderWidth: 1,
+                                        borderColor:
+                                            ColorScheme.Background
+                                                .CheckBoxOutline,
+                                        borderRadius: 2,
+                                    }}
+                                    style={[
+                                        tailwind('flex-row absolute -right-4'),
+                                    ]}
+                                    onPress={() => {
+                                        RNHapticFeedback.trigger(
+                                            'rigid',
+                                            RNHapticFeedbackOptions,
+                                        );
+
+                                        setDefaultToTestnet(!defaultToTestnet);
+                                    }}
+                                    disableBuiltInState={true}
+                                />
+                            </View>
+
+                            <View style={tailwind('w-full')}>
+                                <Text
+                                    style={[
+                                        tailwind('text-xs'),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    Restore and create wallets with mnemonics
+                                    (12-24 words) to testnet. Toggling off will
+                                    default to bitcoin mainnet.
+                                </Text>
+                            </View>
                         </View>
                     </View>
                 </View>
