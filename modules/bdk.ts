@@ -67,7 +67,6 @@ export const formatTXFromBDK = async (
     // Note: we bump the time by 1 second so it shows up in the correct order
     // for CPFPs
     // Place current time for recently broadcasted txs as now
-    // TODO: handle timing calculation for multiple sequential 'isSelfOrBoost' txs
     const timestamp = tx.confirmed
         ? (tx.confirmationTime?.timestamp as number) + (isSelfOrBoost ? 1 : 0)
         : +new Date();
