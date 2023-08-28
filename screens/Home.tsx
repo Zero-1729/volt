@@ -472,7 +472,7 @@ const Home = () => {
                                                 CommonActions.navigate(
                                                     'WalletRoot',
                                                     {
-                                                        screen: 'TransactionView',
+                                                        screen: 'TransactionDetails',
                                                         params: {
                                                             tx: {...item.item},
                                                             source: 'liberal',
