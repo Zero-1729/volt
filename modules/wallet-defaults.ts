@@ -4,9 +4,9 @@ import {TAccountPaths, TExtendedKeyInfo} from '../types/wallet';
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
-    wpkh: ['Native Segwit', 'bc1...'],
-    p2pkh: ['Legacy', '1...'],
-    shp2wpkh: ['Segwit', '3...'],
+    wpkh: ['Native Segwit', 'bc1...', 'tb1...'],
+    p2pkh: ['Legacy', '1...', 'm...'],
+    shp2wpkh: ['Segwit', '3...', '2...'],
 };
 
 // Descriptor type reverse aliases

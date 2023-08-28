@@ -23,6 +23,7 @@ import {WalletTypeDetails} from '../../modules/wallet-defaults';
 import {getMiniWallet} from '../../modules/wallet-utils';
 
 import Clipboard from '@react-native-clipboard/clipboard';
+import {ENet} from '../../types/enums';
 
 const Info = () => {
     const tailwind = useTailwind();
@@ -54,7 +55,10 @@ const Info = () => {
     const walletType = WalletTypeDetails[walletData.type];
     const walletNetwork = walletData.network;
     const walletTypeName =
-        walletType[0] + (isAdvancedMode ? ` (${walletType[1]})` : '');
+        walletType[0] +
+        (isAdvancedMode
+            ? ` (${walletType[walletData.network === ENet.Testnet ? 2 : 1]})`
+            : '');
     const walletFingerprint = walletData.masterFingerprint
         ? walletData.masterFingerprint.toUpperCase()
         : '-';
