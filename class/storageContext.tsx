@@ -71,6 +71,7 @@ type defaultContextType = {
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
     isAdvancedMode: boolean;
+    defaultToTestnet: boolean;
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
@@ -80,6 +81,7 @@ type defaultContextType = {
     updateFiatRate: (fiatObj: TFiatRate) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
+    setDefaultToTestnet: (defaultToTestnet: boolean) => void;
     updateAppUnit: (unit: TUnit) => void;
     updateWalletTransactions: (
         id: string,
@@ -131,6 +133,7 @@ const defaultContext: defaultContextType = {
     hideTotalBalance: false,
     isWalletInitialized: false,
     isAdvancedMode: false,
+    defaultToTestnet: true,
     electrumServerURL: {
         // Default and alternates for testnet and bitcoin
         testnet: 'ssl://electrum.blockstream.info:60002',
@@ -141,6 +144,7 @@ const defaultContext: defaultContextType = {
     updateFiatRate: () => {},
     setTotalBalanceHidden: () => {},
     setIsAdvancedMode: () => {},
+    setDefaultToTestnet: () => {},
     restoreWallet: () => {},
     addWallet: () => {},
     updateAppUnit: () => {},
@@ -187,6 +191,9 @@ export const AppStorageProvider = ({children}: Props) => {
     const [isAdvancedMode, _setAdvancedMode] = useState(
         defaultContext.isAdvancedMode,
     );
+    const [defaultToTestnet, _setDefaultToTestnet] = useState(
+        defaultContext.defaultToTestnet,
+    );
     const [electrumServerURL, _setElectrumServerURL] = useState(
         defaultContext.electrumServerURL,
     );
@@ -211,6 +218,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('wallets');
     const {getItem: _getIsAdvancedMode, setItem: _updateIsAdvancedMode} =
         useAsyncStorage('isAdvancedMode');
+    const {getItem: _getDefaultToTestnet, setItem: _updateDefaultToTestnet} =
+        useAsyncStorage('defaultToTestnet');
     const {getItem: _getCurrentWalletID, setItem: _updateCurrentWalletID} =
         useAsyncStorage('currentWalletID');
     const {getItem: _getElectrumServerURL, setItem: _updateElectrumServerURL} =
@@ -384,6 +393,22 @@ export const AppStorageProvider = ({children}: Props) => {
             }
         },
         [_setAdvancedMode, _updateIsAdvancedMode],
+    );
+
+    const setDefaultToTestnet = useCallback(
+        async (testnet: boolean) => {
+            try {
+                _setDefaultToTestnet(testnet);
+                _updateDefaultToTestnet(JSON.stringify(testnet));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Default to testnet setting) Error loading data: ${e}`,
+                );
+
+                throw new Error('Unable to set default to testnet option');
+            }
+        },
+        [_setDefaultToTestnet, _updateDefaultToTestnet],
     );
 
     const _loadIsAdvancedMode = async () => {
@@ -1031,7 +1056,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 currentWalletID,
                 setCurrentWalletID,
                 isAdvancedMode,
+                defaultToTestnet,
                 setIsAdvancedMode,
+                setDefaultToTestnet,
                 getWalletData,
                 updateAppUnit,
                 updateWalletTransactions,
