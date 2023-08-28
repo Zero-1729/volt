@@ -42,10 +42,13 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {addWallet, isAdvancedMode} = useContext(AppStorageContext);
+    const {addWallet, isAdvancedMode, defaultToTestnet} =
+        useContext(AppStorageContext);
     const [newWalletName, setNewWalletName] = useState('');
 
-    const [network, setNetwork] = useState<ENet>(ENet.Testnet); // Default to testnet
+    const [network, setNetwork] = useState<ENet>(
+        defaultToTestnet ? ENet.Testnet : ENet.Bitcoin,
+    );
     const [open, setOpen] = useState(false);
     const [account, setAccount] = useState('wpkh'); // Default to segwit
     const [accounts, setAccounts] = useState([

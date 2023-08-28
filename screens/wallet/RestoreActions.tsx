@@ -50,10 +50,13 @@ const ImportAction = () => {
 
     const tailwind = useTailwind();
 
-    const [importText, setImportText] = useState('');
-    const [network, setNetwork] = useState<ENet>(ENet.Testnet);
+    const {isAdvancedMode, restoreWallet, defaultToTestnet} =
+        useContext(AppStorageContext);
 
-    const {isAdvancedMode, restoreWallet} = useContext(AppStorageContext);
+    const [importText, setImportText] = useState('');
+    const [network, setNetwork] = useState<ENet>(
+        defaultToTestnet ? ENet.Testnet : ENet.Bitcoin,
+    );
 
     const toggleNetwork = () => {
         if (network === ENet.Testnet) {
