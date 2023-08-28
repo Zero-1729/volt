@@ -741,7 +741,7 @@ export const fullsendBDKTransaction = async (
         tx = await tx.feeRate(effectiveRate);
         tx = await tx.addRecipient(script, Number(amount));
 
-        statusCallback('Finaled transaction.');
+        statusCallback('Finalized transaction.');
         // Finish building tx
         const finalTx = await tx.finish(w);
 
@@ -787,9 +787,12 @@ export const fullsendBDKTransaction = async (
     }
 };
 
+// Creates a PSBT given an address and sats amount (or send max amount), and returns the singed Psbt and broadcast status
 export const SingleBDKSend = async (
     amount: string,
     address: string,
+    feeRate: number,
+    drainTx: boolean,
     wallet: TWalletType,
     electrumServerUrl: TElectrumServerURLs,
     statusCallback: (message: string) => void,
@@ -797,21 +800,46 @@ export const SingleBDKSend = async (
     // Expects the wallet to contain private internal and external descriptors
     const _w = await createBDKWallet(wallet);
 
-    const hardCodedFeeRate = 5;
+    statusCallback('creating and signing Psbt...');
+    let signedPsbt!: BDK.PartiallySignedTransaction;
+    let broadcasted: boolean = false;
 
-    statusCallback('Preparing wallet...');
+    try {
+        const PsbtMeta = await createBDKPsbt(
+            [{address: address, amount: Number(amount)}],
+            feeRate,
+            drainTx, // Ignores amount and sends all funds to address, if true
+            _w,
+            wallet.network,
+            electrumServerUrl,
+        );
 
-    return await fullsendBDKTransaction(
-        amount,
-        address,
-        hardCodedFeeRate,
-        _w,
-        wallet.network,
-        electrumServerUrl,
-        statusCallback,
-    );
+        signedPsbt = await signBDKPsbt(PsbtMeta.Psbt, PsbtMeta.wallet);
+
+        broadcasted = await broadcastBDKPsbt(
+            signedPsbt,
+            wallet.network,
+            electrumServerUrl,
+        );
+
+        if (!broadcasted) {
+            return {
+                broadcasted: false,
+                psbt: signedPsbt,
+                errorMessage: 'Failed to get transaction id.',
+            };
+        }
+    } catch (e: any) {
+        return {
+            broadcasted: false,
+            psbt: null,
+            errorMessage: e.message,
+        };
+    }
+
+    return {
+        broadcasted: broadcasted,
+        psbt: signedPsbt,
+        errorMessage: '',
+    };
 };
-
-// Special tx to drain all funds from wallet
-// to recipient
-export const drainBDKSend = async () => {};
