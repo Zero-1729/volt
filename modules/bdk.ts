@@ -638,6 +638,31 @@ const signBDKPsbt = async (
     return signedPsbt;
 };
 
+// Broadcast a signed Psbt to the network
+const broadcastBDKPsbt = async (
+    psbt: BDK.PartiallySignedTransaction,
+    network: string,
+    electrumServer: TElectrumServerURLs,
+): Promise<boolean> => {
+    // Get chain for fee recommendation
+    const chain = await _getChain(network, electrumServer);
+
+    // Extract the newly signed BDK transaction from the Psbt
+    const transaction = await psbt.extractTx();
+
+    // Retrieve final tx id to check if it exists and move to broadcast tx
+    const finalTxId = await transaction.txid();
+
+    if (finalTxId) {
+        // Broadcast transaction
+        const broadcasted = await chain.broadcast(transaction);
+
+        return broadcasted;
+    } else {
+        return false;
+    }
+};
+
 // Creates a PSBT created a given address and sats amount, and returns the singed Psbt and broadcast status
 export const fullsendBDKTransaction = async (
     amount: string,
