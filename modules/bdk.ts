@@ -626,6 +626,16 @@ const createBDKPsbt = async (
     // Return Psbt
     return {Psbt: finalTx.psbt, wallet: w};
 };
+
+// Sign a Psbt with a BDK wallet
+const signBDKPsbt = async (
+    psbt: BDK.PartiallySignedTransaction,
+    bdkWallet: BDK.Wallet,
+): Promise<BDK.PartiallySignedTransaction> => {
+    // Sign the Psbt
+    const signedPsbt = await bdkWallet.sign(psbt);
+
+    return signedPsbt;
 };
 
 // Creates a PSBT created a given address and sats amount, and returns the singed Psbt and broadcast status
