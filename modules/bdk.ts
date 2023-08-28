@@ -21,6 +21,8 @@ import {
 } from '../types/wallet';
 import {ENet} from '../types/enums';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
+import {Script} from 'bdk-rn/lib/classes/Script';
+import {ScriptAmount} from 'bdk-rn/lib/classes/Bindings';
 
 export const generateMnemonic = async () => {
     const mnemonic = await new BDK.Mnemonic().create();
@@ -491,6 +493,139 @@ export const generateAddress = async (
         asString: addressString,
         index: address.index,
     };
+};
+
+// Core helper functions for creating transactions
+// and broadcasting them to the network
+// Note: these functions are not exported
+
+type AddressAmount = {
+    address: string;
+    amount: number;
+};
+
+// Helper function to get address scripts from addresses
+const _getAddressScripts = async (addressAmounts: AddressAmount[]) => {
+    let scriptAmounts: ScriptAmount[] = [];
+
+    for (const item of addressAmounts) {
+        const addr = await new BDK.Address().create(item.address);
+        const script = await addr.scriptPubKey();
+
+        scriptAmounts.push({script: script, amount: item.amount});
+    }
+
+    return scriptAmounts;
+};
+
+const _getChain = async (
+    network: string,
+    electrumServer: TElectrumServerURLs,
+): Promise<BDK.Blockchain> => {
+    // chain config chain before broadcasting
+    const config = _getConfig(network, electrumServer, 5);
+
+    // Create chain to use for broadcast of signed psbt
+    const chain = await new BDK.Blockchain().create(
+        config,
+        BlockChainNames.Electrum,
+    );
+
+    return chain;
+};
+
+// Function to create a BDK Psbt
+// Takes in a list of addresses and amounts
+const createBDKPsbt = async (
+    addressesAmount: AddressAmount[],
+    feeRate: number,
+    drainTx: boolean,
+    bdkWallet: BDK.Wallet,
+    network: string,
+    electrumServer: TElectrumServerURLs,
+    opReturnData?: string,
+): Promise<{Psbt: BDK.PartiallySignedTransaction; wallet: BDK.Wallet}> => {
+    // Extract address scripts from addresses
+    let scriptAmounts: ScriptAmount[] = [];
+
+    // Handle case for multiple or single addresses
+    if (addressesAmount.length > 0) {
+        scriptAmounts = await _getAddressScripts(addressesAmount);
+    } else {
+        const address = await new BDK.Address().create(
+            addressesAmount[0].address,
+        );
+        const script = await address.scriptPubKey();
+
+        scriptAmounts.push({script: script, amount: addressesAmount[0].amount});
+    }
+
+    // Get chain for fee recommendation
+    const chain = await _getChain(network, electrumServer);
+
+    // Sync wallet before any tx creation
+    const w = await syncBdkWallet(
+        bdkWallet,
+        () => {},
+        network as TNetwork,
+        electrumServer,
+    );
+
+    // Fetch recommended feerate here
+    // Can skip and just use from user in UI
+    // Displayed from Mempool.space 'fetch'
+    const recommendedFeeRate = (await chain.estimateFee(1)).asSatPerVb();
+    const effectiveRate =
+        network === ENet.Bitcoin
+            ? Math.max(feeRate, recommendedFeeRate)
+            : feeRate;
+
+    // Create transaction builder
+    let txTemplate = await new BDK.TxBuilder().create();
+
+    // Create actual transaction
+    if (opReturnData) {
+        // Create a Uint8Array from utf-8 string 'opReturnData'
+        let dataList = new Uint8Array(opReturnData.length);
+
+        // Fill each array element with the data
+        for (let i = 0; i < opReturnData.length; i++) {
+            dataList[i] = opReturnData.charCodeAt(i);
+        }
+
+        // Convert to array
+        const dataArray = Array.from(dataList);
+
+        txTemplate = await txTemplate.addData(dataArray);
+    }
+
+    // Add essential tx data to tx builder
+    // 1. Enable RBF always by default
+    // 2. Fee rate
+    // 3. Recipient and amount to send them
+    // Note: can use 'tx.setRecipients([{script, amount: Number(amount)}])' for multiple recipients and mounts
+    txTemplate = await txTemplate.enableRbf();
+    txTemplate = await txTemplate.feeRate(effectiveRate);
+
+    // Drain assumes only one address and amount
+    // present in addressesAmount array
+    if (drainTx) {
+        if (addressesAmount.length > 1) {
+            throw new Error('Drain transaction can only have one recipient.');
+        }
+
+        txTemplate = await txTemplate.drainTo(scriptAmounts[0].script);
+        txTemplate = await txTemplate.drainWallet();
+    } else {
+        txTemplate = await txTemplate.setRecipients(scriptAmounts);
+    }
+
+    // Finish building tx
+    const finalTx = await txTemplate.finish(w);
+
+    // Return Psbt
+    return {Psbt: finalTx.psbt, wallet: w};
+};
 };
 
 // Creates a PSBT created a given address and sats amount, and returns the singed Psbt and broadcast status
