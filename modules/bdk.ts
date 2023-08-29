@@ -18,10 +18,10 @@ import {
     TElectrumServerURLs,
     TNetwork,
     TBalance,
+    TAddressAmount,
 } from '../types/wallet';
 import {ENet} from '../types/enums';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
-import {Script} from 'bdk-rn/lib/classes/Script';
 import {ScriptAmount} from 'bdk-rn/lib/classes/Bindings';
 
 export const generateMnemonic = async () => {
@@ -499,13 +499,8 @@ export const generateAddress = async (
 // and broadcasting them to the network
 // Note: these functions are not exported
 
-type AddressAmount = {
-    address: string;
-    amount: number;
-};
-
 // Helper function to get address scripts from addresses
-const _getAddressScripts = async (addressAmounts: AddressAmount[]) => {
+const _getAddressScripts = async (addressAmounts: TAddressAmount[]) => {
     let scriptAmounts: ScriptAmount[] = [];
 
     for (const item of addressAmounts) {
@@ -537,7 +532,7 @@ const _getChain = async (
 // Function to create a BDK Psbt
 // Takes in a list of addresses and amounts
 const createBDKPsbt = async (
-    addressesAmount: AddressAmount[],
+    addressesAmount: TAddressAmount[],
     feeRate: number,
     drainTx: boolean,
     bdkWallet: BDK.Wallet,
@@ -800,7 +795,7 @@ export const SingleBDKSend = async (
     // Expects the wallet to contain private internal and external descriptors
     const _w = await createBDKWallet(wallet);
 
-    statusCallback('creating and signing Psbt...');
+    statusCallback('creating and signing transaction...');
     let signedPsbt!: BDK.PartiallySignedTransaction;
     let broadcasted: boolean = false;
 

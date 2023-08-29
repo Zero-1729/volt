@@ -37,6 +37,12 @@ export type TInvoiceData = {
     };
 };
 
+// Address set for BDK transaction functions
+export type TAddressAmount = {
+    address: string;
+    amount: number;
+};
+
 // Wallet balance type
 export type TBalance = BigNumber;
 
