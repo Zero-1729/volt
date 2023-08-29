@@ -1015,6 +1015,10 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
+        _getDefaultToTestnet();
+    });
+
+    useEffect(() => {
         _loadWallets();
     }, []);
 
