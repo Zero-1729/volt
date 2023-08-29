@@ -8,6 +8,7 @@ import {SegWitP2SHWallet} from '../class/wallet/segwit/shp2wpkh';
 import {LegacyWallet} from '../class/wallet/p2pkh';
 
 import {LocalUtxo} from 'bdk-rn/lib/classes/Bindings';
+import {FeesRecommended} from '@mempool/mempool.js/lib/interfaces';
 
 import {Network} from 'bdk-rn/lib/lib/enums';
 import {ENet} from './enums';
@@ -137,3 +138,5 @@ export type TAccountPaths = {
     bitcoin: string;
     testnet: string;
 };
+
+export type TMempoolFeeRates = FeesRecommended;
