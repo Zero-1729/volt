@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {Text, View, useColorScheme, Linking} from 'react-native';
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {useNavigation, StackActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -9,6 +10,12 @@ import {WalletParamList} from '../../Navigation';
 import {AppStorageContext} from '../../class/storageContext';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {SingleBDKSend} from '../../modules/bdk';
+import {PartiallySignedTransaction} from 'bdk-rn';
+import {getPrivateDescriptors} from '../../modules/descriptors';
+
+import {TComboWallet} from '../../types/wallet';
 
 import Dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
@@ -30,18 +37,26 @@ import {LongBottomButton, PlainButton} from '../../components/button';
 
 import Success from '../../assets/svg/check-circle-fill-24.svg';
 import Failed from '../../assets/svg/x-circle-fill-24.svg';
+import Cog from '../../assets/svg/gear-24.svg';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionStatus'>;
 
-const TransactionStatus = ({route}: Props) => {
+type TStatusInfo = {
+    status: string;
+    txId: string;
+    message: string;
+};
+
+const DoneRender = (
+    statusInfo: TStatusInfo,
+    network: string,
+    isAMode: boolean,
+) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
-
     const navigation = useNavigation();
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
-
-    const buttonText = isAdvancedMode ? 'View on Mempool.space' : 'See more';
+    const bottomOffset = NativeOffsets.bottom + 96;
 
     // Get URL for mempool.space
     const openMempoolSpace = (txid: string) => {
@@ -49,12 +64,202 @@ const TransactionStatus = ({route}: Props) => {
 
         Linking.openURL(
             `https://mempool.space/${
-                route.params.network === ENet.Testnet ? 'testnet/' : ''
+                network === ENet.Testnet ? 'testnet/' : ''
             }tx/${txid}`,
         );
     };
 
-    const bottomOffset = NativeOffsets.bottom + 96;
+    const buttonText = isAMode ? 'View on Mempool.space' : 'See more';
+
+    return (
+        <View style={[tailwind('h-full justify-center')]}>
+            <Text
+                style={[
+                    tailwind(
+                        'text-lg absolute font-bold text-center w-full top-6 px-4',
+                    ),
+                    {color: ColorScheme.Text.Default},
+                ]}>
+                Status
+            </Text>
+
+            <View style={[tailwind('-mt-12 justify-center px-4 items-center')]}>
+                <View style={[tailwind('items-center')]}>
+                    {statusInfo.status === 'failed' ? (
+                        <Failed
+                            style={[tailwind('self-center')]}
+                            fill={ColorScheme.SVG.Default}
+                            height={128}
+                            width={128}
+                        />
+                    ) : (
+                        <></>
+                    )}
+                    {statusInfo.status === 'success' ? (
+                        <Success
+                            style={[tailwind('self-center')]}
+                            fill={ColorScheme.SVG.Default}
+                            height={128}
+                            width={128}
+                        />
+                    ) : (
+                        <></>
+                    )}
+                </View>
+
+                <View style={[tailwind('w-4/5 mt-4 items-center')]}>
+                    <Text
+                        style={[
+                            tailwind('text-lg font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        {statusInfo.status === 'success'
+                            ? 'Transaction sent'
+                            : 'Transaction failed to send'}
+                    </Text>
+                </View>
+
+                {isAMode ? (
+                    <View style={[tailwind('items-center w-4/5')]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm text-center mt-4'),
+                                {color: ColorScheme.Text.GrayedText},
+                            ]}>
+                            {statusInfo.status === 'success'
+                                ? statusInfo.txId
+                                : statusInfo.message}
+                        </Text>
+                    </View>
+                ) : (
+                    <></>
+                )}
+            </View>
+
+            {statusInfo.status === 'success' ? (
+                <PlainButton
+                    style={[
+                        tailwind('absolute self-center'),
+                        {bottom: bottomOffset},
+                    ]}
+                    onPress={() => {
+                        openMempoolSpace(statusInfo.txId);
+                    }}>
+                    <Text style={[tailwind('font-bold text-sm')]}>
+                        {buttonText}
+                    </Text>
+                </PlainButton>
+            ) : (
+                <></>
+            )}
+
+            <View style={[tailwind('absolute bottom-0 items-center w-full')]}>
+                <LongBottomButton
+                    onPress={() => {
+                        navigation.dispatch(StackActions.popToTop());
+                    }}
+                    title={'Back to Wallet'}
+                    textColor={ColorScheme.Text.Alt}
+                    backgroundColor={ColorScheme.Background.Inverted}
+                />
+            </View>
+        </View>
+    );
+};
+
+const StatusRender = (statusMessage: string) => {
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    return (
+        <View style={[tailwind('w-full h-full items-center justify-center')]}>
+            <View style={[tailwind('items-center justify-center')]}>
+                <Cog
+                    style={[tailwind('mb-2')]}
+                    width={32}
+                    height={32}
+                    fill={ColorScheme.SVG.Default}
+                />
+
+                <Text
+                    style={[
+                        tailwind('text-sm'),
+                        {color: ColorScheme.Text.Default},
+                    ]}>
+                    {statusMessage}
+                </Text>
+            </View>
+
+            {/* Replace with loading status bars below */}
+        </View>
+    );
+};
+
+const TransactionStatus = ({route}: Props) => {
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    const {electrumServerURL, isAdvancedMode} = useContext(AppStorageContext);
+
+    const [statusMessage, setStatusMessage] = useState('');
+    const [showStatus, setShowStatus] = useState(false);
+    const [statusInfo, setStatusInfo] = useState<TStatusInfo>({
+        status: '',
+        txId: '',
+        message: '',
+    });
+
+    const initSend = async () => {
+        // For now, only single sends are supported
+        // Update wallet descriptors to private version
+        const descriptors = await getPrivateDescriptors(
+            route.params.wallet.privateDescriptor,
+        );
+
+        let wallet = {
+            ...route.params.wallet,
+            externalDescriptor: descriptors.external,
+            internalDescriptor: descriptors.internal,
+        };
+
+        const {address, amount} = route.params.payload.addressAmounts[0];
+
+        // determine if max send
+        const isMaxSend = amount.toString() === wallet.balance.toString();
+
+        const {broadcasted, psbt, errorMessage} = await SingleBDKSend(
+            amount.toString(),
+            address,
+            route.params.payload.feeRate,
+            isMaxSend,
+            wallet as TComboWallet,
+            electrumServerURL,
+            (msg: string) => {
+                setStatusMessage(msg);
+            },
+        );
+
+        updateStatusInfo(broadcasted, psbt, errorMessage);
+
+        setShowStatus(true);
+    };
+
+    const updateStatusInfo = async (
+        broadcasted: boolean,
+        psbt: PartiallySignedTransaction | null,
+        errorMessage: string,
+    ) => {
+        setStatusInfo({
+            status: broadcasted ? 'success' : 'failed',
+            txId: psbt ? await psbt?.txid() : '',
+            message: errorMessage,
+        });
+    };
+
+    // Start process of tx build and send
+    useEffect(() => {
+        initSend();
+    }, []);
 
     return (
         <SafeAreaView edges={['right', 'left', 'bottom']}>
@@ -67,100 +272,13 @@ const TransactionStatus = ({route}: Props) => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <Text
-                    style={[
-                        tailwind(
-                            'text-lg font-bold absolute text-center w-full top-6 px-4',
-                        ),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
-                    Status
-                </Text>
-
-                <View
-                    style={[
-                        tailwind('-mt-12 justify-center px-4 items-center'),
-                    ]}>
-                    <View style={[tailwind('items-center')]}>
-                        {route.params.status === 'failed' ? (
-                            <Failed
-                                style={[tailwind('self-center')]}
-                                fill={ColorScheme.SVG.Default}
-                                height={128}
-                                width={128}
-                            />
-                        ) : (
-                            <></>
-                        )}
-                        {route.params.status === 'success' ? (
-                            <Success
-                                style={[tailwind('self-center')]}
-                                fill={ColorScheme.SVG.Default}
-                                height={128}
-                                width={128}
-                            />
-                        ) : (
-                            <></>
-                        )}
-                    </View>
-
-                    <View style={[tailwind('w-4/5 mt-4 items-center')]}>
-                        <Text
-                            style={[
-                                tailwind('text-lg font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {route.params.status === 'success'
-                                ? 'Transaction sent'
-                                : 'Transaction failed to send'}
-                        </Text>
-                    </View>
-
-                    {isAdvancedMode ? (
-                        <View style={[tailwind('items-center w-4/5')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm text-center mt-4'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                {route.params.status === 'success'
-                                    ? route.params.txId
-                                    : route.params.message}
-                            </Text>
-                        </View>
-                    ) : (
-                        <></>
-                    )}
-                </View>
-
-                {route.params.status === 'success' ? (
-                    <PlainButton
-                        style={[
-                            tailwind('absolute self-center'),
-                            {bottom: bottomOffset},
-                        ]}
-                        onPress={() => {
-                            openMempoolSpace(route.params.txId);
-                        }}>
-                        <Text style={[tailwind('font-bold text-sm')]}>
-                            {buttonText}
-                        </Text>
-                    </PlainButton>
-                ) : (
-                    <></>
-                )}
-
-                <View
-                    style={[tailwind('absolute bottom-0 items-center w-full')]}>
-                    <LongBottomButton
-                        onPress={() => {
-                            navigation.dispatch(StackActions.popToTop());
-                        }}
-                        title={'Back to Wallet'}
-                        textColor={ColorScheme.Text.Alt}
-                        backgroundColor={ColorScheme.Background.Inverted}
-                    />
-                </View>
+                {showStatus
+                    ? DoneRender(
+                          statusInfo,
+                          route.params.network,
+                          isAdvancedMode,
+                      )
+                    : StatusRender(statusMessage)}
             </View>
         </SafeAreaView>
     );
