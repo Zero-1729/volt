@@ -42,7 +42,11 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import {TTransaction, TMiniWallet} from './types/wallet';
+import {
+    TTransaction,
+    TMiniWallet,
+    TAddressAmount,
+} from './types/wallet';
 
 // Root Param List for screens
 export type WalletParamList = {
@@ -71,9 +75,11 @@ export type WalletParamList = {
         source: string;
     };
     TransactionStatus: {
-        status: string;
-        message: string;
-        txId: string;
+        payload: {
+            addressAmounts: TAddressAmount[];
+            feeRate: number;
+        };
+        wallet: TMiniWallet;
         network: string;
     };
 };
