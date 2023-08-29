@@ -46,6 +46,7 @@ import {
     TTransaction,
     TMiniWallet,
     TAddressAmount,
+    TInvoiceData,
 } from './types/wallet';
 
 // Root Param List for screens
@@ -56,7 +57,7 @@ export type WalletParamList = {
         fiat: string;
     };
     Send: {
-        invoiceData: any;
+        invoiceData: TInvoiceData;
         wallet: TMiniWallet;
     };
     WalletView: undefined;
