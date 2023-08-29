@@ -735,6 +735,12 @@
 			"paddingBottom": 16
 		}
 	},
+	"py-8": {
+		"style": {
+			"paddingTop": 32,
+			"paddingBottom": 32
+		}
+	},
 	"pb-10": {
 		"style": {
 			"paddingBottom": 40
@@ -778,6 +784,11 @@
 	"text-center": {
 		"style": {
 			"textAlign": "center"
+		}
+	},
+	"text-right": {
+		"style": {
+			"textAlign": "right"
 		}
 	},
 	"text-justify": {
@@ -846,6 +857,11 @@
 	"font-normal": {
 		"style": {
 			"fontWeight": "400"
+		}
+	},
+	"font-semibold": {
+		"style": {
+			"fontWeight": "600"
 		}
 	},
 	"capitalize": {
