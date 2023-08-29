@@ -46,6 +46,7 @@ import {
     TTransaction,
     TMiniWallet,
     TAddressAmount,
+    TMempoolFeeRates,
     TInvoiceData,
 } from './types/wallet';
 
@@ -59,6 +60,7 @@ export type WalletParamList = {
     Send: {
         invoiceData: TInvoiceData;
         wallet: TMiniWallet;
+        feeRate?: number;
     };
     WalletView: undefined;
     WalletInfo: undefined;
