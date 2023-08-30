@@ -239,7 +239,7 @@ const TransactionStatus = ({route}: Props) => {
             },
         );
 
-        updateStatusInfo(broadcasted, psbt, errorMessage);
+        await updateStatusInfo(broadcasted, psbt, errorMessage);
 
         setShowStatus(true);
     };
