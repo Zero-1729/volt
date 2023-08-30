@@ -17,6 +17,7 @@ import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
+import Fee from './screens/wallet/Fee';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
@@ -42,7 +43,13 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import {TTransaction, TMiniWallet} from './types/wallet';
+import {
+    TTransaction,
+    TMiniWallet,
+    TAddressAmount,
+    TMempoolFeeRates,
+    TInvoiceData,
+} from './types/wallet';
 
 // Root Param List for screens
 export type WalletParamList = {
@@ -52,8 +59,9 @@ export type WalletParamList = {
         fiat: string;
     };
     Send: {
-        invoiceData: any;
+        invoiceData: TInvoiceData;
         wallet: TMiniWallet;
+        feeRate?: number;
     };
     WalletView: undefined;
     WalletInfo: undefined;
@@ -66,14 +74,21 @@ export type WalletParamList = {
         invoiceData: any;
         wallet: TMiniWallet;
     };
+    Fee: {
+        feeRates: TMempoolFeeRates;
+        invoiceData: any;
+        wallet: TMiniWallet;
+    };
     TransactionDetails: {
         tx: TTransaction;
         source: string;
     };
     TransactionStatus: {
-        status: string;
-        message: string;
-        txId: string;
+        payload: {
+            addressAmounts: TAddressAmount[];
+            feeRate: number;
+        };
+        wallet: TMiniWallet;
         network: string;
     };
 };
@@ -130,6 +145,7 @@ const WalletRoot = () => {
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen name="Send" component={Send} />
+                <WalletStack.Screen name="Fee" component={Fee} />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"

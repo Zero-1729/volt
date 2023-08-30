@@ -37,3 +37,20 @@ export const getAddressInfo = async (address: string, network: string) => {
         throw e;
     }
 };
+
+export const getFeeRates = async (network: string) => {
+    try {
+        const {
+            bitcoin: {fees},
+        } = mempoolJS({
+            hostname: 'mempool.space',
+            network: network,
+        });
+
+        const feesRecommended = await fees.getFeesRecommended();
+
+        return feesRecommended;
+    } catch (e) {
+        throw e;
+    }
+};

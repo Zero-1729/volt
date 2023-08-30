@@ -445,7 +445,8 @@ const Wallet = () => {
                                 ),
                             ]}>
                             <Balance
-                                id={currentWalletID}
+                                fontColor={'white'}
+                                balance={walletData.balance}
                                 balanceFontSize={'text-4xl'}
                                 disableFiat={false}
                                 loading={loadingBalance}

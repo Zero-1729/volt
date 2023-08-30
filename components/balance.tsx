@@ -88,15 +88,12 @@ export const Balance = (props: BalanceProps) => {
 
     const {
         hideTotalBalance,
-        getWalletData,
         appFiatCurrency,
         appUnit,
         updateAppUnit,
         fiatRate,
     } = useContext(AppStorageContext);
     const [unit, setUnit] = useState(appUnit);
-
-    const walletData = getWalletData(props.id);
 
     // Toggle between BTC and sats
     // and fiat if enabled
@@ -139,6 +136,9 @@ export const Balance = (props: BalanceProps) => {
                         <Text
                             numberOfLines={1}
                             style={[
+                                {
+                                    color: props.fontColor,
+                                },
                                 tailwind(
                                     `${
                                         props.balanceFontSize
@@ -146,7 +146,7 @@ export const Balance = (props: BalanceProps) => {
                                             : 'text-2xl'
                                     } self-center ${
                                         appUnit.name === 'sats' ? 'mt-0.5' : ''
-                                    } mr-2 text-white`,
+                                    } mr-2`,
                                 ),
                                 unit.name === 'sats' || props.disableFiat
                                     ? Font.SatSymbol
@@ -164,11 +164,14 @@ export const Balance = (props: BalanceProps) => {
                                         props.balanceFontSize
                                             ? props.balanceFontSize
                                             : 'text-2xl'
-                                    } text-white self-center`,
+                                    } self-center`,
                                 ),
+                                {
+                                    color: props.fontColor,
+                                },
                             ]}>
                             {_getBalance(
-                                new BigNumber(walletData.balance),
+                                new BigNumber(props.balance),
                                 unit,
                                 fiatRate,
                                 props.disableFiat,

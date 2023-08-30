@@ -18,9 +18,11 @@ import {
     TElectrumServerURLs,
     TNetwork,
     TBalance,
+    TAddressAmount,
 } from '../types/wallet';
 import {ENet} from '../types/enums';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
+import {ScriptAmount} from 'bdk-rn/lib/classes/Bindings';
 
 export const generateMnemonic = async () => {
     const mnemonic = await new BDK.Mnemonic().create();
@@ -493,6 +495,169 @@ export const generateAddress = async (
     };
 };
 
+// Core helper functions for creating transactions
+// and broadcasting them to the network
+// Note: these functions are not exported
+
+// Helper function to get address scripts from addresses
+const _getAddressScripts = async (addressAmounts: TAddressAmount[]) => {
+    let scriptAmounts: ScriptAmount[] = [];
+
+    for (const item of addressAmounts) {
+        const addr = await new BDK.Address().create(item.address);
+        const script = await addr.scriptPubKey();
+
+        scriptAmounts.push({script: script, amount: item.amount});
+    }
+
+    return scriptAmounts;
+};
+
+const _getChain = async (
+    network: string,
+    electrumServer: TElectrumServerURLs,
+): Promise<BDK.Blockchain> => {
+    // chain config chain before broadcasting
+    const config = _getConfig(network, electrumServer, 5);
+
+    // Create chain to use for broadcast of signed psbt
+    const chain = await new BDK.Blockchain().create(
+        config,
+        BlockChainNames.Electrum,
+    );
+
+    return chain;
+};
+
+// Function to create a BDK Psbt
+// Takes in a list of addresses and amounts
+const createBDKPsbt = async (
+    addressesAmount: TAddressAmount[],
+    feeRate: number,
+    drainTx: boolean,
+    bdkWallet: BDK.Wallet,
+    network: string,
+    electrumServer: TElectrumServerURLs,
+    opReturnData?: string,
+): Promise<{Psbt: BDK.PartiallySignedTransaction; wallet: BDK.Wallet}> => {
+    // Extract address scripts from addresses
+    let scriptAmounts: ScriptAmount[] = [];
+
+    // Handle case for multiple or single addresses
+    if (addressesAmount.length > 0) {
+        scriptAmounts = await _getAddressScripts(addressesAmount);
+    } else {
+        const address = await new BDK.Address().create(
+            addressesAmount[0].address,
+        );
+        const script = await address.scriptPubKey();
+
+        scriptAmounts.push({script: script, amount: addressesAmount[0].amount});
+    }
+
+    // Get chain for fee recommendation
+    const chain = await _getChain(network, electrumServer);
+
+    // Sync wallet before any tx creation
+    const w = await syncBdkWallet(
+        bdkWallet,
+        () => {},
+        network as TNetwork,
+        electrumServer,
+    );
+
+    // Fetch recommended feerate here
+    // Can skip and just use from user in UI
+    // Displayed from Mempool.space 'fetch'
+    const recommendedFeeRate = (await chain.estimateFee(1)).asSatPerVb();
+    const effectiveRate =
+        network === ENet.Bitcoin
+            ? Math.max(feeRate, recommendedFeeRate)
+            : feeRate;
+
+    // Create transaction builder
+    let txTemplate = await new BDK.TxBuilder().create();
+
+    // Create actual transaction
+    if (opReturnData) {
+        // Create a Uint8Array from utf-8 string 'opReturnData'
+        let dataList = new Uint8Array(opReturnData.length);
+
+        // Fill each array element with the data
+        for (let i = 0; i < opReturnData.length; i++) {
+            dataList[i] = opReturnData.charCodeAt(i);
+        }
+
+        // Convert to array
+        const dataArray = Array.from(dataList);
+
+        txTemplate = await txTemplate.addData(dataArray);
+    }
+
+    // Add essential tx data to tx builder
+    // 1. Enable RBF always by default
+    // 2. Fee rate
+    // 3. Recipient and amount to send them
+    // Note: can use 'tx.setRecipients([{script, amount: Number(amount)}])' for multiple recipients and mounts
+    txTemplate = await txTemplate.enableRbf();
+    txTemplate = await txTemplate.feeRate(effectiveRate);
+
+    // Drain assumes only one address and amount
+    // present in addressesAmount array
+    if (drainTx) {
+        if (addressesAmount.length > 1) {
+            throw new Error('Drain transaction can only have one recipient.');
+        }
+
+        txTemplate = await txTemplate.drainTo(scriptAmounts[0].script);
+        txTemplate = await txTemplate.drainWallet();
+    } else {
+        txTemplate = await txTemplate.setRecipients(scriptAmounts);
+    }
+
+    // Finish building tx
+    const finalTx = await txTemplate.finish(w);
+
+    // Return Psbt
+    return {Psbt: finalTx.psbt, wallet: w};
+};
+
+// Sign a Psbt with a BDK wallet
+const signBDKPsbt = async (
+    psbt: BDK.PartiallySignedTransaction,
+    bdkWallet: BDK.Wallet,
+): Promise<BDK.PartiallySignedTransaction> => {
+    // Sign the Psbt
+    const signedPsbt = await bdkWallet.sign(psbt);
+
+    return signedPsbt;
+};
+
+// Broadcast a signed Psbt to the network
+const broadcastBDKPsbt = async (
+    psbt: BDK.PartiallySignedTransaction,
+    network: string,
+    electrumServer: TElectrumServerURLs,
+): Promise<boolean> => {
+    // Get chain for fee recommendation
+    const chain = await _getChain(network, electrumServer);
+
+    // Extract the newly signed BDK transaction from the Psbt
+    const transaction = await psbt.extractTx();
+
+    // Retrieve final tx id to check if it exists and move to broadcast tx
+    const finalTxId = await transaction.txid();
+
+    if (finalTxId) {
+        // Broadcast transaction
+        const broadcasted = await chain.broadcast(transaction);
+
+        return broadcasted;
+    } else {
+        return false;
+    }
+};
+
 // Creates a PSBT created a given address and sats amount, and returns the singed Psbt and broadcast status
 export const fullsendBDKTransaction = async (
     amount: string,
@@ -571,7 +736,7 @@ export const fullsendBDKTransaction = async (
         tx = await tx.feeRate(effectiveRate);
         tx = await tx.addRecipient(script, Number(amount));
 
-        statusCallback('Finaled transaction.');
+        statusCallback('Finalized transaction.');
         // Finish building tx
         const finalTx = await tx.finish(w);
 
@@ -617,9 +782,12 @@ export const fullsendBDKTransaction = async (
     }
 };
 
+// Creates a PSBT given an address and sats amount (or send max amount), and returns the singed Psbt and broadcast status
 export const SingleBDKSend = async (
     amount: string,
     address: string,
+    feeRate: number,
+    drainTx: boolean,
     wallet: TWalletType,
     electrumServerUrl: TElectrumServerURLs,
     statusCallback: (message: string) => void,
@@ -627,21 +795,46 @@ export const SingleBDKSend = async (
     // Expects the wallet to contain private internal and external descriptors
     const _w = await createBDKWallet(wallet);
 
-    const hardCodedFeeRate = 5;
+    statusCallback('creating and signing transaction...');
+    let signedPsbt!: BDK.PartiallySignedTransaction;
+    let broadcasted: boolean = false;
 
-    statusCallback('Preparing wallet...');
+    try {
+        const PsbtMeta = await createBDKPsbt(
+            [{address: address, amount: Number(amount)}],
+            feeRate,
+            drainTx, // Ignores amount and sends all funds to address, if true
+            _w,
+            wallet.network,
+            electrumServerUrl,
+        );
 
-    return await fullsendBDKTransaction(
-        amount,
-        address,
-        hardCodedFeeRate,
-        _w,
-        wallet.network,
-        electrumServerUrl,
-        statusCallback,
-    );
+        signedPsbt = await signBDKPsbt(PsbtMeta.Psbt, PsbtMeta.wallet);
+
+        broadcasted = await broadcastBDKPsbt(
+            signedPsbt,
+            wallet.network,
+            electrumServerUrl,
+        );
+
+        if (!broadcasted) {
+            return {
+                broadcasted: false,
+                psbt: signedPsbt,
+                errorMessage: 'Failed to get transaction id.',
+            };
+        }
+    } catch (e: any) {
+        return {
+            broadcasted: false,
+            psbt: null,
+            errorMessage: e.message,
+        };
+    }
+
+    return {
+        broadcasted: broadcasted,
+        psbt: signedPsbt,
+        errorMessage: '',
+    };
 };
-
-// Special tx to drain all funds from wallet
-// to recipient
-export const drainBDKSend = async () => {};

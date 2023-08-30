@@ -46,7 +46,7 @@ export type CardProps = BaseProps & {
 };
 
 export type WalletCardProps = CardProps & {
-    id: string;
+    balance: BalanceType;
     walletBalance: BalanceType;
     walletType: string;
     isWatchOnly: boolean;
@@ -69,8 +69,9 @@ export type TxBalanceProps = BaseProps & {
 };
 
 export type BalanceProps = BaseProps & {
-    id: string; // current id of the wallet to show balance
+    balance: BalanceType;
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
+    fontColor: string;
     balanceFontSize?: string;
     loading: boolean;
     disableFiat: boolean; // false by default
