@@ -125,7 +125,6 @@ const Scan = ({route}: Props) => {
     const isFocused = useIsFocused();
     const tailwind = useTailwind();
     const navigation = useNavigation();
-    const ColorScheme = Color(useColorScheme());
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -347,16 +346,14 @@ const Scan = ({route}: Props) => {
     // Display Camera view if camera available
     return (
         <SafeAreaView
-            style={[
-                styles.flexed,
-                {backgroundColor: ColorScheme.Background.Inverted},
-            ]}
+            style={[styles.flexed, tailwind('bg-black')]}
             edges={['bottom', 'left', 'right']}>
             <View
                 style={[
-                    tailwind('items-center justify-center h-full w-full'),
+                    tailwind(
+                        'items-center justify-center h-full w-full bg-black',
+                    ),
                     styles.flexed,
-                    {backgroundColor: ColorScheme.Background.Inverted},
                 ]}>
                 <View
                     style={[
@@ -367,14 +364,10 @@ const Scan = ({route}: Props) => {
                     <PlainButton
                         onPress={closeScreen}
                         style={[tailwind('absolute z-10 left-6')]}>
-                        <Close fill={ColorScheme.SVG.Inverted} />
+                        <Close fill={'white'} />
                     </PlainButton>
                     {/* Screen header */}
-                    <Text
-                        style={[
-                            tailwind('text-sm font-bold'),
-                            {color: ColorScheme.Text.Alt},
-                        ]}>
+                    <Text style={[tailwind('text-sm font-bold text-white')]}>
                         {dynamicHeading}
                     </Text>
                 </View>
@@ -397,24 +390,17 @@ const Scan = ({route}: Props) => {
                             <View
                                 style={[
                                     tailwind(
-                                        'w-4/5 flex-row items-center justify-around rounded px-1 py-3',
+                                        'w-4/5 flex-row items-center justify-around rounded px-1 py-3 bg-white',
                                     ),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Primary,
-                                    },
                                 ]}>
                                 <InfoIcon
                                     height={18}
                                     width={18}
-                                    fill={ColorScheme.SVG.Default}
+                                    fill={'black'}
                                 />
                                 <Text
                                     style={[
-                                        tailwind('text-sm w-5/6'),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                        },
+                                        tailwind('text-sm w-5/6 text-black'),
                                     ]}>
                                     {scannerAlertMsg}
                                 </Text>
@@ -424,11 +410,7 @@ const Scan = ({route}: Props) => {
                         <></>
                     )}
 
-                    <Text
-                        style={[
-                            tailwind('text-sm mb-4'),
-                            {color: ColorScheme.Text.Alt},
-                        ]}>
+                    <Text style={[tailwind('text-sm mb-4 text-white')]}>
                         Scan a Bitcoin invoice or address to pay
                     </Text>
 
@@ -438,7 +420,7 @@ const Scan = ({route}: Props) => {
                             tailwind('h-2/5 w-4/5 border'),
                             {
                                 borderWidth: 2,
-                                borderColor: ColorScheme.Background.Primary,
+                                borderColor: 'white',
                                 borderRadius: 12,
                             },
                         ]}>
@@ -456,8 +438,8 @@ const Scan = ({route}: Props) => {
                 <LongBottomButton
                     onPress={handleClipboard}
                     title={'Paste'}
-                    textColor={ColorScheme.Text.Default}
-                    backgroundColor={ColorScheme.Background.Primary}
+                    textColor={'black'}
+                    backgroundColor={'white'}
                 />
             </View>
         </SafeAreaView>
