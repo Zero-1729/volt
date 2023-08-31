@@ -37,6 +37,7 @@ import {
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
+import {TaprootWallet} from './wallet/p2tr';
 import {SegWitNativeWallet} from './wallet/segwit/wpkh';
 import {SegWitP2SHWallet} from './wallet/segwit/shp2wpkh';
 import {LegacyWallet} from './wallet/p2pkh';
@@ -53,7 +54,7 @@ import {
     normalizeExtKey,
 } from '../modules/wallet-utils';
 
-import {extendedKeyInfo} from '../modules/wallet-defaults';
+import {extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -157,7 +158,7 @@ const defaultContext: defaultContextType = {
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
-        return new BaseWallet({name: 'test wallet', type: 'wpkh'});
+        return new BaseWallet({name: 'test wallet', type: 'p2tr'});
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
     setElectrumServerURL: () => {},
@@ -485,6 +486,9 @@ export const AppStorageProvider = ({children}: Props) => {
         // Silently just fail and return undefined
         if (index !== -1) {
             switch (stringyW.type) {
+                case 'p2tr':
+                    w = TaprootWallet.fromJSON(JSON.stringify(stringyW));
+                    break;
                 case 'wpkh':
                     w = SegWitNativeWallet.fromJSON(JSON.stringify(stringyW));
                     break;
@@ -519,6 +523,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 let tmp: TWalletType;
 
                 switch (walletObject.type) {
+                    case 'p2tr':
+                        tmp = TaprootWallet.fromJSON(serializedWallet);
+                        break;
                     case 'wpkh':
                         tmp = SegWitNativeWallet.fromJSON(serializedWallet);
                         break;
@@ -739,7 +746,7 @@ export const AppStorageProvider = ({children}: Props) => {
         ) => {
             // Default network and wallet type
             var net = backupNetwork;
-            var walletType = 'wpkh';
+            var walletType = 'p2tr'; // p2tr
 
             var fingerprint = '';
             var path = '';
@@ -817,12 +824,17 @@ export const AppStorageProvider = ({children}: Props) => {
             var newWallet!: TWalletType;
 
             // Ensure we have a valid wallet type
-            if (!['wpkh', 'shp2wpkh', 'p2pkh'].includes(walletArgs.type)) {
+            if (!validWalletTypes.includes(walletArgs.type)) {
                 throw new Error('[restoreWallet] Invalid wallet type');
             }
 
             // Create wallet based on type
             switch (walletArgs.type) {
+                case 'p2tr':
+                    newWallet = new TaprootWallet(
+                        walletArgs as TBaseWalletArgs,
+                    );
+                    break;
                 case 'wpkh':
                     newWallet = new SegWitNativeWallet(
                         walletArgs as TBaseWalletArgs,
@@ -865,6 +877,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     };
 
                     switch (backupMaterialType) {
+                        // TODO: send straight to new fns
                         case EBackupMaterial.Xpub:
                             descriptor = await fromDescriptorTemplatePublic(
                                 // BDK expects a tpub or xpub, so we need to convert it
@@ -878,6 +891,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             break;
 
                         case EBackupMaterial.Xprv:
+                            // TODO: send straight to new fns; should handle already
                             const {internal, external, priv} =
                                 createDescriptorFromXprv(walletArgs.xprv);
 
@@ -912,7 +926,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 let newWallet!: TWalletType;
 
                 // Ensure we have a valid wallet type
-                if (!['wpkh', 'shp2wpkh', 'p2pkh'].includes(type)) {
+                if (!validWalletTypes.includes(type)) {
                     throw new Error('[restoreWallet] Invalid wallet type');
                 }
 
@@ -920,6 +934,15 @@ export const AppStorageProvider = ({children}: Props) => {
                 const mnemonic = await generateMnemonic();
 
                 switch (type) {
+                    case 'p2tr':
+                        newWallet = new TaprootWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                            mnemonic: mnemonic,
+                        });
+
+                        break;
                     case 'wpkh':
                         newWallet = new SegWitNativeWallet({
                             name: name,
