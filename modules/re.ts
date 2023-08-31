@@ -2,7 +2,7 @@
 
 // Descriptors
 // For now, we only support single key descriptors
-// with three specific script types (i.e. ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’)
+// with three specific script types (i.e. `tr`, ‘wpkh’, ‘pkh’, ‘sh’, ‘sh(wpkh(…))’)
 // Includes support for two kinds of inner descriptor patterns:
 // Public descriptor: [abce1234/49h/0h/0h][extkey][key path])
 // Private descriptor: [extkey][key path][key path]
@@ -41,13 +41,14 @@ const publicDescriptorRegex: string = String.raw`(${keyOriginRegex}+${extendedKe
 const privateDescriptorRegex: string = String.raw`(${extendedKeyRegex}${pathLevelRegex}+${keyPathRegex}+)`;
 
 // Each supported regex for the supported script types
+export const p2trDescriptorRegex: string = String.raw`(tr\((${publicDescriptorRegex}|${privateDescriptorRegex})\)${checksumRegex}?)`;
 export const wpkhDescriptorRegex: string = String.raw`(wpkh\((${publicDescriptorRegex}|${privateDescriptorRegex})\)${checksumRegex}?)`;
 export const pkhDescriptorRegex: string = String.raw`(pkh\((${publicDescriptorRegex}|${privateDescriptorRegex})\)${checksumRegex}?)`;
 export const shp2wpkhDescriptorRegex: string = String.raw`(sh\(wpkh\((${publicDescriptorRegex}|${privateDescriptorRegex})\)\)${checksumRegex}?)`;
 
 // Combined general regex pattern for all supported script types
 export const descriptorRegex: RegExp = RegExp(
-    String.raw`^(${wpkhDescriptorRegex}|${pkhDescriptorRegex}|${shp2wpkhDescriptorRegex})$`,
+    String.raw`^(${p2trDescriptorRegex}|${wpkhDescriptorRegex}|${pkhDescriptorRegex}|${shp2wpkhDescriptorRegex})$`,
 );
 
 // Extended Keys
