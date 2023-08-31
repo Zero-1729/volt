@@ -2,17 +2,21 @@
 import {ENet} from './../types/enums';
 import {TAccountPaths, TExtendedKeyInfo} from '../types/wallet';
 
+export const validWalletTypes = ['p2tr', 'wpkh', 'sh2wpkh', 'pkh'];
+
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
-    wpkh: ['Native Segwit', 'bc1...', 'tb1...'],
+    p2tr: ['Taproot', 'bc1p...', 'tb1p...'],
+    wpkh: ['Native Segwit', 'bc1q...', 'tb1q...'],
     p2pkh: ['Legacy', '1...', 'm...'],
     shp2wpkh: ['Segwit', '3...', '2...'],
 };
 
 // Descriptor type reverse aliases
 export const DescriptorType: {[index: string]: string} = {
-    p2pkh: 'P2PKH',
+    p2tr: 'P2TR',
     wpkh: 'WPKH',
+    p2pkh: 'P2PKH',
     shp2wpkh: 'P2SH-P2WPKH',
 };
 
@@ -51,6 +55,8 @@ export const DescriptorType: {[index: string]: string} = {
 
 */
 export const WalletPaths: {[index: string]: TAccountPaths} = {
+    // Experimental
+    p2tr: {bitcoin: "m/86'/0'/0'", testnet: "m/86'/1'/0'"},
     wpkh: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
     p2pkh: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
     shp2wpkh: {bitcoin: "m/49'/0'/0'", testnet: "m/49'/1'/0'"},
@@ -89,13 +95,13 @@ export const BJSNetworks: {[index: string]: any} = {
 /*
     Coin	          Public Key	    Private Key	      Address Encoding	                BIP 32 Path
     --------------    ---------------    ------------     ------------------------------    ------------------------
-    Bitcoin	          0488b21e - xpub   0488ade4 - xprv	  P2PKH  or P2SH	                m/44'/0'
+    Bitcoin	          0488b21e - xpub   0488ade4 - xprv	  P2PKH  or P2SH (defaults P2TR)	(defaults to m/86'/0')
     Bitcoin	          049d7cb2 - ypub   049d7878 - yprv	  P2WPKH in P2SH	                m/49'/0'
     Bitcoin	          04b24746 - zpub   04b2430c - zprv	  P2WPKH	                        m/84'/0'
     Bitcoin	          0295b43f - Ypub   0295b005 - Yprv	  Multi-signature P2WSH in P2SH	    -
     Bitcoin	          02aa7ed3 - Zpub   02aa7a99 - Zprv	  Multi-signature P2WSH	            -
 
-    Bitcoin Testnet	  043587cf - tpub	04358394 - tprv	  P2PKH  or P2SH	                m/44'/1'
+    Bitcoin Testnet	  043587cf - tpub	04358394 - tprv	  P2PKH  or P2SH (default P2TR)	    (defaults to m/86'/1')
     Bitcoin Testnet	  044a5262 - upub	044a4e28 - uprv	  P2WPKH in P2SH	                m/49'/1'
     Bitcoin Testnet	  045f1cf6 - vpub	045f18bc - vprv	  P2WPKH	                        m/84'/1'
     Bitcoin Testnet	  024289ef - Upub	024285b5 - Uprv	  Multi-signature P2WSH in P2SH     -
@@ -125,12 +131,12 @@ export const supportedExtVersions = ['x', 'y', 'z', 't', 'u', 'v'];
 // Supported extended key version metadata definitions
 export const extendedKeyInfo: {[index: string]: TExtendedKeyInfo} = {
     // mainnet / bitcoin
-    x: {network: ENet.Bitcoin, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    x: {network: ENet.Bitcoin, type: 'p2tr'}, // Account path P2PKH only possible to import via descriptors; WPKH only possible to import via descriptors and zprv/pub
     y: {network: ENet.Bitcoin, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
     z: {network: ENet.Bitcoin, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 
     // testnet
-    t: {network: ENet.Testnet, type: 'wpkh'}, // Account path P2PKH (legacy) [1...] only possible to import via descriptors
+    t: {network: ENet.Testnet, type: 'p2tr'}, // Account path P2PKH only possible to import via descriptors; WPKH only possible to import via descriptors and zprv/pub
     u: {network: ENet.Testnet, type: 'shp2wpkh'}, // Account path P2SH(P2WPKH(...)) [3...]
     v: {network: ENet.Testnet, type: 'wpkh'}, // Account path P2WPKH [bc1...]
 };
