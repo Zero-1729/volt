@@ -3,8 +3,13 @@ import {
     parseDescriptor,
     createDescriptorFromXprv,
     createDescriptorFromString,
+    fromDescriptorPTR,
+    fromDescriptorPublicPTR,
 } from './../../modules/descriptors';
 import {descriptorRegex} from '../../modules/re';
+import {ENet} from '../../types/enums';
+
+import * as descriptors from '@bitcoinerlab/descriptors';
 
 describe('testing descriptor checksum extraction', () => {
     test('descriptor checksum matches', () => {
@@ -27,6 +32,45 @@ describe('testing descriptor fingerprint extraction', () => {
         const parts = parseDescriptor(descriptor);
 
         expect(parts.fingerprint).toBe(descriptor_fingerprint);
+    });
+});
+
+describe('testing experimental taproot from mnemonic', () => {
+    test('descriptor from mnemonic (ptr)', () => {
+        const privDescriptor =
+            "tr(tprv8ghHZW6r86FCyWoyCT4Q7M2QqPJpgkMspG2Nq2Uz6hWq3hCBDh7qEkEnKK6LD1f1rj2Vj99W99vYFF8NuDu5gGkrLmr5RyF5gVrQurc7usZ/86'/1'/0'/0/*)";
+        const mnemonic =
+            'monitor glove mother power people spoon interest orbit solar faint muscle apart direct elite direct lens budget enhance decorate program boost unknown culture fabric';
+        // const xprv-0 'tprv8ZgxMBicQKsPcvxdwahz6p8taceYS8eF2CVHgEdf9QYY4gzVcwGZJdjr29dYryqMfkYCnh7MM8ypP5siT8MwFBE6PrHBu9fXGHkMitjp7G3'
+
+        // const xpub "tr([827aac3a/86'/1'/0']tpubDDPKhv96GTvsryqm66izWkgXQQpkr5YnPZdA7YXHWyKDtBSwr5wRREreVRmVY9uFCwfJLRGG7eVhevX5CKbYBvwFrpDQVDNfRyeHAjQZ6m2/0/*)"
+
+        const taprootDescriptor = fromDescriptorPTR(mnemonic, ENet.Testnet);
+        const strippedDescriptor = taprootDescriptor.priv.split('#')[0];
+
+        expect(strippedDescriptor).toEqual(privDescriptor);
+    });
+});
+
+describe('testing experimental taproot from xpub', () => {
+    test('descriptor from xpub (tr)', () => {
+        const xpub =
+            'tpubDDPKhv96GTvsryqm66izWkgXQQpkr5YnPZdA7YXHWyKDtBSwr5wRREreVRmVY9uFCwfJLRGG7eVhevX5CKbYBvwFrpDQVDNfRyeHAjQZ6m2';
+
+        let externalPubDescriptor = `tr([827aac3a/86'/1'/0']${xpub}/0/*)`;
+        externalPubDescriptor =
+            externalPubDescriptor +
+            '#' +
+            descriptors.checksum(externalPubDescriptor);
+
+        const pubTemp = fromDescriptorPublicPTR(
+            xpub,
+            '827aac3a',
+            'p2tr',
+            ENet.Testnet,
+        );
+
+        expect(pubTemp.ExternalDescriptor).toEqual(externalPubDescriptor);
     });
 });
 
@@ -139,15 +183,23 @@ describe('generated descriptor from string', () => {
 
 describe('generated descriptor from xprv', () => {
     test('descriptor from xprv tests passed', () => {
+        // Note: no longer getting 'wpkh' as default for x/tprv/pub
+        // Instead we grab the taproot
         const xprv =
             'tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr';
 
-        const descriptorPrivate =
-            "wpkh(tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr/84'/1'/0'/0/*)#wcm6z32h";
-        const descriptorExternal =
-            "wpkh([b5c34791/84'/1'/0']tpubDDBVgMeGwNw4nF48bznPJgxe91iovKF7h6459cnY6UoJawokFr3G2yFvNrkiouzTjN65PzvwY1HiuL9dY7EXwZ5DHRZ9yD9mH9eXmBZtTyn/0/*)#zx87kdp7";
-        const descriptorInternal =
-            "wpkh([b5c34791/84'/1'/0']tpubDDBVgMeGwNw4nF48bznPJgxe91iovKF7h6459cnY6UoJawokFr3G2yFvNrkiouzTjN65PzvwY1HiuL9dY7EXwZ5DHRZ9yD9mH9eXmBZtTyn/1/*)#njzltc3x";
+        let descriptorPrivate =
+            "tr(tprv8gVTXwc2o1FPtn2LiM7nuHJXZzCskz4D7nTHs6kEgCzukTYydTDfrUe4CkJhPfTVcEaCSZPgWTyL6i3wGsbvF6i87Mea89YdwYamM277nrr/86'/1'/0'/0/*)";
+        descriptorPrivate =
+            descriptorPrivate + '#' + descriptors.checksum(descriptorPrivate);
+        let descriptorExternal =
+            "tr([b5c34791/86'/1'/0']tpubDDBVgMeGwNw4nF48bznPJgxe91iovKF7h6459cnY6UoJawokFr3G2yFvNrkiouzTjN65PzvwY1HiuL9dY7EXwZ5DHRZ9yD9mH9eXmBZtTyn/0/*)";
+        descriptorExternal =
+            descriptorExternal + '#' + descriptors.checksum(descriptorExternal);
+        let descriptorInternal =
+            "tr([b5c34791/86'/1'/0']tpubDDBVgMeGwNw4nF48bznPJgxe91iovKF7h6459cnY6UoJawokFr3G2yFvNrkiouzTjN65PzvwY1HiuL9dY7EXwZ5DHRZ9yD9mH9eXmBZtTyn/1/*)";
+        descriptorInternal =
+            descriptorInternal + '#' + descriptors.checksum(descriptorInternal);
 
         const {internal, external, priv} = createDescriptorFromXprv(xprv);
 
