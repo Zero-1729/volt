@@ -146,9 +146,6 @@ export const descriptorFromTemplate = async (
     let externalDescriptor!: BDK.Descriptor;
 
     switch (type) {
-        case 'p2tr': {
-            throw new Error('Not Impleneted Yet!');
-        }
         case 'wpkh': {
             externalDescriptor = await new BDK.Descriptor().newBip84(
                 descriptorSecretKey,
