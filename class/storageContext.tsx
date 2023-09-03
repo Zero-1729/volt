@@ -19,6 +19,8 @@ import {
     includeDescriptorKeyPath,
     createDescriptorFromXprv,
     createDescriptorFromString,
+    fromDescriptorPublicPTR,
+    fromDescriptorPTR,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
 
@@ -700,12 +702,31 @@ export const AppStorageProvider = ({children}: Props) => {
             let ExternalDescriptor!: string;
             let PrivateDescriptor!: string;
 
-            ({InternalDescriptor, ExternalDescriptor, PrivateDescriptor} =
-                await descriptorFromTemplate(
-                    newWallet.mnemonic,
-                    newWallet.type,
-                    newWallet.network,
-                ));
+            switch (newWallet.type) {
+                case 'p2tr':
+                    const descriptorsPTR = fromDescriptorPTR(
+                        newWallet.mnemonic,
+                        newWallet.network,
+                    );
+
+                    InternalDescriptor = descriptorsPTR.internal;
+                    ExternalDescriptor = descriptorsPTR.external;
+                    PrivateDescriptor = descriptorsPTR.priv;
+
+                    break;
+                default:
+                    ({
+                        InternalDescriptor,
+                        ExternalDescriptor,
+                        PrivateDescriptor,
+                    } = await descriptorFromTemplate(
+                        newWallet.mnemonic,
+                        newWallet.type,
+                        newWallet.network,
+                    ));
+
+                    break;
+            }
 
             // REM: We only store the string representation of the descriptors
             newWallet.setDescriptor({
@@ -877,23 +898,37 @@ export const AppStorageProvider = ({children}: Props) => {
                     };
 
                     switch (backupMaterialType) {
-                        // TODO: send straight to new fns
                         case EBackupMaterial.Xpub:
-                            descriptor = await fromDescriptorTemplatePublic(
-                                // BDK expects a tpub or xpub, so we need to convert it
-                                // if it's an exotic prefix
-                                normalizeExtKey(walletArgs.xpub, 'pub'),
-                                walletArgs.fingerprint,
-                                walletArgs.type,
-                                walletArgs.network,
-                            );
+                            descriptor =
+                                walletArgs.type === 'p2tr'
+                                    ? fromDescriptorPublicPTR(
+                                          walletArgs.xpub,
+                                          walletArgs.fingerprint,
+                                          'p2tr',
+                                          walletArgs.network,
+                                      )
+                                    : await fromDescriptorTemplatePublic(
+                                          // BDK expects a tpub or xpub, so we need to convert it
+                                          // if it's an exotic prefix
+                                          normalizeExtKey(
+                                              walletArgs.xpub,
+                                              'pub',
+                                          ),
+                                          walletArgs.fingerprint,
+                                          walletArgs.type,
+                                          walletArgs.network,
+                                      );
 
                             break;
 
                         case EBackupMaterial.Xprv:
-                            // TODO: send straight to new fns; should handle already
                             const {internal, external, priv} =
-                                createDescriptorFromXprv(walletArgs.xprv);
+                                walletArgs.type === 'p2tr'
+                                    ? fromDescriptorPTR(
+                                          walletArgs.xprv,
+                                          walletArgs.network,
+                                      )
+                                    : createDescriptorFromXprv(walletArgs.xprv);
 
                             descriptor = {
                                 InternalDescriptor: internal,
