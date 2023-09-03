@@ -11,7 +11,7 @@ export class TaprootWallet extends BaseWallet {
         throw new Error('Not implemented');
     }
 
-    updateTransanctions(transactions: TTransaction[]) {
+    updateTransactions(transactions: TTransaction[]) {
         this.transactions = transactions;
     }
 }
