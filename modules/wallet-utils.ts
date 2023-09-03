@@ -348,9 +348,15 @@ const _generateAddress = (
             address = P2WPKHData.address;
             break;
         case 'p2tr':
+            // Initialize ecc library
+            bitcoin.initEccLib(ecc);
+
+            // drop the DER header byte to get internal pubkey
+            const internalPubKey = keyPair.publicKey.subarray(1, 33);
+
             const P2TRData = bitcoin.payments.p2tr({
-                pubkey: keyPair.publicKey,
-                network,
+                internalPubkey: internalPubKey,
+                network: network,
             });
 
             address = P2TRData.address;
