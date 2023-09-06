@@ -136,6 +136,11 @@ export const createDescriptorFromString = (
     // Manipulate internal descriptor key path
     internal = strippedDescriptor.replace('0/*', '1/*');
 
+    // Reformat and include checksum
+    external = reformatDescriptorToBDK(external);
+    internal = reformatDescriptorToBDK(internal);
+    priv = reformatDescriptorToBDK(priv);
+
     // Re-include checksums
     internal = internal + '#' + descriptors.checksum(internal);
     external = external + '#' + descriptors.checksum(external);
@@ -145,9 +150,9 @@ export const createDescriptorFromString = (
     // We assume the descriptor has keypath in it
     // wpkh(xprv.../84'/0'/0'/0/*)
     return {
-        external: reformatDescriptorToBDK(external),
-        internal: reformatDescriptorToBDK(internal),
-        priv: reformatDescriptorToBDK(priv),
+        external: external,
+        internal: internal,
+        priv: priv,
     };
 };
 
@@ -554,13 +559,13 @@ export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
     // Rebuild internal descriptor
     let privateInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
     // re-include checksum
+    privateInternalDescriptor = reformatDescriptorToBDK(
+        privateInternalDescriptor,
+    );
     privateInternalDescriptor =
         privateInternalDescriptor +
         '#' +
         descriptors.checksum(privateInternalDescriptor);
-    privateInternalDescriptor = reformatDescriptorToBDK(
-        privateInternalDescriptor,
-    );
 
     return {
         external: privateExternalDescriptor,
