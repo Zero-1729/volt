@@ -513,7 +513,8 @@ export const canSendToInvoice = (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'shp2wpkh' ||
-                    miniWallet.type === 'wpkh')
+                    miniWallet.type === 'wpkh' ||
+                    miniWallet.type === 'p2tr')
             );
     }
 
