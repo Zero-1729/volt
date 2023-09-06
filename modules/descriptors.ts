@@ -52,8 +52,10 @@ const _getDescriptorNetwork = (expression: string) => {
     return BJSNetworks[network];
 };
 
-const reformatDescriptorToBDK = (expression: string) => {
+const _reformatDescriptorToBDK = (expression: string) => {
     const parsedDescriptor = parseDescriptor(expression);
+
+    // Inhale descriptor and return stripped descriptor (no checksum)
 
     if (parsedDescriptor.isPublic) {
         // script([fingerprint+origin path]xkey/keypath)
@@ -65,8 +67,7 @@ const reformatDescriptorToBDK = (expression: string) => {
             ']' +
             parsedDescriptor.keyOnly +
             parsedDescriptor.keyPath +
-            parsedDescriptor.scriptSuffix +
-            parsedDescriptor.checksum
+            parsedDescriptor.scriptSuffix
         );
     } else {
         // script(xkey/key origin/keypath)
@@ -75,8 +76,7 @@ const reformatDescriptorToBDK = (expression: string) => {
             parsedDescriptor.keyOnly +
             parsedDescriptor.path.slice(1) +
             parsedDescriptor.keyPath +
-            parsedDescriptor.scriptSuffix +
-            parsedDescriptor.checksum
+            parsedDescriptor.scriptSuffix
         );
     }
 };
@@ -128,7 +128,7 @@ export const createDescriptorFromString = (
 
         // Reformat to public descriptor format
         // script(xpub/key origin/keypath)
-        strippedDescriptor = reformatDescriptorToBDK(strippedDescriptor);
+        strippedDescriptor = _reformatDescriptorToBDK(strippedDescriptor);
     }
 
     // Update external if xpub-based
@@ -137,9 +137,9 @@ export const createDescriptorFromString = (
     internal = strippedDescriptor.replace('0/*', '1/*');
 
     // Reformat and include checksum
-    external = reformatDescriptorToBDK(external);
-    internal = reformatDescriptorToBDK(internal);
-    priv = reformatDescriptorToBDK(priv);
+    external = _reformatDescriptorToBDK(external);
+    internal = _reformatDescriptorToBDK(internal);
+    priv = _reformatDescriptorToBDK(priv);
 
     // Re-include checksums
     internal = internal + '#' + descriptors.checksum(internal);
@@ -267,9 +267,9 @@ export const createDescriptorFromXprv = (
 
             // Clean up descriptor to fit BDK format
             // wpkh(xprv.../84'/0'/0'/0/*)
-            descriptorPrivate = reformatDescriptorToBDK(descriptorPrivate);
-            descriptorExternal = reformatDescriptorToBDK(descriptorExternal);
-            descriptorInternal = reformatDescriptorToBDK(descriptorInternal);
+            descriptorPrivate = _reformatDescriptorToBDK(descriptorPrivate);
+            descriptorExternal = _reformatDescriptorToBDK(descriptorExternal);
+            descriptorInternal = _reformatDescriptorToBDK(descriptorInternal);
 
             // Re-include appropriate checksums
             descriptorPrivate =
@@ -362,9 +362,9 @@ export const createDescriptorFromXprv = (
         }
 
         // Reformat to BDK format
-        descriptorPrivate = reformatDescriptorToBDK(descriptorPrivate);
-        descriptorExternal = reformatDescriptorToBDK(descriptorExternal);
-        descriptorInternal = reformatDescriptorToBDK(descriptorInternal);
+        descriptorPrivate = _reformatDescriptorToBDK(descriptorPrivate);
+        descriptorExternal = _reformatDescriptorToBDK(descriptorExternal);
+        descriptorInternal = _reformatDescriptorToBDK(descriptorInternal);
 
         // Re-include checksums
         descriptorPrivate =
@@ -404,13 +404,13 @@ export const fromDescriptorPublicPTR = (
     let internalDescriptor = `tr([${fingerprint}/${canonicalPath}]${pubKey}/1/*)`;
     let privateDescriptor = externalDescriptor;
 
-    let ExternalDescriptor = reformatDescriptorToBDK(externalDescriptor);
+    let ExternalDescriptor = _reformatDescriptorToBDK(externalDescriptor);
     ExternalDescriptor =
         ExternalDescriptor + '#' + descriptors.checksum(ExternalDescriptor);
-    let InternalDescriptor = reformatDescriptorToBDK(internalDescriptor);
+    let InternalDescriptor = _reformatDescriptorToBDK(internalDescriptor);
     InternalDescriptor =
         InternalDescriptor + '#' + descriptors.checksum(InternalDescriptor);
-    let PrivateDescriptor = reformatDescriptorToBDK(privateDescriptor);
+    let PrivateDescriptor = _reformatDescriptorToBDK(privateDescriptor);
     PrivateDescriptor =
         PrivateDescriptor + '#' + descriptors.checksum(PrivateDescriptor);
 
@@ -559,7 +559,7 @@ export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
     // Rebuild internal descriptor
     let privateInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
     // re-include checksum
-    privateInternalDescriptor = reformatDescriptorToBDK(
+    privateInternalDescriptor = _reformatDescriptorToBDK(
         privateInternalDescriptor,
     );
     privateInternalDescriptor =
