@@ -328,15 +328,6 @@ const _generateAddress = (
             address = P2PKData.address;
             break;
 
-        case 'wpkh':
-            const P2WPKHData = bitcoin.payments.p2wpkh({
-                pubkey: keyPair.publicKey,
-                network,
-            });
-
-            address = P2WPKHData.address;
-            break;
-
         case 'shp2wpkh':
             const P2SHData = bitcoin.payments.p2sh({
                 redeem: bitcoin.payments.p2wpkh({
@@ -347,6 +338,28 @@ const _generateAddress = (
             });
 
             address = P2SHData.address;
+            break;
+        case 'wpkh':
+            const P2WPKHData = bitcoin.payments.p2wpkh({
+                pubkey: keyPair.publicKey,
+                network,
+            });
+
+            address = P2WPKHData.address;
+            break;
+        case 'p2tr':
+            // Initialize ecc library
+            bitcoin.initEccLib(ecc);
+
+            // drop the DER header byte to get internal pubkey
+            const internalPubKey = keyPair.publicKey.subarray(1, 33);
+
+            const P2TRData = bitcoin.payments.p2tr({
+                internalPubkey: internalPubKey,
+                network: network,
+            });
+
+            address = P2TRData.address;
             break;
     }
 
@@ -454,25 +467,27 @@ export const canSendToInvoice = (
     // check that network matches
     const prefixInfo: {[index: string]: {network: string; type: string}} = {
         '1': {network: 'bitcoin', type: 'p2pkh'},
-        b: {network: 'bitcoin', type: 'wpkh'},
+        // Handle special case
+        // P2TR -> bc1p
+        // WPKH -> bc1q
+        bc1q: {network: 'bitcoin', type: 'wpkh'},
+        bc1p: {network: 'bitcoin', type: 'p2tr'},
         '3': {network: 'bitcoin', type: 'shp2wpkh'},
         m: {network: 'testnet', type: 'p2pkh'},
-        t: {network: 'testnet', type: 'wpkh'},
+        tb1q: {network: 'testnet', type: 'wpkh'},
+        tb1p: {network: 'testnet', type: 'p2tr'},
         '2': {network: 'testnet', type: 'shp2wpkh'},
     };
 
-    const invoicePrefixInfo = prefixInfo[invoice.address[0]];
+    // Handle special case for WPKH & P2TR
+    const prefixTip = invoice.address[0];
+    const prefixStub =
+        prefixTip === 'b' ? invoice.address.slice(0, 4) : prefixTip;
+    const invoicePrefixInfo = prefixInfo[prefixStub];
 
     switch (invoicePrefixInfo?.type) {
         case 'p2pkh':
             // Can send to P2PKH if wallet is Segwit Wrapped ('shp2wpkh') or Legacy ('p2pkh')
-            return (
-                miniWallet.network === invoicePrefixInfo.network &&
-                (miniWallet.type === invoicePrefixInfo.type ||
-                    miniWallet.type === 'shp2wpkh')
-            );
-        case 'wpkh':
-            // Can send to WPKH if wallet is Segwit Wrapped ('shp2wpkh') or Native Segwit ('wpkh')
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
@@ -484,6 +499,22 @@ export const canSendToInvoice = (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'wpkh')
+            );
+        case 'wpkh':
+            // Can send to WPKH if wallet is Segwit Wrapped ('shp2wpkh') or Native Segwit ('wpkh')
+            return (
+                miniWallet.network === invoicePrefixInfo.network &&
+                (miniWallet.type === invoicePrefixInfo.type ||
+                    miniWallet.type === 'shp2wpkh')
+            );
+        case 'p2tr':
+            // Can send to P2TR if wallet is P2TR, WPKH, or SH-WPKH
+            return (
+                miniWallet.network === invoicePrefixInfo.network &&
+                (miniWallet.type === invoicePrefixInfo.type ||
+                    miniWallet.type === 'shp2wpkh' ||
+                    miniWallet.type === 'wpkh' ||
+                    miniWallet.type === 'p2tr')
             );
     }
 

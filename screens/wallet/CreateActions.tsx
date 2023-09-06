@@ -50,8 +50,12 @@ const CreateAction = () => {
         defaultToTestnet ? ENet.Testnet : ENet.Bitcoin,
     );
     const [open, setOpen] = useState(false);
-    const [account, setAccount] = useState('wpkh'); // Default to segwit
+    const [account, setAccount] = useState('p2tr'); // Default to taproot
     const [accounts, setAccounts] = useState([
+        {
+            value: 'p2tr',
+            label: 'Taproot (BIP86)',
+        },
         {
             value: 'wpkh',
             label: 'Native SegWit (BIP84)',
@@ -61,9 +65,10 @@ const CreateAction = () => {
     ]);
 
     const accountInfo: {[index: string]: string[]} = {
+        p2tr: ['Taproot (bc1p...)', 'Taproot Testnet (tb1p...)'],
         wpkh: [
-            'Native SegWit Bech32 (bc1...)',
-            'Native SegWit Testnet Bech32 (tb1...)',
+            'Native SegWit Bech32 (bc1q...)',
+            'Native SegWit Testnet Bech32 (tb1q...)',
         ],
         shp2wpkh: [
             'Segwit Wrapped P2SH (3...)',
@@ -85,7 +90,7 @@ const CreateAction = () => {
             // Clear wallet name
             setNewWalletName('');
 
-            // Default wallet type is Segwit wpkh on Testnet
+            // Default wallet type is Segwit p2tr on Testnet
             await addWallet(walletName, type, network);
 
             // Vibrate to let user know the action was successful

@@ -2,10 +2,18 @@ import * as secp256k1 from '@bitcoinerlab/secp256k1';
 import * as descriptors from '@bitcoinerlab/descriptors';
 
 import {BJSNetworks, extendedKeyInfo, WalletPaths} from './wallet-defaults';
-import {getInfoFromXKey, getRawRootFromXprv} from './wallet-utils';
+import {
+    getInfoFromXKey,
+    getRawRootFromXprv,
+    generateRootFromMnemonic,
+} from './wallet-utils';
 import {extendedKeyPatternG} from './re';
+import {TNetwork} from '../types/wallet';
+import {ENet} from '../types/enums';
 
 const validPathTypes: {[index: string]: string} = {
+    "m/86'/0'/0'": 'p2tr:bitcoin',
+    "m/86'/1'/0'": 'p2tr:testnet',
     "m/84'/0'/0'": 'wpkh:bitcoin',
     "m/84'/1'/0'": 'wpkh:testnet',
     "m/44'/0'/0'": 'p2pkh:bitcoin',
@@ -44,8 +52,10 @@ const _getDescriptorNetwork = (expression: string) => {
     return BJSNetworks[network];
 };
 
-const reformatDescriptorToBDK = (expression: string) => {
+const _reformatDescriptorToBDK = (expression: string) => {
     const parsedDescriptor = parseDescriptor(expression);
+
+    // Inhale descriptor and return stripped descriptor (no checksum)
 
     if (parsedDescriptor.isPublic) {
         // script([fingerprint+origin path]xkey/keypath)
@@ -57,8 +67,7 @@ const reformatDescriptorToBDK = (expression: string) => {
             ']' +
             parsedDescriptor.keyOnly +
             parsedDescriptor.keyPath +
-            parsedDescriptor.scriptSuffix +
-            parsedDescriptor.checksum
+            parsedDescriptor.scriptSuffix
         );
     } else {
         // script(xkey/key origin/keypath)
@@ -67,8 +76,7 @@ const reformatDescriptorToBDK = (expression: string) => {
             parsedDescriptor.keyOnly +
             parsedDescriptor.path.slice(1) +
             parsedDescriptor.keyPath +
-            parsedDescriptor.scriptSuffix +
-            parsedDescriptor.checksum
+            parsedDescriptor.scriptSuffix
         );
     }
 };
@@ -120,13 +128,18 @@ export const createDescriptorFromString = (
 
         // Reformat to public descriptor format
         // script(xpub/key origin/keypath)
-        strippedDescriptor = reformatDescriptorToBDK(strippedDescriptor);
+        strippedDescriptor = _reformatDescriptorToBDK(strippedDescriptor);
     }
 
     // Update external if xpub-based
     external = strippedDescriptor;
     // Manipulate internal descriptor key path
     internal = strippedDescriptor.replace('0/*', '1/*');
+
+    // Reformat and include checksum
+    external = _reformatDescriptorToBDK(external);
+    internal = _reformatDescriptorToBDK(internal);
+    priv = _reformatDescriptorToBDK(priv);
 
     // Re-include checksums
     internal = internal + '#' + descriptors.checksum(internal);
@@ -137,9 +150,9 @@ export const createDescriptorFromString = (
     // We assume the descriptor has keypath in it
     // wpkh(xprv.../84'/0'/0'/0/*)
     return {
-        external: reformatDescriptorToBDK(external),
-        internal: reformatDescriptorToBDK(internal),
-        priv: reformatDescriptorToBDK(priv),
+        external: external,
+        internal: internal,
+        priv: priv,
     };
 };
 
@@ -163,6 +176,34 @@ export const createDescriptorFromXprv = (
     if (root.depth === 0) {
         try {
             switch (keyInfo.type) {
+                case 'p2tr':
+                    descriptorPrivate = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.p2tr[keyInfo.network].slice(1),
+                        keyPath: '/0/*',
+                        isPublic: false,
+                    });
+
+                    descriptorExternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.p2tr[keyInfo.network].slice(1),
+                        keyPath: '/0/*',
+                        isPublic: true,
+                    });
+
+                    descriptorInternal = descriptors.keyExpressionBIP32({
+                        masterNode: root,
+                        originPath: WalletPaths.p2tr[keyInfo.network].slice(1),
+                        keyPath: '/1/*',
+                        isPublic: true,
+                    });
+
+                    // wrap descriptor in script
+                    descriptorPrivate = `tr(${descriptorPrivate})`;
+                    descriptorExternal = `tr(${descriptorExternal})`;
+                    descriptorInternal = `tr(${descriptorInternal})`;
+
+                    break;
                 case 'wpkh':
                     descriptorPrivate = descriptors.keyExpressionBIP32({
                         masterNode: root,
@@ -226,9 +267,9 @@ export const createDescriptorFromXprv = (
 
             // Clean up descriptor to fit BDK format
             // wpkh(xprv.../84'/0'/0'/0/*)
-            descriptorPrivate = reformatDescriptorToBDK(descriptorPrivate);
-            descriptorExternal = reformatDescriptorToBDK(descriptorExternal);
-            descriptorInternal = reformatDescriptorToBDK(descriptorInternal);
+            descriptorPrivate = _reformatDescriptorToBDK(descriptorPrivate);
+            descriptorExternal = _reformatDescriptorToBDK(descriptorExternal);
+            descriptorInternal = _reformatDescriptorToBDK(descriptorInternal);
 
             // Re-include appropriate checksums
             descriptorPrivate =
@@ -255,6 +296,27 @@ export const createDescriptorFromXprv = (
         const xpub = root.neutered().toBase58();
 
         switch (keyInfo.type) {
+            case 'p2tr':
+                descriptorPrivate =
+                    'tr' +
+                    '(' +
+                    xprv +
+                    WalletPaths.p2tr[keyInfo.network].slice(1) +
+                    '/0/*)';
+                descriptorExternal =
+                    'tr' +
+                    '(' +
+                    xpub +
+                    WalletPaths.p2tr[keyInfo.network].slice(1) +
+                    '/0/*)';
+                descriptorInternal =
+                    'tr' +
+                    '(' +
+                    xpub +
+                    WalletPaths.p2tr[keyInfo.network].slice(1) +
+                    '/1/*)';
+
+                break;
             case 'wpkh':
                 descriptorPrivate =
                     'wpkh' +
@@ -300,9 +362,9 @@ export const createDescriptorFromXprv = (
         }
 
         // Reformat to BDK format
-        descriptorPrivate = reformatDescriptorToBDK(descriptorPrivate);
-        descriptorExternal = reformatDescriptorToBDK(descriptorExternal);
-        descriptorInternal = reformatDescriptorToBDK(descriptorInternal);
+        descriptorPrivate = _reformatDescriptorToBDK(descriptorPrivate);
+        descriptorExternal = _reformatDescriptorToBDK(descriptorExternal);
+        descriptorInternal = _reformatDescriptorToBDK(descriptorInternal);
 
         // Re-include checksums
         descriptorPrivate =
@@ -323,6 +385,49 @@ export const createDescriptorFromXprv = (
         external: External,
         internal: Internal,
     };
+};
+
+export const fromDescriptorPublicPTR = (
+    pubKey: string,
+    fingerprint: string,
+    type: string,
+    network: TNetwork,
+) => {
+    // Just pass over the pub from manual string manipulation
+    const canonicalPath = network === ENet.Testnet ? "86'/1'/0'" : "86'/0'/0'";
+
+    if (type !== 'p2tr') {
+        throw new Error('Function only attends to Pay to Taproot');
+    }
+
+    let externalDescriptor = `tr([${fingerprint}/${canonicalPath}]${pubKey}/0/*)`;
+    let internalDescriptor = `tr([${fingerprint}/${canonicalPath}]${pubKey}/1/*)`;
+    let privateDescriptor = externalDescriptor;
+
+    let ExternalDescriptor = _reformatDescriptorToBDK(externalDescriptor);
+    ExternalDescriptor =
+        ExternalDescriptor + '#' + descriptors.checksum(ExternalDescriptor);
+    let InternalDescriptor = _reformatDescriptorToBDK(internalDescriptor);
+    InternalDescriptor =
+        InternalDescriptor + '#' + descriptors.checksum(InternalDescriptor);
+    let PrivateDescriptor = _reformatDescriptorToBDK(privateDescriptor);
+    PrivateDescriptor =
+        PrivateDescriptor + '#' + descriptors.checksum(PrivateDescriptor);
+
+    return {
+        ExternalDescriptor,
+        InternalDescriptor,
+        PrivateDescriptor,
+    };
+};
+
+export const fromDescriptorPTR = (mnemonic: string, network: TNetwork) => {
+    const rootPath = network === ENet.Testnet ? "m/86'/1'/0'" : "m/86'/0'/0'";
+    const rootKey = generateRootFromMnemonic(mnemonic, rootPath, network);
+
+    const xprv = rootKey.toBase58();
+
+    return createDescriptorFromXprv(xprv);
 };
 
 // Get descriptor components
@@ -360,6 +465,8 @@ export const parseDescriptor = (expression: string) => {
                 `Checksum is ${checksumLength < 9 ? 'incomplete' : 'too long'}`,
             );
         }
+
+        console.log('[Error Catch] ', e);
 
         throw new Error('Could not parse descriptor');
     }
@@ -452,13 +559,13 @@ export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
     // Rebuild internal descriptor
     let privateInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
     // re-include checksum
+    privateInternalDescriptor = _reformatDescriptorToBDK(
+        privateInternalDescriptor,
+    );
     privateInternalDescriptor =
         privateInternalDescriptor +
         '#' +
         descriptors.checksum(privateInternalDescriptor);
-    privateInternalDescriptor = reformatDescriptorToBDK(
-        privateInternalDescriptor,
-    );
 
     return {
         external: privateExternalDescriptor,

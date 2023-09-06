@@ -221,6 +221,9 @@ export const fromDescriptorTemplatePublic = async (
     let PrivateDescriptor!: string;
 
     switch (type) {
+        case 'p2tr': {
+            throw new Error('Not Omplemented Yet!');
+        }
         case 'wpkh': {
             const externalDescriptor =
                 await new BDK.Descriptor().newBip84Public(

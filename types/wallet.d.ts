@@ -3,6 +3,7 @@ import 'react';
 
 import BigNumber from 'bignumber.js';
 
+import {TaprootWallet} from '../class/wallet/p2tr';
 import {SegWitNativeWallet} from '../class/wallet/segwit/wpkh';
 import {SegWitP2SHWallet} from '../class/wallet/segwit/shp2wpkh';
 import {LegacyWallet} from '../class/wallet/p2pkh';
@@ -15,7 +16,11 @@ import {ENet} from './enums';
 
 export type TNetwork = ENet | Network;
 
-export type TWalletType = SegWitNativeWallet | LegacyWallet | SegWitP2SHWallet;
+export type TWalletType =
+    | TaprootWallet
+    | SegWitNativeWallet
+    | LegacyWallet
+    | SegWitP2SHWallet;
 export type TComboWallet = TWalletType & TMiniWallet;
 
 export type TMiniWallet = {
