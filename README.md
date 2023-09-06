@@ -9,7 +9,7 @@ A Modern Descriptor based Sovereign Bitcoin Wallet
 
 # Features
 
-- [x] Descriptor-based HD wallet (wpkh(), pkh(), sh(wpkh()))
+- [x] Descriptor-based HD wallet (wpkh(), pkh(), sh(wpkh()), tr())
 - [x] Watch Only (public descriptor / extended public key)
 - [x] Multi-wallet support
 - [ ] Multi-lingual
@@ -18,7 +18,6 @@ A Modern Descriptor based Sovereign Bitcoin Wallet
 - [ ] Multi-Signature Descriptors
 - [ ] Lightning Network
 - [ ] Hardware Wallets (BitBox)
-- [ ] BIP86 Taproot
 - [ ] Nostr key signing & management
 
 #### Supported BIPs
@@ -28,6 +27,7 @@ A Modern Descriptor based Sovereign Bitcoin Wallet
 - [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) Multi-Account Hierarchy for Deterministic Wallets
 - [BIP49](https://github.com/bitcoin/bips/blob/master/bip-0049.mediawiki) Derivation scheme for P2WPKH-nested-in-P2SH based accounts
 - [BIP84](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki) Derivation scheme for P2WPKH based accounts
+- [BIP86](https://github.com/bitcoin/bips/blob/master/bip-0086.mediawiki) Derivation scheme for PTR based accounts
 - [BIP173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki) Base32 address format for native v0-16 witness outputs
 - [BIP174](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki) Partially Signed Bitcoin Transactions
 - [BIP21](https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki) URI Scheme
