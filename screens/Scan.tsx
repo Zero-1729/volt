@@ -185,6 +185,12 @@ const Scan = ({route}: Props) => {
             return;
         }
 
+        // Check that invoice amount above dust limit
+        if (amount.multipliedBy(100000000).isLessThanOrEqualTo(546)) {
+            updateScannerAlert('Invoice amount is below dust limit');
+            return;
+        }
+
         // Check can send to address
         if (!canSendToInvoice(decodedInvoice, route.params.wallet)) {
             updateScannerAlert(
