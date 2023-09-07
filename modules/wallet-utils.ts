@@ -482,7 +482,9 @@ export const canSendToInvoice = (
     // Handle special case for WPKH & P2TR
     const prefixTip = invoice.address[0];
     const prefixStub =
-        prefixTip === 'b' ? invoice.address.slice(0, 4) : prefixTip;
+        prefixTip === 'b' || prefixTip === 't'
+            ? invoice.address.slice(0, 4)
+            : prefixTip;
     const invoicePrefixInfo = prefixInfo[prefixStub];
 
     switch (invoicePrefixInfo?.type) {
