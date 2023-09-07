@@ -1,7 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import {Text, View, useColorScheme, Linking} from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
+import {
+    Text,
+    View,
+    useColorScheme,
+    Linking,
+    ActivityIndicator,
+} from 'react-native';
+import React, {useState, useEffect, useContext} from 'react';
 
 import {useNavigation, StackActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -188,6 +194,12 @@ const StatusRender = (statusMessage: string) => {
                     ]}>
                     {statusMessage}
                 </Text>
+
+                <ActivityIndicator
+                    style={[tailwind('mt-4')]}
+                    size="small"
+                    color={ColorScheme.SVG.Default}
+                />
             </View>
 
             {/* Replace with loading status bars below */}
