@@ -150,7 +150,7 @@ const SendView = ({route}: Props) => {
                         />
                     </View>
 
-                    <View style={[tailwind('mt-12')]}>
+                    <View style={[tailwind('mt-12 w-4/5')]}>
                         <PlainButton onPress={() => {}}>
                             <View
                                 style={[
