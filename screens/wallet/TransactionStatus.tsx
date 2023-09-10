@@ -7,7 +7,7 @@ import {
     Linking,
     ActivityIndicator,
 } from 'react-native';
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useLayoutEffect, useContext} from 'react';
 
 import {useNavigation, StackActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -91,25 +91,22 @@ const DoneRender = (
 
             <View style={[tailwind('-mt-12 justify-center px-4 items-center')]}>
                 <View style={[tailwind('items-center')]}>
-                    {statusInfo.status === 'failed' ? (
+                    {statusInfo.status === 'failed' && (
                         <Failed
                             style={[tailwind('self-center')]}
                             fill={ColorScheme.SVG.Default}
                             height={128}
                             width={128}
                         />
-                    ) : (
-                        <></>
                     )}
-                    {statusInfo.status === 'success' ? (
+
+                    {statusInfo.status === 'success' && (
                         <Success
                             style={[tailwind('self-center')]}
                             fill={ColorScheme.SVG.Default}
                             height={128}
                             width={128}
                         />
-                    ) : (
-                        <></>
                     )}
                 </View>
 
@@ -208,23 +205,27 @@ const StatusRender = (statusMessage: string) => {
 };
 
 const TransactionStatus = ({route}: Props) => {
-    const tailwind = useTailwind();
-    const ColorScheme = Color(useColorScheme());
-
     const {electrumServerURL, isAdvancedMode} = useContext(AppStorageContext);
 
     const [statusMessage, setStatusMessage] = useState('');
-    const [showStatus, setShowStatus] = useState(false);
     const [statusInfo, setStatusInfo] = useState<TStatusInfo>({
         status: '',
         txId: '',
         message: '',
     });
 
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    // Start process of tx build and send
+    useLayoutEffect(() => {
+        initSend();
+    }, []);
+
     const initSend = async () => {
         // For now, only single sends are supported
         // Update wallet descriptors to private version
-        const descriptors = await getPrivateDescriptors(
+        const descriptors = getPrivateDescriptors(
             route.params.wallet.privateDescriptor,
         );
 
@@ -252,8 +253,6 @@ const TransactionStatus = ({route}: Props) => {
         );
 
         await updateStatusInfo(broadcasted, psbt, errorMessage);
-
-        setShowStatus(true);
     };
 
     const updateStatusInfo = async (
@@ -268,11 +267,6 @@ const TransactionStatus = ({route}: Props) => {
         });
     };
 
-    // Start process of tx build and send
-    useEffect(() => {
-        initSend();
-    }, []);
-
     return (
         <SafeAreaView edges={['right', 'left', 'bottom']}>
             <View
@@ -284,13 +278,13 @@ const TransactionStatus = ({route}: Props) => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                {showStatus
-                    ? DoneRender(
-                          statusInfo,
-                          route.params.network,
-                          isAdvancedMode,
-                      )
-                    : StatusRender(statusMessage)}
+                {!!statusInfo.status &&
+                    DoneRender(
+                        statusInfo,
+                        route.params.network,
+                        isAdvancedMode,
+                    )}
+                {!!statusInfo.status && StatusRender(statusMessage)}
             </View>
         </SafeAreaView>
     );
