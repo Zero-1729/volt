@@ -1,12 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
-import {Text, useColorScheme, View} from 'react-native';
+import {Text, useColorScheme, View, ActivityIndicator} from 'react-native';
 
 import {AppStorageContext} from '../../class/storageContext';
 
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {useNetInfo} from '@react-native-community/netinfo';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -23,6 +25,7 @@ import {Address} from 'bdk-rn';
 
 import Close from '../../assets/svg/x-24.svg';
 import {WalletParamList} from '../../Navigation';
+import {errorAlert, liberalAlert} from '../../components/alert';
 
 type Props = NativeStackScreenProps<WalletParamList, 'AddressOwnership'>;
 
@@ -38,7 +41,14 @@ const AddressOwnership = ({route}: Props) => {
 
     const {electrumServerURL} = useContext(AppStorageContext);
 
+    const networkState = useNetInfo();
+
     const checkAddressOwnership = async () => {
+        if (!networkState.isInternetReachable) {
+            errorAlert('Network', 'Cannot connect to Internet.');
+            return;
+        }
+
         setLoading(true);
 
         const wallet = route.params.wallet;
@@ -49,18 +59,22 @@ const AddressOwnership = ({route}: Props) => {
 
         setResultMessage('Scanning wallet addresses...');
 
-        let _w = await createBDKWallet(wallet as TComboWallet);
-        _w = await syncBdkWallet(_w, () => {}, network, electrumServerURL);
+        try {
+            let _w = await createBDKWallet(wallet as TComboWallet);
+            _w = await syncBdkWallet(_w, () => {}, network, electrumServerURL);
 
-        const bdkAddr = await new Address().create(address);
-        const script = await bdkAddr.scriptPubKey();
+            const bdkAddr = await new Address().create(address);
+            const script = await bdkAddr.scriptPubKey();
 
-        const isOwnedByYou = await _w.isMine(script);
+            const isOwnedByYou = await _w.isMine(script);
 
-        if (isOwnedByYou) {
-            setResultMessage('Address is owned by this wallet');
-        } else {
-            setResultMessage('Address is not owned by this wallet');
+            if (isOwnedByYou) {
+                setResultMessage('Address is owned by this wallet');
+            } else {
+                setResultMessage('Address is not owned by this wallet');
+            }
+        } catch (e: any) {
+            errorAlert('Network', e.message);
         }
 
         setLoading(false);
@@ -165,6 +179,14 @@ const AddressOwnership = ({route}: Props) => {
                         ]}>
                         {resultMessage}
                     </Text>
+
+                    {loading && (
+                        <ActivityIndicator
+                            style={[tailwind('mt-4')]}
+                            size="small"
+                            color={ColorScheme.SVG.Default}
+                        />
+                    )}
                 </View>
 
                 {/* Checker Button */}
