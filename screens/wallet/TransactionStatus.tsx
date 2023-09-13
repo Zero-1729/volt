@@ -278,13 +278,13 @@ const TransactionStatus = ({route}: Props) => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
+                {!statusInfo.status && StatusRender(statusMessage)}
                 {!!statusInfo.status &&
                     DoneRender(
                         statusInfo,
                         route.params.network,
                         isAdvancedMode,
                     )}
-                {!!statusInfo.status && StatusRender(statusMessage)}
             </View>
         </SafeAreaView>
     );
