@@ -489,28 +489,30 @@ export const canSendToInvoice = (
 
     switch (invoicePrefixInfo?.type) {
         case 'p2pkh':
-            // Can send to P2PKH if wallet is Segwit Wrapped ('shp2wpkh') or Legacy ('p2pkh')
+            // Can send to p2pkh if wallet is shp2wpkh, wpkh, p2tr, or p2pkh
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
-                    miniWallet.type === 'shp2wpkh')
+                    miniWallet.type === 'shp2wpkh' ||
+                    miniWallet.type === 'wpkh' ||
+                    miniWallet.type === 'p2tr')
             );
         case 'shp2wpkh':
-            // Can send to Segwit Wrapped if wallet is Native Segwit ('wpkh') or Segwit Wrapped ('shp2wpkh')
+            // Can send to shp2wpkh if wallet is wpkh, shp2wpkh
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'wpkh')
             );
         case 'wpkh':
-            // Can send to WPKH if wallet is Segwit Wrapped ('shp2wpkh') or Native Segwit ('wpkh')
+            // Can send to wpkh if wallet is shp2wpkh, wpkh, p2tr
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
-                    miniWallet.type === 'shp2wpkh')
+                    miniWallet.type === 'shp2wpkh' || miniWallet.type === 'p2tr')
             );
         case 'p2tr':
-            // Can send to P2TR if wallet is P2TR, WPKH, or SH-WPKH
+            // Can send to p2tr if wallet is p2tr, wpkh, or shp2wpkh
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
