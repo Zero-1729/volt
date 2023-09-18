@@ -3128,13 +3128,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remobile/react-native-qrcode-local-image@github:Zero-1729/react-native-qrcode-local-image#b1077073c13cdd6d8e17da77c61d9ea4de075ecb":
-  version: 1.0.4
-  resolution: "@remobile/react-native-qrcode-local-image@https://github.com/Zero-1729/react-native-qrcode-local-image.git#commit=b1077073c13cdd6d8e17da77c61d9ea4de075ecb"
-  checksum: d2b645c96501ab03fa690d54bc930448f0697dd53877703e1b44d7630567a70f76e9e6d96d705f4f6176e50a15eb71ce4ca36b0aeaaef7ecdc99cc6fc0dbe57a
-  languageName: node
-  linkType: hard
-
 "@scure/base@npm:^1.1.1":
   version: 1.1.1
   resolution: "@scure/base@npm:1.1.1"
@@ -4471,9 +4464,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bdk-rn@github:LtbLightning/bdk-rn#dd46e3175022ca63604fa24013dab7ddf431c2d6":
+"bdk-rn@https://github.com/LtbLightning/bdk-rn#4a8e84f65d984af8ffbef4ec44be55f272e171fc":
   version: 0.29.0
-  resolution: "bdk-rn@https://github.com/LtbLightning/bdk-rn.git#commit=dd46e3175022ca63604fa24013dab7ddf431c2d6"
+  resolution: "bdk-rn@https://github.com/LtbLightning/bdk-rn.git#commit=4a8e84f65d984af8ffbef4ec44be55f272e171fc"
   dependencies:
     "@synonymdev/result": 0.0.2
     adm-zip: ^0.5.9
@@ -4481,7 +4474,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 9fa5c0e6a1a638db70808de3b7748e87e455026aa5b99716bdfab74fc9b8cbf127a13d4801e9d0d0818efe3d2fa03eaf8416f3df81312da06aaad395036258dc
+  checksum: 1d0634d27de3318e2b0fd22d634f4e478425902f55aea90c578298cc34664e2ec98d73bee4965943fa196fc1d672fbe7a021489ff6af764a7ba9015b3286c739
   languageName: node
   linkType: hard
 
@@ -12110,7 +12103,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:*, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.0, prop-types@npm:^15.8.1":
+"prop-types@npm:*, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -12301,15 +12294,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-freeze@npm:^1.0.0":
-  version: 1.0.3
-  resolution: "react-freeze@npm:1.0.3"
-  peerDependencies:
-    react: ">=17.0.0"
-  checksum: 4258eabdbbf74aaebc38ad1fd7cfdc1984d2a844a2247b39a341c55c1beb02d5e855e6473ec5683205a52b2251d0f7dffa07cd8100f402dd2698af88b932d946
-  languageName: node
-  linkType: hard
-
 "react-is@npm:^16.12.0 || ^17.0.0 || ^18.0.0, react-is@npm:^18.0.0, react-is@npm:^18.1.0":
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
@@ -12406,6 +12390,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-flipper@npm:^0.191.0":
+  version: 0.191.0
+  resolution: "react-native-flipper@npm:0.191.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-native: ">0.62.0"
+  checksum: 102262e3f6b2a55d1131e3c5a4df70f5f3c6d0fe2c91bd30d789fd7728a5f2ac656defecd00bb5889f215e06c1bd27a8265af89fe83b22e85ea557c515b0e185
+  languageName: node
+  linkType: hard
+
 "react-native-fs@npm:^2.20.0":
   version: 2.20.0
   resolution: "react-native-fs@npm:2.20.0"
@@ -12435,13 +12429,6 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 1aec3d71c5fd3b8087e613708ee77a0ce7a1ac2bc87f5a6a22529300795b48aaa2359bcba7309f2c14f9de1ca1ffa4904d06b3cb7263820f657a4469976aecb3
-  languageName: node
-  linkType: hard
-
-"react-native-gradle-plugin@npm:^0.0.7":
-  version: 0.0.7
-  resolution: "react-native-gradle-plugin@npm:0.0.7"
-  checksum: 959ce3bcbc8362909210fae894e4b414a0afdff39fe1683463214b7feddae6beaf8584ebe62323b1e91ba31de00311e826588e0d807c93a949e445b1770cac27
   languageName: node
   linkType: hard
 
@@ -12528,28 +12515,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-qrcode-svg@npm:^6.2.0":
-  version: 6.2.0
-  resolution: "react-native-qrcode-svg@npm:6.2.0"
+"react-native-qrcode-styled@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "react-native-qrcode-styled@npm:0.2.1"
   dependencies:
-    prop-types: ^15.8.0
     qrcode: ^1.5.1
   peerDependencies:
     react: "*"
-    react-native: ">=0.63.4"
-    react-native-svg: ^13.2.0
-  checksum: e4e8a709900e16cf0116e9c5edd8ff7150cfbbb2c9763a5a7b171ba6efb1f84d8b93b919dedb915d16686d7a8b0c49c905c62dcbd86f98d471b1c0bcec6f1ae3
+    react-native: "*"
+    react-native-svg: "*"
+  checksum: a7400702d5309d9bcc3bc9e146275170188259a73c133b824774726677865b981a070ed5da5222d69c3463806a86376768ae8a7c078c4b8063f5f47bfe44fd8c
   languageName: node
   linkType: hard
 
-"react-native-quick-actions@npm:^0.3.13":
-  version: 0.3.13
-  resolution: "react-native-quick-actions@npm:0.3.13"
-  checksum: c3d52043d26ce8fd7b95d8158d8b03e4d00463fc60c96e5b8f1b7817b62e8683c758ff665e4e42ece75d3e299c680432937ed5774e28aedf2fe52f02937fa812
-  languageName: node
-  linkType: hard
-
-"react-native-quick-base64@npm:^2.0.5":
+"react-native-quick-base64@npm:^2.0.5, react-native-quick-base64@npm:^2.0.7":
   version: 2.0.7
   resolution: "react-native-quick-base64@npm:2.0.7"
   dependencies:
@@ -12618,19 +12597,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-screens@npm:^3.20.0":
-  version: 3.24.0
-  resolution: "react-native-screens@npm:3.24.0"
-  dependencies:
-    react-freeze: ^1.0.0
-    warn-once: ^0.1.0
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: e6eedf2f57eccd22ee9c0ec7a6cd92603db71f22206985b219b88b28f1db5d0e599df68a427ee31b171dcbf8adf23db9b98ffb38f12ffb1a59ec53e1a5a0bc0d
-  languageName: node
-  linkType: hard
-
 "react-native-secure-key-store@npm:^2.0.9":
   version: 2.0.10
   resolution: "react-native-secure-key-store@npm:2.0.10"
@@ -12669,16 +12635,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-svg@npm:^12.3.0":
-  version: 12.5.1
-  resolution: "react-native-svg@npm:12.5.1"
+"react-native-svg@npm:^13.13.0":
+  version: 13.13.0
+  resolution: "react-native-svg@npm:13.13.0"
   dependencies:
     css-select: ^5.1.0
     css-tree: ^1.1.3
   peerDependencies:
     react: "*"
-    react-native: ">=0.50.0"
-  checksum: e51a4eccb205c433c088087500b9da6a2956b2f5937ca18211243d033c2f57c9e720167222c394aa660fa070c417ea120ba9542cc3a6b178d0017895b7d35d2e
+    react-native: "*"
+  checksum: 533365186d868f8220dc9c247cc7f8a4e1b6ff73bd9530e5feff1bac9157225bae683f2cc148f00210080f29e02f5b2f673b536198d456e69870748e4e2b8998
   languageName: node
   linkType: hard
 
@@ -12689,13 +12655,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@npm:^v2.15.6":
-  version: 2.15.6
-  resolution: "react-native-vision-camera@npm:2.15.6"
+"react-native-vision-camera@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-native-vision-camera@npm:3.0.0"
+  dependencies:
+    string-hash-64: ^1.0.3
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 275e919491569fdc26ce2a0261d614b4a0afdc82f4650519d113cbcb7d8b7656b3160075367bd4e0d521e74d58e85040c62cab244c0f8c004a61ff6ae9e3ca36
+    react-native-worklets-core: "*"
+  peerDependenciesMeta:
+    react-native-worklets-core:
+      optional: true
+  checksum: fd5530e15aa64ec72dfc2f069ba40d600c364ca6ee480f161c9847468ac198660fab3c6b1abbdd0b25dd9c46d5a9b7dae72ad356579542651f2975f58d9e79b6
   languageName: node
   linkType: hard
 
@@ -12747,9 +12719,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:^0.71.6":
-  version: 0.71.12
-  resolution: "react-native@npm:0.71.12"
+"react-native@npm:^0.71.7":
+  version: 0.71.13
+  resolution: "react-native@npm:0.71.13"
   dependencies:
     "@jest/create-cache-key-function": ^29.2.1
     "@react-native-community/cli": 10.2.4
@@ -12790,7 +12762,7 @@ __metadata:
     react: 18.2.0
   bin:
     react-native: cli.js
-  checksum: 5de4f8754641f0ea463a6e0f2e01de82ad51cee52f44cf704742e6dba09b1e24818f1d6d3d6c9b9591930f5d453acc5220ac628746b72d7624e2cdf051934635
+  checksum: c895895b88af8a9268ea0d919d41637cabd5450b8397f4e2609095e09925f583471c27b722e78cb583f0e1fdc27f0db09610a95b4bba0bf817081132c695006d
   languageName: node
   linkType: hard
 
@@ -15036,17 +15008,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vision-camera-code-scanner-fix-55@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "vision-camera-code-scanner-fix-55@npm:0.2.1"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-    react-native-vision-camera: ">=2.9.4"
-  checksum: 0a41c85283b66502af364c734e3b2b76e1daad7715ec82350457f436b92335869fb66dee410c302ccea3b44358f6dc4f1983c16db2bfc035bc8a14954beaa402
-  languageName: node
-  linkType: hard
-
 "vlq@npm:^1.0.0":
   version: 1.0.1
   resolution: "vlq@npm:1.0.1"
@@ -15077,7 +15038,6 @@ __metadata:
     "@react-navigation/native-stack": ^6.9.10
     "@react-navigation/stack": ^6.3.13
     "@realm/react": ^0.4.3
-    "@remobile/react-native-qrcode-local-image": "github:Zero-1729/react-native-qrcode-local-image#b1077073c13cdd6d8e17da77c61d9ea4de075ecb"
     "@tsconfig/react-native": ^2.0.2
     "@types/bs58check": ^2.1.0
     "@types/jest": ^29.2.1
@@ -15087,7 +15047,7 @@ __metadata:
     assert: ^2.0.0
     babel-jest: ^29.2.1
     babel-plugin-module-resolver: ^5.0.0
-    bdk-rn: "github:LtbLightning/bdk-rn#dd46e3175022ca63604fa24013dab7ddf431c2d6"
+    bdk-rn: "https://github.com/LtbLightning/bdk-rn#4a8e84f65d984af8ffbef4ec44be55f272e171fc"
     bech32: ^1.1.4
     bignumber.js: ^9.1.1
     bip21: ^2.0.3
@@ -15122,16 +15082,17 @@ __metadata:
     prettier: ^2.8.8
     process: ^0.11.10
     react: 18.2.0
-    react-native: ^0.71.6
+    react-native: ^0.71.7
     react-native-bouncy-checkbox: ^3.0.6
     react-native-default-preference: ^1.4.3
     react-native-device-info: ^8.1.4
     react-native-document-picker: ^5.2.0
     react-native-dropdown-picker: ^5.4.4
     react-native-eject: ^0.1.2
+    react-native-flipper: ^0.191.0
     react-native-fs: ^2.20.0
     react-native-gesture-handler: ^2.6.0
-    react-native-gradle-plugin: ^0.0.7
+    react-native-gradle-plugin: ^0.71.19
     react-native-haptic-feedback: ^1.11.0
     react-native-image-picker: ^4.0.6
     react-native-keychain: ^8.1.0
@@ -15141,21 +15102,19 @@ __metadata:
     react-native-popup-menu-android: ^1.0.3
     react-native-privacy-snapshot: ^1.0.0
     react-native-prompt-android: ^1.1.0
-    react-native-qrcode-svg: ^6.2.0
-    react-native-quick-actions: ^0.3.13
-    react-native-quick-base64: ^2.0.5
+    react-native-qrcode-styled: ^0.2.1
+    react-native-quick-base64: ^2.0.7
     react-native-quick-crypto: ^0.6.1
     react-native-reanimated: ^2.10.0
     react-native-remote-svg: ^2.0.6
     react-native-safe-area-context: ^4.5.0
-    react-native-screens: ^3.20.0
     react-native-secure-key-store: ^2.0.9
     react-native-share: ^9.2.3
     react-native-splash-screen: ^3.2.0
-    react-native-svg: ^12.3.0
+    react-native-svg: ^13.13.0
     react-native-svg-transformer: ^1.0.0
     react-native-tooltip: ^5.2.0
-    react-native-vision-camera: ^v2.15.6
+    react-native-vision-camera: ^3.0.0
     react-test-renderer: 18.1.0
     rn-nodeify: ^10.3.0
     scryptsy: ^2.1.0
@@ -15166,7 +15125,6 @@ __metadata:
     typescript: ^5.0.4
     url: ^0.11.0
     util: ^0.12.4
-    vision-camera-code-scanner-fix-55: ^0.2.1
     wif: ^2.0.6
   languageName: unknown
   linkType: soft
