@@ -95,14 +95,13 @@
     "react-native-svg": "^13.13.0",
     "react-native-svg-transformer": "^1.0.0",
     "react-native-tooltip": "^5.2.0",
-    "react-native-vision-camera": "^v2.15.6",
+    "react-native-vision-camera": "^3.0.0",
     "rn-nodeify": "^10.3.0",
     "scryptsy": "^2.1.0",
     "stream-browserify": "^3.0.0",
     "tailwind-rn": "^4.2.0",
     "url": "^0.11.0",
     "util": "^0.12.4",
-    "vision-camera-code-scanner-fix-55": "^0.2.1",
     "wif": "^2.0.6"
   },
   "devDependencies": {
