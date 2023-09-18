@@ -1,5 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import React, {
     useContext,
     useState,
@@ -203,15 +204,19 @@ const Receive = ({route}: Props) => {
                         style={[
                             tailwind('rounded'),
                             {
-                                borderWidth: 10,
-                                borderColor: 'white',
+                                borderWidth: 2,
+                                borderColor: ColorScheme.Background.Inverted,
                             },
                         ]}>
                         <QRCodeStyled
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Inverted,
+                            }}
                             data={BitcoinInvoice}
-                            style={{height: 255, width: 255}}
-                            padding={20}
+                            padding={10}
                             pieceSize={8}
+                            color={ColorScheme.Background.Default}
                             pieceCornerType={'rounded'}
                             isPiecesGlued={true}
                             pieceBorderRadius={4}

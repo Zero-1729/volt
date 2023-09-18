@@ -329,15 +329,30 @@ const Backup = () => {
                     </View>
 
                     {/* Display QR code with seed */}
-                    <View style={[tailwind('self-center mb-4')]}>
+                    <View
+                        style={[
+                            tailwind('rounded self-center mb-4'),
+                            {
+                                borderWidth: 2,
+                                borderColor: ColorScheme.Background.Inverted,
+                            },
+                        ]}>
                         <QRCodeStyled
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Inverted,
+                            }}
                             data={getQRData(backupMaterial)}
-                            style={{height: 255, width: 255}}
-                            padding={20}
-                            pieceSize={8}
+                            pieceSize={
+                                backupMaterial !== EBackupMaterial.Descriptor
+                                    ? 7
+                                    : 5
+                            }
+                            padding={10}
+                            color={ColorScheme.Background.Default}
                             pieceCornerType={'rounded'}
                             isPiecesGlued={true}
-                            pieceBorderRadius={4}
+                            pieceBorderRadius={2}
                         />
                     </View>
 
