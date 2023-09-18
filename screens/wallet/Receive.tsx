@@ -1,5 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import React, {
     useContext,
     useState,
@@ -30,7 +31,7 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import QRCode from 'react-native-qrcode-svg';
+import QRCodeStyled from 'react-native-qrcode-styled';
 import Close from '../../assets/svg/x-24.svg';
 
 import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
@@ -203,11 +204,23 @@ const Receive = ({route}: Props) => {
                         style={[
                             tailwind('rounded'),
                             {
-                                borderWidth: 10,
-                                borderColor: 'white',
+                                borderWidth: 2,
+                                borderColor: ColorScheme.Background.Inverted,
                             },
                         ]}>
-                        <QRCode value={BitcoinInvoice} size={225} />
+                        <QRCodeStyled
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Inverted,
+                            }}
+                            data={BitcoinInvoice}
+                            padding={10}
+                            pieceSize={8}
+                            color={ColorScheme.Background.Default}
+                            pieceCornerType={'rounded'}
+                            isPiecesGlued={true}
+                            pieceBorderRadius={4}
+                        />
                     </View>
                 </View>
 

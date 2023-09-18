@@ -46,8 +46,8 @@ const Info = () => {
     const walletData = getWalletData(currentWalletID);
 
     const HeadingBar = {
-        height: 2,
-        backgroundColor: ColorScheme.HeadingBar,
+        borderBottomWidth: 2,
+        borderColor: ColorScheme.HeadingBar,
     };
 
     const walletName = walletData.name;
@@ -184,7 +184,7 @@ const Info = () => {
                 </View>
 
                 {/* Allow user to change wallet name */}
-                <View style={[tailwind('w-5/6 mt-12')]}>
+                <View style={[tailwind('w-5/6 mt-12'), {marginBottom: 64}]}>
                     <View>
                         <Text
                             style={[
@@ -229,9 +229,6 @@ const Info = () => {
                         </View>
                     </View>
                 </View>
-
-                {/* View Divider */}
-                <View style={[tailwind('w-full my-8'), HeadingBar]} />
 
                 {/* Wallet Info */}
                 {/* Wallet Type Path and Master Fingerprint */}

@@ -331,8 +331,8 @@ const Wallet = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            {/* Fake status bar filler */}
-            <StatusBar barStyle={'light-content'} />
+            {/* status bar filler */}
+            <StatusBar barStyle={'light-content'} backgroundColor={CardColor} />
             <View
                 style={[
                     tailwind('absolute w-full h-16 top-0'),

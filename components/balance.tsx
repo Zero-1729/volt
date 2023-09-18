@@ -57,12 +57,12 @@ export const TXBalance = (props: TxBalanceProps) => {
                 <Text
                     numberOfLines={1}
                     style={[
-                        tailwind(
-                            `${props.balanceFontSize} font-bold self-start mr-2`,
-                        ),
-                        {color: props.fontColor},
-                        {marginTop: appUnit.name === 'sats' ? 1 : 0},
-                        Font.SatSymbol,
+                        {...Font.SatSymbol},
+                        tailwind(`${props.balanceFontSize} self-start mr-2`),
+                        {
+                            color: props.fontColor,
+                            marginTop: appUnit.name === 'sats' ? 1.5 : 0,
+                        },
                     ]}>
                     {appUnit.symbol}
                 </Text>

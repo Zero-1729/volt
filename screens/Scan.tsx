@@ -1,13 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, {useCallback, useEffect, useState} from 'react';
 
-import {Text, View, StyleSheet, useColorScheme, Linking} from 'react-native';
+import React, {useEffect, useState} from 'react';
+
 import {
-    useIsFocused,
-    CommonActions,
-    useNavigation,
-} from '@react-navigation/native';
+    Text,
+    View,
+    StyleSheet,
+    useColorScheme,
+    Linking,
+    Platform,
+} from 'react-native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
+
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
@@ -22,21 +27,7 @@ import decodeURI from 'bip21';
 
 import {canSendToInvoice} from '../modules/wallet-utils';
 
-import {
-    useCameraDevices,
-    Camera,
-    CameraPermissionStatus,
-    useFrameProcessor,
-    CameraRuntimeError,
-} from 'react-native-vision-camera';
-
-// Revert to base package when require cycle is fixed:
-// see https://github.com/rodgomesc/vision-camera-code-scanner/issues/55
-import {
-    BarcodeFormat,
-    scanBarcodes,
-    Barcode,
-} from 'vision-camera-code-scanner-fix-55';
+import {Camera, CameraType} from 'react-native-camera-kit';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
@@ -52,6 +43,12 @@ import InfoIcon from '../assets/svg/info-16.svg';
 
 import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
+
+enum Status {
+    AUTHORIZED = 'AUTHORIZED',
+    NOT_AUTHORIZED = 'NOT_AUTHORIZED',
+    UNKNOWN = 'UNKNOWN',
+}
 
 type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
 
@@ -122,21 +119,44 @@ const openSettings = () => {
 };
 
 const Scan = ({route}: Props) => {
-    const isFocused = useIsFocused();
     const tailwind = useTailwind();
     const navigation = useNavigation();
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
     // Else, we'll cut it out and let Camera View take over
-    const [isLoading, setIsLoading] = useState(true);
-    const [grantedPermission, setGrantedPermission] =
-        useState<CameraPermissionStatus>('not-determined');
-    const [isCamAvailable, setCamAvailable] = useState<boolean | null>(null);
+    const [grantedPermission, setGrantedPermission] = useState<Status>(
+        Status.UNKNOWN,
+    );
+    const [rawQRData, setRawQRData] = useState('');
+    const cameraRef = React.useRef<Camera>(null);
 
-    const onError = useCallback(async (error: CameraRuntimeError) => {
+    const onError = (error: any) => {
         conservativeAlert('QR Scan', error.message);
-    }, []);
+    };
+
+    const requestCamPerms = async () => {
+        const CamPermission =
+            Platform.OS === 'ios'
+                ? PERMISSIONS.IOS.CAMERA
+                : PERMISSIONS.ANDROID.CAMERA;
+
+        const checkResult = await check(CamPermission);
+
+        switch (checkResult) {
+            case RESULTS.UNAVAILABLE:
+            case RESULTS.BLOCKED:
+                setGrantedPermission(Status.NOT_AUTHORIZED);
+                break;
+            case RESULTS.DENIED:
+                // TODO: Handle
+                break;
+            case RESULTS.LIMITED:
+            case RESULTS.GRANTED:
+                setGrantedPermission(Status.AUTHORIZED);
+                break;
+        }
+    };
 
     // We want to make sure it the scanner isn't constantly scanning the frame
     // in the background, so we'll lock it until the user closes the alert
@@ -208,8 +228,18 @@ const Scan = ({route}: Props) => {
         return btcAmount.multipliedBy(100000000).toString();
     };
 
-    const onQRDetected = useCallback(async (QR: Barcode[]) => {
-        const rawQRData = QR[0].content.data as string;
+    const onQRDetected = (event: any) => {
+        if (scanLock) {
+            return;
+        }
+
+        const _QR = event.nativeEvent.codeStringValue;
+
+        if (_QR !== rawQRData) {
+            setRawQRData(_QR);
+        } else {
+            return;
+        }
 
         const decodedQR = handleInvalidInvoice(rawQRData);
 
@@ -246,79 +276,25 @@ const Scan = ({route}: Props) => {
                 );
             }
         }
-    }, []);
+    };
 
     const closeScreen = () => {
         navigation.dispatch(CommonActions.goBack());
     };
 
-    // Update permission state when permission changes.
-    const updatePermissions = useCallback(async () => {
-        const status = await Camera.requestCameraPermission();
-
-        setGrantedPermission(status);
-    }, []);
-
-    const updateCameraAvail = useCallback(async () => {
-        // Get available camera devices
-        const device = await Camera.getAvailableCameraDevices();
-
-        // If array empty, we assume no camera is available
-        setCamAvailable(device.length > 0);
-    }, []);
-
-    // Note, IOS simulator does not support the camera,
-    // so you need a physical device to test.
-    const devices = useCameraDevices();
-    const camera = devices.back;
-
     useEffect(() => {
-        // Update camera availability if not determined.
-        updateCameraAvail();
-
-        // If camera available initialized
-        // cut out of loading
-        if (isCamAvailable !== null) {
-            setIsLoading(false);
-        }
-    }, [isCamAvailable, updateCameraAvail]);
-
-    useEffect(() => {
-        // Update permission setting if not determined.
-        if (grantedPermission === 'not-determined') {
-            updatePermissions();
-        }
-    }, [grantedPermission, updatePermissions]);
-
-    const frameProcessor = useFrameProcessor(
-        frame => {
-            'worklet';
-
-            // If scan lock is true, we'll skip processing
-            if (!scanLock) {
-                const digestedFrame = scanBarcodes(frame, [
-                    BarcodeFormat.QR_CODE,
-                ]);
-
-                // Only attempt to handle QR if any detected in-frame
-                if (digestedFrame.length > 0) {
-                    // Pass detected QR to processing function
-                    runOnJS(onQRDetected)(digestedFrame);
-                }
-            }
-        },
-        [onQRDetected],
-    );
+        requestCamPerms();
+    }, []);
 
     // Display if permission is not granted,
     // then, request permission if not determined.
-    if (grantedPermission === 'denied') {
+    if (grantedPermission === Status.NOT_AUTHORIZED) {
         return <RequestPermView />;
     }
 
     // Display loading or camera unavailable; handle differently
-    if (isLoading || camera === undefined) {
-        return <LoadingView isCamAvailable={isCamAvailable} />;
+    if (Camera === undefined) {
+        return <LoadingView isCamAvailable={false} />;
     }
 
     const handleClipboard = async () => {
@@ -425,18 +401,19 @@ const Scan = ({route}: Props) => {
                         style={[
                             tailwind('h-2/5 w-4/5 border'),
                             {
-                                borderWidth: 2,
+                                borderWidth: 4,
                                 borderColor: 'white',
-                                borderRadius: 12,
                             },
                         ]}>
                         <Camera
-                            style={[styles.flexed, {borderRadius: 11}]}
-                            device={camera}
-                            isActive={isFocused}
-                            frameProcessor={frameProcessor}
-                            frameProcessorFps={1}
+                            style={[styles.flexed]}
                             onError={onError}
+                            CameraType={CameraType.Back}
+                            ref={cameraRef}
+                            flashMode={'off'} // TODO: Add flash mode
+                            scanBarcode={true}
+                            focusMode={'on'}
+                            onReadCode={onQRDetected}
                         />
                     </View>
                 </View>

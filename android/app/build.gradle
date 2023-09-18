@@ -74,7 +74,7 @@ def enableProguardInReleaseBuilds = false
  * give correct results when using with locales other than en-US. Note that
  * this variant is about 6MiB larger per architecture than default.
  */
-def jscFlavor = 'org.webkit:android-jsc:+'
+def jscFlavor = 'org.webkit:android-jsc-intl:+'
 
 /**
  * Private function to get the list of Native Architectures you want to build.
@@ -99,6 +99,13 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+    }
+
+    packagingOptions {
+        pickFirst 'lib/arm64-v8a/libcrypto.so'
+        pickFirst 'lib/armeabi-v7a/libcrypto.so'
+        pickFirst 'lib/x86_64/libcrypto.so'
+        pickFirst 'lib/x86/libcrypto.so'
     }
 
     splits {
@@ -150,8 +157,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
 
@@ -160,7 +166,7 @@ dependencies {
     }
 
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
-    
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

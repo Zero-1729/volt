@@ -1,9 +1,4 @@
 {
-	"fixed": {
-		"style": {
-			"position": "fixed"
-		}
-	},
 	"absolute": {
 		"style": {
 			"position": "absolute"

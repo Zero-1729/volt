@@ -8,7 +8,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {useNavigation, CommonActions} from '@react-navigation/core';
 
-import QRCode from 'react-native-qrcode-svg';
+import QRCodeStyled from 'react-native-qrcode-styled';
 import Checkbox from 'react-native-bouncy-checkbox';
 
 import {useTailwind} from 'tailwind-rn';
@@ -329,8 +329,31 @@ const Backup = () => {
                     </View>
 
                     {/* Display QR code with seed */}
-                    <View style={[tailwind('self-center mb-4')]}>
-                        <QRCode value={getQRData(backupMaterial)} size={225} />
+                    <View
+                        style={[
+                            tailwind('rounded self-center mb-4'),
+                            {
+                                borderWidth: 2,
+                                borderColor: ColorScheme.Background.Inverted,
+                            },
+                        ]}>
+                        <QRCodeStyled
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Inverted,
+                            }}
+                            data={getQRData(backupMaterial)}
+                            pieceSize={
+                                backupMaterial !== EBackupMaterial.Descriptor
+                                    ? 7
+                                    : 5
+                            }
+                            padding={10}
+                            color={ColorScheme.Background.Default}
+                            pieceCornerType={'rounded'}
+                            isPiecesGlued={true}
+                            pieceBorderRadius={2}
+                        />
                     </View>
 
                     {/* Display either seed or descriptor */}
