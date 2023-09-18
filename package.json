@@ -64,7 +64,7 @@
     "pbkdf2": "^3.1.2",
     "process": "^0.11.10",
     "react": "18.2.0",
-    "react-native": "^0.71.6",
+    "react-native": "^0.71.7",
     "react-native-bouncy-checkbox": "^3.0.6",
     "react-native-default-preference": "^1.4.3",
     "react-native-device-info": "^8.1.4",
