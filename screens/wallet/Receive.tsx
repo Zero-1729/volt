@@ -30,7 +30,7 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import QRCode from 'react-native-qrcode-svg';
+import QRCodeStyled from 'react-native-qrcode-styled';
 import Close from '../../assets/svg/x-24.svg';
 
 import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
@@ -207,7 +207,15 @@ const Receive = ({route}: Props) => {
                                 borderColor: 'white',
                             },
                         ]}>
-                        <QRCode value={BitcoinInvoice} size={225} />
+                        <QRCodeStyled
+                            data={BitcoinInvoice}
+                            style={{height: 255, width: 255}}
+                            padding={20}
+                            pieceSize={8}
+                            pieceCornerType={'rounded'}
+                            isPiecesGlued={true}
+                            pieceBorderRadius={4}
+                        />
                     </View>
                 </View>
 
