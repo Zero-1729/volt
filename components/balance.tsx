@@ -288,9 +288,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
             <Text
                 numberOfLines={1}
                 style={[
-                    tailwind(
-                        `${props.fontSize} font-bold self-center mt-0.5 mr-2`,
-                    ),
+                    tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
                     {color: ColorScheme.Text.Default},
                     Font.SatSymbol,
                 ]}>
