@@ -101,6 +101,13 @@ android {
         versionName "1.0"
     }
 
+    packagingOptions {
+        pickFirst 'lib/arm64-v8a/libcrypto.so'
+        pickFirst 'lib/armeabi-v7a/libcrypto.so'
+        pickFirst 'lib/x86_64/libcrypto.so'
+        pickFirst 'lib/x86/libcrypto.so'
+    }
+
     splits {
         abi {
             reset()
