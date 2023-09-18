@@ -36,7 +36,7 @@
     "@realm/react": "^0.4.3",
     "@remobile/react-native-qrcode-local-image": "github:Zero-1729/react-native-qrcode-local-image#b1077073c13cdd6d8e17da77c61d9ea4de075ecb",
     "assert": "^2.0.0",
-    "bdk-rn": "github:LtbLightning/bdk-rn#dd46e3175022ca63604fa24013dab7ddf431c2d6",
+    "bdk-rn": "https://github.com/LtbLightning/bdk-rn#4a8e84f65d984af8ffbef4ec44be55f272e171fc",
     "bech32": "^1.1.4",
     "bignumber.js": "^9.1.1",
     "bip21": "^2.0.3",
