@@ -92,7 +92,7 @@
     "react-native-secure-key-store": "^2.0.9",
     "react-native-share": "^9.2.3",
     "react-native-splash-screen": "^3.2.0",
-    "react-native-svg": "^12.3.0",
+    "react-native-svg": "^13.13.0",
     "react-native-svg-transformer": "^1.0.0",
     "react-native-tooltip": "^5.2.0",
     "react-native-vision-camera": "^v2.15.6",
