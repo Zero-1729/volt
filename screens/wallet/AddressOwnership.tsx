@@ -25,7 +25,7 @@ import {Address} from 'bdk-rn';
 
 import Close from '../../assets/svg/x-24.svg';
 import {WalletParamList} from '../../Navigation';
-import {errorAlert, liberalAlert} from '../../components/alert';
+import {errorAlert} from '../../components/alert';
 
 type Props = NativeStackScreenProps<WalletParamList, 'AddressOwnership'>;
 
