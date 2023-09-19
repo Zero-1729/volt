@@ -10,6 +10,7 @@ import {
 import {extendedKeyPatternG} from './re';
 import {TNetwork} from '../types/wallet';
 import {ENet} from '../types/enums';
+import {normalizeExtKey, getExtendedKeyPrefix} from './wallet-utils';
 
 const validPathTypes: {[index: string]: string} = {
     "m/86'/0'/0'": 'p2tr:bitcoin',
@@ -445,9 +446,11 @@ export const parseDescriptor = (expression: string) => {
 
     var descriptorObj!: any;
 
+    let normalizedDescriptor = _normalizeDescriptor(expression);
+
     try {
         descriptorObj = descriptor.expand({
-            expression: expression,
+            expression: normalizedDescriptor,
             network: network,
         });
     } catch (e: any) {
@@ -457,9 +460,9 @@ export const parseDescriptor = (expression: string) => {
 
         // Check if descriptor has a malformed checksum
         // i.e. whether too long or short
-        if (expression.includes('#')) {
+        if (normalizedDescriptor.includes('#')) {
             // We report accordingly based on the length of the checksum
-            const checksumLength = expression.split('#')[1].length;
+            const checksumLength = normalizedDescriptor.split('#')[1].length;
 
             throw new Error(
                 `Checksum is ${checksumLength < 9 ? 'incomplete' : 'too long'}`,
@@ -474,8 +477,8 @@ export const parseDescriptor = (expression: string) => {
     const descObjmap = descriptorObj.expansionMap['@0'];
 
     // For now, we only support single key descriptors
-    const partsByLeftBrace = expression.split('(');
-    const partsByRightBrace = expression.split(')');
+    const partsByLeftBrace = normalizedDescriptor.split('(');
+    const partsByRightBrace = normalizedDescriptor.split(')');
 
     var descriptorType!: string;
     var extractedPath = descObjmap?.path
@@ -571,4 +574,28 @@ export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
         external: privateExternalDescriptor,
         internal: privateInternalDescriptor,
     };
+};
+
+const _normalizeDescriptor = (descriptor: string) => {
+    // Normalize descriptor xkey
+    try {
+        const xkey = extendedKeyPatternG.exec(descriptor);
+        const innerKey = xkey !== null ? xkey[0] : '';
+
+        if (!innerKey) {
+            throw new Error('Invalid descriptor extended key.');
+        }
+
+        const prefix = getExtendedKeyPrefix(innerKey).slice(1);
+        const nxKey = normalizeExtKey(innerKey, prefix);
+
+        const normalizedDescriptor = descriptor.replace(
+            extendedKeyPatternG,
+            nxKey,
+        );
+
+        return normalizedDescriptor;
+    } catch (e: any) {
+        throw new Error('[restoreWallet] Invalid descriptor extended key.');
+    }
 };
