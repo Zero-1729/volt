@@ -158,7 +158,7 @@ const CreateAction = () => {
                             ? accountInfo[account][
                                   network === ENet.Testnet ? 1 : 0
                               ]
-                            : `Defaults to SegWit Native (address starts with '${
+                            : `Defaults to Taproot (address starts with '${
                                   network === ENet.Testnet ? 'tb1' : 'bc1'
                               }...')`}
                     </Text>
