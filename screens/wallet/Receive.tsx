@@ -205,13 +205,12 @@ const Receive = ({route}: Props) => {
                             tailwind('rounded'),
                             {
                                 borderWidth: 2,
-                                borderColor: ColorScheme.Background.Inverted,
+                                borderColor: ColorScheme.Background.QRBorder,
                             },
                         ]}>
                         <QRCodeStyled
                             style={{
-                                backgroundColor:
-                                    ColorScheme.Background.Inverted,
+                                backgroundColor: 'white',
                             }}
                             data={BitcoinInvoice}
                             padding={10}

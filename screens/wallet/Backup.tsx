@@ -334,13 +334,12 @@ const Backup = () => {
                             tailwind('rounded self-center mb-4'),
                             {
                                 borderWidth: 2,
-                                borderColor: ColorScheme.Background.Inverted,
+                                borderColor: ColorScheme.Background.QRBorder,
                             },
                         ]}>
                         <QRCodeStyled
                             style={{
-                                backgroundColor:
-                                    ColorScheme.Background.Inverted,
+                                backgroundColor: 'white',
                             }}
                             data={getQRData(backupMaterial)}
                             pieceSize={
