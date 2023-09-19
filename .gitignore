@@ -37,6 +37,7 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+android/app/debug/*
 
 # node.js
 #
@@ -50,6 +51,9 @@ package-lock.json
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+
+# eslint
+coverage/**
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
