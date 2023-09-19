@@ -204,7 +204,8 @@ const TransactionDetailsView = ({route}: Props) => {
                         style={[
                             tailwind(
                                 `text-sm text-center ${
-                                    route.params.tx.cpfp && isAdvancedMode
+                                    route.params.tx.isSelfOrBoost &&
+                                    isAdvancedMode
                                         ? 'mt-1 mb-2'
                                         : ''
                                 }`,
@@ -217,7 +218,7 @@ const TransactionDetailsView = ({route}: Props) => {
                     {/* Transaction type flags for RBF and CPFP */}
                     {isAdvancedMode && route.params.tx.rbf ? (
                         <View style={[tailwind('flex-row self-center')]}>
-                            {route.params.tx.cpfp ? (
+                            {route.params.tx.isSelfOrBoost ? (
                                 <View
                                     style={[
                                         tailwind(

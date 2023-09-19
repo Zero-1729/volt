@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
