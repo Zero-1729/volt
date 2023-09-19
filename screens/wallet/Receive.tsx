@@ -214,7 +214,7 @@ const Receive = ({route}: Props) => {
                             }}
                             data={BitcoinInvoice}
                             padding={10}
-                            pieceSize={8}
+                            pieceSize={6}
                             color={ColorScheme.Background.Default}
                             pieceCornerType={'rounded'}
                             isPiecesGlued={true}
