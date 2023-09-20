@@ -411,7 +411,7 @@ const Home = () => {
                         {/** Create a vertical scroll carousel for 'BaseCard */}
                         {wallets.length > 0 ? (
                             <FlatList
-                                style={[tailwind('w-full h-48 mb-4')]}
+                                style={[tailwind('w-full h-48')]}
                                 data={wallets}
                                 renderItem={renderCard}
                                 keyExtractor={item => item.id}
