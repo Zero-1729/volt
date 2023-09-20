@@ -145,6 +145,16 @@ export const isValidExtendedKey = (
     return isValid;
 };
 
+// Detect whether address valid bitcoin address
+export const isValidAddress = (address: string): boolean => {
+    try {
+        bitcoin.address.fromBech32(address);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
 // Deserialize Extended Key without Checksum
 const _deserializeExtendedKeyCheck = (key: string): Buffer => {
     const decodedBuffArray = b58c.decode(key);
