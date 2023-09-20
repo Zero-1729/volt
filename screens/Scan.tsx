@@ -25,7 +25,7 @@ import BigNumber from 'bignumber.js';
 
 import decodeURI from 'bip21';
 
-import {canSendToInvoice} from '../modules/wallet-utils';
+import {canSendToInvoice, isValidAddress} from '../modules/wallet-utils';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
 
@@ -181,6 +181,20 @@ const Scan = ({route}: Props) => {
     const handleInvalidInvoice = (invoice: string) => {
         let decodedInvoice;
         let amount!: BigNumber;
+
+        // Handle single btc supported address
+        if (!invoice.startsWith('bitcoin:')) {
+            let btcAddress = invoice;
+
+            try {
+                isValidAddress(btcAddress);
+            } catch (e: any) {
+                updateScannerAlert('Detected an invalid address');
+                return;
+            }
+
+            invoice = 'bitcoin:' + btcAddress;
+        }
 
         try {
             decodedInvoice = decodeURI.decode(invoice);
