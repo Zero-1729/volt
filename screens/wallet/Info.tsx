@@ -96,8 +96,6 @@ const Info = () => {
         // Only update if name is not empty
         if (name.trim().length > 1) {
             setTmpName(name);
-
-            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
         }
     };
 
@@ -191,7 +189,7 @@ const Info = () => {
                                 tailwind('text-sm text-left mb-2'),
                                 {color: 'white'},
                             ]}>
-                            Wallet Name
+                            Name
                         </Text>
                         <View
                             style={[
@@ -217,6 +215,10 @@ const Info = () => {
                                         tmpName.trim() !== walletName &&
                                         tmpName.trim().length > 1
                                     ) {
+                                        RNHapticFeedback.trigger(
+                                            'impactLight',
+                                            RNHapticFeedbackOptions,
+                                        );
                                         renameWallet(currentWalletID, tmpName);
                                     } else {
                                         // Otherwise, reset tmpName and clear input
