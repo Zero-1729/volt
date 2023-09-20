@@ -323,16 +323,32 @@ const Scan = ({route}: Props) => {
                 RNHapticFeedbackOptions,
             );
 
-            // Return clipboard data
-            runOnJS(navigation.dispatch)(
-                CommonActions.navigate('WalletRoot', {
-                    screen: 'Send',
-                    params: {
-                        invoiceData: decodedInvoice,
-                        wallet: route.params.wallet,
-                    },
-                }),
-            );
+            if (decodedInvoice.options.amount) {
+                // Update amount to sats
+                decodedInvoice.options.amount = convertBTCtoSats(
+                    decodedInvoice.options.amount,
+                );
+
+                runOnJS(navigation.dispatch)(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'Send',
+                        params: {
+                            invoiceData: decodedInvoice,
+                            wallet: route.params.wallet,
+                        },
+                    }),
+                );
+            } else {
+                runOnJS(navigation.dispatch)(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'SendAmount',
+                        params: {
+                            invoiceData: decodedInvoice,
+                            wallet: route.params.wallet,
+                        },
+                    }),
+                );
+            }
         }
     };
 
