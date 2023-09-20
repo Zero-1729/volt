@@ -78,9 +78,7 @@ const Fee = ({route}: Props) => {
                 style={[
                     tailwind('w-full h-full items-center'),
                     {
-                        borderTopLeftRadius: 32,
-                        borderTopRightRadius: 32,
-                        backgroundColor: ColorScheme.Background.Primary,
+                        backgroundColor: ColorScheme.Background.Inverted,
                     },
                 ]}>
                 <View
@@ -94,12 +92,12 @@ const Fee = ({route}: Props) => {
                             navigation.dispatch(CommonActions.goBack())
                         }
                         style={[tailwind('absolute z-10 left-6')]}>
-                        <Close fill={ColorScheme.SVG.Default} />
+                        <Close fill={ColorScheme.SVG.Inverted} />
                     </PlainButton>
                     <Text
                         style={[
                             tailwind('text-sm font-bold'),
-                            {color: ColorScheme.Text.Default},
+                            {color: ColorScheme.Text.Alt},
                         ]}>
                         Fee Rate Selection
                     </Text>
@@ -415,8 +413,8 @@ const Fee = ({route}: Props) => {
                 <LongBottomButton
                     title={'Custom'}
                     onPress={openFeeModal}
-                    backgroundColor={ColorScheme.Background.Inverted}
-                    textColor={ColorScheme.Text.Alt}
+                    backgroundColor={ColorScheme.Background.Primary}
+                    textColor={ColorScheme.Text.Default}
                 />
             </View>
         </SafeAreaView>
