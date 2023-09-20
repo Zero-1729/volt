@@ -2,9 +2,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
 
-import {useColorScheme, Text, View} from 'react-native';
+import {useColorScheme, Text, View, ActivityIndicator} from 'react-native';
 
 import {StackActions, useNavigation} from '@react-navigation/core';
+
+import screenOffsets from '../../constants/NativeWindowMetrics';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -50,6 +52,7 @@ const CreateAction = () => {
         defaultToTestnet ? ENet.Testnet : ENet.Bitcoin,
     );
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [account, setAccount] = useState('p2tr'); // Default to taproot
     const [accounts, setAccounts] = useState([
         {
@@ -89,12 +92,16 @@ const CreateAction = () => {
         try {
             // Clear wallet name
             setNewWalletName('');
+            setLoading(true);
 
             // Default wallet type is Segwit p2tr on Testnet
             await addWallet(walletName, type, network);
 
             // Vibrate to let user know the action was successful
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+
+            // Clear loading
+            setLoading(false);
 
             // Navigate to mnemonic screen
             navigation.dispatch(StackActions.push('Mnemonic'));
@@ -146,7 +153,7 @@ const CreateAction = () => {
                             tailwind('font-bold text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Generate New Wallet
+                        Create New Wallet
                     </Text>
 
                     <Text
@@ -274,6 +281,23 @@ const CreateAction = () => {
                         <></>
                     )}
                 </View>
+
+                {loading && (
+                    <View
+                        style={[
+                            tailwind('absolute'),
+                            {bottom: screenOffsets.bottomButtonOffset + 72},
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm mb-4'),
+                                {color: ColorScheme.Text.GrayedText},
+                            ]}>
+                            Generating wallet material...
+                        </Text>
+                        <ActivityIndicator />
+                    </View>
+                )}
 
                 <LongBottomButton
                     onPress={() => {
