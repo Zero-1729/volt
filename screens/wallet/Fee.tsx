@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
-import {Text, View, useColorScheme, Alert} from 'react-native';
+import {Text, View, useColorScheme, Alert, Platform} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {AppStorageContext} from '../../class/storageContext';
@@ -8,6 +8,8 @@ import {AppStorageContext} from '../../class/storageContext';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
+
+import Prompt from 'react-native-prompt-android';
 
 const {useTailwind} = require('tailwind-rn');
 import Color from '../../constants/Color';
@@ -25,6 +27,7 @@ const Fee = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme);
 
     const {isAdvancedMode} = useContext(AppStorageContext);
+    const isAndroid = Platform.OS === 'android';
 
     const setFeeRate = (feeRate: number) => {
         navigation.dispatch(
@@ -40,19 +43,31 @@ const Fee = ({route}: Props) => {
     };
 
     const openFeeModal = () => {
-        Alert.prompt('Custom', 'Enter fee rate (sats/vB)', [
-            {
-                text: 'Cancel',
-                onPress: () => {},
-                style: 'cancel',
-            },
-            {
-                text: 'Set',
-                onPress: (value: string | undefined) => {
-                    setFeeRate(Number(value));
+        if (isAndroid) {
+            Prompt('Custom', 'Enter fee rate (sats/vB)', [
+                {text: 'Cancel'},
+                {
+                    text: 'Set',
+                    onPress: (value: string | undefined) => {
+                        setFeeRate(Number(value));
+                    },
                 },
-            },
-        ]);
+            ]);
+        } else {
+            Alert.prompt('Custom', 'Enter fee rate (sats/vB)', [
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+                {
+                    text: 'Set',
+                    onPress: (value: string | undefined) => {
+                        setFeeRate(Number(value));
+                    },
+                },
+            ]);
+        }
     };
 
     return (
