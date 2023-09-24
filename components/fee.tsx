@@ -2,45 +2,37 @@
 import React, {useContext} from 'react';
 import {Text, View, useColorScheme, Alert, Platform} from 'react-native';
 
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {AppStorageContext} from '../../class/storageContext';
+import {AppStorageContext} from '../class/storageContext';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {WalletParamList} from '../../Navigation';
+import Modal from '@gorhom/bottom-sheet';
+import {useSnapPoints, BottomModal} from './bmodal';
+import Color from '../constants/Color';
 
+import {LongButton, PlainButton} from './button';
 import Prompt from 'react-native-prompt-android';
 
-const {useTailwind} = require('tailwind-rn');
-import Color from '../../constants/Color';
-import Font from '../../constants/Font';
+import {useTailwind} from 'tailwind-rn';
 
-import {LongBottomButton, PlainButton} from '../../components/button';
+import {TMempoolFeeRates} from '../types/wallet';
+import Font from '../constants/Font';
 
-import Close from '../../assets/svg/x-24.svg';
+type FeeProps = {
+    feeRef: React.RefObject<Modal>;
+    feeRates: TMempoolFeeRates;
+    setFeeRate: (feeRate: number) => void;
+    handleUpdate: (idx: number) => void;
+    openModal: boolean;
+};
 
-type Props = NativeStackScreenProps<WalletParamList, 'Fee'>;
-
-const Fee = ({route}: Props) => {
+const FeeModal = (props: FeeProps) => {
     const tailwind = useTailwind();
-    const navigation = useNavigation();
-    const ColorScheme = Color(useColorScheme);
+    const snapPoints = useSnapPoints('medium');
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
+    const ColorScheme = Color(useColorScheme());
+
     const isAndroid = Platform.OS === 'android';
 
-    const setFeeRate = (feeRate: number) => {
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'Send',
-                params: {
-                    invoiceData: route.params.invoiceData,
-                    wallet: route.params.wallet,
-                    feeRate: feeRate,
-                },
-            }),
-        );
-    };
+    const {isAdvancedMode} = useContext(AppStorageContext);
 
     const openFeeModal = () => {
         if (isAndroid) {
@@ -49,7 +41,7 @@ const Fee = ({route}: Props) => {
                 {
                     text: 'Set',
                     onPress: (value: string | undefined) => {
-                        setFeeRate(Number(value));
+                        props.setFeeRate(Number(value));
                     },
                 },
             ]);
@@ -63,7 +55,7 @@ const Fee = ({route}: Props) => {
                 {
                     text: 'Set',
                     onPress: (value: string | undefined) => {
-                        setFeeRate(Number(value));
+                        props.setFeeRate(Number(value));
                     },
                 },
             ]);
@@ -71,51 +63,36 @@ const Fee = ({route}: Props) => {
     };
 
     return (
-        <SafeAreaView
-            style={[tailwind('w-full h-full')]}
-            edges={['bottom', 'left', 'right']}>
+        <BottomModal
+            index={props.openModal ? 1 : -1}
+            snapPoints={snapPoints}
+            onUpdate={props.handleUpdate}
+            ref={props.feeRef}>
             <View
                 style={[
-                    tailwind('w-full h-full items-center'),
+                    tailwind('w-full h-full items-center relative'),
                     {
-                        backgroundColor: ColorScheme.Background.Inverted,
+                        backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
                 <View
                     style={[
-                        tailwind(
-                            'absolute top-6 w-full flex-row items-center justify-center',
-                        ),
+                        tailwind('w-full flex-row items-center justify-center'),
                     ]}>
-                    <PlainButton
-                        onPress={() =>
-                            navigation.dispatch(CommonActions.goBack())
-                        }
-                        style={[tailwind('absolute z-10 left-6')]}>
-                        <Close fill={ColorScheme.SVG.Inverted} />
-                    </PlainButton>
                     <Text
                         style={[
                             tailwind('text-sm font-bold'),
-                            {color: ColorScheme.Text.Alt},
+                            {color: ColorScheme.Text.Default},
                         ]}>
                         Fee Rate Selection
                     </Text>
                 </View>
 
-                <View
-                    style={[
-                        tailwind('w-4/5 px-6 py-8 rounded'),
-                        {
-                            borderWidth: 1,
-                            borderColor: ColorScheme.Background.Greyed,
-                            marginTop: 80,
-                        },
-                    ]}>
+                <View style={[tailwind('w-full px-6 py-8 rounded mt-2')]}>
                     {/* Fee selection: 10 mins */}
                     <PlainButton
                         onPress={() => {
-                            setFeeRate(route.params.feeRates.fastestFee);
+                            props.setFeeRate(props.feeRates.fastestFee);
                         }}>
                         <View style={[tailwind('items-center')]}>
                             <View
@@ -169,10 +146,7 @@ const Fee = ({route}: Props) => {
                                                             .Alt,
                                                     },
                                                 ]}>
-                                                {
-                                                    route.params.feeRates
-                                                        .fastestFee
-                                                }{' '}
+                                                {props.feeRates.fastestFee}{' '}
                                                 <Text
                                                     style={[
                                                         tailwind(
@@ -206,7 +180,7 @@ const Fee = ({route}: Props) => {
 
                     <View
                         style={[
-                            tailwind('w-full mt-6'),
+                            tailwind('w-full mt-4'),
                             {
                                 height: 1,
                                 backgroundColor: ColorScheme.Background.Greyed,
@@ -217,9 +191,9 @@ const Fee = ({route}: Props) => {
                     {/* Fee selection: Medium 30 minutes */}
                     <PlainButton
                         onPress={() => {
-                            setFeeRate(route.params.feeRates.halfHourFee);
+                            props.setFeeRate(props.feeRates.halfHourFee);
                         }}>
-                        <View style={[tailwind('items-center mt-6')]}>
+                        <View style={[tailwind('items-center mt-4')]}>
                             <View
                                 style={[
                                     tailwind(
@@ -271,10 +245,7 @@ const Fee = ({route}: Props) => {
                                                             .Alt,
                                                     },
                                                 ]}>
-                                                {
-                                                    route.params.feeRates
-                                                        .halfHourFee
-                                                }{' '}
+                                                {props.feeRates.halfHourFee}{' '}
                                                 <Text
                                                     style={[
                                                         tailwind(
@@ -308,7 +279,7 @@ const Fee = ({route}: Props) => {
 
                     <View
                         style={[
-                            tailwind('w-full mt-6'),
+                            tailwind('w-full mt-4'),
                             {
                                 height: 1,
                                 backgroundColor: ColorScheme.Background.Greyed,
@@ -319,9 +290,9 @@ const Fee = ({route}: Props) => {
                     {/* Fee selection: Slow 1 hour */}
                     <PlainButton
                         onPress={() => {
-                            setFeeRate(route.params.feeRates.minimumFee);
+                            props.setFeeRate(props.feeRates.minimumFee);
                         }}>
-                        <View style={[tailwind('items-center mt-6')]}>
+                        <View style={[tailwind('items-center mt-4')]}>
                             <View
                                 style={[
                                     tailwind(
@@ -373,10 +344,7 @@ const Fee = ({route}: Props) => {
                                                             .Alt,
                                                     },
                                                 ]}>
-                                                {
-                                                    route.params.feeRates
-                                                        .minimumFee
-                                                }{' '}
+                                                {props.feeRates.minimumFee}{' '}
                                                 <Text
                                                     style={[
                                                         tailwind(
@@ -410,15 +378,17 @@ const Fee = ({route}: Props) => {
                 </View>
 
                 {/* Fee selection: Custom */}
-                <LongBottomButton
-                    title={'Custom'}
-                    onPress={openFeeModal}
-                    backgroundColor={ColorScheme.Background.Primary}
-                    textColor={ColorScheme.Text.Default}
-                />
+                <View style={[tailwind('w-4/5 absolute bottom-6')]}>
+                    <LongButton
+                        title={'Custom'}
+                        onPress={openFeeModal}
+                        backgroundColor={ColorScheme.Background.Inverted}
+                        textColor={ColorScheme.Text.Alt}
+                    />
+                </View>
             </View>
-        </SafeAreaView>
+        </BottomModal>
     );
 };
 
-export default Fee;
+export default FeeModal;

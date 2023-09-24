@@ -17,7 +17,6 @@ import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
-import Fee from './screens/wallet/Fee';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
@@ -47,7 +46,6 @@ import {
     TTransaction,
     TMiniWallet,
     TAddressAmount,
-    TMempoolFeeRates,
     TInvoiceData,
 } from './types/wallet';
 
@@ -61,7 +59,6 @@ export type WalletParamList = {
     Send: {
         invoiceData: TInvoiceData;
         wallet: TMiniWallet;
-        feeRate?: number;
     };
     WalletView: undefined;
     WalletInfo: undefined;
@@ -71,11 +68,6 @@ export type WalletParamList = {
     };
     RequestAmount: undefined;
     SendAmount: {
-        invoiceData: any;
-        wallet: TMiniWallet;
-    };
-    Fee: {
-        feeRates: TMempoolFeeRates;
         invoiceData: any;
         wallet: TMiniWallet;
     };
@@ -145,7 +137,6 @@ const WalletRoot = () => {
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen name="Send" component={Send} />
-                <WalletStack.Screen name="Fee" component={Fee} />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
