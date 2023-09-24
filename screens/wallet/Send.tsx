@@ -11,6 +11,8 @@ import {TMempoolFeeRates} from '../../types/wallet';
 import {FiatBalance, Balance} from '../../components/balance';
 
 import Font from '../../constants/Font';
+import BottomModal from '@gorhom/bottom-sheet';
+import FeeModal from '../../components/fee';
 
 import {
     useNavigation,
@@ -36,7 +38,12 @@ const SendView = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const [feeRates, setFeeRates] = useState<TMempoolFeeRates>();
+    const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
+        fastestFee: 1,
+        halfHourFee: 1,
+        hourFee: 1,
+        minimumFee: 1,
+    });
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>();
 
     const sats = route.params.invoiceData.options?.amount || 0;
@@ -64,17 +71,17 @@ const SendView = ({route}: Props) => {
         );
     };
 
+    const bottomFeeRef = React.useRef<BottomModal>(null);
+    const [openModal, setOpenModal] = useState(false);
+
     const openFeeModal = () => {
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'Fee',
-                params: {
-                    feeRates: feeRates,
-                    invoiceData: route.params.invoiceData,
-                    wallet: route.params.wallet,
-                },
-            }),
-        );
+        setOpenModal(!openModal);
+
+        if (openModal) {
+            bottomFeeRef.current?.close();
+        } else {
+            bottomFeeRef.current?.expand();
+        }
     };
 
     const fetchFeeRates = async () => {
@@ -89,11 +96,12 @@ const SendView = ({route}: Props) => {
         fetchFeeRates();
     }, []);
 
-    useEffect(() => {
-        if (route.params.feeRate) {
-            setSelectedFeeRate(route.params.feeRate);
-        }
-    }, [route.params.feeRate]);
+    const updateFeeRate = (fee: number) => {
+        console.log('selected fee: ', fee);
+        setSelectedFeeRate(fee);
+
+        bottomFeeRef.current?.close();
+    };
 
     return (
         <SafeAreaView edges={['bottom', 'left', 'right']}>
@@ -306,6 +314,22 @@ const SendView = ({route}: Props) => {
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />
+
+                {/* Fee Modal */}
+                <View
+                    style={[
+                        tailwind('mt-6 w-full h-full absolute z-10 bottom-0'),
+                    ]}>
+                    <FeeModal
+                        openModal={openModal}
+                        handleUpdate={idx => {
+                            console.log('sheet update: ', idx);
+                        }}
+                        feeRef={bottomFeeRef}
+                        feeRates={feeRates}
+                        setFeeRate={updateFeeRate}
+                    />
+                </View>
             </View>
         </SafeAreaView>
     );
