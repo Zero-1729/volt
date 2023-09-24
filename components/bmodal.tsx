@@ -30,9 +30,9 @@ import {useTailwind} from 'tailwind-rn';
 type bottomProps = {
     children: ReactElement;
     index: number;
-    onUpdate: (idx: number) => void;
     snapPoints: (string | number)[];
     backdrop?: boolean;
+    onUpdate?: (idx: number) => void;
 };
 
 export const useSnapPoints = (
@@ -73,7 +73,7 @@ export const useSnapPoints = (
 // Then subsequently wrap in memo to avoid re-rendering when parent re-renders
 const _BottomModal = forwardRef(
     (
-        {children, index, onUpdate, snapPoints, backdrop}: bottomProps,
+        {children, index, snapPoints, backdrop, onUpdate}: bottomProps,
         ref,
     ): ReactElement => {
         const tailwind = useTailwind();
@@ -94,7 +94,7 @@ const _BottomModal = forwardRef(
         }));
 
         const onSheetChange = (idx: number) => {
-            onUpdate(idx);
+            onUpdate?.(idx);
         };
 
         const handleIndicatorStyle = useMemo(
@@ -104,7 +104,6 @@ const _BottomModal = forwardRef(
 
         const renderBackdrop = useCallback(
             (props: BottomSheetBackdropProps) => {
-                console.log('bg: drop');
                 if (!backdrop) {
                     return null;
                 }

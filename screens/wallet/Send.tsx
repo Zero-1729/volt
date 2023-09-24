@@ -97,7 +97,6 @@ const SendView = ({route}: Props) => {
     }, []);
 
     const updateFeeRate = (fee: number) => {
-        console.log('selected fee: ', fee);
         setSelectedFeeRate(fee);
 
         bottomFeeRef.current?.close();
@@ -322,9 +321,6 @@ const SendView = ({route}: Props) => {
                     ]}>
                     <FeeModal
                         openModal={openModal}
-                        handleUpdate={idx => {
-                            console.log('sheet update: ', idx);
-                        }}
                         feeRef={bottomFeeRef}
                         feeRates={feeRates}
                         setFeeRate={updateFeeRate}

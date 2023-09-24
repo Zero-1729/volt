@@ -20,7 +20,6 @@ type FeeProps = {
     feeRef: React.RefObject<Modal>;
     feeRates: TMempoolFeeRates;
     setFeeRate: (feeRate: number) => void;
-    handleUpdate: (idx: number) => void;
     openModal: boolean;
 };
 
@@ -66,7 +65,6 @@ const FeeModal = (props: FeeProps) => {
         <BottomModal
             index={props.openModal ? 1 : -1}
             snapPoints={snapPoints}
-            onUpdate={props.handleUpdate}
             ref={props.feeRef}>
             <View
                 style={[
