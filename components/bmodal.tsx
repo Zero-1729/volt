@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {StyleSheet, useColorScheme, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import React, {
     ReactElement,
     forwardRef,
@@ -23,7 +23,6 @@ import {
     useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import Color from '../constants/Color';
 import {useTailwind} from 'tailwind-rn';
 
 /* BottomSheet component wrapper to use across App */
@@ -31,6 +30,8 @@ type bottomProps = {
     children: ReactElement;
     index: number;
     snapPoints: (string | number)[];
+    backgroundColor: string;
+    handleIndicatorColor: string;
     backdrop?: boolean;
     onUpdate?: (idx: number) => void;
 };
@@ -73,11 +74,18 @@ export const useSnapPoints = (
 // Then subsequently wrap in memo to avoid re-rendering when parent re-renders
 const _BottomModal = forwardRef(
     (
-        {children, index, snapPoints, backdrop, onUpdate}: bottomProps,
+        {
+            children,
+            index,
+            snapPoints,
+            backgroundColor,
+            handleIndicatorColor,
+            backdrop,
+            onUpdate,
+        }: bottomProps,
         ref,
     ): ReactElement => {
         const tailwind = useTailwind();
-        const ColorScheme = Color(useColorScheme());
 
         const bottomSheetRef = React.useRef<BottomSheet>(null);
 
@@ -98,8 +106,8 @@ const _BottomModal = forwardRef(
         };
 
         const handleIndicatorStyle = useMemo(
-            () => ({backgroundColor: ColorScheme.Background.Greyed}),
-            [ColorScheme.Background.Greyed],
+            () => ({backgroundColor: handleIndicatorColor}),
+            [],
         );
 
         const renderBackdrop = useCallback(
@@ -124,7 +132,9 @@ const _BottomModal = forwardRef(
                     style={[
                         tailwind('relative'),
                         styles.backgroundContainer,
-                        {backgroundColor: ColorScheme.Background.Primary},
+                        {
+                            backgroundColor: backgroundColor,
+                        },
                         style,
                     ]}
                 />
