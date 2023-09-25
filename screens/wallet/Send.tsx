@@ -72,15 +72,13 @@ const SendView = ({route}: Props) => {
     };
 
     const bottomFeeRef = React.useRef<BottomModal>(null);
-    const [openModal, setOpenModal] = useState(false);
+    const [openModal, setOpenModal] = useState(-1);
 
     const openFeeModal = () => {
-        setOpenModal(!openModal);
-
-        if (openModal) {
-            bottomFeeRef.current?.close();
-        } else {
+        if (openModal !== 1) {
             bottomFeeRef.current?.expand();
+        } else {
+            bottomFeeRef.current?.close();
         }
     };
 
@@ -190,7 +188,7 @@ const SendView = ({route}: Props) => {
                             ]}>
                             <Text
                                 style={[
-                                    tailwind('mt-4 text-sm font-bold'),
+                                    tailwind('text-sm font-bold'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
                                 Fee rate
@@ -198,9 +196,7 @@ const SendView = ({route}: Props) => {
 
                             <PlainButton
                                 style={[
-                                    tailwind(
-                                        'items-center self-baseline justify-center',
-                                    ),
+                                    tailwind('items-center justify-center'),
                                 ]}
                                 onPress={openFeeModal}>
                                 <View
@@ -317,13 +313,20 @@ const SendView = ({route}: Props) => {
                 {/* Fee Modal */}
                 <View
                     style={[
-                        tailwind('mt-6 w-full h-full absolute z-10 bottom-0'),
+                        tailwind(
+                            `mt-6 absolute bottom-0 ${
+                                openModal ? 'w-full h-1/2 z-10' : ''
+                            }`,
+                        ),
                     ]}>
                     <FeeModal
-                        openModal={openModal}
+                        index={openModal}
                         feeRef={bottomFeeRef}
                         feeRates={feeRates}
                         setFeeRate={updateFeeRate}
+                        onUpdate={idx => {
+                            setOpenModal(idx);
+                        }}
                     />
                 </View>
             </View>

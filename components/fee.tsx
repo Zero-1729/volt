@@ -20,7 +20,8 @@ type FeeProps = {
     feeRef: React.RefObject<Modal>;
     feeRates: TMempoolFeeRates;
     setFeeRate: (feeRate: number) => void;
-    openModal: boolean;
+    index: number;
+    onUpdate: (idx: number) => void;
 };
 
 const FeeModal = (props: FeeProps) => {
@@ -63,14 +64,17 @@ const FeeModal = (props: FeeProps) => {
 
     return (
         <BottomModal
-            index={props.openModal ? 1 : -1}
+            index={props.index}
             snapPoints={snapPoints}
-            ref={props.feeRef}>
+            ref={props.feeRef}
+            onUpdate={props.onUpdate}
+            backgroundColor={ColorScheme.Background.Greyed}
+            handleIndicatorColor={'#64676E'}
             <View
                 style={[
                     tailwind('w-full h-full items-center relative'),
                     {
-                        backgroundColor: ColorScheme.Background.Primary,
+                        backgroundColor: ColorScheme.Background.Greyed,
                     },
                 ]}>
                 <View
@@ -102,8 +106,9 @@ const FeeModal = (props: FeeProps) => {
                                 <Text
                                     style={[
                                         tailwind(
-                                            'text-left text-base font-semibold',
+                                            'text-left text-sm font-semibold',
                                         ),
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     High Priority
                                 </Text>
@@ -181,7 +186,7 @@ const FeeModal = (props: FeeProps) => {
                             tailwind('w-full mt-4'),
                             {
                                 height: 1,
-                                backgroundColor: ColorScheme.Background.Greyed,
+                                backgroundColor: '#2E3033',
                             },
                         ]}
                     />
@@ -203,6 +208,7 @@ const FeeModal = (props: FeeProps) => {
                                         tailwind(
                                             'text-left text-base font-semibold',
                                         ),
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Slow
                                 </Text>
@@ -280,7 +286,7 @@ const FeeModal = (props: FeeProps) => {
                             tailwind('w-full mt-4'),
                             {
                                 height: 1,
-                                backgroundColor: ColorScheme.Background.Greyed,
+                                backgroundColor: '#2E3033',
                             },
                         ]}
                     />
@@ -302,6 +308,7 @@ const FeeModal = (props: FeeProps) => {
                                         tailwind(
                                             'text-left text-base font-semibold',
                                         ),
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     Minimum
                                 </Text>

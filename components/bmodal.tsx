@@ -107,7 +107,7 @@ const _BottomModal = forwardRef(
 
         const handleIndicatorStyle = useMemo(
             () => ({backgroundColor: handleIndicatorColor}),
-            [],
+            [handleIndicatorColor],
         );
 
         const renderBackdrop = useCallback(
@@ -115,15 +115,17 @@ const _BottomModal = forwardRef(
                 if (!backdrop) {
                     return null;
                 }
+
                 return (
                     <BottomSheetBackdrop
                         {...props}
+                        opacity={0.2}
                         disappearsOnIndex={-1}
                         appearsOnIndex={0}
                     />
                 );
             },
-            [backdrop],
+            [],
         );
 
         const backgroundComponent = useCallback(
