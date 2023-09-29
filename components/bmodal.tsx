@@ -9,65 +9,23 @@ import React, {
     useImperativeHandle,
 } from 'react';
 
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-
-import BottomSheet, {
-    BottomSheetView,
+import {
     BottomSheetBackgroundProps,
     BottomSheetBackdrop,
     BottomSheetBackdropProps,
+    BottomSheetModal,
 } from '@gorhom/bottom-sheet';
-
-import {
-    useSafeAreaFrame,
-    useSafeAreaInsets,
-} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
 
 /* BottomSheet component wrapper to use across App */
 type bottomProps = {
     children: ReactElement;
-    index: number;
     snapPoints: (string | number)[];
     backgroundColor: string;
     handleIndicatorColor: string;
     backdrop?: boolean;
     onUpdate?: (idx: number) => void;
-};
-
-export const useSnapPoints = (
-    size: 'small' | 'medium' | 'large' | 'calendar',
-): number[] => {
-    const {height} = useSafeAreaFrame();
-    const insets = useSafeAreaInsets();
-
-    const snapPoints = useMemo(() => {
-        if (size === 'large') {
-            // only Header should be visible
-            const preferredHeight = height - (60 + insets.top);
-            return [preferredHeight];
-        }
-        if (size === 'medium') {
-            // only Header + Balance should be visible
-            const preferredHeight = height - (180 + insets.top);
-            const maxHeight = height - (60 + insets.top);
-            const minHeight = Math.min(600, maxHeight);
-            return [Math.max(preferredHeight, minHeight)];
-        }
-        if (size === 'calendar') {
-            // same as medium + 40px, to be just under search input
-            const preferredHeight = height - (140 + insets.top);
-            const maxHeight = height - (60 + insets.top);
-            const minHeight = Math.min(600, maxHeight);
-            return [Math.max(preferredHeight, minHeight)];
-        }
-
-        // small / default
-        return [400 + Math.max(insets.bottom, 16)];
-    }, [size, height, insets]);
-
-    return snapPoints;
 };
 
 // We wrap in forwardRef to accept refs from parent components
@@ -76,7 +34,6 @@ const _BottomModal = forwardRef(
     (
         {
             children,
-            index,
             snapPoints,
             backgroundColor,
             handleIndicatorColor,
@@ -87,16 +44,13 @@ const _BottomModal = forwardRef(
     ): ReactElement => {
         const tailwind = useTailwind();
 
-        const bottomSheetRef = React.useRef<BottomSheet>(null);
+        const bottomSheetRef = React.useRef<BottomSheetModal>(null);
 
         useImperativeHandle(ref, () => ({
-            snapToIndex(idx: number = 0): void {
-                bottomSheetRef.current?.snapToIndex(idx);
+            present(): void {
+                bottomSheetRef.current?.present();
             },
-            expand(): void {
-                bottomSheetRef.current?.snapToIndex(1);
-            },
-            close(): void {
+            collapse(): void {
                 bottomSheetRef.current?.close();
             },
         }));
@@ -145,32 +99,24 @@ const _BottomModal = forwardRef(
         );
 
         return (
-            <GestureHandlerRootView style={styles.root}>
-                <BottomSheet
+            <View style={styles.root}>
+                <BottomSheetModal
                     backgroundComponent={backgroundComponent}
                     handleIndicatorStyle={handleIndicatorStyle}
                     handleStyle={styles.handleBar}
-                    animateOnMount
                     enablePanDownToClose
                     keyboardBlurBehavior="restore"
                     ref={bottomSheetRef}
-                    index={index}
+                    index={0}
                     onChange={onSheetChange}
                     backdropComponent={renderBackdrop}
                     snapPoints={snapPoints}
                     // https://github.com/gorhom/react-native-bottom-sheet/issues/770#issuecomment-1072113936
                     activeOffsetX={useMemo(() => [-999, 999], [])}
-                    activeOffsetY={useMemo(() => [-5, 5], [])}
-                    enableDynamicSizing={true}>
-                    <BottomSheetView
-                        style={[
-                            tailwind('w-full relative'),
-                            styles.sheetContainer,
-                        ]}>
-                        {children}
-                    </BottomSheetView>
-                </BottomSheet>
-            </GestureHandlerRootView>
+                    activeOffsetY={useMemo(() => [-5, 5], [])}>
+                    {children}
+                </BottomSheetModal>
+            </View>
         );
     },
 );

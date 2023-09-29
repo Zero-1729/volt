@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useMemo} from 'react';
 import {Text, View, useColorScheme, Alert, Platform} from 'react-native';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import Modal from '@gorhom/bottom-sheet';
-import {useSnapPoints, BottomModal} from './bmodal';
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
+import {BottomModal} from './bmodal';
 import Color from '../constants/Color';
 
 import {LongButton, PlainButton} from './button';
@@ -17,16 +17,15 @@ import {TMempoolFeeRates} from '../types/wallet';
 import Font from '../constants/Font';
 
 type FeeProps = {
-    feeRef: React.RefObject<Modal>;
+    feeRef: React.RefObject<BottomSheetModal>;
     feeRates: TMempoolFeeRates;
     setFeeRate: (feeRate: number) => void;
-    index: number;
     onUpdate: (idx: number) => void;
 };
 
 const FeeModal = (props: FeeProps) => {
     const tailwind = useTailwind();
-    const snapPoints = useSnapPoints('medium');
+    const snapPoints = useMemo(() => ['50%'], []);
 
     const ColorScheme = Color(useColorScheme());
 
@@ -64,7 +63,6 @@ const FeeModal = (props: FeeProps) => {
 
     return (
         <BottomModal
-            index={props.index}
             snapPoints={snapPoints}
             ref={props.feeRef}
             onUpdate={props.onUpdate}
