@@ -98,36 +98,48 @@ const _BottomModal = forwardRef(
             [],
         );
 
+        const sheetContainerStyle = useMemo(
+            () => ({
+                ...styles.sheetContainer,
+                backgroundColor: backgroundColor,
+            }),
+            [],
+        );
+
         return (
-            <View style={styles.root}>
-                <BottomSheetModal
-                    backgroundComponent={backgroundComponent}
-                    handleIndicatorStyle={handleIndicatorStyle}
-                    handleStyle={styles.handleBar}
-                    enablePanDownToClose
-                    keyboardBlurBehavior="restore"
-                    ref={bottomSheetRef}
-                    index={0}
-                    onChange={onSheetChange}
-                    backdropComponent={renderBackdrop}
-                    snapPoints={snapPoints}
-                    // https://github.com/gorhom/react-native-bottom-sheet/issues/770#issuecomment-1072113936
-                    activeOffsetX={useMemo(() => [-999, 999], [])}
-                    activeOffsetY={useMemo(() => [-5, 5], [])}>
-                    {children}
-                </BottomSheetModal>
-            </View>
+            <BottomSheetModal
+                style={sheetContainerStyle}
+                backgroundComponent={backgroundComponent}
+                handleIndicatorStyle={handleIndicatorStyle}
+                handleStyle={styles.handleBar}
+                enablePanDownToClose
+                keyboardBlurBehavior="restore"
+                ref={bottomSheetRef}
+                index={0}
+                onChange={onSheetChange}
+                backdropComponent={renderBackdrop}
+                snapPoints={snapPoints}
+                // https://github.com/gorhom/react-native-bottom-sheet/issues/770#issuecomment-1072113936
+                activeOffsetX={useMemo(() => [-999, 999], [])}
+                activeOffsetY={useMemo(() => [-5, 5], [])}>
+                {children}
+            </BottomSheetModal>
         );
     },
 );
 
 const styles = StyleSheet.create({
-    root: {
-        flex: 1,
-    },
     sheetContainer: {
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 22,
+        },
+        shadowOpacity: 0.75,
+        shadowRadius: 16.0,
+        elevation: 24,
         flex: 1,
     },
     handleBar: {
