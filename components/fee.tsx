@@ -66,13 +66,13 @@ const FeeModal = (props: FeeProps) => {
             snapPoints={snapPoints}
             ref={props.feeRef}
             onUpdate={props.onUpdate}
-            backgroundColor={ColorScheme.Background.Greyed}
-            handleIndicatorColor={'#64676E'}
+            backgroundColor={ColorScheme.Background.Primary}
+            handleIndicatorColor={'#64676E'}>
             <View
                 style={[
                     tailwind('w-full h-full items-center relative'),
                     {
-                        backgroundColor: ColorScheme.Background.Greyed,
+                        backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
                 <View
@@ -84,7 +84,7 @@ const FeeModal = (props: FeeProps) => {
                             tailwind('text-sm font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Fee Rate Selection
+                        Select Fee Rate
                     </Text>
                 </View>
 
@@ -131,9 +131,7 @@ const FeeModal = (props: FeeProps) => {
                                         style={[
                                             tailwind('rounded-full px-4 py-1'),
                                             {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Inverted,
+                                                backgroundColor: 'darkgrey',
                                             },
                                         ]}>
                                         {isAdvancedMode ? (
@@ -167,7 +165,7 @@ const FeeModal = (props: FeeProps) => {
                                                     ),
                                                     {
                                                         color: ColorScheme.Text
-                                                            .Alt,
+                                                            .GrayedText,
                                                     },
                                                 ]}>
                                                 ~10 mins
@@ -184,7 +182,7 @@ const FeeModal = (props: FeeProps) => {
                             tailwind('w-full mt-4'),
                             {
                                 height: 1,
-                                backgroundColor: '#2E3033',
+                                backgroundColor: ColorScheme.Background.Greyed,
                             },
                         ]}
                     />
@@ -231,9 +229,7 @@ const FeeModal = (props: FeeProps) => {
                                         style={[
                                             tailwind('rounded-full px-4 py-1'),
                                             {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Inverted,
+                                                backgroundColor: 'darkgrey',
                                             },
                                         ]}>
                                         {isAdvancedMode ? (
@@ -267,7 +263,7 @@ const FeeModal = (props: FeeProps) => {
                                                     ),
                                                     {
                                                         color: ColorScheme.Text
-                                                            .Alt,
+                                                            .GrayedText,
                                                     },
                                                 ]}>
                                                 ~30 mins
@@ -284,7 +280,7 @@ const FeeModal = (props: FeeProps) => {
                             tailwind('w-full mt-4'),
                             {
                                 height: 1,
-                                backgroundColor: '#2E3033',
+                                backgroundColor: ColorScheme.Background.Greyed,
                             },
                         ]}
                     />
@@ -333,7 +329,7 @@ const FeeModal = (props: FeeProps) => {
                                             {
                                                 backgroundColor:
                                                     ColorScheme.Background
-                                                        .Inverted,
+                                                        .Greyed,
                                             },
                                         ]}>
                                         {isAdvancedMode ? (
@@ -367,7 +363,7 @@ const FeeModal = (props: FeeProps) => {
                                                     ),
                                                     {
                                                         color: ColorScheme.Text
-                                                            .Alt,
+                                                            .GrayedText,
                                                     },
                                                 ]}>
                                                 ~1 day
