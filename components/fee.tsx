@@ -67,7 +67,8 @@ const FeeModal = (props: FeeProps) => {
             ref={props.feeRef}
             onUpdate={props.onUpdate}
             backgroundColor={ColorScheme.Background.Primary}
-            handleIndicatorColor={'#64676E'}>
+            handleIndicatorColor={'#64676E'}
+            backdrop={true}>
             <View
                 style={[
                     tailwind('w-full h-full items-center relative'),
