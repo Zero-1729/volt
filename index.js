@@ -1,11 +1,13 @@
 import React from 'react';
-import {AppRegistry} from 'react-native';
+import {AppRegistry, StyleSheet} from 'react-native';
 
 // For frameProcessor in 'react-native-vision-camera'
 import 'react-native-reanimated';
 
 import {name as appName} from './app.json';
 import {AppStorageProvider} from './class/storageContext';
+
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 import {TailwindProvider} from 'tailwind-rn';
 import utilities from './tailwind.json';
@@ -16,10 +18,18 @@ const AppWithStorage = () => {
     return (
         <AppStorageProvider>
             <TailwindProvider utilities={utilities}>
-                <App />
+                <GestureHandlerRootView style={styles.root}>
+                    <App />
+                </GestureHandlerRootView>
             </TailwindProvider>
         </AppStorageProvider>
     );
 };
 
 AppRegistry.registerComponent(appName, () => AppWithStorage);
+
+const styles = StyleSheet.create({
+    root: {
+        flex: 1,
+    },
+});
