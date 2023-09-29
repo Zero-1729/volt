@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -11,7 +11,7 @@ import {TMempoolFeeRates} from '../../types/wallet';
 import {FiatBalance, Balance} from '../../components/balance';
 
 import Font from '../../constants/Font';
-import BottomModal from '@gorhom/bottom-sheet';
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import FeeModal from '../../components/fee';
 
 import {
@@ -30,6 +30,7 @@ import Close from '../../assets/svg/x-24.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -71,12 +72,12 @@ const SendView = ({route}: Props) => {
         );
     };
 
-    const bottomFeeRef = React.useRef<BottomModal>(null);
+    const bottomFeeRef = React.useRef<BottomSheetModal>(null);
     const [openModal, setOpenModal] = useState(-1);
 
     const openFeeModal = () => {
         if (openModal !== 1) {
-            bottomFeeRef.current?.expand();
+            bottomFeeRef.current?.present();
         } else {
             bottomFeeRef.current?.close();
         }
@@ -100,235 +101,261 @@ const SendView = ({route}: Props) => {
         bottomFeeRef.current?.close();
     };
 
+    const memoizedUpdateFeeRate = useCallback(updateFeeRate, []);
+
     return (
         <SafeAreaView edges={['bottom', 'left', 'right']}>
             <View
                 style={[tailwind('w-full h-full items-center justify-center')]}>
-                <View
-                    style={[
-                        tailwind(
-                            'absolute top-6 w-full flex-row items-center justify-center',
-                        ),
-                    ]}>
-                    <PlainButton
-                        onPress={() =>
-                            navigation.dispatch(StackActions.popToTop())
-                        }
-                        style={[tailwind('absolute z-10 left-6')]}>
-                        <Close fill={ColorScheme.SVG.Default} />
-                    </PlainButton>
-                    <Text
+                <BottomSheetModalProvider>
+                    <View
                         style={[
-                            tailwind('text-sm font-bold'),
-                            {color: ColorScheme.Text.Default},
+                            tailwind(
+                                'absolute top-6 w-full flex-row items-center justify-center',
+                            ),
                         ]}>
-                        Transaction Summary
-                    </Text>
-                </View>
-
-                <View
-                    style={[
-                        tailwind('-mt-12 items-center w-full h-4/6 relative'),
-                    ]}>
-                    <View style={[tailwind('mt-6 items-center')]}>
-                        <View style={[tailwind('items-center flex-row')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-base mb-1'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                Amount
-                            </Text>
-                        </View>
-                        <FiatBalance
-                            balance={sats}
-                            loading={false}
-                            balanceFontSize={'text-4xl'}
-                            fontColor={ColorScheme.Text.Default}
-                        />
-                        <Balance
-                            loading={false}
-                            disableFiat={true}
-                            balance={sats}
-                            balanceFontSize={'text-sm'}
-                            fontColor={ColorScheme.Text.DescText}
-                        />
-                    </View>
-
-                    <View style={[tailwind('mt-12 w-4/5')]}>
-                        <PlainButton onPress={() => {}}>
-                            <View
-                                style={[
-                                    tailwind('items-center flex-row mb-1'),
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm mr-2'),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
-                                    Address
-                                </Text>
-                            </View>
+                        <PlainButton
+                            onPress={() =>
+                                navigation.dispatch(StackActions.popToTop())
+                            }
+                            style={[tailwind('absolute z-10 left-6')]}>
+                            <Close fill={ColorScheme.SVG.Default} />
                         </PlainButton>
                         <Text
                             style={[
-                                tailwind('text-sm'),
+                                tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {route.params.invoiceData.address}
+                            Transaction Summary
                         </Text>
                     </View>
 
-                    {selectedFeeRate ? (
-                        <View
-                            style={[
-                                tailwind(
-                                    'mt-6 items-center justify-between w-4/5 flex-row',
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                Fee rate
-                            </Text>
+                    <View
+                        style={[
+                            tailwind(
+                                '-mt-12 items-center w-full h-4/6 relative',
+                            ),
+                        ]}>
+                        <View style={[tailwind('mt-6 items-center')]}>
+                            <View style={[tailwind('items-center flex-row')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-base mb-1'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    Amount
+                                </Text>
+                            </View>
+                            <FiatBalance
+                                balance={sats}
+                                loading={false}
+                                balanceFontSize={'text-4xl'}
+                                fontColor={ColorScheme.Text.Default}
+                            />
+                            <Balance
+                                loading={false}
+                                disableFiat={true}
+                                balance={sats}
+                                balanceFontSize={'text-sm'}
+                                fontColor={ColorScheme.Text.DescText}
+                            />
+                        </View>
 
-                            <PlainButton
-                                style={[
-                                    tailwind('items-center justify-center'),
-                                ]}
-                                onPress={openFeeModal}>
+                        <View style={[tailwind('mt-12 w-4/5')]}>
+                            <PlainButton onPress={() => {}}>
                                 <View
                                     style={[
-                                        tailwind('rounded-full px-4 py-1'),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Inverted,
-                                        },
+                                        tailwind('items-center flex-row mb-1'),
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind('text-sm'),
+                                            tailwind('text-sm mr-2'),
                                             {
-                                                color: ColorScheme.Text.Alt,
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
                                             },
                                         ]}>
-                                        {selectedFeeRate}{' '}
-                                        <Text
-                                            style={[
-                                                tailwind(
-                                                    'text-sm self-baseline',
-                                                ),
-                                                Font.SatSymbol,
-                                            ]}>
-                                            s
-                                        </Text>
-                                        /vB
+                                        Address
                                     </Text>
                                 </View>
                             </PlainButton>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {route.params.invoiceData.address}
+                            </Text>
                         </View>
-                    ) : (
-                        <></>
-                    )}
 
-                    {route.params.invoiceData.options?.label ? (
-                        <View style={[tailwind('justify-between w-4/5 mt-4')]}>
-                            {route.params.invoiceData.options.label ? (
-                                <View
+                        {selectedFeeRate ? (
+                            <View
+                                style={[
+                                    tailwind(
+                                        'mt-6 items-center justify-between w-4/5 flex-row',
+                                    ),
+                                ]}>
+                                <Text
                                     style={[
-                                        tailwind('flex-row justify-between'),
+                                        tailwind('text-sm font-bold'),
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
-                                    <Text
-                                        style={[
-                                            tailwind('text-sm font-bold'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
-                                        Label
-                                    </Text>
+                                    Fee rate
+                                </Text>
 
-                                    <Text
-                                        numberOfLines={1}
-                                        ellipsizeMode={'middle'}
+                                <PlainButton
+                                    style={[
+                                        tailwind('items-center justify-center'),
+                                    ]}
+                                    onPress={openFeeModal}>
+                                    <View
+                                        style={[
+                                            tailwind('rounded-full px-4 py-1'),
+                                            {
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Inverted,
+                                            },
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm'),
+                                                {
+                                                    color: ColorScheme.Text.Alt,
+                                                },
+                                            ]}>
+                                            {selectedFeeRate}{' '}
+                                            <Text
+                                                style={[
+                                                    tailwind(
+                                                        'text-sm self-baseline',
+                                                    ),
+                                                    Font.SatSymbol,
+                                                ]}>
+                                                s
+                                            </Text>
+                                            /vB
+                                        </Text>
+                                    </View>
+                                </PlainButton>
+                            </View>
+                        ) : (
+                            <></>
+                        )}
+
+                        {route.params.invoiceData.options?.label ? (
+                            <View
+                                style={[
+                                    tailwind('justify-between w-4/5 mt-4'),
+                                ]}>
+                                {route.params.invoiceData.options.label ? (
+                                    <View
                                         style={[
                                             tailwind(
-                                                'text-sm w-3/5 text-right',
+                                                'flex-row justify-between',
                                             ),
-                                            {color: ColorScheme.Text.DescText},
                                         ]}>
-                                        {
-                                            route.params.invoiceData.options
-                                                ?.label
-                                        }
-                                    </Text>
-                                </View>
-                            ) : (
-                                <></>
-                            )}
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm font-bold'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            Label
+                                        </Text>
 
-                            {route.params.invoiceData.options.message ? (
-                                <View
-                                    style={[
-                                        tailwind('w-full mt-6'),
-                                        {height: 128},
-                                    ]}>
-                                    <Text
+                                        <Text
+                                            numberOfLines={1}
+                                            ellipsizeMode={'middle'}
+                                            style={[
+                                                tailwind(
+                                                    'text-sm w-3/5 text-right',
+                                                ),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .DescText,
+                                                },
+                                            ]}>
+                                            {
+                                                route.params.invoiceData.options
+                                                    ?.label
+                                            }
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <></>
+                                )}
+
+                                {route.params.invoiceData.options.message ? (
+                                    <View
                                         style={[
-                                            tailwind('text-sm mb-4 font-bold'),
-                                            {color: ColorScheme.Text.Default},
+                                            tailwind('w-full mt-6'),
+                                            {height: 128},
                                         ]}>
-                                        Message
-                                    </Text>
-                                    <Text
-                                        numberOfLines={4}
-                                        ellipsizeMode={'middle'}
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {color: ColorScheme.Text.DescText},
-                                        ]}>
-                                        {
-                                            route.params.invoiceData.options
-                                                ?.message
-                                        }
-                                    </Text>
-                                </View>
-                            ) : (
-                                <></>
-                            )}
-                        </View>
-                    ) : (
-                        <></>
-                    )}
-                </View>
+                                        <Text
+                                            style={[
+                                                tailwind(
+                                                    'text-sm mb-4 font-bold',
+                                                ),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            Message
+                                        </Text>
+                                        <Text
+                                            numberOfLines={4}
+                                            ellipsizeMode={'middle'}
+                                            style={[
+                                                tailwind('text-sm'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .DescText,
+                                                },
+                                            ]}>
+                                            {
+                                                route.params.invoiceData.options
+                                                    ?.message
+                                            }
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <></>
+                                )}
+                            </View>
+                        ) : (
+                            <></>
+                        )}
+                    </View>
 
-                <LongBottomButton
-                    disabled={selectedFeeRate === undefined}
-                    onPress={createTransaction}
-                    title={'Send'}
-                    textColor={ColorScheme.Text.Alt}
-                    backgroundColor={ColorScheme.Background.Inverted}
-                />
-
-                {/* Fee Modal */}
-                <View
-                    style={[
-                        tailwind(
-                            `mt-6 absolute bottom-0 ${
-                                openModal ? 'w-full h-1/2 z-10' : ''
-                            }`,
-                        ),
-                    ]}>
-                    <FeeModal
-                        index={openModal}
-                        feeRef={bottomFeeRef}
-                        feeRates={feeRates}
-                        setFeeRate={updateFeeRate}
-                        onUpdate={idx => {
-                            setOpenModal(idx);
-                        }}
+                    <LongBottomButton
+                        disabled={selectedFeeRate === undefined}
+                        onPress={createTransaction}
+                        title={'Send'}
+                        textColor={ColorScheme.Text.Alt}
+                        backgroundColor={ColorScheme.Background.Inverted}
                     />
-                </View>
+
+                    {/* Fee Modal */}
+                    <View
+                        style={[
+                            tailwind(
+                                'mt-6 absolute bottom-0 w-full h-1/2 z-10',
+                            ),
+                        ]}>
+                        <FeeModal
+                            feeRef={bottomFeeRef}
+                            feeRates={feeRates}
+                            setFeeRate={memoizedUpdateFeeRate}
+                            onUpdate={idx => {
+                                setOpenModal(idx);
+                            }}
+                        />
+                    </View>
+                </BottomSheetModalProvider>
             </View>
         </SafeAreaView>
     );
