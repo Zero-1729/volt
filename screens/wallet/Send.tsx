@@ -136,12 +136,14 @@ const SendView = ({route}: Props) => {
                                 '-mt-12 items-center w-full h-4/6 relative',
                             ),
                         ]}>
-                        <View style={[tailwind('mt-6 items-center')]}>
+                        <View style={[tailwind('items-center')]}>
                             <View style={[tailwind('items-center flex-row')]}>
                                 <Text
                                     style={[
                                         tailwind('text-base mb-1'),
-                                        {color: ColorScheme.Text.GrayedText},
+                                        {
+                                            color: ColorScheme.Text.GrayedText,
+                                        },
                                     ]}>
                                     Amount
                                 </Text>
@@ -340,12 +342,7 @@ const SendView = ({route}: Props) => {
                     />
 
                     {/* Fee Modal */}
-                    <View
-                        style={[
-                            tailwind(
-                                'mt-6 absolute bottom-0 w-full h-1/2 z-10',
-                            ),
-                        ]}>
+                    <View style={[tailwind('absolute bottom-0')]}>
                         <FeeModal
                             feeRef={bottomFeeRef}
                             feeRates={feeRates}
