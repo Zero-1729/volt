@@ -35,29 +35,43 @@ const FeeModal = (props: FeeProps) => {
 
     const openFeeModal = () => {
         if (isAndroid) {
-            Prompt('Custom', 'Enter fee rate (sats/vB)', [
-                {text: 'Cancel'},
-                {
-                    text: 'Set',
-                    onPress: (value: string | undefined) => {
-                        props.setFeeRate(Number(value));
+            Prompt(
+                'Custom',
+                'Enter fee rate (sats/vB)',
+                [
+                    {text: 'Cancel'},
+                    {
+                        text: 'Set',
+                        onPress: (value: string | undefined) => {
+                            props.setFeeRate(Number(value));
+                        },
                     },
+                ],
+                {
+                    type: 'numeric',
                 },
-            ]);
+            );
         } else {
-            Alert.prompt('Custom', 'Enter fee rate (sats/vB)', [
-                {
-                    text: 'Cancel',
-                    onPress: () => {},
-                    style: 'cancel',
-                },
-                {
-                    text: 'Set',
-                    onPress: (value: string | undefined) => {
-                        props.setFeeRate(Number(value));
+            Alert.prompt(
+                'Custom',
+                'Enter fee rate (sats/vB)',
+                [
+                    {
+                        text: 'Cancel',
+                        onPress: () => {},
+                        style: 'cancel',
                     },
-                },
-            ]);
+                    {
+                        text: 'Set',
+                        onPress: (value: string | undefined) => {
+                            props.setFeeRate(Number(value));
+                        },
+                    },
+                ],
+                'plain-text',
+                '',
+                'number-pad',
+            );
         }
     };
 
