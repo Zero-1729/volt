@@ -73,7 +73,7 @@ const _BottomModal = forwardRef(
                 return (
                     <BottomSheetBackdrop
                         {...props}
-                        opacity={0.2}
+                        opacity={0.8}
                         disappearsOnIndex={-1}
                         appearsOnIndex={0}
                     />
