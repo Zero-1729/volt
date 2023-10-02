@@ -1,6 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useMemo} from 'react';
-import {Text, View, useColorScheme, Alert, Platform} from 'react-native';
+import {
+    Text,
+    View,
+    useColorScheme,
+    Alert,
+    Platform,
+    Keyboard,
+} from 'react-native';
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -9,6 +16,7 @@ import {BottomModal} from './bmodal';
 import Color from '../constants/Color';
 
 import {LongButton, PlainButton} from './button';
+import {conservativeAlert} from './alert';
 import Prompt from 'react-native-prompt-android';
 
 import {useTailwind} from 'tailwind-rn';
@@ -33,6 +41,24 @@ const FeeModal = (props: FeeProps) => {
 
     const {isAdvancedMode} = useContext(AppStorageContext);
 
+    const processRate = (value: string | undefined) => {
+        const rate = Number(value);
+
+        // Warn user that fee rate invalid
+        if (Number.isNaN(rate)) {
+            conservativeAlert(
+                'Invalid fee rate',
+                'Please enter a valid fee rate',
+            );
+
+            return;
+        }
+
+        props.setFeeRate(rate);
+
+        Keyboard.dismiss();
+    };
+
     const openFeeModal = () => {
         if (isAndroid) {
             Prompt(
@@ -42,9 +68,7 @@ const FeeModal = (props: FeeProps) => {
                     {text: 'Cancel'},
                     {
                         text: 'Set',
-                        onPress: (value: string | undefined) => {
-                            props.setFeeRate(Number(value));
-                        },
+                        onPress: processRate,
                     },
                 ],
                 {
@@ -63,9 +87,7 @@ const FeeModal = (props: FeeProps) => {
                     },
                     {
                         text: 'Set',
-                        onPress: (value: string | undefined) => {
-                            props.setFeeRate(Number(value));
-                        },
+                        onPress: processRate,
                     },
                 ],
                 'plain-text',
