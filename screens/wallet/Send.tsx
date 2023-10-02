@@ -29,6 +29,7 @@ import Close from '../../assets/svg/x-24.svg';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {conservativeAlert} from '../../components/alert';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -38,7 +39,7 @@ const SendView = ({route}: Props) => {
     const navigation = useNavigation();
 
     const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
-        fastestFee: 1,
+        fastestFee: 2,
         halfHourFee: 1,
         hourFee: 1,
         economyFee: 1,
@@ -87,9 +88,19 @@ const SendView = ({route}: Props) => {
     };
 
     const fetchFeeRates = async () => {
-        const rates = (await getFeeRates(
-            route.params.wallet.network,
-        )) as TMempoolFeeRates;
+        let rates = feeRates;
+
+        try {
+            const fetchedRates = await getFeeRates(route.params.wallet.network);
+
+            rates = fetchedRates as TMempoolFeeRates;
+        } catch (e: any) {
+            // Error assumed to be 503; mempool unavailable due to sync
+            conservativeAlert(
+                'Fee rate',
+                'Error fetching fee rates, service unavailable.',
+            );
+        }
 
         // Set the fee rate from modal or use fastest
         setSelectedFeeRate(rates.fastestFee);
