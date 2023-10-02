@@ -98,7 +98,7 @@ const SendView = ({route}: Props) => {
     const updateFeeRate = (fee: number) => {
         setSelectedFeeRate(fee);
 
-        bottomFeeRef.current?.collapse();
+        bottomFeeRef.current?.close();
     };
 
     const memoizedUpdateFeeRate = useCallback(updateFeeRate, []);
