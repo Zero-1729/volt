@@ -76,12 +76,12 @@ const Add = () => {
                     {/* Import an existing Wallet */}
                     <View
                         style={[
+                            styles.cardShadow,
                             tailwind('mb-6 rounded-md p-5'),
                             {
                                 backgroundColor:
                                     ColorScheme.MiscCardColor.ImportCard,
                             },
-                            styles.cardShadow,
                         ]}>
                         <Text
                             style={[

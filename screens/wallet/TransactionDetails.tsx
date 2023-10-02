@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Text, View, useColorScheme, Linking} from 'react-native';
+import {Text, View, useColorScheme, Linking, StyleSheet} from 'react-native';
 import React, {useContext} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -102,10 +102,9 @@ const TransactionDetailsView = ({route}: Props) => {
         <SafeAreaView edges={edges}>
             <View
                 style={[
+                    styles.transactionDetailContainer,
                     tailwind('w-full h-full relative justify-center'),
                     {
-                        borderTopLeftRadius: 32,
-                        borderTopRightRadius: 32,
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
@@ -426,3 +425,10 @@ const TransactionDetailsView = ({route}: Props) => {
 };
 
 export default TransactionDetailsView;
+
+const styles = StyleSheet.create({
+    transactionDetailContainer: {
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+    },
+});

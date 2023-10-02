@@ -2,7 +2,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
 
-import {useColorScheme, Text, View, ActivityIndicator} from 'react-native';
+import {
+    useColorScheme,
+    Text,
+    View,
+    ActivityIndicator,
+    StyleSheet,
+} from 'react-native';
 
 import {StackActions, useNavigation} from '@react-navigation/core';
 
@@ -172,8 +178,8 @@ const CreateAction = () => {
 
                     <View
                         style={[
+                            styles.inputContainer,
                             tailwind('mt-10 border-gray-400 px-4'),
-                            {borderWidth: 1, borderRadius: 6},
                         ]}>
                         <TextSingleInput
                             placeholder={'Enter a wallet name'}
@@ -322,3 +328,10 @@ const CreateAction = () => {
 };
 
 export default CreateAction;
+
+const styles = StyleSheet.create({
+    inputContainer: {
+        borderWidth: 1,
+        borderRadius: 6,
+    },
+});

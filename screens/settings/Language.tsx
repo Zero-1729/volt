@@ -54,7 +54,7 @@ const Language = () => {
                         tailwind(
                             'w-5/6 self-center items-center flex-row justify-between mt-3 mb-6',
                         ),
-                        index === 0 ? styles.PaddedTop : {},
+                        index === 0 ? styles.paddedTop : {},
                     ]}>
                     <Text
                         style={[
@@ -88,7 +88,7 @@ const Language = () => {
                 <View
                     style={[
                         tailwind('w-full h-full mt-4 items-center'),
-                        styles.Flexed,
+                        styles.flexed,
                     ]}>
                     <View style={tailwind('w-5/6 mb-16')}>
                         <PlainButton
@@ -174,10 +174,10 @@ const Language = () => {
 export default Language;
 
 const styles = StyleSheet.create({
-    PaddedTop: {
+    paddedTop: {
         paddingTop: 16,
     },
-    Flexed: {
+    flexed: {
         flex: 1,
     },
 });

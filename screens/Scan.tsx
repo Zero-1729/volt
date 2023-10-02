@@ -1,5 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
-
 import React, {useEffect, useState} from 'react';
 
 import {
@@ -390,7 +388,7 @@ const Scan = ({route}: Props) => {
                             <PlainButton
                                 style={[
                                     tailwind('absolute w-full items-center'),
-                                    {top: 90},
+                                    styles.scanMessage,
                                 ]}
                                 onPress={clearScannerAlert}>
                                 <View
@@ -426,13 +424,10 @@ const Scan = ({route}: Props) => {
                         <View
                             style={[
                                 tailwind('h-2/5 w-4/5 border'),
-                                {
-                                    borderWidth: 4,
-                                    borderColor: 'white',
-                                },
+                                styles.scanAreaBorder,
                             ]}>
                             <Camera
-                                style={[styles.flexed]}
+                                style={styles.flexed}
                                 onError={onError}
                                 CameraType={CameraType.Back}
                                 ref={cameraRef}
@@ -466,6 +461,13 @@ const Scan = ({route}: Props) => {
 const styles = StyleSheet.create({
     flexed: {
         flex: 1,
+    },
+    scanMessage: {
+        top: 90,
+    },
+    scanAreaBorder: {
+        borderWidth: 4,
+        borderColor: 'white',
     },
 });
 

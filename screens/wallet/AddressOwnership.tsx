@@ -1,6 +1,11 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useContext} from 'react';
-import {Text, useColorScheme, View, ActivityIndicator} from 'react-native';
+import {
+    Text,
+    useColorScheme,
+    View,
+    ActivityIndicator,
+    StyleSheet,
+} from 'react-native';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -157,8 +162,8 @@ const AddressOwnership = ({route}: Props) => {
                 {/* Input */}
                 <View
                     style={[
+                        styles.inputContainer,
                         tailwind('mt-10 w-5/6 border-gray-400 px-2'),
-                        {borderWidth: 1, borderRadius: 6},
                     ]}>
                     <TextSingleInput
                         placeholder="Enter an address here..."
@@ -212,3 +217,10 @@ const AddressOwnership = ({route}: Props) => {
 };
 
 export default AddressOwnership;
+
+const styles = StyleSheet.create({
+    inputContainer: {
+        borderWidth: 1,
+        borderRadius: 6,
+    },
+});

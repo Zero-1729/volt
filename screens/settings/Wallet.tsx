@@ -55,7 +55,7 @@ const Wallet = () => {
                 <View
                     style={[
                         tailwind('w-full h-full mt-4 items-center'),
-                        styles.Flexed,
+                        styles.flexed,
                     ]}>
                     <View style={tailwind('w-5/6 mb-16')}>
                         <PlainButton
@@ -231,10 +231,7 @@ const Wallet = () => {
 export default Wallet;
 
 const styles = StyleSheet.create({
-    PaddedTop: {
-        paddingTop: 16,
-    },
-    Flexed: {
+    flexed: {
         flex: 1,
     },
 });

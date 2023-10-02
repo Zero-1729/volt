@@ -1,7 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useCallback, useEffect, useState} from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -10,7 +9,6 @@ import {TMempoolFeeRates} from '../../types/wallet';
 
 import {FiatBalance, Balance} from '../../components/balance';
 
-import Font from '../../constants/Font';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import FeeModal from '../../components/fee';
 
@@ -286,8 +284,8 @@ const SendView = ({route}: Props) => {
                                 {route.params.invoiceData.options.message ? (
                                     <View
                                         style={[
+                                            styles.invoiceMessage,
                                             tailwind('w-full mt-6'),
-                                            {height: 128},
                                         ]}>
                                         <Text
                                             style={[
@@ -352,3 +350,9 @@ const SendView = ({route}: Props) => {
 };
 
 export default SendView;
+
+const styles = StyleSheet.create({
+    invoiceMessage: {
+        height: 128,
+    },
+});

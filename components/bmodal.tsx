@@ -86,8 +86,8 @@ const _BottomModal = forwardRef(
             ({style}: BottomSheetBackgroundProps) => (
                 <View
                     style={[
-                        tailwind('relative'),
                         styles.backgroundContainer,
+                        tailwind('relative'),
                         {
                             backgroundColor: backgroundColor,
                         },

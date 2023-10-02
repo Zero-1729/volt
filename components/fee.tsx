@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useMemo} from 'react';
 import {
     Text,
@@ -7,6 +6,7 @@ import {
     Alert,
     Platform,
     Keyboard,
+    StyleSheet,
 } from 'react-native';
 
 import {AppStorageContext} from '../class/storageContext';
@@ -168,9 +168,9 @@ const FeeModal = (props: FeeProps) => {
 
                     <View
                         style={[
+                            styles.divider,
                             tailwind('w-full mt-4'),
                             {
-                                height: 1,
                                 backgroundColor: ColorScheme.Background.Greyed,
                             },
                         ]}
@@ -219,9 +219,9 @@ const FeeModal = (props: FeeProps) => {
 
                     <View
                         style={[
+                            styles.divider,
                             tailwind('w-full mt-4'),
                             {
-                                height: 1,
                                 backgroundColor: ColorScheme.Background.Greyed,
                             },
                         ]}
@@ -284,3 +284,9 @@ const FeeModal = (props: FeeProps) => {
 };
 
 export default FeeModal;
+
+const styles = StyleSheet.create({
+    divider: {
+        height: 1,
+    },
+});

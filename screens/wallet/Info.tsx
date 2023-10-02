@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useRef, useState} from 'react';
-import {Text, View, TextInput, useColorScheme} from 'react-native';
+import {Text, View, TextInput, useColorScheme, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -144,11 +144,10 @@ const Info = () => {
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View
                     style={[
+                        styles.backgroundContainer,
                         tailwind('w-full absolute'),
                         {
                             backgroundColor: CardColor,
-                            top: 0,
-                            height: 192,
                         },
                     ]}
                 />
@@ -193,12 +192,8 @@ const Info = () => {
                         </Text>
                         <View
                             style={[
+                                styles.renameContainer,
                                 tailwind('px-4 w-full'),
-                                {
-                                    borderWidth: 1,
-                                    borderRadius: 4,
-                                    borderColor: 'rgba(0, 0, 0, 0.4)',
-                                },
                             ]}>
                             <TextSingleInput
                                 placeholderTextColor={
@@ -424,3 +419,15 @@ const Info = () => {
 };
 
 export default Info;
+
+const styles = StyleSheet.create({
+    backgroundContainer: {
+        top: 0,
+        height: 192,
+    },
+    renameContainer: {
+        borderWidth: 1,
+        borderRadius: 4,
+        borderColor: 'rgba(0, 0, 0, 0.4)',
+    },
+});

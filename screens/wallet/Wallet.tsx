@@ -1,7 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
+
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {useColorScheme, View, Text, FlatList, StatusBar} from 'react-native';
+import {
+    useColorScheme,
+    View,
+    Text,
+    FlatList,
+    StatusBar,
+    StyleSheet,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
@@ -329,7 +336,8 @@ const Wallet = () => {
     return (
         <SafeAreaView
             style={[
-                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+                styles.root,
+                {backgroundColor: ColorScheme.Background.Primary},
             ]}>
             {/* status bar filler */}
             <StatusBar barStyle={'light-content'} backgroundColor={CardColor} />
@@ -539,11 +547,10 @@ const Wallet = () => {
                 {/* Transactions List */}
                 <View
                     style={[
+                        styles.transactionList,
                         tailwind('h-1/2 w-full items-center z-10'),
                         {
                             backgroundColor: ColorScheme.Background.Primary,
-                            borderTopLeftRadius: 32,
-                            borderTopRightRadius: 32,
                         },
                     ]}>
                     <View style={[tailwind('mt-6 w-11/12')]}>
@@ -638,3 +645,13 @@ const Wallet = () => {
 };
 
 export default Wallet;
+
+const styles = StyleSheet.create({
+    root: {
+        flex: 1,
+    },
+    transactionList: {
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+    },
+});

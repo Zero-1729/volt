@@ -1,7 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
 
-import {Text, View, useColorScheme, Linking} from 'react-native';
+import {Text, View, useColorScheme, Linking, StyleSheet} from 'react-native';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -87,9 +86,9 @@ const About = () => {
 
                     <View
                         style={[
+                            styles.headingBarContainer,
                             tailwind('w-full'),
                             {
-                                height: 2,
                                 backgroundColor: ColorScheme.HeadingBar,
                             },
                         ]}
@@ -193,7 +192,6 @@ const About = () => {
                                 width={16}
                                 stroke={ColorScheme.SVG.GrayFill}
                                 fill={ColorScheme.SVG.GrayFill}
-                                style={[]}
                             />
                         </View>
                     </PlainButton>
@@ -223,7 +221,6 @@ const About = () => {
                                 width={16}
                                 stroke={ColorScheme.SVG.GrayFill}
                                 fill={ColorScheme.SVG.GrayFill}
-                                style={[]}
                             />
                         </View>
                     </PlainButton>
@@ -296,3 +293,9 @@ const About = () => {
 };
 
 export default About;
+
+const styles = StyleSheet.create({
+    headingBarContainer: {
+        height: 2,
+    },
+});

@@ -103,7 +103,7 @@ const Network = () => {
                 <View
                     style={[
                         tailwind('w-full h-full mt-4 items-center'),
-                        styles.Flexed,
+                        styles.flexed,
                     ]}>
                     <View style={tailwind('w-5/6 mb-16')}>
                         <PlainButton
@@ -252,10 +252,9 @@ const Network = () => {
                             {/* Input */}
                             <View
                                 style={[
+                                    styles.inputContainer,
                                     tailwind('w-full px-2 mb-4'),
                                     {
-                                        borderWidth: 1,
-                                        borderRadius: 6,
                                         borderColor:
                                             url.length === 0
                                                 ? ColorScheme.Background.Greyed
@@ -367,10 +366,11 @@ const Network = () => {
 export default Network;
 
 const styles = StyleSheet.create({
-    PaddedTop: {
-        paddingTop: 16,
-    },
-    Flexed: {
+    flexed: {
         flex: 1,
+    },
+    inputContainer: {
+        borderWidth: 1,
+        borderRadius: 6,
     },
 });

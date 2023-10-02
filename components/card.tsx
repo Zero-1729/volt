@@ -33,10 +33,10 @@ export const EmptyCard = () => {
         <View style={tailwind('w-full h-48 relative items-center')}>
             <View
                 style={[
+                    styles.darkGrayCard,
                     tailwind(
                         'w-11/12 h-full absolute -bottom-2 rounded-md z-20 opacity-60',
                     ),
-                    styles.DarkGrayCard,
                 ]}
             />
 
@@ -103,13 +103,13 @@ export const WalletCard = (props: WalletCardProps) => {
             <View style={tailwind('w-full h-48 relative items-center')}>
                 <View
                     style={[
+                        styles.overflowHidden,
                         tailwind('w-full h-48 rounded-md z-50 px-6'),
                         {
                             backgroundColor:
                                 ColorScheme.WalletColors[props.walletType][
                                     props.network
                                 ],
-                            overflow: 'hidden',
                         },
                     ]}>
                     <View
@@ -143,11 +143,8 @@ export const WalletCard = (props: WalletCardProps) => {
                     {!props.isWatchOnly ? (
                         <View
                             style={[
+                                styles.sim,
                                 tailwind('absolute opacity-80 h-auto w-auto'),
-                                {
-                                    left: 24,
-                                    top: 18,
-                                },
                             ]}>
                             <SIM fill={'white'} width={42} height={42} />
                         </View>
@@ -159,13 +156,12 @@ export const WalletCard = (props: WalletCardProps) => {
                         numberOfLines={1}
                         ellipsizeMode="middle"
                         style={[
+                            styles.label,
                             tailwind(
                                 'absolute pt-4 mt-1 text-base w-4/6 text-left text-white opacity-60',
                             ),
                             {
                                 bottom: props.hideBalance ? 72 : 54,
-                                left: 24,
-                                fontWeight: 100,
                             },
                             Font.RobotoText,
                         ]}>
@@ -175,13 +171,10 @@ export const WalletCard = (props: WalletCardProps) => {
                     {props.isWatchOnly ? (
                         <View
                             style={[
+                                styles.watchOnly,
                                 tailwind(
                                     'bg-black absolute rounded-full opacity-60',
                                 ),
-                                {
-                                    top: 24,
-                                    left: 20,
-                                },
                             ]}>
                             <Text
                                 style={[
@@ -214,7 +207,22 @@ export const WalletCard = (props: WalletCardProps) => {
 };
 
 const styles = StyleSheet.create({
-    DarkGrayCard: {
+    darkGrayCard: {
         backgroundColor: '#B5B5B5',
+    },
+    overflowHidden: {
+        overflow: 'hidden',
+    },
+    label: {
+        left: 24,
+        fontWeight: 100,
+    },
+    watchOnly: {
+        top: 24,
+        left: 20,
+    },
+    sim: {
+        left: 24,
+        top: 18,
     },
 });

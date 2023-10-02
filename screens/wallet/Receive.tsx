@@ -8,7 +8,7 @@ import React, {
     useMemo,
     useReducer,
 } from 'react';
-import {useColorScheme, View, Text, Share} from 'react-native';
+import {useColorScheme, View, Text, Share, StyleSheet} from 'react-native';
 
 import {
     useNavigation,
@@ -202,11 +202,9 @@ const Receive = ({route}: Props) => {
                     {/* QR code */}
                     <View
                         style={[
+                            styles.qrCodeContainer,
                             tailwind('rounded'),
-                            {
-                                borderWidth: 2,
-                                borderColor: ColorScheme.Background.QRBorder,
-                            },
+                            {borderColor: ColorScheme.Background.QRBorder},
                         ]}>
                         <QRCodeStyled
                             style={{
@@ -326,3 +324,9 @@ const Receive = ({route}: Props) => {
 };
 
 export default Receive;
+
+const styles = StyleSheet.create({
+    qrCodeContainer: {
+        borderWidth: 2,
+    },
+});

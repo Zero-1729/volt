@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useState} from 'react';
 
-import {Text, View, useColorScheme, Platform} from 'react-native';
+import {Text, View, useColorScheme, Platform, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -444,8 +444,8 @@ const Backup = () => {
 
                     <View
                         style={[
+                            styles.infoContainer,
                             tailwind('absolute flex w-full'),
-                            {bottom: NativeWindowMetrics.bottom},
                         ]}>
                         <Text
                             style={[
@@ -470,3 +470,9 @@ const Backup = () => {
 };
 
 export default Backup;
+
+const styles = StyleSheet.create({
+    infoContainer: {
+        bottom: NativeWindowMetrics.bottom,
+    },
+});

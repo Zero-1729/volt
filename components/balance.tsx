@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useState} from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -57,12 +57,12 @@ export const TXBalance = (props: TxBalanceProps) => {
                 <Text
                     numberOfLines={1}
                     style={[
-                        {...Font.SatSymbol},
                         tailwind(`${props.balanceFontSize} self-start mr-2`),
                         {
                             color: props.fontColor,
                             marginTop: appUnit.name === 'sats' ? 1.5 : 0,
                         },
+                        {...Font.SatSymbol},
                     ]}>
                     {appUnit.symbol}
                 </Text>
@@ -183,12 +183,12 @@ export const Balance = (props: BalanceProps) => {
                 /* Empty view to keep the card height consistent  */
                 <View
                     style={[
+                        styles.emptyCard,
                         tailwind(
                             'rounded-sm flex-row self-center rounded w-full h-12',
                         ),
                         {
                             opacity: props.loading ? 0.15 : 0.3,
-                            backgroundColor: 'darkgrey',
                         },
                     ]}
                 />
@@ -333,3 +333,9 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    emptyCard: {
+        backgroundColor: 'darkgrey',
+    },
+});

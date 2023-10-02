@@ -11,6 +11,7 @@ import {
     Button,
     Pressable,
     useColorScheme,
+    StyleSheet,
 } from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
@@ -99,12 +100,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 enablesReturnKeyAutomatically={true}
                 inputAccessoryViewID={InputAccessoryViewID}
                 {...props}
-                style={[
-                    tailwind('text-xs pt-4'),
-                    {
-                        textAlignVertical: 'top',
-                    },
-                ]}
+                style={[styles.inputContainer, tailwind('text-xs pt-4')]}
             />
 
             {props.showScanIcon ? (
@@ -363,3 +359,9 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    inputContainer: {
+        textAlignVertical: 'top',
+    },
+});

@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
 import {
     Text,
     View,
     useColorScheme,
     Linking,
     ActivityIndicator,
+    StyleSheet,
 } from 'react-native';
 import React, {useState, useLayoutEffect, useContext} from 'react';
 
@@ -271,10 +271,9 @@ const TransactionStatus = ({route}: Props) => {
         <SafeAreaView edges={['right', 'left', 'bottom']}>
             <View
                 style={[
+                    styles.statusContainer,
                     tailwind('w-full h-full relative justify-center'),
                     {
-                        borderTopLeftRadius: 32,
-                        borderTopRightRadius: 32,
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
@@ -291,3 +290,10 @@ const TransactionStatus = ({route}: Props) => {
 };
 
 export default TransactionStatus;
+
+const styles = StyleSheet.create({
+    statusContainer: {
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+    },
+});
