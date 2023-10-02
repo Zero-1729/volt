@@ -43,6 +43,7 @@ const SendView = ({route}: Props) => {
         fastestFee: 1,
         halfHourFee: 1,
         hourFee: 1,
+        economyFee: 1,
         minimumFee: 1,
     });
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>();
@@ -84,7 +85,9 @@ const SendView = ({route}: Props) => {
     };
 
     const fetchFeeRates = async () => {
-        const rates = await getFeeRates(route.params.wallet.network);
+        const rates = (await getFeeRates(
+            route.params.wallet.network,
+        )) as TMempoolFeeRates;
 
         // Set the fee rate from modal or use fastest
         setSelectedFeeRate(rates.fastestFee);
