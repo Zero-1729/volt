@@ -50,7 +50,7 @@ const _BottomModal = forwardRef(
             present(): void {
                 bottomSheetRef.current?.present();
             },
-            collapse(): void {
+            close(): void {
                 bottomSheetRef.current?.close();
             },
         }));
