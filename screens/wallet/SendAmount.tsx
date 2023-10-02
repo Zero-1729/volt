@@ -65,6 +65,26 @@ const SendAmount = ({route}: Props) => {
         name: appFiatCurrency.short,
     });
 
+    const isMax = amount === route.params.wallet.balance.toString();
+
+    const triggerMax = () => {
+        const maxSats = route.params.wallet.balance.toString();
+
+        setAmount(maxSats);
+
+        setSatsAmount({
+            value: new BigNumber(maxSats),
+            symbol: 'sats',
+            name: 'sats',
+        });
+
+        setFiatAmount({
+            value: calculateFiatEquivalent(maxSats),
+            symbol: appFiatCurrency.symbol,
+            name: appFiatCurrency.short,
+        });
+    };
+
     const updateAmount = (value: string) => {
         // When newly swapped, the value is reset to new number from user
         // We reset instead of preserve previous top unit value
@@ -205,56 +225,63 @@ const SendAmount = ({route}: Props) => {
                         ),
                     ]}>
                     {/* Top unit */}
-                    <View style={[tailwind('opacity-40 mb-2')]}>
-                        {!(topUnit?.name === 'sats')
-                            ? renderFiatAmount('text-base')
-                            : renderSatAmount('text-base')}
-                    </View>
+                    {!isMax && (
+                        <View style={[tailwind('opacity-40 mb-2')]}>
+                            {!(topUnit?.name === 'sats')
+                                ? renderFiatAmount('text-base')
+                                : renderSatAmount('text-base')}
+                        </View>
+                    )}
 
                     {/* Bottom unit */}
                     <View>
-                        <PlainButton
-                            onPress={() => {
-                                swapPolarity();
-                            }}>
-                            {bottomUnit?.name === 'sats'
-                                ? renderSatAmount('text-4xl')
-                                : renderFiatAmount('text-4xl')}
-                        </PlainButton>
+                        {isMax && (
+                            <Text
+                                style={[
+                                    tailwind('text-4xl font-bold'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                Max
+                            </Text>
+                        )}
+                        {!isMax && (
+                            <PlainButton
+                                onPress={() => {
+                                    swapPolarity();
+                                }}>
+                                {bottomUnit?.name === 'sats'
+                                    ? renderSatAmount('text-4xl')
+                                    : renderFiatAmount('text-4xl')}
+                            </PlainButton>
+                        )}
                     </View>
 
                     {/* Set maximum */}
-                    <View
-                        style={[
-                            tailwind(
-                                `rounded-full px-4 py-1 mt-6 ${
+                    {!isMax && (
+                        <View
+                            style={[
+                                tailwind('rounded-full px-4 py-1 mt-6'),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                },
+                            ]}>
+                            <PlainButton
+                                disabled={
                                     route.params.wallet.balance.toString() ===
                                     satsAmount.value.toString()
-                                        ? 'opacity-20'
-                                        : ''
-                                }`,
-                            ),
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        <PlainButton
-                            disabled={
-                                route.params.wallet.balance.toString() ===
-                                satsAmount.value.toString()
-                            }
-                            onPress={() => {
-                                updateAmount(
-                                    route.params.wallet.balance.toString(),
-                                );
-                            }}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                Use Max
-                            </Text>
-                        </PlainButton>
-                    </View>
+                                }
+                                onPress={triggerMax}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    Use Max
+                                </Text>
+                            </PlainButton>
+                        </View>
+                    )}
                 </View>
 
                 {/* Number pad for input amount */}

@@ -48,6 +48,10 @@ const SendView = ({route}: Props) => {
 
     const sats = route.params.invoiceData.options?.amount || 0;
 
+    const isMax =
+        route.params.invoiceData.options?.amount?.toString() ===
+        route.params.wallet.balance.toString();
+
     const createTransaction = async () => {
         // Navigate to status screen
         navigation.dispatch(
@@ -149,19 +153,32 @@ const SendView = ({route}: Props) => {
                                     Amount
                                 </Text>
                             </View>
-                            <FiatBalance
-                                balance={sats}
-                                loading={false}
-                                balanceFontSize={'text-4xl'}
-                                fontColor={ColorScheme.Text.Default}
-                            />
-                            <Balance
-                                loading={false}
-                                disableFiat={true}
-                                balance={sats}
-                                balanceFontSize={'text-sm'}
-                                fontColor={ColorScheme.Text.DescText}
-                            />
+                            {isMax && (
+                                <Text
+                                    style={[
+                                        tailwind('text-4xl'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    Max
+                                </Text>
+                            )}
+                            {!isMax && (
+                                <FiatBalance
+                                    balance={sats}
+                                    loading={false}
+                                    balanceFontSize={'text-4xl'}
+                                    fontColor={ColorScheme.Text.Default}
+                                />
+                            )}
+                            {!isMax && (
+                                <Balance
+                                    loading={false}
+                                    disableFiat={true}
+                                    balance={sats}
+                                    balanceFontSize={'text-sm'}
+                                    fontColor={ColorScheme.Text.DescText}
+                                />
+                            )}
                         </View>
 
                         <View style={[tailwind('mt-12 w-4/5')]}>
