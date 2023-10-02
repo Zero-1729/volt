@@ -239,7 +239,7 @@ const FeeModal = (props: FeeProps) => {
                                 <Text
                                     style={[
                                         tailwind(
-                                            'text-left text-base font-semibold',
+                                            'text-left text-sm font-semibold',
                                         ),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
@@ -337,7 +337,7 @@ const FeeModal = (props: FeeProps) => {
                                 <Text
                                     style={[
                                         tailwind(
-                                            'text-left text-base font-semibold',
+                                            'text-left text-sm font-semibold',
                                         ),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
