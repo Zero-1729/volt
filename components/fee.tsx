@@ -22,7 +22,6 @@ import Prompt from 'react-native-prompt-android';
 import {useTailwind} from 'tailwind-rn';
 
 import {TMempoolFeeRates} from '../types/wallet';
-import Font from '../constants/Font';
 
 type FeeProps = {
     feeRef: React.RefObject<BottomSheetModal>;
@@ -150,65 +149,18 @@ const FeeModal = (props: FeeProps) => {
 
                                 <View
                                     style={[tailwind('items-center flex-row')]}>
-                                    {isAdvancedMode ? (
-                                        <Text
-                                            style={[
-                                                tailwind('text-sm mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                                },
-                                            ]}>
-                                            ~10 mins
-                                        </Text>
-                                    ) : (
-                                        <></>
-                                    )}
-                                    <View
+                                    <Text
                                         style={[
-                                            tailwind('rounded-full px-4 py-1'),
+                                            tailwind('text-sm mr-2'),
                                             {
-                                                backgroundColor: 'darkgrey',
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
                                             },
                                         ]}>
-                                        {isAdvancedMode ? (
-                                            <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm font-bold',
-                                                    ),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .Alt,
-                                                    },
-                                                ]}>
-                                                {props.feeRates.fastestFee}{' '}
-                                                <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm self-baseline',
-                                                        ),
-                                                        Font.SatSymbol,
-                                                    ]}>
-                                                    s
-                                                </Text>
-                                                /vB
-                                            </Text>
-                                        ) : (
-                                            <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm font-bold',
-                                                    ),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .GrayedText,
-                                                    },
-                                                ]}>
-                                                ~10 mins
-                                            </Text>
-                                        )}
-                                    </View>
+                                        {isAdvancedMode
+                                            ? `${props.feeRates.fastestFee} sat/vB`
+                                            : '~10 mins'}
+                                    </Text>
                                 </View>
                             </View>
                         </View>
@@ -248,65 +200,18 @@ const FeeModal = (props: FeeProps) => {
 
                                 <View
                                     style={[tailwind('items-center flex-row')]}>
-                                    {isAdvancedMode ? (
-                                        <Text
-                                            style={[
-                                                tailwind('text-sm mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                                },
-                                            ]}>
-                                            ~30 mins
-                                        </Text>
-                                    ) : (
-                                        <></>
-                                    )}
-                                    <View
+                                    <Text
                                         style={[
-                                            tailwind('rounded-full px-4 py-1'),
+                                            tailwind('text-sm mr-2'),
                                             {
-                                                backgroundColor: 'darkgrey',
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
                                             },
                                         ]}>
-                                        {isAdvancedMode ? (
-                                            <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm font-bold',
-                                                    ),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .Alt,
-                                                    },
-                                                ]}>
-                                                {props.feeRates.halfHourFee}{' '}
-                                                <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm self-baseline',
-                                                        ),
-                                                        Font.SatSymbol,
-                                                    ]}>
-                                                    s
-                                                </Text>
-                                                /vB
-                                            </Text>
-                                        ) : (
-                                            <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm font-bold',
-                                                    ),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .GrayedText,
-                                                    },
-                                                ]}>
-                                                ~30 mins
-                                            </Text>
-                                        )}
-                                    </View>
+                                        {isAdvancedMode
+                                            ? `${props.feeRates.economyFee} sat/vB`
+                                            : '~30 mins'}
+                                    </Text>
                                 </View>
                             </View>
                         </View>
@@ -341,72 +246,23 @@ const FeeModal = (props: FeeProps) => {
                                         ),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Minimum
+                                    Economic
                                 </Text>
 
                                 <View
                                     style={[tailwind('items-center flex-row')]}>
-                                    {isAdvancedMode ? (
-                                        <Text
-                                            style={[
-                                                tailwind('text-sm mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                                },
-                                            ]}>
-                                            ~1 day
-                                        </Text>
-                                    ) : (
-                                        <></>
-                                    )}
-                                    <View
+                                    <Text
                                         style={[
-                                            tailwind('rounded-full px-4 py-1'),
+                                            tailwind('text-sm mr-2'),
                                             {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Greyed,
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
                                             },
                                         ]}>
-                                        {isAdvancedMode ? (
-                                            <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm font-bold',
-                                                    ),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .Alt,
-                                                    },
-                                                ]}>
-                                                {props.feeRates.minimumFee}{' '}
-                                                <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm self-baseline',
-                                                        ),
-                                                        Font.SatSymbol,
-                                                    ]}>
-                                                    s
-                                                </Text>
-                                                /vB
-                                            </Text>
-                                        ) : (
-                                            <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm font-bold',
-                                                    ),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .GrayedText,
-                                                    },
-                                                ]}>
-                                                ~1 day
-                                            </Text>
-                                        )}
-                                    </View>
+                                        {isAdvancedMode
+                                            ? `${props.feeRates.minimumFee} sat/vB`
+                                            : 'more than 1 hour'}
+                                    </Text>
                                 </View>
                             </View>
                         </View>
