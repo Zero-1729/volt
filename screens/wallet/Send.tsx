@@ -229,17 +229,7 @@ const SendView = ({route}: Props) => {
                                                     color: ColorScheme.Text.Alt,
                                                 },
                                             ]}>
-                                            {selectedFeeRate}{' '}
-                                            <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm self-baseline',
-                                                    ),
-                                                    Font.SatSymbol,
-                                                ]}>
-                                                s
-                                            </Text>
-                                            /vB
+                                            {`${selectedFeeRate} sat/vB`}
                                         </Text>
                                     </View>
                                 </PlainButton>
