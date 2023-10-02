@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
-import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
@@ -87,12 +87,11 @@ const RequestPermView = () => {
         <SafeAreaView
             style={[
                 styles.flexed,
-                {backgroundColor: ColorScheme.Background.Primary},
-                tailwind('justify-center items-center'),
+                tailwind('justify-center items-center bg-black'),
             ]}>
             <Text
                 style={[
-                    {color: ColorScheme.Text.Default},
+                    {color: ColorScheme.Text.Alt},
                     tailwind('text-sm text-center mb-6'),
                 ]}>
                 Camera Permission Denied
@@ -105,8 +104,8 @@ const RequestPermView = () => {
                         tailwind('text-sm text-center'),
                     ]}
                     onPress={openSettings}
-                    backgroundColor={ColorScheme.Background.Inverted}
-                    textColor={ColorScheme.Text.Alt}
+                    backgroundColor={'white'}
+                    textColor={'black'}
                     title={'Open Settings'}
                 />
             </View>
@@ -128,7 +127,6 @@ const Scan = ({route}: Props) => {
     const [grantedPermission, setGrantedPermission] = useState<Status>(
         Status.UNKNOWN,
     );
-    const [rawQRData, setRawQRData] = useState('');
     const cameraRef = React.useRef<Camera>(null);
 
     const onError = (error: any) => {
@@ -144,12 +142,23 @@ const Scan = ({route}: Props) => {
         const checkResult = await check(CamPermission);
 
         switch (checkResult) {
-            case RESULTS.UNAVAILABLE:
             case RESULTS.BLOCKED:
                 setGrantedPermission(Status.NOT_AUTHORIZED);
                 break;
+            case RESULTS.UNAVAILABLE:
             case RESULTS.DENIED:
-                // TODO: Handle
+                const permRequest = await request(CamPermission, {
+                    title: 'Camera Permission',
+                    message: 'Allow Camera to Scan QR Codes',
+                    buttonPositive: 'OK',
+                    buttonNegative: 'Cancel',
+                });
+
+                setGrantedPermission(
+                    permRequest === RESULTS.GRANTED
+                        ? Status.AUTHORIZED
+                        : Status.NOT_AUTHORIZED,
+                );
                 break;
             case RESULTS.LIMITED:
             case RESULTS.GRANTED:
@@ -249,13 +258,7 @@ const Scan = ({route}: Props) => {
 
         const _QR = event.nativeEvent.codeStringValue;
 
-        if (_QR !== rawQRData) {
-            setRawQRData(_QR);
-        } else {
-            return;
-        }
-
-        const decodedQR = handleInvalidInvoice(rawQRData);
+        const decodedQR = handleInvalidInvoice(_QR);
 
         if (decodedQR) {
             // To highlight the successful scan, we'll trigger a success haptic
@@ -299,17 +302,6 @@ const Scan = ({route}: Props) => {
     useEffect(() => {
         requestCamPerms();
     }, []);
-
-    // Display if permission is not granted,
-    // then, request permission if not determined.
-    if (grantedPermission === Status.NOT_AUTHORIZED) {
-        return <RequestPermView />;
-    }
-
-    // Display loading or camera unavailable; handle differently
-    if (Camera === undefined) {
-        return <LoadingView isCamAvailable={false} />;
-    }
 
     const handleClipboard = async () => {
         const clipboardData = await Clipboard.getString();
@@ -360,101 +352,113 @@ const Scan = ({route}: Props) => {
         <SafeAreaView
             style={[styles.flexed, tailwind('bg-black')]}
             edges={['bottom', 'left', 'right']}>
-            <View
-                style={[
-                    tailwind(
-                        'items-center justify-center h-full w-full bg-black',
-                    ),
-                    styles.flexed,
-                ]}>
+            {grantedPermission === Status.AUTHORIZED && (
                 <View
                     style={[
                         tailwind(
-                            'absolute top-6 z-10 w-full flex-row items-center justify-center',
+                            'items-center justify-center h-full w-full bg-black',
                         ),
+                        styles.flexed,
                     ]}>
-                    <PlainButton
-                        onPress={closeScreen}
-                        style={[tailwind('absolute z-10 left-6')]}>
-                        <Close fill={'white'} />
-                    </PlainButton>
-                    {/* Screen header */}
-                    <Text style={[tailwind('text-sm font-bold text-white')]}>
-                        {dynamicHeading}
-                    </Text>
-                </View>
-
-                {/* Scan midsection */}
-                <View
-                    style={[
-                        tailwind(
-                            'items-center justify-center w-full h-full -mt-8',
-                        ),
-                    ]}>
-                    {/* Scan description */}
-                    {scannerAlertMsg ? (
-                        <PlainButton
-                            style={[
-                                tailwind('absolute w-full items-center'),
-                                {top: 90},
-                            ]}
-                            onPress={clearScannerAlert}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'w-4/5 flex-row items-center justify-around rounded px-1 py-3 bg-white',
-                                    ),
-                                ]}>
-                                <InfoIcon
-                                    height={18}
-                                    width={18}
-                                    fill={'black'}
-                                />
-                                <Text
-                                    style={[
-                                        tailwind('text-sm w-5/6 text-black'),
-                                    ]}>
-                                    {scannerAlertMsg}
-                                </Text>
-                            </View>
-                        </PlainButton>
-                    ) : (
-                        <></>
-                    )}
-
-                    <Text style={[tailwind('text-sm mb-4 text-white')]}>
-                        Scan a Bitcoin invoice or address to pay
-                    </Text>
-
-                    {/* Scan Area */}
                     <View
                         style={[
-                            tailwind('h-2/5 w-4/5 border'),
-                            {
-                                borderWidth: 4,
-                                borderColor: 'white',
-                            },
+                            tailwind(
+                                'absolute top-6 z-10 w-full flex-row items-center justify-center',
+                            ),
                         ]}>
-                        <Camera
-                            style={[styles.flexed]}
-                            onError={onError}
-                            CameraType={CameraType.Back}
-                            ref={cameraRef}
-                            flashMode={'off'} // TODO: Add flash mode
-                            scanBarcode={true}
-                            focusMode={'on'}
-                            onReadCode={onQRDetected}
-                        />
+                        <PlainButton
+                            onPress={closeScreen}
+                            style={[tailwind('absolute z-10 left-6')]}>
+                            <Close fill={'white'} />
+                        </PlainButton>
+                        {/* Screen header */}
+                        <Text
+                            style={[tailwind('text-sm font-bold text-white')]}>
+                            {dynamicHeading}
+                        </Text>
                     </View>
-                </View>
 
-                <LongBottomButton
-                    onPress={handleClipboard}
-                    title={'Paste'}
-                    textColor={'black'}
-                    backgroundColor={'white'}
-                />
-            </View>
+                    {/* Scan midsection */}
+                    <View
+                        style={[
+                            tailwind(
+                                'items-center justify-center w-full h-full -mt-8',
+                            ),
+                        ]}>
+                        {/* Scan description */}
+                        {scannerAlertMsg ? (
+                            <PlainButton
+                                style={[
+                                    tailwind('absolute w-full items-center'),
+                                    {top: 90},
+                                ]}
+                                onPress={clearScannerAlert}>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'w-4/5 flex-row items-center justify-around rounded px-1 py-3 bg-white',
+                                        ),
+                                    ]}>
+                                    <InfoIcon
+                                        height={18}
+                                        width={18}
+                                        fill={'black'}
+                                    />
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                'text-sm w-5/6 text-black',
+                                            ),
+                                        ]}>
+                                        {scannerAlertMsg}
+                                    </Text>
+                                </View>
+                            </PlainButton>
+                        ) : (
+                            <></>
+                        )}
+
+                        <Text style={[tailwind('text-sm mb-4 text-white')]}>
+                            Scan a Bitcoin invoice or address to pay
+                        </Text>
+
+                        {/* Scan Area */}
+                        <View
+                            style={[
+                                tailwind('h-2/5 w-4/5 border'),
+                                {
+                                    borderWidth: 4,
+                                    borderColor: 'white',
+                                },
+                            ]}>
+                            <Camera
+                                style={[styles.flexed]}
+                                onError={onError}
+                                CameraType={CameraType.Back}
+                                ref={cameraRef}
+                                flashMode={'off'} // TODO: Add flash mode
+                                scanBarcode={true}
+                                focusMode={'on'}
+                                onReadCode={onQRDetected}
+                            />
+                        </View>
+                    </View>
+
+                    <LongBottomButton
+                        onPress={handleClipboard}
+                        title={'Paste'}
+                        textColor={'black'}
+                        backgroundColor={'white'}
+                    />
+                </View>
+            )}
+
+            {/* Display if permission is not granted,
+            then, request permission if not determined. */}
+            {grantedPermission === Status.NOT_AUTHORIZED && <RequestPermView />}
+
+            {/* Display loading or camera unavailable; handle differently */}
+            {!Camera && <LoadingView isCamAvailable={true} />}
         </SafeAreaView>
     );
 };

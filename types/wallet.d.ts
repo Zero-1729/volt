@@ -144,4 +144,6 @@ export type TAccountPaths = {
     testnet: string;
 };
 
-export type TMempoolFeeRates = FeesRecommended;
+export type TMempoolFeeRates = {
+    economyFee: number;
+} & FeesRecommended;

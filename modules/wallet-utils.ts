@@ -36,6 +36,20 @@ import {
     extendedKeyPattern,
 } from './re';
 
+const prefixInfo: {[index: string]: {network: string; type: string}} = {
+    '1': {network: 'bitcoin', type: 'p2pkh'},
+    // Handle special case
+    // P2TR -> bc1p
+    // WPKH -> bc1q
+    bc1q: {network: 'bitcoin', type: 'wpkh'},
+    bc1p: {network: 'bitcoin', type: 'p2tr'},
+    '3': {network: 'bitcoin', type: 'shp2wpkh'},
+    m: {network: 'testnet', type: 'p2pkh'},
+    tb1q: {network: 'testnet', type: 'wpkh'},
+    tb1p: {network: 'testnet', type: 'p2tr'},
+    '2': {network: 'testnet', type: 'shp2wpkh'},
+};
+
 export const getUniqueTXs = (transactions: TTransaction[]): TTransaction[] => {
     const uniqueTXs: TTransaction[] = [];
 
@@ -475,20 +489,6 @@ export const canSendToInvoice = (
     miniWallet: TMiniWallet,
 ): Boolean => {
     // check that network matches
-    const prefixInfo: {[index: string]: {network: string; type: string}} = {
-        '1': {network: 'bitcoin', type: 'p2pkh'},
-        // Handle special case
-        // P2TR -> bc1p
-        // WPKH -> bc1q
-        bc1q: {network: 'bitcoin', type: 'wpkh'},
-        bc1p: {network: 'bitcoin', type: 'p2tr'},
-        '3': {network: 'bitcoin', type: 'shp2wpkh'},
-        m: {network: 'testnet', type: 'p2pkh'},
-        tb1q: {network: 'testnet', type: 'wpkh'},
-        tb1p: {network: 'testnet', type: 'p2tr'},
-        '2': {network: 'testnet', type: 'shp2wpkh'},
-    };
-
     // Handle special case for WPKH & P2TR
     const prefixTip = invoice.address[0];
     const prefixStub =
