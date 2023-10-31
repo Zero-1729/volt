@@ -562,19 +562,62 @@ export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
         : privateExternalDescriptor;
 
     // Rebuild internal descriptor
-    let privateInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
+    let privInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
+    let privExternalDescriptor = strippedDescriptor;
+
+    // Check `tr()` descriptor
+    const isPTR = privExternalDescriptor.slice(0, 3) === 'tr(';
+    const isWPKH = privExternalDescriptor.slice(0, 5) === 'wpkh(';
+
+    // Check `tr()` descriptor
+    // Somehow the public descriptor gets balance but not the private one
+    if (isPTR && isWPKH) {
+        const descriptorTRParts = parseDescriptor(strippedDescriptor);
+
+        // Rebuild Internal descriptor
+        const rIDesc = (
+            descriptorTRParts.scriptPrefix +
+            '[' +
+            descriptorTRParts.fingerprint +
+            descriptorTRParts.originPath +
+            ']' +
+            descriptorTRParts.keyOnly +
+            descriptorTRParts.keyPath +
+            descriptorTRParts.scriptSuffix
+        ).replace('0/*', '1/*');
+
+        // Rebuild External descriptor
+        const rEDesc =
+            descriptorTRParts.scriptPrefix +
+            '[' +
+            descriptorTRParts.fingerprint +
+            descriptorTRParts.originPath +
+            ']' +
+            descriptorTRParts.keyOnly +
+            descriptorTRParts.keyPath +
+            descriptorTRParts.scriptSuffix;
+
+        privInternalDescriptor = rIDesc;
+        privExternalDescriptor = rEDesc;
+    } else {
+        privInternalDescriptor = _reformatDescriptorToBDK(
+            privInternalDescriptor,
+        );
+    }
+
     // re-include checksum
-    privateInternalDescriptor = _reformatDescriptorToBDK(
-        privateInternalDescriptor,
-    );
-    privateInternalDescriptor =
-        privateInternalDescriptor +
+    privInternalDescriptor =
+        privInternalDescriptor +
         '#' +
-        descriptors.checksum(privateInternalDescriptor);
+        descriptors.checksum(privInternalDescriptor);
+    privExternalDescriptor =
+        privExternalDescriptor +
+        '#' +
+        descriptors.checksum(privExternalDescriptor);
 
     return {
-        external: privateExternalDescriptor,
-        internal: privateInternalDescriptor,
+        external: privExternalDescriptor,
+        internal: privInternalDescriptor,
     };
 };
 
