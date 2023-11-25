@@ -7,3 +7,4 @@ declare module '*.svg' {
 
 declare module 'bitcoinjs-lib';
 declare module 'bip21';
+declare module 'react-native-privacy-snapshot';
