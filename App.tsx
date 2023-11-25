@@ -6,6 +6,8 @@ import {StatusBar, useColorScheme} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 
+import Privacy from 'react-native-privacy-snapshot';
+
 import InitScreen from './Navigation';
 import Color from './constants/Color';
 
@@ -14,6 +16,9 @@ import SplashScreen from 'react-native-splash-screen';
 const App = () => {
     useEffect(() => {
         SplashScreen.hide();
+
+        // Enable privacy blur for IOS; blur screen when screen inactive
+        Privacy?.enabled(true);
     }, []);
 
     const ColorScheme = Color(useColorScheme());
