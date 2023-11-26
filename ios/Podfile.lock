@@ -445,6 +445,9 @@ PODS:
     - RCT-Folly/Fabric (= 2022.05.16.00)
     - RCTRequired
     - RCTTypeSafety
+  - react-native-biometrics (3.0.1):
+    - React-Core
+  - react-native-document-picker (5.2.0):
     - React-Core
     - React-cxxreact
     - React-debug
@@ -1246,6 +1249,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector-modern`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
+  - react-native-biometrics (from `../node_modules/react-native-biometrics`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-flipper (from `../node_modules/react-native-flipper`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -1374,6 +1378,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
+  react-native-biometrics:
+    :path: "../node_modules/react-native-biometrics"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
   react-native-flipper:
@@ -1518,6 +1524,26 @@ SPEC CHECKSUMS:
   react-native-image-picker: d3db110a3ded6e48c93aef7e8e51afdde8b16ed0
   react-native-netinfo: bdb108d340cdb41875c9ced535977cac6d2ff321
   react-native-quick-base64: 777057ea4286f806b00259ede65dc79c7c706320
+  RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
+  RCTRequired: c20235648eeb64a874f55459ceae6b081956318d
+  RCTTypeSafety: ca004f1fe0b76f7936f7fe7dfd761a4386cf72f5
+  React: b27df2b1da30335cf1bf1909056c4e1c3a3603ae
+  React-callinvoker: f2a69510d781d8226d51342a3cbe8a9b13573ea5
+  React-Codegen: 90eb4e8352b823234ee25adbe64233b2fc642aee
+  React-Core: 0771d135beb41b14e0e2ee9238fda50df6f18b97
+  React-CoreModules: 0e081b26ab034992d6a60217fc35a83e8ad9b8ed
+  React-cxxreact: 3ec43be907f4d818c5113e436d661836d1ab5aa9
+  React-hermes: 870871faa5b35c8163361e22241360de26afe07d
+  React-jsi: c06ec745faeea7bb8845a9b906aefa7c049c86cb
+  React-jsiexecutor: a2867f1f81301b1f56ad968632b6ebc45c64a530
+  React-jsinspector: 7e58fe86c7cc442fd11da0c9d8bef12a8d63f771
+  React-logger: a3f6ca0d018749852a2a6f07c154bfc6fcd4195a
+  react-native-biometrics: 352e5a794bfffc46a0c86725ea7dc62deb085bdc
+  react-native-document-picker: f1b5398801b332c77bc62ae0eae2116f49bdff26
+  react-native-flipper: 5d8dcbcb905a7e8076c9a61a3709944c23cf48ee
+  react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
+  react-native-netinfo: fefd4e98d75cbdd6e85fc530f7111a8afdf2b0c5
+  react-native-quick-base64: a5dbe4528f1453e662fcf7351029500b8b63e7bb
   react-native-quick-crypto: 455c1b411db006dba1026a30681ececb19180187
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
   react-native-secure-key-store: 910e6df6bc33cb790aba6ee24bc7818df1fe5898

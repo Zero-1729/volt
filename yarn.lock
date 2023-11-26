@@ -11113,6 +11113,16 @@ __metadata:
   linkType: hard
 
 "react-native-bouncy-checkbox@npm:^3.0.7":
+"react-native-biometrics@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "react-native-biometrics@npm:3.0.1"
+  peerDependencies:
+    react-native: ">=0.60.0"
+  checksum: 3864fea4bbf3dee1d360daf048e4f9980083c4e919e95082a5e4646e3b22475bb2b592cae18cccd7fb55b50498dca29e5346cf98d958646cbfc26fed5654bc53
+  languageName: node
+  linkType: hard
+
+"react-native-bouncy-checkbox@npm:^3.0.6":
   version: 3.0.7
   resolution: "react-native-bouncy-checkbox@npm:3.0.7"
   peerDependencies:
@@ -13670,6 +13680,9 @@ __metadata:
     react-i18next: ^14.0.1
     react-native: ^0.73.5
     react-native-bouncy-checkbox: ^3.0.7
+    react-native: ^0.71.7
+    react-native-biometrics: ^3.0.1
+    react-native-bouncy-checkbox: ^3.0.6
     react-native-camera-kit: ^13.0.0
     react-native-default-preference: ^1.4.4
     react-native-device-info: ^10.13.1
