@@ -1,12 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
+
 import React, {useContext, useEffect, useState, useCallback} from 'react';
 
-import {Platform, Text, useColorScheme, View, FlatList} from 'react-native';
+import {
+    Platform,
+    Text,
+    useColorScheme,
+    View,
+    FlatList,
+    Dimensions,
+    StyleSheet,
+} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
+import Carousel from 'react-native-reanimated-carousel';
 
 import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
@@ -90,6 +99,8 @@ const Home = () => {
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
+
+    const AppScreenWidth = Dimensions.get('window').width;
 
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
@@ -282,7 +293,7 @@ const Home = () => {
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
-            <View style={[tailwind('w-full absolute -top-24')]}>
+            <View style={[tailwind('w-full absolute')]}>
                 <WalletCard
                     balance={item.balance}
                     network={item.network}
@@ -408,22 +419,23 @@ const Home = () => {
                             )}
                         </View>
 
-                        {/** Create a vertical scroll carousel for 'BaseCard */}
+                        {/** Carousel for 'BaseCard */}
                         {wallets.length > 0 ? (
-                            <FlatList
-                                style={[tailwind('w-full h-48')]}
-                                data={wallets}
-                                renderItem={renderCard}
-                                keyExtractor={item => item.id}
-                                initialNumToRender={10}
-                                contentContainerStyle={[
-                                    tailwind('flex justify-center'),
-                                    {flex: 1},
-                                ]}
-                                contentInsetAdjustmentBehavior="automatic"
-                                inverted
-                                showsVerticalScrollIndicator
-                            />
+                            <View style={[styles.CardContainer]}>
+                                <Carousel
+                                    loop
+                                    autoPlay={false}
+                                    width={AppScreenWidth * 0.84}
+                                    data={[...wallets]}
+                                    renderItem={renderCard}
+                                    pagingEnabled={true}
+                                    mode={'vertical-stack'}
+                                    modeConfig={{
+                                        snapDirection: 'left',
+                                        stackInterval: 8,
+                                    }}
+                                />
+                            </View>
                         ) : (
                             <EmptyCard />
                         )}
@@ -518,5 +530,11 @@ const Home = () => {
         </SafeAreaView>
     );
 };
+
+const styles = StyleSheet.create({
+    CardContainer: {
+        height: 200,
+    },
+});
 
 export default Home;
