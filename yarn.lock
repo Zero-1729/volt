@@ -12479,9 +12479,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^2.13.1":
-  version: 2.13.1
-  resolution: "react-native-gesture-handler@npm:2.13.1"
+"react-native-gesture-handler@npm:^2.14.0":
+  version: 2.14.0
+  resolution: "react-native-gesture-handler@npm:2.14.0"
   dependencies:
     "@egjs/hammerjs": ^2.0.17
     hoist-non-react-statics: ^3.3.0
@@ -12491,7 +12491,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: c89504c52a2f4940a5cb56862f0676422ff30ad111fb015e37d2b4d3b736e708e6301da9027f003565bd23d8a3f4e8641eb5810f7da9ed848f81b3063df64e98
+  checksum: 8227d3f66f2f41932d3b7d12cc029d4ff1f57ba93249d71844cb1b75bae887cc50f9df516da52863746a2df8af4da013c1eb28b484caf181f782bcfe35bc59b0
   languageName: node
   linkType: hard
 
@@ -12633,6 +12633,18 @@ __metadata:
     react: "*"
     react-native: ">=0.71.0"
   checksum: 47b227c74cef0c9630ce7e91fe2153bcf2492f3fae175352818ca2278779f28c2932611df44cb8a18cb290da6d73aa3a927bcea56c3a9a4a51db6a7f4f72ac4d
+  languageName: node
+  linkType: hard
+
+"react-native-reanimated-carousel@npm:^3.5.1":
+  version: 3.5.1
+  resolution: "react-native-reanimated-carousel@npm:3.5.1"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-native: ">=0.6.0"
+    react-native-gesture-handler: ">=2.0.0"
+    react-native-reanimated: ">=3.0.0"
+  checksum: a2eb640453fa35f659c1fb5575f903364d513fb7f621104afa14fee2284132674dfaf0d87cb29e8c119f7513094a5967d5193f3dfa24043af167c6f26abcfe73
   languageName: node
   linkType: hard
 
@@ -15168,7 +15180,7 @@ __metadata:
     react-native-eject: ^0.1.2
     react-native-flipper: ^0.191.0
     react-native-fs: ^2.20.0
-    react-native-gesture-handler: ^2.13.1
+    react-native-gesture-handler: ^2.14.0
     react-native-gradle-plugin: ^0.71.19
     react-native-haptic-feedback: ^1.11.0
     react-native-image-picker: ^4.0.6
@@ -15184,6 +15196,7 @@ __metadata:
     react-native-quick-base64: ^2.0.7
     react-native-quick-crypto: ^0.6.1
     react-native-reanimated: ^3.5.3
+    react-native-reanimated-carousel: ^3.5.1
     react-native-remote-svg: ^2.0.6
     react-native-safe-area-context: ^4.5.0
     react-native-screens: ^3.25.0
