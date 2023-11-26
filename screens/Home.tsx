@@ -423,9 +423,11 @@ const Home = () => {
                         {wallets.length > 0 ? (
                             <View style={[styles.CardContainer]}>
                                 <Carousel
-                                    loop
+                                    ref={carouselRef}
+                                    vertical={true}
                                     autoPlay={false}
                                     width={AppScreenWidth * 0.84}
+                                    height={200}
                                     data={[...wallets]}
                                     renderItem={renderCard}
                                     pagingEnabled={true}
