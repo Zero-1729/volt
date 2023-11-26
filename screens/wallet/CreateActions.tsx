@@ -95,6 +95,8 @@ const CreateAction = () => {
     };
 
     const updateWalletName = async (walletName: string, type: string) => {
+        const cachedName = walletName;
+
         try {
             // Clear wallet name
             setNewWalletName('');
@@ -113,6 +115,10 @@ const CreateAction = () => {
             navigation.dispatch(StackActions.push('Mnemonic'));
         } catch (e: any) {
             errorAlert('Alert', e.message);
+
+            // Revert to make it obvious to user to try again
+            setNewWalletName(cachedName);
+            setLoading(false);
         }
     };
 
