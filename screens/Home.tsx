@@ -424,7 +424,6 @@ const Home = () => {
                         {wallets.length > 0 ? (
                             <View style={[styles.CardContainer]}>
                                 <Carousel
-                                    ref={carouselRef}
                                     vertical={true}
                                     autoPlay={false}
                                     width={AppScreenWidth * 0.9}
