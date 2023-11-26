@@ -294,6 +294,7 @@ const Home = () => {
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
             <View style={[tailwind('w-full absolute')]}>
+                {/* Avoid gesture handler triggering click event */}
                 <WalletCard
                     balance={item.balance}
                     network={item.network}
@@ -426,8 +427,8 @@ const Home = () => {
                                     ref={carouselRef}
                                     vertical={true}
                                     autoPlay={false}
-                                    width={AppScreenWidth * 0.84}
-                                    height={200}
+                                    width={AppScreenWidth * 0.9}
+                                    height={styles.CardContainer.height}
                                     data={[...wallets]}
                                     renderItem={renderCard}
                                     pagingEnabled={true}
@@ -535,7 +536,7 @@ const Home = () => {
 
 const styles = StyleSheet.create({
     CardContainer: {
-        height: 200,
+        height: 230,
     },
 });
 

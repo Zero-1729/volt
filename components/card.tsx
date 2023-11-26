@@ -100,12 +100,17 @@ export const WalletCard = (props: WalletCardProps) => {
                 }
             }}
             activeOpacity={1}>
-            <View style={tailwind('w-full h-48 relative items-center')}>
+            <View
+                style={[
+                    tailwind('w-full relative items-center'),
+                    {height: 206},
+                ]}>
                 <View
                     style={[
                         styles.overflowHidden,
-                        tailwind('w-full h-48 rounded-md z-50 px-6'),
+                        tailwind('w-full rounded-md z-50 px-6'),
                         {
+                            height: 206,
                             backgroundColor:
                                 ColorScheme.WalletColors[props.walletType][
                                     props.network
