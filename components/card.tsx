@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     },
     label: {
         left: 24,
-        fontWeight: 100,
+        fontWeight: '100',
     },
     watchOnly: {
         top: 24,
