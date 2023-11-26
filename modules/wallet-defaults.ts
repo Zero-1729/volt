@@ -2,7 +2,7 @@
 import {ENet} from './../types/enums';
 import {TAccountPaths, TExtendedKeyInfo} from '../types/wallet';
 
-export const validWalletTypes = ['p2tr', 'wpkh', 'sh2wpkh', 'pkh'];
+export const validWalletTypes = ['p2tr', 'wpkh', 'shp2wpkh', 'p2pkh'];
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
