@@ -4498,9 +4498,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bdk-rn@https://github.com/LtbLightning/bdk-rn#4a8e84f65d984af8ffbef4ec44be55f272e171fc":
+"bdk-rn@https://github.com/LtbLightning/bdk-rn#37b33a8282e35032e50a34aead94ecc829e66f45":
   version: 0.29.0
-  resolution: "bdk-rn@https://github.com/LtbLightning/bdk-rn.git#commit=4a8e84f65d984af8ffbef4ec44be55f272e171fc"
+  resolution: "bdk-rn@https://github.com/LtbLightning/bdk-rn.git#commit=37b33a8282e35032e50a34aead94ecc829e66f45"
   dependencies:
     "@synonymdev/result": 0.0.2
     adm-zip: ^0.5.9
@@ -4508,7 +4508,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 1d0634d27de3318e2b0fd22d634f4e478425902f55aea90c578298cc34664e2ec98d73bee4965943fa196fc1d672fbe7a021489ff6af764a7ba9015b3286c739
+  checksum: cb62e5f02d6711f17416949e87cc390a7c900d6cea3b0310fdd9a9c589490d039d507aec65efa599c73a022519cd71ab4123843f7250a7939e189414cdbb5c8e
   languageName: node
   linkType: hard
 
@@ -15135,7 +15135,7 @@ __metadata:
     assert: ^2.0.0
     babel-jest: ^29.2.1
     babel-plugin-module-resolver: ^5.0.0
-    bdk-rn: "https://github.com/LtbLightning/bdk-rn#4a8e84f65d984af8ffbef4ec44be55f272e171fc"
+    bdk-rn: "https://github.com/LtbLightning/bdk-rn#37b33a8282e35032e50a34aead94ecc829e66f45"
     bech32: ^1.1.4
     bignumber.js: ^9.1.1
     bip21: ^2.0.3

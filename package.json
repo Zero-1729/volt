@@ -45,7 +45,7 @@
     "@react-navigation/stack": "^6.3.13",
     "@realm/react": "^0.4.3",
     "assert": "^2.0.0",
-    "bdk-rn": "https://github.com/LtbLightning/bdk-rn#4a8e84f65d984af8ffbef4ec44be55f272e171fc",
+    "bdk-rn": "https://github.com/LtbLightning/bdk-rn#37b33a8282e35032e50a34aead94ecc829e66f45",
     "bech32": "^1.1.4",
     "bignumber.js": "^9.1.1",
     "bip21": "^2.0.3",
