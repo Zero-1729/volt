@@ -19,7 +19,10 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {WalletTypeDetails} from '../../modules/wallet-defaults';
+import {
+    WalletTypeDetails,
+    WALLET_NAME_LENGTH,
+} from '../../modules/wallet-defaults';
 import {getMiniWallet} from '../../modules/wallet-utils';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -94,7 +97,7 @@ const Info = () => {
 
     const updateTmpName = (name: string) => {
         // Only update if name is not empty
-        if (name.trim().length > 1) {
+        if (name.trim().length >= 0) {
             setTmpName(name);
         }
     };
@@ -183,13 +186,15 @@ const Info = () => {
                 {/* Allow user to change wallet name */}
                 <View style={[tailwind('w-5/6 mt-12'), {marginBottom: 64}]}>
                     <View>
-                        <Text
-                            style={[
-                                tailwind('text-sm text-left mb-2'),
-                                {color: 'white'},
-                            ]}>
-                            Name
-                        </Text>
+                        <View style={[tailwind('flex flex-row')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm text-left mb-2 mr-1'),
+                                    {color: 'white'},
+                                ]}>
+                                Name
+                            </Text>
+                        </View>
                         <View
                             style={[
                                 styles.renameContainer,
@@ -200,6 +205,7 @@ const Info = () => {
                                     'rgba(255, 255, 255, 0.6)'
                                 }
                                 refs={nameInput}
+                                maxLength={WALLET_NAME_LENGTH}
                                 shavedHeight={true}
                                 placeholder={walletName}
                                 onChangeText={updateTmpName}
@@ -215,14 +221,31 @@ const Info = () => {
                                             RNHapticFeedbackOptions,
                                         );
                                         renameWallet(currentWalletID, tmpName);
-                                    } else {
-                                        // Otherwise, reset tmpName and clear input
+
+                                        // Reset tmpName and clear input
                                         setTmpName('');
                                         nameInput.current?.clear();
                                     }
                                 }}
                                 color={'white'}
                             />
+
+                            {tmpName.length > 0 && (
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'absolute right-4 justify-center h-full',
+                                        ),
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm opacity-60'),
+                                            {color: 'white'},
+                                        ]}>
+                                        ({tmpName.length}/{WALLET_NAME_LENGTH})
+                                    </Text>
+                                </View>
+                            )}
                         </View>
                     </View>
                 </View>
