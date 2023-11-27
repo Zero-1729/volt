@@ -55,6 +55,7 @@ export type WalletCardProps = CardProps & {
     unit: Unit;
     network: string;
     navCallback?: () => void;
+    maxedCard: boolean;
 };
 
 export type TxListItemProps = BaseProps & {
