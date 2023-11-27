@@ -20,7 +20,7 @@ import Close from '../../assets/svg/x-24.svg';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
-import {formatFiat} from '../../modules/transform';
+import {formatFiat, normalizeFiat} from '../../modules/transform';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -191,6 +191,27 @@ const SendAmount = ({route}: Props) => {
         );
     };
 
+    const displayBalance = (fontSize: string) => {
+        const bottomUnitSats = bottomUnit?.name === 'sats';
+        const rawBalance = new BigNumber(route.params.wallet.balance); // sats
+        const fiatBalance = normalizeFiat(rawBalance, fiatRate.rate);
+
+        return bottomUnitSats ? (
+            <DisplaySatsAmount
+                amount={rawBalance}
+                fontSize={fontSize}
+                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
+            />
+        ) : (
+            <DisplayFiatAmount
+                amount={fiatBalance}
+                fontSize={fontSize}
+                isApprox={topUnit?.name !== 'sats' && amount.length > 0}
+                symbol={fiatAmount?.symbol}
+            />
+        );
+    };
+
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
             <View
@@ -267,6 +288,11 @@ const SendAmount = ({route}: Props) => {
                                 },
                             ]}>
                             <PlainButton
+                                style={[
+                                    tailwind(
+                                        'flex-row items-center justify-center',
+                                    ),
+                                ]}
                                 disabled={
                                     route.params.wallet.balance.toString() ===
                                     satsAmount.value.toString()
@@ -274,11 +300,14 @@ const SendAmount = ({route}: Props) => {
                                 onPress={triggerMax}>
                                 <Text
                                     style={[
-                                        tailwind('text-sm font-bold'),
+                                        tailwind('text-sm font-bold mr-2'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
                                     Use Max
                                 </Text>
+                                <View style={[tailwind('justify-center')]}>
+                                    {displayBalance('text-sm')}
+                                </View>
                             </PlainButton>
                         </View>
                     )}
