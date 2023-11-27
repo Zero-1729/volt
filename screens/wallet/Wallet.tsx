@@ -12,6 +12,9 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {WalletParamList} from '../../Navigation';
+
 import BDK from 'bdk-rn';
 
 import BigNumber from 'bignumber.js';
@@ -55,7 +58,9 @@ import {TransactionListItem} from '../../components/transaction';
 
 import {TBalance, TTransaction} from '../../types/wallet';
 
-const Wallet = () => {
+type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
+
+const Wallet = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
@@ -330,6 +335,14 @@ const Wallet = () => {
             setLoadLock(false);
         };
     }, []);
+
+    useEffect(() => {
+        // Attempt to sync balance when reload triggered
+        // E.g. from completed transaction
+        if (route.params?.reload) {
+            refreshWallet();
+        }
+    }, [route.params?.reload]);
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
