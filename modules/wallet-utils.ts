@@ -535,3 +535,11 @@ export const canSendToInvoice = (
 
     return false;
 };
+
+// We assume the bare minimum wallet material is an xpub
+export const doesWalletExist = (
+    xpub: string,
+    wallets: any, // Assumes a list of objects with at least 'xpub' property
+) => {
+    return wallets.some((wallet: any) => wallet.xpub === xpub);
+};
