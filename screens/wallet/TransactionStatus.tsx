@@ -272,7 +272,9 @@ const TransactionStatus = ({route}: Props) => {
                                         CommonActions.navigate('WalletRoot', {
                                             screen: 'WalletView',
                                             params: {
-                                                reload: true,
+                                                reload:
+                                                    statusInfo.status ===
+                                                    'success',
                                             },
                                         }),
                                     );
