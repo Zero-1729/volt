@@ -143,3 +143,6 @@ export const extendedKeyInfo: {[index: string]: TExtendedKeyInfo} = {
 
 // Wallet Gap Limit
 export const GAP_LIMIT = 20;
+
+// Dust limit
+export const DUST_LIMIT = 546;
