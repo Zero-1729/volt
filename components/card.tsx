@@ -195,16 +195,36 @@ export const WalletCard = (props: WalletCardProps) => {
                         <></>
                     )}
 
-                    {/* Balance */}
-                    <View style={tailwind('w-full absolute mx-6 bottom-5')}>
-                        <Balance
-                            fontColor={'white'}
-                            balance={props.balance}
-                            balanceFontSize={'text-2xl'}
-                            disableFiat={true}
-                            loading={props.loading}
-                        />
-                    </View>
+                    {/* Show Balance or Maxed card */}
+                    {!props.maxedCard ? (
+                        <View style={tailwind('w-full absolute mx-6 bottom-5')}>
+                            <Balance
+                                fontColor={'white'}
+                                balance={props.balance}
+                                balanceFontSize={'text-2xl'}
+                                disableFiat={true}
+                                loading={props.loading}
+                            />
+                        </View>
+                    ) : (
+                        <View
+                            style={[
+                                styles.maxedOut,
+                                tailwind(
+                                    'bg-black absolute rounded opacity-60',
+                                ),
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-xs text-white font-bold px-4 py-1',
+                                    ),
+                                    Font.RobotoText,
+                                ]}>
+                                Swept Balance
+                            </Text>
+                        </View>
+                    )}
                 </View>
             </View>
         </PlainButton>
@@ -225,6 +245,10 @@ const styles = StyleSheet.create({
     watchOnly: {
         top: 24,
         left: 20,
+    },
+    maxedOut: {
+        bottom: 20,
+        left: 24,
     },
     sim: {
         left: 24,
