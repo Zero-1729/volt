@@ -67,6 +67,10 @@ const SendAmount = ({route}: Props) => {
 
     const isMax = amount === route.params.wallet.balance.toString();
 
+    const isOverBalance = new BigNumber(satsAmount.value).gt(
+        route.params.wallet.balance,
+    );
+
     const triggerMax = () => {
         const maxSats = route.params.wallet.balance.toString();
 
@@ -327,7 +331,7 @@ const SendAmount = ({route}: Props) => {
                         {bottom: bottomOffset.bottom},
                     ]}>
                     <PlainButton
-                        disabled={amount === ''}
+                        disabled={amount === '' || isOverBalance}
                         onPress={() => {
                             navigation.dispatch(
                                 CommonActions.navigate('WalletRoot', {
@@ -348,7 +352,9 @@ const SendAmount = ({route}: Props) => {
                             style={[
                                 tailwind(
                                     `rounded-full items-center flex-row justify-center px-6 py-3 ${
-                                        amount === '' ? 'opacity-20' : ''
+                                        amount === '' || isOverBalance
+                                            ? 'opacity-20'
+                                            : ''
                                     }`,
                                 ),
                                 {
