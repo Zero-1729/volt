@@ -91,6 +91,8 @@ const Home = () => {
         updateWalletBalance,
         isWalletInitialized,
         electrumServerURL,
+        walletsIndex,
+        updateWalletsIndex,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -439,6 +441,10 @@ const Home = () => {
                                         snapDirection: 'left',
                                         stackInterval: 8,
                                     }}
+                                    onScrollEnd={index => {
+                                        updateWalletsIndex(index);
+                                    }}
+                                    defaultIndex={walletsIndex}
                                 />
                             </View>
                         ) : (
