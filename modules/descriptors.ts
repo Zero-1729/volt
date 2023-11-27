@@ -42,7 +42,9 @@ const _getDescriptorNetwork = (expression: string) => {
     const keyMaterial = expression.match(extendedKeyPatternG);
 
     if (!keyMaterial) {
-        throw new Error('Could not get network from descriptor');
+        throw new Error(
+            'Could not get network from descriptor, missing extended key',
+        );
     }
 
     const key = keyMaterial[0];
