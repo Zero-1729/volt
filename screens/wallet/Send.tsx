@@ -533,9 +533,9 @@ const SendView = ({route}: Props) => {
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                {`'Generating ${
+                                {`Generating ${
                                     isAdvancedMode ? 'PSBT' : 'transaction'
-                                }...'`}
+                                }...`}
                             </Text>
                         </View>
                     ) : (
