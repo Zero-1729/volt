@@ -42,6 +42,7 @@ export const TextSingleInput = (props: TextInputProps) => {
             keyboardType={
                 Platform.OS === 'android' ? 'visible-password' : 'default'
             }
+            maxLength={props.maxLength}
             spellCheck={false}
             autoCorrect={false}
             autoCapitalize="none"
