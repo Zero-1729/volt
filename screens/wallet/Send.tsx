@@ -18,7 +18,11 @@ import {getPrivateDescriptors} from '../../modules/descriptors';
 import {TComboWallet} from '../../types/wallet';
 import {PartiallySignedTransaction} from 'bdk-rn';
 
-import {FiatBalance, Balance} from '../../components/balance';
+import RNFS from 'react-native-fs';
+import Share from 'react-native-share';
+
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+
 import {AppStorageContext} from '../../class/storageContext';
 import {normalizeFiat} from '../../modules/transform';
 import BigNumber from 'bignumber.js';
@@ -41,6 +45,7 @@ import Color from '../../constants/Color';
 import {PlainButton, LongBottomButton} from '../../components/button';
 
 import Close from '../../assets/svg/x-24.svg';
+import ShareIcon from '../../assets/svg/share-24.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
@@ -90,7 +95,17 @@ const SendView = ({route}: Props) => {
     };
 
     const bottomFeeRef = React.useRef<BottomSheetModal>(null);
+    const bottomExportRef = React.useRef<BottomSheetModal>(null);
     const [openModal, setOpenModal] = useState(-1);
+    const [openExport, setOpenExport] = useState(-1);
+
+    const openExportModal = () => {
+        if (openExport !== 1) {
+            bottomExportRef.current?.present();
+        } else {
+            bottomExportRef.current?.close();
+        }
+    };
 
     const openFeeModal = () => {
         if (openModal !== 1) {
@@ -168,6 +183,45 @@ const SendView = ({route}: Props) => {
         setFeeRates(rates);
     };
 
+    const exportUPsbt = async () => {
+        if (!uPsbt) {
+            conservativeAlert('Error', 'No PSBT data to export.');
+            return;
+        }
+
+        // Sign the psbt adn write to file
+        // Get txid and use it with wallet name to create a unique file name
+        const txid = await uPsbt.txid();
+        let pathData =
+            RNFS.TemporaryDirectoryPath +
+            `/${txid}-${route.params.wallet.name}.json`;
+
+        const fileBackupData = (await uPsbt.jsonSerialize()) || '';
+
+        if (Platform.OS === 'ios') {
+            await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
+                conservativeAlert('Error', e.message);
+            });
+            await Share.open({
+                url: 'file://' + pathData,
+                type: 'text/plain',
+                title: 'Volt Wallet Descriptor Backup',
+            })
+                .catch(e => {
+                    if (e.message !== 'User did not share') {
+                        conservativeAlert('Error', e.message);
+                    }
+                })
+                .finally(() => {
+                    RNFS.unlink(pathData);
+                });
+        } else {
+            conservativeAlert('Export', 'Not yet implemented on Android');
+        }
+
+        bottomExportRef.current?.close();
+    };
+
     useEffect(() => {
         fetchFeeRates();
 
@@ -193,6 +247,18 @@ const SendView = ({route}: Props) => {
                                 'absolute top-6 w-full flex-row items-center justify-center',
                             ),
                         ]}>
+                        {isAdvancedMode && PSBTFee ? (
+                            <PlainButton
+                                style={[tailwind('absolute right-6')]}
+                                onPress={openExportModal}>
+                                <ShareIcon
+                                    width={32}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </PlainButton>
+                        ) : (
+                            <></>
+                        )}
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(StackActions.popToTop())
@@ -495,6 +561,20 @@ const SendView = ({route}: Props) => {
                             }}
                         />
                     </View>
+
+                    {isAdvancedMode && PSBTFee ? (
+                        <View style={[tailwind('absolute bottom-0')]}>
+                            <ExportPsbt
+                                exportRef={bottomExportRef}
+                                triggerExport={exportUPsbt}
+                                onSelectExport={idx => {
+                                    setOpenExport(idx);
+                                }}
+                            />
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </BottomSheetModalProvider>
             </View>
         </SafeAreaView>
