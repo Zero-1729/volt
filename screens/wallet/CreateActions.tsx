@@ -29,6 +29,8 @@ import {PlainButton, LongBottomButton} from '../../components/button';
 
 import {TextSingleInput} from '../../components/input';
 
+import {WALLET_NAME_LENGTH} from '../../modules/wallet-defaults';
+
 import Checkbox from 'react-native-bouncy-checkbox';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
@@ -185,15 +187,33 @@ const CreateAction = () => {
                     <View
                         style={[
                             styles.inputContainer,
-                            tailwind('mt-10 border-gray-400 px-4'),
+                            tailwind('mt-10 border-gray-400 px-4 relative'),
                         ]}>
                         <TextSingleInput
+                            maxLength={WALLET_NAME_LENGTH}
                             placeholder={'Enter a wallet name'}
                             placeholderTextColor={ColorScheme.Text.GrayedText}
                             onChangeText={setNewWalletName}
                             onBlur={onBlur}
                             color={ColorScheme.Text.Default}
                         />
+                        {/* Input limit */}
+                        {newWalletName.trim().length > 0 && (
+                            <View
+                                style={[
+                                    tailwind(
+                                        'absolute justify-center h-full right-4',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {newWalletName.length}/{WALLET_NAME_LENGTH}
+                                </Text>
+                            </View>
+                        )}
                     </View>
 
                     {isAdvancedMode ? (
