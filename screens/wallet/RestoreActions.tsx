@@ -3,7 +3,7 @@ import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
 
-import {StackActions, useNavigation} from '@react-navigation/core';
+import {CommonActions, useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -124,12 +124,15 @@ const ImportAction = () => {
 
     const handleSuccessRoute = () => {
         // Simple helper to show successful import and navigate back home
-        conservativeAlert('Success', 'Wallet restored successfully');
-
-        // Vibrate to let user know the action was successful
-        RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
-
-        navigation.getParent()?.dispatch(StackActions.popToTop());
+        navigation.getParent()?.dispatch(
+            CommonActions.navigate('HomeScreen', {
+                restoreMeta: {
+                    title: 'Restore',
+                    message: 'Wallet restored successfully',
+                    reload: true,
+                },
+            }),
+        );
     };
 
     const handleMnemonic = async (mnemonic: string) => {
