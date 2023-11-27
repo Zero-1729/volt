@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {PartiallySignedTransaction} from 'bdk-rn';
 
 import Home from './screens/Home';
 
@@ -42,12 +43,7 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Release from './screens/settings/Release';
 
-import {
-    TTransaction,
-    TMiniWallet,
-    TAddressAmount,
-    TInvoiceData,
-} from './types/wallet';
+import {TTransaction, TMiniWallet, TInvoiceData} from './types/wallet';
 
 // Root Param List for screens
 export type WalletParamList = {
@@ -76,10 +72,7 @@ export type WalletParamList = {
         source: string;
     };
     TransactionStatus: {
-        payload: {
-            addressAmounts: TAddressAmount[];
-            feeRate: number;
-        };
+        unsignedPsbt: string;
         wallet: TMiniWallet;
         network: string;
     };
