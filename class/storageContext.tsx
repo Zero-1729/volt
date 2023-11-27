@@ -54,6 +54,7 @@ import {
     getPubKeyFromXprv,
     getExtendedKeyPrefix,
     normalizeExtKey,
+    doesWalletExist,
 } from '../modules/wallet-utils';
 
 import {extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
@@ -865,6 +866,11 @@ export const AppStorageProvider = ({children}: Props) => {
                 if (backupMaterialType === 'xprv') {
                     xpub = getPubKeyFromXprv(backupMaterial, network);
                 }
+            }
+
+            // Check if wallet is a duplicate
+            if (doesWalletExist(xpub, wallets)) {
+                throw new Error('Wallet already exists');
             }
 
             const walletArgs = {
