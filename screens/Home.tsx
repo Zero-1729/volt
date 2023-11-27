@@ -296,6 +296,9 @@ const Home = () => {
             <View style={[tailwind('w-full absolute')]}>
                 {/* Avoid gesture handler triggering click event */}
                 <WalletCard
+                    maxedCard={
+                        item.balance.isZero() && item.transactions.length > 0
+                    }
                     balance={item.balance}
                     network={item.network}
                     isWatchOnly={item.isWatchOnly}
