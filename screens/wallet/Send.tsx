@@ -152,7 +152,7 @@ const SendView = ({route}: Props) => {
         } catch (e: any) {
             conservativeAlert(
                 'Error',
-                `Error creating transaction. ${
+                `Could not creating transaction. ${
                     isAdvancedMode ? e.message : ''
                 }`,
             );
