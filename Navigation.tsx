@@ -18,6 +18,7 @@ import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
+import Xpub from './screens/wallet/Xpub';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
@@ -94,6 +95,7 @@ export type WalletParamList = {
         wallet: TMiniWallet;
         network: string;
     };
+    WalletXpub: undefined;
 };
 
 export type ScanParamList = {
@@ -167,6 +169,7 @@ const WalletRoot = () => {
                     component={RequestAmount}
                 />
                 <WalletStack.Screen name="SendAmount" component={SendAmount} />
+                <WalletStack.Screen name="WalletXpub" component={Xpub} />
             </WalletStack.Group>
         </WalletStack.Navigator>
     );
