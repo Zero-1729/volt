@@ -7,7 +7,7 @@ import {
     ActivityIndicator,
     StyleSheet,
 } from 'react-native';
-import React, {useState, useLayoutEffect, useContext} from 'react';
+import React, {useState, useLayoutEffect, useContext, useEffect} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -123,6 +123,13 @@ const TransactionStatus = ({route}: Props) => {
             message: errorMessage,
         });
     };
+
+    useEffect(() => {
+        // vibrate on successful send
+        if (statusInfo.status === 'success') {
+            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+        }
+    }, [statusInfo.status]);
 
     return (
         <SafeAreaView edges={['right', 'left', 'bottom']}>
