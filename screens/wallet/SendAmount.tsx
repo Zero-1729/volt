@@ -17,9 +17,13 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
+import {conservativeAlert} from '../../components/alert';
+
 import Close from '../../assets/svg/x-24.svg';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
+
+import {DUST_LIMIT} from '../../modules/wallet-defaults';
 
 import {formatFiat, normalizeFiat} from '../../modules/transform';
 
@@ -70,6 +74,8 @@ const SendAmount = ({route}: Props) => {
     const isOverBalance = new BigNumber(satsAmount.value).gt(
         route.params.wallet.balance,
     );
+
+    const isBelowDust = new BigNumber(satsAmount.value).lt(DUST_LIMIT);
 
     const triggerMax = () => {
         const maxSats = route.params.wallet.balance.toString();
@@ -333,6 +339,14 @@ const SendAmount = ({route}: Props) => {
                     <PlainButton
                         disabled={amount === '' || isOverBalance}
                         onPress={() => {
+                            if (isBelowDust) {
+                                conservativeAlert(
+                                    'Dust Limit',
+                                    `You cannot send amounts below the dust limit of ${DUST_LIMIT} sats.`,
+                                );
+                                return;
+                            }
+
                             navigation.dispatch(
                                 CommonActions.navigate('WalletRoot', {
                                     screen: 'Send',
