@@ -567,11 +567,11 @@ export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
 
     // Check `tr()` descriptor
     const isPTR = privExternalDescriptor.slice(0, 3) === 'tr(';
-    const isWPKH = privExternalDescriptor.slice(0, 5) === 'wpkh(';
 
-    // Check `tr()` descriptor
-    // Somehow the public descriptor gets balance but not the private one
-    if (isPTR && isWPKH) {
+    // Special check `tr()` descriptor
+    // To warp private descriptor to prepend fingerprint and origin path
+    // TODO: Find a way to investigate and fix better; somehow the public descriptor gets balance but not the private one
+    if (isPTR) {
         const descriptorTRParts = parseDescriptor(strippedDescriptor);
 
         // Rebuild Internal descriptor
