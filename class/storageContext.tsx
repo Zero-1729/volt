@@ -793,6 +793,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
         await _setWallets(tmp);
         await _updateWallets(JSON.stringify(tmp));
+        await updateWalletsIndex(tmp.length - 1);
 
         // Update current walled ID
         await setCurrentWalletID(newWallet.id);
