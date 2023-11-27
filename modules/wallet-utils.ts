@@ -34,6 +34,7 @@ import {
     xprvPattern,
     xpubPattern,
     extendedKeyPattern,
+    addressRegex,
 } from './re';
 
 const prefixInfo: {[index: string]: {network: string; type: string}} = {
@@ -161,12 +162,7 @@ export const isValidExtendedKey = (
 
 // Detect whether address valid bitcoin address
 export const isValidAddress = (address: string): boolean => {
-    try {
-        bitcoin.address.fromBech32(address);
-        return true;
-    } catch (e) {
-        return false;
-    }
+    return address.match(addressRegex) !== null;
 };
 
 // Deserialize Extended Key without Checksum
