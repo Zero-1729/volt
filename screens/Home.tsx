@@ -17,12 +17,18 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {InitStackParamList} from '../Navigation';
+
 import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
 import {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTailwind} from 'tailwind-rn';
+
+import RNHapticFeedback from 'react-native-haptic-feedback';
+import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -51,11 +57,13 @@ import {TBalance, TTransaction} from '../types/wallet';
 import {FiatBalance} from '../components/balance';
 
 import {fetchFiatRate} from '../modules/currency';
-import {liberalAlert} from '../components/alert';
+import {liberalAlert, conservativeAlert} from '../components/alert';
 
 import {getUniqueTXs} from '../modules/wallet-utils';
 
-const Home = () => {
+type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
+
+const Home = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
@@ -292,6 +300,24 @@ const Home = () => {
             setLoadingBalance(false);
         };
     }, []);
+
+    useEffect(() => {
+        if (route.params?.restoreMeta) {
+            if (route.params?.restoreMeta.reload) {
+                // Reload the wallet
+                refreshWallet();
+            }
+
+            // Simple helper to show successful import and navigate back home
+            conservativeAlert(
+                route.params.restoreMeta.title,
+                route.params.restoreMeta.message,
+            );
+
+            // Vibrate to let user know the action was successful
+            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+        }
+    }, [route.params?.restoreMeta]);
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (
