@@ -532,6 +532,13 @@ const _getChain = async (
     return chain;
 };
 
+// Return PSBT object from JSON
+export const psbtFromJSON = async (psbtBase64: string) => {
+    const _psbt = new BDK.PartiallySignedTransaction(psbtBase64);
+
+    return _psbt;
+};
+
 // Function to create a BDK Psbt
 // Takes in a list of addresses and amounts
 const createBDKPsbt = async (
@@ -623,6 +630,38 @@ const createBDKPsbt = async (
 
     // Return Psbt
     return {Psbt: finalTx.psbt, wallet: w};
+};
+
+// Creates an Unsigned PSBT given an address and sats amount (or send max amount)
+export const constructPSBT = async (
+    amount: string,
+    address: string,
+    feeRate: number,
+    drainTx: boolean,
+    wallet: TWalletType,
+    electrumServerUrl: TElectrumServerURLs,
+) => {
+    // Expects the wallet to contain private internal and external descriptors
+    const _w = await createBDKWallet(wallet);
+
+    let psbt!: BDK.PartiallySignedTransaction;
+
+    try {
+        const PsbtMeta = await createBDKPsbt(
+            [{address: address, amount: Number(amount)}],
+            feeRate,
+            drainTx, // Ignores amount and sends all funds to address, if true
+            _w,
+            wallet.network,
+            electrumServerUrl,
+        );
+
+        psbt = PsbtMeta.Psbt;
+    } catch (e: any) {
+        throw e;
+    }
+
+    return psbt;
 };
 
 // Sign a Psbt with a BDK wallet
@@ -785,34 +824,23 @@ export const fullsendBDKTransaction = async (
     }
 };
 
-// Creates a PSBT given an address and sats amount (or send max amount), and returns the singed Psbt and broadcast status
+// Signs an unsigned PSBT and returns the singed Psbt and broadcast status
 export const SingleBDKSend = async (
-    amount: string,
-    address: string,
-    feeRate: number,
-    drainTx: boolean,
+    uPsbtBase64: string,
     wallet: TWalletType,
     electrumServerUrl: TElectrumServerURLs,
     statusCallback: (message: string) => void,
 ) => {
     // Expects the wallet to contain private internal and external descriptors
     const _w = await createBDKWallet(wallet);
+    const uPsbt = await psbtFromJSON(uPsbtBase64);
 
     statusCallback('creating and signing transaction...');
     let signedPsbt!: BDK.PartiallySignedTransaction;
     let broadcasted: boolean = false;
 
     try {
-        const PsbtMeta = await createBDKPsbt(
-            [{address: address, amount: Number(amount)}],
-            feeRate,
-            drainTx, // Ignores amount and sends all funds to address, if true
-            _w,
-            wallet.network,
-            electrumServerUrl,
-        );
-
-        signedPsbt = await signBDKPsbt(PsbtMeta.Psbt, PsbtMeta.wallet);
+        signedPsbt = await signBDKPsbt(uPsbt, _w);
 
         broadcasted = await broadcastBDKPsbt(
             signedPsbt,

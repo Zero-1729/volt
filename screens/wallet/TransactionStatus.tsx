@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React, {useState, useLayoutEffect, useContext} from 'react';
 
-import {useNavigation, StackActions} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
@@ -20,7 +20,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {SingleBDKSend} from '../../modules/bdk';
 import {PartiallySignedTransaction} from 'bdk-rn';
 import {getPrivateDescriptors} from '../../modules/descriptors';
-
 import {TComboWallet} from '../../types/wallet';
 
 import Dayjs from 'dayjs';
@@ -53,158 +52,11 @@ type TStatusInfo = {
     message: string;
 };
 
-const DoneRender = (
-    statusInfo: TStatusInfo,
-    network: string,
-    isAMode: boolean,
-) => {
+const TransactionStatus = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const bottomOffset = NativeOffsets.bottom + 96;
-
-    // Get URL for mempool.space
-    const openMempoolSpace = (txid: string) => {
-        RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
-
-        Linking.openURL(
-            `https://mempool.space/${
-                network === ENet.Testnet ? 'testnet/' : ''
-            }tx/${txid}`,
-        );
-    };
-
-    const buttonText = isAMode ? 'View on Mempool.space' : 'See more';
-
-    return (
-        <View style={[tailwind('h-full justify-center')]}>
-            <Text
-                style={[
-                    tailwind(
-                        'text-lg absolute font-bold text-center w-full top-6 px-4',
-                    ),
-                    {color: ColorScheme.Text.Default},
-                ]}>
-                Status
-            </Text>
-
-            <View style={[tailwind('-mt-12 justify-center px-4 items-center')]}>
-                <View style={[tailwind('items-center')]}>
-                    {statusInfo.status === 'failed' && (
-                        <Failed
-                            style={[tailwind('self-center')]}
-                            fill={ColorScheme.SVG.Default}
-                            height={128}
-                            width={128}
-                        />
-                    )}
-
-                    {statusInfo.status === 'success' && (
-                        <Success
-                            style={[tailwind('self-center')]}
-                            fill={ColorScheme.SVG.Default}
-                            height={128}
-                            width={128}
-                        />
-                    )}
-                </View>
-
-                <View style={[tailwind('w-4/5 mt-4 items-center')]}>
-                    <Text
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        {statusInfo.status === 'success'
-                            ? 'Transaction sent'
-                            : 'Transaction failed to send'}
-                    </Text>
-                </View>
-
-                {isAMode ? (
-                    <View style={[tailwind('items-center w-4/5')]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm text-center mt-4'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
-                            {statusInfo.status === 'success'
-                                ? statusInfo.txId
-                                : statusInfo.message}
-                        </Text>
-                    </View>
-                ) : (
-                    <></>
-                )}
-            </View>
-
-            {statusInfo.status === 'success' ? (
-                <PlainButton
-                    style={[
-                        tailwind('absolute self-center'),
-                        {bottom: bottomOffset},
-                    ]}
-                    onPress={() => {
-                        openMempoolSpace(statusInfo.txId);
-                    }}>
-                    <Text style={[tailwind('font-bold text-sm')]}>
-                        {buttonText}
-                    </Text>
-                </PlainButton>
-            ) : (
-                <></>
-            )}
-
-            <View style={[tailwind('absolute bottom-0 items-center w-full')]}>
-                <LongBottomButton
-                    onPress={() => {
-                        navigation.dispatch(StackActions.popToTop());
-                    }}
-                    title={'Back to Wallet'}
-                    textColor={ColorScheme.Text.Alt}
-                    backgroundColor={ColorScheme.Background.Inverted}
-                />
-            </View>
-        </View>
-    );
-};
-
-const StatusRender = (statusMessage: string) => {
-    const tailwind = useTailwind();
-    const ColorScheme = Color(useColorScheme());
-
-    return (
-        <View style={[tailwind('w-full h-full items-center justify-center')]}>
-            <View style={[tailwind('items-center justify-center')]}>
-                <Cog
-                    style={[tailwind('mb-2')]}
-                    width={32}
-                    height={32}
-                    fill={ColorScheme.SVG.Default}
-                />
-
-                <Text
-                    style={[
-                        tailwind('text-sm'),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
-                    {statusMessage}
-                </Text>
-
-                <ActivityIndicator
-                    style={[tailwind('mt-4')]}
-                    size="small"
-                    color={ColorScheme.SVG.Default}
-                />
-            </View>
-
-            {/* Replace with loading status bars below */}
-        </View>
-    );
-};
-
-const TransactionStatus = ({route}: Props) => {
     const {electrumServerURL, isAdvancedMode} = useContext(AppStorageContext);
 
     const [statusMessage, setStatusMessage] = useState('');
@@ -214,8 +66,20 @@ const TransactionStatus = ({route}: Props) => {
         message: '',
     });
 
-    const tailwind = useTailwind();
-    const ColorScheme = Color(useColorScheme());
+    const bottomOffset = NativeOffsets.bottom + 110;
+
+    // Get URL for mempool.space
+    const openMempoolSpace = (txid: string) => {
+        RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+
+        Linking.openURL(
+            `https://mempool.space/${
+                route.params.network === ENet.Testnet ? 'testnet/' : ''
+            }tx/${txid}`,
+        );
+    };
+
+    const buttonText = isAdvancedMode ? 'View on Mempool.space' : 'See more';
 
     // Start process of tx build and send
     useLayoutEffect(() => {
@@ -235,16 +99,9 @@ const TransactionStatus = ({route}: Props) => {
             internalDescriptor: descriptors.internal,
         };
 
-        const {address, amount} = route.params.payload.addressAmounts[0];
-
-        // determine if max send
-        const isMaxSend = amount.toString() === wallet.balance.toString();
-
+        // We expect a signed PSBT to be passed in
         const {broadcasted, psbt, errorMessage} = await SingleBDKSend(
-            amount.toString(),
-            address,
-            route.params.payload.feeRate,
-            isMaxSend,
+            route.params.unsignedPsbt,
             wallet as TComboWallet,
             electrumServerURL,
             (msg: string) => {
@@ -277,13 +134,160 @@ const TransactionStatus = ({route}: Props) => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                {!statusInfo.status && StatusRender(statusMessage)}
-                {!!statusInfo.status &&
-                    DoneRender(
-                        statusInfo,
-                        route.params.network,
-                        isAdvancedMode,
-                    )}
+                {!statusInfo.status && (
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full h-full items-center justify-center',
+                            ),
+                        ]}>
+                        <View style={[tailwind('items-center justify-center')]}>
+                            <Cog
+                                style={[tailwind('mb-2')]}
+                                width={32}
+                                height={32}
+                                fill={ColorScheme.SVG.Default}
+                            />
+
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {statusMessage}
+                            </Text>
+
+                            <ActivityIndicator
+                                style={[tailwind('mt-4')]}
+                                size="small"
+                                color={ColorScheme.SVG.Default}
+                            />
+                        </View>
+
+                        {/* Replace with loading status bars below */}
+                    </View>
+                )}
+                {!!statusInfo.status && (
+                    <View style={[tailwind('h-full justify-center')]}>
+                        <Text
+                            style={[
+                                tailwind(
+                                    'text-lg absolute font-bold text-center w-full top-6 px-4',
+                                ),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            Status
+                        </Text>
+
+                        <View
+                            style={[
+                                tailwind(
+                                    '-mt-12 justify-center px-4 items-center',
+                                ),
+                            ]}>
+                            <View style={[tailwind('items-center')]}>
+                                {statusInfo.status === 'failed' && (
+                                    <Failed
+                                        style={[tailwind('self-center')]}
+                                        fill={ColorScheme.SVG.Default}
+                                        height={128}
+                                        width={128}
+                                    />
+                                )}
+
+                                {statusInfo.status === 'success' && (
+                                    <Success
+                                        style={[tailwind('self-center')]}
+                                        fill={ColorScheme.SVG.Default}
+                                        height={128}
+                                        width={128}
+                                    />
+                                )}
+                            </View>
+
+                            <View style={[tailwind('w-4/5 mt-4 items-center')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-lg font-bold'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {statusInfo.status === 'success'
+                                        ? 'Transaction sent'
+                                        : 'Transaction failed to send'}
+                                </Text>
+                            </View>
+
+                            {isAdvancedMode ? (
+                                <View style={[tailwind('items-center w-4/5')]}>
+                                    <Text
+                                        style={[
+                                            tailwind(
+                                                'text-sm text-center mt-4',
+                                            ),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
+                                        ]}>
+                                        {statusInfo.status === 'success'
+                                            ? statusInfo.txId
+                                            : statusInfo.message}
+                                    </Text>
+                                </View>
+                            ) : (
+                                <></>
+                            )}
+                        </View>
+
+                        {statusInfo.status === 'success' ? (
+                            <PlainButton
+                                style={[
+                                    tailwind('absolute self-center'),
+                                    {bottom: bottomOffset},
+                                ]}
+                                onPress={() => {
+                                    openMempoolSpace(statusInfo.txId);
+                                }}>
+                                <Text
+                                    style={[
+                                        tailwind('font-bold text-sm'),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {buttonText}
+                                </Text>
+                            </PlainButton>
+                        ) : (
+                            <></>
+                        )}
+
+                        <View
+                            style={[
+                                tailwind(
+                                    'absolute bottom-0 items-center w-full',
+                                ),
+                            ]}>
+                            <LongBottomButton
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate('WalletRoot', {
+                                            screen: 'WalletView',
+                                            params: {
+                                                reload:
+                                                    statusInfo.status ===
+                                                    'success',
+                                            },
+                                        }),
+                                    );
+                                }}
+                                title={'Back to Wallet'}
+                                textColor={ColorScheme.Text.Alt}
+                                backgroundColor={
+                                    ColorScheme.Background.Inverted
+                                }
+                            />
+                        </View>
+                    </View>
+                )}
             </View>
         </SafeAreaView>
     );

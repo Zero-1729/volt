@@ -1,16 +1,36 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet, Text, View, useColorScheme} from 'react-native';
+import React, {useCallback, useEffect, useState, useContext} from 'react';
+import {
+    StyleSheet,
+    Text,
+    View,
+    useColorScheme,
+    Platform,
+    ActivityIndicator,
+} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {getFeeRates} from '../../modules/mempool';
 import {TMempoolFeeRates} from '../../types/wallet';
+import {constructPSBT} from '../../modules/bdk';
+import {getPrivateDescriptors} from '../../modules/descriptors';
+import {TComboWallet} from '../../types/wallet';
+import {PartiallySignedTransaction} from 'bdk-rn';
 
-import {FiatBalance, Balance} from '../../components/balance';
+import RNFS from 'react-native-fs';
+import Share from 'react-native-share';
+
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+
+import {AppStorageContext} from '../../class/storageContext';
+import {normalizeFiat} from '../../modules/transform';
+import BigNumber from 'bignumber.js';
 
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import FeeModal from '../../components/fee';
+import ExportPsbt from '../../components/psbt';
+import {FiatBalance, Balance} from '../../components/balance';
 
 import {
     useNavigation,
@@ -25,6 +45,7 @@ import Color from '../../constants/Color';
 import {PlainButton, LongBottomButton} from '../../components/button';
 
 import Close from '../../assets/svg/x-24.svg';
+import ShareIcon from '../../assets/svg/share-24.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
@@ -38,6 +59,8 @@ const SendView = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
+    const [PSBTFee, setPSBTFee] = useState<BigNumber>();
+    const [uPsbt, setUPsbt] = useState<PartiallySignedTransaction>();
     const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
         fastestFee: 2,
         halfHourFee: 1,
@@ -45,7 +68,11 @@ const SendView = ({route}: Props) => {
         economyFee: 1,
         minimumFee: 1,
     });
-    const [selectedFeeRate, setSelectedFeeRate] = useState<number>();
+    const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
+    const [loadingPSBT, setLoadingPSBT] = useState<boolean>(true);
+
+    const {electrumServerURL, fiatRate, appFiatCurrency, isAdvancedMode} =
+        useContext(AppStorageContext);
 
     const sats = route.params.invoiceData.options?.amount || 0;
 
@@ -59,16 +86,7 @@ const SendView = ({route}: Props) => {
             CommonActions.navigate({
                 name: 'TransactionStatus',
                 params: {
-                    payload: {
-                        addressAmounts: [
-                            {
-                                address: route.params.invoiceData.address,
-                                amount: route.params.invoiceData.options
-                                    ?.amount,
-                            },
-                        ],
-                        feeRate: selectedFeeRate,
-                    },
+                    unsignedPsbt: uPsbt?.base64,
                     wallet: route.params.wallet,
                     network: route.params.wallet.network,
                 },
@@ -77,13 +95,71 @@ const SendView = ({route}: Props) => {
     };
 
     const bottomFeeRef = React.useRef<BottomSheetModal>(null);
+    const bottomExportRef = React.useRef<BottomSheetModal>(null);
     const [openModal, setOpenModal] = useState(-1);
+    const [openExport, setOpenExport] = useState(-1);
+
+    const openExportModal = () => {
+        if (openExport !== 1) {
+            bottomExportRef.current?.present();
+        } else {
+            bottomExportRef.current?.close();
+        }
+    };
 
     const openFeeModal = () => {
         if (openModal !== 1) {
             bottomFeeRef.current?.present();
         } else {
             bottomFeeRef.current?.close();
+        }
+    };
+
+    // Get fee based on PSBT
+    const calculatePSBTFee = async () => {
+        try {
+            const descriptors = getPrivateDescriptors(
+                route.params.wallet.privateDescriptor,
+            );
+
+            let wallet = {
+                ...route.params.wallet,
+                externalDescriptor: descriptors.external,
+                internalDescriptor: descriptors.internal,
+            };
+
+            const _psbt = await constructPSBT(
+                sats.toString(),
+                route.params.invoiceData.address,
+                Number(selectedFeeRate) || 1,
+                sats.toString() === route.params.wallet.balance.toString(),
+                wallet as TComboWallet,
+                electrumServerURL,
+            );
+
+            if (!_psbt) {
+                conservativeAlert('Fee', 'Error fetching fee.');
+                return;
+            }
+
+            // Grab fee amount
+            const feeAmount = new BigNumber(await _psbt.feeAmount());
+
+            // set PSBT info
+            setUPsbt(_psbt);
+            setPSBTFee(feeAmount);
+            setLoadingPSBT(false);
+        } catch (e: any) {
+            conservativeAlert(
+                'Error',
+                `Error creating transaction. ${
+                    isAdvancedMode ? e.message : ''
+                }`,
+            );
+
+            // Clear loading and revert to wallet screen
+            setLoadingPSBT(false);
+            navigation.dispatch(StackActions.popToTop());
         }
     };
 
@@ -107,8 +183,49 @@ const SendView = ({route}: Props) => {
         setFeeRates(rates);
     };
 
+    const exportUPsbt = async () => {
+        if (!uPsbt) {
+            conservativeAlert('Error', 'No PSBT data to export.');
+            return;
+        }
+
+        // Sign the psbt adn write to file
+        // Get txid and use it with wallet name to create a unique file name
+        const txid = await uPsbt.txid();
+        let pathData =
+            RNFS.TemporaryDirectoryPath +
+            `/${txid}-${route.params.wallet.name}.json`;
+
+        const fileBackupData = (await uPsbt.jsonSerialize()) || '';
+
+        if (Platform.OS === 'ios') {
+            await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
+                conservativeAlert('Error', e.message);
+            });
+            await Share.open({
+                url: 'file://' + pathData,
+                type: 'text/plain',
+                title: 'Volt Wallet Descriptor Backup',
+            })
+                .catch(e => {
+                    if (e.message !== 'User did not share') {
+                        conservativeAlert('Error', e.message);
+                    }
+                })
+                .finally(() => {
+                    RNFS.unlink(pathData);
+                });
+        } else {
+            conservativeAlert('Export', 'Not yet implemented on Android');
+        }
+
+        bottomExportRef.current?.close();
+    };
+
     useEffect(() => {
         fetchFeeRates();
+
+        calculatePSBTFee();
     }, []);
 
     const updateFeeRate = (fee: number) => {
@@ -130,6 +247,18 @@ const SendView = ({route}: Props) => {
                                 'absolute top-6 w-full flex-row items-center justify-center',
                             ),
                         ]}>
+                        {isAdvancedMode && PSBTFee ? (
+                            <PlainButton
+                                style={[tailwind('absolute right-6')]}
+                                onPress={openExportModal}>
+                                <ShareIcon
+                                    width={32}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </PlainButton>
+                        ) : (
+                            <></>
+                        )}
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(StackActions.popToTop())
@@ -219,7 +348,7 @@ const SendView = ({route}: Props) => {
                             </Text>
                         </View>
 
-                        {selectedFeeRate ? (
+                        {PSBTFee ? (
                             <View
                                 style={[
                                     tailwind(
@@ -231,34 +360,66 @@ const SendView = ({route}: Props) => {
                                         tailwind('text-sm font-bold'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Fee rate
+                                    Fee
                                 </Text>
 
-                                <PlainButton
+                                <View
                                     style={[
-                                        tailwind('items-center justify-center'),
-                                    ]}
-                                    onPress={openFeeModal}>
-                                    <View
+                                        tailwind(
+                                            'flex flex-row justify-center items-center',
+                                        ),
+                                    ]}>
+                                    <Text
                                         style={[
-                                            tailwind('rounded-full px-4 py-1'),
+                                            tailwind(
+                                                'text-sm px-2 mr-2 rounded-full',
+                                            ),
                                             {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Inverted,
+                                                color: ColorScheme.Text
+                                                    .GrayText,
                                             },
                                         ]}>
-                                        <Text
+                                        {PSBTFee
+                                            ? `${
+                                                  appFiatCurrency.symbol
+                                              } ${normalizeFiat(
+                                                  PSBTFee,
+                                                  new BigNumber(fiatRate.rate),
+                                              )}`
+                                            : `${appFiatCurrency.symbol} ...`}
+                                    </Text>
+
+                                    <PlainButton
+                                        style={[
+                                            tailwind(
+                                                'items-center justify-center',
+                                            ),
+                                        ]}
+                                        onPress={openFeeModal}>
+                                        <View
                                             style={[
-                                                tailwind('text-sm'),
+                                                tailwind(
+                                                    'rounded-full px-4 py-1',
+                                                ),
                                                 {
-                                                    color: ColorScheme.Text.Alt,
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Inverted,
                                                 },
                                             ]}>
-                                            {`${selectedFeeRate} sat/vB`}
-                                        </Text>
-                                    </View>
-                                </PlainButton>
+                                            <Text
+                                                style={[
+                                                    tailwind('text-sm'),
+                                                    {
+                                                        color: ColorScheme.Text
+                                                            .Alt,
+                                                    },
+                                                ]}>
+                                                {`${selectedFeeRate} sat/vB`}
+                                            </Text>
+                                        </View>
+                                    </PlainButton>
+                                </View>
                             </View>
                         ) : (
                             <></>
@@ -352,8 +513,37 @@ const SendView = ({route}: Props) => {
                         )}
                     </View>
 
+                    {loadingPSBT ? (
+                        <View
+                            style={[
+                                tailwind('absolute'),
+                                {
+                                    bottom:
+                                        NativeWindowMetrics.bottomButtonOffset +
+                                        76,
+                                },
+                            ]}>
+                            <ActivityIndicator
+                                style={[tailwind('mb-4')]}
+                                size="small"
+                                color={ColorScheme.SVG.Default}
+                            />
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.GrayedText},
+                                ]}>
+                                {`'Generating ${
+                                    isAdvancedMode ? 'PSBT' : 'transaction'
+                                }...'`}
+                            </Text>
+                        </View>
+                    ) : (
+                        <></>
+                    )}
+
                     <LongBottomButton
-                        disabled={selectedFeeRate === undefined}
+                        disabled={PSBTFee === undefined}
                         onPress={createTransaction}
                         title={'Send'}
                         textColor={ColorScheme.Text.Alt}
@@ -371,6 +561,20 @@ const SendView = ({route}: Props) => {
                             }}
                         />
                     </View>
+
+                    {isAdvancedMode && PSBTFee ? (
+                        <View style={[tailwind('absolute bottom-0')]}>
+                            <ExportPsbt
+                                exportRef={bottomExportRef}
+                                triggerExport={exportUPsbt}
+                                onSelectExport={idx => {
+                                    setOpenExport(idx);
+                                }}
+                            />
+                        </View>
+                    ) : (
+                        <></>
+                    )}
                 </BottomSheetModalProvider>
             </View>
         </SafeAreaView>
