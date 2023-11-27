@@ -1,3 +1,4 @@
+// TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
@@ -187,7 +188,7 @@ const RequestAmount = () => {
                             tailwind('text-sm text-center w-full font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Request Amount
+                        Receive
                     </Text>
                 </View>
 

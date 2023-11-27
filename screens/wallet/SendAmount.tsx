@@ -1,3 +1,4 @@
+// TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
@@ -42,7 +43,6 @@ const SendAmount = ({route}: Props) => {
 
     const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
 
-    // TODO: fix amount calculation
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
         value: new BigNumber(0),
@@ -238,7 +238,7 @@ const SendAmount = ({route}: Props) => {
                             tailwind('text-sm text-center w-full font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Send Amount
+                        Send
                     </Text>
                 </View>
 
