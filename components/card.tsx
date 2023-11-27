@@ -196,7 +196,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     )}
 
                     {/* Show Balance or Maxed card */}
-                    {!props.maxedCard ? (
+                    {!props.maxedCard || props.hideBalance ? (
                         <View style={tailwind('w-full absolute mx-6 bottom-5')}>
                             <Balance
                                 fontColor={'white'}
