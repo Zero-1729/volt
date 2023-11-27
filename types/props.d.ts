@@ -89,6 +89,7 @@ export type FiatBalanceProps = BaseProps & {
 // Base Text Input Prop Type (for reuse)
 export type TextInputProps = BaseProps & {
     shavedHeight?: boolean;
+    maxLength?: number;
     color: string;
     isEnabled?: boolean;
     placeholder: string;
