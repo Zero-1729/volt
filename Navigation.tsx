@@ -45,6 +45,22 @@ import Release from './screens/settings/Release';
 
 import {TTransaction, TMiniWallet, TInvoiceData} from './types/wallet';
 
+// Root Param List for Home Screen
+export type InitStackParamList = {
+    HomeScreen: {
+        restoreMeta: {
+            title: string;
+            message: string;
+            reload: boolean;
+        };
+    };
+    AddWalletRoot: undefined;
+    WalletRoot: undefined;
+    SettingsRoot: undefined;
+    ScanRoot: undefined;
+    Apps: undefined;
+};
+
 // Root Param List for screens
 export type WalletParamList = {
     Receive: {
@@ -174,7 +190,7 @@ const AddWalletRoot = () => {
     );
 };
 
-const InitScreenStack = createNativeStackNavigator();
+const InitScreenStack = createNativeStackNavigator<InitStackParamList>();
 const initScreen = () => {
     return (
         <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
