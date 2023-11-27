@@ -193,9 +193,7 @@ const Scan = ({route}: Props) => {
         if (!invoice.startsWith('bitcoin:')) {
             let btcAddress = invoice;
 
-            try {
-                isValidAddress(btcAddress);
-            } catch (e: any) {
+            if (!isValidAddress(btcAddress)) {
                 updateScannerAlert('Detected an invalid address');
                 return;
             }
@@ -205,6 +203,11 @@ const Scan = ({route}: Props) => {
 
         try {
             decodedInvoice = decodeURI.decode(invoice);
+
+            if (!isValidAddress(decodedInvoice.address)) {
+                updateScannerAlert('Detected an invalid invoice');
+                return;
+            }
 
             amount = new BigNumber(
                 decodedInvoice.options ? decodedInvoice.options.amount : '0',
