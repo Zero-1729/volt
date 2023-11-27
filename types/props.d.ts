@@ -107,7 +107,6 @@ export type TextLongInputProps = BaseProps &
         borderColor?: string;
         showFolder?: boolean;
         folderColor?: string;
-        showScanIcon?: boolean;
         showTestnetToggle?: boolean;
         onChange?: React.Dispatch<React.SetStateAction>;
         onSuccess: (

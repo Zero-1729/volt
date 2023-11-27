@@ -31,7 +31,6 @@ import {
 } from '../types/props';
 
 import Folder from './../assets/svg/file-directory-fill-24.svg';
-import Scan from './../assets/svg/scan.svg';
 import LeftArrow from '../assets/svg/chevron-left-24.svg';
 
 export const TextSingleInput = (props: TextInputProps) => {
@@ -102,23 +101,6 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 {...props}
                 style={[styles.inputContainer, tailwind('text-xs pt-4')]}
             />
-
-            {props.showScanIcon ? (
-                <View
-                    style={[
-                        tailwind(
-                            `absolute ${
-                                props.showFolder ? 'right-12' : 'right-4'
-                            } bottom-3`,
-                        ),
-                    ]}>
-                    <PlainButton onPress={() => {}}>
-                        <Scan width={22} fill={'gray'} />
-                    </PlainButton>
-                </View>
-            ) : (
-                <></>
-            )}
 
             {props.showFolder ? (
                 <View style={[tailwind('absolute right-4 bottom-3')]}>

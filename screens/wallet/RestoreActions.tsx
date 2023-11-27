@@ -348,7 +348,6 @@ const ImportAction = () => {
                         color={ColorScheme.Text.Default}
                         borderColor={ColorScheme.Text.LightGreyText}
                         showFolder={true}
-                        showScanIcon={true}
                         onSuccess={handleFolderCallback}
                         onError={handleFolderError}
                         onCancel={handleFolderCancel}
