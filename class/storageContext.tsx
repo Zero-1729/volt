@@ -75,6 +75,7 @@ type defaultContextType = {
     isWalletInitialized: boolean;
     isAdvancedMode: boolean;
     defaultToTestnet: boolean;
+    walletsIndex: number;
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
@@ -106,6 +107,7 @@ type defaultContextType = {
     getWalletData: (id: string) => TWalletType;
     setLoadLock: (loadLock: boolean) => void;
     setElectrumServerURL: (url: string) => void;
+    updateWalletsIndex: (idx: number) => void;
 };
 
 // Default app context values
@@ -125,6 +127,7 @@ const defaultContext: defaultContextType = {
         name: 'sats',
         symbol: 's',
     },
+    walletsIndex: 0,
     wallets: [],
     fiatRate: {
         rate: new BigNumber(26000),
@@ -164,6 +167,7 @@ const defaultContext: defaultContextType = {
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
     setElectrumServerURL: () => {},
+    updateWalletsIndex: () => {},
 };
 
 // Note: context 'value' will default to 'defaultContext' if no Provider is found
@@ -185,6 +189,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [isWalletInitialized, _setWalletInitialized] = useState(
         defaultContext.isWalletInitialized,
     );
+    const [walletsIndex, _setWalletsIndex] = useState<number>(0);
     const [wallets, _setWallets] = useState<TWalletType[]>(
         defaultContext.wallets,
     );
@@ -217,6 +222,8 @@ export const AppStorageProvider = ({children}: Props) => {
     } = useAsyncStorage('hideTotalBalance');
     const {getItem: _getWalletInitialized, setItem: _updateWalletInitialized} =
         useAsyncStorage('isWalletInitialized');
+    const {getItem: _getWalletsIndex, setItem: _updateWalletsIndex} =
+        useAsyncStorage('walletsIndex');
     const {getItem: _getWallets, setItem: _updateWallets} =
         useAsyncStorage('wallets');
     const {getItem: _getIsAdvancedMode, setItem: _updateIsAdvancedMode} =
@@ -381,6 +388,32 @@ export const AppStorageProvider = ({children}: Props) => {
             _setWalletInitialized(JSON.parse(init));
         }
     };
+
+    const _loadWalletsIndex = async () => {
+        const index = await _getWalletsIndex();
+
+        // Only update setting if a value already exists
+        // ...otherwise, use default
+        if (index !== null) {
+            _setWalletsIndex(JSON.parse(index));
+        }
+    };
+
+    const updateWalletsIndex = useCallback(
+        async (idx: number) => {
+            try {
+                _setWalletsIndex(idx);
+                _updateWalletsIndex(JSON.stringify(idx));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Wallets index setting) Error loading data: ${e}`,
+                );
+
+                throw new Error('Unable to set wallets index option');
+            }
+        },
+        [_updateWalletsIndex, _setWalletsIndex],
+    );
 
     const setIsAdvancedMode = useCallback(
         async (advanced: boolean) => {
@@ -578,6 +611,12 @@ export const AppStorageProvider = ({children}: Props) => {
             // Reset wallet init flag
             if (tmp.length === 0) {
                 _setWalletInit(false);
+            }
+
+            if (walletsIndex === index) {
+                const newIdx = index > 0 ? index - 1 : 0;
+
+                updateWalletsIndex(newIdx);
             }
 
             await setWallets(tmp);
@@ -1030,6 +1069,7 @@ export const AppStorageProvider = ({children}: Props) => {
             await setWallets([]);
             await setCurrentWalletID('');
             await setIsAdvancedMode(false);
+            await updateWalletsIndex(0);
             await setElectrumServerURL(
                 defaultContext.electrumServerURL.bitcoin,
             );
@@ -1092,10 +1132,16 @@ export const AppStorageProvider = ({children}: Props) => {
         _loadElectrumServerURL();
     }, []);
 
+    useEffect(() => {
+        _loadWalletsIndex();
+    }, []);
+
     // Return provider
     return (
         <AppStorageContext.Provider
             value={{
+                walletsIndex,
+                updateWalletsIndex,
                 loadLock,
                 setLoadLock,
                 electrumServerURL,
