@@ -326,7 +326,7 @@ const Info = () => {
                     <></>
                 )}
 
-                {/* Wallet Tools */}
+                {/* Wallet Tools & Info */}
                 {/* Backup / Export material - Seed and Descriptor */}
                 <PlainButton
                     style={[tailwind('w-5/6 mb-6')]}
@@ -347,6 +347,38 @@ const Info = () => {
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             Backup
+                        </Text>
+
+                        <View style={[tailwind('items-center')]}>
+                            <Right
+                                width={16}
+                                stroke={ColorScheme.SVG.GrayFill}
+                                fill={ColorScheme.SVG.GrayFill}
+                            />
+                        </View>
+                    </View>
+                </PlainButton>
+
+                {/* Wallet Xpub */}
+                <PlainButton
+                    style={[tailwind('w-5/6 mb-6')]}
+                    onPress={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'WalletXpub',
+                            }),
+                        );
+                    }}>
+                    <View
+                        style={[
+                            tailwind('items-center flex-row justify-between'),
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            Show Xpub
                         </Text>
 
                         <View style={[tailwind('items-center')]}>

@@ -93,6 +93,7 @@ const Backup = () => {
         }
 
         // Fallback to xpub, assuming first two unavailable (i.e., in case only watch only xpub restore)
+        // NOTE: don't seem to make this the case as xpub import creates public descriptor
         return walletData.xpub;
     };
 
