@@ -146,3 +146,6 @@ export const GAP_LIMIT = 20;
 
 // Dust limit
 export const DUST_LIMIT = 546;
+
+// Wallet name character limit
+export const WALLET_NAME_LENGTH = 15;
