@@ -43,9 +43,13 @@ const APIFetcher = {
             const rate = returnedJSON?.bitcoin[ticker];
 
             return new BigNumber(rate);
-        } catch (e) {
+        } catch (e: any) {
+            const detailed_error =
+                returnedJSON?.status.error_message.split('.')[0];
+            const msg = detailed_error ? detailed_error : e.message;
+
             throw new Error(
-                `Error parsing rate for ${ticker} from CoinGecko: ${e}`,
+                `Error parsing rate for ${ticker} from CoinGecko: ${msg}`,
             );
         }
     },
