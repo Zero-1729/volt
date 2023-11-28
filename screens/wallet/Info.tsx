@@ -93,7 +93,7 @@ const Info = () => {
         }, 450);
     };
 
-    const [tmpName, setTmpName] = useState(walletName);
+    const [tmpName, setTmpName] = useState<string>('');
 
     const updateTmpName = (name: string) => {
         // Only update if name is not empty
