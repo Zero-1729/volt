@@ -194,6 +194,11 @@
 			"marginBottom": 8
 		}
 	},
+	"mb-3": {
+		"style": {
+			"marginBottom": 12
+		}
+	},
 	"mb-4": {
 		"style": {
 			"marginBottom": 16
@@ -742,9 +747,9 @@
 			"paddingBottom": 44
 		}
 	},
-	"pb-16": {
+	"pb-20": {
 		"style": {
-			"paddingBottom": 64
+			"paddingBottom": 80
 		}
 	},
 	"pl-8": {

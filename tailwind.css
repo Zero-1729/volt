@@ -152,6 +152,10 @@
   margin-bottom: 0.5rem
 }
 
+.mb-3 {
+  margin-bottom: 0.75rem
+}
+
 .mb-4 {
   margin-bottom: 1rem
 }
@@ -565,8 +569,8 @@
   padding-bottom: 2.75rem
 }
 
-.pb-16 {
-  padding-bottom: 4rem
+.pb-20 {
+  padding-bottom: 5rem
 }
 
 .pl-8 {

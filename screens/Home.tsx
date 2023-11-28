@@ -410,7 +410,7 @@ const Home = ({route}: Props) => {
                             ),
                         ]}>
                         <View
-                            style={tailwind('justify-around w-full mt-2 mb-4')}>
+                            style={tailwind('justify-around w-full mt-3 mb-3')}>
                             {wallets.length > 0 ? (
                                 <>
                                     <Text
@@ -483,12 +483,12 @@ const Home = ({route}: Props) => {
                             tailwind(
                                 `w-full ${
                                     wallets.length > 0 ? 'h-3/5' : 'h-4/6'
-                                } mt-4`,
+                                } mt-8`,
                             ),
                         ]}>
                         <Text
                             style={[
-                                tailwind('w-5/6 mb-2 font-medium self-center'),
+                                tailwind('w-5/6 font-medium self-center'),
                                 DarkGrayText,
                                 Font.RobotoText,
                             ]}>
@@ -497,7 +497,7 @@ const Home = ({route}: Props) => {
 
                         <View
                             style={[
-                                tailwind('w-full h-full items-center pb-16'),
+                                tailwind('w-full h-full items-center pb-20'),
                             ]}>
                             <FlatList
                                 refreshing={refreshing}
