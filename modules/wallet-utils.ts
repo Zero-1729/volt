@@ -37,7 +37,7 @@ import {
     addressRegex,
 } from './re';
 
-const prefixInfo: {[index: string]: {network: string; type: string}} = {
+export const prefixInfo: {[index: string]: {network: string; type: string}} = {
     '1': {network: 'bitcoin', type: 'p2pkh'},
     // Handle special case
     // P2TR -> bc1p
