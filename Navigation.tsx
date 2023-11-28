@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {PartiallySignedTransaction} from 'bdk-rn';
 
 import Home from './screens/Home';
 
@@ -42,7 +41,7 @@ import ExtendedKey from './screens/settings/tools/ExtendedKey';
 
 import About from './screens/settings/About';
 import License from './screens/settings/License';
-import Release from './screens/settings/Release';
+import Changelog from './screens/settings/Changelog';
 
 import {TTransaction, TMiniWallet, TInvoiceData} from './types/wallet';
 
@@ -122,7 +121,7 @@ const SettingsRoot = () => {
 
             <SettingsStack.Group screenOptions={{presentation: 'modal'}}>
                 <SettingsStack.Screen name="License" component={License} />
-                <SettingsStack.Screen name="Release" component={Release} />
+                <SettingsStack.Screen name="Changelog" component={Changelog} />
                 <SettingsStack.Screen name="XKeyTool" component={ExtendedKey} />
             </SettingsStack.Group>
         </SettingsStack.Navigator>

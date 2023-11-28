@@ -170,7 +170,7 @@ const About = () => {
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
-                                CommonActions.navigate({name: 'Release'}),
+                                CommonActions.navigate({name: 'Changelog'}),
                             );
                         }}>
                         <View
