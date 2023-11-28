@@ -42,6 +42,9 @@ import InfoIcon from '../assets/svg/info-16.svg';
 import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
+import {prefixInfo} from '../modules/wallet-utils';
+import {WalletTypeDetails } from '../modules/wallet-defaults';
+
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
     NOT_AUTHORIZED = 'NOT_AUTHORIZED',
@@ -237,8 +240,17 @@ const Scan = ({route}: Props) => {
 
         // Check can send to address
         if (!canSendToInvoice(decodedInvoice, route.params.wallet)) {
+            const addressTip = decodedInvoice.address[0];
+            const prefixStub =
+                addressTip === 'b' || addressTip === 't'
+                    ? decodedInvoice.address.slice(0, 4)
+                    : addressTip;
+            console.log('pre: ', prefixStub);
+            const addressType = prefixInfo[prefixStub].type;
+            const addressTypeName = WalletTypeDetails[addressType][0];
+
             updateScannerAlert(
-                'Selected wallet cannot pay to invoice address type',
+                `Wallet cannot pay to a ${addressTypeName} address`,
             );
             return;
         }
