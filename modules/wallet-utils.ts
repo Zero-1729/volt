@@ -520,11 +520,10 @@ export const canSendToInvoice = (
                     miniWallet.type === 'p2tr')
             );
         case 'p2tr':
-            // Can send to p2tr if wallet is p2tr, wpkh, or shp2wpkh
+            // Can send to p2tr if wallet is p2tr or wpkh
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
-                    miniWallet.type === 'shp2wpkh' ||
                     miniWallet.type === 'wpkh' ||
                     miniWallet.type === 'p2tr')
             );
