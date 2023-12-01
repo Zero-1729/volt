@@ -308,6 +308,7 @@ const SendView = ({route}: Props) => {
                                     loading={false}
                                     balanceFontSize={'text-4xl'}
                                     fontColor={ColorScheme.Text.Default}
+                                    ignoreHideBalance={true}
                                 />
                             )}
                             {!isMax && (
