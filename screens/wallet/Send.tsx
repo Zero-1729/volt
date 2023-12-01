@@ -60,6 +60,7 @@ const SendView = ({route}: Props) => {
     const navigation = useNavigation();
 
     const [PsbtVSize, setPSBTFee] = useState<number>();
+    const [uPsbtFee, setUPsbtFee] = useState<number>(0);
     const [uPsbt, setUPsbt] = useState<PartiallySignedTransaction>();
     const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
         fastestFee: 2,
@@ -149,6 +150,9 @@ const SendView = ({route}: Props) => {
             setUPsbt(_psbt);
             setPSBTFee(_vsize);
             setLoadingPSBT(false);
+
+            // Grab Psbt Fee
+            await getPSBTFee();
         } catch (e: any) {
             conservativeAlert(
                 'Error',
@@ -181,6 +185,15 @@ const SendView = ({route}: Props) => {
         // Set the fee rate from modal or use fastest
         setSelectedFeeRate(rates.fastestFee);
         setFeeRates(rates);
+    };
+
+    const getPSBTFee = async () => {
+        if (!uPsbt) {
+            setUPsbtFee(0);
+            return;
+        }
+
+        setUPsbtFee(await getPsbtFee(uPsbt.base64, selectedFeeRate));
     };
 
     const exportUPsbt = async () => {
@@ -227,6 +240,10 @@ const SendView = ({route}: Props) => {
 
         calculatePSBTFee();
     }, []);
+
+    useEffect(() => {
+        getPSBTFee();
+    }, [selectedFeeRate]);
 
     const updateFeeRate = (fee: number) => {
         setSelectedFeeRate(fee);
@@ -384,12 +401,7 @@ const SendView = ({route}: Props) => {
                                             ? `${
                                                   appFiatCurrency.symbol
                                               } ${normalizeFiat(
-                                                  new BigNumber(
-                                                      getPsbtFee(
-                                                          PsbtVSize,
-                                                          selectedFeeRate,
-                                                      ),
-                                                  ),
+                                                  new BigNumber(uPsbtFee),
                                                   new BigNumber(fiatRate.rate),
                                               )}`
                                             : `${appFiatCurrency.symbol} ...`}
