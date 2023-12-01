@@ -538,7 +538,7 @@ export const parseDescriptor = (expression: string) => {
             : descObjmap?.path.split('/').splice(0, 4).join('/').slice(1),
         keyPath: '/' + descObjmap?.path.split('/').splice(4).join('/'),
         scriptPrefix: scripts.join('(') + '(',
-        scriptSuffix: scripts.length === 3 ? '))' : ')',
+        scriptSuffix: scripts.length === 2 ? '))' : ')',
         checksum:
             partsByRightBrace.slice(-1)[0][0] === '#'
                 ? partsByRightBrace.slice(-1)[0]
