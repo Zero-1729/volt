@@ -13,7 +13,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {getFeeRates} from '../../modules/mempool';
 import {TMempoolFeeRates} from '../../types/wallet';
-import {constructPSBT} from '../../modules/bdk';
+import {constructPSBT, getPsbtFee} from '../../modules/bdk';
 import {getPrivateDescriptors} from '../../modules/descriptors';
 import {TComboWallet} from '../../types/wallet';
 import {PartiallySignedTransaction} from 'bdk-rn';
@@ -59,7 +59,7 @@ const SendView = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const [PSBTFee, setPSBTFee] = useState<BigNumber>();
+    const [PsbtVSize, setPSBTFee] = useState<number>();
     const [uPsbt, setUPsbt] = useState<PartiallySignedTransaction>();
     const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
         fastestFee: 2,
@@ -142,12 +142,12 @@ const SendView = ({route}: Props) => {
                 return;
             }
 
-            // Grab fee amount
-            const feeAmount = new BigNumber(await _psbt.feeAmount());
+            // Grab Psbt vsize
+            const _vsize = await (await _psbt.extractTx()).vsize();
 
             // set PSBT info
             setUPsbt(_psbt);
-            setPSBTFee(feeAmount);
+            setPSBTFee(_vsize);
             setLoadingPSBT(false);
         } catch (e: any) {
             conservativeAlert(
@@ -247,7 +247,7 @@ const SendView = ({route}: Props) => {
                                 'absolute top-6 w-full flex-row items-center justify-center',
                             ),
                         ]}>
-                        {isAdvancedMode && PSBTFee ? (
+                        {isAdvancedMode && PsbtVSize ? (
                             <PlainButton
                                 style={[tailwind('absolute right-6')]}
                                 onPress={openExportModal}>
@@ -349,7 +349,7 @@ const SendView = ({route}: Props) => {
                             </Text>
                         </View>
 
-                        {PSBTFee ? (
+                        {PsbtVSize ? (
                             <View
                                 style={[
                                     tailwind(
@@ -380,11 +380,16 @@ const SendView = ({route}: Props) => {
                                                     .GrayText,
                                             },
                                         ]}>
-                                        {PSBTFee
+                                        {PsbtVSize
                                             ? `${
                                                   appFiatCurrency.symbol
                                               } ${normalizeFiat(
-                                                  PSBTFee,
+                                                  new BigNumber(
+                                                      getPsbtFee(
+                                                          PsbtVSize,
+                                                          selectedFeeRate,
+                                                      ),
+                                                  ),
                                                   new BigNumber(fiatRate.rate),
                                               )}`
                                             : `${appFiatCurrency.symbol} ...`}
@@ -544,7 +549,7 @@ const SendView = ({route}: Props) => {
                     )}
 
                     <LongBottomButton
-                        disabled={PSBTFee === undefined}
+                        disabled={PsbtVSize === undefined}
                         onPress={createTransaction}
                         title={'Send'}
                         textColor={ColorScheme.Text.Alt}
@@ -563,7 +568,7 @@ const SendView = ({route}: Props) => {
                         />
                     </View>
 
-                    {isAdvancedMode && PSBTFee ? (
+                    {isAdvancedMode && PsbtVSize ? (
                         <View style={[tailwind('absolute bottom-0')]}>
                             <ExportPsbt
                                 exportRef={bottomExportRef}
