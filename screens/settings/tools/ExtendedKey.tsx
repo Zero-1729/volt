@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {Text, useColorScheme, View} from 'react-native';
+import React, {useState, useRef} from 'react';
+import {Text, useColorScheme, View, TextInput} from 'react-native';
 
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
@@ -45,6 +45,8 @@ const ExtendedKey = () => {
         });
     }
 
+    const inputTextRef = useRef<TextInput>(null);
+
     const [open, setOpen] = useState(false);
     const [version, setVersion] = useState('x');
     const [versions, setVersions] = useState(xKeyVersionsSet);
@@ -71,8 +73,24 @@ const ExtendedKey = () => {
         }, 450);
     };
 
+    const handleButtonPress = () => {
+        if (resultMessage.length > 0) {
+            clearText();
+            inputTextRef.current?.clear();
+        } else {
+            convertKey();
+        }
+    };
+
     const convertKey = () => {
-        const extKeyPrefix = getExtendedKeyPrefix(xkey);
+        let extKeyPrefix = '';
+
+        try {
+            extKeyPrefix = getExtendedKeyPrefix(xkey);
+        } catch (e: any) {
+            errorAlert('Error', e.message);
+            return;
+        }
 
         // Check if it is indeed an xpub and valid
         if (
@@ -175,6 +193,7 @@ const ExtendedKey = () => {
                         {borderWidth: 1, borderRadius: 6},
                     ]}>
                     <TextSingleInput
+                        refs={inputTextRef}
                         placeholder="Enter an extended key here..."
                         placeholderTextColor={ColorScheme.Text.GrayedText}
                         isEnabled={true}
@@ -268,8 +287,8 @@ const ExtendedKey = () => {
                 {/* Converter Button */}
                 <LongBottomButton
                     style={[tailwind('mt-12 w-full items-center')]}
-                    title={'Convert'}
-                    onPress={convertKey}
+                    title={`${resultMessage ? 'Clear' : 'Convert'}`}
+                    onPress={handleButtonPress}
                     disabled={xkey.trim().length === 0}
                     textColor={
                         xkey.trim().length > 0
