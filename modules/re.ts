@@ -64,7 +64,7 @@ export const xprvPattern: RegExp = RegExp(String.raw`^${xprvRegex}$`);
 
 // Bitcoin Address Regex
 const legacyAddressRegex: string = String.raw`^(1|m)[A-HJ-NP-Za-km-z1-9]{25,33}$`; // pkh (26, 34)
-const segwitWrappedRegex: string = String.raw`^(3|2)[A-HJ-NP-Za-km-z1-9]{25,33}$`; // sh(wpkh) (34)
+const segwitWrappedRegex: string = String.raw`^(3|2)[A-HJ-NP-Za-km-z1-9]{25,34}$`; // sh(wpkh) (34)
 const segwitNativeAddressRegex: string = String.raw`^(bc1q|tb1q)[a-z0-9]{38,58}$`; // wpkh (42, 62)
 const taprootAddressRegex: string = String.raw`^(bc1p|tb1p)[a-z0-9]{58}$`; // p2tr (62)
 
