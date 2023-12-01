@@ -539,6 +539,14 @@ export const psbtFromJSON = async (psbtBase64: string) => {
     return _psbt;
 };
 
+export const getPsbtFee = async (psbtBase58: string, feerate: number) => {
+    const _psbt = new BDK.PartiallySignedTransaction(psbtBase58);
+
+    const _vsize = await (await _psbt.extractTx()).vsize();
+
+    return _vsize * feerate;
+};
+
 // Function to create a BDK Psbt
 // Takes in a list of addresses and amounts
 const createBDKPsbt = async (
