@@ -163,8 +163,8 @@ const ExtendedKey = () => {
                             tailwind('text-sm'),
                             {color: ColorScheme.Text.GrayedText},
                         ]}>
-                        [EXPERIMENTAL] This tool allows you to convert extended
-                        keys between different versions.
+                        This tool allows you to convert extended keys between
+                        different versions.
                     </Text>
                 </View>
 
