@@ -98,19 +98,26 @@ const Xpub = () => {
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}
-                    <View style={[tailwind('absolute top-6  w-full left-0')]}>
-                        {/* Allow exporting XPub */}
-                        <PlainButton
-                            style={[tailwind('absolute left-0')]}
-                            onPress={() => {
-                                writeDescriptorToFile();
-                            }}>
-                            <ShareIcon
-                                width={32}
-                                fill={ColorScheme.SVG.Default}
-                            />
-                        </PlainButton>
-                    </View>
+                    {Platform.OS === 'ios' && (
+                        <>
+                            <View
+                                style={[
+                                    tailwind('absolute top-6  w-full left-0'),
+                                ]}>
+                                {/* Allow exporting XPub */}
+                                <PlainButton
+                                    style={[tailwind('absolute left-0')]}
+                                    onPress={() => {
+                                        writeDescriptorToFile();
+                                    }}>
+                                    <ShareIcon
+                                        width={32}
+                                        fill={ColorScheme.SVG.Default}
+                                    />
+                                </PlainButton>
+                            </View>
+                        </>
+                    )}
 
                     <View style={[tailwind('absolute top-6 right-0')]}>
                         <PlainButton

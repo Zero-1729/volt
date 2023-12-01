@@ -171,7 +171,7 @@ const Backup = () => {
                     {/* Top panel */}
                     <View style={[tailwind('absolute top-6  w-full left-0')]}>
                         {/* Allow exporting public descriptor to file */}
-                        {backupMaterial === EBackupMaterial.Descriptor &&
+                        {backupMaterial === EBackupMaterial.Descriptor && Platform.OS === 'ios' &&
                         !showPrivateDescriptor ? (
                             <PlainButton
                                 style={[tailwind('absolute left-0')]}
