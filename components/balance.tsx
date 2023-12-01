@@ -207,7 +207,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
 
     return (
         <View>
-            {!hideTotalBalance && !props.ignoreHideBalance ? (
+            {!(hideTotalBalance && !props.ignoreHideBalance) ? (
                 <View
                     style={[
                         tailwind(
