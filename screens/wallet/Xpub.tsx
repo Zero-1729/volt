@@ -9,7 +9,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {useNavigation, CommonActions} from '@react-navigation/core';
 
 import QRCodeStyled from 'react-native-qrcode-styled';
-import Checkbox from 'react-native-bouncy-checkbox';
 
 import {useTailwind} from 'tailwind-rn';
 

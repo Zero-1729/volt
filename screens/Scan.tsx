@@ -245,7 +245,6 @@ const Scan = ({route}: Props) => {
                 addressTip === 'b' || addressTip === 't'
                     ? decodedInvoice.address.slice(0, 4)
                     : addressTip;
-            console.log('pre: ', prefixStub);
             const addressType = prefixInfo[prefixStub].type;
             const addressTypeName = WalletTypeDetails[addressType][0];
 
