@@ -1,10 +1,11 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useRef} from 'react';
 import {
     Text,
     useColorScheme,
     View,
     ActivityIndicator,
     StyleSheet,
+    TextInput,
 } from 'react-native';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -47,6 +48,18 @@ const AddressOwnership = ({route}: Props) => {
     const {electrumServerURL} = useContext(AppStorageContext);
 
     const networkState = useNetInfo();
+
+    const addressInputRef = useRef<TextInput>(null);
+
+    const handleButtonCheck = () => {
+        if (!resultMessage) {
+            checkAddressOwnership();
+        } else {
+            clearText();
+            updateText('');
+            addressInputRef.current?.clear();
+        }
+    };
 
     const checkAddressOwnership = async () => {
         if (!networkState.isInternetReachable) {
@@ -166,6 +179,7 @@ const AddressOwnership = ({route}: Props) => {
                         tailwind('mt-10 w-5/6 border-gray-400 px-2'),
                     ]}>
                     <TextSingleInput
+                        refs={addressInputRef}
                         placeholder="Enter an address here..."
                         placeholderTextColor={ColorScheme.Text.GrayedText}
                         isEnabled={true}
@@ -198,8 +212,8 @@ const AddressOwnership = ({route}: Props) => {
                 <LongBottomButton
                     disabled={loading}
                     style={[tailwind('mt-12 w-full items-center')]}
-                    title={'Check Address'}
-                    onPress={checkAddressOwnership}
+                    title={resultMessage.includes('Address') ? 'Clear' : 'Check Address'}
+                    onPress={handleButtonCheck}
                     textColor={
                         address.trim().length > 0
                             ? ColorScheme.Text.Alt
