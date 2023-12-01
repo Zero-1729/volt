@@ -84,6 +84,7 @@ export type FiatBalanceProps = BaseProps & {
     amountSign?: string;
     loading: boolean;
     fontColor: string;
+    ignoreHideBalance?: boolean;
 };
 
 // Base Text Input Prop Type (for reuse)
