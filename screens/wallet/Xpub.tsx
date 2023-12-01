@@ -20,6 +20,7 @@ import Color from '../../constants/Color';
 import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
+import {WalletTypeDetails} from '../../modules/wallet-defaults';
 
 import CloseIcon from '../../assets/svg/x-24.svg';
 import ShareIcon from '../../assets/svg/share-24.svg';
@@ -33,10 +34,15 @@ const Xpub = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {currentWalletID, getWalletData} = useContext(AppStorageContext);
+    const {currentWalletID, getWalletData, isAdvancedMode} =
+        useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
     const [backupData, setBackupData] = useState<string>(walletData.xpub);
+
+    const walletType = WalletTypeDetails[walletData.type];
+    const walletTypeName =
+        walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
 
     // Write public descriptor file to device
     const writeDescriptorToFile = async () => {
@@ -133,6 +139,15 @@ const Xpub = () => {
                             numberOfLines={1}
                             ellipsizeMode={'middle'}>
                             {walletData.name}
+                        </Text>
+
+                        {/* Display wallet type */}
+                        <Text
+                            style={[
+                                tailwind('text-base self-center mb-10'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {isAdvancedMode ? walletTypeName : 'Backup'}
                         </Text>
                     </View>
 
