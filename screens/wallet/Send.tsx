@@ -117,7 +117,7 @@ const SendView = ({route}: Props) => {
     };
 
     // Get fee based on PSBT
-    const calculatePSBTFee = async () => {
+    const constructPsbt = async () => {
         try {
             const descriptors = getPrivateDescriptors(
                 route.params.wallet.privateDescriptor,
@@ -238,7 +238,7 @@ const SendView = ({route}: Props) => {
     useEffect(() => {
         fetchFeeRates();
 
-        calculatePSBTFee();
+        constructPsbt();
     }, []);
 
     useEffect(() => {
