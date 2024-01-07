@@ -15,6 +15,7 @@ import Info from './screens/wallet/Info';
 import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
+import FeeSelection from './screens/wallet/FeeSelection';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 import Xpub from './screens/wallet/Xpub';
@@ -68,7 +69,12 @@ export type WalletParamList = {
         sats: string;
         fiat: string;
     };
+    FeeSelection: {
+        invoiceData: TInvoiceData;
+        wallet: TMiniWallet;
+    };
     Send: {
+        feeRate: number;
         invoiceData: TInvoiceData;
         wallet: TMiniWallet;
     };
@@ -148,6 +154,10 @@ const WalletRoot = () => {
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
+                <WalletStack.Screen
+                    name="FeeSelection"
+                    component={FeeSelection}
+                />
                 <WalletStack.Screen name="Send" component={Send} />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
