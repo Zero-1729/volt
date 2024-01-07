@@ -8,6 +8,7 @@ import {
     Alert,
     Platform,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 
 import {
@@ -21,13 +22,14 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {WalletParamList} from '../../Navigation';
 
 import BigNumber from 'bignumber.js';
-import Color from '../../constants/Color';
+import {TComboWallet} from '../../types/wallet';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {conservativeAlert} from '../../components/alert';
 import Prompt from 'react-native-prompt-android';
 
 import {useTailwind} from 'tailwind-rn';
+import Color from '../../constants/Color';
 
 import {TMempoolFeeRates} from '../../types/wallet';
 import {getFeeRates} from '../../modules/mempool';
@@ -35,6 +37,10 @@ import {normalizeFiat, addCommas} from '../../modules/transform';
 
 import SelectedIcon from './../../assets/svg/check-circle-fill-24.svg';
 import Close from '../../assets/svg/x-24.svg';
+
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+import {getPrivateDescriptors} from '../../modules/descriptors';
+import {generatePsbtVsize} from '../../modules/bdk';
 
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
@@ -45,10 +51,12 @@ const FeeSelection = ({route}: Props) => {
 
     const isAndroid = Platform.OS === 'android';
 
-    const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
+    const {fiatRate, appFiatCurrency, isAdvancedMode, electrumServerURL} =
+        useContext(AppStorageContext);
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
     const [selectedFeeRateType, setSelectedFeeRateType] = useState<string>();
     const [psbtVSize, setPsbtVSize] = useState<number>(1);
+    const [loadingPSBT, setLoadingPSBT] = useState<boolean>(true);
     const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
         fastestFee: 2,
         halfHourFee: 1,
@@ -56,6 +64,40 @@ const FeeSelection = ({route}: Props) => {
         economyFee: 1,
         minimumFee: 1,
     });
+
+    const calculateUPsbt = async () => {
+        const descriptors = getPrivateDescriptors(
+            route.params.wallet.privateDescriptor,
+        );
+
+        const _psbtVsize = await generatePsbtVsize(
+            descriptors,
+            selectedFeeRate,
+            route.params.invoiceData,
+            route.params.wallet as TComboWallet,
+            electrumServerURL,
+            (e: any) => {
+                conservativeAlert(
+                    'Error',
+                    `Could not create transaction. ${
+                        isAdvancedMode ? e.message : ''
+                    }`,
+                );
+
+                // Stop loading
+                setLoadingPSBT(false);
+            },
+        );
+
+        // Set psbt vsize
+        setPsbtVSize(_psbtVsize as number);
+
+        // Select fastest fee
+        setSelectedFeeRateType('priority');
+
+        // Stop loading
+        setLoadingPSBT(false);
+    };
 
     const fetchFeeRates = async () => {
         let rates = feeRates;
@@ -152,6 +194,7 @@ const FeeSelection = ({route}: Props) => {
 
     useEffect(() => {
         fetchFeeRates();
+        calculateUPsbt();
     }, []);
 
     return (
@@ -227,54 +270,62 @@ const FeeSelection = ({route}: Props) => {
                                     )}
                                 </View>
 
-                                <View
-                                    style={[tailwind('items-center flex-row')]}>
+                                {!loadingPSBT && (
+                                    <View
+                                        style={[
+                                            tailwind('items-center flex-row'),
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm mr-2'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .GrayedText,
+                                                },
+                                            ]}>
+                                            {`${addCommas(
+                                                feeRates.fastestFee.toString(),
+                                            )} sat/vB`}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+
+                            {!loadingPSBT && (
+                                <View style={[tailwind('w-4/5 mt-2')]}>
                                     <Text
                                         style={[
-                                            tailwind('text-sm mr-2'),
+                                            tailwind('text-sm'),
                                             {
                                                 color: ColorScheme.Text
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        {`${addCommas(
-                                            feeRates.fastestFee.toString(),
-                                        )} sat/vB`}
+                                        Expected confirmation time is ~10 mins
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm'),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
+                                        ]}>
+                                        {`~${addCommas(
+                                            (
+                                                psbtVSize * feeRates.fastestFee
+                                            ).toString(),
+                                        )} sats (${
+                                            appFiatCurrency.symbol
+                                        } ${normalizeFiat(
+                                            new BigNumber(
+                                                psbtVSize * feeRates.fastestFee,
+                                            ),
+                                            new BigNumber(fiatRate.rate),
+                                        )})`}
                                     </Text>
                                 </View>
-                            </View>
-
-                            <View style={[tailwind('w-4/5 mt-2')]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
-                                    Expected confirmation time is ~10 mins
-                                </Text>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
-                                    {`~${addCommas(
-                                        (
-                                            psbtVSize * feeRates.fastestFee
-                                        ).toString(),
-                                    )} sats (${
-                                        appFiatCurrency.symbol
-                                    } ${normalizeFiat(
-                                        new BigNumber(
-                                            psbtVSize * feeRates.fastestFee,
-                                        ),
-                                        new BigNumber(fiatRate.rate),
-                                    )})`}
-                                </Text>
-                            </View>
+                            )}
                         </View>
                     </PlainButton>
 
@@ -325,54 +376,62 @@ const FeeSelection = ({route}: Props) => {
                                     )}
                                 </View>
 
-                                <View
-                                    style={[tailwind('items-center flex-row')]}>
+                                {!loadingPSBT && (
+                                    <View
+                                        style={[
+                                            tailwind('items-center flex-row'),
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm mr-2'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .GrayedText,
+                                                },
+                                            ]}>
+                                            {`${addCommas(
+                                                feeRates.economyFee.toString(),
+                                            )} sat/vB`}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+
+                            {!loadingPSBT && (
+                                <View style={[tailwind('w-4/5 mt-2')]}>
                                     <Text
                                         style={[
-                                            tailwind('text-sm mr-2'),
+                                            tailwind('text-sm'),
                                             {
                                                 color: ColorScheme.Text
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        {`${addCommas(
-                                            feeRates.economyFee.toString(),
-                                        )} sat/vB`}
+                                        Expected confirmation time is ~30 mins
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm'),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
+                                        ]}>
+                                        {`~${addCommas(
+                                            (
+                                                psbtVSize * feeRates.fastestFee
+                                            ).toString(),
+                                        )} sats (${
+                                            appFiatCurrency.symbol
+                                        } ${normalizeFiat(
+                                            new BigNumber(
+                                                psbtVSize * feeRates.economyFee,
+                                            ),
+                                            new BigNumber(fiatRate.rate),
+                                        )})`}
                                     </Text>
                                 </View>
-                            </View>
-
-                            <View style={[tailwind('w-4/5 mt-2')]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
-                                    Expected confirmation time is ~30 mins
-                                </Text>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
-                                    {`~${addCommas(
-                                        (
-                                            psbtVSize * feeRates.fastestFee
-                                        ).toString(),
-                                    )} sats (${
-                                        appFiatCurrency.symbol
-                                    } ${normalizeFiat(
-                                        new BigNumber(
-                                            psbtVSize * feeRates.economyFee,
-                                        ),
-                                        new BigNumber(fiatRate.rate),
-                                    )})`}
-                                </Text>
-                            </View>
+                            )}
                         </View>
                     </PlainButton>
 
@@ -471,7 +530,7 @@ const FeeSelection = ({route}: Props) => {
                                         ]}>
                                         {`~${addCommas(
                                             (
-                                                psbtVSize * feeRates.fastestFee
+                                                psbtVSize * selectedFeeRate
                                             ).toString(),
                                         )} sats (${
                                             appFiatCurrency.symbol
@@ -487,6 +546,31 @@ const FeeSelection = ({route}: Props) => {
                         </View>
                     </PlainButton>
                 </View>
+
+                {/* Loading psbt text */}
+                {loadingPSBT && (
+                    <View
+                        style={[
+                            tailwind('absolute'),
+                            {
+                                bottom:
+                                    NativeWindowMetrics.bottomButtonOffset + 76,
+                            },
+                        ]}>
+                        <ActivityIndicator
+                            style={[tailwind('mb-4')]}
+                            size="small"
+                            color={ColorScheme.SVG.Default}
+                        />
+                        <Text
+                            style={[
+                                tailwind('text-sm'),
+                                {color: ColorScheme.Text.GrayedText},
+                            ]}>
+                            Retrieving fee data from Bitcoin network...
+                        </Text>
+                    </View>
+                )}
 
                 <LongBottomButton
                     onPress={() => {
