@@ -39,7 +39,7 @@ import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
 import InfoIcon from '../assets/svg/info-16.svg';
 
-import {conservativeAlert, liberalAlert} from '../components/alert';
+import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {prefixInfo} from '../modules/wallet-utils';
@@ -348,7 +348,7 @@ const Scan = ({route}: Props) => {
 
                 runOnJS(navigation.dispatch)(
                     CommonActions.navigate('WalletRoot', {
-                        screen: 'Send',
+                        screen: 'FeeSelection',
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: route.params.wallet,
