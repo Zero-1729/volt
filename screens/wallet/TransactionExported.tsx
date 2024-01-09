@@ -34,8 +34,6 @@ const TransactionExported = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
-
     const [statusInfo, setStatusInfo] = useState<TStatusInfo>({
         status: false,
         fname: '',
@@ -67,106 +65,89 @@ const TransactionExported = ({route}: Props) => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                {!!statusInfo.status && (
-                    <View style={[tailwind('h-full justify-center')]}>
-                        <Text
-                            style={[
-                                tailwind(
-                                    'text-lg absolute font-bold text-center w-full top-6 px-4',
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            Export
-                        </Text>
+                <View style={[tailwind('h-full justify-center')]}>
+                    <Text
+                        style={[
+                            tailwind(
+                                'text-lg absolute font-bold text-center w-full top-6 px-4',
+                            ),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        Export
+                    </Text>
 
-                        <View
-                            style={[
-                                tailwind(
-                                    '-mt-12 justify-center px-4 items-center',
-                                ),
-                            ]}>
-                            <View style={[tailwind('items-center')]}>
-                                {!statusInfo.status && (
-                                    <Failed
-                                        style={[tailwind('self-center')]}
-                                        fill={ColorScheme.SVG.Default}
-                                        height={128}
-                                        width={128}
-                                    />
-                                )}
+                    <View
+                        style={[
+                            tailwind('-mt-12 justify-center px-4 items-center'),
+                        ]}>
+                        <View style={[tailwind('items-center')]}>
+                            {!statusInfo.status && (
+                                <Failed
+                                    style={[tailwind('self-center')]}
+                                    fill={ColorScheme.SVG.Default}
+                                    height={128}
+                                    width={128}
+                                />
+                            )}
 
-                                {statusInfo.status && (
-                                    <Success
-                                        style={[tailwind('self-center')]}
-                                        fill={ColorScheme.SVG.Default}
-                                        height={128}
-                                        width={128}
-                                    />
-                                )}
-                            </View>
-
-                            <View style={[tailwind('w-4/5 mt-4 items-center')]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-lg font-bold'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
-                                    {statusInfo.status
-                                        ? 'Successful'
-                                        : 'Failed'}
-                                </Text>
-                            </View>
-
-                            {!isAdvancedMode ? (
-                                <View style={[tailwind('items-center w-4/5')]}>
-                                    <Text
-                                        ellipsizeMode="middle"
-                                        numberOfLines={1}
-                                        style={[
-                                            tailwind(
-                                                'text-sm text-center mt-4',
-                                            ),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
-                                        {statusInfo.status
-                                            ? statusInfo.fname
-                                            : statusInfo.message}
-                                    </Text>
-                                </View>
-                            ) : (
-                                <></>
+                            {statusInfo.status && (
+                                <Success
+                                    style={[tailwind('self-center')]}
+                                    fill={ColorScheme.SVG.Default}
+                                    height={128}
+                                    width={128}
+                                />
                             )}
                         </View>
 
-                        <View
-                            style={[
-                                tailwind(
-                                    'absolute bottom-0 items-center w-full',
-                                ),
-                            ]}>
-                            <LongBottomButton
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate('WalletRoot', {
-                                            screen: 'WalletView',
-                                            params: {
-                                                reload: statusInfo.status,
-                                            },
-                                        }),
-                                    );
-                                }}
-                                title={'Back to Wallet'}
-                                textColor={ColorScheme.Text.Alt}
-                                backgroundColor={
-                                    ColorScheme.Background.Inverted
-                                }
-                            />
+                        <View style={[tailwind('w-4/5 mt-4 items-center')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-lg font-bold'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {statusInfo.status ? 'Successful' : 'Failed'}
+                            </Text>
+                        </View>
+
+                        <View style={[tailwind('items-center w-4/5')]}>
+                            <Text
+                                ellipsizeMode="middle"
+                                numberOfLines={1}
+                                style={[
+                                    tailwind('text-sm text-center mt-4'),
+                                    {
+                                        color: ColorScheme.Text.GrayedText,
+                                    },
+                                ]}>
+                                {statusInfo.status
+                                    ? statusInfo.fname
+                                    : statusInfo.message}
+                            </Text>
                         </View>
                     </View>
-                )}
+
+                    <View
+                        style={[
+                            tailwind('absolute bottom-0 items-center w-full'),
+                        ]}>
+                        <LongBottomButton
+                            onPress={() => {
+                                navigation.dispatch(
+                                    CommonActions.navigate('WalletRoot', {
+                                        screen: 'WalletView',
+                                        params: {
+                                            reload: statusInfo.status,
+                                        },
+                                    }),
+                                );
+                            }}
+                            title={'Back to Wallet'}
+                            textColor={ColorScheme.Text.Alt}
+                            backgroundColor={ColorScheme.Background.Inverted}
+                        />
+                    </View>
+                </View>
             </View>
         </SafeAreaView>
     );
