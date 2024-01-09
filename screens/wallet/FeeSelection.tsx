@@ -122,6 +122,8 @@ const FeeSelection = ({route}: Props) => {
 
     const updateCustomFeeRate = (value: string | undefined) => {
         const rate = Number(value);
+        const amount = Number(route.params.invoiceData.options?.amount);
+        const fee = rate * psbtVSize;
 
         // Warn user that fee rate invalid
         if (Number.isNaN(rate)) {
@@ -130,6 +132,12 @@ const FeeSelection = ({route}: Props) => {
                 'Please enter a valid fee rate',
             );
 
+            return;
+        }
+
+        // Avoid too high fee rate
+        if (fee + amount > route.params.wallet.balance) {
+            conservativeAlert('Error', 'Fee rate too high, please try again.');
             return;
         }
 
