@@ -263,7 +263,7 @@ const RequestAmount = () => {
                                     },
                                 ]}>
                                 {/* TODO: fix polarity fn to avoid clearing amount and persist shown values to receive screen. ATM skip is shown despite satsAmount and fiatAmount still showing */}
-                                {amount === '' ? 'Skip Amount' : 'Continue'}
+                                {amount === '' ? 'Skip' : 'Continue'}
                             </Text>
                         </View>
                     </PlainButton>
