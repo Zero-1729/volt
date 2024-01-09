@@ -349,7 +349,7 @@ const SendAmount = ({route}: Props) => {
 
                             navigation.dispatch(
                                 CommonActions.navigate('WalletRoot', {
-                                    screen: 'Send',
+                                    screen: 'FeeSelection',
                                     params: {
                                         invoiceData: {
                                             ...route.params.invoiceData,
