@@ -18,6 +18,7 @@ import {
     TNetwork,
     TBalance,
     TAddressAmount,
+    TComboWallet,
 } from '../types/wallet';
 import {ENet} from '../types/enums';
 import {Balance} from 'bdk-rn/lib/classes/Bindings';
@@ -530,6 +531,48 @@ const _getChain = async (
     );
 
     return chain;
+};
+
+export const psbtFromInvoice = async (
+    descriptors: {internal: string; external: string},
+    feeRate: number,
+    invoiceData: {address: string; options?: {amount?: number}},
+    wallet: TComboWallet,
+    electrumServerURL: TElectrumServerURLs,
+    onError: (e: any) => void,
+    returnVSOnly?: boolean,
+) => {
+    try {
+        let _wallet = {
+            ...wallet,
+            externalDescriptor: descriptors.external,
+            internalDescriptor: descriptors.internal,
+        };
+
+        let uPsbt!: BDK.PartiallySignedTransaction;
+
+        try {
+            const _uPsbt = await constructPSBT(
+                invoiceData.options?.amount?.toString() as string,
+                invoiceData.address,
+                Number(feeRate),
+                wallet.balance === invoiceData.options?.amount,
+                _wallet as TComboWallet,
+                electrumServerURL,
+            );
+
+            uPsbt = _uPsbt;
+        } catch (e) {
+            throw e;
+        }
+
+        // Return Psbt or psbt vsize
+        return returnVSOnly ? await (await uPsbt.extractTx()).vsize() : uPsbt;
+    } catch (e) {
+        onError(e);
+
+        return null;
+    }
 };
 
 // Return PSBT object from JSON

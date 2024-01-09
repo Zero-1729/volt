@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useCallback, useEffect, useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {
     StyleSheet,
     Text,
@@ -11,24 +11,18 @@ import {
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {getFeeRates} from '../../modules/mempool';
-import {TMempoolFeeRates} from '../../types/wallet';
-import {constructPSBT, getPsbtFee} from '../../modules/bdk';
-import {getPrivateDescriptors} from '../../modules/descriptors';
-import {TComboWallet} from '../../types/wallet';
-import {PartiallySignedTransaction} from 'bdk-rn';
-
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
-
-import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import {AppStorageContext} from '../../class/storageContext';
 import {normalizeFiat} from '../../modules/transform';
 import BigNumber from 'bignumber.js';
 
-import {BottomSheetModal} from '@gorhom/bottom-sheet';
-import FeeModal from '../../components/fee';
+import {psbtFromInvoice} from './../../modules/bdk';
+import {getPrivateDescriptors} from './../../modules/descriptors';
+import {TComboWallet} from '../../types/wallet';
+
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import ExportPsbt from '../../components/psbt';
 import {FiatBalance, Balance} from '../../components/balance';
 
@@ -49,8 +43,9 @@ import ShareIcon from '../../assets/svg/share-24.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
-import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {conservativeAlert} from '../../components/alert';
+import {PartiallySignedTransaction} from 'bdk-rn';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -59,20 +54,10 @@ const SendView = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const [PsbtVSize, setPSBTFee] = useState<number>();
-    const [uPsbtFee, setUPsbtFee] = useState<number>(0);
     const [uPsbt, setUPsbt] = useState<PartiallySignedTransaction>();
-    const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
-        fastestFee: 2,
-        halfHourFee: 1,
-        hourFee: 1,
-        economyFee: 1,
-        minimumFee: 1,
-    });
-    const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
-    const [loadingPSBT, setLoadingPSBT] = useState<boolean>(true);
+    const [loadingPsbt, setLoadingPsbt] = useState(true);
 
-    const {electrumServerURL, fiatRate, appFiatCurrency, isAdvancedMode} =
+    const {fiatRate, appFiatCurrency, isAdvancedMode, electrumServerURL} =
         useContext(AppStorageContext);
 
     const sats = route.params.invoiceData.options?.amount || 0;
@@ -95,9 +80,7 @@ const SendView = ({route}: Props) => {
         );
     };
 
-    const bottomFeeRef = React.useRef<BottomSheetModal>(null);
     const bottomExportRef = React.useRef<BottomSheetModal>(null);
-    const [openModal, setOpenModal] = useState(-1);
     const [openExport, setOpenExport] = useState(-1);
 
     const openExportModal = () => {
@@ -108,108 +91,15 @@ const SendView = ({route}: Props) => {
         }
     };
 
-    const openFeeModal = () => {
-        if (openModal !== 1) {
-            bottomFeeRef.current?.present();
-        } else {
-            bottomFeeRef.current?.close();
-        }
-    };
-
-    // Get fee based on PSBT
-    const constructPsbt = async () => {
-        try {
-            const descriptors = getPrivateDescriptors(
-                route.params.wallet.privateDescriptor,
-            );
-
-            let wallet = {
-                ...route.params.wallet,
-                externalDescriptor: descriptors.external,
-                internalDescriptor: descriptors.internal,
-            };
-
-            const _psbt = await constructPSBT(
-                sats.toString(),
-                route.params.invoiceData.address,
-                Number(selectedFeeRate) || 1,
-                sats.toString() === route.params.wallet.balance.toString(),
-                wallet as TComboWallet,
-                electrumServerURL,
-            );
-
-            if (!_psbt) {
-                conservativeAlert('Fee', 'Error fetching fee.');
-                return;
-            }
-
-            // Grab Psbt vsize
-            const _vsize = await (await _psbt.extractTx()).vsize();
-
-            // set PSBT info
-            setUPsbt(_psbt);
-            setPSBTFee(_vsize);
-            setLoadingPSBT(false);
-
-            // Grab Psbt Fee
-            await getPSBTFee();
-        } catch (e: any) {
-            conservativeAlert(
-                'Error',
-                `Could not create transaction. ${
-                    isAdvancedMode ? e.message : ''
-                }`,
-            );
-
-            // Clear loading and revert to wallet screen
-            setLoadingPSBT(false);
-            navigation.dispatch(StackActions.popToTop());
-        }
-    };
-
-    const fetchFeeRates = async () => {
-        let rates = feeRates;
-
-        try {
-            const fetchedRates = await getFeeRates(route.params.wallet.network);
-
-            rates = fetchedRates as TMempoolFeeRates;
-        } catch (e: any) {
-            // Error assumed to be 503; mempool unavailable due to sync
-            conservativeAlert(
-                'Fee rate',
-                'Error fetching fee rates, service unavailable.',
-            );
-        }
-
-        // Set the fee rate from modal or use fastest
-        setSelectedFeeRate(rates.fastestFee);
-        setFeeRates(rates);
-    };
-
-    const getPSBTFee = async () => {
-        if (!uPsbt) {
-            setUPsbtFee(0);
-            return;
-        }
-
-        setUPsbtFee(await getPsbtFee(uPsbt.base64, selectedFeeRate));
-    };
-
     const exportUPsbt = async () => {
-        if (!uPsbt) {
-            conservativeAlert('Error', 'No PSBT data to export.');
-            return;
-        }
-
         // Sign the psbt adn write to file
         // Get txid and use it with wallet name to create a unique file name
-        const txid = await uPsbt.txid();
+        const txid = await uPsbt?.txid();
         let pathData =
             RNFS.TemporaryDirectoryPath +
             `/${txid}-${route.params.wallet.name}.json`;
 
-        const fileBackupData = (await uPsbt.jsonSerialize()) || '';
+        const fileBackupData = (await uPsbt?.jsonSerialize()) || '';
 
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
@@ -235,23 +125,40 @@ const SendView = ({route}: Props) => {
         bottomExportRef.current?.close();
     };
 
-    useEffect(() => {
-        fetchFeeRates();
+    const loadUPsbt = async () => {
+        const descriptors = getPrivateDescriptors(
+            route.params.wallet.privateDescriptor,
+        );
 
-        constructPsbt();
-    }, []);
+        const _uPsbt = (await psbtFromInvoice(
+            descriptors,
+            route.params.feeRate,
+            route.params.invoiceData,
+            route.params.wallet as TComboWallet,
+            electrumServerURL,
+            (e: any) => {
+                conservativeAlert(
+                    'Error',
+                    `Could not create transaction. ${
+                        isAdvancedMode ? e.message : ''
+                    }`,
+                );
 
-    useEffect(() => {
-        getPSBTFee();
-    }, [selectedFeeRate]);
+                // Stop loading
+                setLoadingPsbt(false);
+            },
+        )) as PartiallySignedTransaction;
 
-    const updateFeeRate = (fee: number) => {
-        setSelectedFeeRate(fee);
+        setUPsbt(_uPsbt);
+        setLoadingPsbt(false);
 
-        bottomFeeRef.current?.close();
+        console.log(await uPsbt?.serialize());
     };
 
-    const memoizedUpdateFeeRate = useCallback(updateFeeRate, []);
+    useEffect(() => {
+        // Create Psbt
+        loadUPsbt();
+    }, []);
 
     return (
         <SafeAreaView edges={['bottom', 'left', 'right']}>
@@ -264,7 +171,7 @@ const SendView = ({route}: Props) => {
                                 'absolute top-6 w-full flex-row items-center justify-center',
                             ),
                         ]}>
-                        {isAdvancedMode && PsbtVSize ? (
+                        {!loadingPsbt ? (
                             <PlainButton
                                 style={[tailwind('absolute right-6')]}
                                 onPress={openExportModal}>
@@ -291,7 +198,6 @@ const SendView = ({route}: Props) => {
                             Transaction Summary
                         </Text>
                     </View>
-
                     <View
                         style={[
                             tailwind(
@@ -366,82 +272,66 @@ const SendView = ({route}: Props) => {
                             </Text>
                         </View>
 
-                        {PsbtVSize ? (
+                        <View
+                            style={[
+                                tailwind(
+                                    'mt-6 items-center justify-between w-4/5 flex-row',
+                                ),
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm font-bold'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                Fee
+                            </Text>
+
                             <View
                                 style={[
                                     tailwind(
-                                        'mt-6 items-center justify-between w-4/5 flex-row',
+                                        'flex flex-row justify-center items-center',
                                     ),
                                 ]}>
                                 <Text
                                     style={[
-                                        tailwind('text-sm font-bold'),
-                                        {color: ColorScheme.Text.Default},
+                                        tailwind(
+                                            'text-sm px-2 mr-2 rounded-full',
+                                        ),
+                                        {
+                                            color: ColorScheme.Text.GrayText,
+                                        },
                                     ]}>
-                                    Fee
+                                    {`${appFiatCurrency.symbol} ${normalizeFiat(
+                                        new BigNumber(
+                                            route.params.feeRate *
+                                                route.params.dummyPsbtVSize,
+                                        ),
+                                        new BigNumber(fiatRate.rate),
+                                    )}`}
                                 </Text>
 
                                 <View
                                     style={[
                                         tailwind(
-                                            'flex flex-row justify-center items-center',
+                                            'items-center justify-center rounded-full px-4 py-1',
                                         ),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background.Inverted,
+                                        },
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind(
-                                                'text-sm px-2 mr-2 rounded-full',
-                                            ),
+                                            tailwind('text-sm'),
                                             {
-                                                color: ColorScheme.Text
-                                                    .GrayText,
+                                                color: ColorScheme.Text.Alt,
                                             },
                                         ]}>
-                                        {PsbtVSize
-                                            ? `${
-                                                  appFiatCurrency.symbol
-                                              } ${normalizeFiat(
-                                                  new BigNumber(uPsbtFee),
-                                                  new BigNumber(fiatRate.rate),
-                                              )}`
-                                            : `${appFiatCurrency.symbol} ...`}
+                                        {`${route.params.feeRate} sat/vB`}
                                     </Text>
-
-                                    <PlainButton
-                                        style={[
-                                            tailwind(
-                                                'items-center justify-center',
-                                            ),
-                                        ]}
-                                        onPress={openFeeModal}>
-                                        <View
-                                            style={[
-                                                tailwind(
-                                                    'rounded-full px-4 py-1',
-                                                ),
-                                                {
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Inverted,
-                                                },
-                                            ]}>
-                                            <Text
-                                                style={[
-                                                    tailwind('text-sm'),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .Alt,
-                                                    },
-                                                ]}>
-                                                {`${selectedFeeRate} sat/vB`}
-                                            </Text>
-                                        </View>
-                                    </PlainButton>
                                 </View>
                             </View>
-                        ) : (
-                            <></>
-                        )}
+                        </View>
 
                         {route.params.invoiceData.options?.label ? (
                             <View
@@ -530,8 +420,7 @@ const SendView = ({route}: Props) => {
                             <></>
                         )}
                     </View>
-
-                    {loadingPSBT ? (
+                    {loadingPsbt && (
                         <View
                             style={[
                                 tailwind('absolute'),
@@ -543,56 +432,35 @@ const SendView = ({route}: Props) => {
                             ]}>
                             <ActivityIndicator
                                 style={[tailwind('mb-4')]}
-                                size="small"
-                                color={ColorScheme.SVG.Default}
+                                size={'small'}
+                                color={ColorScheme.Text.Default}
                             />
                             <Text
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                {`Generating ${
-                                    isAdvancedMode ? 'PSBT' : 'transaction'
-                                }...`}
-                            </Text>
+                                ]}>{`Generating ${
+                                isAdvancedMode ? 'PSBT' : 'Transaction'
+                            }...`}</Text>
                         </View>
-                    ) : (
-                        <></>
                     )}
-
                     <LongBottomButton
-                        disabled={PsbtVSize === undefined}
+                        disabled={loadingPsbt}
                         onPress={createTransaction}
                         title={'Send'}
                         textColor={ColorScheme.Text.Alt}
                         backgroundColor={ColorScheme.Background.Inverted}
                     />
 
-                    {/* Fee Modal */}
                     <View style={[tailwind('absolute bottom-0')]}>
-                        <FeeModal
-                            feeRef={bottomFeeRef}
-                            feeRates={feeRates}
-                            setFeeRate={memoizedUpdateFeeRate}
-                            onUpdate={idx => {
-                                setOpenModal(idx);
+                        <ExportPsbt
+                            exportRef={bottomExportRef}
+                            triggerExport={exportUPsbt}
+                            onSelectExport={idx => {
+                                setOpenExport(idx);
                             }}
                         />
                     </View>
-
-                    {isAdvancedMode && PsbtVSize ? (
-                        <View style={[tailwind('absolute bottom-0')]}>
-                            <ExportPsbt
-                                exportRef={bottomExportRef}
-                                triggerExport={exportUPsbt}
-                                onSelectExport={idx => {
-                                    setOpenExport(idx);
-                                }}
-                            />
-                        </View>
-                    ) : (
-                        <></>
-                    )}
                 </BottomSheetModalProvider>
             </View>
         </SafeAreaView>
