@@ -171,8 +171,6 @@ const SendView = ({route}: Props) => {
 
         setUPsbt(_uPsbt);
         setLoadingPsbt(false);
-
-        console.log(await uPsbt?.serialize());
     };
 
     useEffect(() => {
