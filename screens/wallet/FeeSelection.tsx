@@ -40,7 +40,7 @@ import Close from '../../assets/svg/x-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {getPrivateDescriptors} from '../../modules/descriptors';
-import {generatePsbtVsize} from '../../modules/bdk';
+import {psbtFromInvoice} from '../../modules/bdk';
 
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
@@ -70,7 +70,7 @@ const FeeSelection = ({route}: Props) => {
             route.params.wallet.privateDescriptor,
         );
 
-        const _psbtVsize = await generatePsbtVsize(
+        const _psbtVsize = await psbtFromInvoice(
             descriptors,
             selectedFeeRate,
             route.params.invoiceData,
@@ -87,6 +87,7 @@ const FeeSelection = ({route}: Props) => {
                 // Stop loading
                 setLoadingData(false);
             },
+            true,
         );
 
         // Set psbt vsize
