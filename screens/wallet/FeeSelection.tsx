@@ -626,14 +626,17 @@ const FeeSelection = ({route}: Props) => {
 
                 <LongBottomButton
                     onPress={() => {
-                        CommonActions.navigate({
-                            name: 'Send',
-                            params: {
-                                feeRate: selectedFeeRate,
-                                invoiceData: route.params.invoiceData,
-                                miniWallet: route.params.wallet,
-                            },
-                        });
+                        navigation.dispatch(
+                            CommonActions.navigate('WalletRoot', {
+                                screen: 'Send',
+                                params: {
+                                    feeRate: selectedFeeRate,
+                                    dummyPsbtVSize: psbtVSize,
+                                    invoiceData: route.params.invoiceData,
+                                    wallet: route.params.wallet,
+                                },
+                            }),
+                        );
                     }}
                     title={'Continue'}
                     textColor={ColorScheme.Text.Alt}
