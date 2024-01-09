@@ -625,6 +625,7 @@ const FeeSelection = ({route}: Props) => {
                 )}
 
                 <LongBottomButton
+                    disabled={loadingData}
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate('WalletRoot', {
