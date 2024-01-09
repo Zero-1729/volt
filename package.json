@@ -1,6 +1,6 @@
 {
   "name": "volt",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "license": "MIT",
   "scripts": {
     "tsc:check": "tsc -p tsconfig.json --noEmit",

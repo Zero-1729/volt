@@ -1,4 +1,5 @@
 [
+    "Add export status screen",
     "Separate fee selection screen and fixed psbt flow",
     "Added wallet Carousel in home screen",
     "Added privacy blur on IOS and Android",
