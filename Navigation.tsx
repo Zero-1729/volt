@@ -75,6 +75,7 @@ export type WalletParamList = {
     };
     Send: {
         feeRate: number;
+        dummyPsbtVSize: number;
         invoiceData: TInvoiceData;
         wallet: TMiniWallet;
     };
