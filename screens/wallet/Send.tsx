@@ -99,22 +99,22 @@ const SendView = ({route}: Props) => {
         let status = true;
         let errorMsg = '';
 
-        let pathData =
+        const pathData =
             RNFS.TemporaryDirectoryPath +
             `/${txid}-${route.params.wallet.name}.json`;
 
-        const fileBackupData = (await uPsbt?.jsonSerialize()) || '';
+        const fileExportData = (await uPsbt?.jsonSerialize()) || '';
 
         if (Platform.OS === 'ios') {
-            await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
-                status = false;
+            await RNFS.writeFile(pathData, fileExportData, 'utf8').catch(e => {
                 errorMsg = e.message;
+                status = false;
             });
 
             await Share.open({
                 url: 'file://' + pathData,
                 type: 'text/plain',
-                title: 'Volt Wallet Descriptor Backup',
+                title: 'PSBT export',
             })
                 .catch(e => {
                     if (e.message !== 'User did not share') {
