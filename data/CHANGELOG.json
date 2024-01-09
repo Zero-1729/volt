@@ -1,4 +1,5 @@
 [
+    "Separate fee selection screen and fixed psbt flow",
     "Added wallet Carousel in home screen",
     "Added privacy blur on IOS and Android",
     "Limited wallet name to 15 characters",
