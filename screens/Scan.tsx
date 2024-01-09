@@ -39,11 +39,11 @@ import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
 import InfoIcon from '../assets/svg/info-16.svg';
 
-import {conservativeAlert} from '../components/alert';
+import {conservativeAlert, liberalAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {prefixInfo} from '../modules/wallet-utils';
-import {WalletTypeDetails } from '../modules/wallet-defaults';
+import {WalletTypeDetails} from '../modules/wallet-defaults';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -121,6 +121,8 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
+
+    const [isOnchain, setIsOnChain] = useState<boolean>(true);
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -220,6 +222,10 @@ const Scan = ({route}: Props) => {
             return;
         }
 
+        if (!invoice.startsWith('bitcoin:')) {
+            setIsOnChain(false);
+        }
+
         // Check whether too broke for tx
         if (
             amount
@@ -278,31 +284,38 @@ const Scan = ({route}: Props) => {
 
             const amount = decodedQR.options.amount;
 
-            if (amount) {
-                // Route to Send screen with amount
-                // Update amount to sats
-                decodedQR.options.amount = convertBTCtoSats(amount);
+            if (isOnchain) {
+                if (amount) {
+                    // Route to Fee screen with amount (onChain)
+                    // Update amount to sats
 
-                runOnJS(navigation.dispatch)(
-                    CommonActions.navigate('WalletRoot', {
-                        screen: 'Send',
-                        params: {
-                            invoiceData: decodedQR,
-                            wallet: route.params.wallet,
-                        },
-                    }),
-                );
+                    // If Onchain
+                    decodedQR.options.amount = convertBTCtoSats(amount);
+
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'FeeSelection',
+                            params: {
+                                invoiceData: decodedQR,
+                                wallet: route.params.wallet,
+                            },
+                        }),
+                    );
+                } else {
+                    // Route to SendAmount screen
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'SendAmount',
+                            params: {
+                                invoiceData: decodedQR,
+                                wallet: route.params.wallet,
+                            },
+                        }),
+                    );
+                }
             } else {
-                // Route to SendAmount screen
-                runOnJS(navigation.dispatch)(
-                    CommonActions.navigate('WalletRoot', {
-                        screen: 'SendAmount',
-                        params: {
-                            invoiceData: decodedQR,
-                            wallet: route.params.wallet,
-                        },
-                    }),
-                );
+                // If LN Invoice
+                conservativeAlert('Warning', 'Lightning is not yet supported');
             }
         }
     };
