@@ -16,6 +16,7 @@ import Backup from './screens/wallet/Backup';
 import Ownership from './screens/wallet/AddressOwnership';
 import RequestAmount from './screens/wallet/RequestAmount';
 import FeeSelection from './screens/wallet/FeeSelection';
+import TransactionExported from './screens/wallet/TransactionExported';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 import Xpub from './screens/wallet/Xpub';
@@ -96,6 +97,11 @@ export type WalletParamList = {
         tx: TTransaction;
         source: string;
     };
+    TransactionExported: {
+        status: boolean;
+        fname: string;
+        errorMsg: string;
+    };
     TransactionStatus: {
         unsignedPsbt: string;
         wallet: TMiniWallet;
@@ -172,6 +178,10 @@ const WalletRoot = () => {
                 <WalletStack.Screen
                     name="TransactionStatus"
                     component={TransactionStatus}
+                />
+                <WalletStack.Screen
+                    name="TransactionExported"
+                    component={TransactionExported}
                 />
                 <WalletStack.Screen name="Receive" component={Receive} />
                 <WalletStack.Screen
