@@ -533,13 +533,14 @@ const _getChain = async (
     return chain;
 };
 
-export const generatePsbtVsize = async (
+export const psbtFromInvoice = async (
     descriptors: {internal: string; external: string},
     feeRate: number,
     invoiceData: {address: string; options?: {amount?: number}},
     wallet: TComboWallet,
     electrumServerURL: TElectrumServerURLs,
     onError: (e: any) => void,
+    returnVSOnly?: boolean,
 ) => {
     try {
         let _wallet = {
@@ -565,8 +566,8 @@ export const generatePsbtVsize = async (
             throw e;
         }
 
-        // Return Psbt vsize
-        return await (await uPsbt.extractTx()).vsize();
+        // Return Psbt or psbt vsize
+        return returnVSOnly ? await (await uPsbt.extractTx()).vsize() : uPsbt;
     } catch (e) {
         onError(e);
 
