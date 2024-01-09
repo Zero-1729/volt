@@ -95,6 +95,10 @@ const SendView = ({route}: Props) => {
         // Sign the psbt adn write to file
         // Get txid and use it with wallet name to create a unique file name
         const txid = await uPsbt?.txid();
+
+        let status = true;
+        let errorMsg = '';
+
         let pathData =
             RNFS.TemporaryDirectoryPath +
             `/${txid}-${route.params.wallet.name}.json`;
@@ -103,8 +107,10 @@ const SendView = ({route}: Props) => {
 
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
-                conservativeAlert('Error', e.message);
+                status = false;
+                errorMsg = e.message;
             });
+
             await Share.open({
                 url: 'file://' + pathData,
                 type: 'text/plain',
@@ -112,17 +118,31 @@ const SendView = ({route}: Props) => {
             })
                 .catch(e => {
                     if (e.message !== 'User did not share') {
-                        conservativeAlert('Error', e.message);
+                        errorMsg = e.message;
+                        status = false;
                     }
                 })
                 .finally(() => {
                     RNFS.unlink(pathData);
                 });
         } else {
-            conservativeAlert('Export', 'Not yet implemented on Android');
+            errorMsg = 'Not yet implemented on Android';
+            status = false;
         }
 
         bottomExportRef.current?.close();
+
+        // Navigate to status screen
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'TransactionExported',
+                params: {
+                    status: status,
+                    errorMsg: errorMsg,
+                    fname: 'file://' + pathData,
+                },
+            }),
+        );
     };
 
     const loadUPsbt = async () => {
