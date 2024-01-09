@@ -56,7 +56,7 @@ const FeeSelection = ({route}: Props) => {
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
     const [selectedFeeRateType, setSelectedFeeRateType] = useState<string>();
     const [psbtVSize, setPsbtVSize] = useState<number>(1);
-    const [loadingPSBT, setLoadingPSBT] = useState<boolean>(true);
+    const [loadingData, setLoadingData] = useState<boolean>(true);
     const [feeRates, setFeeRates] = useState<TMempoolFeeRates>({
         fastestFee: 2,
         halfHourFee: 1,
@@ -85,7 +85,7 @@ const FeeSelection = ({route}: Props) => {
                 );
 
                 // Stop loading
-                setLoadingPSBT(false);
+                setLoadingData(false);
             },
         );
 
@@ -96,7 +96,7 @@ const FeeSelection = ({route}: Props) => {
         setSelectedFeeRateType('priority');
 
         // Stop loading
-        setLoadingPSBT(false);
+        setLoadingData(false);
     };
 
     const fetchFeeRates = async () => {
@@ -261,6 +261,23 @@ const FeeSelection = ({route}: Props) => {
                                         High Priority
                                     </Text>
 
+                                    {/* Faux loading placeholder */}
+                                    {loadingData && (
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'absolute items-center w-full',
+                                                ),
+                                                {
+                                                    height: 20,
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Greyed,
+                                                },
+                                            ]}
+                                        />
+                                    )}
+
                                     {selectedFeeRateType === 'priority' && (
                                         <SelectedIcon
                                             height={16}
@@ -270,7 +287,7 @@ const FeeSelection = ({route}: Props) => {
                                     )}
                                 </View>
 
-                                {!loadingPSBT && (
+                                {!loadingData && (
                                     <View
                                         style={[
                                             tailwind('items-center flex-row'),
@@ -291,7 +308,7 @@ const FeeSelection = ({route}: Props) => {
                                 )}
                             </View>
 
-                            {!loadingPSBT && (
+                            {!loadingData && (
                                 <View style={[tailwind('w-4/5 mt-2')]}>
                                     <Text
                                         style={[
@@ -367,6 +384,23 @@ const FeeSelection = ({route}: Props) => {
                                         Economic
                                     </Text>
 
+                                    {/* Faux loading placeholder */}
+                                    {loadingData && (
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'absolute items-center w-full',
+                                                ),
+                                                {
+                                                    height: 20,
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Greyed,
+                                                },
+                                            ]}
+                                        />
+                                    )}
+
                                     {selectedFeeRateType === 'economic' && (
                                         <SelectedIcon
                                             height={16}
@@ -376,7 +410,7 @@ const FeeSelection = ({route}: Props) => {
                                     )}
                                 </View>
 
-                                {!loadingPSBT && (
+                                {!loadingData && (
                                     <View
                                         style={[
                                             tailwind('items-center flex-row'),
@@ -397,7 +431,7 @@ const FeeSelection = ({route}: Props) => {
                                 )}
                             </View>
 
-                            {!loadingPSBT && (
+                            {!loadingData && (
                                 <View style={[tailwind('w-4/5 mt-2')]}>
                                     <Text
                                         style={[
@@ -475,6 +509,23 @@ const FeeSelection = ({route}: Props) => {
                                         Custom Fee
                                     </Text>
 
+                                    {/* Faux loading placeholder */}
+                                    {loadingData && (
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'absolute items-center w-full',
+                                                ),
+                                                {
+                                                    height: 20,
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Greyed,
+                                                },
+                                            ]}
+                                        />
+                                    )}
+
                                     {selectedFeeRateType === 'custom' && (
                                         <SelectedIcon
                                             height={16}
@@ -548,7 +599,7 @@ const FeeSelection = ({route}: Props) => {
                 </View>
 
                 {/* Loading psbt text */}
-                {loadingPSBT && (
+                {loadingData && (
                     <View
                         style={[
                             tailwind('absolute'),
