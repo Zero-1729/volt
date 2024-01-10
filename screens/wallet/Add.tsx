@@ -5,6 +5,8 @@ import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 
 import {useNavigation} from '@react-navigation/core';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {AddWalletParamList} from './../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -20,7 +22,9 @@ import InfoIcon from './../../assets/svg/info-16.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-const Add = () => {
+type Props = NativeStackScreenProps<AddWalletParamList, 'Add'>;
+
+const Add = ({route}: Props) => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
@@ -37,24 +41,26 @@ const Add = () => {
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View style={tailwind('w-5/6 mt-8 mb-16')}>
-                    <PlainButton
-                        style={tailwind('items-center flex-row -ml-1')}
-                        onPress={() => {
-                            navigation.goBack();
-                        }}>
-                        <Back
-                            style={tailwind('mr-2')}
-                            fill={ColorScheme.SVG.Default}
-                        />
-                        <Text
-                            style={[
-                                tailwind('text-sm font-medium'),
-                                {color: ColorScheme.Text.Default},
-                                Font.RobotoText,
-                            ]}>
-                            Back
-                        </Text>
-                    </PlainButton>
+                    {!route.params.onboarding && (
+                        <PlainButton
+                            style={tailwind('items-center flex-row -ml-1')}
+                            onPress={() => {
+                                navigation.goBack();
+                            }}>
+                            <Back
+                                style={tailwind('mr-2')}
+                                fill={ColorScheme.SVG.Default}
+                            />
+                            <Text
+                                style={[
+                                    tailwind('text-sm font-medium'),
+                                    {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
+                                ]}>
+                                Back
+                            </Text>
+                        </PlainButton>
+                    )}
 
                     <View style={[tailwind('mt-20 mb-10')]}>
                         <Text
