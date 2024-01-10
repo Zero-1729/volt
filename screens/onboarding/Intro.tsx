@@ -27,7 +27,7 @@ const Intro = () => {
     const {isWalletInitialized} = useContext(AppStorageContext);
 
     useEffect(() => {
-        if (!isWalletInitialized) {
+        if (isWalletInitialized) {
             navigation.dispatch(
                 CommonActions.reset({
                     index: 1,
