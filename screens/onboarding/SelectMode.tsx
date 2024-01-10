@@ -1,10 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {AppStorageContext} from '../../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -21,10 +23,14 @@ const SelectMode = () => {
 
     const tailwind = useTailwind();
 
-    const [selectedMode, setSelectedMode] = useState('single');
+    const {setWalletModeType} = useContext(AppStorageContext);
+
+    // TODO: Set default to single when unified card created
+    const [selectedMode, setSelectedMode] = useState('multi');
 
     const setModeAndRoute = () => {
-        // TODO: Set the mode in the store
+        // Set the mode in the store
+        setWalletModeType(selectedMode);
 
         // Route to add wallet screen
         navigation.dispatch(
