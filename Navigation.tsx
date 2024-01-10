@@ -69,6 +69,16 @@ export type InitStackParamList = {
     Apps: undefined;
 };
 
+// Add Wallet Param List for screens
+export type AddWalletParamList = {
+    Add: {
+        onboarding: boolean;
+    };
+    RestoreActions: undefined;
+    CreateActions: undefined;
+    Mnemonic: undefined;
+};
+
 // Onboarding Param List for screens
 export type OnboardingParams = {
     Intro: undefined;
@@ -223,7 +233,7 @@ const WalletRoot = () => {
     );
 };
 
-const AddWalletStack = createNativeStackNavigator();
+const AddWalletStack = createNativeStackNavigator<AddWalletParamList>();
 const AddWalletRoot = () => {
     return (
         <AddWalletStack.Navigator screenOptions={{headerShown: false}}>
