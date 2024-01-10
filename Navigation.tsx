@@ -4,6 +4,11 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import Home from './screens/Home';
 
+// Onboarding screens
+import Intro from './screens/onboarding/Intro';
+import SelectMode from './screens/onboarding/SelectMode';
+import DescriptorsInfo from './screens/onboarding/DescriptorsInfo';
+
 // Wallet screens
 import Add from './screens/wallet/Add';
 import RestoreActions from './screens/wallet/RestoreActions';
@@ -56,11 +61,29 @@ export type InitStackParamList = {
             reload: boolean;
         };
     };
+    OnboardingRoot: undefined;
     AddWalletRoot: undefined;
     WalletRoot: undefined;
     SettingsRoot: undefined;
     ScanRoot: undefined;
     Apps: undefined;
+};
+
+// Add Wallet Param List for screens
+export type AddWalletParamList = {
+    Add: {
+        onboarding: boolean;
+    };
+    RestoreActions: undefined;
+    CreateActions: undefined;
+    Mnemonic: undefined;
+};
+
+// Onboarding Param List for screens
+export type OnboardingParams = {
+    Intro: undefined;
+    SelectMode: undefined;
+    DescriptorsInfo: undefined;
 };
 
 // Root Param List for screens
@@ -115,6 +138,21 @@ export type ScanParamList = {
         screen: string;
         wallet: TMiniWallet;
     };
+};
+
+const OnboardingStack = createNativeStackNavigator<OnboardingParams>();
+
+export const OnboardingRoot = () => {
+    return (
+        <OnboardingStack.Navigator screenOptions={{headerShown: false}}>
+            <OnboardingStack.Screen name="Intro" component={Intro} />
+            <OnboardingStack.Screen
+                name="DescriptorsInfo"
+                component={DescriptorsInfo}
+            />
+            <OnboardingStack.Screen name="SelectMode" component={SelectMode} />
+        </OnboardingStack.Navigator>
+    );
 };
 
 const SettingsStack = createNativeStackNavigator();
@@ -195,7 +233,7 @@ const WalletRoot = () => {
     );
 };
 
-const AddWalletStack = createNativeStackNavigator();
+const AddWalletStack = createNativeStackNavigator<AddWalletParamList>();
 const AddWalletRoot = () => {
     return (
         <AddWalletStack.Navigator screenOptions={{headerShown: false}}>
@@ -216,7 +254,13 @@ const AddWalletRoot = () => {
 const InitScreenStack = createNativeStackNavigator<InitStackParamList>();
 const initScreen = () => {
     return (
-        <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
+        <InitScreenStack.Navigator
+            screenOptions={{headerShown: false}}
+            initialRouteName="OnboardingRoot">
+            <InitScreenStack.Screen
+                name="OnboardingRoot"
+                component={OnboardingRoot}
+            />
             <InitScreenStack.Screen name="HomeScreen" component={Home} />
             <InitScreenStack.Screen
                 name="AddWalletRoot"
