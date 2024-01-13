@@ -41,7 +41,7 @@ const Add = ({route}: Props) => {
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View style={tailwind('w-5/6 mt-8 mb-16')}>
-                    {!route.params.onboarding && (
+                    {!route.params?.onboarding && (
                         <PlainButton
                             style={tailwind('items-center flex-row -ml-1')}
                             onPress={() => {
