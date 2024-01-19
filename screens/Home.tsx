@@ -468,7 +468,7 @@ const Home = ({route}: Props) => {
                                     enabled={wallets.length > 1}
                                     vertical={true}
                                     autoPlay={false}
-                                    width={AppScreenWidth * 0.9}
+                                    width={AppScreenWidth * 0.92}
                                     height={styles.CardContainer.height}
                                     data={[...wallets]}
                                     renderItem={renderCard}
@@ -494,7 +494,7 @@ const Home = ({route}: Props) => {
                             tailwind(
                                 `w-full ${
                                     wallets.length > 0 ? 'h-3/5' : 'h-4/6'
-                                } mt-8`,
+                                } mt-4`,
                             ),
                         ]}>
                         <Text
