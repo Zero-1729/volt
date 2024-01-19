@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 
 import {
     useColorScheme,
@@ -52,13 +53,14 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {addWallet, isAdvancedMode, defaultToTestnet} =
+    const {addWallet, isAdvancedMode, defaultToTestnet, isWalletInitialized} =
         useContext(AppStorageContext);
     const [newWalletName, setNewWalletName] = useState('');
 
     const [network, setNetwork] = useState<ENet>(
         defaultToTestnet ? ENet.Testnet : ENet.Bitcoin,
     );
+    const [onboarding, setOnboarding] = useState(false);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [account, setAccount] = useState('p2tr'); // Default to taproot
@@ -114,7 +116,9 @@ const CreateAction = () => {
             setLoading(false);
 
             // Navigate to mnemonic screen
-            navigation.dispatch(StackActions.push('Mnemonic'));
+            navigation.dispatch(
+                StackActions.push('Mnemonic', {onboarding: onboarding}),
+            );
         } catch (e: any) {
             errorAlert('Alert', e.message);
 
@@ -134,6 +138,10 @@ const CreateAction = () => {
 
         return valueWithSingleWhitespace;
     };
+
+    useEffect(() => {
+        setOnboarding(!isWalletInitialized);
+    }, []);
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
