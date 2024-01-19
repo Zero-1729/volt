@@ -302,6 +302,17 @@ const Home = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
+        if (!isWalletInitialized) {
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 1,
+                    routes: [{name: 'OnboardingRoot'}],
+                }),
+            );
+        }
+    }, [isWalletInitialized]);
+
+    useEffect(() => {
         if (route.params?.restoreMeta) {
             if (route.params?.restoreMeta.reload) {
                 // Reload the wallet
