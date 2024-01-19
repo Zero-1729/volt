@@ -101,6 +101,7 @@ const Home = ({route}: Props) => {
         electrumServerURL,
         walletsIndex,
         updateWalletsIndex,
+        walletMode,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -389,7 +390,7 @@ const Home = ({route}: Props) => {
                         />
                     </PlainButton>
 
-                    {wallets.length > 0 ? (
+                    {wallets.length > 0 && walletMode === 'multi' ? (
                         <View
                             style={tailwind(
                                 'flex-row justify-between items-center -mr-1',
