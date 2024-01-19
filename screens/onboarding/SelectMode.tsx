@@ -25,8 +25,7 @@ const SelectMode = () => {
 
     const {setWalletModeType} = useContext(AppStorageContext);
 
-    // TODO: Set default to single when unified card created
-    const [selectedMode, setSelectedMode] = useState('multi');
+    const [selectedMode, setSelectedMode] = useState('single');
 
     const setModeAndRoute = () => {
         // Set the mode in the store
