@@ -607,6 +607,8 @@ const FeeSelection = ({route}: Props) => {
                     </PlainButton>
                 </View>
 
+                {/* TODO: calculate/determine if in high-fee or congested mempool environment and display warn message here */}
+
                 {/* Loading psbt text */}
                 {loadingData && (
                     <View
