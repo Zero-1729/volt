@@ -617,9 +617,6 @@ const createBDKPsbt = async (
         scriptAmounts.push({script: script, amount: addressesAmount[0].amount});
     }
 
-    // Get chain for fee recommendation
-    const chain = await _getChain(network, electrumServer);
-
     // Sync wallet before any tx creation
     const w = await syncBdkWallet(
         bdkWallet,
@@ -627,15 +624,6 @@ const createBDKPsbt = async (
         network as TNetwork,
         electrumServer,
     );
-
-    // Fetch recommended feerate here
-    // Can skip and just use from user in UI
-    // Displayed from Mempool.space 'fetch'
-    const recommendedFeeRate = (await chain.estimateFee(1)).asSatPerVb();
-    const effectiveRate =
-        network === ENet.Bitcoin
-            ? Math.max(feeRate, recommendedFeeRate)
-            : feeRate;
 
     // Create transaction builder
     let txTemplate = await new BDK.TxBuilder().create();
@@ -660,9 +648,9 @@ const createBDKPsbt = async (
     // 1. Enable RBF always by default
     // 2. Fee rate
     // 3. Recipient and amount to send them
-    // Note: can use 'tx.setRecipients([{script, amount: Number(amount)}])' for multiple recipients and mounts
+    // Note: can use 'tx.setRecipients([{script, amount: Number(amount)}])' for multiple recipients and amounts
+    txTemplate = await txTemplate.feeRate(feeRate);
     txTemplate = await txTemplate.enableRbf();
-    txTemplate = await txTemplate.feeRate(effectiveRate);
 
     // Drain assumes only one address and amount
     // present in addressesAmount array
