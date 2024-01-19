@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useEffect} from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import {Text, View, useColorScheme, Platform} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/core';
@@ -11,7 +11,9 @@ import {AppStorageContext} from './../../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {LongBottomButton} from '../../components/button';
+import {LongBottomButton, PlainButton} from '../../components/button';
+
+const marginTopPlatform = 10 + (Platform.OS === 'android' ? 12 : 0);
 
 import Volt from './../../assets/svg/volt-logo.svg';
 
@@ -48,6 +50,32 @@ const Intro = () => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
+                <View
+                    style={[
+                        tailwind('w-5/6 absolute justify-center'),
+                        {top: marginTopPlatform},
+                    ]}>
+                    <PlainButton
+                        onPress={() => {
+                            // Route to add wallet screen
+                            navigation.dispatch(
+                                CommonActions.navigate('AddWalletRoot', {
+                                    screen: 'Add',
+                                    params: {onboarding: true},
+                                }),
+                            );
+                        }}
+                        style={[tailwind('self-end')]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            Skip
+                        </Text>
+                    </PlainButton>
+                </View>
+
                 <View style={[tailwind('items-center'), {top: -25}]}>
                     <Volt width={100} height={100} />
 
@@ -70,6 +98,7 @@ const Intro = () => {
                         </Text>
                     </View>
                 </View>
+
                 <LongBottomButton
                     onPress={() => {
                         navigation.dispatch(

@@ -514,6 +514,11 @@
 			"alignSelf": "flex-start"
 		}
 	},
+	"self-end": {
+		"style": {
+			"alignSelf": "flex-end"
+		}
+	},
 	"self-center": {
 		"style": {
 			"alignSelf": "center"
