@@ -141,7 +141,7 @@ const defaultContext: defaultContextType = {
     isDevMode: false,
     hideTotalBalance: false,
     isWalletInitialized: false,
-    walletMode: 'multi', // TODO: Should be single once unified card created
+    walletMode: 'single',
     isAdvancedMode: false,
     defaultToTestnet: true,
     electrumServerURL: {
@@ -1101,7 +1101,7 @@ export const AppStorageProvider = ({children}: Props) => {
             await updateAppUnit(defaultContext.appUnit);
             await setTotalBalanceHidden(false);
             await _setWalletInit(false);
-            await setWalletModeType('multi');
+            await setWalletModeType('single');
             await setWallets([]);
             await setCurrentWalletID('');
             await setIsAdvancedMode(false);
