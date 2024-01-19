@@ -5,6 +5,10 @@ import {TBalance} from '../types/wallet';
 export const SATS_TO_BTC_RATE = 100_000_000;
 const SEPARATOR = ' ';
 
+export const capitalizeFirst = (text: string) => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
 export const addCommas = (num: string, separator: string = ',') => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 };
