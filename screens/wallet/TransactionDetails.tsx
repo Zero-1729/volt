@@ -26,7 +26,13 @@ import Color from '../../constants/Color';
 
 import {ENet} from '../../types/enums';
 
-import {LongBottomButton, PlainButton} from '../../components/button';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+
+import {
+    LongBottomButton,
+    LongButton,
+    PlainButton,
+} from '../../components/button';
 import {FiatBalance} from '../../components/balance';
 
 import CloseIcon from '../../assets/svg/x-24.svg';
@@ -136,7 +142,14 @@ const TransactionDetailsView = ({route}: Props) => {
                         : 'Pending confirmation'}
                 </Text>
 
-                <View style={[tailwind('-mt-8 justify-center px-4')]}>
+                <View
+                    style={[
+                        tailwind(
+                            `${
+                                route.params.tx.confirmed ? '-mt-8' : '-mt-16'
+                            } justify-center px-4`,
+                        ),
+                    ]}>
                     <View style={[tailwind('items-center')]}>
                         {route.params.tx.confirmations > 0 &&
                         route.params.tx.confirmations <= 6 ? (
@@ -407,6 +420,25 @@ const TransactionDetailsView = ({route}: Props) => {
                         <></>
                     )}
                 </View>
+
+                {/* Show bump fee button when tx still in mempool */}
+                {!route.params.tx.confirmed && (
+                    <View
+                        style={[
+                            tailwind('absolute self-center items-center w-5/6'),
+                            {
+                                bottom:
+                                    NativeWindowMetrics.bottomButtonOffset + 64,
+                            },
+                        ]}>
+                        <LongButton
+                            title={'Bump Fee'}
+                            textColor={ColorScheme.Text.Default}
+                            backgroundColor={ColorScheme.Background.Greyed}
+                            onPress={() => {}}
+                        />
+                    </View>
+                )}
 
                 <View
                     style={[tailwind('absolute bottom-0 items-center w-full')]}>
