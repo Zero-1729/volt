@@ -24,11 +24,12 @@ import BigNumber from 'bignumber.js';
 import decodeURI from 'bip21';
 
 import {canSendToInvoice, isValidAddress} from '../modules/wallet-utils';
-import {capitalizeFirst} from '../modules/transform';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
+
+import {useNetInfo} from '@react-native-community/netinfo';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -175,6 +176,7 @@ const Scan = ({route}: Props) => {
     // in the background, so we'll lock it until the user closes the alert
     const [scanLock, setScanLock] = useState(false);
     const [scannerAlertMsg, setScannerAlertMsg] = useState('');
+    const networkState = useNetInfo();
 
     const clearScannerAlert = () => {
         setScannerAlertMsg('');
@@ -306,15 +308,22 @@ const Scan = ({route}: Props) => {
                     // If Onchain
                     decodedQR.options.amount = convertBTCtoSats(amount);
 
-                    runOnJS(navigation.dispatch)(
-                        CommonActions.navigate('WalletRoot', {
-                            screen: 'FeeSelection',
-                            params: {
-                                invoiceData: decodedQR,
-                                wallet: route.params.wallet,
-                            },
-                        }),
-                    );
+                    if (networkState?.isInternetReachable) {
+                        runOnJS(navigation.dispatch)(
+                            CommonActions.navigate('WalletRoot', {
+                                screen: 'FeeSelection',
+                                params: {
+                                    invoiceData: decodedQR,
+                                    wallet: route.params.wallet,
+                                },
+                            }),
+                        );
+                    } else {
+                        conservativeAlert(
+                            'Network',
+                            'Please check your internet connection',
+                        );
+                    }
                 } else {
                     // Route to SendAmount screen
                     runOnJS(navigation.dispatch)(

@@ -27,6 +27,8 @@ import {DUST_LIMIT} from '../../modules/wallet-defaults';
 
 import {formatFiat, normalizeFiat} from '../../modules/transform';
 
+import {useNetInfo} from '@react-native-community/netinfo';
+
 type DisplayUnit = {
     value: BigNumber;
     symbol: string;
@@ -46,6 +48,8 @@ const SendAmount = ({route}: Props) => {
     const navigation = useNavigation();
 
     const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
+
+    const networkState = useNetInfo();
 
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
@@ -347,20 +351,29 @@ const SendAmount = ({route}: Props) => {
                                 return;
                             }
 
-                            navigation.dispatch(
-                                CommonActions.navigate('WalletRoot', {
-                                    screen: 'FeeSelection',
-                                    params: {
-                                        invoiceData: {
-                                            ...route.params.invoiceData,
-                                            options: {
-                                                amount: satsAmount.value.toString(),
+                            if (networkState?.isInternetReachable) {
+                                navigation.dispatch(
+                                    CommonActions.navigate('WalletRoot', {
+                                        screen: 'FeeSelection',
+                                        params: {
+                                            invoiceData: {
+                                                ...route.params.invoiceData,
+                                                options: {
+                                                    amount: satsAmount.value.toString(),
+                                                },
                                             },
+                                            wallet: route.params.wallet,
                                         },
-                                        wallet: route.params.wallet,
-                                    },
-                                }),
-                            );
+                                    }),
+                                );
+                            } else {
+                                conservativeAlert(
+                                    'No Internet Connection',
+                                    'Please connect to the internet to continue.',
+                                );
+                                return;
+                            }
+
                         }}>
                         <View
                             style={[
