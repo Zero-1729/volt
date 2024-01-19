@@ -51,7 +51,7 @@ const FeeSelection = ({route}: Props) => {
 
     const isAndroid = Platform.OS === 'android';
 
-    const {fiatRate, appFiatCurrency, isAdvancedMode, electrumServerURL} =
+    const {fiatRate, appFiatCurrency, electrumServerURL} =
         useContext(AppStorageContext);
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
     const [selectedFeeRateType, setSelectedFeeRateType] = useState<string>();
@@ -88,9 +88,7 @@ const FeeSelection = ({route}: Props) => {
             (e: any) => {
                 conservativeAlert(
                     'Error',
-                    `Could not create transaction. ${
-                        isAdvancedMode ? e.message : ''
-                    }`,
+                    `Could not create transaction. ${e.message}`,
                 );
 
                 // Stop loading
