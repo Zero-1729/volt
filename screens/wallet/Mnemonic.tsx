@@ -1,12 +1,19 @@
 import React, {useContext, useCallback} from 'react';
 
 import {Text, View, useColorScheme} from 'react-native';
-import {StackActions, useNavigation} from '@react-navigation/native';
+import {
+    StackActions,
+    useNavigation,
+    CommonActions,
+} from '@react-navigation/native';
 
 import {useTailwind} from 'tailwind-rn';
 
 import {LongBottomButton} from '../../components/button';
 import {AppStorageContext} from '../../class/storageContext';
+
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {AddWalletParamList} from '../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -14,7 +21,9 @@ import {displayNumberedSeed} from '../../modules/transform';
 
 import Color from '../../constants/Color';
 
-const Mnemonic = () => {
+type Props = NativeStackScreenProps<AddWalletParamList, 'Mnemonic'>;
+
+const Mnemonic = ({route}: Props) => {
     const navigation = useNavigation();
     const {getWalletData, currentWalletID} = useContext(AppStorageContext);
 
@@ -24,10 +33,20 @@ const Mnemonic = () => {
     const ColorScheme = Color(useColorScheme());
 
     const returnToHome = useCallback(() => {
-        // We need to get back to the main parent modal
-        // so we can close it and return to the home screen
-        navigation.getParent()?.dispatch(StackActions.popToTop());
-    }, [navigation]);
+        // Return home
+        if (route.params?.onboarding) {
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 1,
+                    routes: [{name: 'HomeScreen'}],
+                }),
+            );
+        } else {
+            // We need to get back to the main parent modal
+            // so we can close it and return to the home screen
+            navigation.getParent()?.dispatch(StackActions.popToTop());
+        }
+    }, [navigation, route.params?.onboarding]);
 
     const displayMnemonic = () => {
         const components: JSX.Element[] = [];
