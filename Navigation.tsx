@@ -3,6 +3,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import Home from './screens/Home';
+import SelectWallet from './screens/wallet/SelectWallet';
 
 // Onboarding screens
 import Intro from './screens/onboarding/Intro';
@@ -60,6 +61,9 @@ export type InitStackParamList = {
             message: string;
             load: boolean;
         };
+    };
+    SelectWallet: {
+        invoice: TInvoiceData;
     };
     OnboardingRoot: undefined;
     AddWalletRoot: undefined;
@@ -266,6 +270,10 @@ const initScreen = () => {
                 component={OnboardingRoot}
             />
             <InitScreenStack.Screen name="HomeScreen" component={Home} />
+            <InitScreenStack.Screen
+                name="SelectWallet"
+                component={SelectWallet}
+            />
             <InitScreenStack.Screen
                 name="AddWalletRoot"
                 component={AddWalletRoot}
