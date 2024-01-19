@@ -76,7 +76,9 @@ export type AddWalletParamList = {
     };
     RestoreActions: undefined;
     CreateActions: undefined;
-    Mnemonic: undefined;
+    Mnemonic: {
+        onboarding: boolean;
+    };
 };
 
 // Onboarding Param List for screens
