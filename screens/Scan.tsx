@@ -24,6 +24,7 @@ import BigNumber from 'bignumber.js';
 import decodeURI from 'bip21';
 
 import {canSendToInvoice, isValidAddress} from '../modules/wallet-utils';
+import {capitalizeFirst} from '../modules/transform';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
 
@@ -226,6 +227,27 @@ const Scan = ({route}: Props) => {
             setIsOnChain(false);
         }
 
+        // Stip out invoice address info
+        const addressTip = decodedInvoice.address[0];
+        const prefixStub =
+            addressTip === 'b' || addressTip === 't'
+                ? decodedInvoice.address.slice(0, 4)
+                : addressTip;
+        const addressNetwork =
+            prefixInfo[prefixStub].network === 'bitcoin'
+                ? 'mainnet'
+                : 'testnet';
+        const addressType = prefixInfo[prefixStub].type;
+        const addressTypeName = WalletTypeDetails[addressType][0];
+
+        // Check network
+        if (addressNetwork !== route.params.wallet.network) {
+            updateScannerAlert(
+                `Cannot pay with a ${route.params.wallet.network} wallet`,
+            );
+            return;
+        }
+
         // Check whether too broke for tx
         if (
             amount
@@ -246,14 +268,6 @@ const Scan = ({route}: Props) => {
 
         // Check can send to address
         if (!canSendToInvoice(decodedInvoice, route.params.wallet)) {
-            const addressTip = decodedInvoice.address[0];
-            const prefixStub =
-                addressTip === 'b' || addressTip === 't'
-                    ? decodedInvoice.address.slice(0, 4)
-                    : addressTip;
-            const addressType = prefixInfo[prefixStub].type;
-            const addressTypeName = WalletTypeDetails[addressType][0];
-
             updateScannerAlert(
                 `Wallet cannot pay to a ${addressTypeName} address`,
             );
