@@ -51,7 +51,7 @@ const FeeSelection = ({route}: Props) => {
 
     const isAndroid = Platform.OS === 'android';
 
-    const {fiatRate, appFiatCurrency, isAdvancedMode, electrumServerURL} =
+    const {fiatRate, appFiatCurrency, electrumServerURL} =
         useContext(AppStorageContext);
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
     const [selectedFeeRateType, setSelectedFeeRateType] = useState<string>();
@@ -65,6 +65,14 @@ const FeeSelection = ({route}: Props) => {
         minimumFee: 1,
     });
 
+    const isFeeTooHigh = (fee: number, isMaxAmount: boolean) => {
+        const amount = Number(route.params.invoiceData.options?.amount);
+
+        const balance = new BigNumber(route.params.wallet.balance);
+
+        return isMaxAmount ? balance.lte(fee) : balance.lte(fee + amount);
+    };
+
     const calculateUPsbt = async () => {
         const descriptors = getPrivateDescriptors(
             route.params.wallet.privateDescriptor,
@@ -75,13 +83,12 @@ const FeeSelection = ({route}: Props) => {
             selectedFeeRate,
             route.params.invoiceData,
             route.params.wallet as TComboWallet,
+            new BigNumber(route.params.wallet.balance),
             electrumServerURL,
             (e: any) => {
                 conservativeAlert(
                     'Error',
-                    `Could not create transaction. ${
-                        isAdvancedMode ? e.message : ''
-                    }`,
+                    `Could not create transaction. ${e.message}`,
                 );
 
                 // Stop loading
@@ -123,6 +130,7 @@ const FeeSelection = ({route}: Props) => {
     const updateCustomFeeRate = (value: string | undefined) => {
         const rate = Number(value);
         const amount = Number(route.params.invoiceData.options?.amount);
+        const isMaxSend = new BigNumber(route.params.wallet.balance).eq(amount);
         const fee = rate * psbtVSize;
 
         // Warn user that fee rate invalid
@@ -136,7 +144,7 @@ const FeeSelection = ({route}: Props) => {
         }
 
         // Avoid too high fee rate
-        if (fee + amount > route.params.wallet.balance) {
+        if (isFeeTooHigh(fee, isMaxSend)) {
             conservativeAlert('Error', 'Fee rate too high, please try again.');
             return;
         }
