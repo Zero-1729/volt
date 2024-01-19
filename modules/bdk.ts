@@ -659,9 +659,11 @@ const createBDKPsbt = async (
             throw new Error('Drain transaction can only have one recipient.');
         }
 
-        txTemplate = await txTemplate.drainTo(scriptAmounts[0].script);
+        // Set spend all 'spendable' UTXOs
         txTemplate = await txTemplate.drainWallet();
+        txTemplate = await txTemplate.drainTo(scriptAmounts[0].script);
     } else {
+        // Set recipients
         txTemplate = await txTemplate.setRecipients(scriptAmounts);
     }
 
