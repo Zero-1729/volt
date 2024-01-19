@@ -78,9 +78,7 @@ const Home = ({route}: Props) => {
 
     const svgGrayFill = ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA';
 
-    const topPlatformOffset = {
-        marginTop: 6 + (Platform.OS === 'android' ? 12 : 0),
-    };
+    const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
 
     const navigation = useNavigation();
 
@@ -375,7 +373,7 @@ const Home = ({route}: Props) => {
                         tailwind(
                             'w-5/6 h-10 items-center flex-row justify-between',
                         ),
-                        topPlatformOffset,
+                        {marginTop: topPlatformOffset},
                     ]}>
                     <PlainButton
                         onPress={() =>
