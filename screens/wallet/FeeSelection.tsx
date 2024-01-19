@@ -75,6 +75,7 @@ const FeeSelection = ({route}: Props) => {
             selectedFeeRate,
             route.params.invoiceData,
             route.params.wallet as TComboWallet,
+            new BigNumber(route.params.wallet.balance),
             electrumServerURL,
             (e: any) => {
                 conservativeAlert(

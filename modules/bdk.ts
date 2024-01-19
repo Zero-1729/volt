@@ -538,6 +538,7 @@ export const psbtFromInvoice = async (
     feeRate: number,
     invoiceData: {address: string; options?: {amount?: number}},
     wallet: TComboWallet,
+    maxBalance: BigNumber,
     electrumServerURL: TElectrumServerURLs,
     onError: (e: any) => void,
     returnVSOnly?: boolean,
@@ -556,7 +557,7 @@ export const psbtFromInvoice = async (
                 invoiceData.options?.amount?.toString() as string,
                 invoiceData.address,
                 Number(feeRate),
-                wallet.balance === invoiceData.options?.amount,
+                maxBalance.eq(Number(invoiceData.options?.amount)),
                 _wallet as TComboWallet,
                 electrumServerURL,
             );
