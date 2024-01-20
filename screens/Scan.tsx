@@ -27,8 +27,6 @@ import {Camera, CameraType} from 'react-native-camera-kit';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
-import {useNetInfo} from '@react-native-community/netinfo';
-
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
@@ -173,7 +171,6 @@ const Scan = ({route}: Props) => {
     // in the background, so we'll lock it until the user closes the alert
     const [scanLock, setScanLock] = useState(false);
     const [scannerAlertMsg, setScannerAlertMsg] = useState('');
-    const networkState = useNetInfo();
 
     const clearScannerAlert = () => {
         setScannerAlertMsg('');
