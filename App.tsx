@@ -37,6 +37,7 @@ const App = () => {
         },
     };
 
+    // Deep linking
     const linking: LinkingOptions<{}> = {
         prefixes: ['bitcoin'],
         config: {
