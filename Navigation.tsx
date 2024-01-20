@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createNavigationContainerRef} from '@react-navigation/native';
 
 import Home from './screens/Home';
 import SelectWallet from './screens/wallet/SelectWallet';
@@ -257,6 +258,30 @@ const AddWalletRoot = () => {
             />
         </AddWalletStack.Navigator>
     );
+};
+
+// Create a navigation container reference
+export const navigationRef = createNavigationContainerRef<InitStackParamList>();
+export const rootNavigation = {
+    navigate<RouteName extends keyof InitStackParamList>(
+        ...args: RouteName extends unknown
+            ? undefined extends InitStackParamList[RouteName]
+                ?
+                      | [screen: RouteName]
+                      | [
+                            screen: RouteName,
+                            params: InitStackParamList[RouteName],
+                        ]
+                : [screen: RouteName, params: InitStackParamList[RouteName]]
+            : never
+    ): void {
+        if (navigationRef.isReady()) {
+            navigationRef.navigate(...args);
+        } else {
+            // If navigation not ready
+            console.log('Navigation not ready');
+        }
+    },
 };
 
 const InitScreenStack = createNativeStackNavigator<InitStackParamList>();
