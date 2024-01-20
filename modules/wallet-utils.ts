@@ -7,6 +7,9 @@ import * as bitcoin from 'bitcoinjs-lib';
 
 import {BIP32Factory, BIP32Interface} from 'bip32';
 import ecc from '@bitcoinerlab/secp256k1';
+import BigNumber from 'bignumber.js';
+
+import {WalletTypeDetails, DUST_LIMIT} from './wallet-defaults';
 
 const bip32 = BIP32Factory(ecc);
 
@@ -548,5 +551,70 @@ export const checkNetworkIsReachable = (networkState: NetInfoState) => {
             : networkState.isConnected;
     } else {
         return networkState.isInternetReachable;
+    }
+};
+
+// Function to check and report invoice and wallet error for payment
+export const checkInvoiceAndWallet = (
+    wallet: TMiniWallet,
+    invoice: TInvoiceData,
+    alert: any,
+) => {
+    const balance = new BigNumber(wallet.balance);
+    const invoiceHasAmount = !!invoice?.options?.amount;
+    const invoiceAmount = new BigNumber(Number(invoice?.options?.amount));
+
+    // Strip out invoice address info
+    const addressTip = invoice.address[0];
+    const prefixStub =
+        addressTip === 'b' || addressTip === 't'
+            ? invoice.address.slice(0, 4)
+            : addressTip;
+    const addressNetwork =
+        prefixInfo[prefixStub].network === 'bitcoin' ? 'mainnet' : 'testnet';
+    const addressType = prefixInfo[prefixStub].type;
+    const addressTypeName = WalletTypeDetails[addressType][0];
+
+    // Check network
+    if (addressNetwork !== wallet.network) {
+        alert(`Cannot pay with a ${wallet.network} wallet`);
+        return;
+    }
+
+    // Check balance if zero
+    if (balance.isZero()) {
+        alert(
+            'Error',
+            'Wallet is empty, please select a different wallet or add funds.',
+        );
+        return;
+    }
+
+    // Check against dust limit
+    if (
+        invoiceHasAmount &&
+        invoiceAmount.multipliedBy(100000000).isLessThanOrEqualTo(DUST_LIMIT)
+    ) {
+        alert('Error', 'Invoice amount is below dust limit');
+        return;
+    }
+
+    // Check balance if too broke
+    if (
+        invoiceHasAmount &&
+        invoiceAmount.multipliedBy(100000000).isGreaterThan(wallet.balance)
+    ) {
+        alert(
+            'Error',
+            'Wallet balance insufficient, select a different wallet or add funds.',
+        );
+        return;
+    }
+
+    // Check can pay invoice with wallet
+    // Check can send to address
+    if (!canSendToInvoice(invoice, wallet)) {
+        alert('Error', `Wallet cannot pay to a ${addressTypeName} address`);
+        return;
     }
 };
