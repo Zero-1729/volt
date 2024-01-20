@@ -565,10 +565,12 @@ export const checkInvoiceAndWallet = (
     const invoiceAmount = new BigNumber(Number(invoice?.options?.amount));
 
     // Strip out invoice address info
-    const addressTip = invoice.address[0];
+    // Note: convert to lowercase as BIP21 can include upper-cased addresses
+    const addressTip = invoice.address[0].toLowerCase();
+
     const prefixStub =
         addressTip === 'b' || addressTip === 't'
-            ? invoice.address.slice(0, 4)
+            ? invoice.address.slice(0, 4).toLowerCase()
             : addressTip;
     const addressNetwork =
         prefixInfo[prefixStub].network === 'bitcoin' ? 'mainnet' : 'testnet';
