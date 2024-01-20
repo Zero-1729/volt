@@ -111,6 +111,9 @@ const Home = ({route}: Props) => {
 
     const AppScreenWidth = Dimensions.get('window').width;
 
+    // Locked wallet for single wallet mode
+    const singleWallet = [wallets[walletsIndex]];
+
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
         (accumulator: TBalance, currentValue: BaseWallet) =>
@@ -388,7 +391,7 @@ const Home = ({route}: Props) => {
                         />
                     </PlainButton>
 
-                    {wallets.length > 0 && walletMode === 'multi' ? (
+                    {wallets.length > 0 && walletMode === 'multi' && (
                         <View
                             style={tailwind(
                                 'flex-row justify-between items-center -mr-1',
@@ -405,8 +408,6 @@ const Home = ({route}: Props) => {
                                 />
                             </PlainButton>
                         </View>
-                    ) : (
-                        <></>
                     )}
                 </View>
 
@@ -421,7 +422,7 @@ const Home = ({route}: Props) => {
                         ]}>
                         <View
                             style={tailwind('justify-around w-full mt-3 mb-3')}>
-                            {wallets.length > 0 ? (
+                            {wallets.length > 0 && (
                                 <>
                                     <Text
                                         style={[
@@ -456,21 +457,23 @@ const Home = ({route}: Props) => {
                                         />
                                     )}
                                 </>
-                            ) : (
-                                <></>
                             )}
                         </View>
 
                         {/** Carousel for 'BaseCard */}
-                        {wallets.length > 0 ? (
+                        {wallets.length > 0 && (
                             <View style={[styles.CardContainer]}>
                                 <Carousel
-                                    enabled={wallets.length > 1}
+                                    enabled={walletMode === 'multi'}
                                     vertical={true}
                                     autoPlay={false}
                                     width={AppScreenWidth * 0.92}
                                     height={styles.CardContainer.height}
-                                    data={[...wallets]}
+                                    data={
+                                        walletMode === 'multi'
+                                            ? [...wallets]
+                                            : singleWallet
+                                    }
                                     renderItem={renderCard}
                                     pagingEnabled={true}
                                     mode={'vertical-stack'}
@@ -484,8 +487,6 @@ const Home = ({route}: Props) => {
                                     defaultIndex={walletsIndex}
                                 />
                             </View>
-                        ) : (
-                            <EmptyCard />
                         )}
                     </View>
 
