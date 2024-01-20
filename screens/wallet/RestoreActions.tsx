@@ -141,7 +141,7 @@ const ImportAction = ({route}: Props) => {
                                 restoreMeta: {
                                     title: 'Restore',
                                     message: 'Wallet restored successfully',
-                                    reload: true,
+                                    load: true,
                                 },
                             },
                         },
@@ -155,7 +155,7 @@ const ImportAction = ({route}: Props) => {
                     restoreMeta: {
                         title: 'Restore',
                         message: 'Wallet restored successfully',
-                        reload: true,
+                        load: true,
                     },
                 }),
             );
