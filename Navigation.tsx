@@ -58,7 +58,7 @@ export type InitStackParamList = {
         restoreMeta: {
             title: string;
             message: string;
-            reload: boolean;
+            load: boolean;
         };
     };
     OnboardingRoot: undefined;
