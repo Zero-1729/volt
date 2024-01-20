@@ -544,7 +544,7 @@ export const doesWalletExist = (
 export const checkNetworkIsReachable = (networkState: NetInfoState) => {
     if (networkState.isInternetReachable === null) {
         return networkState.isConnected === null
-            ? false
+            ? true
             : networkState.isConnected;
     } else {
         return networkState.isInternetReachable;
