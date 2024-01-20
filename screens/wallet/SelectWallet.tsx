@@ -81,38 +81,42 @@ const SelectWallet = ({route}: Props) => {
         }
 
         // Check wallet and invoice
-        checkInvoiceAndWallet(wallet, decodedInvoice, conservativeAlert);
+        if (
+            checkInvoiceAndWallet(wallet, decodedInvoice, (msg: string) => {
+                conservativeAlert('Error', msg);
+            })
+        ) {
+            // Navigate handling
+            if (invoiceHasAmount) {
+                // convert btc to sats
+                if (decodedInvoice.options) {
+                    decodedInvoice.options.amount = Number(
+                        convertBTCtoSats(
+                            decodedInvoice.options?.amount?.toString() as string,
+                        ),
+                    );
+                }
 
-        // Navigate handling
-        if (invoiceHasAmount) {
-            // convert btc to sats
-            if (decodedInvoice.options) {
-                decodedInvoice.options.amount = Number(
-                    convertBTCtoSats(
-                        decodedInvoice.options?.amount?.toString() as string,
-                    ),
+                navigation.dispatch(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'FeeSelection',
+                        params: {
+                            invoiceData: decodedInvoice,
+                            wallet: getMiniWallet(wallet),
+                        },
+                    }),
+                );
+            } else {
+                navigation.dispatch(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'SendAmount',
+                        params: {
+                            invoiceData: decodedInvoice,
+                            wallet: getMiniWallet(wallet),
+                        },
+                    }),
                 );
             }
-
-            navigation.dispatch(
-                CommonActions.navigate('WalletRoot', {
-                    screen: 'FeeSelection',
-                    params: {
-                        invoiceData: decodedInvoice,
-                        wallet: getMiniWallet(wallet),
-                    },
-                }),
-            );
-        } else {
-            navigation.dispatch(
-                CommonActions.navigate('WalletRoot', {
-                    screen: 'SendAmount',
-                    params: {
-                        invoiceData: decodedInvoice,
-                        wallet: getMiniWallet(wallet),
-                    },
-                }),
-            );
         }
     };
 
