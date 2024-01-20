@@ -74,7 +74,9 @@ export type AddWalletParamList = {
     Add: {
         onboarding: boolean;
     };
-    RestoreActions: undefined;
+    RestoreActions: {
+        onboarding: boolean;
+    };
     CreateActions: undefined;
     Mnemonic: {
         onboarding: boolean;
