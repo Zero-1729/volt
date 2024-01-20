@@ -43,7 +43,7 @@ import {
     createBDKWallet,
     getBdkWalletTransactions,
 } from '../../modules/bdk';
-import {getMiniWallet} from '../../modules/wallet-utils';
+import {getMiniWallet, checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
 
@@ -133,7 +133,7 @@ const Wallet = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!networkState?.isInternetReachable) {
+        if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
             return;
         }
@@ -305,7 +305,7 @@ const Wallet = ({route}: Props) => {
         currentWalletID,
         fiatRate,
         loadingBalance,
-        networkState?.isInternetReachable,
+        networkState,
         refreshing,
         updateFiatRate,
         updateWalletBalance,
@@ -448,7 +448,7 @@ const Wallet = ({route}: Props) => {
                                 tailwind('text-sm text-white opacity-60 mb-2'),
                             ]}>
                             Current{' '}
-                            {!networkState?.isInternetReachable
+                            {!checkNetworkIsReachable(networkState)
                                 ? 'Offline '
                                 : ''}
                             Balance

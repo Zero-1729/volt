@@ -15,6 +15,7 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNetInfo} from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -62,7 +63,7 @@ const AddressOwnership = ({route}: Props) => {
     };
 
     const checkAddressOwnership = async () => {
-        if (!networkState.isInternetReachable) {
+        if (!checkNetworkIsReachable(networkState)) {
             errorAlert('Network', 'Cannot connect to Internet.');
             return;
         }

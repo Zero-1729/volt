@@ -15,6 +15,7 @@ import calendar from 'dayjs/plugin/calendar';
 DayJS.extend(calendar);
 
 import {useNetInfo} from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
@@ -53,7 +54,7 @@ const Currency = () => {
         return (
             <PlainButton
                 onPress={() => {
-                    if (!networkState?.isInternetReachable) {
+                    if (!checkNetworkIsReachable(networkState)) {
                         liberalAlert(
                             'Network',
                             'Unable to fetch currency data, connect to the Internet',

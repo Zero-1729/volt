@@ -48,7 +48,7 @@ import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
-import {EmptyCard, WalletCard} from '../components/card';
+import {WalletCard} from '../components/card';
 import {TransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
@@ -59,7 +59,7 @@ import {FiatBalance} from '../components/balance';
 import {fetchFiatRate} from '../modules/currency';
 import {liberalAlert, conservativeAlert} from '../components/alert';
 
-import {getUniqueTXs} from '../modules/wallet-utils';
+import {getUniqueTXs, checkNetworkIsReachable} from '../modules/wallet-utils';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
@@ -200,7 +200,7 @@ const Home = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!networkState?.isInternetReachable) {
+        if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
             return;
         }
@@ -231,7 +231,7 @@ const Home = ({route}: Props) => {
         }
 
         // Check net again, just in case there is a drop mid execution
-        if (!networkState?.isInternetReachable) {
+        if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
             return;
         }
@@ -264,14 +264,14 @@ const Home = ({route}: Props) => {
         fiatRate,
         appFiatCurrency,
         updateFiatRate,
-        networkState?.isInternetReachable,
+        networkState,
     ]);
 
     // Fetch the fiat rate on currency change
     useEffect(() => {
         // Avoid fiat rate update call when offline
         // or when newly loaded screen to avoid dup call
-        if (!networkState?.isInternetReachable) {
+        if (!checkNetworkIsReachable(networkState)) {
             return;
         }
 
@@ -286,7 +286,7 @@ const Home = ({route}: Props) => {
         // and wallets exists
         if (wallets.length > 0) {
             // Avoid fiat rate update call when offline
-            if (!networkState?.isInternetReachable) {
+            if (!checkNetworkIsReachable(networkState)) {
                 return;
             }
 

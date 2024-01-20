@@ -28,6 +28,7 @@ import {DUST_LIMIT} from '../../modules/wallet-defaults';
 import {formatFiat, normalizeFiat} from '../../modules/transform';
 
 import {useNetInfo} from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -351,7 +352,7 @@ const SendAmount = ({route}: Props) => {
                                 return;
                             }
 
-                            if (networkState?.isInternetReachable) {
+                            if (checkNetworkIsReachable(networkState)) {
                                 navigation.dispatch(
                                     CommonActions.navigate('WalletRoot', {
                                         screen: 'FeeSelection',
