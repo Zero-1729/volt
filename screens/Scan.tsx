@@ -42,8 +42,6 @@ import InfoIcon from '../assets/svg/info-16.svg';
 import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {prefixInfo} from '../modules/wallet-utils';
-import {WalletTypeDetails, DUST_LIMIT} from '../modules/wallet-defaults';
 import {convertBTCtoSats} from '../modules/transform';
 
 enum Status {
@@ -248,6 +246,11 @@ const Scan = ({route}: Props) => {
 
             const amount = decodedQR.options.amount;
 
+            conservativeAlert(
+                'Network',
+                'Please check your internet connection.',
+            );
+
             if (isOnchain) {
                 if (amount) {
                     // Route to Fee screen with amount (onChain)
@@ -256,22 +259,15 @@ const Scan = ({route}: Props) => {
                     // If Onchain
                     decodedQR.options.amount = convertBTCtoSats(amount);
 
-                    if (networkState?.isInternetReachable) {
-                        runOnJS(navigation.dispatch)(
-                            CommonActions.navigate('WalletRoot', {
-                                screen: 'FeeSelection',
-                                params: {
-                                    invoiceData: decodedQR,
-                                    wallet: route.params.wallet,
-                                },
-                            }),
-                        );
-                    } else {
-                        conservativeAlert(
-                            'Network',
-                            'Please check your internet connection',
-                        );
-                    }
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'FeeSelection',
+                            params: {
+                                invoiceData: decodedQR,
+                                wallet: route.params.wallet,
+                            },
+                        }),
+                    );
                 } else {
                     // Route to SendAmount screen
                     runOnJS(navigation.dispatch)(

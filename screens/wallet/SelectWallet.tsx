@@ -13,15 +13,8 @@ import Carousel from 'react-native-reanimated-carousel';
 import {AppStorageContext} from '../../class/storageContext';
 import {conservativeAlert} from '../../components/alert';
 
-import BigNumber from 'bignumber.js';
 import decodeURI from 'bip21';
-import {WalletTypeDetails, DUST_LIMIT} from '../../modules/wallet-defaults';
-import {
-    canSendToInvoice,
-    prefixInfo,
-    getMiniWallet,
-    checkInvoiceAndWallet,
-} from '../../modules/wallet-utils';
+import {getMiniWallet, checkInvoiceAndWallet} from '../../modules/wallet-utils';
 import {convertBTCtoSats} from '../../modules/transform';
 
 import {useTailwind} from 'tailwind-rn';
@@ -33,6 +26,7 @@ import {LongBottomButton} from '../../components/button';
 import {WalletCard} from '../../components/card';
 import {BaseWallet} from '../../class/wallet/base';
 import {TInvoiceData} from '../../types/wallet';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'SelectWallet'>;
 
@@ -48,6 +42,8 @@ const SelectWallet = ({route}: Props) => {
 
     const {wallets, hideTotalBalance, getWalletData, walletsIndex, walletMode} =
         useContext(AppStorageContext);
+
+    const networkState = useNetInfo();
 
     const [walletId, updateWalletId] = useState(wallets[walletsIndex].id);
 
@@ -74,6 +70,15 @@ const SelectWallet = ({route}: Props) => {
     const handleRoute = () => {
         const wallet = getWalletData(walletId);
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
+
+        // Check network connection first
+        if (!networkState?.isInternetReachable) {
+            conservativeAlert(
+                'Error',
+                'Please check your internet connection.',
+            );
+            return;
+        }
 
         // Check wallet and invoice
         checkInvoiceAndWallet(wallet, decodedInvoice, conservativeAlert);
