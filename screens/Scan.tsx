@@ -19,11 +19,9 @@ import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
-import BigNumber from 'bignumber.js';
-
 import decodeURI from 'bip21';
 
-import {canSendToInvoice, isValidAddress} from '../modules/wallet-utils';
+import {checkInvoiceAndWallet, isValidAddress} from '../modules/wallet-utils';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
 
@@ -196,7 +194,6 @@ const Scan = ({route}: Props) => {
 
     const handleInvalidInvoice = (invoice: string) => {
         let decodedInvoice;
-        let amount!: BigNumber;
 
         // Handle single btc supported address
         if (!invoice.startsWith('bitcoin:')) {
@@ -217,10 +214,6 @@ const Scan = ({route}: Props) => {
                 updateScannerAlert('Detected an invalid invoice');
                 return;
             }
-
-            amount = new BigNumber(
-                decodedInvoice.options ? decodedInvoice.options.amount : '0',
-            );
         } catch (e) {
             updateScannerAlert('Detected an invalid invoice');
             return;
@@ -230,52 +223,12 @@ const Scan = ({route}: Props) => {
             setIsOnChain(false);
         }
 
-        // Stip out invoice address info
-        const addressTip = decodedInvoice.address[0];
-        const prefixStub =
-            addressTip === 'b' || addressTip === 't'
-                ? decodedInvoice.address.slice(0, 4)
-                : addressTip;
-        const addressNetwork =
-            prefixInfo[prefixStub].network === 'bitcoin'
-                ? 'mainnet'
-                : 'testnet';
-        const addressType = prefixInfo[prefixStub].type;
-        const addressTypeName = WalletTypeDetails[addressType][0];
-
-        // Check network
-        if (addressNetwork !== route.params.wallet.network) {
-            updateScannerAlert(
-                `Cannot pay with a ${route.params.wallet.network} wallet`,
-            );
-            return;
-        }
-
-        // Check whether too broke for tx
-        if (
-            amount
-                .multipliedBy(100000000)
-                .isGreaterThan(route.params.wallet.balance)
-        ) {
-            updateScannerAlert(
-                'You do not have sufficient funds to pay this invoice',
-            );
-            return;
-        }
-
-        // Check that invoice amount above dust limit
-        if (amount.multipliedBy(100000000).isLessThanOrEqualTo(DUST_LIMIT)) {
-            updateScannerAlert('Invoice amount is below dust limit');
-            return;
-        }
-
-        // Check can send to address
-        if (!canSendToInvoice(decodedInvoice, route.params.wallet)) {
-            updateScannerAlert(
-                `Wallet cannot pay to a ${addressTypeName} address`,
-            );
-            return;
-        }
+        // Check and report errors from wallet and invoice
+        checkInvoiceAndWallet(
+            route.params.wallet,
+            decodedInvoice,
+            conservativeAlert,
+        );
 
         return decodedInvoice;
     };

@@ -20,6 +20,7 @@ import {
     canSendToInvoice,
     prefixInfo,
     getMiniWallet,
+    checkInvoiceAndWallet,
 } from '../../modules/wallet-utils';
 import {convertBTCtoSats} from '../../modules/transform';
 
@@ -72,63 +73,10 @@ const SelectWallet = ({route}: Props) => {
 
     const handleRoute = () => {
         const wallet = getWalletData(walletId);
-        const balance = new BigNumber(wallet.balance);
-
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
-        const invoiceAmount = new BigNumber(
-            Number(decodedInvoice?.options?.amount),
-        );
 
-        const addressTip = decodedInvoice.address[0];
-        const prefixStub =
-            addressTip === 'b' || addressTip === 't'
-                ? decodedInvoice.address.slice(0, 4)
-                : addressTip;
-        const addressType = prefixInfo[prefixStub].type;
-        const addressTypeName = WalletTypeDetails[addressType][0];
-
-        // Check balance if zero
-        if (balance.isZero()) {
-            conservativeAlert(
-                'Error',
-                'Wallet is empty, please select a different wallet or add funds.',
-            );
-            return;
-        }
-
-        // Check against dust limit
-        if (
-            invoiceHasAmount &&
-            invoiceAmount
-                .multipliedBy(100000000)
-                .isLessThanOrEqualTo(DUST_LIMIT)
-        ) {
-            conservativeAlert('Error', 'Invoice amount is below dust limit');
-            return;
-        }
-
-        // Check balance if less than invoice amount
-        if (
-            invoiceHasAmount &&
-            invoiceAmount.multipliedBy(100000000).isGreaterThan(wallet.balance)
-        ) {
-            // Check balance
-            conservativeAlert(
-                'Error',
-                'Wallet balance insufficient, select a different wallet or add funds.',
-            );
-            return;
-        }
-
-        // Check can pay invoice with wallet
-        // Check can send to address
-        if (!canSendToInvoice(decodedInvoice, wallet)) {
-            conservativeAlert(
-                'Error',
-                `Wallet cannot pay to a ${addressTypeName} address`,
-            );
-            return;
-        }
+        // Check wallet and invoice
+        checkInvoiceAndWallet(wallet, decodedInvoice, conservativeAlert);
 
         // Navigate handling
         if (invoiceHasAmount) {
