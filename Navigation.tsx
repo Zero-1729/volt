@@ -63,7 +63,7 @@ export type InitStackParamList = {
         };
     };
     SelectWallet: {
-        invoice: TInvoiceData;
+        invoice: string;
     };
     OnboardingRoot: undefined;
     AddWalletRoot: undefined;
