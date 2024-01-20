@@ -119,8 +119,6 @@ const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
 
-    const [isOnchain, setIsOnChain] = useState<boolean>(true);
-
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
     // Else, we'll cut it out and let Camera View take over
@@ -188,6 +186,8 @@ const Scan = ({route}: Props) => {
     };
 
     const handleInvalidInvoice = (invoice: string) => {
+        // TODO: update to handle unified invoice format (LN & BTC)
+        //       Make ln priority if unified or LN wallet
         let decodedInvoice;
 
         // Handle single btc supported address
@@ -196,36 +196,53 @@ const Scan = ({route}: Props) => {
 
             if (!isValidAddress(btcAddress)) {
                 updateScannerAlert('Detected an invalid address');
-                return;
+                return {decodedInvoice: null, isOnchain: null};
             }
 
             invoice = 'bitcoin:' + btcAddress;
         }
 
+        if (
+            !(
+                invoice.startsWith('bitcoin:') ||
+                invoice.startsWith('lihgtning:')
+            )
+        ) {
+            updateScannerAlert('Detected unsupported invoice');
+            return {decodedInvoice: null, isOnchain: null};
+        }
+
+        // Check if LN invoice and handle separately
+        if (invoice.startsWith('lightning:')) {
+            return {decodedInvoice: decodedInvoice, isOnchain: false};
+        }
+
+        // Attempt to decode BIP21 QR
         try {
             decodedInvoice = decodeURI.decode(invoice);
 
-            if (!isValidAddress(decodedInvoice.address)) {
+            // BIP21 QR could contain upper case address, so we'll convert to lower case
+            if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
                 updateScannerAlert('Detected an invalid invoice');
-                return;
+                return {decodedInvoice: null, isOnchain: null};
             }
         } catch (e) {
             updateScannerAlert('Detected an invalid invoice');
-            return;
-        }
-
-        if (!invoice.startsWith('bitcoin:')) {
-            setIsOnChain(false);
+            return {decodedInvoice: null, isOnchain: null};
         }
 
         // Check and report errors from wallet and invoice
-        checkInvoiceAndWallet(
-            route.params.wallet,
-            decodedInvoice,
-            conservativeAlert,
-        );
+        if (
+            !checkInvoiceAndWallet(
+                route.params.wallet,
+                decodedInvoice,
+                updateScannerAlert,
+            )
+        ) {
+            return {decodedInvoice: null, isOnchain: null};
+        }
 
-        return decodedInvoice;
+        return {decodedInvoice: decodedInvoice, isOnchain: true};
     };
 
     const onQRDetected = (event: any) => {
@@ -235,32 +252,31 @@ const Scan = ({route}: Props) => {
 
         const _QR = event.nativeEvent.codeStringValue;
 
-        const decodedQR = handleInvalidInvoice(_QR);
+        const decodedQRState: {
+            decodedInvoice: any;
+            isOnchain: boolean | null;
+        } = handleInvalidInvoice(_QR);
 
-        if (decodedQR) {
+        if (decodedQRState.decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
 
-            const amount = decodedQR.options.amount;
+            const amount = decodedQRState.decodedInvoice.options.amount;
 
-            conservativeAlert(
-                'Network',
-                'Please check your internet connection.',
-            );
-
-            if (isOnchain) {
+            if (decodedQRState.isOnchain) {
                 if (amount) {
                     // Route to Fee screen with amount (onChain)
                     // Update amount to sats
 
                     // If Onchain
-                    decodedQR.options.amount = convertBTCtoSats(amount);
+                    decodedQRState.decodedInvoice.options.amount =
+                        convertBTCtoSats(amount);
 
                     runOnJS(navigation.dispatch)(
                         CommonActions.navigate('WalletRoot', {
                             screen: 'FeeSelection',
                             params: {
-                                invoiceData: decodedQR,
+                                invoiceData: decodedQRState.decodedInvoice,
                                 wallet: route.params.wallet,
                             },
                         }),
@@ -295,7 +311,7 @@ const Scan = ({route}: Props) => {
     const handleClipboard = async () => {
         const clipboardData = await Clipboard.getString();
 
-        const decodedInvoice = handleInvalidInvoice(clipboardData);
+        const {decodedInvoice} = handleInvalidInvoice(clipboardData);
 
         if (decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic
