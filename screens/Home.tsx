@@ -316,7 +316,10 @@ const Home = ({route}: Props) => {
 
     useEffect(() => {
         if (route.params?.restoreMeta) {
-            if (route.params?.restoreMeta.reload) {
+            if (route.params?.restoreMeta.load) {
+                // set loading
+                setLoadingBalance(true);
+
                 // Reload the wallet
                 refreshWallet();
             }
