@@ -36,6 +36,7 @@ import {
     extendedKeyPattern,
     addressRegex,
 } from './re';
+import {NetInfoState} from '@react-native-community/netinfo';
 
 export const prefixInfo: {[index: string]: {network: string; type: string}} = {
     '1': {network: 'bitcoin', type: 'p2pkh'},
@@ -538,4 +539,14 @@ export const doesWalletExist = (
     wallets: any, // Assumes a list of objects with at least 'xpub' property
 ) => {
     return wallets.some((wallet: any) => wallet.xpub === xpub);
+};
+
+export const checkNetworkIsReachable = (networkState: NetInfoState) => {
+    if (networkState.isInternetReachable === null) {
+        return networkState.isConnected === null
+            ? false
+            : networkState.isConnected;
+    } else {
+        return networkState.isInternetReachable;
+    }
 };
