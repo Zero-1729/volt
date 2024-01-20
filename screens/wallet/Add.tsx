@@ -31,7 +31,7 @@ const Add = ({route}: Props) => {
 
     const tailwind = useTailwind();
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
+    const {isAdvancedMode, isWalletInitialized} = useContext(AppStorageContext);
 
     return (
         <SafeAreaView edges={['left', 'bottom', 'right']}>
@@ -109,8 +109,13 @@ const Add = ({route}: Props) => {
                         <View style={[tailwind('items-end')]}>
                             <PlainButton
                                 onPress={() => {
+                                    // If the wallet is not initialized, then we are on the onboarding screen
+                                    const onboarding = !isWalletInitialized;
+
                                     navigation.dispatch(
-                                        StackActions.push('RestoreActions'),
+                                        StackActions.push('RestoreActions', {
+                                            onboarding: onboarding,
+                                        }),
                                     );
                                 }}>
                                 <View
