@@ -44,7 +44,12 @@ import {
 
 import {EBackupMaterial, ENet} from '../../types/enums';
 
-const ImportAction = () => {
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {AddWalletParamList} from '../../Navigation';
+
+type Props = NativeStackScreenProps<AddWalletParamList, 'RestoreActions'>;
+
+const ImportAction = ({route}: Props) => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
 
@@ -123,16 +128,38 @@ const ImportAction = () => {
     };
 
     const handleSuccessRoute = () => {
-        // Simple helper to show successful import and navigate back home
-        navigation.getParent()?.dispatch(
-            CommonActions.navigate('HomeScreen', {
-                restoreMeta: {
-                    title: 'Restore',
-                    message: 'Wallet restored successfully',
-                    reload: true,
-                },
-            }),
-        );
+        // Route to home and display success alert
+        // If onboarding, reset to home screen
+        if (route.params?.onboarding) {
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 1,
+                    routes: [
+                        {
+                            name: 'HomeScreen',
+                            params: {
+                                restoreMeta: {
+                                    title: 'Restore',
+                                    message: 'Wallet restored successfully',
+                                    reload: true,
+                                },
+                            },
+                        },
+                    ],
+                }),
+            );
+        } else {
+            // If not onboarding, navigate back home
+            navigation.getParent()?.dispatch(
+                CommonActions.navigate('HomeScreen', {
+                    restoreMeta: {
+                        title: 'Restore',
+                        message: 'Wallet restored successfully',
+                        reload: true,
+                    },
+                }),
+            );
+        }
     };
 
     const handleMnemonic = async (mnemonic: string) => {
