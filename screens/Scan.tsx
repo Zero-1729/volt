@@ -46,6 +46,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {prefixInfo} from '../modules/wallet-utils';
 import {WalletTypeDetails} from '../modules/wallet-defaults';
+import {convertBTCtoSats} from '../modules/transform';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -277,12 +278,6 @@ const Scan = ({route}: Props) => {
         }
 
         return decodedInvoice;
-    };
-
-    const convertBTCtoSats = (btc: string) => {
-        const btcAmount = new BigNumber(btc);
-
-        return btcAmount.multipliedBy(100000000).toString();
     };
 
     const onQRDetected = (event: any) => {
