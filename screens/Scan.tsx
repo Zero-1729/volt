@@ -202,10 +202,16 @@ const Scan = ({route}: Props) => {
             invoice = 'bitcoin:' + btcAddress;
         }
 
+        // Only support:
+        // - Unified and regular BIP21 Invoice
+        // - Bolt11 Invoice
+        // - LNURL
         if (
             !(
                 invoice.startsWith('bitcoin:') ||
-                invoice.startsWith('lihgtning:')
+                invoice.startsWith('lightning:') ||
+                invoice.toLowerCase().startsWith('lnbc') ||
+                invoice.toLowerCase().startsWith('lnurl')
             )
         ) {
             updateScannerAlert('Detected unsupported invoice');
@@ -213,7 +219,11 @@ const Scan = ({route}: Props) => {
         }
 
         // Check if LN invoice and handle separately
-        if (invoice.startsWith('lightning:')) {
+        if (
+            invoice.startsWith('lightning:') ||
+            invoice.toLowerCase().startsWith('lnbc') ||
+            invoice.toLowerCase().startsWith('lnurl')
+        ) {
             return {decodedInvoice: decodedInvoice, isOnchain: false};
         }
 
