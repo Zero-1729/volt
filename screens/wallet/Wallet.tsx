@@ -43,7 +43,10 @@ import {
     createBDKWallet,
     getBdkWalletTransactions,
 } from '../../modules/bdk';
-import {getMiniWallet, checkNetworkIsReachable} from '../../modules/wallet-utils';
+import {
+    getMiniWallet,
+    checkNetworkIsReachable,
+} from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
 
@@ -66,6 +69,7 @@ const Wallet = ({route}: Props) => {
     const navigation = useNavigation();
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
+    const [singleLoadLock, setSingleLoadLock] = useState(false);
 
     const networkState = useNetInfo();
 
@@ -112,11 +116,7 @@ const Wallet = ({route}: Props) => {
 
         const W = await syncBdkWallet(
             w,
-            (status: boolean) => {
-                if (status) {
-                    setSingleLoadLock(true);
-                }
-            },
+            () => {},
             walletData.network,
             electrumServerURL,
         );
