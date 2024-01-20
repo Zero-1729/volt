@@ -40,6 +40,7 @@ export type TInvoiceData = {
         amount?: number;
         message?: string;
         label?: string;
+        lightning?: string;
     };
 };
 
