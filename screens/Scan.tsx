@@ -279,7 +279,7 @@ const Scan = ({route}: Props) => {
                 }
             } else {
                 // If LN Invoice
-                conservativeAlert('Warning', 'Lightning is not yet supported');
+                updateScannerAlert('Lightning is not yet supported');
             }
         }
     };
