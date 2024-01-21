@@ -559,6 +559,7 @@ export const checkInvoiceAndWallet = (
     wallet: TMiniWallet,
     invoice: TInvoiceData,
     alert: any,
+    singleMode?: boolean,
 ) => {
     const balance = new BigNumber(wallet.balance);
     const invoiceHasAmount = !!invoice?.options?.amount;
@@ -579,14 +580,16 @@ export const checkInvoiceAndWallet = (
 
     // Check network
     if (addressNetwork !== wallet.network) {
-        alert(`Cannot pay with a ${wallet.network} wallet`);
+        alert(`Cannot pay invoice with a ${wallet.network} wallet`);
         return false;
     }
 
     // Check balance if zero
     if (balance.isZero()) {
         alert(
-            'Wallet is empty, please select a different wallet or add funds.'
+            `Wallet is empty, add funds to wallet ${
+                singleMode ? '' : 'or select a different wallet.'
+            }`,
         );
         return false;
     }
@@ -606,7 +609,9 @@ export const checkInvoiceAndWallet = (
         invoiceAmount.multipliedBy(100000000).isGreaterThan(wallet.balance)
     ) {
         alert(
-            'Wallet balance insufficient, select a different wallet or add funds.',
+            `Wallet balance insufficient, add funds to wallet ${
+                singleMode ? '' : 'or select a different wallet.'
+            }`,
         );
         return false;
     }
