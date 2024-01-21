@@ -4,6 +4,7 @@
         [
             "@babel/plugin-transform-modules-commonjs"
         ],
+        ["module:react-native-dotenv"],
         [
             "module-resolver",
             {
