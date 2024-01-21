@@ -1611,6 +1611,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.23.2":
+  version: 7.23.8
+  resolution: "@babel/runtime@npm:7.23.8"
+  dependencies:
+    regenerator-runtime: ^0.14.0
+  checksum: 0bd5543c26811153822a9f382fd39886f66825ff2a397a19008011376533747cd05c33a91f6248c0b8b0edf0448d7c167ebfba34786088f1b7eb11c65be7dfc3
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.0.0, @babel/template@npm:^7.22.5, @babel/template@npm:^7.3.3":
   version: 7.22.5
   resolution: "@babel/template@npm:7.22.5"
@@ -7943,6 +7952,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-parse-stringify@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "html-parse-stringify@npm:3.0.1"
+  dependencies:
+    void-elements: 3.1.0
+  checksum: 334fdebd4b5c355dba8e95284cead6f62bf865a2359da2759b039db58c805646350016d2017875718bc3c4b9bf81a0d11be5ee0cf4774a3a5a7b97cde21cfd67
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -8008,6 +8026,24 @@ __metadata:
   dependencies:
     ms: ^2.0.0
   checksum: 9c7a74a2827f9294c009266c82031030eae811ca87b0da3dceb8d6071b9bde22c9f3daef0469c3c533cc67a97d8a167cd9fc0389350e5f415f61a79b171ded16
+  languageName: node
+  linkType: hard
+
+"i18next-icu@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "i18next-icu@npm:2.3.0"
+  peerDependencies:
+    intl-messageformat: ^10.3.3
+  checksum: da5cbf1fed795921dc903f8bd9129b5ad8ef4c5acd9cdea00c096a2dd4fafc8007cdc0501c11db5f86c7bfda8cde71896f8a4321129ead3557196a76fd4ad2d0
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^23.7.18":
+  version: 23.7.18
+  resolution: "i18next@npm:23.7.18"
+  dependencies:
+    "@babel/runtime": ^7.23.2
+  checksum: 4731125d2829e8343e088605e72eefbe06818a45b88478ca1d994bfd850efb5e41fda48474eefcdfecf0e6b8b820b7caddb275aa5fd72389dc56026dff86a01b
   languageName: node
   linkType: hard
 
@@ -12345,6 +12381,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-i18next@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "react-i18next@npm:14.0.1"
+  dependencies:
+    "@babel/runtime": ^7.22.5
+    html-parse-stringify: ^3.0.1
+  peerDependencies:
+    i18next: ">= 23.2.3"
+    react: ">= 16.8.0"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 5ddd3bde1f31fbb1a2103148111decc09f73c993291ed943e7da58dd585e34f8104d6c0d4e6c3f2559add7298156526244d7dd58a2b3200253c512af8f5ddb9a
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^16.12.0 || ^17.0.0 || ^18.0.0, react-is@npm:^18.0.0, react-is@npm:^18.1.0":
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
@@ -12525,6 +12579,20 @@ __metadata:
   version: 8.1.2
   resolution: "react-native-keychain@npm:8.1.2"
   checksum: 0602f0c8c664ee73aedfe7704c5199e90ecf91d933c218d1d74f8a4ea2bfe39814abe2a65492ba19478f416f8ba2cccb82e56878ebf4618712aac0f5a9e6a855
+  languageName: node
+  linkType: hard
+
+"react-native-localize@npm:^3.0.6":
+  version: 3.0.6
+  resolution: "react-native-localize@npm:3.0.6"
+  peerDependencies:
+    react: ">=18.1.0"
+    react-native: ">=0.70.0"
+    react-native-macos: ">=0.70.0"
+  peerDependenciesMeta:
+    react-native-macos:
+      optional: true
+  checksum: 83d0c7756f316b97951af2dc70713d922d7aa67130242add08c6851b08a07c719ecd3a02b87b1b3fd2e33f46bec719658ecc745bd3e48fa7e6d12ce3ea821a6b
   languageName: node
   linkType: hard
 
@@ -13025,6 +13093,13 @@ __metadata:
   version: 0.13.11
   resolution: "regenerator-runtime@npm:0.13.11"
   checksum: 27481628d22a1c4e3ff551096a683b424242a216fee44685467307f14d58020af1e19660bf2e26064de946bad7eff28950eae9f8209d55723e2d9351e632bbb4
+  languageName: node
+  linkType: hard
+
+"regenerator-runtime@npm:^0.14.0":
+  version: 0.14.1
+  resolution: "regenerator-runtime@npm:0.14.1"
+  checksum: 9f57c93277b5585d3c83b0cf76be47b473ae8c6d9142a46ce8b0291a04bb2cf902059f0f8445dcabb3fb7378e5fe4bb4ea1e008876343d42e46d3b484534ce38
   languageName: node
   linkType: hard
 
@@ -15102,6 +15177,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"void-elements@npm:3.1.0":
+  version: 3.1.0
+  resolution: "void-elements@npm:3.1.0"
+  checksum: 0390f818107fa8fce55bb0a5c3f661056001c1d5a2a48c28d582d4d847347c2ab5b7f8272314cac58acf62345126b6b09bea623a185935f6b1c3bbce0dfd7f7f
+  languageName: node
+  linkType: hard
+
 "volt@workspace:.":
   version: 0.0.0-use.local
   resolution: "volt@workspace:."
@@ -15157,6 +15239,8 @@ __metadata:
     electrum-mnemonic: ^2.0.0
     eslint: 8.19.0
     events: ^3.3.0
+    i18next: ^23.7.18
+    i18next-icu: ^2.3.0
     jest: ^29.6.2
     junderw-crc32c: ^1.2.0
     ledger-bitcoin: ^0.2.3
@@ -15170,6 +15254,7 @@ __metadata:
     prettier: ^2.8.8
     process: ^0.11.10
     react: 18.2.0
+    react-i18next: ^14.0.1
     react-native: ^0.71.7
     react-native-bouncy-checkbox: ^3.0.6
     react-native-camera-kit: ^13.0.0
@@ -15185,6 +15270,7 @@ __metadata:
     react-native-haptic-feedback: ^1.11.0
     react-native-image-picker: ^4.0.6
     react-native-keychain: ^8.1.0
+    react-native-localize: ^3.0.6
     react-native-modal: ^13.0.0
     react-native-passcode-auth: ^1.0.0
     react-native-permissions: ^3.9.2
