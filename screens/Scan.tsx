@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 
 import {
     Text,
@@ -18,6 +18,8 @@ import {ScanParamList} from '../Navigation';
 import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
+
+import {AppStorageContext} from '../class/storageContext';
 
 import decodeURI from 'bip21';
 
@@ -118,6 +120,8 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
+
+    const {walletMode} = useContext(AppStorageContext);
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -247,6 +251,7 @@ const Scan = ({route}: Props) => {
                 route.params.wallet,
                 decodedInvoice,
                 updateScannerAlert,
+                walletMode === 'single',
             )
         ) {
             return {decodedInvoice: null, isOnchain: null};

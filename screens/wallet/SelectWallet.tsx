@@ -82,9 +82,14 @@ const SelectWallet = ({route}: Props) => {
 
         // Check wallet and invoice
         if (
-            checkInvoiceAndWallet(wallet, decodedInvoice, (msg: string) => {
-                conservativeAlert('Error', msg);
-            })
+            checkInvoiceAndWallet(
+                wallet,
+                decodedInvoice,
+                (msg: string) => {
+                    conservativeAlert('Error', msg);
+                },
+                walletMode === 'single',
+            )
         ) {
             // Navigate handling
             if (invoiceHasAmount) {
