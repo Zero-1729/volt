@@ -69,7 +69,6 @@ const Wallet = ({route}: Props) => {
     const navigation = useNavigation();
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-    const [singleLoadLock, setSingleLoadLock] = useState(false);
 
     const networkState = useNetInfo();
 
