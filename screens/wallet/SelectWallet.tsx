@@ -173,7 +173,9 @@ const SelectWallet = ({route}: Props) => {
                                 {height: cardHeight},
                             ]}>
                             <Carousel
-                                enabled={walletMode === 'multi'}
+                                enabled={
+                                    walletMode === 'multi' && wallets.length > 1
+                                }
                                 vertical={true}
                                 autoPlay={false}
                                 width={AppScreenWidth * 0.92}
