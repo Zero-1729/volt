@@ -1,0 +1,19 @@
+{
+    "continue": "continue",
+    "cancel": "cancel",
+    "close": "close",
+    "sat_vbyte": "sats/vB",
+    "edit": "edit",
+    "copy": "copy",
+    "share": "share",
+    "save": "save",
+    "done": "done",
+    "delete": "delete",
+    "ok": "OK",
+    "skip": "skip",
+    "copied": "copied",
+    "yes": "yes",
+    "no": "no",
+    "back": "back",
+    "connect": "connect"
+}
