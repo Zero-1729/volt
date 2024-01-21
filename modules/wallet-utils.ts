@@ -469,7 +469,7 @@ export const normalizeExtKey = (xkey: string, key_type: string) => {
     return xkey;
 };
 
-export const getMiniWallet = (wallet: TWalletType) => {
+export const getMiniWallet = (wallet: TWalletType): TMiniWallet => {
     const balance = wallet.balance.toNumber();
 
     return {

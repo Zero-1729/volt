@@ -27,7 +27,7 @@ export type TMiniWallet = {
     name: string;
     type: string;
     network: string;
-    balance: TBalance;
+    balance: number;
     privateDescriptor: string;
     externalDescriptor?: string;
     internalDescriptor?: string;

@@ -128,6 +128,7 @@ export type WalletParamList = {
     TransactionDetails: {
         tx: TTransaction;
         source: string;
+        walletId: string;
     };
     TransactionExported: {
         status: boolean;

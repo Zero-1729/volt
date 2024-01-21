@@ -606,6 +606,7 @@ const Wallet = ({route}: Props) => {
                                                 params: {
                                                     tx: {...item.item},
                                                     source: 'conservative',
+                                                    walletId: currentWalletID,
                                                 },
                                             }),
                                         );
