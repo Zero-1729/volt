@@ -51,6 +51,7 @@ package-lock.json
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.env*
 
 # eslint
 coverage/**
