@@ -6,6 +6,7 @@ export const validWalletTypes = ['p2tr', 'wpkh', 'shp2wpkh', 'p2pkh'];
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
+    unified: ['Lightning', 'bc1p', 'bc1p'],
     p2tr: ['Taproot', 'bc1p...', 'tb1p...'],
     wpkh: ['Native Segwit', 'bc1q...', 'tb1q...'],
     p2pkh: ['Legacy', '1...', 'm...'],
@@ -14,6 +15,7 @@ export const WalletTypeDetails: {[index: string]: string[]} = {
 
 // Descriptor type reverse aliases
 export const DescriptorType: {[index: string]: string} = {
+    unified: 'Lightning',
     p2tr: 'P2TR',
     wpkh: 'WPKH',
     p2pkh: 'P2PKH',
