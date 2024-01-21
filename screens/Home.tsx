@@ -543,6 +543,8 @@ const Home = ({route}: Props) => {
                                                         params: {
                                                             tx: {...item.item},
                                                             source: 'liberal',
+                                                            walletId:
+                                                                currentWalletID,
                                                         },
                                                     },
                                                 ),
