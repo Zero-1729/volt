@@ -132,8 +132,15 @@ const Home = ({route}: Props) => {
     const extractAllTransactions = (): TTransaction[] => {
         let transactions: TTransaction[] = [];
 
-        for (const w of wallets) {
-            transactions = transactions.concat(w.transactions);
+        // Filter and show only transactions from current wallet
+        // if in single wallet mode
+        // else show all transactions across wallets
+        if (walletMode === 'multi') {
+            for (const w of wallets) {
+                transactions = transactions.concat(w.transactions);
+            }
+        } else {
+            transactions = transactions.concat(wallet.transactions);
         }
 
         const txs = getUniqueTXs(transactions);
