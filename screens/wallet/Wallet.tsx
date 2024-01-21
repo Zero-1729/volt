@@ -43,7 +43,10 @@ import {
     createBDKWallet,
     getBdkWalletTransactions,
 } from '../../modules/bdk';
-import {getMiniWallet, checkNetworkIsReachable} from '../../modules/wallet-utils';
+import {
+    getMiniWallet,
+    checkNetworkIsReachable,
+} from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
 
@@ -87,7 +90,6 @@ const Wallet = ({route}: Props) => {
 
     // For loading effect on balance
     const [loadingBalance, setLoadingBalance] = useState(false);
-    const [singleLoadLock, setSingleLoadLock] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
     // Get current wallet data
@@ -113,11 +115,7 @@ const Wallet = ({route}: Props) => {
 
         const W = await syncBdkWallet(
             w,
-            (status: boolean) => {
-                if (status) {
-                    setSingleLoadLock(true);
-                }
-            },
+            () => {},
             walletData.network,
             electrumServerURL,
         );
@@ -322,12 +320,6 @@ const Wallet = ({route}: Props) => {
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
     useEffect(() => {
-        // Attempt to sync balance
-        if (!singleLoadLock) {
-            refreshWallet();
-            setSingleLoadLock(true);
-        }
-
         // Kill all loading effects
         () => {
             setRefreshing(false);

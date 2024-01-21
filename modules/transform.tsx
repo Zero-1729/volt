@@ -9,6 +9,12 @@ export const capitalizeFirst = (text: string) => {
     return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
+export const convertBTCtoSats = (btc: string) => {
+    const btcAmount = new BigNumber(btc);
+
+    return btcAmount.multipliedBy(100000000).toString();
+};
+
 export const addCommas = (num: string, separator: string = ',') => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 };

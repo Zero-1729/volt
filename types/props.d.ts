@@ -51,7 +51,7 @@ export type WalletCardProps = CardProps & {
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
-    loading: boolean;
+    loading?: boolean;
     unit: Unit;
     network: string;
     navCallback?: () => void;

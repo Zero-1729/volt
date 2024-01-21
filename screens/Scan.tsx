@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 
 import {
     Text,
@@ -19,17 +19,15 @@ import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
-import BigNumber from 'bignumber.js';
+import {AppStorageContext} from '../class/storageContext';
 
 import decodeURI from 'bip21';
 
-import {canSendToInvoice, isValidAddress} from '../modules/wallet-utils';
+import {checkInvoiceAndWallet, isValidAddress} from '../modules/wallet-utils';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
-
-import {useNetInfo} from '@react-native-community/netinfo';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -44,8 +42,7 @@ import InfoIcon from '../assets/svg/info-16.svg';
 import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {prefixInfo} from '../modules/wallet-utils';
-import {WalletTypeDetails} from '../modules/wallet-defaults';
+import {convertBTCtoSats} from '../modules/transform';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -124,7 +121,7 @@ const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
 
-    const [isOnchain, setIsOnChain] = useState<boolean>(true);
+    const {walletMode} = useContext(AppStorageContext);
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -176,7 +173,6 @@ const Scan = ({route}: Props) => {
     // in the background, so we'll lock it until the user closes the alert
     const [scanLock, setScanLock] = useState(false);
     const [scannerAlertMsg, setScannerAlertMsg] = useState('');
-    const networkState = useNetInfo();
 
     const clearScannerAlert = () => {
         setScannerAlertMsg('');
@@ -194,8 +190,9 @@ const Scan = ({route}: Props) => {
     };
 
     const handleInvalidInvoice = (invoice: string) => {
+        // TODO: update to handle unified invoice format (LN & BTC)
+        //       Make ln priority if unified or LN wallet
         let decodedInvoice;
-        let amount!: BigNumber;
 
         // Handle single btc supported address
         if (!invoice.startsWith('bitcoin:')) {
@@ -203,86 +200,64 @@ const Scan = ({route}: Props) => {
 
             if (!isValidAddress(btcAddress)) {
                 updateScannerAlert('Detected an invalid address');
-                return;
+                return {decodedInvoice: null, isOnchain: null};
             }
 
             invoice = 'bitcoin:' + btcAddress;
         }
 
+        // Only support:
+        // - Unified and regular BIP21 Invoice
+        // - Bolt11 Invoice
+        // - LNURL
+        if (
+            !(
+                invoice.startsWith('bitcoin:') ||
+                invoice.startsWith('lightning:') ||
+                invoice.toLowerCase().startsWith('lnbc') ||
+                invoice.toLowerCase().startsWith('lnurl')
+            )
+        ) {
+            updateScannerAlert('Detected unsupported invoice');
+            return {decodedInvoice: null, isOnchain: null};
+        }
+
+        // Check if LN invoice and handle separately
+        if (
+            invoice.startsWith('lightning:') ||
+            invoice.toLowerCase().startsWith('lnbc') ||
+            invoice.toLowerCase().startsWith('lnurl')
+        ) {
+            return {decodedInvoice: decodedInvoice, isOnchain: false};
+        }
+
+        // Attempt to decode BIP21 QR
         try {
             decodedInvoice = decodeURI.decode(invoice);
 
-            if (!isValidAddress(decodedInvoice.address)) {
+            // BIP21 QR could contain upper case address, so we'll convert to lower case
+            if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
                 updateScannerAlert('Detected an invalid invoice');
-                return;
+                return {decodedInvoice: null, isOnchain: null};
             }
-
-            amount = new BigNumber(
-                decodedInvoice.options ? decodedInvoice.options.amount : '0',
-            );
         } catch (e) {
             updateScannerAlert('Detected an invalid invoice');
-            return;
+            return {decodedInvoice: null, isOnchain: null};
         }
 
-        if (!invoice.startsWith('bitcoin:')) {
-            setIsOnChain(false);
-        }
-
-        // Stip out invoice address info
-        const addressTip = decodedInvoice.address[0];
-        const prefixStub =
-            addressTip === 'b' || addressTip === 't'
-                ? decodedInvoice.address.slice(0, 4)
-                : addressTip;
-        const addressNetwork =
-            prefixInfo[prefixStub].network === 'bitcoin'
-                ? 'mainnet'
-                : 'testnet';
-        const addressType = prefixInfo[prefixStub].type;
-        const addressTypeName = WalletTypeDetails[addressType][0];
-
-        // Check network
-        if (addressNetwork !== route.params.wallet.network) {
-            updateScannerAlert(
-                `Cannot pay with a ${route.params.wallet.network} wallet`,
-            );
-            return;
-        }
-
-        // Check whether too broke for tx
+        // Check and report errors from wallet and invoice
         if (
-            amount
-                .multipliedBy(100000000)
-                .isGreaterThan(route.params.wallet.balance)
+            !checkInvoiceAndWallet(
+                route.params.wallet,
+                decodedInvoice,
+                updateScannerAlert,
+                walletMode === 'single',
+            )
         ) {
-            updateScannerAlert(
-                'You do not have sufficient funds to pay this invoice',
-            );
-            return;
+            return {decodedInvoice: null, isOnchain: null};
         }
 
-        // Check that invoice amount above dust limit
-        if (amount.multipliedBy(100000000).isLessThanOrEqualTo(546)) {
-            updateScannerAlert('Invoice amount is below dust limit');
-            return;
-        }
-
-        // Check can send to address
-        if (!canSendToInvoice(decodedInvoice, route.params.wallet)) {
-            updateScannerAlert(
-                `Wallet cannot pay to a ${addressTypeName} address`,
-            );
-            return;
-        }
-
-        return decodedInvoice;
-    };
-
-    const convertBTCtoSats = (btc: string) => {
-        const btcAmount = new BigNumber(btc);
-
-        return btcAmount.multipliedBy(100000000).toString();
+        return {decodedInvoice: decodedInvoice, isOnchain: true};
     };
 
     const onQRDetected = (event: any) => {
@@ -292,45 +267,42 @@ const Scan = ({route}: Props) => {
 
         const _QR = event.nativeEvent.codeStringValue;
 
-        const decodedQR = handleInvalidInvoice(_QR);
+        const decodedQRState: {
+            decodedInvoice: any;
+            isOnchain: boolean | null;
+        } = handleInvalidInvoice(_QR);
 
-        if (decodedQR) {
+        if (decodedQRState.decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
 
-            const amount = decodedQR.options.amount;
+            const amount = decodedQRState.decodedInvoice.options.amount;
 
-            if (isOnchain) {
+            if (decodedQRState.isOnchain) {
                 if (amount) {
                     // Route to Fee screen with amount (onChain)
                     // Update amount to sats
 
                     // If Onchain
-                    decodedQR.options.amount = convertBTCtoSats(amount);
+                    decodedQRState.decodedInvoice.options.amount =
+                        convertBTCtoSats(amount);
 
-                    if (networkState?.isInternetReachable) {
-                        runOnJS(navigation.dispatch)(
-                            CommonActions.navigate('WalletRoot', {
-                                screen: 'FeeSelection',
-                                params: {
-                                    invoiceData: decodedQR,
-                                    wallet: route.params.wallet,
-                                },
-                            }),
-                        );
-                    } else {
-                        conservativeAlert(
-                            'Network',
-                            'Please check your internet connection',
-                        );
-                    }
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'FeeSelection',
+                            params: {
+                                invoiceData: decodedQRState.decodedInvoice,
+                                wallet: route.params.wallet,
+                            },
+                        }),
+                    );
                 } else {
                     // Route to SendAmount screen
                     runOnJS(navigation.dispatch)(
                         CommonActions.navigate('WalletRoot', {
                             screen: 'SendAmount',
                             params: {
-                                invoiceData: decodedQR,
+                                invoiceData: decodedQRState.decodedInvoice,
                                 wallet: route.params.wallet,
                             },
                         }),
@@ -338,7 +310,7 @@ const Scan = ({route}: Props) => {
                 }
             } else {
                 // If LN Invoice
-                conservativeAlert('Warning', 'Lightning is not yet supported');
+                updateScannerAlert('Lightning is not yet supported');
             }
         }
     };
@@ -354,7 +326,7 @@ const Scan = ({route}: Props) => {
     const handleClipboard = async () => {
         const clipboardData = await Clipboard.getString();
 
-        const decodedInvoice = handleInvalidInvoice(clipboardData);
+        const {decodedInvoice} = handleInvalidInvoice(clipboardData);
 
         if (decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic

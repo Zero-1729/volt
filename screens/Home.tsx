@@ -467,7 +467,10 @@ const Home = ({route}: Props) => {
                         {wallets.length > 0 && (
                             <View style={[styles.CardContainer]}>
                                 <Carousel
-                                    enabled={walletMode === 'multi'}
+                                    enabled={
+                                        walletMode === 'multi' &&
+                                        wallets.length > 1
+                                    }
                                     vertical={true}
                                     autoPlay={false}
                                     width={AppScreenWidth * 0.92}

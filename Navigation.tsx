@@ -1,8 +1,10 @@
 import React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createNavigationContainerRef} from '@react-navigation/native';
 
 import Home from './screens/Home';
+import SelectWallet from './screens/wallet/SelectWallet';
 
 // Onboarding screens
 import Intro from './screens/onboarding/Intro';
@@ -60,6 +62,9 @@ export type InitStackParamList = {
             message: string;
             load: boolean;
         };
+    };
+    SelectWallet: {
+        invoice: string;
     };
     OnboardingRoot: undefined;
     AddWalletRoot: undefined;
@@ -255,6 +260,30 @@ const AddWalletRoot = () => {
     );
 };
 
+// Create a navigation container reference
+export const navigationRef = createNavigationContainerRef<InitStackParamList>();
+export const rootNavigation = {
+    navigate<RouteName extends keyof InitStackParamList>(
+        ...args: RouteName extends unknown
+            ? undefined extends InitStackParamList[RouteName]
+                ?
+                      | [screen: RouteName]
+                      | [
+                            screen: RouteName,
+                            params: InitStackParamList[RouteName],
+                        ]
+                : [screen: RouteName, params: InitStackParamList[RouteName]]
+            : never
+    ): void {
+        if (navigationRef.isReady()) {
+            navigationRef.navigate(...args);
+        } else {
+            // If navigation not ready
+            console.log('Navigation not ready');
+        }
+    },
+};
+
 const InitScreenStack = createNativeStackNavigator<InitStackParamList>();
 const initScreen = () => {
     return (
@@ -266,6 +295,10 @@ const initScreen = () => {
                 component={OnboardingRoot}
             />
             <InitScreenStack.Screen name="HomeScreen" component={Home} />
+            <InitScreenStack.Screen
+                name="SelectWallet"
+                component={SelectWallet}
+            />
             <InitScreenStack.Screen
                 name="AddWalletRoot"
                 component={AddWalletRoot}
