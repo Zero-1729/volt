@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
 
-import languages from '../../loc/languages';
+import languages from '../../i18n/languages';
 
 import {TLanguage} from '../../types/settings';
 
