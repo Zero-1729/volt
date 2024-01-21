@@ -1902,6 +1902,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@breeztech/react-native-breez-sdk@npm:^0.2.12":
+  version: 0.2.12
+  resolution: "@breeztech/react-native-breez-sdk@npm:0.2.12"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: a4e4a2f9e2cec57ca9fefdf1397eea51f06a4ad3f997d59475045619775ff0e6d2be38bc3abe7ad907942b544eed08d01eb20545ebc90d6139ad3c5fded7754f
+  languageName: node
+  linkType: hard
+
 "@craftzdog/react-native-buffer@npm:^6.0.5":
   version: 6.0.5
   resolution: "@craftzdog/react-native-buffer@npm:6.0.5"
@@ -15592,6 +15602,7 @@ __metadata:
     "@babel/runtime": ^7.20.0
     "@bitcoinerlab/descriptors": ^1.0.2
     "@bitcoinerlab/secp256k1": ^1.0.2
+    "@breeztech/react-native-breez-sdk": ^0.2.12
     "@craftzdog/react-native-buffer": ^6.0.5
     "@formatjs/intl-datetimeformat": ^6.12.2
     "@formatjs/intl-getcanonicallocales": ^2.3.0
