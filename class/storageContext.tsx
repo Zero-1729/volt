@@ -43,6 +43,7 @@ import {TaprootWallet} from './wallet/p2tr';
 import {SegWitNativeWallet} from './wallet/segwit/wpkh';
 import {SegWitP2SHWallet} from './wallet/segwit/shp2wpkh';
 import {LegacyWallet} from './wallet/p2pkh';
+import {UnifiedLNWallet} from './wallet/unified';
 
 import {
     descriptorFromTemplate,
@@ -605,6 +606,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 case 'p2pkh':
                     w = LegacyWallet.fromJSON(JSON.stringify(stringyW));
                     break;
+                case 'unified':
+                    w = UnifiedLNWallet.fromJSON(JSON.stringify(stringyW));
+                    break;
             }
 
             return w;
@@ -641,6 +645,9 @@ export const AppStorageProvider = ({children}: Props) => {
                         break;
                     case 'p2pkh':
                         tmp = LegacyWallet.fromJSON(serializedWallet);
+                        break;
+                    case 'unified':
+                        tmp = UnifiedLNWallet.fromJSON(serializedWallet);
                         break;
                     default:
                         throw new Error(
@@ -973,6 +980,11 @@ export const AppStorageProvider = ({children}: Props) => {
 
             // Create wallet based on type
             switch (walletArgs.type) {
+                case 'unified':
+                    newWallet = new UnifiedLNWallet(
+                        walletArgs as TBaseWalletArgs,
+                    );
+                    break;
                 case 'p2tr':
                     newWallet = new TaprootWallet(
                         walletArgs as TBaseWalletArgs,
@@ -1091,6 +1103,15 @@ export const AppStorageProvider = ({children}: Props) => {
                 const mnemonic = await generateMnemonic();
 
                 switch (type) {
+                    case 'unified':
+                        newWallet = new UnifiedLNWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                            mnemonic: mnemonic,
+                        });
+
+                        break;
                     case 'p2tr':
                         newWallet = new TaprootWallet({
                             name: name,
