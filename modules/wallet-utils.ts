@@ -559,7 +559,7 @@ export const checkInvoiceAndWallet = (
     wallet: TMiniWallet,
     invoice: TInvoiceData,
     alert: any,
-    singleMode?: boolean,
+    singleMode: boolean,
 ) => {
     const balance = new BigNumber(wallet.balance);
     const invoiceHasAmount = !!invoice?.options?.amount;
