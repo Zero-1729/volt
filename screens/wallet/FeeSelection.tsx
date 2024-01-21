@@ -501,7 +501,6 @@ const FeeSelection = ({route}: Props) => {
                     <PlainButton
                         onPress={() => {
                             openFeeModal();
-                            // setFeeRate(feeRates.minimumFee);
                         }}>
                         <View style={[tailwind('mt-6')]}>
                             <View
