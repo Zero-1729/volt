@@ -717,6 +717,80 @@ const signBDKPsbt = async (
     return signedPsbt;
 };
 
+// Bump and broadcast signed fee-bumped Psbt
+export const bumpFeeBDKPsbt = async (
+    txId: string,
+    feeRate: number, // Assumes the new fee rate is higher than the original
+    wallet: TComboWallet,
+    electrumServer: TElectrumServerURLs,
+): Promise<{
+    broadcasted: boolean;
+    psbt: BDK.PartiallySignedTransaction;
+    errorMessage: string;
+}> => {
+    let broadcasted: boolean = false;
+    let psbt!: BDK.PartiallySignedTransaction;
+    let errorMessage: string = '';
+
+    try {
+        // Create BDK wallet
+        let _w = await createBDKWallet(wallet);
+
+        // Create Psbt from txId
+        let txBumpBuilder = new BDK.BumpFeeTxBuilder();
+        txBumpBuilder = await txBumpBuilder.create(txId, feeRate);
+        txBumpBuilder = await txBumpBuilder.enableRbf();
+
+        // Sync wallet before any tx creation
+        _w = await syncBdkWallet(
+            _w,
+            (status: boolean) => {
+                if (!status) {
+                    throw new Error('Failed to sync wallet.');
+                }
+            },
+            wallet.network as TNetwork,
+            electrumServer,
+        );
+
+        // Finalize & sign Psbt
+        psbt = await txBumpBuilder.finish(_w);
+        psbt = await signBDKPsbt(psbt, _w);
+    } catch (e: any) {
+        errorMessage = e.message;
+
+        return {
+            broadcasted: broadcasted,
+            psbt: psbt,
+            errorMessage: errorMessage,
+        };
+    }
+
+    try {
+        // Broadcast transaction
+        broadcasted = await broadcastBDKPsbt(
+            psbt,
+            wallet.network,
+            electrumServer,
+        );
+    } catch (e: any) {
+        errorMessage = e.message;
+
+        return {
+            broadcasted: broadcasted,
+            psbt: psbt,
+            errorMessage: errorMessage,
+        };
+    }
+
+    // Return broadcasted Psbt and other meta
+    return {
+        broadcasted: broadcasted,
+        psbt: psbt,
+        errorMessage: errorMessage,
+    };
+};
+
 // Broadcast a signed Psbt to the network
 const broadcastBDKPsbt = async (
     psbt: BDK.PartiallySignedTransaction,
