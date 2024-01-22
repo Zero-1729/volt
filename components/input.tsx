@@ -16,6 +16,8 @@ import {
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
 import DocumentPicker from 'react-native-document-picker';
 
 import Color from '../constants/Color';
@@ -36,6 +38,9 @@ import LeftArrow from '../assets/svg/chevron-left-24.svg';
 export const TextSingleInput = (props: TextInputProps) => {
     const tailwind = useTailwind();
 
+    const {i18n} = useTranslation();
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
     return (
         <TextInput
             underlineColorAndroid="transparent"
@@ -54,6 +59,7 @@ export const TextSingleInput = (props: TextInputProps) => {
                 tailwind(
                     `${props.shavedHeight ? 'py-3' : 'py-4'} px-2 text-xs`,
                 ),
+                {textAlign: props.noTrans ? 'auto' : langDir},
             ]}
         />
     );
