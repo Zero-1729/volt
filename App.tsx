@@ -10,6 +10,8 @@ import {
     LinkingOptions,
 } from '@react-navigation/native';
 
+import './i18n';
+
 import Privacy from 'react-native-privacy-snapshot';
 
 import InitScreen, {rootNavigation, navigationRef} from './Navigation';
