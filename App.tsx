@@ -2,18 +2,21 @@
 import 'react-native-gesture-handler';
 
 import React, {useContext, useEffect} from 'react';
-
 import {StatusBar, useColorScheme, Linking} from 'react-native';
+
+import {AppStorageContext} from './class/storageContext';
+
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+
 import {
     NavigationContainer,
     DefaultTheme,
     LinkingOptions,
 } from '@react-navigation/native';
 
-import {AppStorageContext} from './class/storageContext';
+import './i18n';
 
-import {initI18n} from './i18n';
+import {useTranslation} from 'react-i18next';
 
 import Privacy from 'react-native-privacy-snapshot';
 
@@ -23,7 +26,9 @@ import Color from './constants/Color';
 import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
-    const {appLanguage} = useContext(AppStorageContext);
+    const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
+
+    const {i18n} = useTranslation();
 
     useEffect(() => {
         SplashScreen.hide();
@@ -31,8 +36,11 @@ const App = () => {
         // Enable privacy blur for IOS; blur screen when screen inactive
         Privacy?.enabled(true);
 
-        // init i18n language
-        initI18n(appLanguage.code);
+        // If new and onboarding load device language
+        if (isWalletInitialized) {
+            // Load default language selected by user
+            i18n.changeLanguage(appLanguage.code);
+        }
     }, []);
 
     const ColorScheme = Color(useColorScheme());
