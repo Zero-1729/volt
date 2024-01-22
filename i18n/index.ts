@@ -5,6 +5,9 @@ import {initReactI18next} from 'react-i18next';
 
 import resources from './locales';
 
+// Default to common namespace
+export const defaultNS = 'common';
+
 const getAppLanguage = (): string => {
     const {languageTag} = RNL.findBestLanguageTag(Object.keys(resources)) || {
         languageTag: 'en',
@@ -15,24 +18,52 @@ const getAppLanguage = (): string => {
 
 // Main instance of i18next
 // with ICU enabled plurals
-const i18nICU = i18n.createInstance();
-i18nICU
-    .use(new ICU())
-    .use(initReactI18next)
-    .init({
-        lng: getAppLanguage(),
-        fallbackLng: 'en',
-        resources,
-        defaultNS: 'common',
-        debug: false,
-        cache: {enabled: true},
-        interpolation: {
-            escapeValue: false,
-        },
-        returnNull: false,
-    });
+export const initI18n = async (language: string) => {
+    const i18nICU = i18n.createInstance();
 
-export default i18nICU;
+    return i18nICU
+        .use(initReactI18next)
+        .use(new ICU())
+        .init({
+            lng: language,
+            fallbackLng: getAppLanguage(),
+            resources,
+            defaultNS,
+            fallbackNS: defaultNS,
+            debug: false,
+            cache: {enabled: true},
+            interpolation: {
+                escapeValue: false,
+            },
+            returnNull: false,
+        })
+        .then(() => {
+            let timeZone = RNL.getTimeZone();
+
+            // if polyfill is used, we need to set default timezone
+            // https://formatjs.io/docs/polyfills/intl-datetimeformat/#default-timezone
+            if ('__setDefaultTimeZone' in Intl.DateTimeFormat) {
+                // formatjs doesn't know GMT, that is used by default in github actions
+                if (timeZone === 'GMT') {
+                    timeZone = 'Etc/GMT';
+                }
+
+                try {
+                    // @ts-ignore __setDefaultTimeZone doesn't exist in native API
+                    Intl.DateTimeFormat.__setDefaultTimeZone(timeZone);
+                } catch (e) {
+                    console.log(
+                        `error settings timezone to: ${timeZone} fallback to UTC`,
+                    );
+                    // @ts-ignore __setDefaultTimeZone doesn't exist in native API
+                    Intl.DateTimeFormat.__setDefaultTimeZone('UTC');
+                    timeZone = 'UTC';
+                }
+            }
+        });
+};
+
+export default i18n;
 
 // i18Next instance for date and time formatting
 // with ICU enabled plurals
