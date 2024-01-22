@@ -1,8 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
+import React, {useContext} from 'react';
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
+
+import {AppStorageContext} from '../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -92,6 +94,17 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const tailwind = useTailwind();
 
+    const {appLanguage} = useContext(AppStorageContext);
+
+    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
+
+    const mxPositionBTC =
+        langDir === 'right'
+            ? {left: props.hideBalance ? -34 : -24}
+            : {right: props.hideBalance ? -34 : -24};
+
+    const mxPositionSim = langDir === 'right' ? {right: 24} : {left: 24};
+
     return (
         <PlainButton
             onPress={() => {
@@ -139,7 +152,7 @@ export const WalletCard = (props: WalletCardProps) => {
                             tailwind('absolute h-auto w-auto opacity-40 z-0'),
                             {
                                 top: props.hideBalance ? -34 : -16,
-                                right: props.hideBalance ? -34 : -24,
+                                ...mxPositionBTC,
                             },
                         ]}>
                         <BITCOIN fill={'black'} width={148} height={148} />
@@ -148,7 +161,10 @@ export const WalletCard = (props: WalletCardProps) => {
                     {!props.isWatchOnly ? (
                         <View
                             style={[
-                                styles.sim,
+                                {
+                                    top: 18,
+                                    ...mxPositionSim,
+                                },
                                 tailwind('absolute opacity-80 h-auto w-auto'),
                             ]}>
                             <SIM fill={'white'} width={42} height={42} />
@@ -163,10 +179,11 @@ export const WalletCard = (props: WalletCardProps) => {
                         style={[
                             styles.label,
                             tailwind(
-                                'absolute pt-4 mt-1 text-base w-4/6 text-left text-white opacity-60',
+                                'absolute pt-4 mt-1 text-base w-full text-left text-white opacity-60',
                             ),
                             {
                                 bottom: props.hideBalance ? 72 : 54,
+                                textAlign: langDir,
                             },
                             Font.RobotoText,
                         ]}>
@@ -176,7 +193,9 @@ export const WalletCard = (props: WalletCardProps) => {
                     {props.isWatchOnly ? (
                         <View
                             style={[
-                                styles.watchOnly,
+                                langDir === 'right'
+                                    ? styles.watchOnlyRTL
+                                    : styles.watchOnlyLTR,
                                 tailwind(
                                     'bg-black absolute rounded-full opacity-60',
                                 ),
@@ -219,6 +238,7 @@ export const WalletCard = (props: WalletCardProps) => {
                                     tailwind(
                                         'text-xs text-white font-bold px-4 py-1',
                                     ),
+                                    {textAlign: langDir},
                                     Font.RobotoText,
                                 ]}>
                                 Swept Balance
@@ -242,16 +262,16 @@ const styles = StyleSheet.create({
         left: 24,
         fontWeight: '100',
     },
-    watchOnly: {
+    watchOnlyLTR: {
         top: 24,
         left: 20,
+    },
+    watchOnlyRTL: {
+        top: 24,
+        right: 20,
     },
     maxedOut: {
         bottom: 20,
         left: 24,
-    },
-    sim: {
-        left: 24,
-        top: 18,
     },
 });

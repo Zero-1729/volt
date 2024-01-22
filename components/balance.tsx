@@ -92,8 +92,11 @@ export const Balance = (props: BalanceProps) => {
         appUnit,
         updateAppUnit,
         fiatRate,
+        appLanguage,
     } = useContext(AppStorageContext);
     const [unit, setUnit] = useState(appUnit);
+
+    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
 
     // Toggle between BTC and sats
     // and fiat if enabled
@@ -131,6 +134,12 @@ export const Balance = (props: BalanceProps) => {
                                     props.loading ? 'opacity-40' : ''
                                 }`,
                             ),
+                            {
+                                justifyContent:
+                                    langDir === 'right'
+                                        ? 'flex-end'
+                                        : 'flex-start',
+                            },
                         ]}>
                         {/* Satoshi Symbol */}
                         <Text
@@ -200,8 +209,11 @@ export const Balance = (props: BalanceProps) => {
 export const FiatBalance = (props: FiatBalanceProps) => {
     const tailwind = useTailwind();
 
-    const {hideTotalBalance, appFiatCurrency, fiatRate} =
+    const {hideTotalBalance, appFiatCurrency, fiatRate, appLanguage} =
         useContext(AppStorageContext);
+
+    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
+    const langFlex = appLanguage.dir === 'RTL' ? 'flex-end' : 'flex-start';
 
     const unit = {name: appFiatCurrency.short, symbol: appFiatCurrency.symbol};
 
@@ -215,6 +227,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                 props.loading ? 'opacity-20' : ''
                             }`,
                         ),
+                        {justifyContent: langFlex},
                     ]}>
                     {/* Display fiat symbol */}
                     <Text
@@ -227,7 +240,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                         : 'text-2xl'
                                 } self-baseline mr-2`,
                             ),
-                            {color: props.fontColor},
+                            {color: props.fontColor, textAlign: langDir},
                         ]}>
                         {(props.amountSign ? props.amountSign + ' ' : '') +
                             unit.symbol}
@@ -244,7 +257,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                         : 'text-2xl'
                                 } self-baseline`,
                             ),
-                            {color: props.fontColor},
+                            {color: props.fontColor, textAlign: langDir},
                         ]}>
                         {_getBalance(
                             new BigNumber(props.balance),
@@ -272,13 +285,17 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
+    const {appLanguage} = useContext(AppStorageContext);
+
+    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
+
     return (
         <View style={[tailwind('flex-row')]}>
             {props.isApprox ? (
                 <Text
                     style={[
                         tailwind('self-center'),
-                        {color: ColorScheme.Text.Default},
+                        {color: ColorScheme.Text.Default, textAlign: langDir},
                     ]}>
                     ~{' '}
                 </Text>
@@ -289,7 +306,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
                 numberOfLines={1}
                 style={[
                     tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
-                    {color: ColorScheme.Text.Default},
+                    {color: ColorScheme.Text.Default, textAlign: langDir},
                     Font.SatSymbol,
                 ]}>
                 s
@@ -298,7 +315,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
             <Text
                 style={[
                     tailwind(`${props.fontSize} self-center font-bold`),
-                    {color: ColorScheme.Text.Default},
+                    {color: ColorScheme.Text.Default, textAlign: langDir},
                 ]}>
                 {props.amount.isZero() ? '0' : formatSats(props.amount)}
             </Text>
