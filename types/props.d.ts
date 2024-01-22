@@ -13,7 +13,7 @@ export type BaseProps = PropsWithChildren<{
     activeOpacity?: number;
 }>;
 
-export type RTLTextProps = {
+export type VTextProps = {
     style: React.CSSProperties | StyleProp<ViewStyle>;
     children?: React.ReactNode;
 };
