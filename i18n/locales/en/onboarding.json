@@ -1,5 +1,12 @@
 {
     "welcome": "Welcome to Volt",
-    "next": "Next",
-    "app_description": " A carefully crafted descriptor-based Bitcoin wallet for the modern age."
+    "next": "next",
+    "app_description": " A carefully crafted descriptor-based Bitcoin wallet for the modern age.",
+    "wallet_descriptors": "Wallet Descriptors",
+    "descriptors_gist": "A wallet descriptor is a human-readable string that describes a wallet with enough precision to derive all its addresses and private keys for accurate backups.",
+    "select_mode_title": "Select a mode",
+    "single_mode_title": "Single (Recommended)",
+    "single_mode_description": "Create a single unified Bitcoin and Lightning wallet, which allows you to receive and send both on and off-chain",
+    "multi_mode_description": "This mode is for (advanced) users who want to manage multiple wallets in a single app.",
+    "multi_mode_title": "Multi"
 }

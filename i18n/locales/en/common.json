@@ -1,5 +1,11 @@
 {
     "continue": "continue",
+    "error": "error",
+    "descriptor": "descriptor",
+    "mnemonic": "mnemonic",
+    "extended_key": "extended key",
+    "import": "import",
+    "try_again": "try again",
     "cancel": "cancel",
     "close": "close",
     "sat_vbyte": "sats/vB",
@@ -15,5 +21,7 @@
     "yes": "yes",
     "no": "no",
     "back": "back",
-    "connect": "connect"
+    "connect": "connect",
+    "note": "note",
+    "latest_transactions_text": "latest transactions"
 }

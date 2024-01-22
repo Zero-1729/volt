@@ -1,1 +1,26 @@
-{}
+{
+    "add_wallet_title": "أضف المحفظة",
+    "add_wallet_description": "قم بإنشاء محفظة جديدة أو استعادتها من نسخة احتياطية",
+    "import_title": "الاستيراد",
+    "import_description": "استعادة المحفظة من البذور أو غيرها من المواد الاحتياطية. حدد ما إذا كنت تريد استيراد محفظة موجودة أم لا",
+    "import_button_text": "الاستيراد",
+    "create_title": "إنشاء محفظة جديدة",
+    "supported_accounts_info": "حسابات HD المدعومة: BIP44، BIP46، BIP84",
+    "select_account_type": "اختر نوع الحساب",
+    "set_testnet": "تعيين testnet",
+    "wallet_generation_text": "جارٍ إنشاء مواد المحفظة...",
+    "wallet_create_placeholder": "أدخل اسم المحفظة",
+    "import_support_error": "يتم دعم مادة استيراد واحدة فقط",
+    "mnemonic_invalid_error": "هذا غير صالح mnemonic",
+    "descriptor_valid_error": "يتم دعم واصفات المفاتيح الفردية فقط (مثل tr(...) wpkh(...)، pkh(...)، sh(wpkh(...))",
+    "unsupported_ext_key": "هذا المفتاح الممتد غير مدعوم",
+    "import_material_error": "لا يمكن استيراد المواد",
+    "import_advanced_placeholder": "أدخل واحدًا مما يلي:\n\n- اثني عشر - أربع وعشرون كلمة تذكير\n- واصف المحفظة (على سبيل المثال، pkh(tprv...))\n- مفتاح خاص ممتد (على سبيل المثال، x/y/z/tprv)\n- المفتاح العام الموسع (على سبيل المثال، x/y/z/tpub)",
+    "import_basic_placeholder": "أدخل اثني عشر - أربع وعشرين كلمة تذكير\n",
+    "create_wallet_defaults_message": "الافتراضات ل Taproot",
+    "create_wallet_defaults_message_1": "العنوان يبدأ بـ",
+    "mnemonic_title": "النسخ الاحتياطي mnemonic",
+    "mnemonic_note": "من فضلك، قم بعمل نسخة احتياطية الخاص بك mnemonic.هذه هي الطريقة الوحيدة لاستعادة محفظتك.",
+    "mnemonic_warn": "يمكنك عمل نسخة احتياطية لجهازك mnemonic عن طريق كتابتها على قطعة من الورق وتخزينها في مكان آمن. لا تشاركها مع أي شخص.",
+    "mnemonic_ok_button": "حسنًا، لقد قمت بعمل نسخة احتياطية"
+}

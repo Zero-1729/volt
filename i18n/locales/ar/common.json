@@ -1,6 +1,12 @@
 {
     "continue": "المتابعة",
     "cancel": "إلغاء",
+    "error": "error",
+    "descriptor": "descriptor",
+    "mnemonic": "mnemonic",
+    "extended_key": "extended key",
+    "import": "import",
+    "try_again": "try again",
     "close": "اغلاق",
     "sat_vbyte": "sats/vB",
     "edit": "يحرر",
@@ -15,5 +21,7 @@
     "yes": "نعم",
     "no": "لا",
     "back": "خلف",
-    "connect": "يتصل"
+    "connect": "يتصل",
+    "note": "note",
+    "latest_transactions_text": "آخر عملية"
 }
