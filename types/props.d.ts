@@ -13,6 +13,11 @@ export type BaseProps = PropsWithChildren<{
     activeOpacity?: number;
 }>;
 
+export type RTLTextProps = {
+    style: React.CSSProperties | StyleProp<ViewStyle>;
+    children?: React.ReactNode;
+};
+
 export type AppCard = BaseProps & {
     key: React.Key;
     title: string;
@@ -51,7 +56,7 @@ export type WalletCardProps = CardProps & {
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
-    loading?: boolean;
+    loading: boolean;
     unit: Unit;
     network: string;
     navCallback?: () => void;
