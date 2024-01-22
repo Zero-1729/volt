@@ -20,6 +20,10 @@ import Carousel from 'react-native-reanimated-carousel';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../Navigation';
 
+import VText from '../components/text';
+
+import {useTranslation} from 'react-i18next';
+
 import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
@@ -67,6 +71,8 @@ const Home = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('home');
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -137,13 +143,13 @@ const Home = ({route}: Props) => {
         // else show all transactions across wallets
         if (walletMode === 'multi') {
             for (const w of wallets) {
-                transactions = transactions.concat(w.transactions);
+                transactions = transactions.concat(w?.transactions);
             }
         } else {
-            transactions = transactions.concat(wallet.transactions);
+            transactions = transactions.concat(wallet?.transactions);
         }
 
-        const txs = getUniqueTXs(transactions);
+        const txs = wallets.length > 0 ? getUniqueTXs(transactions) : [];
 
         // Sort by timestamp
         return txs.sort((a: TTransaction, b: TTransaction) => {
@@ -434,7 +440,7 @@ const Home = ({route}: Props) => {
                             style={tailwind('justify-around w-full mt-3 mb-3')}>
                             {wallets.length > 0 && (
                                 <>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind(
                                                 'text-base font-medium mb-1',
@@ -442,8 +448,8 @@ const Home = ({route}: Props) => {
                                             {color: ColorScheme.Text.Default},
                                             Font.RobotoText,
                                         ]}>
-                                        Total Balance
-                                    </Text>
+                                        {t('total_balance_text')}
+                                    </VText>
 
                                     {!hideTotalBalance ? (
                                         <FiatBalance
@@ -511,14 +517,14 @@ const Home = ({route}: Props) => {
                                 } mt-4`,
                             ),
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('w-5/6 font-medium self-center'),
                                 DarkGrayText,
                                 Font.RobotoText,
                             ]}>
-                            Latest Transactions
-                        </Text>
+                            {t('latest_transactions_text')}
+                        </VText>
 
                         <View
                             style={[
@@ -575,15 +581,14 @@ const Home = ({route}: Props) => {
                                             fill={svgGrayFill}
                                             style={tailwind('mb-4')}
                                         />
-                                        <Text
+                                        <VText
                                             style={[
                                                 tailwind('w-5/6 text-center'),
                                                 DarkGreyText,
                                                 Font.RobotoText,
                                             ]}>
-                                            A list of all latest transactions
-                                            will be displayed here
-                                        </Text>
+                                            {t('no_transactions_text')}
+                                        </VText>
                                     </View>
                                 }
                             />

@@ -30,6 +30,8 @@ import {PlainButton, LongBottomButton} from '../../components/button';
 
 import {TextSingleInput} from '../../components/input';
 
+import {useTranslation} from 'react-i18next';
+
 import {WALLET_NAME_LENGTH} from '../../modules/wallet-defaults';
 
 import Checkbox from 'react-native-bouncy-checkbox';
@@ -52,6 +54,8 @@ const CreateAction = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('wallet');
 
     const {addWallet, isAdvancedMode, defaultToTestnet, isWalletInitialized} =
         useContext(AppStorageContext);
@@ -166,7 +170,7 @@ const CreateAction = () => {
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Back
+                            {t('back')}
                         </Text>
                     </PlainButton>
 
@@ -175,7 +179,7 @@ const CreateAction = () => {
                             tailwind('font-bold text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Create New Wallet
+                        {t('create_title')}
                     </Text>
 
                     <Text
@@ -187,7 +191,7 @@ const CreateAction = () => {
                             ? accountInfo[account][
                                   network === ENet.Testnet ? 1 : 0
                               ]
-                            : `Defaults to Taproot (address starts with '${
+                            : `{t('create_wallet_defaults_message')} ({t('create_wallet_defaults_message_1')} '${
                                   network === ENet.Testnet ? 'tb1' : 'bc1'
                               }...')`}
                     </Text>
@@ -199,7 +203,7 @@ const CreateAction = () => {
                         ]}>
                         <TextSingleInput
                             maxLength={WALLET_NAME_LENGTH}
-                            placeholder={'Enter a wallet name'}
+                            placeholder={t('wallet_create_placeholder')}
                             placeholderTextColor={ColorScheme.Text.GrayedText}
                             onChangeText={setNewWalletName}
                             onBlur={onBlur}
@@ -231,7 +235,7 @@ const CreateAction = () => {
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                Select Account Type
+                                {t('select_account_type')}
                             </Text>
 
                             {/* Dropdown */}
@@ -279,7 +283,7 @@ const CreateAction = () => {
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Set Testnet
+                                    {t('set_testnet')}
                                 </Text>
                                 {/* btn */}
                                 <Checkbox
@@ -333,7 +337,7 @@ const CreateAction = () => {
                                 tailwind('text-sm mb-4'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            Generating wallet material...
+                            {t('wallet_generation_text')}
                         </Text>
                         <ActivityIndicator />
                     </View>
@@ -344,7 +348,7 @@ const CreateAction = () => {
                         updateWalletName(newWalletName, account);
                     }}
                     disabled={newWalletName.trim().length === 0}
-                    title={'Continue'}
+                    title={t('continue')}
                     textColor={
                         newWalletName.trim().length > 0
                             ? ColorScheme.Text.Alt

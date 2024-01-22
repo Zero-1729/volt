@@ -17,7 +17,9 @@ import {AddWalletParamList} from '../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {displayNumberedSeed} from '../../modules/transform';
+import {useTranslation} from 'react-i18next';
+
+import {displayNumberedSeed, capitalizeFirst} from '../../modules/transform';
 
 import Color from '../../constants/Color';
 
@@ -31,6 +33,8 @@ const Mnemonic = ({route}: Props) => {
 
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
+
+    const {t} = useTranslation('wallet');
 
     const returnToHome = useCallback(() => {
         // Return home
@@ -89,7 +93,7 @@ const Mnemonic = ({route}: Props) => {
                             tailwind('font-bold text-lg'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Backup Mnemonic
+                        {t('mnemonic_title')}
                     </Text>
                 </View>
 
@@ -113,19 +117,16 @@ const Mnemonic = ({route}: Props) => {
                         }>
                         <Text
                             style={[tailwind('font-bold text-sm text-center')]}>
-                            NOTE:
+                            {capitalizeFirst(t('note'))}:
                         </Text>{' '}
-                        Please, back up your mnemonic phrase. It is the only way
-                        to restore your wallet.
+                        {t('mnemonic_note')}
                         {'\n\n'}
                         <Text
                             style={[
                                 tailwind('text-center'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            You can backup your mnemonic phrase by writing it
-                            down on a piece of paper and storing it in a safe
-                            place. Do not share it with anyone.
+                            {t('mnemonic_warn')}
                         </Text>
                     </Text>
                 </View>
@@ -143,7 +144,7 @@ const Mnemonic = ({route}: Props) => {
                     onPress={returnToHome}
                     backgroundColor={ColorScheme.Background.Inverted}
                     textColor={ColorScheme.Text.Alt}
-                    title="OK, I have backed up"
+                    title={t('mnemonic_ok_button')}
                     style={[tailwind('font-bold')]}
                 />
             </View>

@@ -8,6 +8,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
 
+import {useTranslation} from 'react-i18next';
+
 import {useTailwind} from 'tailwind-rn';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
@@ -22,6 +24,8 @@ const SelectMode = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('onboarding');
 
     const {setWalletModeType} = useContext(AppStorageContext);
 
@@ -56,7 +60,7 @@ const SelectMode = () => {
                         tailwind('text-lg absolute font-bold top-6'),
                         {color: ColorScheme.Text.Default},
                     ]}>
-                    Select Mode
+                    {t('select_mode_title')}
                 </Text>
 
                 <View style={[tailwind('items-center w-4/5 py-4'), {top: -25}]}>
@@ -79,7 +83,7 @@ const SelectMode = () => {
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Single (Recommended)
+                                        {t('single_mode_title')}
                                     </Text>
 
                                     {selectedMode === 'single' && (
@@ -96,9 +100,7 @@ const SelectMode = () => {
                                         tailwind('text-left text-sm mt-4'),
                                         {color: ColorScheme.Text.GrayedText},
                                     ]}>
-                                    Create a single unified Bitcoin and LN
-                                    wallet, which allows you to receive and send
-                                    both on and off-chain.
+                                    {t('single_mode_description')}
                                 </Text>
                             </>
                         </PlainButton>
@@ -129,7 +131,7 @@ const SelectMode = () => {
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Multi
+                                        {t('multi_mode_title')}
                                     </Text>
 
                                     {selectedMode === 'multi' && (
@@ -146,9 +148,7 @@ const SelectMode = () => {
                                         tailwind('text-left text-sm mt-4'),
                                         {color: ColorScheme.Text.GrayedText},
                                     ]}>
-                                    Create and manage multiple wallet types,
-                                    including Lightning, Bolt Card, and Bitcoin
-                                    cards.
+                                    {t('multi_mode_description')}
                                 </Text>
                             </>
                         </PlainButton>
@@ -157,7 +157,7 @@ const SelectMode = () => {
 
                 <LongBottomButton
                     onPress={setModeAndRoute}
-                    title={'Done'}
+                    title={t('done')}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />
