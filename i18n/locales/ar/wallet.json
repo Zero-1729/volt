@@ -22,5 +22,15 @@
     "mnemonic_title": "النسخ الاحتياطي mnemonic",
     "mnemonic_note": "من فضلك، قم بعمل نسخة احتياطية الخاص بك mnemonic.هذه هي الطريقة الوحيدة لاستعادة محفظتك.",
     "mnemonic_warn": "يمكنك عمل نسخة احتياطية لجهازك mnemonic عن طريق كتابتها على قطعة من الورق وتخزينها في مكان آمن. لا تشاركها مع أي شخص.",
-    "mnemonic_ok_button": "حسنًا، لقد قمت بعمل نسخة احتياطية"
+    "mnemonic_ok_button": "حسنًا، لقد قمت بعمل نسخة احتياطية",
+    "balance": "الرصيد",
+    "current_balance": "الرصيد الحالي",
+    "offline_balance": "الرصيد الغير متصل",
+    "total_balance": "الرصيد الاجمالي",
+    "no_transactions_text": "الحوالات",
+    "send": "يرسل",
+    "receive": "صرف",
+    "edit_amount": "تحرير المبلغ",
+    "bitcoin_invoice": "فاتورة البيتكوين",
+    "invoice_address": "عنوان الفاتورة"
 }

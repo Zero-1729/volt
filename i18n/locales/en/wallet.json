@@ -24,5 +24,15 @@
     "mnemonic_title": "Backup mnemonic",
     "mnemonic_note": "Please, back up your mnemonic. It is the only way to restore your wallet.",
     "mnemonic_warn": "You can backup your mnemonic by writing it down on a piece of paper and storing it in a safe place. Do not share it with anyone.",
-    "mnemonic_ok_button": "OK, I have backed up"
+    "mnemonic_ok_button": "OK, I have backed up",
+    "balance": "Balance",
+    "current_balance": "Current Balance",
+    "offline_balance": "Offline Balance",
+    "total_balance": "Total Balance",
+    "no_transactions_text": "A list of transactions for this wallet will be displayed here",
+    "send": "Send",
+    "receive": "Receive",
+    "edit_amount": "Edit Amount",
+    "bitcoin_invoice": "Bitcoin Invoice",
+    "invoice_address": "Invoice Address"
 }
