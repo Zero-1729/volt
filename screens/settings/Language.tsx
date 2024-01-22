@@ -16,6 +16,8 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
 import {AppStorageContext} from '../../class/storageContext';
 
 import {PlainButton} from '../../components/button';
@@ -33,6 +35,8 @@ const Language = () => {
 
     const tailwind = useTailwind();
 
+    const {t, i18n} = useTranslation('settings');
+
     const HeadingBar = {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
@@ -47,6 +51,8 @@ const Language = () => {
                 onPress={() => {
                     RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
 
+                    // Change local language in i18n and store
+                    i18n.changeLanguage(item.code);
                     setAppLanguage(item);
                 }}>
                 <View
