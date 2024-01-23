@@ -10,10 +10,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
-import DayJS from 'dayjs';
-import calendar from 'dayjs/plugin/calendar';
-DayJS.extend(calendar);
-
 import {useTranslation} from 'react-i18next';
 
 import VText from '../../components/text';
@@ -227,9 +223,7 @@ const Currency = () => {
 
                     <View style={[tailwind('w-full items-center mt-2')]}>
                         <VText style={[{color: ColorScheme.Text.GrayedText}]}>
-                            {`${t('last_updated')} ${DayJS(
-                                fiatRate.lastUpdated,
-                            ).calendar()}`}
+                            {t('last_updated', {date: fiatRate.lastUpdated})}
                         </VText>
                     </View>
                 </View>
