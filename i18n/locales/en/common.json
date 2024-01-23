@@ -14,7 +14,7 @@
     "close": "close",
     "clear": "clear",
     "sat_vbyte": "sats/vB",
-    "satoshi": "satoshi",
+    "satoshi": "sats",
     "bitcoin": "bitcoin",
     "edit": "edit",
     "copy": "copy",
@@ -30,6 +30,8 @@
     "no": "no",
     "back": "back",
     "connect": "connect",
+    "max": "max",
+    "export": "export",
     "note": "note",
     "copied_to_clipboard": "copied to clipboard",
     "transaction": "transaction",
@@ -45,5 +47,13 @@
     "tools": "tools",
     "beta": "beta",
     "warning": "warning",
-    "watch_only": "Watch only"
+    "watch_only": "Watch only",
+    "paste": "paste",
+    "psbt": "psbt",
+    "success": "success",
+    "successful": "successful",
+    "failed": "failed",
+    "status": "status",
+    "unconfirmed": "unconfirmed",
+    "feerate": "feerate"
 }
