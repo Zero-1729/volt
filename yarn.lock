@@ -8152,15 +8152,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-icu@npm:^2.3.0":
-  version: 2.3.0
-  resolution: "i18next-icu@npm:2.3.0"
-  peerDependencies:
-    intl-messageformat: ^10.3.3
-  checksum: da5cbf1fed795921dc903f8bd9129b5ad8ef4c5acd9cdea00c096a2dd4fafc8007cdc0501c11db5f86c7bfda8cde71896f8a4321129ead3557196a76fd4ad2d0
-  languageName: node
-  linkType: hard
-
 "i18next@npm:^23.7.18":
   version: 23.7.18
   resolution: "i18next@npm:23.7.18"
@@ -15388,7 +15379,6 @@ __metadata:
     eslint: 8.19.0
     events: ^3.3.0
     i18next: ^23.7.18
-    i18next-icu: ^2.3.0
     intl-messageformat: ^10.5.10
     jest: ^29.6.2
     junderw-crc32c: ^1.2.0

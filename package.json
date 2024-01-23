@@ -72,7 +72,6 @@
     "electrum-mnemonic": "^2.0.0",
     "events": "^3.3.0",
     "i18next": "^23.7.18",
-    "i18next-icu": "^2.3.0",
     "intl-messageformat": "^10.5.10",
     "junderw-crc32c": "^1.2.0",
     "ledger-bitcoin": "^0.2.3",
