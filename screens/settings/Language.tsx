@@ -1,6 +1,8 @@
 import React, {useContext} from 'react';
 
-import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
+import {StyleSheet, View, FlatList, useColorScheme} from 'react-native';
+
+import VText from '../../components/text';
 
 import languages from '../../i18n/languages';
 
@@ -20,6 +22,8 @@ import {useTranslation} from 'react-i18next';
 
 import {AppStorageContext} from '../../class/storageContext';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
@@ -36,6 +40,8 @@ const Language = () => {
     const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const HeadingBar = {
         height: 2,
@@ -58,18 +64,22 @@ const Language = () => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 self-center items-center flex-row justify-between mt-3 mb-6',
+                            `w-5/6 self-center items-center ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } justify-between mt-3 mb-6 relative`,
                         ),
                         index === 0 ? styles.paddedTop : {},
                     ]}>
-                    <Text
+                    <VText
                         style={[
-                            tailwind('text-sm'),
+                            tailwind('text-sm '),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
                         {item.name}
-                    </Text>
+                    </VText>
 
                     <View
                         style={[
@@ -106,14 +116,14 @@ const Language = () => {
                                 style={tailwind('mr-2')}
                                 fill={ColorScheme.SVG.Default}
                             />
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Settings
-                            </Text>
+                                {capitalizeFirst(t('settings'))}
+                            </VText>
                         </PlainButton>
                     </View>
 
@@ -121,16 +131,22 @@ const Language = () => {
                         style={tailwind('justify-center w-full items-center')}>
                         <View
                             style={[
-                                tailwind('flex-row w-5/6 justify-between'),
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } w-5/6 justify-between`,
+                                ),
                             ]}>
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-2xl mb-4 font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Language
-                            </Text>
+                                {capitalizeFirst(t('language'))}
+                            </VText>
 
                             {/* Highlight current select language here */}
                             <View
@@ -143,7 +159,7 @@ const Language = () => {
                                             ColorScheme.Background.Inverted,
                                     },
                                 ]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm font-bold'),
                                         {
@@ -156,7 +172,7 @@ const Language = () => {
                                     {/* We simply parse the language object */}
                                     {/* and display the language name meta for user context */}
                                     {appLanguage.name}
-                                </Text>
+                                </VText>
                             </View>
                         </View>
 

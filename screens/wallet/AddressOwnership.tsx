@@ -8,6 +8,8 @@ import {
     TextInput,
 } from 'react-native';
 
+import VText from '../../components/text';
+
 import {AppStorageContext} from '../../class/storageContext';
 
 import {CommonActions, useNavigation} from '@react-navigation/native';
@@ -22,6 +24,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
+import {useTranslation} from 'react-i18next';
+
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 
@@ -34,6 +38,8 @@ import Close from '../../assets/svg/x-24.svg';
 import {WalletParamList} from '../../Navigation';
 import {errorAlert} from '../../components/alert';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 type Props = NativeStackScreenProps<WalletParamList, 'AddressOwnership'>;
 
 const AddressOwnership = ({route}: Props) => {
@@ -43,6 +49,9 @@ const AddressOwnership = ({route}: Props) => {
 
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
+
+    const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors'); 
 
     const navigation = useNavigation();
 
@@ -64,7 +73,11 @@ const AddressOwnership = ({route}: Props) => {
 
     const checkAddressOwnership = async () => {
         if (!checkNetworkIsReachable(networkState)) {
-            errorAlert('Network', 'Cannot connect to Internet.');
+            errorAlert(
+                capitalizeFirst(t('network')),
+                e('no_internet_message'),
+                capitalizeFirst(t('cancel')),
+            );
             return;
         }
 
@@ -76,7 +89,7 @@ const AddressOwnership = ({route}: Props) => {
                 ? ENet.Testnet
                 : ENet.Bitcoin;
 
-        setResultMessage('Scanning wallet addresses...');
+        setResultMessage(t('scanning_addresses'));
 
         try {
             let _w = await createBDKWallet(wallet as TComboWallet);
@@ -88,12 +101,17 @@ const AddressOwnership = ({route}: Props) => {
             const isOwnedByYou = await _w.isMine(script);
 
             if (isOwnedByYou) {
-                setResultMessage('Address is owned by this wallet');
+                setResultMessage(t('wallet_is_owner'));
             } else {
-                setResultMessage('Address is not owned by this wallet');
+                setResultMessage(t('wallet_is_not_owner'));
             }
-        } catch (e: any) {
-            errorAlert('Network', e.message);
+        } catch (err: any) {
+            // TODO: translate error
+            errorAlert(
+                capitalizeFirst(t('network')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
         }
 
         setLoading(false);
@@ -140,7 +158,7 @@ const AddressOwnership = ({route}: Props) => {
                             tailwind('text-lg font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Address Ownership
+                        {t('address_ownership')}
                     </Text>
 
                     <PlainButton
@@ -154,23 +172,20 @@ const AddressOwnership = ({route}: Props) => {
 
                 {/* Content */}
                 <View style={tailwind('mt-20 w-5/6')}>
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-sm text-justify'),
                             {color: ColorScheme.Text.GrayedText},
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            INFO:
-                        </Text>{' '}
-                        This tool allows you to check whether an address is
-                        owned by this wallet or not. If there is a match, the
-                        tool will also indicate whether this wallet has the key
-                        material to spend from the address.
-                    </Text>
+                            {`${capitalizeFirst(t('info'))}:`}
+                        </VText>{' '}
+                        {t('address_ownership_description')}
+                    </VText>
                 </View>
 
                 {/* Input */}
@@ -181,7 +196,7 @@ const AddressOwnership = ({route}: Props) => {
                     ]}>
                     <TextSingleInput
                         refs={addressInputRef}
-                        placeholder="Enter an address here..."
+                        placeholder={t('address_ownership_placeholder')}
                         placeholderTextColor={ColorScheme.Text.GrayedText}
                         isEnabled={true}
                         color={ColorScheme.Text.Default}
@@ -213,7 +228,11 @@ const AddressOwnership = ({route}: Props) => {
                 <LongBottomButton
                     disabled={loading}
                     style={[tailwind('mt-12 w-full items-center')]}
-                    title={resultMessage.includes('Address') ? 'Clear' : 'Check Address'}
+                    title={
+                        resultMessage.includes('Address')
+                            ? capitalizeFirst(t('clear'))
+                            : t('check_address')
+                    }
                     onPress={handleButtonCheck}
                     textColor={
                         address.trim().length > 0

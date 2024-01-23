@@ -12,6 +12,8 @@ import QRCodeStyled from 'react-native-qrcode-styled';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
 
@@ -29,6 +31,8 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import {conservativeAlert} from '../../components/alert';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 const Xpub = () => {
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -36,6 +40,9 @@ const Xpub = () => {
 
     const {currentWalletID, getWalletData, isAdvancedMode} =
         useContext(AppStorageContext);
+
+    const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     const walletData = getWalletData(currentWalletID);
     const [backupData, setBackupData] = useState<string>(walletData.xpub);
@@ -53,17 +60,34 @@ const Xpub = () => {
         const fileBackupData = walletData.xpub;
 
         if (Platform.OS === 'ios') {
-            await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
-                conservativeAlert('Error', e.message);
-            });
+            await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(
+                err => {
+                    conservativeAlert(
+                        capitalizeFirst(t('error')),
+                        e('failed_to_write_file'),
+                        capitalizeFirst(t('cancel')),
+                    );
+
+                    console.log('[Export] Failed to write file: ', err.message);
+                },
+            );
             await Share.open({
                 url: 'file://' + pathData,
                 type: 'text/plain',
                 title: 'Volt Wallet Descriptor Xpub',
             })
-                .catch(e => {
-                    if (e.message !== 'User did not share') {
-                        conservativeAlert('Error', e.message);
+                .catch(err => {
+                    if (err.message !== 'User did not share') {
+                        conservativeAlert(
+                            capitalizeFirst(t('error')),
+                            e('failed_to_share_file'),
+                            capitalizeFirst(t('cancel')),
+                        );
+
+                        console.log(
+                            '[Share] Failed to share file: ',
+                            err.message,
+                        );
                     }
                 })
                 .finally(() => {
@@ -82,16 +106,15 @@ const Xpub = () => {
         // and revert after a few seconds
         Clipboard.setString(walletData.xpub);
 
-        setBackupData('Copied to clipboard');
+        setBackupData(capitalizeFirst(t('copied_to_clipboard')));
 
         setTimeout(() => {
             setBackupData(walletData.xpub);
         }, 450);
     };
 
-    const info =
-        'Keep your wallet safe to protect your funds. Please, write down and secure this backup material.';
-    const warning = 'Do not screenshot or share with anyone.';
+    const info = t('backup_description');
+    const warning = t('backup_clarification');
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -154,7 +177,9 @@ const Xpub = () => {
                                 tailwind('text-base self-center mb-10'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {isAdvancedMode ? walletTypeName : 'Backup'}
+                            {isAdvancedMode
+                                ? walletTypeName
+                                : capitalizeFirst(t('backup'))}
                         </Text>
                     </View>
 
@@ -242,7 +267,7 @@ const Xpub = () => {
                                 tailwind('text-sm text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            <Text>{warning}</Text>
+                            {warning}
                         </Text>
                     </View>
                 </View>
@@ -255,6 +280,6 @@ export default Xpub;
 
 const styles = StyleSheet.create({
     infoContainer: {
-        bottom: NativeWindowMetrics.bottom,
+        bottom: NativeWindowMetrics.bottom + 24,
     },
 });

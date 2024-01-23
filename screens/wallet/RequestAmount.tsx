@@ -8,6 +8,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
 import BigNumber from 'bignumber.js';
 
 import Color from '../../constants/Color';
@@ -18,7 +20,7 @@ import Close from '../../assets/svg/x-24.svg';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
-import {formatFiat} from '../../modules/transform';
+import {capitalizeFirst, formatFiat} from '../../modules/transform';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -35,6 +37,8 @@ const RequestAmount = () => {
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
+
+    const {t} = useTranslation('wallet');
 
     const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
 
@@ -188,7 +192,7 @@ const RequestAmount = () => {
                             tailwind('text-sm text-center w-full font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Receive
+                        {capitalizeFirst(t('receive'))}
                     </Text>
                 </View>
 
@@ -263,7 +267,9 @@ const RequestAmount = () => {
                                     },
                                 ]}>
                                 {/* TODO: fix polarity fn to avoid clearing amount and persist shown values to receive screen. ATM skip is shown despite satsAmount and fiatAmount still showing */}
-                                {amount === '' ? 'Skip' : 'Continue'}
+                                {amount === ''
+                                    ? capitalizeFirst(t('skip'))
+                                    : capitalizeFirst(t('continue'))}
                             </Text>
                         </View>
                     </PlainButton>

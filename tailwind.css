@@ -34,6 +34,10 @@
   left: 0px
 }
 
+.left-4 {
+  left: 1rem
+}
+
 .left-6 {
   left: 1.5rem
 }
@@ -96,6 +100,11 @@
 
 .m-1 {
   margin: 0.25rem
+}
+
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem
 }
 
 .mx-6 {
@@ -176,6 +185,10 @@
   margin-left: 0.25rem
 }
 
+.ml-2 {
+  margin-left: 0.5rem
+}
+
 .ml-4 {
   margin-left: 1rem
 }
@@ -186,10 +199,6 @@
 
 .mr-1 {
   margin-right: 0.25rem
-}
-
-.mr-16 {
-  margin-right: 4rem
 }
 
 .mr-2 {
@@ -378,6 +387,10 @@
 
 .flex-row {
   flex-direction: row
+}
+
+.flex-row-reverse {
+  flex-direction: row-reverse
 }
 
 .flex-wrap {
@@ -585,8 +598,8 @@
   padding-left: 2rem
 }
 
-.pl-9 {
-  padding-left: 2.25rem
+.pr-8 {
+  padding-right: 2rem
 }
 
 .pt-4 {

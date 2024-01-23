@@ -1,7 +1,9 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useRef} from 'react';
-import {Text, useColorScheme, View, TextInput} from 'react-native';
+import {useColorScheme, View, TextInput} from 'react-native';
+
+import VText from '../../../components/text';
 
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
@@ -11,6 +13,8 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
+
+import {useTranslation} from 'react-i18next';
 
 import {LongBottomButton, PlainButton} from '../../../components/button';
 import {TextSingleInput} from '../../../components/input';
@@ -31,11 +35,16 @@ import {errorAlert} from '../../../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {EBackupMaterial} from '../../../types/enums';
+import {capitalizeFirst} from '../../../modules/transform';
 
 const ExtendedKey = () => {
     const [resultMessageText, setResulteMessageText] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [xkey, setXKey] = useState('');
+
+    const {t, i18n} = useTranslation('settings');
+    const {t: e} = useTranslation('errors');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const xKeyVersionsSet = [];
     for (const item of supportedExtVersions) {
@@ -66,7 +75,7 @@ const ExtendedKey = () => {
     const copyXpubToClipboard = () => {
         Clipboard.setString(resultMessage);
 
-        setResulteMessageText('Copied to clipboard!');
+        setResulteMessageText(capitalizeFirst(t('copied_to_clipboard!')));
 
         setTimeout(() => {
             setResulteMessageText(resultMessage);
@@ -87,8 +96,13 @@ const ExtendedKey = () => {
 
         try {
             extKeyPrefix = getExtendedKeyPrefix(xkey);
-        } catch (e: any) {
-            errorAlert('Error', e.message);
+        } catch (err: any) {
+            // TODO: translate error
+            errorAlert(
+                capitalizeFirst(e('error')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
             return;
         }
 
@@ -97,12 +111,20 @@ const ExtendedKey = () => {
             extKeyPrefix !== EBackupMaterial.Xpub &&
             extKeyPrefix !== EBackupMaterial.Xprv
         ) {
-            errorAlert('Error', 'Please provide an extended key');
+            errorAlert(
+                capitalizeFirst(e('error')),
+                e('give_ext_key_error'),
+                capitalizeFirst(t('cancel')),
+            );
             return;
         }
 
         if (!isValidExtendedKey(xkey, true)) {
-            errorAlert('Error', 'Please provide a valid extended key');
+            errorAlert(
+                capitalizeFirst(e('error')),
+                e('invalid_ext_key_error'),
+                capitalizeFirst(t('cancel')),
+            );
             return;
         }
 
@@ -115,8 +137,8 @@ const ExtendedKey = () => {
 
             setResultMessage(key);
             setResulteMessageText(key);
-        } catch (e: any) {
-            errorAlert('Extended Key', e);
+        } catch (err: any) {
+            errorAlert(t('ext_key'), err.message, capitalizeFirst(t('cancel')));
         }
     };
 
@@ -154,16 +176,20 @@ const ExtendedKey = () => {
                 <View
                     style={[
                         tailwind(
-                            'flex-row items-center justify-center relative mt-6 w-5/6',
+                            `${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } items-center justify-center relative mt-6 w-5/6`,
                         ),
                     ]}>
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-lg font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Extended Key Converter
-                    </Text>
+                        {t('ext_key_converter')}
+                    </VText>
 
                     <PlainButton
                         style={[tailwind('absolute right-0 top-0')]}
@@ -176,14 +202,13 @@ const ExtendedKey = () => {
 
                 {/* Content */}
                 <View style={tailwind('mt-20 w-5/6')}>
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-sm'),
                             {color: ColorScheme.Text.GrayedText},
                         ]}>
-                        This tool allows you to convert extended keys between
-                        different versions.
-                    </Text>
+                        {t('ext_key_converter_description')}
+                    </VText>
                 </View>
 
                 {/* Input */}
@@ -194,7 +219,7 @@ const ExtendedKey = () => {
                     ]}>
                     <TextSingleInput
                         refs={inputTextRef}
-                        placeholder="Enter an extended key here..."
+                        placeholder={t('ext_key_converter_placeholder')}
                         placeholderTextColor={ColorScheme.Text.GrayedText}
                         isEnabled={true}
                         color={ColorScheme.Text.Default}
@@ -205,13 +230,13 @@ const ExtendedKey = () => {
 
                 {/* Dropdown */}
                 <View style={[tailwind('mt-6 w-5/6 self-center z-50')]}>
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-sm'),
                             {color: ColorScheme.Text.DescText},
                         ]}>
-                        Select Version
-                    </Text>
+                        {t('select_version')}
+                    </VText>
 
                     <DropDownPicker
                         style={[
@@ -252,13 +277,13 @@ const ExtendedKey = () => {
                 {/* Result */}
                 {resultMessageText.length > 0 ? (
                     <View style={[tailwind('mt-8 w-5/6')]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-sm mb-4'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            Converted extended public key:
-                        </Text>
+                            {t('converted_xpub_text')}
+                        </VText>
 
                         <PlainButton
                             style={[
@@ -271,13 +296,13 @@ const ExtendedKey = () => {
                             onPress={() => {
                                 copyXpubToClipboard();
                             }}>
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
                                 {resultMessageText}
-                            </Text>
+                            </VText>
                         </PlainButton>
                     </View>
                 ) : (
@@ -287,7 +312,11 @@ const ExtendedKey = () => {
                 {/* Converter Button */}
                 <LongBottomButton
                     style={[tailwind('mt-12 w-full items-center')]}
-                    title={`${resultMessage ? 'Clear' : 'Convert'}`}
+                    title={`${
+                        resultMessage
+                            ? capitalizeFirst(t('clear'))
+                            : capitalizeFirst(t('convert'))
+                    }`}
                     onPress={handleButtonPress}
                     disabled={xkey.trim().length === 0}
                     textColor={

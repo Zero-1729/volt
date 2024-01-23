@@ -8,6 +8,8 @@ import {useNavigation} from '@react-navigation/core';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
 import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
@@ -21,6 +23,8 @@ const Release = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('settings');
 
     const navigation = useNavigation();
 
@@ -62,7 +66,7 @@ const Release = () => {
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
-                        Release Notes
+                        {t('release_notes')}
                     </Text>
                 </View>
 

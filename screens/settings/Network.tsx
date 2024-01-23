@@ -2,7 +2,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useEffect, useState} from 'react';
 
-import {StyleSheet, Text, View, useColorScheme} from 'react-native';
+import {StyleSheet, View, useColorScheme} from 'react-native';
+
+import VText from '../../components/text';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -13,6 +15,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
+
+import {useTranslation} from 'react-i18next';
 
 import {getBlockHeight} from '../../modules/bdk';
 
@@ -31,12 +35,17 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 const Network = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t, i18n} = useTranslation('settings');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const HeadingBar = {
         height: 2,
@@ -115,27 +124,27 @@ const Network = () => {
                                 style={tailwind('mr-2')}
                                 fill={ColorScheme.SVG.Default}
                             />
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Settings
-                            </Text>
+                                {capitalizeFirst(t('settings'))}
+                            </VText>
                         </PlainButton>
                     </View>
 
                     <View
                         style={tailwind('justify-center w-full items-center')}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-2xl mb-4 w-5/6 font-medium'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Network
-                        </Text>
+                            {capitalizeFirst(t('network'))}
+                        </VText>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
                     </View>
@@ -148,26 +157,42 @@ const Network = () => {
                         <View style={tailwind('w-5/6')}>
                             <View
                                 style={tailwind(
-                                    'w-full flex-row items-center mb-2',
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center mb-2`,
                                 )}>
-                                <Text
+                                <VText
                                     style={[
-                                        tailwind('text-sm font-medium mr-4'),
+                                        tailwind(
+                                            `text-sm font-medium ${
+                                                langDir === 'right'
+                                                    ? ''
+                                                    : 'mr-4'
+                                            }`,
+                                        ),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Electrum Server
-                                </Text>
+                                    {t('electrum_server')}
+                                </VText>
 
                                 <View
                                     style={[
-                                        tailwind('rounded-full'),
+                                        tailwind(
+                                            `rounded-full ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : ''
+                                            }`,
+                                        ),
                                         {
                                             backgroundColor: status
                                                 ? 'lightgreen'
                                                 : '#ff4e4a',
                                         },
                                     ]}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind(
                                                 'text-xs font-bold p-1 px-4',
@@ -178,18 +203,22 @@ const Network = () => {
                                                     : 'black',
                                             },
                                         ]}>
-                                        {status ? 'Connected' : 'Disconnected'}
-                                    </Text>
+                                        {status
+                                            ? capitalizeFirst(t('connected'))
+                                            : capitalizeFirst(
+                                                  t('disconnected'),
+                                              )}
+                                    </VText>
                                 </View>
                             </View>
 
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm mb-2 italic'),
                                     {color: ColorScheme.Text.GrayText},
                                 ]}>
                                 {`${electrumServerURL.bitcoin}`}
-                            </Text>
+                            </VText>
                         </View>
                     </View>
 
@@ -201,15 +230,19 @@ const Network = () => {
                         <View style={tailwind('w-5/6')}>
                             <View
                                 style={tailwind(
-                                    'w-full flex-row items-center mb-4',
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center mb-4`,
                                 )}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm font-medium mr-4'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Custom Electrum Server
-                                </Text>
+                                    {t('custom_electrum_server')}
+                                </VText>
 
                                 {/* Save button */}
                                 <PlainButton
@@ -239,13 +272,13 @@ const Network = () => {
                                             RNHapticFeedbackOptions,
                                         );
                                     }}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind('text-xs font-bold'),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Save
-                                    </Text>
+                                        {capitalizeFirst(t('save'))}
+                                    </VText>
                                 </PlainButton>
                             </View>
 
@@ -262,6 +295,7 @@ const Network = () => {
                                     },
                                 ]}>
                                 <TextSingleInput
+                                    noTrans={true}
                                     value={url}
                                     placeholder="ssl://..."
                                     placeholderTextColor={
@@ -274,21 +308,21 @@ const Network = () => {
                                 />
                             </View>
 
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-xs'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-xs'),
                                         {color: ColorScheme.Text.DescText},
                                     ]}>
-                                    Warning:
-                                </Text>{' '}
-                                using a public server makes all your
-                                transactions visible to them.
-                            </Text>
+                                    {capitalizeFirst(t('warning'))}
+                                    {':'}
+                                </VText>{' '}
+                                {t('default_testnet_warn')}
+                            </VText>
                         </View>
                     </View>
 
@@ -300,15 +334,19 @@ const Network = () => {
                         <View style={tailwind('w-5/6')}>
                             <View
                                 style={tailwind(
-                                    'w-full flex-row items-center mb-2',
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center mb-2`,
                                 )}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm font-medium'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Default to Testnet
-                                </Text>
+                                    {t('default_testnet')}
+                                </VText>
                                 <Checkbox
                                     fillColor={
                                         ColorScheme.Background.CheckBoxFilled
@@ -345,15 +383,13 @@ const Network = () => {
                             </View>
 
                             <View style={tailwind('w-full')}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-xs'),
                                         {color: ColorScheme.Text.DescText},
                                     ]}>
-                                    Restore and create wallets with mnemonics
-                                    (12-24 words) to testnet. Toggling off will
-                                    default to bitcoin mainnet.
-                                </Text>
+                                    {t('default_testnet_description')}
+                                </VText>
                             </View>
                         </View>
                     </View>

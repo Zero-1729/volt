@@ -22,6 +22,8 @@ import {PartiallySignedTransaction} from 'bdk-rn';
 import {getPrivateDescriptors} from '../../modules/descriptors';
 import {TComboWallet} from '../../types/wallet';
 
+import {useTranslation} from 'react-i18next';
+
 import Dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import LocalizedFormat from 'dayjs/plugin/localizedFormat';
@@ -33,6 +35,7 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 import NativeOffsets from '../../constants/NativeWindowMetrics';
 
+import {capitalizeFirst} from '../../modules/transform';
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
@@ -57,6 +60,8 @@ const TransactionStatus = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
+    const {t} = useTranslation('wallet');
+
     const {electrumServerURL, isAdvancedMode} = useContext(AppStorageContext);
 
     const [statusMessage, setStatusMessage] = useState('');
@@ -79,7 +84,7 @@ const TransactionStatus = ({route}: Props) => {
         );
     };
 
-    const buttonText = isAdvancedMode ? 'View on Mempool.space' : 'See more';
+    const buttonText = isAdvancedMode ? t('view_on_mempool') : t('see_more');
 
     // Start process of tx build and send
     useLayoutEffect(() => {
@@ -105,7 +110,7 @@ const TransactionStatus = ({route}: Props) => {
             wallet as TComboWallet,
             electrumServerURL,
             (msg: string) => {
-                setStatusMessage(msg);
+                setStatusMessage(t(msg));
             },
         );
 
@@ -183,7 +188,7 @@ const TransactionStatus = ({route}: Props) => {
                                 ),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Status
+                            {capitalizeFirst(t('status'))}
                         </Text>
 
                         <View
@@ -219,8 +224,8 @@ const TransactionStatus = ({route}: Props) => {
                                         {color: ColorScheme.Text.Default},
                                     ]}>
                                     {statusInfo.status === 'success'
-                                        ? 'Transaction sent'
-                                        : 'Transaction failed to send'}
+                                        ? t('tx_sent')
+                                        : t('tx_failed')}
                                 </Text>
                             </View>
 
@@ -286,7 +291,7 @@ const TransactionStatus = ({route}: Props) => {
                                         }),
                                     );
                                 }}
-                                title={'Back to Wallet'}
+                                title={t('back_to_wallet')}
                                 textColor={ColorScheme.Text.Alt}
                                 backgroundColor={
                                     ColorScheme.Background.Inverted

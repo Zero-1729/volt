@@ -41,17 +41,26 @@ import {
 } from '../../components/button';
 import {FiatBalance} from '../../components/balance';
 
+import {useTranslation} from 'react-i18next';
+
 import CloseIcon from '../../assets/svg/x-24.svg';
 import Success from '../../assets/svg/check-circle-fill-24.svg';
 import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
 const TransactionDetailsView = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
+
+    const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const bumpFeeRef = useRef<BottomSheetModal>(null);
     const [openBump, setOpenBump] = useState(-1);
@@ -62,7 +71,7 @@ const TransactionDetailsView = ({route}: Props) => {
 
     const [txIdText, setTxIdText] = React.useState<string>('');
 
-    const buttonText = isAdvancedMode ? 'View on Mempool.space' : 'See more';
+    const buttonText = isAdvancedMode ? t('view_on_mempool') : t('see_more');
 
     const displayFeeBump = !route.params.tx.confirmed && route.params.tx.rbf;
 
@@ -85,7 +94,11 @@ const TransactionDetailsView = ({route}: Props) => {
         let isConfirmedAlready = status.errorMessage.includes('confirmed');
 
         if (isConfirmedAlready) {
-            conservativeAlert('Warning', 'Transaction already confirmed');
+            conservativeAlert(
+                capitalizeFirst(t('warning')),
+                e('tx_already_confirmed_error'),
+                capitalizeFirst(t('cancel')),
+            );
         }
 
         if (status.broadcasted || isConfirmedAlready) {
@@ -101,9 +114,12 @@ const TransactionDetailsView = ({route}: Props) => {
         } else {
             // show error alert
             conservativeAlert(
-                'Error',
-                `Could not bump fee. ${status.errorMessage}`,
+                capitalizeFirst(t('error')),
+                e('bump_fee_error'),
+                capitalizeFirst(t('cancel')),
             );
+
+            console.log('[Fee Bump] Could not bump fee: ', status.errorMessage);
         }
     };
 
@@ -131,7 +147,7 @@ const TransactionDetailsView = ({route}: Props) => {
         // and revert after a few seconds
         Clipboard.setString(route.params.tx.txid);
 
-        setTxIdText('Copied Transaction Id!');
+        setTxIdText(t('copied_tx_id'));
 
         setTimeout(() => {
             setTxIdText('');
@@ -146,14 +162,18 @@ const TransactionDetailsView = ({route}: Props) => {
             ? ['top', 'bottom', 'left', 'right']
             : ['bottom', 'right', 'left'];
 
+    const confirmationCount =
+        route.params.tx.confirmations > 6
+            ? '6+'
+            : capitalizeFirst(t('unconfirmed'));
     const confirmationText = route.params.tx.confirmed
         ? `${
-              route.params.tx.confirmations > 6
-                  ? '6+'
-                  : route.params.tx.confirmations
-          } confirmation${route.params.tx.confirmations === 1 ? '' : 's'}`
+              route.params.tx.confirmations === 1
+                  ? t('confirmation')
+                  : t('confirmations')
+          }`
         : isAdvancedMode
-        ? 'Waiting in Mempool'
+        ? t('waiting_in_mempool')
         : '';
 
     return (
@@ -182,7 +202,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             ),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Summary
+                        {t('summary')}
                     </Text>
 
                     <Text
@@ -194,7 +214,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         ]}>
                         {route.params.tx.confirmed
                             ? getTxTimestamp(route.params.tx.timestamp)
-                            : 'Pending confirmation'}
+                            : t('pending')}
                     </Text>
 
                     <View
@@ -260,27 +280,52 @@ const TransactionDetailsView = ({route}: Props) => {
                                                 color: ColorScheme.Text.Default,
                                             },
                                         ]}>
-                                        Fee boost transaction
+                                        {t('fee_boost_tx')}
                                     </Text>
                                 </View>
                             ) : (
                                 <></>
                             )}
                         </View>
-                        <Text
+                        <View
                             style={[
                                 tailwind(
-                                    `text-sm text-center ${
-                                        route.params.tx.isSelfOrBoost &&
-                                        isAdvancedMode
-                                            ? 'mt-1 mb-2'
-                                            : ''
+                                    `justify-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
                                     }`,
                                 ),
-                                {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            {confirmationText}
-                        </Text>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        `text-sm mx-1 text-center ${
+                                            route.params.tx.isSelfOrBoost &&
+                                            isAdvancedMode
+                                                ? 'mt-1 mb-2'
+                                                : ''
+                                        }`,
+                                    ),
+                                    {color: ColorScheme.Text.GrayedText},
+                                ]}>
+                                {confirmationText}
+                            </Text>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        `text-sm text-center ${
+                                            route.params.tx.isSelfOrBoost &&
+                                            isAdvancedMode
+                                                ? 'mt-1 mb-2'
+                                                : ''
+                                        }`,
+                                    ),
+                                    {color: ColorScheme.Text.GrayedText},
+                                ]}>
+                                {confirmationCount}
+                            </Text>
+                        </View>
 
                         {/* Transaction type flags for RBF and CPFP */}
                         {isAdvancedMode && route.params.tx.rbf ? (
@@ -329,7 +374,7 @@ const TransactionDetailsView = ({route}: Props) => {
                                                     .GrayText,
                                             },
                                         ]}>
-                                        RBF Enabled
+                                        {`RBF ${t('enabled')}`}
                                     </Text>
                                 </View>
                             </View>
@@ -529,7 +574,7 @@ const TransactionDetailsView = ({route}: Props) => {
                                 },
                             ]}>
                             <LongButton
-                                title={'Bump Fee'}
+                                title={t('bump_fee')}
                                 textColor={ColorScheme.Text.Default}
                                 backgroundColor={ColorScheme.Background.Greyed}
                                 onPress={openBumpFee}

@@ -4,6 +4,8 @@ import {Text, View, TextInput, useColorScheme, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import VText from '../../components/text';
+
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
@@ -11,12 +13,15 @@ import {PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
 import {DeletionAlert, liberalAlert} from '../../components/alert';
 
+import {useTranslation} from 'react-i18next';
+
 import {useTailwind} from 'tailwind-rn';
 
 import Color from '../../constants/Color';
 
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
+import Left from './../../assets/svg/chevron-left-24.svg';
 
 import {AppStorageContext} from '../../class/storageContext';
 import {
@@ -27,11 +32,16 @@ import {getMiniWallet} from '../../modules/wallet-utils';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ENet} from '../../types/enums';
+import {capitalizeFirst} from '../../modules/transform';
 
 const Info = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     // To control input elm
     const nameInput = useRef<TextInput>();
@@ -76,7 +86,7 @@ const Info = () => {
     const copyPathToClipboard = () => {
         Clipboard.setString(walletPath);
 
-        setWalletPathText('Copied to clipboard');
+        setWalletPathText(capitalizeFirst(t('copied_to_clipboard')));
 
         setTimeout(() => {
             setWalletPathText(walletPath);
@@ -86,7 +96,7 @@ const Info = () => {
     const copyFingerToClipboard = () => {
         Clipboard.setString(walletFingerprint);
 
-        setWalletFingerprintText('Copied to clipboard');
+        setWalletFingerprintText(capitalizeFirst(t('copied_to_clipboard')));
 
         setTimeout(() => {
             setWalletFingerprintText(walletFingerprintText);
@@ -106,18 +116,19 @@ const Info = () => {
         // Avoid deletion while loading
         if (loadLock) {
             liberalAlert(
-                'Notice',
-                'Cannot delete wallet, the wallet transactions are still loading.',
-                'Cancel',
+                capitalizeFirst(t('notice')),
+                e('wait_for_wallet_to_load_error'),
+                capitalizeFirst(t('cancel')),
                 true,
             );
             return;
         }
 
         DeletionAlert(
-            'Delete Wallet',
-            'Are you sure you want to delete this wallet?',
-            'Delete',
+            t('delete_wallet'),
+            e('wallet_delete_warn'),
+            capitalizeFirst(t('delete')),
+            capitalizeFirst(t('cancel')),
             handleDeleteWallet,
         );
     };
@@ -130,8 +141,8 @@ const Info = () => {
 
             // Delete wallet from store
             await deleteWallet(currentWalletID);
-        } catch (e) {
-            console.error('[Wallet Screen] Error deleting wallet: ', e);
+        } catch (err) {
+            console.error('[Wallet Screen] Error deleting wallet: ', err);
         }
     };
 
@@ -187,13 +198,13 @@ const Info = () => {
                 <View style={[tailwind('w-5/6 mt-12'), {marginBottom: 64}]}>
                     <View>
                         <View style={[tailwind('flex flex-row')]}>
-                            <Text
+                            <VText
                                 style={[
-                                    tailwind('text-sm text-left mb-2 mr-1'),
+                                    tailwind('text-sm mb-2 mr-1 w-full'),
                                     {color: 'white'},
                                 ]}>
-                                Name
-                            </Text>
+                                {t('name')}
+                            </VText>
                         </View>
                         <View
                             style={[
@@ -253,15 +264,14 @@ const Info = () => {
                 {/* Wallet Info */}
                 {/* Wallet Type Path and Master Fingerprint */}
                 {isAdvancedMode ? (
-                    <View
-                        style={[tailwind('w-5/6 mb-6 flex-row justify-start')]}>
-                        <View style={[tailwind('w-1/2')]}>
+                    <View style={[tailwind('w-5/6 mb-6 flex-row')]}>
+                        <View style={[tailwind('w-1/2 items-center')]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm mr-16 mb-2'),
+                                    tailwind('text-sm mb-2'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                Derivation Path
+                                {t('derivation_path')}
                             </Text>
 
                             <PlainButton onPress={copyPathToClipboard}>
@@ -275,13 +285,13 @@ const Info = () => {
                             </PlainButton>
                         </View>
 
-                        <View style={[tailwind('w-1/2')]}>
+                        <View style={[tailwind('w-1/2 items-center')]}>
                             <Text
                                 style={[
                                     tailwind('text-sm mb-2'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                Master Fingerprint
+                                {t('master_fingerprint')}
                             </Text>
 
                             <PlainButton onPress={copyFingerToClipboard}>
@@ -302,13 +312,13 @@ const Info = () => {
                 {/* Wallet Network and Type */}
                 {isAdvancedMode ? (
                     <View style={[tailwind('w-5/6 flex-row justify-start')]}>
-                        <View style={[tailwind('w-1/2')]}>
+                        <View style={[tailwind('w-1/2 items-center')]}>
                             <Text
                                 style={[
                                     tailwind('text-sm mb-2'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                Network
+                                {capitalizeFirst(t('network'))}
                             </Text>
 
                             <Text
@@ -320,13 +330,13 @@ const Info = () => {
                             </Text>
                         </View>
 
-                        <View style={[tailwind('w-1/2')]}>
+                        <View style={[tailwind('w-1/2 items-center')]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm mr-16 mb-2'),
+                                    tailwind('text-sm mb-2'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                Type
+                                {t('type')}
                             </Text>
 
                             <Text
@@ -362,22 +372,37 @@ const Info = () => {
                     }}>
                     <View
                         style={[
-                            tailwind('items-center flex-row justify-between'),
+                            tailwind(
+                                `items-center ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } justify-between`,
+                            ),
                         ]}>
                         <Text
                             style={[
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Backup
+                            {capitalizeFirst(t('backup'))}
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
+                            {langDir === 'right' && (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
+                            {langDir === 'left' && (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
                         </View>
                     </View>
                 </PlainButton>
@@ -394,22 +419,37 @@ const Info = () => {
                     }}>
                     <View
                         style={[
-                            tailwind('items-center flex-row justify-between'),
+                            tailwind(
+                                `items-center ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } justify-between`,
+                            ),
                         ]}>
                         <Text
                             style={[
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Show Xpub
+                            {t('show_xpub')}
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
+                            {langDir === 'right' && (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
+                            {langDir === 'left' && (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
                         </View>
                     </View>
                 </PlainButton>
@@ -431,22 +471,37 @@ const Info = () => {
                     }}>
                     <View
                         style={[
-                            tailwind('items-center flex-row justify-between'),
+                            tailwind(
+                                `items-center ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } justify-between`,
+                            ),
                         ]}>
                         <Text
                             style={[
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Check Address Ownership
+                            {t('check_address_ownership')}
                         </Text>
 
                         <View style={[tailwind('items-center')]}>
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
+                            {langDir === 'right' && (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
+                            {langDir === 'left' && (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
                         </View>
                     </View>
                 </PlainButton>
@@ -465,7 +520,7 @@ const Info = () => {
                             tailwind('font-bold'),
                             {color: ColorScheme.Text.Alert},
                         ]}>
-                        Delete
+                        {capitalizeFirst(t('delete'))}
                     </Text>
                 </PlainButton>
             </View>

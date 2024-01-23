@@ -11,6 +11,8 @@ import {AppStorageContext} from './../../class/storageContext';
 
 import {useTranslation} from 'react-i18next';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 import {useTailwind} from 'tailwind-rn';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
@@ -112,7 +114,7 @@ const Intro = () => {
                             }),
                         );
                     }}
-                    title={t('next')}
+                    title={capitalizeFirst(t('next'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />

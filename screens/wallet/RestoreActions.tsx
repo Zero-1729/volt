@@ -3,6 +3,8 @@ import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
 
+import VText from '../../components/text';
+
 import {CommonActions, useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -49,6 +51,8 @@ import {EBackupMaterial, ENet} from '../../types/enums';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AddWalletParamList} from '../../Navigation';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 type Props = NativeStackScreenProps<AddWalletParamList, 'RestoreActions'>;
 
 const ImportAction = ({route}: Props) => {
@@ -58,6 +62,7 @@ const ImportAction = ({route}: Props) => {
     const tailwind = useTailwind();
 
     const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     const {isAdvancedMode, restoreWallet, defaultToTestnet} =
         useContext(AppStorageContext);
@@ -86,20 +91,29 @@ const ImportAction = ({route}: Props) => {
                 const lines = dataByLines.length;
 
                 if (lines > 1) {
-                    conservativeAlert(t('error'), t('import_support_error'));
+                    conservativeAlert(
+                        capitalizeFirst(t('error')),
+                        t('import_support_error'),
+                        capitalizeFirst(t('cancel')),
+                    );
                     return;
                 }
 
                 handleImport(importMaterial);
             })
-            .catch(e => {
-                handleFolderError(e);
+            .catch(err => {
+                handleFolderError(err);
             });
     };
 
-    const handleFolderError = (e: Error) => {
+    const handleFolderError = (err: Error) => {
         // Handle when any error in the folder action is reported
-        conservativeAlert(t('error'), e.message);
+        // TODO: translate error
+        conservativeAlert(
+            capitalizeFirst(t('error')),
+            err.message,
+            capitalizeFirst(t('cancel')),
+        );
 
         return;
     };
@@ -139,8 +153,8 @@ const ImportAction = ({route}: Props) => {
                             name: 'HomeScreen',
                             params: {
                                 restoreMeta: {
-                                    title: 'Restore',
-                                    message: 'Wallet restored successfully',
+                                    title: capitalizeFirst(t('restore')),
+                                    message: t('wallet_restored_message'),
                                     load: true,
                                 },
                             },
@@ -168,7 +182,11 @@ const ImportAction = ({route}: Props) => {
             validateMnenomic(mnemonic);
         } catch {
             // Let user know the mnemonic is valid
-            errorAlert(t('mnemonic'), t('mnemonic_invalid_error'));
+            errorAlert(
+                capitalizeFirst(t('mnemonic')),
+                t('mnemonic_invalid_error'),
+                capitalizeFirst(t('cancel')),
+            );
             return;
         }
 
@@ -181,16 +199,25 @@ const ImportAction = ({route}: Props) => {
             setImportText('');
 
             handleSuccessRoute();
-        } catch (e: any) {
+        } catch (err: any) {
             // Let user know the mnemonic is valid
-            errorAlert(t('mnemonic'), e.message);
+            // TODO: translate error
+            errorAlert(
+                capitalizeFirst(t('mnemonic')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
         }
     };
 
     const handleDescriptor = async (descriptor: string) => {
         try {
             if (!isDescriptorPattern(descriptor)) {
-                errorAlert(t('descriptor'), t('descriptor_valid_error'));
+                errorAlert(
+                    capitalizeFirst(t('descriptor')),
+                    t('descriptor_valid_error'),
+                    capitalizeFirst(t('cancel')),
+                );
 
                 return;
             }
@@ -205,8 +232,12 @@ const ImportAction = ({route}: Props) => {
             setImportText('');
 
             handleSuccessRoute();
-        } catch (e: any) {
-            errorAlert(t('descriptor'), e.message);
+        } catch (err: any) {
+            errorAlert(
+                capitalizeFirst(t('descriptor')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
         }
     };
 
@@ -222,8 +253,12 @@ const ImportAction = ({route}: Props) => {
             setImportText('');
 
             handleSuccessRoute();
-        } catch (e: any) {
-            errorAlert(t('extended_key'), e.message);
+        } catch (err: any) {
+            errorAlert(
+                capitalizeFirst(t('extended_key')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
         }
     };
 
@@ -294,7 +329,7 @@ const ImportAction = ({route}: Props) => {
                 liberalAlert(
                     t('extended_key'),
                     t('unsupported_ext_key'),
-                    t('cancel'),
+                    capitalizeFirst(t('cancel')),
                 );
                 return;
             }
@@ -302,9 +337,13 @@ const ImportAction = ({route}: Props) => {
             // Perform a checksum check
             try {
                 isValidExtendedKey(material);
-            } catch (e: any) {
+            } catch (err: any) {
                 // Report invalid ext key
-                errorAlert(t('extended_key'), e.message);
+                errorAlert(
+                    capitalizeFirst(t('extended_key')),
+                    err.message,
+                    capitalizeFirst(t('cancel')),
+                );
                 return;
             }
 
@@ -314,7 +353,7 @@ const ImportAction = ({route}: Props) => {
             return;
         }
 
-        liberalAlert(t('import'), t('import_material_error'), t('try_again'));
+        liberalAlert(t('import'), e('import_material_error'), t('try_again'));
     };
 
     const importInstructions = isAdvancedMode
@@ -348,21 +387,21 @@ const ImportAction = ({route}: Props) => {
                         </Text>
                     </PlainButton>
 
-                    <Text
+                    <VText
                         style={[
                             tailwind('font-medium text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
                         {t('restore_wallet_title')}
-                    </Text>
-                    <Text
+                    </VText>
+                    <VText
                         style={[
                             tailwind('text-sm mt-2 mb-8'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
                         {t('restore_wallet_description')}
-                    </Text>
+                    </VText>
 
                     <TextMultiInput
                         placeholder={importInstructions}

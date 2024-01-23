@@ -11,6 +11,8 @@ import {
     StyleSheet,
 } from 'react-native';
 
+import VText from '../../components/text';
+
 import {StackActions, useNavigation} from '@react-navigation/core';
 
 import screenOffsets from '../../constants/NativeWindowMetrics';
@@ -47,6 +49,7 @@ import Color from '../../constants/Color';
 import {errorAlert} from '../../components/alert';
 
 import {ENet} from '../../types/enums';
+import {capitalizeFirst} from '../../modules/transform';
 
 const CreateAction = () => {
     const navigation = useNavigation();
@@ -55,7 +58,8 @@ const CreateAction = () => {
 
     const tailwind = useTailwind();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {addWallet, isAdvancedMode, defaultToTestnet, isWalletInitialized} =
         useContext(AppStorageContext);
@@ -124,7 +128,12 @@ const CreateAction = () => {
                 StackActions.push('Mnemonic', {onboarding: onboarding}),
             );
         } catch (e: any) {
-            errorAlert('Alert', e.message);
+            // TODO: translate error
+            errorAlert(
+                capitalizeFirst(t('alert')),
+                e.message,
+                capitalizeFirst(t('cancel')),
+            );
 
             // Revert to make it obvious to user to try again
             setNewWalletName(cachedName);
@@ -174,15 +183,15 @@ const CreateAction = () => {
                         </Text>
                     </PlainButton>
 
-                    <Text
+                    <VText
                         style={[
                             tailwind('font-bold text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         {t('create_title')}
-                    </Text>
+                    </VText>
 
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-xs mt-2'),
                             {color: ColorScheme.Text.GrayText},
@@ -191,10 +200,12 @@ const CreateAction = () => {
                             ? accountInfo[account][
                                   network === ENet.Testnet ? 1 : 0
                               ]
-                            : `{t('create_wallet_defaults_message')} ({t('create_wallet_defaults_message_1')} '${
+                            : `${t('create_wallet_defaults_message')} (${t(
+                                  'create_wallet_defaults_message_1',
+                              )} '${
                                   network === ENet.Testnet ? 'tb1' : 'bc1'
                               }...')`}
-                    </Text>
+                    </VText>
 
                     <View
                         style={[
@@ -214,7 +225,11 @@ const CreateAction = () => {
                             <View
                                 style={[
                                     tailwind(
-                                        'absolute justify-center h-full right-4',
+                                        `absolute justify-center h-full ${
+                                            langDir === 'right'
+                                                ? 'left-4'
+                                                : 'right-4'
+                                        }`,
                                     ),
                                 ]}>
                                 <Text
@@ -230,13 +245,13 @@ const CreateAction = () => {
 
                     {isAdvancedMode ? (
                         <View style={[tailwind('mt-8')]}>
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
                                 {t('select_account_type')}
-                            </Text>
+                            </VText>
 
                             {/* Dropdown */}
                             <DropDownPicker
@@ -278,13 +293,13 @@ const CreateAction = () => {
 
                             {/* Wallet Network */}
                             <View style={[tailwind('mt-10 flex-row')]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
                                     {t('set_testnet')}
-                                </Text>
+                                </VText>
                                 {/* btn */}
                                 <Checkbox
                                     fillColor={
@@ -332,13 +347,13 @@ const CreateAction = () => {
                             tailwind('absolute'),
                             {bottom: screenOffsets.bottomButtonOffset + 72},
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-sm mb-4'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
                             {t('wallet_generation_text')}
-                        </Text>
+                        </VText>
                         <ActivityIndicator />
                     </View>
                 )}

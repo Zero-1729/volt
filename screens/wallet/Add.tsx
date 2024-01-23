@@ -2,6 +2,8 @@ import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
+import VText from '../../components/text';
+
 import {StackActions} from '@react-navigation/native';
 
 import {useNavigation} from '@react-navigation/core';
@@ -67,20 +69,20 @@ const Add = ({route}: Props) => {
                     )}
 
                     <View style={[tailwind('mt-20 mb-10')]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('font-bold text-2xl'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             {t('add_wallet_title')}
-                        </Text>
-                        <Text
+                        </VText>
+                        <VText
                             style={[
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.GrayText},
                             ]}>
                             {t('add_wallet_description')}
-                        </Text>
+                        </VText>
                     </View>
 
                     {/* Import an existing Wallet */}
@@ -93,21 +95,21 @@ const Add = ({route}: Props) => {
                                     ColorScheme.MiscCardColor.ImportCard,
                             },
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('font-bold mt-2 text-white'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             {t('import_title')}
-                        </Text>
+                        </VText>
 
-                        <Text
+                        <VText
                             style={[
                                 tailwind('mt-4 mb-2 text-white text-xs'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
                             {t('import_description')}
-                        </Text>
+                        </VText>
 
                         <View style={[tailwind('items-end')]}>
                             <PlainButton

@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
 
-import {StyleSheet, Text, View, useColorScheme} from 'react-native';
+import {StyleSheet, View, useColorScheme} from 'react-native';
+import VText from '../../components/text';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -17,6 +18,8 @@ import Checkbox from 'react-native-bouncy-checkbox';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
 import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
@@ -26,12 +29,17 @@ import {AppStorageContext} from '../../class/storageContext';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 const Wallet = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t, i18n} = useTranslation('settings');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const HeadingBar = {
         height: 2,
@@ -78,27 +86,27 @@ const Wallet = () => {
                                 style={tailwind('mr-2')}
                                 fill={ColorScheme.SVG.Default}
                             />
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Settings
-                            </Text>
+                                {capitalizeFirst(t('settings'))}
+                            </VText>
                         </PlainButton>
                     </View>
 
                     <View
                         style={tailwind('justify-center w-full items-center')}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-2xl mb-4 w-5/6 font-medium'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Wallet
-                        </Text>
+                            {capitalizeFirst(t('wallet'))}
+                        </VText>
 
                         <View style={[tailwind('w-full'), HeadingBar]} />
 
@@ -110,15 +118,19 @@ const Wallet = () => {
                             <View style={tailwind('w-5/6')}>
                                 <View
                                     style={tailwind(
-                                        'w-full flex-row items-center mb-2',
+                                        `w-full ${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } items-center mb-2`,
                                     )}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind('text-sm font-medium'),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Advanced Mode
-                                    </Text>
+                                        {t('advanced_mode')}
+                                    </VText>
                                     <Checkbox
                                         fillColor={
                                             ColorScheme.Background
@@ -159,15 +171,13 @@ const Wallet = () => {
                                 </View>
 
                                 <View style={tailwind('w-full')}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind('text-xs'),
                                             {color: ColorScheme.Text.DescText},
                                         ]}>
-                                        Expose more advanced options. Only turn
-                                        {'\n'}
-                                        this on if you know what you are doing.
-                                    </Text>
+                                        {t('advanced_mode_description')}
+                                    </VText>
                                 </View>
                             </View>
                         </View>
@@ -176,15 +186,19 @@ const Wallet = () => {
                         <View style={tailwind('w-5/6')}>
                             <View
                                 style={tailwind(
-                                    'w-full flex-row items-center mb-2',
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center mb-2`,
                                 )}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm font-medium'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Hide Total Balance
-                                </Text>
+                                    {t('hide_balance')}
+                                </VText>
                                 <Checkbox
                                     fillColor={
                                         ColorScheme.Background.CheckBoxFilled
@@ -222,15 +236,13 @@ const Wallet = () => {
                                 />
                             </View>
 
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-xs'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                Conceal the total and current wallet balances
-                                {'\n'}
-                                displayed on the home page.
-                            </Text>
+                                {t('hide_balance_description')}
+                            </VText>
                         </View>
 
                         {/* Toggle Multi mode */}
@@ -241,15 +253,19 @@ const Wallet = () => {
                             <View style={tailwind('w-5/6')}>
                                 <View
                                     style={tailwind(
-                                        'w-full flex-row items-center mb-2',
+                                        `w-full ${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } items-center mb-2`,
                                     )}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind('text-sm font-medium'),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Enable Multi Wallet Mode
-                                    </Text>
+                                        {t('enable_multi_wallet')}
+                                    </VText>
                                     <Checkbox
                                         fillColor={
                                             ColorScheme.Background
@@ -290,14 +306,13 @@ const Wallet = () => {
                                 </View>
 
                                 <View style={tailwind('w-full')}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind('text-xs'),
                                             {color: ColorScheme.Text.DescText},
                                         ]}>
-                                        Enable creating and managing multiple
-                                        wallets.
-                                    </Text>
+                                        {t('enable_multi_wallet_description')}
+                                    </VText>
                                 </View>
                             </View>
                         </View>

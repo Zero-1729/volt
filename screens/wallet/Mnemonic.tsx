@@ -35,6 +35,7 @@ const Mnemonic = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     const returnToHome = useCallback(() => {
         // Return home
@@ -126,7 +127,7 @@ const Mnemonic = ({route}: Props) => {
                                 tailwind('text-center'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            {t('mnemonic_warn')}
+                            {e('mnemonic_warn')}
                         </Text>
                     </Text>
                 </View>

@@ -13,6 +13,9 @@ import {useNavigation} from '@react-navigation/core';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+import {capitalizeFirst} from '../../modules/transform';
+
 import Back from './../../assets/svg/arrow-left-24.svg';
 
 import Font from './../../constants/Font';
@@ -26,6 +29,8 @@ const License = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('settings');
 
     const renderItem = ({item}: {item: string | string[]}) => {
         return (
@@ -65,7 +70,7 @@ const License = () => {
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
-                        License
+                        {capitalizeFirst(t('license'))}
                     </Text>
                 </View>
 

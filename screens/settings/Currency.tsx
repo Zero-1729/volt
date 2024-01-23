@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 
-import {StyleSheet, Text, View, FlatList, useColorScheme} from 'react-native';
+import {StyleSheet, View, FlatList, useColorScheme} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -13,6 +13,10 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 import DayJS from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 DayJS.extend(calendar);
+
+import {useTranslation} from 'react-i18next';
+
+import VText from '../../components/text';
 
 import {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
@@ -36,7 +40,7 @@ import Color from '../../constants/Color';
 import {Currencies} from '../../constants/Currency';
 
 import {liberalAlert} from '../../components/alert';
-import {addCommas} from '../../modules/transform';
+import {addCommas, capitalizeFirst} from '../../modules/transform';
 
 const Currency = () => {
     const navigation = useNavigation();
@@ -44,6 +48,10 @@ const Currency = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t, i18n} = useTranslation('settings');
+    const {t: e} = useTranslation('errors');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {appFiatCurrency, setAppFiatCurrency, fiatRate} =
         useContext(AppStorageContext);
@@ -56,9 +64,9 @@ const Currency = () => {
                 onPress={() => {
                     if (!checkNetworkIsReachable(networkState)) {
                         liberalAlert(
-                            'Network',
-                            'Unable to fetch currency data, connect to the Internet',
-                            'Cancel',
+                            capitalizeFirst(t('network')),
+                           e('no_internet_message'),
+                            capitalizeFirst(t('cancel')),
                         );
                         return;
                     }
@@ -69,18 +77,22 @@ const Currency = () => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 self-center items-center flex-row justify-between mt-3 mb-6',
+                            `w-5/6 self-center items-center ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } justify-between mt-3 mb-6`,
                         ),
                         index === 0 ? styles.paddedTop : {},
                     ]}>
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-sm'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
                         {`${item.short} (${item.symbol})`}
-                    </Text>
+                    </VText>
 
                     <View
                         style={[
@@ -117,14 +129,14 @@ const Currency = () => {
                                 style={tailwind('mr-2')}
                                 fill={ColorScheme.SVG.Default}
                             />
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Settings
-                            </Text>
+                                {capitalizeFirst(t('settings'))}
+                            </VText>
                         </PlainButton>
                     </View>
 
@@ -132,16 +144,22 @@ const Currency = () => {
                         style={tailwind('justify-center w-full items-center')}>
                         <View
                             style={[
-                                tailwind('flex-row w-5/6 justify-between'),
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } w-5/6 justify-between`,
+                                ),
                             ]}>
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-2xl mb-4 font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Currency
-                            </Text>
+                                {capitalizeFirst(t('currency'))}
+                            </VText>
 
                             {/* Highlight current select currency here */}
                             <View
@@ -154,7 +172,7 @@ const Currency = () => {
                                             ColorScheme.Background.Inverted,
                                     },
                                 ]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm font-bold'),
                                         {
@@ -165,29 +183,36 @@ const Currency = () => {
                                         Font.RobotoText,
                                     ]}>
                                     {`${appFiatCurrency.short} (${appFiatCurrency.symbol})`}
-                                </Text>
+                                </VText>
                             </View>
                         </View>
 
                         <View
                             style={[
-                                tailwind('text-sm py-4 w-full pl-8'),
+                                tailwind(
+                                    `text-sm py-4 w-full ${
+                                        langDir === 'right' ? 'pr-8' : 'pl-8'
+                                    }`,
+                                ),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                 },
                             ]}>
-                            <Text style={{color: ColorScheme.Text.Default}}>
-                                Price at{' '}
-                                {`${addCommas(fiatRate.rate.toString())} ${
-                                    appFiatCurrency.short
-                                }`}{' '}
-                                on
-                                <Text style={[tailwind('font-bold')]}>
-                                    {' '}
+                            <VText
+                                style={[
+                                    tailwind('text-sm'),
+                                    {
+                                        color: ColorScheme.Text.Default,
+                                    },
+                                ]}>
+                                {`${t('price_at')} ${addCommas(
+                                    fiatRate.rate.toString(),
+                                )} ${appFiatCurrency.short} ${t('price_on')} `}
+                                <VText style={[tailwind('flex font-bold')]}>
                                     {fiatRate.source}
-                                </Text>
-                            </Text>
+                                </VText>
+                            </VText>
                         </View>
                     </View>
 
@@ -201,10 +226,11 @@ const Currency = () => {
                     />
 
                     <View style={[tailwind('w-full items-center mt-2')]}>
-                        <Text style={[{color: ColorScheme.Text.GrayedText}]}>
-                            Last updated{' '}
-                            {DayJS(fiatRate.lastUpdated).calendar()}
-                        </Text>
+                        <VText style={[{color: ColorScheme.Text.GrayedText}]}>
+                            {`${t('last_updated')} ${DayJS(
+                                fiatRate.lastUpdated,
+                            ).calendar()}`}
+                        </VText>
                     </View>
                 </View>
             </View>

@@ -2,6 +2,8 @@
 import React, {useState, useContext} from 'react';
 import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
+import VText from '../../components/text';
+
 import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -9,6 +11,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {AppStorageContext} from '../../class/storageContext';
 
 import {useTranslation} from 'react-i18next';
+
+import {capitalizeFirst} from '../../modules/transform';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -25,7 +29,8 @@ const SelectMode = () => {
 
     const tailwind = useTailwind();
 
-    const {t} = useTranslation('onboarding');
+    const {t, i18n} = useTranslation('onboarding');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {setWalletModeType} = useContext(AppStorageContext);
 
@@ -75,11 +80,23 @@ const SelectMode = () => {
                             }}>
                             <>
                                 <View
-                                    style={[tailwind('flex-row items-center')]}>
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } items-center`,
+                                        ),
+                                    ]}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-sm font-semibold mr-2',
+                                                `text-sm font-semibold ${
+                                                    langDir === 'right'
+                                                        ? 'ml-2'
+                                                        : 'mr-2'
+                                                }`,
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
@@ -95,13 +112,13 @@ const SelectMode = () => {
                                     )}
                                 </View>
 
-                                <Text
+                                <VText
                                     style={[
-                                        tailwind('text-left text-sm mt-4'),
+                                        tailwind('text-sm mt-4'),
                                         {color: ColorScheme.Text.GrayedText},
                                     ]}>
                                     {t('single_mode_description')}
-                                </Text>
+                                </VText>
                             </>
                         </PlainButton>
 
@@ -123,11 +140,23 @@ const SelectMode = () => {
                             }}>
                             <>
                                 <View
-                                    style={[tailwind('flex-row items-center')]}>
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } items-center`,
+                                        ),
+                                    ]}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-sm font-semibold mr-2',
+                                                `text-sm font-semibold ${
+                                                    langDir === 'right'
+                                                        ? 'ml-2'
+                                                        : 'mr-2'
+                                                }`,
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
@@ -143,13 +172,13 @@ const SelectMode = () => {
                                     )}
                                 </View>
 
-                                <Text
+                                <VText
                                     style={[
-                                        tailwind('text-left text-sm mt-4'),
+                                        tailwind('text-sm mt-4'),
                                         {color: ColorScheme.Text.GrayedText},
                                     ]}>
                                     {t('multi_mode_description')}
-                                </Text>
+                                </VText>
                             </>
                         </PlainButton>
                     </View>
@@ -157,7 +186,7 @@ const SelectMode = () => {
 
                 <LongBottomButton
                     onPress={setModeAndRoute}
-                    title={t('done')}
+                    title={capitalizeFirst(t('done'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />

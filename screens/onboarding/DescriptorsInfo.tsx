@@ -10,6 +10,8 @@ import {useTailwind} from 'tailwind-rn';
 
 import {useTranslation} from 'react-i18next';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 import {LongBottomButton} from '../../components/button';
 
 import Volt from './../../assets/svg/btc.svg';
@@ -70,7 +72,7 @@ const DescriptorsInfo = () => {
                             }),
                         );
                     }}
-                    title={t('continue')}
+                    title={capitalizeFirst(t('continue'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />
