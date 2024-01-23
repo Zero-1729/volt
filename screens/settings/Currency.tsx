@@ -65,7 +65,7 @@ const Currency = () => {
                     if (!checkNetworkIsReachable(networkState)) {
                         liberalAlert(
                             capitalizeFirst(t('network')),
-                           e('no_internet_message'),
+                            e('no_internet_message'),
                             capitalizeFirst(t('cancel')),
                         );
                         return;

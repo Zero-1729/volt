@@ -51,7 +51,7 @@ const AddressOwnership = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
-    const {t: e} = useTranslation('errors'); 
+    const {t: e} = useTranslation('errors');
 
     const navigation = useNavigation();
 
