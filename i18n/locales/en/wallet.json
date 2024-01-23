@@ -1,4 +1,6 @@
 {
+    "name": "Name",
+    "type": "Type",
     "add_wallet_title": "Add Wallet",
     "add_wallet_description": "Create a new wallet or restor from a backup",
     "import_title": "Import",

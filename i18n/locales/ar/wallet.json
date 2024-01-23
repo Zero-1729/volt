@@ -1,4 +1,6 @@
 {
+    "name": "الاسم",
+    "type": "النوع",
     "add_wallet_title": "أضف المحفظة",
     "add_wallet_description": "قم بإنشاء محفظة جديدة أو استعادتها من نسخة احتياطية",
     "import_title": "الاستيراد",
