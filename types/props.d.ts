@@ -14,13 +14,14 @@ export type BaseProps = PropsWithChildren<{
 }>;
 
 export type VTextProps = {
-    style: React.CSSProperties | StyleProp<ViewStyle>;
+    style?: React.CSSProperties | StyleProp<ViewStyle>;
     children?: React.ReactNode;
 };
 
 export type AppCard = BaseProps & {
     key: React.Key;
     title: string;
+    titleColor: string;
     description: string;
     icon: React.FC<SvgProps>;
     url: string;
