@@ -14,9 +14,7 @@ import {
     LinkingOptions,
 } from '@react-navigation/native';
 
-import './i18n';
-
-import {useTranslation} from 'react-i18next';
+import i18n from './i18n';
 
 import Privacy from 'react-native-privacy-snapshot';
 
@@ -27,18 +25,19 @@ import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
     const {appLanguage} = useContext(AppStorageContext);
-
-    const {i18n} = useTranslation();
+    console.log('lll: ', appLanguage);
 
     useEffect(() => {
         SplashScreen.hide();
 
         // Enable privacy blur for IOS; blur screen when screen inactive
         Privacy?.enabled(true);
-
-        // Load default language selected by user
-        i18n.changeLanguage(appLanguage.code);
     }, []);
+
+    useEffect(() => {
+        // Load language when app language change
+        i18n.changeLanguage(appLanguage.code);
+    }, [appLanguage]);
 
     const ColorScheme = Color(useColorScheme());
 
