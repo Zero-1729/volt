@@ -9,16 +9,11 @@ A Modern descriptor based Sovereign Bitcoin Wallet
 
 # Features
 
-- [x] Descriptor-based HD wallet (wpkh(), pkh(), sh(wpkh()), tr())
-- [x] Watch Only (public descriptor / extended public key)
-- [x] Multi-wallet support
-- [ ] Multi-lingual
-- [ ] Coin Control
-- [ ] Tor Network Support
-- [ ] Multi-Signature Descriptors
-- [ ] Lightning Network
-- [ ] Hardware Wallets (BitBox)
-- [ ] Nostr key signing & management
+- Descriptor-based HD wallet (wpkh(), pkh(), sh(wpkh()), tr())
+- Watch Only (public descriptor / extended public key)
+- Partially Signed Bitcoin Transactions (PSBTs) and Fee Bumping (RBF)
+- Multi-wallet support
+- Multi-lingual (en, ar)
 
 #### Supported BIPs
 
