@@ -951,7 +951,8 @@ export const SingleBDKSend = async (
     const _w = await createBDKWallet(wallet);
     const uPsbt = await psbtFromJSON(uPsbtBase64);
 
-    statusCallback('creating and signing transaction...');
+    statusCallback('generating_tx');
+
     let signedPsbt!: BDK.PartiallySignedTransaction;
     let broadcasted: boolean = false;
 
