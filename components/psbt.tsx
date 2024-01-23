@@ -1,5 +1,7 @@
 import React, {useMemo} from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import {View, useColorScheme} from 'react-native';
+
+import VText from './text';
 
 import {LongButton} from './button';
 
@@ -8,6 +10,8 @@ import {BottomModal} from './bmodal';
 import Color from '../constants/Color';
 
 import {useTailwind} from 'tailwind-rn';
+import {useTranslation} from 'react-i18next';
+import {capitalizeFirst} from '../modules/transform';
 
 type ExportPsbtProps = {
     exportRef: React.RefObject<BottomSheetModal>;
@@ -18,6 +22,8 @@ type ExportPsbtProps = {
 const ExportPsbt = (props: ExportPsbtProps) => {
     const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['30'], []);
+
+    const {t} = useTranslation('wallet');
 
     const ColorScheme = Color(useColorScheme());
 
@@ -39,28 +45,25 @@ const ExportPsbt = (props: ExportPsbtProps) => {
                 <View style={[tailwind('w-full px-2 h-full items-center')]}>
                     {/* Export Signed Psbt */}
                     <View style={[tailwind('items-center px-4 mt-3 w-full')]}>
-                        <Text
+                        <VText
                             style={[
-                                tailwind(
-                                    'text-left w-full text-sm font-semibold',
-                                ),
+                                tailwind('w-full text-sm font-semibold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Unsigned PSBT
-                        </Text>
-                        <Text
+                            {t('unsigned_psbt')}
+                        </VText>
+                        <VText
                             style={[
-                                tailwind('text-left w-full text-sm mt-2'),
+                                tailwind('w-full text-sm mt-2'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            Save the PSBT to this device to sign with another
-                            Bitcoin wallet and broadcast later.
-                        </Text>
+                            {t('export_psbt_message')}
+                        </VText>
                     </View>
 
                     <View style={[tailwind('w-4/5 absolute bottom-6')]}>
                         <LongButton
-                            title={'Export'}
+                            title={capitalizeFirst(t('export'))}
                             onPress={() => {
                                 props.triggerExport();
                             }}

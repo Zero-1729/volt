@@ -4,6 +4,8 @@ import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
+import VText, {VTextSingle} from './text';
+
 import BigNumber from 'bignumber.js';
 
 import {PlainButton} from './button';
@@ -25,6 +27,7 @@ import {
     DisplayFiatAmountProps,
 } from '../types/props';
 import {TFiatRate, TUnit} from '../types/wallet';
+import {useTranslation} from 'react-i18next';
 
 const _getBalance = (
     balance: BigNumber,
@@ -50,34 +53,48 @@ export const TXBalance = (props: TxBalanceProps) => {
 
     const {appUnit, fiatRate} = useContext(AppStorageContext);
 
+    const {i18n} = useTranslation('common');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
     return (
         <>
-            <View style={[tailwind('flex-row items-center')]}>
-                {/* Display Satoshi symbol or Bitcoin symbol */}
-                <Text
-                    numberOfLines={1}
-                    style={[
-                        tailwind(`${props.balanceFontSize} self-start mr-2`),
-                        {
-                            color: props.fontColor,
-                            marginTop: appUnit.name === 'sats' ? 1.5 : 0,
-                        },
-                        {...Font.SatSymbol},
-                    ]}>
-                    {appUnit.symbol}
-                </Text>
+            <View
+                style={[
+                    tailwind(
+                        `${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        } items-center`,
+                    ),
+                ]}>
+                <View style={[tailwind('flex-row')]}>
+                    {/* Display Satoshi symbol or Bitcoin symbol */}
+                    <VTextSingle
+                        style={[
+                            tailwind(
+                                `${props.balanceFontSize} self-start mr-2`,
+                            ),
+                            {
+                                color: props.fontColor,
+                                marginTop: appUnit.name === 'sats' ? 1.5 : 0,
+                            },
+                            {...Font.SatSymbol},
+                        ]}>
+                        {appUnit.symbol}
+                    </VTextSingle>
 
-                {/* Display balance in sats */}
-                <Text
-                    numberOfLines={1}
-                    style={[
-                        tailwind(
-                            `${props.balanceFontSize} font-bold text-white self-baseline`,
-                        ),
-                        {color: props.fontColor},
-                    ]}>
-                    {_getBalance(props.balance, appUnit, fiatRate, false)}
-                </Text>
+                    {/* Display balance in sats */}
+                    <VText
+                        style={[
+                            tailwind(
+                                `${props.balanceFontSize} font-bold text-white self-baseline`,
+                            ),
+                            {color: props.fontColor},
+                        ]}>
+                        {_getBalance(props.balance, appUnit, fiatRate, false)}
+                    </VText>
+                </View>
             </View>
         </>
     );
@@ -92,11 +109,12 @@ export const Balance = (props: BalanceProps) => {
         appUnit,
         updateAppUnit,
         fiatRate,
-        appLanguage,
     } = useContext(AppStorageContext);
     const [unit, setUnit] = useState(appUnit);
 
-    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
+    const {i18n} = useTranslation('common');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     // Toggle between BTC and sats
     // and fiat if enabled
@@ -209,11 +227,13 @@ export const Balance = (props: BalanceProps) => {
 export const FiatBalance = (props: FiatBalanceProps) => {
     const tailwind = useTailwind();
 
-    const {hideTotalBalance, appFiatCurrency, fiatRate, appLanguage} =
+    const {hideTotalBalance, appFiatCurrency, fiatRate} =
         useContext(AppStorageContext);
 
-    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
-    const langFlex = appLanguage.dir === 'RTL' ? 'flex-end' : 'flex-start';
+    const {i18n} = useTranslation('common');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+    const langFlex = i18n.dir() === 'rtl' ? 'flex-end' : 'flex-start';
 
     const unit = {name: appFiatCurrency.short, symbol: appFiatCurrency.symbol};
 
@@ -285,9 +305,9 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
-    const {appLanguage} = useContext(AppStorageContext);
+    const {i18n} = useTranslation('common');
 
-    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     return (
         <View style={[tailwind('flex-row')]}>

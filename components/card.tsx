@@ -1,10 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React from 'react';
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
-
-import {AppStorageContext} from '../class/storageContext';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -13,6 +11,8 @@ import {PlainButton} from './button';
 import {Balance} from './balance';
 
 import {WalletCardProps} from '../types/props';
+
+import {useTranslation} from 'react-i18next';
 
 import Font from '../constants/Font';
 import Color from '../constants/Color';
@@ -94,9 +94,8 @@ export const WalletCard = (props: WalletCardProps) => {
 
     const tailwind = useTailwind();
 
-    const {appLanguage} = useContext(AppStorageContext);
-
-    const langDir = appLanguage.dir === 'RTL' ? 'right' : 'left';
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const mxPositionBTC =
         langDir === 'right'
@@ -228,10 +227,14 @@ export const WalletCard = (props: WalletCardProps) => {
                     ) : (
                         <View
                             style={[
-                                styles.maxedOut,
                                 tailwind(
                                     'bg-black absolute rounded opacity-60',
                                 ),
+                                {
+                                    bottom: 20,
+                                    left: langDir === 'right' ? undefined : 24,
+                                    right: langDir === 'right' ? 24 : undefined,
+                                },
                             ]}>
                             <Text
                                 style={[
@@ -241,7 +244,7 @@ export const WalletCard = (props: WalletCardProps) => {
                                     {textAlign: langDir},
                                     Font.RobotoText,
                                 ]}>
-                                Swept Balance
+                                {t('wallet_empty_balance')}
                             </Text>
                         </View>
                     )}
@@ -269,9 +272,5 @@ const styles = StyleSheet.create({
     watchOnlyRTL: {
         top: 24,
         right: 20,
-    },
-    maxedOut: {
-        bottom: 20,
-        left: 24,
     },
 });
