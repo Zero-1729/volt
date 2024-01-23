@@ -34,7 +34,6 @@ const interpolFormat: FormatFunction = (value: any, format: any, lng: any) => {
 };
 
 // Main instance of i18next
-// with ICU enabled plurals
 const i18n = i18next.createInstance();
 i18n.use(initReactI18next).init({
     lng: getAppLanguage(),
