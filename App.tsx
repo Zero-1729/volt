@@ -26,7 +26,7 @@ import Color from './constants/Color';
 import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
-    const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
+    const {appLanguage} = useContext(AppStorageContext);
 
     const {i18n} = useTranslation();
 
@@ -36,11 +36,8 @@ const App = () => {
         // Enable privacy blur for IOS; blur screen when screen inactive
         Privacy?.enabled(true);
 
-        // If new and onboarding load device language
-        if (isWalletInitialized) {
-            // Load default language selected by user
-            i18n.changeLanguage(appLanguage.code);
-        }
+        // Load default language selected by user
+        i18n.changeLanguage(appLanguage.code);
     }, []);
 
     const ColorScheme = Color(useColorScheme());
