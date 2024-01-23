@@ -7,13 +7,8 @@ import resources from './locales';
 import DayJS from 'dayjs';
 
 // Include supported locales
-import 'dayjs/locale/af'; // Afrikaans
 import 'dayjs/locale/ar'; // Arabic
 import 'dayjs/locale/en'; // English
-import 'dayjs/locale/es'; // Spanish
-import 'dayjs/locale/es-us'; // Spanish (Latin America)
-import 'dayjs/locale/fr'; // French
-import 'dayjs/locale/sw'; // Swahili
 
 import calendar from 'dayjs/plugin/calendar';
 DayJS.extend(calendar);
