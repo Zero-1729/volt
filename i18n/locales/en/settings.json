@@ -25,7 +25,7 @@
     "default_testnet_description": "Restore and create wallets with mnemonics (12-24 words) to testnet by default. Toggling off will default to bitcoin mainnet.",
     "price_at": "Price at",
     "price_on": "on",
-    "last_updated": "Last updated",
+    "last_updated": "Last updated {{date, last_updated}}",
     "convert": "convert",
     "converted_xpub_text": "Converted Extended Public Key"
 }
