@@ -8,17 +8,17 @@ if (!Intl.Locale) {
 if (!NumberFormat.formatToParts) {
     require('@formatjs/intl-numberformat/polyfill');
     require('@formatjs/intl-numberformat/locale-data/en');
-    require('@formatjs/intl-numberformat/locale-data/ru');
+    require('@formatjs/intl-numberformat/locale-data/ar');
 }
 
 if (!Intl.PluralRules) {
     require('@formatjs/intl-pluralrules/polyfill');
     require('@formatjs/intl-pluralrules/locale-data/en');
-    require('@formatjs/intl-pluralrules/locale-data/ru');
+    require('@formatjs/intl-pluralrules/locale-data/ar');
 }
 
 if (!Intl.RelativeTimeFormat) {
     require('@formatjs/intl-relativetimeformat/polyfill');
     require('@formatjs/intl-relativetimeformat/locale-data/en');
-    require('@formatjs/intl-relativetimeformat/locale-data/ru');
+    require('@formatjs/intl-relativetimeformat/locale-data/ar');
 }
