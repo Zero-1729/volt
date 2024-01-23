@@ -3,7 +3,6 @@
     "reset_app": "إعادة تعيين التطبيق",
     "reset_app_text": "هل أنت متأكد أنك تريد حذف بيانات التطبيق؟",
     "system_preferences": "تفضيلات النظام",
-    "lang_error": "لا يمكن ضبط اللغة",
     "release_notes": "ملاحظات الإصدار",
     "source_code": "الشفرة المصدرية",
     "report_bug": "الإبلاغ عن مشكلة أو خطأ",
@@ -24,7 +23,6 @@
     "custom_electrum_server": "خادم Electrum مخصص",
     "default_testnet": "الافتراضي إلى Testnet",
     "default_testnet_description": "قم باستعادة وإنشاء محافظ باستخدام\nأساليب الإستذكار (12-24 كلمة) إلى testnet بشكل افتراضي.\nسيتم إيقاف التشغيل افتراضيًا على شبكة البيتكوين الرئيسية.",
-    "default_testnet_warn": "إن استخدام خادم عام يجعل جميع معاملاتك مرئية لهم.",
     "price_at": "السعر في",
     "price_on": "في",
     "last_updated": "آخر تحديث"
