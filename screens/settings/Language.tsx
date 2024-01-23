@@ -57,8 +57,7 @@ const Language = () => {
                 onPress={() => {
                     RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
 
-                    // Change local language in i18n and store
-                    i18n.changeLanguage(item.code);
+                    // We update the i18n locale language in `App.tsx` based on mutation here
                     setAppLanguage(item);
                 }}>
                 <View
