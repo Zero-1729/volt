@@ -25,8 +25,6 @@ import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
     const {appLanguage} = useContext(AppStorageContext);
-    console.log('lll: ', appLanguage);
-
     useEffect(() => {
         SplashScreen.hide();
 
