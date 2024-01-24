@@ -7,12 +7,6 @@ import {useTailwind} from 'tailwind-rn';
 import VText from './text';
 
 import BigNum from 'bignumber.js';
-import Dayjs from 'dayjs';
-import calendar from 'dayjs/plugin/calendar';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
-
-Dayjs.extend(calendar);
-Dayjs.extend(LocalizedFormat);
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -28,7 +22,7 @@ import ArrowUp from '../assets/svg/arrow-up-right-24.svg';
 import ArrowDown from '../assets/svg/arrow-down-left-24.svg';
 import {useTranslation} from 'react-i18next';
 
-import {capitalizeFirst} from '../modules/transform';
+import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
 
 export const TransactionListItem = (props: TxListItemProps) => {
     const tailwind = useTailwind();
@@ -40,10 +34,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
     const {isAdvancedMode} = useContext(AppStorageContext);
 
     const getTxTimestamp = (time: Date) => {
-        const date = +time * 1000;
-        const isToday = Dayjs(date).isSame(Dayjs(), 'day');
-
-        return isToday ? Dayjs(date).calendar() : Dayjs(date).format('LLL');
+        return formatLocaleDate(i18n.language, time);
     };
 
     return (

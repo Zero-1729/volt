@@ -17,13 +17,6 @@ import {conservativeAlert} from '../../components/alert';
 
 import BumpFee from '../../components/bump';
 
-import Dayjs from 'dayjs';
-import calendar from 'dayjs/plugin/calendar';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
-
-Dayjs.extend(calendar);
-Dayjs.extend(LocalizedFormat);
-
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
@@ -49,7 +42,7 @@ import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
 
-import {capitalizeFirst} from '../../modules/transform';
+import {capitalizeFirst, formatLocaleDate} from '../../modules/transform';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
@@ -124,10 +117,7 @@ const TransactionDetailsView = ({route}: Props) => {
     };
 
     const getTxTimestamp = (time: Date) => {
-        const date = +time * 1000;
-        const isToday = Dayjs(date).isSame(Dayjs(), 'day');
-
-        return isToday ? Dayjs(date).calendar() : Dayjs(date).format('LLL');
+        return formatLocaleDate(i18n.language, time);
     };
 
     // Get URL for mempool.space

@@ -24,13 +24,6 @@ import {TComboWallet} from '../../types/wallet';
 
 import {useTranslation} from 'react-i18next';
 
-import Dayjs from 'dayjs';
-import calendar from 'dayjs/plugin/calendar';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
-
-Dayjs.extend(calendar);
-Dayjs.extend(LocalizedFormat);
-
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 import NativeOffsets from '../../constants/NativeWindowMetrics';

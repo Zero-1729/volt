@@ -20,12 +20,6 @@ import {WalletParamList} from '../../Navigation';
 import BDK from 'bdk-rn';
 
 import BigNumber from 'bignumber.js';
-import Dayjs from 'dayjs';
-import calendar from 'dayjs/plugin/calendar';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
-
-Dayjs.extend(calendar);
-Dayjs.extend(LocalizedFormat);
 
 import {useNetInfo} from '@react-native-community/netinfo';
 
