@@ -5,7 +5,6 @@ import React, {useContext, useEffect} from 'react';
 import {StatusBar, useColorScheme, Linking} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
-
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {
@@ -25,17 +24,6 @@ import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
     const {appLanguage} = useContext(AppStorageContext);
-    useEffect(() => {
-        SplashScreen.hide();
-
-        // Enable privacy blur for IOS; blur screen when screen inactive
-        Privacy?.enabled(true);
-    }, []);
-
-    useEffect(() => {
-        // Load language when app language change
-        i18n.changeLanguage(appLanguage.code);
-    }, [appLanguage]);
 
     const ColorScheme = Color(useColorScheme());
 
@@ -74,6 +62,21 @@ const App = () => {
             };
         },
     };
+
+    useEffect(() => {
+        SplashScreen.hide();
+
+        // Enable privacy blur for IOS; blur screen when screen inactive
+        Privacy?.enabled(true);
+
+        // Check clipboard contents
+        checkAndSetClipboard();
+    }, []);
+
+    useEffect(() => {
+        // Load language when app language change
+        i18n.changeLanguage(appLanguage.code);
+    }, [appLanguage]);
 
     return (
         <SafeAreaProvider
