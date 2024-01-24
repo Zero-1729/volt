@@ -1,5 +1,15 @@
 import BigNumber from 'bignumber.js';
 
+import DayJS from 'dayjs';
+import calendar from 'dayjs/plugin/calendar';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+DayJS.extend(calendar);
+DayJS.extend(localizedFormat);
+
+// Include supported locales
+import 'dayjs/locale/ar'; // Arabic
+import 'dayjs/locale/en'; // English
+
 import {TBalance} from '../types/wallet';
 
 export const SATS_TO_BTC_RATE = 100_000_000;
@@ -111,6 +121,18 @@ export const normalizeFiat = (sats: TBalance, rate: TBalance) => {
         : rate.multipliedBy(_getBTCfromSats(sats));
 
     return formatFiat(fiat);
+};
+
+export const formatLocaleDate = (locale: string, date: Date) => {
+    const d = +date * 1000;
+    const isToday = DayJS(date).isSame(DayJS(), 'day');
+    const isEnglish = locale === 'en';
+
+    return isToday
+        ? isEnglish
+            ? DayJS(date).calendar()
+            : DayJS(date).locale(locale).format('L LT')
+        : DayJS(d).locale(locale).format('LLL');
 };
 
 // Format a string of Mnemonic phrases into
