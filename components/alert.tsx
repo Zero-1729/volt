@@ -55,6 +55,33 @@ export const conservativeAlert = (
     ]);
 };
 
+export const actionAlert = (
+    heading: string,
+    msg: string,
+    primaryButtonText: string,
+    cancelButtonText: string,
+    onSuccess: () => void,
+) => {
+    Alert.alert(heading, msg, [
+        {
+            text: cancelButtonText,
+            onPress: () => {},
+        },
+        {
+            text: primaryButtonText,
+            style: 'default',
+            onPress: () => {
+                RNHapticFeedback.trigger(
+                    'impactLight',
+                    RNHapticFeedbackOptions,
+                );
+
+                onSuccess();
+            },
+        },
+    ]);
+};
+
 export const DeletionAlert = (
     heading: string,
     msg: string,

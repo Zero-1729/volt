@@ -29,5 +29,7 @@
     "failed_fee_rate_fetch": "حدث خطأ أثناء جلب معدلات الرسوم، الخدمة غير متوفرة.",
     "invalid_fee_rate": "معدل الرسوم غير صالح",
     "invalid_fee_rate_message": "الرجاء إدخال معدل رسوم صالح",
-    "fee_rate_high_error": "معدل الرسوم مرتفع جدًا، يرجى المحاولة مرة أخرى."
+    "fee_rate_high_error": "معدل الرسوم مرتفع جدًا، يرجى المحاولة مرة أخرى.",
+    "clipboard_empty_error": "الحافظة فارغة",
+    "unsupported_invoice_type": "نوع الفاتورة غير مدعوم"
 }

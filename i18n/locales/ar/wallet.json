@@ -100,5 +100,7 @@
     "restore_wallet_title": "استعادة المحفظة",
     "restore_wallet_description": "أدخل المواد الاحتياطية",
     "restore": "يعيد",
-    "wallet_restored_message": "تمت استعادة المحفظة بنجاح"
+    "wallet_restored_message": "تمت استعادة المحفظة بنجاح",
+    "read_clipboard_lightning_text": "لديك فاتورة البرق",
+    "read_clipboard_bitcoin_text": "لديك فاتورة بيتكوين"
 }
