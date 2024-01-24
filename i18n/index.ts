@@ -4,14 +4,7 @@ import {initReactI18next} from 'react-i18next';
 
 import resources from './locales';
 
-import DayJS from 'dayjs';
-
-// Include supported locales
-import 'dayjs/locale/ar'; // Arabic
-import 'dayjs/locale/en'; // English
-
-import calendar from 'dayjs/plugin/calendar';
-DayJS.extend(calendar);
+import {formatLocaleDate} from '../modules/transform';
 
 // Default to common namespace
 export const defaultNS = 'common';
@@ -22,12 +15,9 @@ const getAppLanguage = (): string => {
 
 // Interpolation function for date and number formatting
 const interpolFormat: FormatFunction = (value: any, format: any, lng: any) => {
+    // Format dates
     if (format === 'last_updated') {
-        if (lng === 'en') {
-            return DayJS(value).calendar();
-        } else {
-            return DayJS(value).locale(lng).format('llll');
-        }
+        return formatLocaleDate(lng, value);
     }
 
     return value;
