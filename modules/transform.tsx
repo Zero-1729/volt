@@ -123,6 +123,18 @@ export const normalizeFiat = (sats: TBalance, rate: TBalance) => {
     return formatFiat(fiat);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getLocaleDecimalSeparator = (locale: string) => {
+    // Returns the group separator for a given language locale, e.g. ',' for en-US
+    return (1.1).toLocaleString(locale).substring(1, 2);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getLocaleGroupingSeparator = (locale: string) => {
+    // Returns the decimal separator for a given language locale, e.g. '.' for en-US
+    return (1000).toLocaleString(locale).substring(1, 2);
+};
+
 export const formatLocaleDate = (locale: string, date: Date) => {
     const d = +date * 1000;
     const isToday = DayJS(date).isSame(DayJS(), 'day');
