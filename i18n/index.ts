@@ -20,6 +20,11 @@ const interpolFormat: FormatFunction = (value: any, format: any, lng: any) => {
         return formatLocaleDate(lng, value);
     }
 
+    // Format numbers
+    if (format === 'number') {
+        return new Intl.NumberFormat(lng).format(value);
+    }
+
     return value;
 };
 
