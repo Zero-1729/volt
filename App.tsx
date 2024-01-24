@@ -7,6 +7,12 @@ import {StatusBar, useColorScheme, Linking} from 'react-native';
 import {AppStorageContext} from './class/storageContext';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
+import {actionAlert} from './components/alert';
+
+import {checkClipboardContents} from './modules/clipboard';
+import {capitalizeFirst} from './modules/transform';
+import {useTranslation} from 'react-i18next';
+
 import {
     NavigationContainer,
     DefaultTheme,
@@ -24,6 +30,7 @@ import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
     const {appLanguage} = useContext(AppStorageContext);
+    const {t} = useTranslation('wallet');
 
     const ColorScheme = Color(useColorScheme());
 
@@ -35,6 +42,42 @@ const App = () => {
             ...DefaultTheme.colors,
             ...ColorScheme.NavigatorTheme.colors,
         },
+    };
+
+    // Clipboard check
+    const checkAndSetClipboard = async () => {
+        // We only display dialogs if content is not empty and valid invoice
+        const clipboardResult = await checkClipboardContents();
+        let clipboardMessage!: string;
+
+        // Set clipboard message
+        if (clipboardResult.invoiceType === 'lightning') {
+            clipboardMessage = t('read_clipboard_lightning_text', {
+                spec: clipboardResult.spec,
+            });
+        }
+
+        if (clipboardResult.invoiceType === 'bitcoin') {
+            clipboardMessage = t('read_clipboard_bitcoin_text');
+        }
+
+        // If clipboard has contents, display dialog
+        if (
+            clipboardResult.hasContents &&
+            clipboardResult.invoiceType !== 'unsupported'
+        ) {
+            actionAlert(
+                capitalizeFirst(t('clipboard')),
+                clipboardMessage,
+                capitalizeFirst(t('pay')),
+                capitalizeFirst(t('cancel')),
+                () => {
+                    rootNavigation.navigate('SelectWallet', {
+                        invoice: clipboardResult.content,
+                    });
+                },
+            );
+        }
     };
 
     // Deep linking
