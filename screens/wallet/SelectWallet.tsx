@@ -102,6 +102,15 @@ const SelectWallet = ({route}: Props) => {
                         msg,
                         capitalizeFirst(t('cancel')),
                     );
+
+                    // route home
+                    navigation.dispatch(
+                        CommonActions.navigate('HomeScreen', {
+                            screen: 'HomeScreen',
+                        }),
+                    );
+
+                    return;
                 },
                 walletMode === 'single',
             )
