@@ -97,10 +97,9 @@ const ExtendedKey = () => {
         try {
             extKeyPrefix = getExtendedKeyPrefix(xkey);
         } catch (err: any) {
-            // TODO: translate error
             errorAlert(
                 capitalizeFirst(e('error')),
-                err.message,
+                e(err.message),
                 capitalizeFirst(t('cancel')),
             );
             return;

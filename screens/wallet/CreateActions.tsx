@@ -59,6 +59,7 @@ const CreateAction = () => {
     const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {addWallet, isAdvancedMode, defaultToTestnet, isWalletInitialized} =
@@ -127,11 +128,10 @@ const CreateAction = () => {
             navigation.dispatch(
                 StackActions.push('Mnemonic', {onboarding: onboarding}),
             );
-        } catch (e: any) {
-            // TODO: translate error
+        } catch (err: any) {
             errorAlert(
                 capitalizeFirst(t('alert')),
-                e.message,
+                e(err.message),
                 capitalizeFirst(t('cancel')),
             );
 

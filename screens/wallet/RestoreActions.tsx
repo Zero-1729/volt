@@ -328,7 +328,7 @@ const ImportAction = ({route}: Props) => {
                 // Report unsupported extended keys
                 liberalAlert(
                     t('extended_key'),
-                    t('unsupported_ext_key'),
+                    e('unsupported_ext_key_error'),
                     capitalizeFirst(t('cancel')),
                 );
                 return;
