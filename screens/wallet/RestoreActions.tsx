@@ -108,7 +108,6 @@ const ImportAction = ({route}: Props) => {
 
     const handleFolderError = (err: Error) => {
         // Handle when any error in the folder action is reported
-        // TODO: translate error
         conservativeAlert(
             capitalizeFirst(t('error')),
             err.message,
@@ -201,7 +200,6 @@ const ImportAction = ({route}: Props) => {
             handleSuccessRoute();
         } catch (err: any) {
             // Let user know the mnemonic is valid
-            // TODO: translate error
             errorAlert(
                 capitalizeFirst(t('mnemonic')),
                 err.message,

@@ -106,7 +106,6 @@ const AddressOwnership = ({route}: Props) => {
                 setResultMessage(t('wallet_is_not_owner'));
             }
         } catch (err: any) {
-            // TODO: translate error
             errorAlert(
                 capitalizeFirst(t('network')),
                 err.message,
