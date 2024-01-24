@@ -2,11 +2,17 @@
 import React, {useState, useContext} from 'react';
 import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
+import VText from '../../components/text';
+
 import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
+
+import {useTranslation} from 'react-i18next';
+
+import {capitalizeFirst} from '../../modules/transform';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -22,6 +28,9 @@ const SelectMode = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t, i18n} = useTranslation('onboarding');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {setWalletModeType} = useContext(AppStorageContext);
 
@@ -56,7 +65,7 @@ const SelectMode = () => {
                         tailwind('text-lg absolute font-bold top-6'),
                         {color: ColorScheme.Text.Default},
                     ]}>
-                    Select Mode
+                    {t('select_mode_title')}
                 </Text>
 
                 <View style={[tailwind('items-center w-4/5 py-4'), {top: -25}]}>
@@ -71,15 +80,27 @@ const SelectMode = () => {
                             }}>
                             <>
                                 <View
-                                    style={[tailwind('flex-row items-center')]}>
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } items-center`,
+                                        ),
+                                    ]}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-sm font-semibold mr-2',
+                                                `text-sm font-semibold ${
+                                                    langDir === 'right'
+                                                        ? 'ml-2'
+                                                        : 'mr-2'
+                                                }`,
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Single (Recommended)
+                                        {t('single_mode_title')}
                                     </Text>
 
                                     {selectedMode === 'single' && (
@@ -91,15 +112,13 @@ const SelectMode = () => {
                                     )}
                                 </View>
 
-                                <Text
+                                <VText
                                     style={[
-                                        tailwind('text-left text-sm mt-4'),
+                                        tailwind('text-sm mt-4'),
                                         {color: ColorScheme.Text.GrayedText},
                                     ]}>
-                                    Create a single unified Bitcoin and LN
-                                    wallet, which allows you to receive and send
-                                    both on and off-chain.
-                                </Text>
+                                    {t('single_mode_description')}
+                                </VText>
                             </>
                         </PlainButton>
 
@@ -121,15 +140,27 @@ const SelectMode = () => {
                             }}>
                             <>
                                 <View
-                                    style={[tailwind('flex-row items-center')]}>
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } items-center`,
+                                        ),
+                                    ]}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-sm font-semibold mr-2',
+                                                `text-sm font-semibold ${
+                                                    langDir === 'right'
+                                                        ? 'ml-2'
+                                                        : 'mr-2'
+                                                }`,
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Multi
+                                        {t('multi_mode_title')}
                                     </Text>
 
                                     {selectedMode === 'multi' && (
@@ -141,15 +172,13 @@ const SelectMode = () => {
                                     )}
                                 </View>
 
-                                <Text
+                                <VText
                                     style={[
-                                        tailwind('text-left text-sm mt-4'),
+                                        tailwind('text-sm mt-4'),
                                         {color: ColorScheme.Text.GrayedText},
                                     ]}>
-                                    Create and manage multiple wallet types,
-                                    including Lightning, Bolt Card, and Bitcoin
-                                    cards.
-                                </Text>
+                                    {t('multi_mode_description')}
+                                </VText>
                             </>
                         </PlainButton>
                     </View>
@@ -157,7 +186,7 @@ const SelectMode = () => {
 
                 <LongBottomButton
                     onPress={setModeAndRoute}
-                    title={'Done'}
+                    title={capitalizeFirst(t('done'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />

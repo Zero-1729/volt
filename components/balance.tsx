@@ -4,6 +4,8 @@ import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
+import VText, {VTextSingle} from './text';
+
 import BigNumber from 'bignumber.js';
 
 import {PlainButton} from './button';
@@ -25,6 +27,7 @@ import {
     DisplayFiatAmountProps,
 } from '../types/props';
 import {TFiatRate, TUnit} from '../types/wallet';
+import {useTranslation} from 'react-i18next';
 
 const _getBalance = (
     balance: BigNumber,
@@ -50,34 +53,48 @@ export const TXBalance = (props: TxBalanceProps) => {
 
     const {appUnit, fiatRate} = useContext(AppStorageContext);
 
+    const {i18n} = useTranslation('common');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
     return (
         <>
-            <View style={[tailwind('flex-row items-center')]}>
-                {/* Display Satoshi symbol or Bitcoin symbol */}
-                <Text
-                    numberOfLines={1}
-                    style={[
-                        tailwind(`${props.balanceFontSize} self-start mr-2`),
-                        {
-                            color: props.fontColor,
-                            marginTop: appUnit.name === 'sats' ? 1.5 : 0,
-                        },
-                        {...Font.SatSymbol},
-                    ]}>
-                    {appUnit.symbol}
-                </Text>
+            <View
+                style={[
+                    tailwind(
+                        `${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        } items-center`,
+                    ),
+                ]}>
+                <View style={[tailwind('flex-row')]}>
+                    {/* Display Satoshi symbol or Bitcoin symbol */}
+                    <VTextSingle
+                        style={[
+                            tailwind(
+                                `${props.balanceFontSize} self-start mr-2`,
+                            ),
+                            {
+                                color: props.fontColor,
+                                marginTop: appUnit.name === 'sats' ? 1.5 : 0,
+                            },
+                            {...Font.SatSymbol},
+                        ]}>
+                        {appUnit.symbol}
+                    </VTextSingle>
 
-                {/* Display balance in sats */}
-                <Text
-                    numberOfLines={1}
-                    style={[
-                        tailwind(
-                            `${props.balanceFontSize} font-bold text-white self-baseline`,
-                        ),
-                        {color: props.fontColor},
-                    ]}>
-                    {_getBalance(props.balance, appUnit, fiatRate, false)}
-                </Text>
+                    {/* Display balance in sats */}
+                    <VText
+                        style={[
+                            tailwind(
+                                `${props.balanceFontSize} font-bold text-white self-baseline`,
+                            ),
+                            {color: props.fontColor},
+                        ]}>
+                        {_getBalance(props.balance, appUnit, fiatRate, false)}
+                    </VText>
+                </View>
             </View>
         </>
     );
@@ -94,6 +111,10 @@ export const Balance = (props: BalanceProps) => {
         fiatRate,
     } = useContext(AppStorageContext);
     const [unit, setUnit] = useState(appUnit);
+
+    const {i18n} = useTranslation('common');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     // Toggle between BTC and sats
     // and fiat if enabled
@@ -131,6 +152,12 @@ export const Balance = (props: BalanceProps) => {
                                     props.loading ? 'opacity-40' : ''
                                 }`,
                             ),
+                            {
+                                justifyContent:
+                                    langDir === 'right'
+                                        ? 'flex-end'
+                                        : 'flex-start',
+                            },
                         ]}>
                         {/* Satoshi Symbol */}
                         <Text
@@ -203,6 +230,11 @@ export const FiatBalance = (props: FiatBalanceProps) => {
     const {hideTotalBalance, appFiatCurrency, fiatRate} =
         useContext(AppStorageContext);
 
+    const {i18n} = useTranslation('common');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+    const langFlex = i18n.dir() === 'rtl' ? 'flex-end' : 'flex-start';
+
     const unit = {name: appFiatCurrency.short, symbol: appFiatCurrency.symbol};
 
     return (
@@ -215,6 +247,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                 props.loading ? 'opacity-20' : ''
                             }`,
                         ),
+                        {justifyContent: langFlex},
                     ]}>
                     {/* Display fiat symbol */}
                     <Text
@@ -227,7 +260,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                         : 'text-2xl'
                                 } self-baseline mr-2`,
                             ),
-                            {color: props.fontColor},
+                            {color: props.fontColor, textAlign: langDir},
                         ]}>
                         {(props.amountSign ? props.amountSign + ' ' : '') +
                             unit.symbol}
@@ -244,7 +277,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                                         : 'text-2xl'
                                 } self-baseline`,
                             ),
-                            {color: props.fontColor},
+                            {color: props.fontColor, textAlign: langDir},
                         ]}>
                         {_getBalance(
                             new BigNumber(props.balance),
@@ -272,13 +305,17 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
+    const {i18n} = useTranslation('common');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
     return (
         <View style={[tailwind('flex-row')]}>
             {props.isApprox ? (
                 <Text
                     style={[
                         tailwind('self-center'),
-                        {color: ColorScheme.Text.Default},
+                        {color: ColorScheme.Text.Default, textAlign: langDir},
                     ]}>
                     ~{' '}
                 </Text>
@@ -289,7 +326,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
                 numberOfLines={1}
                 style={[
                     tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
-                    {color: ColorScheme.Text.Default},
+                    {color: ColorScheme.Text.Default, textAlign: langDir},
                     Font.SatSymbol,
                 ]}>
                 s
@@ -298,7 +335,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
             <Text
                 style={[
                     tailwind(`${props.fontSize} self-center font-bold`),
-                    {color: ColorScheme.Text.Default},
+                    {color: ColorScheme.Text.Default, textAlign: langDir},
                 ]}>
                 {props.amount.isZero() ? '0' : formatSats(props.amount)}
             </Text>

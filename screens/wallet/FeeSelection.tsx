@@ -11,6 +11,10 @@ import {
     ActivityIndicator,
 } from 'react-native';
 
+import VText from './../../components/text';
+
+import {useTranslation} from 'react-i18next';
+
 import {
     CommonActions,
     useNavigation,
@@ -33,7 +37,11 @@ import Color from '../../constants/Color';
 
 import {TMempoolFeeRates} from '../../types/wallet';
 import {getFeeRates} from '../../modules/mempool';
-import {normalizeFiat, addCommas} from '../../modules/transform';
+import {
+    normalizeFiat,
+    addCommas,
+    capitalizeFirst,
+} from '../../modules/transform';
 
 import SelectedIcon from './../../assets/svg/check-circle-fill-24.svg';
 import Close from '../../assets/svg/x-24.svg';
@@ -48,6 +56,11 @@ const FeeSelection = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const isAndroid = Platform.OS === 'android';
 
@@ -85,10 +98,16 @@ const FeeSelection = ({route}: Props) => {
             route.params.wallet as TComboWallet,
             new BigNumber(route.params.wallet.balance),
             electrumServerURL,
-            (e: any) => {
+            (err: any) => {
                 conservativeAlert(
-                    'Error',
-                    `Could not create transaction. ${e.message}`,
+                    capitalizeFirst(t('error')),
+                    e('tx_fail_creation_error'),
+                    capitalizeFirst(t('cancel')),
+                );
+
+                console.log(
+                    '[Fee Selection] Failed to create tx: ',
+                    err.message,
                 );
 
                 // Stop loading
@@ -114,11 +133,12 @@ const FeeSelection = ({route}: Props) => {
             const fetchedRates = await getFeeRates(route.params.wallet.network);
 
             rates = fetchedRates as TMempoolFeeRates;
-        } catch (e: any) {
+        } catch (err: any) {
             // Error assumed to be 503; mempool unavailable due to sync
             conservativeAlert(
-                'Fee rate',
-                'Error fetching fee rates, service unavailable.',
+                t('feerate'),
+                e('failed_fee_rate_fetch'),
+                capitalizeFirst(t('cancel')),
             );
         }
 
@@ -136,8 +156,9 @@ const FeeSelection = ({route}: Props) => {
         // Warn user that fee rate invalid
         if (Number.isNaN(rate)) {
             conservativeAlert(
-                'Invalid fee rate',
-                'Please enter a valid fee rate',
+                e('invalid_fee_rate'),
+                e('invalid_fee_rate_message'),
+                capitalizeFirst(t('cancel')),
             );
 
             return;
@@ -145,7 +166,11 @@ const FeeSelection = ({route}: Props) => {
 
         // Avoid too high fee rate
         if (isFeeTooHigh(fee, isMaxSend)) {
-            conservativeAlert('Error', 'Fee rate too high, please try again.');
+            conservativeAlert(
+                capitalizeFirst(t('error')),
+                e('fee_too_high_error'),
+                capitalizeFirst(t('cancel')),
+            );
             return;
         }
 
@@ -159,27 +184,27 @@ const FeeSelection = ({route}: Props) => {
 
     const getFeeRateTime = (rate: number) => {
         if (rate >= feeRates.fastestFee) {
-            return '~10 mins';
+            return t('ten_mins');
         } else if (rate >= feeRates.halfHourFee) {
-            return '~30 mins';
+            return t('thirty_mins');
         } else if (rate >= feeRates.hourFee) {
-            return '~1 hour';
+            return t('one_hour');
         } else if (rate >= feeRates.minimumFee) {
-            return '~24 hours';
+            return t('one_day');
         } else {
-            return 'more than 24 hours';
+            return t('over_one_day');
         }
     };
 
     const openFeeModal = () => {
         if (isAndroid) {
             Prompt(
-                'Custom',
-                'Enter fee rate (sats/vB)',
+                t('custom'),
+                t('custom_fee_alert_message'),
                 [
-                    {text: 'Cancel'},
+                    {text: capitalizeFirst(t('cancel'))},
                     {
-                        text: 'Set',
+                        text: t('set'),
                         onPress: updateCustomFeeRate,
                     },
                 ],
@@ -189,16 +214,16 @@ const FeeSelection = ({route}: Props) => {
             );
         } else {
             Alert.prompt(
-                'Custom',
-                'Enter fee rate (sats/vB)',
+                t('custom'),
+                t('custom_fee_alert_message'),
                 [
                     {
-                        text: 'Cancel',
+                        text: capitalizeFirst(t('cancel')),
                         onPress: () => {},
                         style: 'cancel',
                     },
                     {
-                        text: 'Set',
+                        text: t('set'),
                         onPress: updateCustomFeeRate,
                     },
                 ],
@@ -241,7 +266,7 @@ const FeeSelection = ({route}: Props) => {
                             tailwind('text-sm font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Select Fee rate
+                        {t('select_fee_rate_title')}
                     </Text>
                 </View>
 
@@ -259,24 +284,36 @@ const FeeSelection = ({route}: Props) => {
                             <View
                                 style={[
                                     tailwind(
-                                        'flex-row justify-between items-center w-full',
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } justify-between items-center w-full`,
                                     ),
                                 ]}>
                                 <View
                                     style={[
                                         tailwind(
-                                            'flex-row justify-center items-center',
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } justify-center items-center`,
                                         ),
                                     ]}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind(
-                                                'text-left text-sm font-semibold mr-2',
+                                                `text-left ${
+                                                    langDir === 'right'
+                                                        ? 'ml-2'
+                                                        : 'mr-2'
+                                                }  text-sm font-semibold`,
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        High Priority
-                                    </Text>
+                                        {t('high_priority_fee')}
+                                    </VText>
 
                                     {/* Faux loading placeholder */}
                                     {loadingData && (
@@ -319,15 +356,15 @@ const FeeSelection = ({route}: Props) => {
                                             ]}>
                                             {`${addCommas(
                                                 feeRates.fastestFee.toString(),
-                                            )} sat/vB`}
+                                            )} ${t('sat_vbyte')}`}
                                         </Text>
                                     </View>
                                 )}
                             </View>
 
                             {!loadingData && (
-                                <View style={[tailwind('w-4/5 mt-2')]}>
-                                    <Text
+                                <View style={[tailwind('w-full mt-2')]}>
+                                    <VText
                                         style={[
                                             tailwind('text-sm'),
                                             {
@@ -335,9 +372,9 @@ const FeeSelection = ({route}: Props) => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        Expected confirmation time is ~10 mins
-                                    </Text>
-                                    <Text
+                                        {t('priority_fee_description')}
+                                    </VText>
+                                    <VText
                                         style={[
                                             tailwind('text-sm'),
                                             {
@@ -357,7 +394,7 @@ const FeeSelection = ({route}: Props) => {
                                             ),
                                             new BigNumber(fiatRate.rate),
                                         )})`}
-                                    </Text>
+                                    </VText>
                                 </View>
                             )}
                         </View>
@@ -382,24 +419,36 @@ const FeeSelection = ({route}: Props) => {
                             <View
                                 style={[
                                     tailwind(
-                                        'flex-row justify-between items-center w-full',
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        }  justify-between items-center w-full`,
                                     ),
                                 ]}>
                                 <View
                                     style={[
                                         tailwind(
-                                            'flex-row justify-center items-center',
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            }  justify-center items-center`,
                                         ),
                                     ]}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind(
-                                                'text-left text-sm font-semibold mr-2',
+                                                `text-left ${
+                                                    langDir === 'right'
+                                                        ? 'ml-2'
+                                                        : 'mr-2'
+                                                }  text-sm font-semibold`,
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Economic
-                                    </Text>
+                                        {t('economic_fee')}
+                                    </VText>
 
                                     {/* Faux loading placeholder */}
                                     {loadingData && (
@@ -442,15 +491,15 @@ const FeeSelection = ({route}: Props) => {
                                             ]}>
                                             {`${addCommas(
                                                 feeRates.economyFee.toString(),
-                                            )} sat/vB`}
+                                            )} ${t('sat_vbyte')}`}
                                         </Text>
                                     </View>
                                 )}
                             </View>
 
                             {!loadingData && (
-                                <View style={[tailwind('w-4/5 mt-2')]}>
-                                    <Text
+                                <View style={[tailwind('w-full mt-2')]}>
+                                    <VText
                                         style={[
                                             tailwind('text-sm'),
                                             {
@@ -458,9 +507,9 @@ const FeeSelection = ({route}: Props) => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        Expected confirmation time is ~30 mins
-                                    </Text>
-                                    <Text
+                                        {t('economic_fee_description')}
+                                    </VText>
+                                    <VText
                                         style={[
                                             tailwind('text-sm'),
                                             {
@@ -480,7 +529,7 @@ const FeeSelection = ({route}: Props) => {
                                             ),
                                             new BigNumber(fiatRate.rate),
                                         )})`}
-                                    </Text>
+                                    </VText>
                                 </View>
                             )}
                         </View>
@@ -506,7 +555,11 @@ const FeeSelection = ({route}: Props) => {
                             <View
                                 style={[
                                     tailwind(
-                                        'flex-row justify-between items-center w-full',
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } justify-between items-center w-full`,
                                     ),
                                 ]}>
                                 <View
@@ -515,15 +568,15 @@ const FeeSelection = ({route}: Props) => {
                                             'flex-row justify-center items-center',
                                         ),
                                     ]}>
-                                    <Text
+                                    <VText
                                         style={[
                                             tailwind(
                                                 'text-left text-sm font-semibold mr-2',
                                             ),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        Custom Fee
-                                    </Text>
+                                        {t('custom_fee')}
+                                    </VText>
 
                                     {/* Faux loading placeholder */}
                                     {loadingData && (
@@ -566,15 +619,15 @@ const FeeSelection = ({route}: Props) => {
                                             ]}>
                                             {`${addCommas(
                                                 selectedFeeRate.toString(),
-                                            )} sat/vB`}
+                                            )} ${t('sat_vbyte')}`}
                                         </Text>
                                     </View>
                                 )}
                             </View>
 
                             {selectedFeeRateType === 'custom' && (
-                                <View style={[tailwind('w-4/5 mt-2')]}>
-                                    <Text
+                                <View style={[tailwind('w-full mt-2')]}>
+                                    <VText
                                         style={[
                                             tailwind('text-sm'),
                                             {
@@ -583,11 +636,11 @@ const FeeSelection = ({route}: Props) => {
                                             },
                                         ]}>
                                         {/* Make text variable */}
-                                        {`Expected confirmation time is ${getFeeRateTime(
-                                            selectedFeeRate,
-                                        )}`}
-                                    </Text>
-                                    <Text
+                                        {`${t(
+                                            'expected_fee_confirmation',
+                                        )} ${getFeeRateTime(selectedFeeRate)}`}
+                                    </VText>
+                                    <VText
                                         style={[
                                             tailwind('text-sm'),
                                             {
@@ -607,7 +660,7 @@ const FeeSelection = ({route}: Props) => {
                                             ),
                                             new BigNumber(fiatRate.rate),
                                         )})`}
-                                    </Text>
+                                    </VText>
                                 </View>
                             )}
                         </View>
@@ -636,7 +689,7 @@ const FeeSelection = ({route}: Props) => {
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            Retrieving fee data from Bitcoin network...
+                            {t('fee_loading_message')}
                         </Text>
                     </View>
                 )}
@@ -656,7 +709,7 @@ const FeeSelection = ({route}: Props) => {
                             }),
                         );
                     }}
-                    title={'Continue'}
+                    title={capitalizeFirst(t('continue'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />

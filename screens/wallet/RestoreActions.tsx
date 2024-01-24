@@ -3,9 +3,13 @@ import React, {useState, useContext} from 'react';
 
 import {useColorScheme, Text, View} from 'react-native';
 
+import VText from '../../components/text';
+
 import {CommonActions, useNavigation} from '@react-navigation/core';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {useTranslation} from 'react-i18next';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
@@ -47,6 +51,8 @@ import {EBackupMaterial, ENet} from '../../types/enums';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AddWalletParamList} from '../../Navigation';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 type Props = NativeStackScreenProps<AddWalletParamList, 'RestoreActions'>;
 
 const ImportAction = ({route}: Props) => {
@@ -54,6 +60,9 @@ const ImportAction = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     const {isAdvancedMode, restoreWallet, defaultToTestnet} =
         useContext(AppStorageContext);
@@ -83,23 +92,27 @@ const ImportAction = ({route}: Props) => {
 
                 if (lines > 1) {
                     conservativeAlert(
-                        'Error',
-                        'Import supports only one line of text with material to import',
+                        capitalizeFirst(t('error')),
+                        t('import_support_error'),
+                        capitalizeFirst(t('cancel')),
                     );
-
                     return;
                 }
 
                 handleImport(importMaterial);
             })
-            .catch(e => {
-                handleFolderError(e);
+            .catch(err => {
+                handleFolderError(err);
             });
     };
 
-    const handleFolderError = (e: Error) => {
+    const handleFolderError = (err: Error) => {
         // Handle when any error in the folder action is reported
-        conservativeAlert('Error', e.message);
+        conservativeAlert(
+            capitalizeFirst(t('error')),
+            err.message,
+            capitalizeFirst(t('cancel')),
+        );
 
         return;
     };
@@ -139,8 +152,8 @@ const ImportAction = ({route}: Props) => {
                             name: 'HomeScreen',
                             params: {
                                 restoreMeta: {
-                                    title: 'Restore',
-                                    message: 'Wallet restored successfully',
+                                    title: capitalizeFirst(t('restore')),
+                                    message: t('wallet_restored_message'),
                                     load: true,
                                 },
                             },
@@ -168,7 +181,11 @@ const ImportAction = ({route}: Props) => {
             validateMnenomic(mnemonic);
         } catch {
             // Let user know the mnemonic is valid
-            errorAlert('Mnemonic', 'This is an invalid mnemonic');
+            errorAlert(
+                capitalizeFirst(t('mnemonic')),
+                t('mnemonic_invalid_error'),
+                capitalizeFirst(t('cancel')),
+            );
             return;
         }
 
@@ -181,9 +198,13 @@ const ImportAction = ({route}: Props) => {
             setImportText('');
 
             handleSuccessRoute();
-        } catch (e: any) {
+        } catch (err: any) {
             // Let user know the mnemonic is valid
-            errorAlert('Mnemonic', e.message);
+            errorAlert(
+                capitalizeFirst(t('mnemonic')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
         }
     };
 
@@ -191,8 +212,9 @@ const ImportAction = ({route}: Props) => {
         try {
             if (!isDescriptorPattern(descriptor)) {
                 errorAlert(
-                    'Descriptor',
-                    'Only single-key descriptors are supported (i.e. tr(...) wpkh(...), pkh(...), sh(wpkh(...))',
+                    capitalizeFirst(t('descriptor')),
+                    t('descriptor_valid_error'),
+                    capitalizeFirst(t('cancel')),
                 );
 
                 return;
@@ -208,8 +230,12 @@ const ImportAction = ({route}: Props) => {
             setImportText('');
 
             handleSuccessRoute();
-        } catch (e: any) {
-            errorAlert('Descriptor', e.message);
+        } catch (err: any) {
+            errorAlert(
+                capitalizeFirst(t('descriptor')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
         }
     };
 
@@ -225,8 +251,12 @@ const ImportAction = ({route}: Props) => {
             setImportText('');
 
             handleSuccessRoute();
-        } catch (e: any) {
-            errorAlert('Extended Key', e.message);
+        } catch (err: any) {
+            errorAlert(
+                capitalizeFirst(t('extended_key')),
+                err.message,
+                capitalizeFirst(t('cancel')),
+            );
         }
     };
 
@@ -295,9 +325,9 @@ const ImportAction = ({route}: Props) => {
             if (!isSupportedExtKey(material)) {
                 // Report unsupported extended keys
                 liberalAlert(
-                    'Extended Key',
-                    'This extended key is unsupported',
-                    'Cancel',
+                    t('extended_key'),
+                    e('unsupported_ext_key_error'),
+                    capitalizeFirst(t('cancel')),
                 );
                 return;
             }
@@ -305,9 +335,13 @@ const ImportAction = ({route}: Props) => {
             // Perform a checksum check
             try {
                 isValidExtendedKey(material);
-            } catch (e: any) {
+            } catch (err: any) {
                 // Report invalid ext key
-                errorAlert('Extended Key', e.message);
+                errorAlert(
+                    capitalizeFirst(t('extended_key')),
+                    err.message,
+                    capitalizeFirst(t('cancel')),
+                );
                 return;
             }
 
@@ -317,12 +351,12 @@ const ImportAction = ({route}: Props) => {
             return;
         }
 
-        liberalAlert('Import', 'Cannot import material', 'Try Again');
+        liberalAlert(t('import'), e('import_material_error'), t('try_again'));
     };
 
     const importInstructions = isAdvancedMode
-        ? 'Enter one of the following:\n\n- 12 - 24 word mnemonic\n- Wallet Descriptor (e.g., pkh(tprv...))\n- Extended private Key (e.g., x/y/z/tprv)\n- Extended public key (e.g., x/y/z/tpub)'
-        : 'Enter your 12 - 24 word mnemonic\nor wallet descriptor (e.g., pkh(tprv...))';
+        ? t('import_advanced_placeholder')
+        : t('import_basic_placeholder');
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -347,25 +381,25 @@ const ImportAction = ({route}: Props) => {
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Back
+                            {t('back')}
                         </Text>
                     </PlainButton>
 
-                    <Text
+                    <VText
                         style={[
                             tailwind('font-medium text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
-                        Restore Wallet
-                    </Text>
-                    <Text
+                        {t('restore_wallet_title')}
+                    </VText>
+                    <VText
                         style={[
                             tailwind('text-sm mt-2 mb-8'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
-                        Enter backup material
-                    </Text>
+                        {t('restore_wallet_description')}
+                    </VText>
 
                     <TextMultiInput
                         placeholder={importInstructions}
@@ -433,7 +467,7 @@ const ImportAction = ({route}: Props) => {
                     onPress={() => {
                         handleImport(importText.trim());
                     }}
-                    title="Continue"
+                    title={t('continue')}
                     textColor={
                         importText.trim().length > 0
                             ? ColorScheme.Text.Alt

@@ -2,6 +2,8 @@ import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
+import VText from '../../components/text';
+
 import {StackActions} from '@react-navigation/native';
 
 import {useNavigation} from '@react-navigation/core';
@@ -11,6 +13,8 @@ import {AddWalletParamList} from './../../Navigation';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
+
+import {useTranslation} from 'react-i18next';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -30,6 +34,8 @@ const Add = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('wallet');
 
     const {isAdvancedMode, isWalletInitialized} = useContext(AppStorageContext);
 
@@ -57,26 +63,26 @@ const Add = ({route}: Props) => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Back
+                                {t('back')}
                             </Text>
                         </PlainButton>
                     )}
 
                     <View style={[tailwind('mt-20 mb-10')]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('font-bold text-2xl'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Add Wallet
-                        </Text>
-                        <Text
+                            {t('add_wallet_title')}
+                        </VText>
+                        <VText
                             style={[
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.GrayText},
                             ]}>
-                            Create a new wallet or restore from a backup
-                        </Text>
+                            {t('add_wallet_description')}
+                        </VText>
                     </View>
 
                     {/* Import an existing Wallet */}
@@ -89,22 +95,21 @@ const Add = ({route}: Props) => {
                                     ColorScheme.MiscCardColor.ImportCard,
                             },
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('font-bold mt-2 text-white'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Import
-                        </Text>
+                            {t('import_title')}
+                        </VText>
 
-                        <Text
+                        <VText
                             style={[
                                 tailwind('mt-4 mb-2 text-white text-xs'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            Restore wallet from seed or other backup material.
-                            Select if you want to restore an existing wallet.
-                        </Text>
+                            {t('import_description')}
+                        </VText>
 
                         <View style={[tailwind('items-end')]}>
                             <PlainButton
@@ -135,7 +140,7 @@ const Add = ({route}: Props) => {
                                             Font.RobotoText,
                                             {color: ColorScheme.Text.GrayText},
                                         ]}>
-                                        Restore
+                                        {t('import_button_text')}
                                     </Text>
                                 </View>
                             </PlainButton>
@@ -151,7 +156,7 @@ const Add = ({route}: Props) => {
                         }}
                         backgroundColor={ColorScheme.Background.Inverted}
                         textColor={ColorScheme.Text.Alt}
-                        title={'Create New Wallet'}
+                        title={t('create_title')}
                     />
 
                     {isAdvancedMode ? (
@@ -165,7 +170,7 @@ const Add = ({route}: Props) => {
                                     tailwind('text-xs'),
                                     {color: ColorScheme.Text.GrayText},
                                 ]}>
-                                Supported HD accounts: BIP44, BIP46, BIP84
+                                {t('supported_accounts_info')}
                             </Text>
                         </View>
                     ) : (

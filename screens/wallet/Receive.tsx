@@ -16,6 +16,8 @@ import {
     StackActions,
 } from '@react-navigation/native';
 
+import VText from '../../components/text';
+
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
@@ -25,7 +27,13 @@ import BigNumber from 'bignumber.js';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {formatFiat, SATS_TO_BTC_RATE} from '../../modules/transform';
+import {useTranslation} from 'react-i18next';
+
+import {
+    capitalizeFirst,
+    formatFiat,
+    SATS_TO_BTC_RATE,
+} from '../../modules/transform';
 
 import Color from '../../constants/Color';
 
@@ -53,6 +61,8 @@ const Receive = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
+
+    const {t} = useTranslation('wallet');
 
     const initialState = {
         // Amount in sats
@@ -126,7 +136,7 @@ const Receive = ({route}: Props) => {
         // and revert after a few seconds
         Clipboard.setString(walletData.address.address);
 
-        setPlainAddress('Copied to Clipboard');
+        setPlainAddress(capitalizeFirst(t('copied_to_clipboard')));
 
         setTimeout(() => {
             setPlainAddress('');
@@ -158,7 +168,7 @@ const Receive = ({route}: Props) => {
                             tailwind('text-lg w-full text-center font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Bitcoin Invoice
+                        {t('bitcoin_invoice')}
                     </Text>
                 </View>
 
@@ -224,18 +234,18 @@ const Receive = ({route}: Props) => {
                 {/* Bitcoin address info */}
                 <View
                     style={[
-                        tailwind('p-4 mt-6 rounded'),
+                        tailwind('p-4 mt-6 w-3/5 rounded'),
                         {backgroundColor: ColorScheme.Background.Greyed},
                     ]}>
-                    <Text
+                    <VText
                         style={[
-                            tailwind('text-left w-full mb-4 font-bold'),
+                            tailwind('mb-4 font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Invoice Address
-                    </Text>
+                        {t('invoice_address')}
+                    </VText>
                     <PlainButton
-                        style={[tailwind('w-3/5')]}
+                        style={[tailwind('w-full')]}
                         onPress={copyDescToClipboard}>
                         <Text
                             ellipsizeMode="middle"
@@ -293,7 +303,7 @@ const Receive = ({route}: Props) => {
                                         color: ColorScheme.Text.Alt,
                                     },
                                 ]}>
-                                Share
+                                {capitalizeFirst(t('share'))}
                             </Text>
                             <ShareIcon fill={ColorScheme.SVG.Inverted} />
                         </View>
@@ -314,7 +324,7 @@ const Receive = ({route}: Props) => {
                                 tailwind('font-bold text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Edit Amount
+                            {t('edit_amount')}
                         </Text>
                     </PlainButton>
                 </View>

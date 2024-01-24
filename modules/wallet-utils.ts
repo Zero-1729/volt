@@ -107,11 +107,11 @@ export const getExtendedKeyPrefix = (key: string): EBackupMaterial => {
     const prefix = _getPrefix(key);
 
     if (!isExtendedKey(key)) {
-        throw new Error('Invalid extended key');
+        throw new Error('invalid_ext_key_error');
     }
 
     if (!validExtendedKeyPrefixes.has(prefix)) {
-        throw new Error('Unsupported extended key');
+        throw new Error('unsupported_ext_key_error');
     }
 
     return prefix.slice(1) === 'pub'

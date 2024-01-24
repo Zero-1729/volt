@@ -9,6 +9,8 @@ import {
     ActivityIndicator,
 } from 'react-native';
 
+import VText, {VTextSingle} from '../components/text';
+
 import {AppStorageContext} from '../class/storageContext';
 
 import {LongBottomButton, PlainButton} from './button';
@@ -17,8 +19,10 @@ import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {BottomModal} from './bmodal';
 import Color from '../constants/Color';
 
+import {useTranslation} from 'react-i18next';
+
 import {useTailwind} from 'tailwind-rn';
-import {addCommas, normalizeFiat} from '../modules/transform';
+import {addCommas, capitalizeFirst, normalizeFiat} from '../modules/transform';
 
 import {TComboWallet, TMiniWallet, TTransaction} from '../types/wallet';
 
@@ -46,6 +50,10 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
     const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['65'], []);
 
+    const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
     const [feeRate, setFeeRate] = React.useState<number>(0);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [newTxId, setNewTxId] = React.useState<string>('');
@@ -62,12 +70,12 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
     const openFeePrompt = () => {
         if (Platform.OS === 'android') {
             Prompt(
-                'Custom',
-                'Enter fee rate (sats/vB)',
+                capitalizeFirst(t('custom')),
+                t('custom_fee_alert_message'),
                 [
-                    {text: 'Cancel'},
+                    {text: capitalizeFirst(t('cancel'))},
                     {
-                        text: 'Set',
+                        text: capitalizeFirst(t('set')),
                         onPress: updateFeeRate,
                     },
                 ],
@@ -77,16 +85,16 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
             );
         } else {
             Alert.prompt(
-                'Custom',
-                'Enter fee rate (sats/vB)',
+                capitalizeFirst(t('custom')),
+                t('custom_fee_alert_message'),
                 [
                     {
-                        text: 'Cancel',
+                        text: capitalizeFirst(t('cancel')),
                         onPress: () => {},
                         style: 'cancel',
                     },
                     {
-                        text: 'Set',
+                        text: capitalizeFirst(t('set')),
                         onPress: updateFeeRate,
                     },
                 ],
@@ -148,8 +156,11 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
         // TODO: add more checks to report here
         if (rate <= oldTxFeeRate) {
             conservativeAlert(
-                'Error',
-                `Fee rate must be higher than ${oldTxFeeRate} sats/vB`,
+                capitalizeFirst(t('error')),
+                capitalizeFirst(
+                    `${e('fee_rate_too_low')} ${oldTxFeeRate} ${t('satoshi')}`,
+                ),
+                capitalizeFirst(t('cancel')),
             );
             return;
         }
@@ -184,7 +195,7 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                                 tailwind('text-lg font-semibold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Bump Fee
+                            {t('bump_fee')}
                         </Text>
                     </View>
 
@@ -194,40 +205,48 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
                         <View style={[tailwind('flex')]}>
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm font-bold'),
                                     {color: ColorScheme.Text.GrayText},
                                 ]}>
-                                Transaction ID
-                            </Text>
-                            <Text
-                                ellipsizeMode="middle"
-                                numberOfLines={1}
+                                {t('tx_id')}
+                            </VText>
+                            <VTextSingle
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
                                 {newTxId.length > 0 ? newTxId : props.tx.txid}
-                            </Text>
+                            </VTextSingle>
                         </View>
 
                         {/* Display current fee rate */}
                         <View style={[tailwind('items-center mt-4 w-full')]}>
                             <View
                                 style={[
-                                    tailwind('flex-row items-center w-full'),
+                                    tailwind(
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } items-center w-full`,
+                                    ),
                                 ]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind(
-                                            'text-left text-sm font-semibold mr-4',
+                                            `text-left text-sm font-semibold ${
+                                                langDir === 'right'
+                                                    ? 'ml-4'
+                                                    : 'mr-4'
+                                            }`,
                                         ),
                                         {color: ColorScheme.Text.GrayText},
                                     ]}>
-                                    Fee
-                                </Text>
-                                <Text
+                                    {capitalizeFirst(t('fee'))}
+                                </VText>
+                                <VText
                                     style={[
                                         tailwind('text-left text-sm'),
                                         {color: ColorScheme.Text.DescText},
@@ -240,7 +259,7 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                                         new BigNumber(props.tx.fee),
                                         new BigNumber(fiatRate.rate),
                                     )})`}
-                                </Text>
+                                </VText>
                             </View>
                         </View>
 
@@ -248,26 +267,36 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                         <View style={[tailwind('items-center mt-1 w-full')]}>
                             <View
                                 style={[
-                                    tailwind('flex-row items-center w-full'),
+                                    tailwind(
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } items-center w-full`,
+                                    ),
                                 ]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind(
-                                            'text-left text-sm font-semibold mr-4',
+                                            `text-left text-sm font-semibold ${
+                                                langDir === 'right'
+                                                    ? 'ml-4'
+                                                    : 'mr-4'
+                                            }`,
                                         ),
                                         {color: ColorScheme.Text.GrayText},
                                     ]}>
-                                    Feerate
-                                </Text>
-                                <Text
+                                    {capitalizeFirst(t('feerate'))}
+                                </VText>
+                                <VText
                                     style={[
                                         tailwind('text-left text-sm'),
                                         {color: ColorScheme.Text.DescText},
                                     ]}>
                                     {`~${addCommas(
                                         oldTxFeeRate.toString(),
-                                    )} sats/vB`}
-                                </Text>
+                                    )} ${t('sat_vbyte')}`}
+                                </VText>
                             </View>
                         </View>
                     </View>
@@ -278,7 +307,11 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                         }}
                         style={[
                             tailwind(
-                                'items-center px-4 flex-row justify-between mt-4 w-full rounded-md',
+                                `items-center px-4 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } justify-between mt-4 w-full rounded-md`,
                             ),
                             {
                                 height: 64,
@@ -286,17 +319,17 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                                 borderColor: ColorScheme.Background.Greyed,
                             },
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-sm font-bold'),
                                 {
                                     color: ColorScheme.Text.Default,
                                 },
                             ]}>
-                            {feeRate > 0 ? 'Update feerate' : 'Set new feerate'}
-                        </Text>
+                            {feeRate > 0 ? t('update_fee') : t('fee_bump_text')}
+                        </VText>
                         {feeRate > 0 && (
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm'),
                                     {
@@ -311,7 +344,7 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                                     new BigNumber(props.tx.vsize * feeRate),
                                     new BigNumber(fiatRate.rate),
                                 )})`}
-                            </Text>
+                            </VText>
                         )}
                     </PlainButton>
 
@@ -337,7 +370,7 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.DescText},
                                     ]}>
-                                    Bumping and broadcasting transaction...
+                                    {t('bumping_tx')}
                                 </Text>
                             )}
                         </View>
@@ -345,7 +378,7 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
 
                     <LongBottomButton
                         disabled={loading || feeRate === 0}
-                        title={'Bump'}
+                        title={capitalizeFirst(t('bump'))}
                         onPress={() => {
                             bumpFee();
                         }}

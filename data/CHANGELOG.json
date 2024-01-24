@@ -1,4 +1,5 @@
 [
+    "Language Support",
     "Added Fee bumping",
     "Add app deep linking for bitcoin uri (might be buggy)",
     "Fixed Home to Onboarding navigation",

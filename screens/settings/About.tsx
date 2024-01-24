@@ -2,6 +2,8 @@ import React, {useContext} from 'react';
 
 import {Text, View, useColorScheme, Linking, StyleSheet} from 'react-native';
 
+import VText from '../../components/text';
+
 import {AppStorageContext} from '../../class/storageContext';
 
 import {CommonActions} from '@react-navigation/native';
@@ -13,6 +15,10 @@ import {getBuildIdSync} from 'react-native-device-info';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
+
+import {useTranslation} from 'react-i18next';
+
+import {capitalizeFirst} from '../../modules/transform';
 
 import Package from './../../package.json';
 import BranchInfo from '../../data/git-branch-data.json';
@@ -27,6 +33,7 @@ import NativeBottomPadding from '../../constants/NativeWindowMetrics';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
+import Left from './../../assets/svg/chevron-left-24.svg';
 import Github from './../../assets/svg/mark-github-24.svg';
 import Squirrel from './../../assets/svg/squirrel-24.svg';
 import VoltLogo from './../../assets/svg/volt-logo.svg';
@@ -42,6 +49,10 @@ const About = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t, i18n} = useTranslation('settings');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {isAdvancedMode} = useContext(AppStorageContext);
 
@@ -68,21 +79,21 @@ const About = () => {
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Settings
+                            {capitalizeFirst(t('settings'))}
                         </Text>
                     </PlainButton>
                 </View>
 
                 <View
                     style={tailwind('justify-center w-full items-center mb-8')}>
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-2xl mb-4 w-5/6 font-medium'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
-                        About
-                    </Text>
+                        {capitalizeFirst(t('about'))}
+                    </VText>
 
                     <View
                         style={[
@@ -116,7 +127,7 @@ const About = () => {
                             {color: ColorScheme.Text.AltGray},
                             Font.RobotoText,
                         ]}>
-                        Built with open source bitcoin technologies
+                        {t('about_description')}
                     </Text>
                 </View>
 
@@ -131,7 +142,7 @@ const About = () => {
                             isAdvancedMode
                                 ? 'Build ' + getBuildIdSync() + ' '
                                 : ''
-                        }Beta`}
+                        }${capitalizeFirst(t('beta'))}`}
                         )
                     </Text>
                 </View>
@@ -176,7 +187,11 @@ const About = () => {
                         <View
                             style={[
                                 tailwind(
-                                    'items-center flex-row justify-between mt-2 mb-4',
+                                    `items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between mt-2 mb-4`,
                                 ),
                             ]}>
                             <Text
@@ -185,14 +200,22 @@ const About = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Release Notes
+                                {t('release_notes')}
                             </Text>
 
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
+                            {langDir === 'left' ? (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            ) : (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
                         </View>
                     </PlainButton>
 
@@ -205,7 +228,11 @@ const About = () => {
                         <View
                             style={[
                                 tailwind(
-                                    'items-center flex-row justify-between mt-2',
+                                    `items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between mt-2`,
                                 ),
                             ]}>
                             <Text
@@ -214,14 +241,22 @@ const About = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                License
+                                {capitalizeFirst(t('license'))}
                             </Text>
 
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
+                            {langDir === 'left' ? (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            ) : (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
                         </View>
                     </PlainButton>
                 </View>
@@ -254,7 +289,7 @@ const About = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Source Code
+                                {t('source_code')}
                             </Text>
                         </View>
                     </PlainButton>
@@ -282,7 +317,7 @@ const About = () => {
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
-                                Report Issue or Bug
+                                {t('report_bug')}
                             </Text>
                         </View>
                     </PlainButton>

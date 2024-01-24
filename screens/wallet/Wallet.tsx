@@ -12,20 +12,18 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
+import VText from '../../components/text';
+
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
 import BDK from 'bdk-rn';
 
 import BigNumber from 'bignumber.js';
-import Dayjs from 'dayjs';
-import calendar from 'dayjs/plugin/calendar';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
-
-Dayjs.extend(calendar);
-Dayjs.extend(LocalizedFormat);
 
 import {useNetInfo} from '@react-native-community/netinfo';
+
+import {useTranslation} from 'react-i18next';
 
 import {getTxData} from '../../modules/mempool';
 
@@ -61,12 +59,18 @@ import {TransactionListItem} from '../../components/transaction';
 
 import {TBalance, TTransaction} from '../../types/wallet';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
 const Wallet = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
 
@@ -162,8 +166,14 @@ const Wallet = ({route}: Props) => {
             if (!triggered) {
                 console.log('[Fiat Rate] Did not fetch fiat rate');
             }
-        } catch (e: any) {
-            liberalAlert('Network', `${e.message}`, 'OK');
+        } catch (err: any) {
+            liberalAlert(
+                capitalizeFirst(t('network')),
+                e('failed_to_fetch_rate'),
+                capitalizeFirst(t('ok')),
+            );
+
+            console.log('[Fiat Rate] Error fetching fiat rate', err.message);
 
             setLoadingBalance(false);
             setRefreshing(false);
@@ -278,8 +288,17 @@ const Wallet = ({route}: Props) => {
                 updateWalletUTXOs(currentWalletID, UTXOs);
 
                 setLoadLock(false);
-            } catch (e: any) {
-                liberalAlert('Network', `${e.message}`, 'OK');
+            } catch (err: any) {
+                liberalAlert(
+                    capitalizeFirst(t('network')),
+                    e('error_fetching_txs'),
+                    capitalizeFirst(t('ok')),
+                );
+
+                console.log(
+                    '[Wallet] Error fetching transactions',
+                    err.message,
+                );
 
                 setLoadingBalance(false);
                 setRefreshing(false);
@@ -419,7 +438,7 @@ const Wallet = ({route}: Props) => {
                                         'text-sm py-1 px-6 text-white font-bold',
                                     ),
                                 ]}>
-                                Watch only
+                                {t('watch_only')}
                             </Text>
                         </View>
                     ) : (
@@ -439,11 +458,9 @@ const Wallet = ({route}: Props) => {
                             style={[
                                 tailwind('text-sm text-white opacity-60 mb-2'),
                             ]}>
-                            Current{' '}
                             {!checkNetworkIsReachable(networkState)
-                                ? 'Offline '
-                                : ''}
-                            Balance
+                                ? t('offline_balance')
+                                : t('current_balance')}
                         </Text>
 
                         {/* Balance component */}
@@ -508,7 +525,7 @@ const Wallet = ({route}: Props) => {
                                             ),
                                             {color: ColorScheme.Text.Alt},
                                         ]}>
-                                        Send
+                                        {capitalizeFirst(t('send'))}
                                     </Text>
                                 </PlainButton>
                             </View>
@@ -542,7 +559,7 @@ const Wallet = ({route}: Props) => {
                                         ),
                                         {color: ColorScheme.Text.Alt},
                                     ]}>
-                                    Receive
+                                    {capitalizeFirst(t('receive'))}
                                 </Text>
                             </PlainButton>
                         </View>
@@ -559,13 +576,17 @@ const Wallet = ({route}: Props) => {
                         },
                     ]}>
                     <View style={[tailwind('mt-6 w-11/12')]}>
-                        <Text
+                        <VText
                             style={[
-                                tailwind('ml-4 text-base font-bold'),
+                                tailwind(
+                                    `${
+                                        langDir === 'right' ? 'mr-4' : 'ml-4'
+                                    } text-base font-bold`,
+                                ),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Transactions
-                        </Text>
+                            {capitalizeFirst(t('transactions'))}
+                        </VText>
                     </View>
 
                     <View
@@ -637,8 +658,7 @@ const Wallet = ({route}: Props) => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        A list of all transactions for this
-                                        wallet will be displayed here
+                                        {t('no_transactions_text')}
                                     </Text>
                                 </View>
                             }

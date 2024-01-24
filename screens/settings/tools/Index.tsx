@@ -1,21 +1,32 @@
 import React from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import {View, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
+
+import VText from '../../../components/text';
 
 import {PlainButton} from '../../../components/button';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
 import Color from '../../../constants/Color';
 
 import Back from '../../../assets/svg/arrow-left-24.svg';
 import Right from '../../../assets/svg/chevron-right-24.svg';
+import Left from '../../../assets/svg/chevron-left-24.svg';
+
+import {capitalizeFirst} from '../../../modules/transform';
 
 const Index = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const {t, i18n} = useTranslation('settings');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const HeadingBar = {
         height: 2,
@@ -43,13 +54,13 @@ const Index = () => {
                         }}>
                         <Back fill={ColorScheme.SVG.Default} />
                     </PlainButton>
-                    <Text
+                    <VText
                         style={[
                             tailwind('font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Tools
-                    </Text>
+                        {capitalizeFirst(t('tools'))}
+                    </VText>
                 </View>
 
                 {/* View Divider */}
@@ -68,22 +79,36 @@ const Index = () => {
                     }}>
                     <View
                         style={[
-                            tailwind('items-center flex-row justify-between'),
+                            tailwind(
+                                `items-center ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } justify-between`,
+                            ),
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Extended Key Converter
-                        </Text>
+                            {t('ext_key_converter')}
+                        </VText>
 
                         <View style={[tailwind('items-center')]}>
-                            <Right
-                                width={16}
-                                stroke={ColorScheme.SVG.GrayFill}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
+                            {langDir === 'right' ? (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            ) : (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
                         </View>
                     </View>
                 </PlainButton>

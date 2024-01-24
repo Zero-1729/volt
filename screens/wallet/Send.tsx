@@ -9,13 +9,15 @@ import {
     ActivityIndicator,
 } from 'react-native';
 
+import VText, {VTextSingle, VTextMulti} from '../../components/text';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {normalizeFiat} from '../../modules/transform';
+import {capitalizeFirst, normalizeFiat} from '../../modules/transform';
 import BigNumber from 'bignumber.js';
 
 import {psbtFromInvoice} from './../../modules/bdk';
@@ -46,6 +48,7 @@ import {WalletParamList} from '../../Navigation';
 import {conservativeAlert} from '../../components/alert';
 import {PartiallySignedTransaction} from 'bdk-rn';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+import {useTranslation} from 'react-i18next';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -53,6 +56,9 @@ const SendView = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [uPsbt, setUPsbt] = useState<PartiallySignedTransaction>();
     const [loadingPsbt, setLoadingPsbt] = useState(true);
@@ -159,11 +165,12 @@ const SendView = ({route}: Props) => {
             electrumServerURL,
             (e: any) => {
                 conservativeAlert(
-                    'Error',
-                    `Could not create transaction. ${
-                        isAdvancedMode ? e.message : ''
-                    }`,
+                    capitalizeFirst(t('error')),
+                    t('tx_fail_creation_error'),
+                    capitalizeFirst(t('cancel')),
                 );
+
+                console.log('[Send] Error creating transaction: ', e.message);
 
                 // Stop loading
                 setLoadingPsbt(false);
@@ -214,7 +221,7 @@ const SendView = ({route}: Props) => {
                                 tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Transaction Summary
+                            {t('transaction_summary')}
                         </Text>
                     </View>
                     <View
@@ -232,7 +239,7 @@ const SendView = ({route}: Props) => {
                                             color: ColorScheme.Text.GrayedText,
                                         },
                                     ]}>
-                                    Amount
+                                    {t('amount')}
                                 </Text>
                             </View>
                             {isMax && (
@@ -241,7 +248,7 @@ const SendView = ({route}: Props) => {
                                         tailwind('text-4xl'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Max
+                                    {capitalizeFirst(t('max'))}
                                 </Text>
                             )}
                             {!isMax && (
@@ -270,31 +277,35 @@ const SendView = ({route}: Props) => {
                                     style={[
                                         tailwind('items-center flex-row mb-1'),
                                     ]}>
-                                    <Text
+                                    <VText
                                         style={[
-                                            tailwind('text-sm mr-2'),
+                                            tailwind('text-sm w-full mr-2'),
                                             {
                                                 color: ColorScheme.Text
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        Address
-                                    </Text>
+                                        {capitalizeFirst(t('address'))}
+                                    </VText>
                                 </View>
                             </PlainButton>
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
                                 {route.params.invoiceData.address}
-                            </Text>
+                            </VText>
                         </View>
 
                         <View
                             style={[
                                 tailwind(
-                                    'mt-6 items-center justify-between w-4/5 flex-row',
+                                    `mt-6 items-center justify-between w-4/5 ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }`,
                                 ),
                             ]}>
                             <Text
@@ -302,13 +313,17 @@ const SendView = ({route}: Props) => {
                                     tailwind('text-sm font-bold'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                Fee
+                                {capitalizeFirst(t('fee'))}
                             </Text>
 
                             <View
                                 style={[
                                     tailwind(
-                                        'flex flex-row justify-center items-center',
+                                        `flex ${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } justify-center items-center`,
                                     ),
                                 ]}>
                                 <Text
@@ -346,7 +361,9 @@ const SendView = ({route}: Props) => {
                                                 color: ColorScheme.Text.Alt,
                                             },
                                         ]}>
-                                        {`${route.params.feeRate} sat/vB`}
+                                        {`${route.params.feeRate} ${t(
+                                            'sat_vbyte',
+                                        )}`}
                                     </Text>
                                 </View>
                             </View>
@@ -361,10 +378,14 @@ const SendView = ({route}: Props) => {
                                     <View
                                         style={[
                                             tailwind(
-                                                'flex-row justify-between',
+                                                `${
+                                                    langDir === 'right'
+                                                        ? 'flex-row-reverse'
+                                                        : 'flex-row'
+                                                } justify-between`,
                                             ),
                                         ]}>
-                                        <Text
+                                        <VText
                                             style={[
                                                 tailwind('text-sm font-bold'),
                                                 {
@@ -372,12 +393,10 @@ const SendView = ({route}: Props) => {
                                                         .Default,
                                                 },
                                             ]}>
-                                            Label
-                                        </Text>
+                                            {capitalizeFirst(t('label'))}
+                                        </VText>
 
-                                        <Text
-                                            numberOfLines={1}
-                                            ellipsizeMode={'middle'}
+                                        <VTextSingle
                                             style={[
                                                 tailwind(
                                                     'text-sm w-3/5 text-right',
@@ -391,7 +410,7 @@ const SendView = ({route}: Props) => {
                                                 route.params.invoiceData.options
                                                     ?.label
                                             }
-                                        </Text>
+                                        </VTextSingle>
                                     </View>
                                 ) : (
                                     <></>
@@ -403,7 +422,7 @@ const SendView = ({route}: Props) => {
                                             styles.invoiceMessage,
                                             tailwind('w-full mt-6'),
                                         ]}>
-                                        <Text
+                                        <VText
                                             style={[
                                                 tailwind(
                                                     'text-sm mb-4 font-bold',
@@ -413,11 +432,9 @@ const SendView = ({route}: Props) => {
                                                         .Default,
                                                 },
                                             ]}>
-                                            Message
-                                        </Text>
-                                        <Text
-                                            numberOfLines={4}
-                                            ellipsizeMode={'middle'}
+                                            {capitalizeFirst(t('message'))}
+                                        </VText>
+                                        <VTextMulti
                                             style={[
                                                 tailwind('text-sm'),
                                                 {
@@ -429,7 +446,7 @@ const SendView = ({route}: Props) => {
                                                 route.params.invoiceData.options
                                                     ?.message
                                             }
-                                        </Text>
+                                        </VTextMulti>
                                     </View>
                                 ) : (
                                     <></>
@@ -458,15 +475,17 @@ const SendView = ({route}: Props) => {
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.GrayedText},
-                                ]}>{`Generating ${
-                                isAdvancedMode ? 'PSBT' : 'Transaction'
+                                ]}>{`${capitalizeFirst(t('generating'))} ${
+                                isAdvancedMode
+                                    ? t('psbt').toUpperCase()
+                                    : capitalizeFirst(t('transaction'))
                             }...`}</Text>
                         </View>
                     )}
                     <LongBottomButton
                         disabled={loadingPsbt}
                         onPress={createTransaction}
-                        title={'Send'}
+                        title={capitalizeFirst(t('send'))}
                         textColor={ColorScheme.Text.Alt}
                         backgroundColor={ColorScheme.Background.Inverted}
                     />

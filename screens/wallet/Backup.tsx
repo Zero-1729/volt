@@ -4,6 +4,8 @@ import React, {useContext, useState} from 'react';
 import {Text, View, useColorScheme, Platform, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import VText from '../../components/text';
+
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {useNavigation, CommonActions} from '@react-navigation/core';
@@ -20,6 +22,8 @@ import Color from '../../constants/Color';
 
 import {PlainButton} from '../../components/button';
 
+import {useTranslation} from 'react-i18next';
+
 import {AppStorageContext} from '../../class/storageContext';
 
 import {WalletTypeDetails} from '../../modules/wallet-defaults';
@@ -35,6 +39,8 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {EBackupMaterial} from '../../types/enums';
 import {conservativeAlert} from '../../components/alert';
 
+import {capitalizeFirst} from '../../modules/transform';
+
 const Backup = () => {
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -42,6 +48,9 @@ const Backup = () => {
 
     const {currentWalletID, getWalletData, isAdvancedMode} =
         useContext(AppStorageContext);
+
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const walletData = getWalletData(currentWalletID);
     const walletType = WalletTypeDetails[walletData.type];
@@ -113,7 +122,11 @@ const Backup = () => {
 
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
-                conservativeAlert('Error', e.message);
+                conservativeAlert(
+                    capitalizeFirst(t('error')),
+                    e.message,
+                    capitalizeFirst(t('cancel')),
+                );
             });
             await Share.open({
                 url: 'file://' + pathData,
@@ -122,7 +135,11 @@ const Backup = () => {
             })
                 .catch(e => {
                     if (e.message !== 'User did not share') {
-                        conservativeAlert('Error', e.message);
+                        conservativeAlert(
+                            capitalizeFirst(t('error')),
+                            e.message,
+                            capitalizeFirst(t('cancel')),
+                        );
                     }
                 })
                 .finally(() => {
@@ -153,16 +170,15 @@ const Backup = () => {
         // and revert after a few seconds
         Clipboard.setString(getQRData(backupMaterial));
 
-        setBackupData('Copied to clipboard');
+        setBackupData(capitalizeFirst(t('copied_to_clipboard')));
 
         setTimeout(() => {
             setBackupData(getQRData(backupMaterial));
         }, 450);
     };
 
-    const info =
-        'Keep your wallet safe to protect your funds. Please, write down and secure this backup material.';
-    const warning = 'Do not screenshot or share with anyone.';
+    const info = t('backup_description');
+    const warning = t('backup_clarification');
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
@@ -171,7 +187,8 @@ const Backup = () => {
                     {/* Top panel */}
                     <View style={[tailwind('absolute top-6  w-full left-0')]}>
                         {/* Allow exporting public descriptor to file */}
-                        {backupMaterial === EBackupMaterial.Descriptor && Platform.OS === 'ios' &&
+                        {backupMaterial === EBackupMaterial.Descriptor &&
+                        Platform.OS === 'ios' &&
                         !showPrivateDescriptor ? (
                             <PlainButton
                                 style={[tailwind('absolute left-0')]}
@@ -223,7 +240,9 @@ const Backup = () => {
                                 tailwind('text-base self-center mb-10'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {isAdvancedMode ? walletTypeName : 'Backup'}
+                            {isAdvancedMode
+                                ? walletTypeName
+                                : capitalizeFirst(t('backup'))}
                         </Text>
                     </View>
 
@@ -388,10 +407,14 @@ const Backup = () => {
                             <View
                                 style={[
                                     tailwind(
-                                        'mb-4 self-center w-11/12 flex-row',
+                                        `mb-4 self-center w-11/12 ${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        }`,
                                     ),
                                 ]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm'),
                                         {
@@ -401,10 +424,9 @@ const Backup = () => {
                                         },
                                     ]}>
                                     {!showPrivateDescriptor
-                                        ? 'Display'
-                                        : 'Hide'}{' '}
-                                    Extended Private Key Descriptor
-                                </Text>
+                                        ? t('display_priv_descriptor')
+                                        : t('display_pub_descriptor')}
+                                </VText>
                                 {/* btn */}
                                 <Checkbox
                                     fillColor={
@@ -428,7 +450,13 @@ const Backup = () => {
                                         borderRadius: 2,
                                     }}
                                     style={[
-                                        tailwind('flex-row absolute -right-4'),
+                                        tailwind(
+                                            `flex-row absolute ${
+                                                langDir === 'right'
+                                                    ? 'right-0'
+                                                    : '-right-4'
+                                            }`,
+                                        ),
                                     ]}
                                     onPress={() => {
                                         RNHapticFeedback.trigger(
@@ -461,7 +489,7 @@ const Backup = () => {
                                 tailwind('text-sm text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            <Text>{warning}</Text>
+                            {warning}
                         </Text>
                     </View>
                 </View>
@@ -474,6 +502,6 @@ export default Backup;
 
 const styles = StyleSheet.create({
     infoContainer: {
-        bottom: NativeWindowMetrics.bottom,
+        bottom: NativeWindowMetrics.bottom + 24,
     },
 });

@@ -1,16 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
-import {Text, View, useColorScheme} from 'react-native';
+import {View, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
-import BigNum from 'bignumber.js';
-import Dayjs from 'dayjs';
-import calendar from 'dayjs/plugin/calendar';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
+import VText from './text';
 
-Dayjs.extend(calendar);
-Dayjs.extend(LocalizedFormat);
+import BigNum from 'bignumber.js';
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -24,18 +20,21 @@ import Color from '../constants/Color';
 
 import ArrowUp from '../assets/svg/arrow-up-right-24.svg';
 import ArrowDown from '../assets/svg/arrow-down-left-24.svg';
+import {useTranslation} from 'react-i18next';
+
+import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
 
 export const TransactionListItem = (props: TxListItemProps) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
     const {isAdvancedMode} = useContext(AppStorageContext);
 
     const getTxTimestamp = (time: Date) => {
-        const date = +time * 1000;
-        const isToday = Dayjs(date).isSame(Dayjs(), 'day');
-
-        return isToday ? Dayjs(date).calendar() : Dayjs(date).format('LLL');
+        return formatLocaleDate(i18n.language, time);
     };
 
     return (
@@ -46,7 +45,11 @@ export const TransactionListItem = (props: TxListItemProps) => {
             <View
                 style={[
                     tailwind(
-                        'flex-row h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md',
+                        `${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`,
                     ),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
@@ -64,7 +67,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
                     <View style={[tailwind('w-full ml-1')]}>
                         {props.tx.isSelfOrBoost ? (
                             <View style={[tailwind('')]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-lg font-bold'),
                                         {color: ColorScheme.Text.GrayedText},
@@ -72,7 +75,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
                                     {isAdvancedMode
                                         ? 'RBF Fee Boost'
                                         : 'Fee Boost'}
-                                </Text>
+                                </VText>
                             </View>
                         ) : (
                             <TXBalance
@@ -81,15 +84,15 @@ export const TransactionListItem = (props: TxListItemProps) => {
                                 fontColor={ColorScheme.Text.Default}
                             />
                         )}
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-xs'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
                             {props.tx.confirmed
                                 ? getTxTimestamp(props.tx.timestamp)
-                                : 'Unconfirmed'}
-                        </Text>
+                                : capitalizeFirst(t('unconfirmed'))}
+                        </VText>
                     </View>
                 </View>
                 {!props.tx.isSelfOrBoost ? (

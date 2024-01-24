@@ -13,9 +13,15 @@ export type BaseProps = PropsWithChildren<{
     activeOpacity?: number;
 }>;
 
+export type VTextProps = {
+    style?: React.CSSProperties | StyleProp<ViewStyle>;
+    children?: React.ReactNode;
+};
+
 export type AppCard = BaseProps & {
     key: React.Key;
     title: string;
+    titleColor: string;
     description: string;
     icon: React.FC<SvgProps>;
     url: string;
@@ -51,7 +57,7 @@ export type WalletCardProps = CardProps & {
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
-    loading?: boolean;
+    loading: boolean;
     unit: Unit;
     network: string;
     navCallback?: () => void;
@@ -96,6 +102,7 @@ export type TextInputProps = BaseProps & {
     placeholder: string;
     placeholderTextColor?: string;
     onBlur?: () => void;
+    noTrans?: boolean;
     value?: string;
     refs?: React.RefObject<TextInput>;
     onChangeText?:

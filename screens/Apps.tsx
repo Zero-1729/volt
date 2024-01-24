@@ -1,10 +1,14 @@
 import React from 'react';
 
-import {FlatList, Text, useColorScheme, View, Linking} from 'react-native';
+import {FlatList, useColorScheme, View, Linking} from 'react-native';
+
+import VText from '../components/text';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
+
+import {capitalizeFirst} from '../modules/transform';
 
 import {PlainButton} from '../components/button';
 
@@ -12,9 +16,11 @@ import {AppCard} from '../types/props';
 
 import Font from '../constants/Font';
 
+import {useTranslation} from 'react-i18next';
+
 import CoinprofileLogo from '../assets/svg/coinprofile.svg';
 import BitrefillLogo from '../assets/svg/bitrefill.svg';
-import ChangellyLogo from '../assets/svg/changelly.svg';
+import SideShiftLogo from '../assets/svg/sideshift.svg';
 
 import Color from '../constants/Color';
 
@@ -23,16 +29,20 @@ const Apps = () => {
 
     const tailwind = useTailwind();
 
+    const {t, i18n} = useTranslation('apps');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
     // Apps
-    const Services = [
+    const Services: AppCard[] = [
         {
             key: 1,
             title: 'Coinprofile',
-            description: 'Send Bitcoin to NGN Bank Accounts',
+            description: t('coinprofile_description'),
             icon: CoinprofileLogo,
             color: {
                 backgroundColor: '#00B3E4',
             },
+            titleColor: '#fefefe',
             textHue: {
                 color: '#095569',
             },
@@ -41,11 +51,12 @@ const Apps = () => {
         {
             key: 2,
             title: 'Bitrefill',
-            description: 'Buy Giftcards with your Bitcoin',
+            description: t('bitrefill_description'),
             icon: BitrefillLogo,
             color: {
                 backgroundColor: '#2E70B7',
             },
+            titleColor: '#fefefe',
             textHue: {
                 color: '#A3C4E8',
             },
@@ -53,14 +64,15 @@ const Apps = () => {
         },
         {
             key: 3,
-            title: 'Changelly',
-            description: 'Swap Bitcoin for other Crypto',
-            icon: ChangellyLogo,
+            title: 'SideShift',
+            description: t('sideshift_description'),
+            icon: SideShiftLogo,
             color: {
-                backgroundColor: '#2D3A34',
+                backgroundColor: '#fefefe',
             },
+            titleColor: '#110b0b',
             textHue: {
-                color: '#1E9A61',
+                color: '#110b0b',
             },
             url: 'https://changelly.com',
         },
@@ -79,23 +91,28 @@ const Apps = () => {
                     key={item.key}
                     style={[
                         tailwind(
-                            'bg-blue-600 w-full h-28 rounded-md items-center justify-center flex-row p-6 mb-4',
+                            `bg-blue-600 w-full h-28 rounded-md items-center justify-center ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } p-6 mb-4`,
                         ),
                         item.color,
                     ]}>
                     <View style={[tailwind('flex h-5/6 w-5/6 justify-around')]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-xl text-white font-medium'),
                                 Font.RobotoText,
+                                {color: item.titleColor},
                             ]}>
                             {item.title}
-                        </Text>
-                        <Text style={[tailwind('text-xs'), item.textHue]}>
+                        </VText>
+                        <VText style={[tailwind('text-xs'), item.textHue]}>
                             {item.description}
-                        </Text>
+                        </VText>
                     </View>
-                    <item.icon />
+                    <item.icon width={42} height={42} />
                 </View>
             </PlainButton>
         );
@@ -109,18 +126,15 @@ const Apps = () => {
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 {/* Top bar */}
-                <View
-                    style={[
-                        tailwind('w-full h-12 mt-4 justify-center pl-9 mb-6'),
-                    ]}>
-                    <Text
+                <View style={[tailwind('w-5/6 h-12 mt-4 justify-center mb-6')]}>
+                    <VText
                         style={[
                             tailwind('text-2xl font-medium'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
-                        Apps
-                    </Text>
+                        {capitalizeFirst(t('apps'))}
+                    </VText>
                 </View>
 
                 {/* List of Apps */}

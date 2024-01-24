@@ -21,6 +21,8 @@ import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
+import {useTranslation} from 'react-i18next';
+
 import decodeURI from 'bip21';
 
 import {checkInvoiceAndWallet, isValidAddress} from '../modules/wallet-utils';
@@ -42,7 +44,7 @@ import InfoIcon from '../assets/svg/info-16.svg';
 import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {convertBTCtoSats} from '../modules/transform';
+import {capitalizeFirst, convertBTCtoSats} from '../modules/transform';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -123,6 +125,8 @@ const Scan = ({route}: Props) => {
 
     const {walletMode} = useContext(AppStorageContext);
 
+    const {t} = useTranslation('wallet');
+
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
     // Else, we'll cut it out and let Camera View take over
@@ -132,7 +136,11 @@ const Scan = ({route}: Props) => {
     const cameraRef = React.useRef<Camera>(null);
 
     const onError = (error: any) => {
-        conservativeAlert('QR Scan', error.message);
+        conservativeAlert(
+            t('qr_scan'),
+            error.message,
+            capitalizeFirst(t('ok')),
+        );
     };
 
     const requestCamPerms = async () => {
@@ -365,7 +373,7 @@ const Scan = ({route}: Props) => {
     };
 
     const dynamicHeading =
-        route.params.screen === 'send' ? 'Scan Invoice QR' : 'Scan QR Code';
+        route.params.screen === 'send' ? t('qr_scan_invoice') : t('qr_scan');
 
     // Display Camera view if camera available
     return (
@@ -439,7 +447,7 @@ const Scan = ({route}: Props) => {
                         )}
 
                         <Text style={[tailwind('text-sm mb-4 text-white')]}>
-                            Scan a Bitcoin invoice or address to pay
+                            {t('scan_message')}
                         </Text>
 
                         {/* Scan Area */}
@@ -463,7 +471,7 @@ const Scan = ({route}: Props) => {
 
                     <LongBottomButton
                         onPress={handleClipboard}
-                        title={'Paste'}
+                        title={capitalizeFirst(t('paste'))}
                         textColor={'black'}
                         backgroundColor={'white'}
                     />

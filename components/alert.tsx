@@ -3,12 +3,16 @@ import {Alert} from 'react-native';
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
-export const errorAlert = (heading: string, msg: string): void => {
+export const errorAlert = (
+    heading: string,
+    msg: string,
+    cancelText: string,
+): void => {
     RNHapticFeedback.trigger('notificationError', RNHapticFeedbackOptions);
 
     Alert.alert(heading, msg, [
         {
-            text: 'Cancel',
+            text: cancelText,
             onPress: () => {},
             style: 'cancel',
         },
@@ -36,12 +40,16 @@ export const liberalAlert = (
     ]);
 };
 
-export const conservativeAlert = (heading: string, msg: string): void => {
+export const conservativeAlert = (
+    heading: string,
+    msg: string,
+    okText: string,
+): void => {
     RNHapticFeedback.trigger('notificationSuccess', RNHapticFeedbackOptions);
 
     Alert.alert(heading, msg, [
         {
-            text: 'Ok',
+            text: okText,
             onPress: () => {},
         },
     ]);
@@ -51,11 +59,12 @@ export const DeletionAlert = (
     heading: string,
     msg: string,
     primaryButtonText: string,
+    cancelButtonText: string,
     onSuccess: () => void,
 ): void => {
     Alert.alert(heading, msg, [
         {
-            text: 'Cancel',
+            text: cancelButtonText,
             onPress: () => {},
             style: 'cancel',
         },

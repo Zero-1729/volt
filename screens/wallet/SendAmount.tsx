@@ -25,7 +25,13 @@ import bottomOffset from '../../constants/NativeWindowMetrics';
 
 import {DUST_LIMIT} from '../../modules/wallet-defaults';
 
-import {formatFiat, normalizeFiat} from '../../modules/transform';
+import {useTranslation} from 'react-i18next';
+
+import {
+    capitalizeFirst,
+    formatFiat,
+    normalizeFiat,
+} from '../../modules/transform';
 
 import {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
@@ -47,6 +53,9 @@ const SendAmount = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
+
+    const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
 
@@ -249,7 +258,7 @@ const SendAmount = ({route}: Props) => {
                             tailwind('text-sm text-center w-full font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Send
+                        {capitalizeFirst(t('send'))}
                     </Text>
                 </View>
 
@@ -277,7 +286,7 @@ const SendAmount = ({route}: Props) => {
                                     tailwind('text-4xl font-bold'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                Max
+                                {capitalizeFirst(t('max'))}
                             </Text>
                         )}
                         {!isMax && (
@@ -318,7 +327,7 @@ const SendAmount = ({route}: Props) => {
                                         tailwind('text-sm font-bold mr-2'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Use Max
+                                    {t('use_max')}
                                 </Text>
                                 <View style={[tailwind('justify-center')]}>
                                     {displayBalance('text-sm')}
@@ -346,8 +355,11 @@ const SendAmount = ({route}: Props) => {
                         onPress={() => {
                             if (isBelowDust) {
                                 conservativeAlert(
-                                    'Dust Limit',
-                                    `You cannot send amounts below the dust limit of ${DUST_LIMIT} sats.`,
+                                    e('dust_limit_title'),
+                                    `${e(
+                                        'dust_limit_message',
+                                    )} ${DUST_LIMIT} ${t('satoshi')}.`,
+                                    capitalizeFirst(t('cancel')),
                                 );
                                 return;
                             }
@@ -369,12 +381,12 @@ const SendAmount = ({route}: Props) => {
                                 );
                             } else {
                                 conservativeAlert(
-                                    'No Internet Connection',
-                                    'Please connect to the internet to continue.',
+                                    e('no_internet_title'),
+                                    e('no_internet_message'),
+                                    capitalizeFirst(t('cancel')),
                                 );
                                 return;
                             }
-
                         }}>
                         <View
                             style={[
@@ -397,7 +409,7 @@ const SendAmount = ({route}: Props) => {
                                         color: ColorScheme.Text.Alt,
                                     },
                                 ]}>
-                                {'Continue'}
+                                {capitalizeFirst(t('continue'))}
                             </Text>
                         </View>
                     </PlainButton>

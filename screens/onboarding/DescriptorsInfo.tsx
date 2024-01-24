@@ -8,6 +8,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTailwind} from 'tailwind-rn';
 
+import {useTranslation} from 'react-i18next';
+
+import {capitalizeFirst} from '../../modules/transform';
+
 import {LongBottomButton} from '../../components/button';
 
 import Volt from './../../assets/svg/btc.svg';
@@ -20,6 +24,8 @@ const DescriptorsInfo = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('onboarding');
 
     return (
         <SafeAreaView>
@@ -45,7 +51,7 @@ const DescriptorsInfo = () => {
                                 tailwind('text-xl font-bold text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Wallet Descriptors
+                            {t('wallet_descriptors')}
                         </Text>
 
                         <Text
@@ -53,9 +59,7 @@ const DescriptorsInfo = () => {
                                 tailwind('mt-4 text-sm text-center'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            Wallet descriptors allow you to export your bitcoin
-                            wallet with more precision and guarantee of accurate
-                            backups
+                            {t('descriptors_gist')}
                         </Text>
                     </View>
                 </View>
@@ -68,7 +72,7 @@ const DescriptorsInfo = () => {
                             }),
                         );
                     }}
-                    title={'Continue'}
+                    title={capitalizeFirst(t('continue'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />

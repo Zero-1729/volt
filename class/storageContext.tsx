@@ -1087,7 +1087,7 @@ export const AppStorageProvider = ({children}: Props) => {
                     `[AsyncStorage] (Add wallet) Error loading data: ${e}`,
                 );
 
-                throw new Error('Unable to add wallet');
+                throw new Error('unable_to_add_wallet_error');
             }
         },
         [wallets, _updateWallets, _setWallets],

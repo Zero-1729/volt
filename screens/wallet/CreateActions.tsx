@@ -11,6 +11,8 @@ import {
     StyleSheet,
 } from 'react-native';
 
+import VText from '../../components/text';
+
 import {StackActions, useNavigation} from '@react-navigation/core';
 
 import screenOffsets from '../../constants/NativeWindowMetrics';
@@ -30,6 +32,8 @@ import {PlainButton, LongBottomButton} from '../../components/button';
 
 import {TextSingleInput} from '../../components/input';
 
+import {useTranslation} from 'react-i18next';
+
 import {WALLET_NAME_LENGTH} from '../../modules/wallet-defaults';
 
 import Checkbox from 'react-native-bouncy-checkbox';
@@ -45,6 +49,7 @@ import Color from '../../constants/Color';
 import {errorAlert} from '../../components/alert';
 
 import {ENet} from '../../types/enums';
+import {capitalizeFirst} from '../../modules/transform';
 
 const CreateAction = () => {
     const navigation = useNavigation();
@@ -52,6 +57,10 @@ const CreateAction = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {addWallet, isAdvancedMode, defaultToTestnet, isWalletInitialized} =
         useContext(AppStorageContext);
@@ -119,8 +128,12 @@ const CreateAction = () => {
             navigation.dispatch(
                 StackActions.push('Mnemonic', {onboarding: onboarding}),
             );
-        } catch (e: any) {
-            errorAlert('Alert', e.message);
+        } catch (err: any) {
+            errorAlert(
+                capitalizeFirst(t('alert')),
+                e(err.message),
+                capitalizeFirst(t('cancel')),
+            );
 
             // Revert to make it obvious to user to try again
             setNewWalletName(cachedName);
@@ -166,19 +179,19 @@ const CreateAction = () => {
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
-                            Back
+                            {t('back')}
                         </Text>
                     </PlainButton>
 
-                    <Text
+                    <VText
                         style={[
                             tailwind('font-bold text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Create New Wallet
-                    </Text>
+                        {t('create_title')}
+                    </VText>
 
-                    <Text
+                    <VText
                         style={[
                             tailwind('text-xs mt-2'),
                             {color: ColorScheme.Text.GrayText},
@@ -187,10 +200,12 @@ const CreateAction = () => {
                             ? accountInfo[account][
                                   network === ENet.Testnet ? 1 : 0
                               ]
-                            : `Defaults to Taproot (address starts with '${
+                            : `${t('create_wallet_defaults_message')} (${t(
+                                  'create_wallet_defaults_message_1',
+                              )} '${
                                   network === ENet.Testnet ? 'tb1' : 'bc1'
                               }...')`}
-                    </Text>
+                    </VText>
 
                     <View
                         style={[
@@ -199,7 +214,7 @@ const CreateAction = () => {
                         ]}>
                         <TextSingleInput
                             maxLength={WALLET_NAME_LENGTH}
-                            placeholder={'Enter a wallet name'}
+                            placeholder={t('wallet_create_placeholder')}
                             placeholderTextColor={ColorScheme.Text.GrayedText}
                             onChangeText={setNewWalletName}
                             onBlur={onBlur}
@@ -210,7 +225,11 @@ const CreateAction = () => {
                             <View
                                 style={[
                                     tailwind(
-                                        'absolute justify-center h-full right-4',
+                                        `absolute justify-center h-full ${
+                                            langDir === 'right'
+                                                ? 'left-4'
+                                                : 'right-4'
+                                        }`,
                                     ),
                                 ]}>
                                 <Text
@@ -226,13 +245,13 @@ const CreateAction = () => {
 
                     {isAdvancedMode ? (
                         <View style={[tailwind('mt-8')]}>
-                            <Text
+                            <VText
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                Select Account Type
-                            </Text>
+                                {t('select_account_type')}
+                            </VText>
 
                             {/* Dropdown */}
                             <DropDownPicker
@@ -274,13 +293,13 @@ const CreateAction = () => {
 
                             {/* Wallet Network */}
                             <View style={[tailwind('mt-10 flex-row')]}>
-                                <Text
+                                <VText
                                     style={[
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    Set Testnet
-                                </Text>
+                                    {t('set_testnet')}
+                                </VText>
                                 {/* btn */}
                                 <Checkbox
                                     fillColor={
@@ -328,13 +347,13 @@ const CreateAction = () => {
                             tailwind('absolute'),
                             {bottom: screenOffsets.bottomButtonOffset + 72},
                         ]}>
-                        <Text
+                        <VText
                             style={[
                                 tailwind('text-sm mb-4'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            Generating wallet material...
-                        </Text>
+                            {t('wallet_generation_text')}
+                        </VText>
                         <ActivityIndicator />
                     </View>
                 )}
@@ -344,7 +363,7 @@ const CreateAction = () => {
                         updateWalletName(newWalletName, account);
                     }}
                     disabled={newWalletName.trim().length === 0}
-                    title={'Continue'}
+                    title={t('continue')}
                     textColor={
                         newWalletName.trim().length > 0
                             ? ColorScheme.Text.Alt

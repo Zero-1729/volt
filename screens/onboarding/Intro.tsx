@@ -9,6 +9,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from './../../class/storageContext';
 
+import {useTranslation} from 'react-i18next';
+
+import {capitalizeFirst} from '../../modules/transform';
+
 import {useTailwind} from 'tailwind-rn';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
@@ -25,6 +29,8 @@ const Intro = () => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('onboarding');
 
     const {isWalletInitialized} = useContext(AppStorageContext);
 
@@ -71,7 +77,7 @@ const Intro = () => {
                                 tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Skip
+                            {t('skip')}
                         </Text>
                     </PlainButton>
                 </View>
@@ -85,16 +91,17 @@ const Intro = () => {
                                 tailwind('text-xl font-bold text-center'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            Welcome to Volt
+                            {t('welcome')}
                         </Text>
 
                         <Text
                             style={[
                                 tailwind('mt-4 text-sm text-center'),
-                                {color: ColorScheme.Text.GrayedText},
+                                {
+                                    color: ColorScheme.Text.GrayedText,
+                                },
                             ]}>
-                            A carefully crafted descriptor-based Bitcoin wallet
-                            for the modern age.
+                            {t('app_description')}
                         </Text>
                     </View>
                 </View>
@@ -107,7 +114,7 @@ const Intro = () => {
                             }),
                         );
                     }}
-                    title={'Next'}
+                    title={capitalizeFirst(t('next'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />

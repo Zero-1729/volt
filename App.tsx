@@ -1,14 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import 'react-native-gesture-handler';
 
-import React, {useEffect} from 'react';
-
+import React, {useContext, useEffect} from 'react';
 import {StatusBar, useColorScheme, Linking} from 'react-native';
+
+import {AppStorageContext} from './class/storageContext';
+
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+
 import {
     NavigationContainer,
     DefaultTheme,
     LinkingOptions,
 } from '@react-navigation/native';
+
+import i18n from './i18n';
 
 import Privacy from 'react-native-privacy-snapshot';
 
@@ -18,12 +24,18 @@ import Color from './constants/Color';
 import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
+    const {appLanguage} = useContext(AppStorageContext);
     useEffect(() => {
         SplashScreen.hide();
 
         // Enable privacy blur for IOS; blur screen when screen inactive
         Privacy?.enabled(true);
     }, []);
+
+    useEffect(() => {
+        // Load language when app language change
+        i18n.changeLanguage(appLanguage.code);
+    }, [appLanguage]);
 
     const ColorScheme = Color(useColorScheme());
 

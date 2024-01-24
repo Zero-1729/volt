@@ -1,12 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {Text, View, useColorScheme, StyleSheet} from 'react-native';
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
-
-import {AppStorageContext} from '../../class/storageContext';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -18,8 +16,11 @@ import Color from '../../constants/Color';
 
 import {LongBottomButton} from '../../components/button';
 
+import {useTranslation} from 'react-i18next';
+
 import Success from '../../assets/svg/check-circle-fill-24.svg';
 import Failed from '../../assets/svg/x-circle-fill-24.svg';
+import {capitalizeFirst} from '../../modules/transform';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionExported'>;
 
@@ -33,6 +34,8 @@ const TransactionExported = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const {t} = useTranslation('wallet');
 
     const [statusInfo, setStatusInfo] = useState<TStatusInfo>({
         status: false,
@@ -73,7 +76,7 @@ const TransactionExported = ({route}: Props) => {
                             ),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Export
+                        {capitalizeFirst(t('export'))}
                     </Text>
 
                     <View
@@ -106,7 +109,9 @@ const TransactionExported = ({route}: Props) => {
                                     tailwind('text-lg font-bold'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {statusInfo.status ? 'Successful' : 'Failed'}
+                                {statusInfo.status
+                                    ? capitalizeFirst(t('successful'))
+                                    : capitalizeFirst(t('failed'))}
                             </Text>
                         </View>
 
@@ -142,7 +147,7 @@ const TransactionExported = ({route}: Props) => {
                                     }),
                                 );
                             }}
-                            title={'Back to Wallet'}
+                            title={t('back_to_wallet')}
                             textColor={ColorScheme.Text.Alt}
                             backgroundColor={ColorScheme.Background.Inverted}
                         />

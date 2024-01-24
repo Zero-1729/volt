@@ -13,9 +13,11 @@ import Carousel from 'react-native-reanimated-carousel';
 import {AppStorageContext} from '../../class/storageContext';
 import {conservativeAlert} from '../../components/alert';
 
+import {useTranslation} from 'react-i18next';
+
 import decodeURI from 'bip21';
 import {getMiniWallet, checkInvoiceAndWallet} from '../../modules/wallet-utils';
-import {convertBTCtoSats} from '../../modules/transform';
+import {capitalizeFirst, convertBTCtoSats} from '../../modules/transform';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -34,6 +36,9 @@ const SelectWallet = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
+
+    const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     const navigation = useNavigation();
     const [decodedInvoice, setDecodedInvoice] = useState<TInvoiceData>(
@@ -61,21 +66,26 @@ const SelectWallet = ({route}: Props) => {
         if (route.params?.invoice.startsWith('bitcoin:')) {
             setDecodedInvoice(decodeInvoice(route.params?.invoice));
         } else {
-            conservativeAlert('Error', 'Invalid invoice format.');
+            conservativeAlert(
+                capitalizeFirst(t('error')),
+                e('invalid_invoice_error'),
+                capitalizeFirst(t('cancel')),
+            );
 
             navigation.dispatch(CommonActions.navigate('HomeScreen'));
         }
     }, []);
 
     const handleRoute = () => {
-        const wallet = getWalletData(walletId);
+        const wallet = getMiniWallet(getWalletData(walletId));
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
 
         // Check network connection first
         if (!networkState?.isInternetReachable) {
             conservativeAlert(
-                'Error',
-                'Please check your internet connection.',
+                capitalizeFirst(t('error')),
+                e('no_internet_message'),
+                capitalizeFirst(t('cancel')),
             );
             return;
         }
@@ -86,7 +96,12 @@ const SelectWallet = ({route}: Props) => {
                 wallet,
                 decodedInvoice,
                 (msg: string) => {
-                    conservativeAlert('Error', msg);
+                    // TODO: Check and translate error
+                    conservativeAlert(
+                        capitalizeFirst(t('error')),
+                        msg,
+                        capitalizeFirst(t('cancel')),
+                    );
                 },
                 walletMode === 'single',
             )
@@ -107,7 +122,7 @@ const SelectWallet = ({route}: Props) => {
                         screen: 'FeeSelection',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: getMiniWallet(wallet),
+                            wallet: wallet,
                         },
                     }),
                 );
@@ -117,7 +132,7 @@ const SelectWallet = ({route}: Props) => {
                         screen: 'SendAmount',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: getMiniWallet(wallet),
+                            wallet: wallet,
                         },
                     }),
                 );
@@ -129,6 +144,7 @@ const SelectWallet = ({route}: Props) => {
         return (
             <View style={[tailwind('w-full absolute')]}>
                 <WalletCard
+                    loading={false}
                     maxedCard={
                         item.balance.isZero() && item.transactions.length > 0
                     }
