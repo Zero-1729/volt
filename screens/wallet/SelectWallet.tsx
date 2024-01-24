@@ -59,11 +59,30 @@ const SelectWallet = ({route}: Props) => {
     const cardHeight = 230;
 
     const decodeInvoice = (invoice: string) => {
+        // TODO: handle decoding Lightning invoices
         return decodeURI.decode(invoice) as TInvoiceData;
     };
 
     useEffect(() => {
-        if (route.params?.invoice.startsWith('bitcoin:')) {
+        if (
+            route.params?.invoice.startsWith('lightning') ||
+            route.params?.invoice.startsWith('lnurl') ||
+            route.params?.invoice.startsWith('lnbc') ||
+            route.params?.invoice.startsWith('bitcoin:')
+        ) {
+            // If LN report we aren't supporting it yet
+            if (!route.params?.invoice.startsWith('bitcoin:')) {
+                conservativeAlert(
+                    capitalizeFirst(t('error')),
+                    e('unsupported_invoice_type'),
+                    capitalizeFirst(t('cancel')),
+                );
+
+                navigation.dispatch(CommonActions.navigate('HomeScreen'));
+
+                return;
+            }
+
             setDecodedInvoice(decodeInvoice(route.params?.invoice));
         } else {
             conservativeAlert(
