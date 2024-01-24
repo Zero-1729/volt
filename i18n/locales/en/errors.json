@@ -30,5 +30,6 @@
     "invalid_fee_rate_message": "Please enter a valid fee rate",
     "fee_rate_high_error": "Fee rate too high, please try again.",
     "failed_fee_rate_fetch": "Error fetching fee rates, service unavailable.",
+    "clipboard_empty_error": "Clipboard is empty",
     "unsupported_invoice_type": "Unsupported invoice type"
 }
