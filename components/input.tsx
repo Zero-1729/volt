@@ -171,6 +171,14 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
         return text + char;
     };
 
+    const safelyDelete = (text: string) => {
+        if (props.maxAmount === text) {
+            return '';
+        }
+
+        return text.slice(0, -1);
+    };
+
     return (
         <View
             style={[
@@ -337,7 +345,7 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
                 <Pressable
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
-                        props.onAmountChange(props.amount.slice(0, -1));
+                        props.onAmountChange(safelyDelete(props.amount));
                     }}
                     onLongPress={() => {
                         props.onAmountChange('');
