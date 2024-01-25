@@ -103,5 +103,7 @@
     "restore": "restore",
     "wallet_restored_message": "Wallet restored successfully",
     "read_clipboard_lightning_text": "You have a lightning {{spec}} invoice in your clipboard",
-    "read_clipboard_bitcoin_text": "You have a bitcoin invoice in your clipboard"
+    "read_clipboard_bitcoin_text": "You have a bitcoin invoice in your clipboard",
+    "select_wallet_title": "Select Wallet",
+    "select_wallet_swipe_notice": "Swipe to change wallet to pay invoice"
 }
