@@ -22,7 +22,7 @@ import {
 } from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AppStorageContext} from '../../class/storageContext';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, Edges} from 'react-native-safe-area-context';
 import {WalletParamList} from '../../Navigation';
 
 import BigNumber from 'bignumber.js';
@@ -49,6 +49,7 @@ import Close from '../../assets/svg/x-24.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {getPrivateDescriptors} from '../../modules/descriptors';
 import {psbtFromInvoice} from '../../modules/bdk';
+import {getScreenEdges} from '../../modules/screen';
 
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
@@ -63,6 +64,11 @@ const FeeSelection = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const isAndroid = Platform.OS === 'android';
+
+    // We need to make adjustments to the screen based on the source caller.
+    // conservative - from the wallet view
+    // liberal - from home screen
+    const edges: Edges = getScreenEdges(route.params.source);
 
     const {fiatRate, appFiatCurrency, electrumServerURL} =
         useContext(AppStorageContext);
@@ -240,7 +246,7 @@ const FeeSelection = ({route}: Props) => {
     }, []);
 
     return (
-        <SafeAreaView edges={['bottom', 'left', 'right']}>
+        <SafeAreaView edges={edges}>
             <View
                 style={[
                     tailwind('w-full h-full items-center relative'),

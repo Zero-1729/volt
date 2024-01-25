@@ -355,6 +355,7 @@ const Scan = ({route}: Props) => {
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: route.params.wallet,
+                            source: 'conservative',
                         },
                     }),
                 );
@@ -365,6 +366,7 @@ const Scan = ({route}: Props) => {
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: route.params.wallet,
+                            source: 'conserative',
                         },
                     }),
                 );

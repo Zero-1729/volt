@@ -9,7 +9,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {Edges, SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, Edges} from 'react-native-safe-area-context';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
@@ -43,6 +43,7 @@ import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
 
 import {capitalizeFirst, formatLocaleDate} from '../../modules/transform';
+import {getScreenEdges} from '../../modules/screen';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
@@ -147,10 +148,7 @@ const TransactionDetailsView = ({route}: Props) => {
     // We need to make adjustments to the screen based on the source caller.
     // conservative - from the wallet view
     // liberal - from home screen
-    const edges: Edges =
-        route.params.source === 'liberal'
-            ? ['top', 'bottom', 'left', 'right']
-            : ['bottom', 'right', 'left'];
+    const edges: Edges = getScreenEdges(route.params.source);
 
     const confirmationCount =
         route.params.tx.confirmations > 6

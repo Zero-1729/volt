@@ -2,9 +2,9 @@
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {useNavigation, CommonActions, StackActions} from '@react-navigation/native';
 
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, Edges} from 'react-native-safe-area-context';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
@@ -24,6 +24,8 @@ import Close from '../../assets/svg/x-24.svg';
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
 import {DUST_LIMIT} from '../../modules/wallet-defaults';
+
+import {getScreenEdges} from '../../modules/screen';
 
 import {useTranslation} from 'react-i18next';
 
@@ -53,6 +55,11 @@ const SendAmount = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
+
+    // We need to make adjustments to the screen based on the source caller.
+    // conservative - from the wallet view
+    // liberal - from home screen
+    const edges: Edges = getScreenEdges(route.params.source);
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -236,8 +243,16 @@ const SendAmount = ({route}: Props) => {
         );
     };
 
+    const handleCloseButton = () => {
+        if (route.params.source === 'liberal') {
+            navigation.dispatch(StackActions.popToTop());
+        } else {
+            navigation.dispatch(CommonActions.goBack());
+        }
+    };
+
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView edges={edges}>
             <View
                 style={[tailwind('w-full h-full items-center justify-center')]}>
                 <View
@@ -248,9 +263,7 @@ const SendAmount = ({route}: Props) => {
                     ]}>
                     <PlainButton
                         style={[tailwind('absolute left-0 z-10')]}
-                        onPress={() => {
-                            navigation.dispatch(CommonActions.goBack());
-                        }}>
+                        onPress={handleCloseButton}>
                         <Close fill={ColorScheme.SVG.Default} width={32} />
                     </PlainButton>
                     <Text

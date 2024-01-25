@@ -151,6 +151,7 @@ const SelectWallet = ({route}: Props) => {
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: wallet,
+                            source: 'liberal',
                         },
                     }),
                 );
@@ -161,6 +162,7 @@ const SelectWallet = ({route}: Props) => {
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: wallet,
+                            source: 'liberal',
                         },
                     }),
                 );
