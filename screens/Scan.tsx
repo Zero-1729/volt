@@ -126,6 +126,7 @@ const Scan = ({route}: Props) => {
     const {walletMode} = useContext(AppStorageContext);
 
     const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -207,7 +208,7 @@ const Scan = ({route}: Props) => {
             let btcAddress = invoice;
 
             if (!isValidAddress(btcAddress)) {
-                updateScannerAlert('Detected an invalid address');
+                updateScannerAlert(e('invalid_btc_address_error'));
                 return {decodedInvoice: null, isOnchain: null};
             }
 
@@ -226,7 +227,7 @@ const Scan = ({route}: Props) => {
                 invoice.toLowerCase().startsWith('lnurl')
             )
         ) {
-            updateScannerAlert('Detected unsupported invoice');
+            updateScannerAlert(e('unsupported_invoice_type'));
             return {decodedInvoice: null, isOnchain: null};
         }
 
@@ -245,11 +246,11 @@ const Scan = ({route}: Props) => {
 
             // BIP21 QR could contain upper case address, so we'll convert to lower case
             if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
-                updateScannerAlert('Detected an invalid invoice');
+                updateScannerAlert(e('invalid_invoice_error'));
                 return {decodedInvoice: null, isOnchain: null};
             }
-        } catch (e) {
-            updateScannerAlert('Detected an invalid invoice');
+        } catch (err: any) {
+            updateScannerAlert(e('invalid_invoice_error'));
             return {decodedInvoice: null, isOnchain: null};
         }
 
@@ -318,7 +319,7 @@ const Scan = ({route}: Props) => {
                 }
             } else {
                 // If LN Invoice
-                updateScannerAlert('Lightning is not yet supported');
+                updateScannerAlert(e('lightning_not_support'));
             }
         }
     };
