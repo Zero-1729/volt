@@ -254,7 +254,7 @@ const SelectWallet = ({route}: Props) => {
 
                 <LongBottomButton
                     title={'Pay Invoice'}
-                    color={ColorScheme.Text.Default}
+                    textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                     onPress={handleRoute}
                 />
