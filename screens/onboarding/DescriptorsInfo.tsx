@@ -14,7 +14,7 @@ import {capitalizeFirst} from '../../modules/transform';
 
 import {LongBottomButton} from '../../components/button';
 
-import Volt from './../../assets/svg/btc.svg';
+import BitcoinAnthIcon from './../../assets/svg/bitcoin-knight.svg';
 
 import Color from '../../constants/Color';
 
@@ -38,14 +38,10 @@ const DescriptorsInfo = () => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View style={[tailwind('items-center'), {top: -25}]}>
-                    <Volt
-                        width={100}
-                        height={100}
-                        fill={ColorScheme.SVG.Default}
-                    />
+                <View style={[tailwind('items-center'), {top: -40}]}>
+                    <BitcoinAnthIcon width={256} height={256} />
 
-                    <View style={[tailwind('mt-12 px-8 text-center')]}>
+                    <View style={[tailwind('mt-6 px-8 text-center')]}>
                         <Text
                             style={[
                                 tailwind('text-xl font-bold text-center'),
