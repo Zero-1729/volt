@@ -105,6 +105,7 @@ export type WalletParamList = {
     FeeSelection: {
         invoiceData: TInvoiceData;
         wallet: TMiniWallet;
+        source: string;
     };
     Send: {
         feeRate: number;
@@ -124,6 +125,7 @@ export type WalletParamList = {
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
+        source: string;
     };
     TransactionDetails: {
         tx: TTransaction;
