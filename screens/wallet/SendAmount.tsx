@@ -356,6 +356,7 @@ const SendAmount = ({route}: Props) => {
                     amount={amount}
                     onAmountChange={updateAmount}
                     isSats={bottomUnit.name === 'sats'}
+                    maxAmount={route.params.wallet.balance.toString()}
                 />
 
                 {/* Continue button */}
