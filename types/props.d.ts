@@ -139,6 +139,7 @@ export type DisplaySatsAmountProps = BaseProps & {
     amount: BigNumber;
     isApprox?: boolean;
     fontSize: string;
+    textColor?: string;
 };
 
 export type DisplayFiatAmountProps = BaseProps & {

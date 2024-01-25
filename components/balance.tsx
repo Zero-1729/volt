@@ -315,7 +315,12 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
                 <Text
                     style={[
                         tailwind('self-center'),
-                        {color: ColorScheme.Text.Default, textAlign: langDir},
+                        {
+                            color: props.textColor
+                                ? props.textColor
+                                : ColorScheme.Text.Default,
+                            textAlign: langDir,
+                        },
                     ]}>
                     ~{' '}
                 </Text>
@@ -326,7 +331,12 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
                 numberOfLines={1}
                 style={[
                     tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
-                    {color: ColorScheme.Text.Default, textAlign: langDir},
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                        textAlign: langDir,
+                    },
                     Font.SatSymbol,
                 ]}>
                 s
@@ -335,7 +345,12 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
             <Text
                 style={[
                     tailwind(`${props.fontSize} self-center font-bold`),
-                    {color: ColorScheme.Text.Default, textAlign: langDir},
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                        textAlign: langDir,
+                    },
                 ]}>
                 {props.amount.isZero() ? '0' : formatSats(props.amount)}
             </Text>
