@@ -133,6 +133,7 @@ export type NumpadRequestInputProps = BaseProps & {
     amount: string;
     isSats?: boolean;
     onAmountChange: (amount: string) => void;
+    maxAmount?: string;
 };
 
 export type DisplaySatsAmountProps = BaseProps & {
