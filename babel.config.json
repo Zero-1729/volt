@@ -20,5 +20,10 @@
                 "globals": ["__scanCodes"]
             }
         ]
-    ]
+    ],
+    "env": {
+        "production": {
+          "plugins": ["transform-remove-console"]
+        }
+    }
 }
