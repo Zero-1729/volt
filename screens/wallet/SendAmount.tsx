@@ -91,6 +91,7 @@ const SendAmount = ({route}: Props) => {
     });
 
     const isMax = amount === route.params.wallet.balance.toString();
+    const isAmountEmpty = Number(amount) === 0;
 
     const isOverBalance = new BigNumber(satsAmount.value).gt(
         route.params.wallet.balance,
@@ -405,7 +406,7 @@ const SendAmount = ({route}: Props) => {
                             style={[
                                 tailwind(
                                     `rounded-full items-center flex-row justify-center px-6 py-3 ${
-                                        amount === '' || isOverBalance
+                                        isAmountEmpty || isOverBalance
                                             ? 'opacity-20'
                                             : ''
                                     }`,
