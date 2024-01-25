@@ -34,7 +34,7 @@ const App = () => {
     const appState = useRef(AppState.currentState);
     const renderCount = useRenderCount();
 
-    const {appLanguage} = useContext(AppStorageContext);
+    const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
     const {t} = useTranslation('wallet');
 
     const ColorScheme = Color(useColorScheme());
@@ -132,7 +132,8 @@ const App = () => {
         Privacy?.enabled(true);
 
         // Check for deep link if app newly launched
-        if (renderCount <= 2) {
+        // Ensure that we have wallets before checking
+        if (renderCount <= 2 && isWalletInitialized) {
             checkDeepLinkAndClipboard();
         }
 
@@ -141,9 +142,10 @@ const App = () => {
             'change',
             (incomingState): void => {
                 // Check and run clipboard fn if app is active in foreground
+                // Ensure that we have wallets before checking
                 if (
                     appState.current.match(/background/) &&
-                    incomingState === 'active'
+                    incomingState === 'active' && isWalletInitialized
                 ) {
                     // Check clipboard contents
                     checkAndSetClipboard();
