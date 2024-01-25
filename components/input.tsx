@@ -168,6 +168,11 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
             return text;
         }
 
+        // If already zero and adding to make more zeros, don't allow
+        if (text === '0' && char === '0') {
+            return text;
+        }
+
         return text + char;
     };
 
