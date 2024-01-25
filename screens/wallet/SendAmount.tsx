@@ -2,7 +2,11 @@
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
-import {useNavigation, CommonActions, StackActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 
 import {SafeAreaView, Edges} from 'react-native-safe-area-context';
 
