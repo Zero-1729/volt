@@ -531,73 +531,82 @@ const Home = ({route}: Props) => {
                             {capitalizeFirst(t('latest_transactions_text'))}
                         </VText>
 
-                        <View
-                            style={[
-                                tailwind('w-full h-full items-center pb-20'),
-                            ]}>
-                            <FlatList
-                                refreshing={refreshing}
-                                onRefresh={refreshWallet}
-                                scrollEnabled={true}
-                                style={tailwind('w-full')}
-                                contentContainerStyle={[
+                        {wallets.length > 0 && (
+                            <View
+                                style={[
                                     tailwind(
-                                        `${
-                                            extractAllTransactions().length > 0
-                                                ? 'w-11/12 self-center'
-                                                : 'w-full h-full'
-                                        } items-center`,
+                                        'w-full h-full items-center pb-20',
                                     ),
-                                ]}
-                                data={extractAllTransactions()}
-                                renderItem={item => (
-                                    <TransactionListItem
-                                        callback={() => {
-                                            navigation.dispatch(
-                                                CommonActions.navigate(
-                                                    'WalletRoot',
-                                                    {
-                                                        screen: 'TransactionDetails',
-                                                        params: {
-                                                            tx: {...item.item},
-                                                            source: 'liberal',
-                                                            walletId:
-                                                                currentWalletID,
+                                ]}>
+                                <FlatList
+                                    refreshing={refreshing}
+                                    onRefresh={refreshWallet}
+                                    scrollEnabled={true}
+                                    style={tailwind('w-full')}
+                                    contentContainerStyle={[
+                                        tailwind(
+                                            `${
+                                                extractAllTransactions()
+                                                    .length > 0
+                                                    ? 'w-11/12 self-center'
+                                                    : 'w-full h-full'
+                                            } items-center`,
+                                        ),
+                                    ]}
+                                    data={extractAllTransactions()}
+                                    renderItem={item => (
+                                        <TransactionListItem
+                                            callback={() => {
+                                                navigation.dispatch(
+                                                    CommonActions.navigate(
+                                                        'WalletRoot',
+                                                        {
+                                                            screen: 'TransactionDetails',
+                                                            params: {
+                                                                tx: {
+                                                                    ...item.item,
+                                                                },
+                                                                source: 'liberal',
+                                                                walletId:
+                                                                    currentWalletID,
+                                                            },
                                                         },
-                                                    },
-                                                ),
-                                            );
-                                        }}
-                                        tx={item.item}
-                                    />
-                                )}
-                                keyExtractor={item => item.txid}
-                                initialNumToRender={25}
-                                contentInsetAdjustmentBehavior="automatic"
-                                ListEmptyComponent={
-                                    <View
-                                        style={[
-                                            tailwind(
-                                                'w-5/6 h-5/6 items-center justify-center -mt-12',
-                                            ),
-                                        ]}>
-                                        <Box
-                                            width={32}
-                                            fill={svgGrayFill}
-                                            style={tailwind('mb-4')}
+                                                    ),
+                                                );
+                                            }}
+                                            tx={item.item}
                                         />
-                                        <VText
+                                    )}
+                                    keyExtractor={item => item.txid}
+                                    initialNumToRender={25}
+                                    contentInsetAdjustmentBehavior="automatic"
+                                    ListEmptyComponent={
+                                        <View
                                             style={[
-                                                tailwind('w-5/6 text-center'),
-                                                DarkGreyText,
-                                                Font.RobotoText,
+                                                tailwind(
+                                                    'w-5/6 h-5/6 items-center justify-center -mt-12',
+                                                ),
                                             ]}>
-                                            {t('no_transactions_text')}
-                                        </VText>
-                                    </View>
-                                }
-                            />
-                        </View>
+                                            <Box
+                                                width={32}
+                                                fill={svgGrayFill}
+                                                style={tailwind('mb-4')}
+                                            />
+                                            <VText
+                                                style={[
+                                                    tailwind(
+                                                        'w-5/6 text-center',
+                                                    ),
+                                                    DarkGreyText,
+                                                    Font.RobotoText,
+                                                ]}>
+                                                {t('no_transactions_text')}
+                                            </VText>
+                                        </View>
+                                    }
+                                />
+                            </View>
+                        )}
                     </View>
                 </View>
             </View>
