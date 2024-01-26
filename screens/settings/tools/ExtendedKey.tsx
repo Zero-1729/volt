@@ -274,7 +274,7 @@ const ExtendedKey = () => {
                 </View>
 
                 {/* Result */}
-                {resultMessageText.length > 0 ? (
+                {resultMessageText.length > 0 && (
                     <View style={[tailwind('mt-8 w-5/6')]}>
                         <VText
                             style={[
@@ -304,8 +304,6 @@ const ExtendedKey = () => {
                             </VText>
                         </PlainButton>
                     </View>
-                ) : (
-                    <></>
                 )}
 
                 {/* Converter Button */}

@@ -311,7 +311,7 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
 
     return (
         <View style={[tailwind('flex-row')]}>
-            {props.isApprox ? (
+            {props.isApprox && (
                 <Text
                     style={[
                         tailwind('self-center'),
@@ -324,8 +324,6 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
                     ]}>
                     ~{' '}
                 </Text>
-            ) : (
-                <></>
             )}
             <Text
                 numberOfLines={1}

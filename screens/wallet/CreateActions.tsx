@@ -243,7 +243,7 @@ const CreateAction = () => {
                         )}
                     </View>
 
-                    {isAdvancedMode ? (
+                    {isAdvancedMode && (
                         <View style={[tailwind('mt-8')]}>
                             <VText
                                 style={[
@@ -336,8 +336,6 @@ const CreateAction = () => {
                                 />
                             </View>
                         </View>
-                    ) : (
-                        <></>
                     )}
                 </View>
 

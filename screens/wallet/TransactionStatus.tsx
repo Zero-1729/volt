@@ -222,7 +222,7 @@ const TransactionStatus = ({route}: Props) => {
                                 </Text>
                             </View>
 
-                            {isAdvancedMode ? (
+                            {isAdvancedMode && (
                                 <View style={[tailwind('items-center w-4/5')]}>
                                     <Text
                                         style={[
@@ -239,12 +239,10 @@ const TransactionStatus = ({route}: Props) => {
                                             : statusInfo.message}
                                     </Text>
                                 </View>
-                            ) : (
-                                <></>
                             )}
                         </View>
 
-                        {statusInfo.status === 'success' ? (
+                        {statusInfo.status === 'success' && (
                             <PlainButton
                                 style={[
                                     tailwind('absolute self-center'),
@@ -261,8 +259,6 @@ const TransactionStatus = ({route}: Props) => {
                                     {buttonText}
                                 </Text>
                             </PlainButton>
-                        ) : (
-                            <></>
                         )}
 
                         <View

@@ -148,7 +148,7 @@ const About = () => {
                 </View>
 
                 <View style={[tailwind('mb-8 w-4/6 items-center')]}>
-                    {isAdvancedMode && BranchInfo.length > 0 ? (
+                    {isAdvancedMode && BranchInfo.length > 0 && (
                         <View
                             style={[
                                 tailwind('flex-row px-4 py-1 rounded-full'),
@@ -172,8 +172,6 @@ const About = () => {
                                 {BranchInfo}
                             </Text>
                         </View>
-                    ) : (
-                        <></>
                     )}
                 </View>
 

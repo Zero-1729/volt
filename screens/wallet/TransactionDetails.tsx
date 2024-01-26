@@ -215,35 +215,29 @@ const TransactionDetailsView = ({route}: Props) => {
                         ]}>
                         <View style={[tailwind('items-center')]}>
                             {route.params.tx.confirmations > 0 &&
-                            route.params.tx.confirmations <= 6 ? (
-                                <Pending
-                                    style={[tailwind('self-center')]}
-                                    fill={ColorScheme.SVG.Default}
-                                    height={128}
-                                    width={128}
-                                />
-                            ) : (
-                                <></>
-                            )}
-                            {route.params.tx.confirmations === 0 ? (
+                                route.params.tx.confirmations <= 6 && (
+                                    <Pending
+                                        style={[tailwind('self-center')]}
+                                        fill={ColorScheme.SVG.Default}
+                                        height={128}
+                                        width={128}
+                                    />
+                                )}
+                            {route.params.tx.confirmations === 0 && (
                                 <Broadcasted
                                     style={[tailwind('self-center')]}
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
                                 />
-                            ) : (
-                                <></>
                             )}
-                            {route.params.tx.confirmations > 6 ? (
+                            {route.params.tx.confirmations > 6 && (
                                 <Success
                                     style={[tailwind('self-center')]}
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
                                 />
-                            ) : (
-                                <></>
                             )}
                             {/* We only show the amount if it is not a CPFP, which shows zero */}
                             {!route.params.tx.isSelfOrBoost ? (
@@ -259,20 +253,21 @@ const TransactionDetailsView = ({route}: Props) => {
                                     balanceFontSize={'text-2xl'}
                                     fontColor={ColorScheme.Text.Default}
                                 />
-                            ) : !isAdvancedMode ? (
-                                <View style={[tailwind('flex-row mt-6 ')]}>
-                                    <Text
-                                        style={[
-                                            tailwind('text-base font-bold'),
-                                            {
-                                                color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
-                                        {t('fee_boost_tx')}
-                                    </Text>
-                                </View>
                             ) : (
-                                <></>
+                                !isAdvancedMode && (
+                                    <View style={[tailwind('flex-row mt-6 ')]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-base font-bold'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            {t('fee_boost_tx')}
+                                        </Text>
+                                    </View>
+                                )
                             )}
                         </View>
                         <View
@@ -316,9 +311,9 @@ const TransactionDetailsView = ({route}: Props) => {
                         </View>
 
                         {/* Transaction type flags for RBF and CPFP */}
-                        {isAdvancedMode && route.params.tx.rbf ? (
+                        {isAdvancedMode && route.params.tx.rbf && (
                             <View style={[tailwind('flex-row self-center')]}>
-                                {route.params.tx.isSelfOrBoost ? (
+                                {route.params.tx.isSelfOrBoost && (
                                     <View
                                         style={[
                                             tailwind(
@@ -341,8 +336,6 @@ const TransactionDetailsView = ({route}: Props) => {
                                             CPFP
                                         </Text>
                                     </View>
-                                ) : (
-                                    <></>
                                 )}
 
                                 <View
@@ -366,12 +359,10 @@ const TransactionDetailsView = ({route}: Props) => {
                                     </Text>
                                 </View>
                             </View>
-                        ) : (
-                            <></>
                         )}
 
                         {/* More dev info */}
-                        {isAdvancedMode ? (
+                        {isAdvancedMode && (
                             <View style={[tailwind('w-full mt-4')]}>
                                 <View
                                     style={[
@@ -524,7 +515,7 @@ const TransactionDetailsView = ({route}: Props) => {
                                     </View>
                                 </View>
 
-                                {txIdText.length > 0 ? (
+                                {txIdText.length > 0 && (
                                     <Text
                                         style={[
                                             tailwind(
@@ -537,12 +528,8 @@ const TransactionDetailsView = ({route}: Props) => {
                                         ]}>
                                         {txIdText}
                                     </Text>
-                                ) : (
-                                    <></>
                                 )}
                             </View>
-                        ) : (
-                            <></>
                         )}
                     </View>
 

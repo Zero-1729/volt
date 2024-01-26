@@ -263,7 +263,7 @@ const Info = () => {
 
                 {/* Wallet Info */}
                 {/* Wallet Type Path and Master Fingerprint */}
-                {isAdvancedMode ? (
+                {isAdvancedMode && (
                     <View style={[tailwind('w-5/6 mb-6 flex-row')]}>
                         <View style={[tailwind('w-1/2 items-center')]}>
                             <Text
@@ -305,12 +305,10 @@ const Info = () => {
                             </PlainButton>
                         </View>
                     </View>
-                ) : (
-                    <></>
                 )}
 
                 {/* Wallet Network and Type */}
-                {isAdvancedMode ? (
+                {isAdvancedMode && (
                     <View style={[tailwind('w-5/6 flex-row justify-start')]}>
                         <View style={[tailwind('w-1/2 items-center')]}>
                             <Text
@@ -348,15 +346,11 @@ const Info = () => {
                             </Text>
                         </View>
                     </View>
-                ) : (
-                    <></>
                 )}
 
                 {/* View Divider */}
-                {isAdvancedMode ? (
+                {isAdvancedMode && (
                     <View style={[tailwind('w-full my-8'), HeadingBar]} />
-                ) : (
-                    <></>
                 )}
 
                 {/* Wallet Tools & Info */}

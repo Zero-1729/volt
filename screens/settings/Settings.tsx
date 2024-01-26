@@ -399,7 +399,7 @@ const Settings = () => {
                     </View>
                 </View>
 
-                {isDevMode && isWalletInitialized && isAdvancedMode ? (
+                {isDevMode && isWalletInitialized && isAdvancedMode && (
                     <PlainButton
                         onPress={showDialog}
                         style={[
@@ -415,8 +415,6 @@ const Settings = () => {
                             {t('reset_app')}
                         </VText>
                     </PlainButton>
-                ) : (
-                    <></>
                 )}
 
                 <PlainButton

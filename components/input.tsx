@@ -81,7 +81,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         : 'transparent',
                 },
             ]}>
-            {Platform.OS === 'ios' ? (
+            {Platform.OS === 'ios' && (
                 <InputAccessoryView nativeID={InputAccessoryViewID}>
                     <Button
                         title="Done"
@@ -90,8 +90,6 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         }}
                     />
                 </InputAccessoryView>
-            ) : (
-                <></>
             )}
 
             <TextInput
@@ -109,7 +107,7 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 style={[styles.inputContainer, tailwind('text-xs pt-4')]}
             />
 
-            {props.showFolder ? (
+            {props.showFolder && (
                 <View style={[tailwind('absolute right-4 bottom-3')]}>
                     <PlainButton
                         onPress={() => {
@@ -137,8 +135,6 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                         />
                     </PlainButton>
                 </View>
-            ) : (
-                <></>
             )}
         </View>
     );

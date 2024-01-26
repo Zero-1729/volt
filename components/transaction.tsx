@@ -95,7 +95,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
                         </VText>
                     </View>
                 </View>
-                {!props.tx.isSelfOrBoost ? (
+                {!props.tx.isSelfOrBoost && (
                     <View
                         style={[
                             tailwind(
@@ -112,8 +112,6 @@ export const TransactionListItem = (props: TxListItemProps) => {
                             <ArrowUp fill={ColorScheme.SVG.Sent} />
                         )}
                     </View>
-                ) : (
-                    <></>
                 )}
             </View>
         </PlainButton>

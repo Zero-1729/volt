@@ -415,7 +415,7 @@ const ImportAction = ({route}: Props) => {
                     />
 
                     {/* Wallet Network */}
-                    {isAdvancedMode && isMnemonic(importText.trim()) ? (
+                    {isMnemonic(importText.trim()) && (
                         <View style={[tailwind('mt-8 flex-row')]}>
                             <Text
                                 style={[
@@ -457,8 +457,6 @@ const ImportAction = ({route}: Props) => {
                                 disableBuiltInState={true}
                             />
                         </View>
-                    ) : (
-                        <></>
                     )}
                 </View>
 

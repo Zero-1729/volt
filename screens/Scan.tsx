@@ -417,7 +417,7 @@ const Scan = ({route}: Props) => {
                             ),
                         ]}>
                         {/* Scan description */}
-                        {scannerAlertMsg ? (
+                        {scannerAlertMsg && (
                             <PlainButton
                                 style={[
                                     tailwind('absolute w-full items-center'),
@@ -445,8 +445,6 @@ const Scan = ({route}: Props) => {
                                     </Text>
                                 </View>
                             </PlainButton>
-                        ) : (
-                            <></>
                         )}
 
                         <Text style={[tailwind('text-sm mb-4 text-white')]}>

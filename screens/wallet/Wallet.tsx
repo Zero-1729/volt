@@ -425,7 +425,7 @@ const Wallet = ({route}: Props) => {
                     </View>
 
                     {/* Watch-only */}
-                    {walletData.isWatchOnly ? (
+                    {walletData.isWatchOnly && (
                         <View
                             style={[
                                 tailwind(
@@ -441,8 +441,6 @@ const Wallet = ({route}: Props) => {
                                 {t('watch_only')}
                             </Text>
                         </View>
-                    ) : (
-                        <></>
                     )}
 
                     {/* Balance */}
@@ -492,7 +490,7 @@ const Wallet = ({route}: Props) => {
                             ),
                         ]}>
                         {/* Hide send if Balance is empty or it is a watch-only wallet */}
-                        {!hideSendButton ? (
+                        {!hideSendButton && (
                             <View
                                 style={[
                                     tailwind(
@@ -529,8 +527,6 @@ const Wallet = ({route}: Props) => {
                                     </Text>
                                 </PlainButton>
                             </View>
-                        ) : (
-                            <></>
                         )}
                         <View
                             style={[

@@ -189,7 +189,7 @@ const Backup = () => {
                         {/* Allow exporting public descriptor to file */}
                         {backupMaterial === EBackupMaterial.Descriptor &&
                         Platform.OS === 'ios' &&
-                        !showPrivateDescriptor ? (
+                        !showPrivateDescriptor && (
                             <PlainButton
                                 style={[tailwind('absolute left-0')]}
                                 onPress={() => {
@@ -200,8 +200,6 @@ const Backup = () => {
                                     fill={ColorScheme.SVG.Default}
                                 />
                             </PlainButton>
-                        ) : (
-                            <></>
                         )}
                     </View>
 

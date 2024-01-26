@@ -197,7 +197,7 @@ const SendView = ({route}: Props) => {
                                 'absolute top-6 w-full flex-row items-center justify-center',
                             ),
                         ]}>
-                        {!loadingPsbt ? (
+                        {!loadingPsbt && (
                             <PlainButton
                                 style={[tailwind('absolute right-6')]}
                                 onPress={openExportModal}>
@@ -206,8 +206,6 @@ const SendView = ({route}: Props) => {
                                     fill={ColorScheme.SVG.Default}
                                 />
                             </PlainButton>
-                        ) : (
-                            <></>
                         )}
                         <PlainButton
                             onPress={() =>
@@ -369,12 +367,12 @@ const SendView = ({route}: Props) => {
                             </View>
                         </View>
 
-                        {route.params.invoiceData.options?.label ? (
+                        {route.params.invoiceData.options?.label && (
                             <View
                                 style={[
                                     tailwind('justify-between w-4/5 mt-4'),
                                 ]}>
-                                {route.params.invoiceData.options.label ? (
+                                {route.params.invoiceData.options.label && (
                                     <View
                                         style={[
                                             tailwind(
@@ -412,11 +410,9 @@ const SendView = ({route}: Props) => {
                                             }
                                         </VTextSingle>
                                     </View>
-                                ) : (
-                                    <></>
                                 )}
 
-                                {route.params.invoiceData.options.message ? (
+                                {route.params.invoiceData.options.message && (
                                     <View
                                         style={[
                                             styles.invoiceMessage,
@@ -448,12 +444,8 @@ const SendView = ({route}: Props) => {
                                             }
                                         </VTextMulti>
                                     </View>
-                                ) : (
-                                    <></>
                                 )}
                             </View>
-                        ) : (
-                            <></>
                         )}
                     </View>
                     {loadingPsbt && (

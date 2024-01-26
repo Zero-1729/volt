@@ -157,7 +157,7 @@ export const WalletCard = (props: WalletCardProps) => {
                         <BITCOIN fill={'black'} width={148} height={148} />
                     </View>
 
-                    {!props.isWatchOnly ? (
+                    {!props.isWatchOnly && (
                         <View
                             style={[
                                 {
@@ -168,8 +168,6 @@ export const WalletCard = (props: WalletCardProps) => {
                             ]}>
                             <SIM fill={'white'} width={42} height={42} />
                         </View>
-                    ) : (
-                        <></>
                     )}
 
                     <Text
@@ -189,7 +187,7 @@ export const WalletCard = (props: WalletCardProps) => {
                         {props.label}
                     </Text>
 
-                    {props.isWatchOnly ? (
+                    {props.isWatchOnly && (
                         <View
                             style={[
                                 langDir === 'right'
@@ -209,8 +207,6 @@ export const WalletCard = (props: WalletCardProps) => {
                                 Watch only
                             </Text>
                         </View>
-                    ) : (
-                        <></>
                     )}
 
                     {/* Show Balance or Maxed card */}

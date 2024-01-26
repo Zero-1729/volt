@@ -174,7 +174,7 @@ const Receive = ({route}: Props) => {
 
                 {/* Click should toggle unit amount or display fiat amount below */}
                 <View style={[tailwind('w-5/6 -mt-8 items-center')]}>
-                    {!state.bitcoinValue.isZero() ? (
+                    {!state.bitcoinValue.isZero() && (
                         <View
                             style={[
                                 tailwind(
@@ -205,8 +205,6 @@ const Receive = ({route}: Props) => {
                                 />
                             </View>
                         </View>
-                    ) : (
-                        <></>
                     )}
 
                     {/* QR code */}
@@ -256,7 +254,7 @@ const Receive = ({route}: Props) => {
                     </PlainButton>
                 </View>
 
-                {setPlainAddress.length > 0 ? (
+                {setPlainAddress.length > 0 && (
                     <View>
                         <Text
                             style={[
@@ -266,8 +264,6 @@ const Receive = ({route}: Props) => {
                             {plainAddress}
                         </Text>
                     </View>
-                ) : (
-                    <></>
                 )}
 
                 {/* Bottom buttons */}

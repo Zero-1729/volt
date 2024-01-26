@@ -159,7 +159,7 @@ const Add = ({route}: Props) => {
                         title={t('create_title')}
                     />
 
-                    {isAdvancedMode ? (
+                    {isAdvancedMode && (
                         <View style={[tailwind('mt-6 flex-row')]}>
                             <InfoIcon
                                 width={30}
@@ -173,8 +173,6 @@ const Add = ({route}: Props) => {
                                 {t('supported_accounts_info')}
                             </Text>
                         </View>
-                    ) : (
-                        <></>
                     )}
                 </View>
             </View>
