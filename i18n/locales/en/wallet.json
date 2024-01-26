@@ -63,6 +63,7 @@
     "confirmation": "Confirmation",
     "confirmations": "Confirmations",
     "fee_loading_message": "Retrieving fee data from Bitcoin network...",
+    "fee_too_high_error": "Fee rate to high, try a lower rate",
     "custom_fee": "Custom fee",
     "economic_fee": "Economic",
     "high_priority_fee": "High Priority",

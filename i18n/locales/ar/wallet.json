@@ -60,6 +60,7 @@
     "confirmations": "التأكيدات",
     "confirmation": "تأكيد",
     "fee_loading_message": "جارٍ استرداد بيانات الرسوم من شبكة البيتكوين...",
+    "fee_too_high_error": "معدل الرسوم مرتفع، جرب معدلًا أقل",
     "custom_fee": "تخصيص",
     "economic_fee": "متوسط",
     "high_priority_fee": "سريع",
