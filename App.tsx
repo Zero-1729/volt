@@ -172,6 +172,8 @@ const App = () => {
     }, [isWalletInitialized]);
 
     useEffect(() => {
+        // TODO: fix called through when new wallet created from onbaording
+        // Find a way to block this from running when first wallet created
         if (checkClipboard && isWalletInitialized) {
             checkAndSetClipboard();
             setCheckClipboard(false);
