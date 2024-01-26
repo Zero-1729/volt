@@ -43,7 +43,7 @@ const App = () => {
     const [checkClipboard, setCheckClipboard] = useState<boolean>(false);
     const [deepLinkURL, setDeepLinkURL] = useState<string>('');
 
-    const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
+    const {appLanguage, wallets} = useContext(AppStorageContext);
     const {t} = useTranslation('wallet');
 
     const ColorScheme = Color(useColorScheme());
@@ -169,21 +169,19 @@ const App = () => {
             // Kill subscription
             appStateSub.remove();
         };
-    }, [isWalletInitialized]);
+    }, []);
 
     useEffect(() => {
-        // TODO: fix called through when new wallet created from onbaording
-        // Find a way to block this from running when first wallet created
-        if (checkClipboard && isWalletInitialized) {
+        if (checkClipboard && wallets.length) {
             checkAndSetClipboard();
             setCheckClipboard(false);
         }
 
-        if (deepLinkURL && isWalletInitialized) {
+        if (deepLinkURL && wallets.length > 0) {
             rootNavigation.navigate('SelectWallet', {invoice: deepLinkURL});
             setDeepLinkURL('');
         }
-    }, [checkClipboard, isWalletInitialized, deepLinkURL]);
+    }, [checkClipboard, wallets, deepLinkURL]);
 
     useEffect(() => {
         // Load language when app language change
