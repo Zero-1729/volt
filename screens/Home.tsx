@@ -528,7 +528,7 @@ const Home = ({route}: Props) => {
                                 DarkGrayText,
                                 Font.RobotoText,
                             ]}>
-                            {t('latest_transactions_text')}
+                            {capitalizeFirst(t('latest_transactions_text'))}
                         </VText>
 
                         <View
