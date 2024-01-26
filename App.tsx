@@ -1,7 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import 'react-native-gesture-handler';
 
-import React, {useContext, useEffect, useRef} from 'react';
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import {StatusBar, useColorScheme, Linking, AppState} from 'react-native';
 
 import {useRenderCount} from './modules/hooks';
@@ -33,6 +39,9 @@ import SplashScreen from 'react-native-splash-screen';
 const App = () => {
     const appState = useRef(AppState.currentState);
     const renderCount = useRenderCount();
+
+    const [checkClipboard, setCheckClipboard] = useState<boolean>(false);
+    const [deepLinkURL, setDeepLinkURL] = useState<string>('');
 
     const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
     const {t} = useTranslation('wallet');
@@ -112,18 +121,18 @@ const App = () => {
     };
 
     // Check deep link & clipboard if app newly launched if app previously unopened
-    const checkDeepLinkAndClipboard = async (): Promise<void> => {
+    const checkDeepLinkAndClipboard = useCallback(async (): Promise<void> => {
         // Check deep link
         const url = await Linking.getInitialURL();
 
         if (url) {
-            rootNavigation.navigate('SelectWallet', {invoice: url});
+            setDeepLinkURL(url);
             return;
         }
 
         // Check clipboard
-        checkAndSetClipboard();
-    };
+        setCheckClipboard(true);
+    }, []);
 
     useEffect(() => {
         SplashScreen.hide();
@@ -133,7 +142,7 @@ const App = () => {
 
         // Check for deep link if app newly launched
         // Ensure that we have wallets before checking
-        if (renderCount <= 2 && isWalletInitialized) {
+        if (renderCount <= 2) {
             checkDeepLinkAndClipboard();
         }
 
@@ -145,10 +154,10 @@ const App = () => {
                 // Ensure that we have wallets before checking
                 if (
                     appState.current.match(/background/) &&
-                    incomingState === 'active' && isWalletInitialized
+                    incomingState === 'active'
                 ) {
                     // Check clipboard contents
-                    checkAndSetClipboard();
+                    setCheckClipboard(true);
                 }
 
                 // Update app state
@@ -160,7 +169,19 @@ const App = () => {
             // Kill subscription
             appStateSub.remove();
         };
-    }, []);
+    }, [isWalletInitialized]);
+
+    useEffect(() => {
+        if (checkClipboard && isWalletInitialized) {
+            checkAndSetClipboard();
+            setCheckClipboard(false);
+        }
+
+        if (deepLinkURL && isWalletInitialized) {
+            rootNavigation.navigate('SelectWallet', {invoice: deepLinkURL});
+            setDeepLinkURL('');
+        }
+    }, [checkClipboard, isWalletInitialized, deepLinkURL]);
 
     useEffect(() => {
         // Load language when app language change
