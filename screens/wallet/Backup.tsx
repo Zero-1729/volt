@@ -188,19 +188,19 @@ const Backup = () => {
                     <View style={[tailwind('absolute top-6  w-full left-0')]}>
                         {/* Allow exporting public descriptor to file */}
                         {backupMaterial === EBackupMaterial.Descriptor &&
-                        Platform.OS === 'ios' &&
-                        !showPrivateDescriptor && (
-                            <PlainButton
-                                style={[tailwind('absolute left-0')]}
-                                onPress={() => {
-                                    writeDescriptorToFile();
-                                }}>
-                                <ShareIcon
-                                    width={32}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </PlainButton>
-                        )}
+                            Platform.OS === 'ios' &&
+                            !showPrivateDescriptor && (
+                                <PlainButton
+                                    style={[tailwind('absolute left-0')]}
+                                    onPress={() => {
+                                        writeDescriptorToFile();
+                                    }}>
+                                    <ShareIcon
+                                        width={32}
+                                        fill={ColorScheme.SVG.Default}
+                                    />
+                                </PlainButton>
+                            )}
                     </View>
 
                     <View style={[tailwind('absolute top-6 right-0')]}>
