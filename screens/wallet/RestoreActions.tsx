@@ -183,7 +183,7 @@ const ImportAction = ({route}: Props) => {
             // Let user know the mnemonic is valid
             errorAlert(
                 capitalizeFirst(t('mnemonic')),
-                t('mnemonic_invalid_error'),
+                e('mnemonic_invalid_error'),
                 capitalizeFirst(t('cancel')),
             );
             return;
@@ -213,7 +213,7 @@ const ImportAction = ({route}: Props) => {
             if (!isDescriptorPattern(descriptor)) {
                 errorAlert(
                     capitalizeFirst(t('descriptor')),
-                    t('descriptor_valid_error'),
+                    e('descriptor_valid_error'),
                     capitalizeFirst(t('cancel')),
                 );
 
