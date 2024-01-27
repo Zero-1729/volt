@@ -46,6 +46,8 @@ const App = () => {
     const {appLanguage, wallets} = useContext(AppStorageContext);
     const {t} = useTranslation('wallet');
 
+    const walletsState = useRef(wallets);
+
     const ColorScheme = Color(useColorScheme());
 
     let Theme = {
@@ -172,6 +174,12 @@ const App = () => {
     }, []);
 
     useEffect(() => {
+        // Hack to stop trigger if fresh from onboarding
+        // Check if new first wallet created
+        if (walletsState.current.length === 0) {
+            return;
+        }
+
         // Prioritize deep links over clipboard, if available
         if (deepLinkURL && wallets.length > 0) {
             rootNavigation.navigate('SelectWallet', {invoice: deepLinkURL});
