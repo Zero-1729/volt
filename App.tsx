@@ -172,14 +172,17 @@ const App = () => {
     }, []);
 
     useEffect(() => {
-        if (checkClipboard && wallets.length) {
-            checkAndSetClipboard();
-            setCheckClipboard(false);
-        }
-
+        // Prioritize deep links over clipboard, if available
         if (deepLinkURL && wallets.length > 0) {
             rootNavigation.navigate('SelectWallet', {invoice: deepLinkURL});
             setDeepLinkURL('');
+
+            return;
+        }
+
+        if (checkClipboard && wallets.length) {
+            checkAndSetClipboard();
+            setCheckClipboard(false);
         }
     }, [checkClipboard, wallets, deepLinkURL]);
 
