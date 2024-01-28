@@ -237,7 +237,7 @@ const WalletRoot = () => {
 };
 
 const AddWalletStack = createNativeStackNavigator<AddWalletParamList>();
-const AddWalletRoot = () => {
+export const AddWalletRoot = () => {
     return (
         <AddWalletStack.Navigator screenOptions={{headerShown: false}}>
             <AddWalletStack.Screen name="Add" component={Add} />
