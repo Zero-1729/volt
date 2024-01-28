@@ -146,10 +146,13 @@ const Home = ({route}: Props) => {
                 transactions = transactions.concat(w?.transactions);
             }
         } else {
-            transactions = transactions.concat(wallet?.transactions);
+            transactions = wallet
+                ? transactions.concat(wallet.transactions)
+                : transactions;
         }
 
-        const txs = wallets.length > 0 ? getUniqueTXs(transactions) : [];
+        const txs =
+            wallets.length > 0 ? getUniqueTXs(transactions) : transactions;
 
         // Sort by timestamp
         return txs.sort((a: TTransaction, b: TTransaction) => {
