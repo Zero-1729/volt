@@ -54,7 +54,7 @@ export const formatSats = (sats: TBalance) => {
     }
 
     // Strip trailing zeros
-    return addCommas(sats.toString(), SEPARATOR);
+    return addCommas(sats.toFixed(0), SEPARATOR);
 };
 
 export const formatBTC = (sats: TBalance) => {
