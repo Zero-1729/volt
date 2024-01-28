@@ -211,6 +211,10 @@ const SelectWallet = ({route}: Props) => {
         ? decodedInvoice.options?.amount * 100_000_000
         : undefined;
 
+    const invoiceOptionsEmpty = decodedInvoice.options
+        ? Object.keys(decodedInvoice.options).length === 0
+        : true;
+
     return (
         <SafeAreaView>
             <View
@@ -238,7 +242,9 @@ const SelectWallet = ({route}: Props) => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 p-6 items-center flex justify-between rounded mt-4',
+                            `${
+                                invoiceOptionsEmpty ? 'w-5/6 p-2' : 'w-5/6 p-6'
+                            } items-center flex justify-between rounded mt-4`,
                         ),
                     ]}>
                     {decodedInvoice.options?.label && (
