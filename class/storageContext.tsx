@@ -629,9 +629,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const deleteWallet = useCallback(
         async (id: string) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
-
-            // delete current Wallet index
-            await setCurrentWalletID('');
+            let newIdx = walletsIndex;
 
             const tmp = [...wallets];
             tmp.splice(index, 1);
@@ -643,11 +641,13 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             if (walletsIndex === index) {
-                const newIdx = index > 0 ? index - 1 : 0;
-
+                newIdx = index > 0 ? index - 1 : 0;
                 updateWalletsIndex(newIdx);
             }
 
+            // Reset current wallet ID
+            await setCurrentWalletID(tmp.length > 0 ? tmp[0].id : '');
+            // Update wallets list
             await setWallets(tmp);
         },
         [wallets, _updateWallets, _setWallets],
