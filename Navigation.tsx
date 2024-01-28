@@ -1,15 +1,27 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {ReactElement, memo, useRef, useEffect} from 'react';
+import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createNavigationContainerRef} from '@react-navigation/native';
+import {
+    NavigationContainer,
+    createNavigationContainerRef,
+    DefaultTheme,
+    LinkingOptions,
+} from '@react-navigation/native';
+
+import Color from './constants/Color';
+
+import {useRenderCount} from './modules/hooks';
+
+import {checkClipboardContents} from './modules/clipboard';
+import {capitalizeFirst} from './modules/transform';
+import {useTranslation} from 'react-i18next';
+
+import {actionAlert} from './components/alert';
 
 import Home from './screens/Home';
 import SelectWallet from './screens/wallet/SelectWallet';
-
-// Onboarding screens
-import Intro from './screens/onboarding/Intro';
-import SelectMode from './screens/onboarding/SelectMode';
-import DescriptorsInfo from './screens/onboarding/DescriptorsInfo';
 
 // Wallet screens
 import Add from './screens/wallet/Add';
@@ -66,8 +78,9 @@ export type InitStackParamList = {
     SelectWallet: {
         invoice: string;
     };
-    OnboardingRoot: undefined;
-    AddWalletRoot: undefined;
+    AddWalletRoot: {
+        onboarding: boolean;
+    };
     WalletRoot: undefined;
     SettingsRoot: undefined;
     ScanRoot: undefined;
@@ -86,13 +99,6 @@ export type AddWalletParamList = {
     Mnemonic: {
         onboarding: boolean;
     };
-};
-
-// Onboarding Param List for screens
-export type OnboardingParams = {
-    Intro: undefined;
-    SelectMode: undefined;
-    DescriptorsInfo: undefined;
 };
 
 // Root Param List for screens
@@ -150,21 +156,6 @@ export type ScanParamList = {
         screen: string;
         wallet: TMiniWallet;
     };
-};
-
-const OnboardingStack = createNativeStackNavigator<OnboardingParams>();
-
-export const OnboardingRoot = () => {
-    return (
-        <OnboardingStack.Navigator screenOptions={{headerShown: false}}>
-            <OnboardingStack.Screen name="Intro" component={Intro} />
-            <OnboardingStack.Screen
-                name="DescriptorsInfo"
-                component={DescriptorsInfo}
-            />
-            <OnboardingStack.Screen name="SelectMode" component={SelectMode} />
-        </OnboardingStack.Navigator>
-    );
 };
 
 const SettingsStack = createNativeStackNavigator();
@@ -279,7 +270,7 @@ export const rootNavigation = {
             : never
     ): void {
         if (navigationRef.isReady()) {
-            navigationRef.navigate(...args);
+            navigationRef.current?.navigate(...args);
         } else {
             // If navigation not ready
             console.log('Navigation not ready');
@@ -288,36 +279,168 @@ export const rootNavigation = {
 };
 
 const InitScreenStack = createNativeStackNavigator<InitStackParamList>();
-const initScreen = () => {
+const RootNavigator = (): ReactElement => {
+    const appState = useRef(AppState.currentState);
+    const renderCount = useRenderCount();
+
+    const {t} = useTranslation('wallet');
+
+    const ColorScheme = Color(useColorScheme());
+
+    let Theme = {
+        dark: ColorScheme.isDarkMode,
+        colors: {
+            // Spread the colors from the default theme
+            // and include the custom Navigator theme colors
+            ...DefaultTheme.colors,
+            ...ColorScheme.NavigatorTheme.colors,
+        },
+    };
+
+    // Clipboard check
+    const checkAndSetClipboard = async () => {
+        // We only display dialogs if content is not empty and valid invoice
+        const clipboardResult = await checkClipboardContents();
+        let clipboardMessage!: string;
+
+        // Set clipboard message
+        if (clipboardResult.invoiceType === 'lightning') {
+            clipboardMessage = t('read_clipboard_lightning_text', {
+                spec: clipboardResult.spec,
+            });
+        }
+
+        if (clipboardResult.invoiceType === 'bitcoin') {
+            clipboardMessage = t('read_clipboard_bitcoin_text');
+        }
+
+        // If clipboard has contents, display dialog
+        if (
+            clipboardResult.hasContents &&
+            clipboardResult.invoiceType !== 'unsupported'
+        ) {
+            actionAlert(
+                capitalizeFirst(t('clipboard')),
+                clipboardMessage,
+                capitalizeFirst(t('pay')),
+                capitalizeFirst(t('cancel')),
+                () => {
+                    rootNavigation.navigate('SelectWallet', {
+                        invoice: clipboardResult.content,
+                    });
+                },
+            );
+        }
+    };
+
+    // Deep linking
+    // Triggers while app still open
+    const linking: LinkingOptions<{}> = {
+        prefixes: ['bitcoin', 'lightning'],
+        config: {
+            screens: {
+                SelectWallet: '',
+            },
+        },
+        subscribe(listener): () => void {
+            // Deep linking when app open
+            const onReceiveLink = ({url}: {url: string}) => {
+                rootNavigation.navigate('SelectWallet', {invoice: url});
+
+                return listener(url);
+            };
+
+            // Listen to incoming links from deep linking
+            const subscription = Linking.addEventListener('url', onReceiveLink);
+
+            return () => {
+                // Clean up the event listeners
+                subscription.remove();
+            };
+        },
+    };
+
+    // Check deep link & clipboard if app newly launched if app previously unopened
+    const checkDeepLinkAndClipboard = async (): Promise<void> => {
+        // Check deep link
+        const url = await Linking.getInitialURL();
+
+        if (url) {
+            rootNavigation.navigate('SelectWallet', {invoice: url});
+            return;
+        }
+
+        // Check clipboard
+        checkAndSetClipboard();
+    };
+
+    useEffect(() => {
+        // Check for deep link if app newly launched
+        // Ensure that we have wallets before checking
+        if (renderCount <= 2) {
+            checkDeepLinkAndClipboard();
+        }
+
+        // TODO: Add check for Auth when app is active
+        const appStateSub = AppState.addEventListener(
+            'change',
+            (incomingState): void => {
+                // Check and run clipboard fn if app is active in foreground
+                // Ensure that we have wallets before checking
+                if (
+                    appState.current.match(/background/) &&
+                    incomingState === 'active'
+                ) {
+                    checkAndSetClipboard();
+                }
+
+                // Update app state
+                appState.current = incomingState;
+            },
+        );
+
+        return () => {
+            // Kill subscription
+            appStateSub.remove();
+        };
+    }, []);
+
     return (
-        <InitScreenStack.Navigator
-            screenOptions={{headerShown: false}}
-            initialRouteName="OnboardingRoot">
-            <InitScreenStack.Screen
-                name="OnboardingRoot"
-                component={OnboardingRoot}
-            />
-            <InitScreenStack.Screen name="HomeScreen" component={Home} />
-            <InitScreenStack.Screen
-                name="SelectWallet"
-                component={SelectWallet}
-            />
-            <InitScreenStack.Screen
-                name="AddWalletRoot"
-                component={AddWalletRoot}
-                options={{headerShown: false, presentation: 'modal'}}
-            />
-            <InitScreenStack.Screen name="WalletRoot" component={WalletRoot} />
-            <InitScreenStack.Screen
-                name="SettingsRoot"
-                component={SettingsRoot}
-            />
-            <InitScreenStack.Group screenOptions={{presentation: 'modal'}}>
-                <InitScreenStack.Screen name="ScanRoot" component={ScanRoot} />
-            </InitScreenStack.Group>
-            <InitScreenStack.Screen name="Apps" component={Apps} />
-        </InitScreenStack.Navigator>
+        <NavigationContainer
+            ref={navigationRef}
+            linking={linking}
+            theme={Theme}>
+            <InitScreenStack.Navigator
+                screenOptions={{headerShown: false}}
+                initialRouteName="HomeScreen">
+                <InitScreenStack.Screen name="HomeScreen" component={Home} />
+                <InitScreenStack.Screen
+                    name="SelectWallet"
+                    component={SelectWallet}
+                />
+                <InitScreenStack.Screen
+                    name="AddWalletRoot"
+                    component={AddWalletRoot}
+                    options={{headerShown: false, presentation: 'modal'}}
+                />
+                <InitScreenStack.Screen
+                    name="WalletRoot"
+                    component={WalletRoot}
+                />
+                <InitScreenStack.Screen
+                    name="SettingsRoot"
+                    component={SettingsRoot}
+                />
+                <InitScreenStack.Group screenOptions={{presentation: 'modal'}}>
+                    <InitScreenStack.Screen
+                        name="ScanRoot"
+                        component={ScanRoot}
+                    />
+                </InitScreenStack.Group>
+                <InitScreenStack.Screen name="Apps" component={Apps} />
+            </InitScreenStack.Navigator>
+        </NavigationContainer>
     );
 };
 
-export default initScreen;
+export default memo(RootNavigator);
