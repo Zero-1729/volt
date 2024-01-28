@@ -32,19 +32,6 @@ const Intro = () => {
 
     const {t} = useTranslation('onboarding');
 
-    const {isWalletInitialized} = useContext(AppStorageContext);
-
-    useEffect(() => {
-        if (isWalletInitialized) {
-            navigation.dispatch(
-                CommonActions.reset({
-                    index: 1,
-                    routes: [{name: 'HomeScreen'}],
-                }),
-            );
-        }
-    }, []);
-
     return (
         <SafeAreaView>
             <View
