@@ -7,7 +7,7 @@ import React, {
     useEffect,
     useState,
 } from 'react';
-import {StatusBar, useColorScheme, Platform} from 'react-native';
+import {StatusBar, useColorScheme, Platform, NativeModules} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -16,12 +16,9 @@ import i18n from './i18n';
 
 import Privacy from 'react-native-privacy-snapshot';
 
-import RootNavigator, {navigationRef} from './Navigation';
+import RootNavigator from './Navigation';
 import OnboardingNavigator from './navigation/onboarding/OnboardingNavigator';
 import Color from './constants/Color';
-
-import SplashScreen from 'react-native-splash-screen';
-import {NavigationContainer} from '@react-navigation/native';
 
 const App = () => {
     const [isReady, setIsReady] = useState<boolean>(false);
@@ -44,9 +41,7 @@ const App = () => {
 
     useEffect(() => {
         if (Platform.OS === 'android') {
-            setTimeout(() => {
-                SplashScreen.hide();
-            }, 100);
+            setTimeout(NativeModules.SplashScreenModule.hide, 100);
         }
 
         // Enable privacy blur for IOS; blur screen when screen inactive
