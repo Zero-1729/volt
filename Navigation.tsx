@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {ReactElement, memo, useRef, useEffect} from 'react';
+import React, {ReactElement, memo, useRef, useEffect, useContext} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
+
+import {AppStorageContext} from './class/storageContext';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
@@ -283,6 +285,9 @@ const RootNavigator = (): ReactElement => {
     const appState = useRef(AppState.currentState);
     const renderCount = useRenderCount();
 
+    const {wallets} = useContext(AppStorageContext);
+    const walletState = useRef(wallets);
+
     const {t} = useTranslation('wallet');
 
     const ColorScheme = Color(useColorScheme());
@@ -375,6 +380,11 @@ const RootNavigator = (): ReactElement => {
     };
 
     useEffect(() => {
+        // Block if newly onboarded
+        if (walletState.current.length === 0) {
+            return;
+        }
+
         // Check for deep link if app newly launched
         // Ensure that we have wallets before checking
         if (renderCount <= 2) {
