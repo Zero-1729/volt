@@ -813,11 +813,6 @@ export const AppStorageProvider = ({children}: Props) => {
         // Update temporary wallet address
         newWallet.setAddress(newAddress);
 
-        // Set wallet as initialized
-        if (!isWalletInitialized) {
-            await _setWalletInit(true);
-        }
-
         const tmp = [...wallets, newWallet];
 
         await _setWallets(tmp);
