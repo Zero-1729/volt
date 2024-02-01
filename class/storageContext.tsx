@@ -88,6 +88,7 @@ type defaultContextType = {
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     setDefaultToTestnet: (defaultToTestnet: boolean) => void;
+    setWalletInit: (initialized: boolean) => void;
     setWalletModeType: (mode: string) => void;
     updateAppUnit: (unit: TUnit) => void;
     updateWalletTransactions: (
@@ -162,6 +163,7 @@ const defaultContext: defaultContextType = {
     updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
     updateWalletAddress: () => {},
+    setWalletInit: () => {},
     setWalletModeType: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
@@ -377,6 +379,17 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const _setWalletInit = async (initialized: boolean) => {
+        try {
+            _setWalletInitialized(initialized);
+            _updateWalletInitialized(JSON.stringify(initialized));
+        } catch (e) {
+            console.error(
+                `[AsyncStorage] (Wallet initialized setting) Error loading data: ${e}`,
+            );
+        }
+    };
+
+    const setWalletInit = async (initialized: boolean) => {
         try {
             _setWalletInitialized(initialized);
             _updateWalletInitialized(JSON.stringify(initialized));
@@ -1201,6 +1214,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 setCurrentWalletID,
                 isAdvancedMode,
                 defaultToTestnet,
+                setWalletInit,
                 setWalletModeType,
                 setIsAdvancedMode,
                 setDefaultToTestnet,
