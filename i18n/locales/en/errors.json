@@ -33,5 +33,6 @@
     "clipboard_empty_error": "Clipboard is empty",
     "unsupported_invoice_type": "Unsupported invoice type",
     "invalid_btc_address_error": "Invalid Bitcoin address",
-    "lightning_not_support": "Lightning is not yet supported"
+    "lightning_not_support": "Lightning is not yet supported",
+    "multi_wallets_exist_error": "More wallets exist, please delete them first. To see them, go to Settings > Enable Multi Wallet Mode."
 }
