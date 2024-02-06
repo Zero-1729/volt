@@ -71,7 +71,7 @@ const Settings = () => {
         DeletionAlert(
             t('reset_data'),
             t('reset_app_text'),
-            t('reset'),
+            capitalizeFirst(t('reset')),
             capitalizeFirst(t('cancel')),
             handleAppDataReset,
         );
