@@ -11,7 +11,7 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
-import {DeletionAlert, liberalAlert} from '../../components/alert';
+import {DeletionAlert, actionAlert, liberalAlert} from '../../components/alert';
 
 import {useTranslation} from 'react-i18next';
 
@@ -54,6 +54,9 @@ const Info = () => {
         getWalletData,
         renameWallet,
         deleteWallet,
+        wallets,
+        walletMode,
+        setWalletModeType,
     } = useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
@@ -124,8 +127,21 @@ const Info = () => {
             return;
         }
 
-        // TODO: Check if other wallets exist and in single mode
+        // Check if other wallets exist and in single mode
         // warn user about 'n' other wallets
+        if (walletMode === 'single' && wallets.length > 1) {
+            actionAlert(
+                capitalizeFirst(t('notice')),
+                e('multi_wallets_exist_error', {n: wallets.length - 1}),
+                capitalizeFirst(t('yes')),
+                capitalizeFirst(t('cancel')),
+                () => {
+                    // enable multi mode here
+                    setWalletModeType('multi');
+                },
+            );
+            return;
+        }
 
         DeletionAlert(
             t('delete_wallet'),
