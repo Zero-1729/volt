@@ -574,7 +574,9 @@ export const checkInvoiceAndWallet = (
             ? invoice.address.slice(0, 4).toLowerCase()
             : addressTip;
     const addressNetwork =
-        prefixInfo[prefixStub].network === 'bitcoin' ? 'mainnet' : 'testnet';
+        prefixInfo[prefixStub].network === ENet.Bitcoin
+            ? ENet.Bitcoin
+            : ENet.Testnet;
     const addressType = prefixInfo[prefixStub].type;
     const addressTypeName = WalletTypeDetails[addressType][0];
 
