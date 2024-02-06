@@ -65,6 +65,8 @@ import {liberalAlert, conservativeAlert} from '../components/alert';
 import {getUniqueTXs, checkNetworkIsReachable} from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
+import {ENet} from '../types/enums';
+
 type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
 const Home = ({route}: Props) => {
@@ -127,7 +129,7 @@ const Home = ({route}: Props) => {
             // Don't want user tot think their testnet money
             // is spendable
             accumulator.plus(
-                currentValue.network === 'bitcoin'
+                currentValue.network === ENet.Bitcoin
                     ? currentValue.balance
                     : new BigNumber(0),
             ),

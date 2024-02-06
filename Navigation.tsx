@@ -67,6 +67,7 @@ import License from './screens/settings/License';
 import Changelog from './screens/settings/Changelog';
 
 import {TTransaction, TMiniWallet, TInvoiceData} from './types/wallet';
+import {ENet} from './types/enums';
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
@@ -315,7 +316,7 @@ const RootNavigator = (): ReactElement => {
             });
         }
 
-        if (clipboardResult.invoiceType === 'bitcoin') {
+        if (clipboardResult.invoiceType === ENet.Bitcoin) {
             clipboardMessage = t('read_clipboard_bitcoin_text');
         }
 
