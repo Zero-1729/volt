@@ -42,17 +42,17 @@ import {
 import {NetInfoState} from '@react-native-community/netinfo';
 
 export const prefixInfo: {[index: string]: {network: string; type: string}} = {
-    '1': {network: 'bitcoin', type: 'p2pkh'},
+    '1': {network: ENet.Bitcoin, type: 'p2pkh'},
     // Handle special case
     // P2TR -> bc1p
     // WPKH -> bc1q
-    bc1q: {network: 'bitcoin', type: 'wpkh'},
-    bc1p: {network: 'bitcoin', type: 'p2tr'},
-    '3': {network: 'bitcoin', type: 'shp2wpkh'},
-    m: {network: 'testnet', type: 'p2pkh'},
-    tb1q: {network: 'testnet', type: 'wpkh'},
-    tb1p: {network: 'testnet', type: 'p2tr'},
-    '2': {network: 'testnet', type: 'shp2wpkh'},
+    bc1q: {network: ENet.Bitcoin, type: 'wpkh'},
+    bc1p: {network: ENet.Bitcoin, type: 'p2tr'},
+    '3': {network: ENet.Bitcoin, type: 'shp2wpkh'},
+    m: {network: ENet.Testnet, type: 'p2pkh'},
+    tb1q: {network: ENet.Testnet, type: 'wpkh'},
+    tb1p: {network: ENet.Testnet, type: 'p2tr'},
+    '2': {network: ENet.Testnet, type: 'shp2wpkh'},
 };
 
 export const getUniqueTXs = (transactions: TTransaction[]): TTransaction[] => {
@@ -235,7 +235,7 @@ export const getAddressPath = (
     // Get network prefix
     // Uses unhardened derivation
     const prefix =
-        network === 'bitcoin'
+        network === ENet.Bitcoin
             ? WalletPaths[type].bitcoin
             : WalletPaths[type].testnet;
 
@@ -460,7 +460,7 @@ export const normalizeExtKey = (xkey: string, key_type: string) => {
     if (['u', 'v', 'y', 'z'].includes(xkey[0])) {
         const convertedKey = convertXKey(
             xkey,
-            network === 'testnet' ? `t${key_type}` : `x${key_type}`,
+            network === ENet.Testnet ? `t${key_type}` : `x${key_type}`,
         );
 
         return convertedKey;
@@ -574,7 +574,9 @@ export const checkInvoiceAndWallet = (
             ? invoice.address.slice(0, 4).toLowerCase()
             : addressTip;
     const addressNetwork =
-        prefixInfo[prefixStub].network === 'bitcoin' ? 'mainnet' : 'testnet';
+        prefixInfo[prefixStub].network === ENet.Bitcoin
+            ? ENet.Bitcoin
+            : ENet.Testnet;
     const addressType = prefixInfo[prefixStub].type;
     const addressTypeName = WalletTypeDetails[addressType][0];
 

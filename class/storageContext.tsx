@@ -57,7 +57,7 @@ import {
     doesWalletExist,
 } from '../modules/wallet-utils';
 
-import {extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
+import {WalletPaths, extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -81,6 +81,7 @@ type defaultContextType = {
     wallets: TWalletType[];
     currentWalletID: string;
     isDevMode: boolean;
+    onboarding: boolean;
     electrumServerURL: TElectrumServerURLs;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
@@ -88,6 +89,7 @@ type defaultContextType = {
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     setDefaultToTestnet: (defaultToTestnet: boolean) => void;
+    setWalletInit: (initialized: boolean) => void;
     setWalletModeType: (mode: string) => void;
     updateAppUnit: (unit: TUnit) => void;
     updateWalletTransactions: (
@@ -109,6 +111,7 @@ type defaultContextType = {
     setCurrentWalletID: (id: string) => void;
     getWalletData: (id: string) => TWalletType;
     setLoadLock: (loadLock: boolean) => void;
+    setOnboarding: (onboarding: boolean) => void;
     setElectrumServerURL: (url: string) => void;
     updateWalletsIndex: (idx: number) => void;
 };
@@ -116,6 +119,7 @@ type defaultContextType = {
 // Default app context values
 const defaultContext: defaultContextType = {
     loadLock: false,
+    onboarding: true,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -162,6 +166,7 @@ const defaultContext: defaultContextType = {
     updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
     updateWalletAddress: () => {},
+    setWalletInit: () => {},
     setWalletModeType: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
@@ -171,6 +176,7 @@ const defaultContext: defaultContextType = {
         return new BaseWallet({name: 'test wallet', type: 'p2tr'});
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
+    setOnboarding: () => {},
     setElectrumServerURL: () => {},
     updateWalletsIndex: () => {},
 };
@@ -181,6 +187,7 @@ export const AppStorageContext =
 export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
+    const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -214,6 +221,8 @@ export const AppStorageProvider = ({children}: Props) => {
 
     const {getItem: _getLoadLock, setItem: _updateLoadLock} =
         useAsyncStorage('loadLock');
+    const {getItem: _getOnboarding, setItem: _updateOnboarding} =
+        useAsyncStorage('onboarding');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -252,6 +261,14 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
+    const _loadOnboarding = async () => {
+        const ob = await _getOnboarding();
+
+        if (ob !== null) {
+            _setOnboarding(JSON.parse(ob));
+        }
+    };
+
     const setLoadLock = useCallback(
         async (lock: boolean) => {
             try {
@@ -265,6 +282,21 @@ export const AppStorageProvider = ({children}: Props) => {
             }
         },
         [_setLoadLock, _updateLoadLock],
+    );
+
+    const setOnboarding = useCallback(
+        async (arg: boolean) => {
+            try {
+                await _setOnboarding(arg);
+                await _updateOnboarding(JSON.stringify(arg));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Onboarding) Error loading data: ${e} [${arg}]`,
+                );
+                throw new Error('Error setting onboarding');
+            }
+        },
+        [_setOnboarding, _updateOnboarding],
     );
 
     const setAppLanguage = useCallback(
@@ -377,6 +409,17 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const _setWalletInit = async (initialized: boolean) => {
+        try {
+            _setWalletInitialized(initialized);
+            _updateWalletInitialized(JSON.stringify(initialized));
+        } catch (e) {
+            console.error(
+                `[AsyncStorage] (Wallet initialized setting) Error loading data: ${e}`,
+            );
+        }
+    };
+
+    const setWalletInit = async (initialized: boolean) => {
         try {
             _setWalletInitialized(initialized);
             _updateWalletInitialized(JSON.stringify(initialized));
@@ -629,9 +672,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const deleteWallet = useCallback(
         async (id: string) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
-
-            // delete current Wallet index
-            await setCurrentWalletID('');
+            let newIdx = walletsIndex;
 
             const tmp = [...wallets];
             tmp.splice(index, 1);
@@ -643,11 +684,13 @@ export const AppStorageProvider = ({children}: Props) => {
             }
 
             if (walletsIndex === index) {
-                const newIdx = index > 0 ? index - 1 : 0;
-
+                newIdx = index > 0 ? index - 1 : 0;
                 updateWalletsIndex(newIdx);
             }
 
+            // Reset current wallet ID
+            await setCurrentWalletID(tmp.length > 0 ? tmp[0].id : '');
+            // Update wallets list
             await setWallets(tmp);
         },
         [wallets, _updateWallets, _setWallets],
@@ -813,11 +856,6 @@ export const AppStorageProvider = ({children}: Props) => {
         // Update temporary wallet address
         newWallet.setAddress(newAddress);
 
-        // Set wallet as initialized
-        if (!isWalletInitialized) {
-            await _setWalletInit(true);
-        }
-
         const tmp = [...wallets, newWallet];
 
         await _setWallets(tmp);
@@ -894,6 +932,16 @@ export const AppStorageProvider = ({children}: Props) => {
                 if (backupMaterialType === 'xprv') {
                     xpub = getPubKeyFromXprv(backupMaterial, network);
                 }
+            }
+
+            // Set xpub if from mnemonic
+            if (backupMaterialType === 'mnemonic') {
+                const metas = getMetaFromMnemonic(
+                    backupMaterial,
+                    WalletPaths[walletType][net],
+                    backupNetwork,
+                );
+                xpub = metas.xpub;
             }
 
             // Check if wallet is a duplicate
@@ -1096,6 +1144,8 @@ export const AppStorageProvider = ({children}: Props) => {
     // Resets app data
     const resetAppData = useCallback(async () => {
         try {
+            await setLoadLock(false);
+            await setOnboarding(true);
             await setAppLanguage(defaultContext.appLanguage);
             await setAppFiatCurrency(defaultContext.appFiatCurrency);
             await updateAppUnit(defaultContext.appUnit);
@@ -1122,6 +1172,10 @@ export const AppStorageProvider = ({children}: Props) => {
     // Load settings from disk on app start
     useEffect(() => {
         _loadLock();
+    }, []);
+
+    useEffect(() => {
+        _loadOnboarding();
     }, []);
 
     useEffect(() => {
@@ -1180,6 +1234,7 @@ export const AppStorageProvider = ({children}: Props) => {
     return (
         <AppStorageContext.Provider
             value={{
+                onboarding,
                 walletsIndex,
                 updateWalletsIndex,
                 loadLock,
@@ -1206,6 +1261,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 setCurrentWalletID,
                 isAdvancedMode,
                 defaultToTestnet,
+                setOnboarding,
+                setWalletInit,
                 setWalletModeType,
                 setIsAdvancedMode,
                 setDefaultToTestnet,

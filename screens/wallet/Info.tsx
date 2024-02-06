@@ -124,6 +124,9 @@ const Info = () => {
             return;
         }
 
+        // TODO: Check if other wallets exist and in single mode
+        // warn user about 'n' other wallets
+
         DeletionAlert(
             t('delete_wallet'),
             e('wallet_delete_warn'),

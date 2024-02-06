@@ -295,11 +295,6 @@ const Wallet = ({route}: Props) => {
                     capitalizeFirst(t('ok')),
                 );
 
-                console.log(
-                    '[Wallet] Error fetching transactions',
-                    err.message,
-                );
-
                 setLoadingBalance(false);
                 setRefreshing(false);
                 setLoadLock(false);

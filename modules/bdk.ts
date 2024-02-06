@@ -340,7 +340,7 @@ const _getConfig = (
 export const createBDKWallet = async (wallet: TWalletType) => {
     // Set Network
     const network =
-        wallet.network === 'bitcoin' ? Network.Bitcoin : Network.Testnet;
+        wallet.network === ENet.Bitcoin ? Network.Bitcoin : Network.Testnet;
 
     // Create descriptors
     let ExternalDescriptor!: BDK.Descriptor;

@@ -1,13 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useEffect} from 'react';
+import React from 'react';
 import {Text, View, useColorScheme, Platform} from 'react-native';
 
-import {CommonActions} from '@react-navigation/native';
-import {useNavigation} from '@react-navigation/core';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-
-import {AppStorageContext} from './../../class/storageContext';
 
 import {useTranslation} from 'react-i18next';
 
@@ -31,19 +27,6 @@ const Intro = () => {
     const tailwind = useTailwind();
 
     const {t} = useTranslation('onboarding');
-
-    const {isWalletInitialized} = useContext(AppStorageContext);
-
-    useEffect(() => {
-        if (isWalletInitialized) {
-            navigation.dispatch(
-                CommonActions.reset({
-                    index: 1,
-                    routes: [{name: 'HomeScreen'}],
-                }),
-            );
-        }
-    }, []);
 
     return (
         <SafeAreaView>

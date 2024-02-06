@@ -527,7 +527,9 @@ export const parseDescriptor = (expression: string) => {
         keyOnly: descObjmap?.bip32?.toBase58(),
         type: descriptorType,
         network:
-            descObjmap?.bip32?.network.bech32 === 'bc' ? 'bitcoin' : 'testnet',
+            descObjmap?.bip32?.network.bech32 === 'bc'
+                ? ENet.Bitcoin
+                : ENet.Testnet,
         // get fingerprint provided by descriptor
         fingerprint: descObjmap?.masterFingerprint
             ? descObjmap?.masterFingerprint.toString('hex')

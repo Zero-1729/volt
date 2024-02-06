@@ -42,7 +42,11 @@ import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
 
-import {capitalizeFirst, formatLocaleDate} from '../../modules/transform';
+import {
+    capitalizeFirst,
+    formatLocaleDate,
+    i18nNumber,
+} from '../../modules/transform';
 import {getScreenEdges} from '../../modules/screen';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
@@ -153,6 +157,8 @@ const TransactionDetailsView = ({route}: Props) => {
     const confirmationCount =
         route.params.tx.confirmations > 6
             ? '6+'
+            : route.params.tx.confirmations > 0
+            ? i18nNumber(route.params.tx.confirmations, i18n.language)
             : capitalizeFirst(t('unconfirmed'));
     const confirmationText = route.params.tx.confirmed
         ? `${

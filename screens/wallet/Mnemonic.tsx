@@ -27,7 +27,8 @@ type Props = NativeStackScreenProps<AddWalletParamList, 'Mnemonic'>;
 
 const Mnemonic = ({route}: Props) => {
     const navigation = useNavigation();
-    const {getWalletData, currentWalletID} = useContext(AppStorageContext);
+    const {getWalletData, currentWalletID, isWalletInitialized, setWalletInit} =
+        useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
 
@@ -38,6 +39,13 @@ const Mnemonic = ({route}: Props) => {
     const {t: e} = useTranslation('errors');
 
     const returnToHome = useCallback(() => {
+        const noWallets = !isWalletInitialized;
+
+        // Update wallet init here
+        if (noWallets) {
+            setWalletInit(true);
+        }
+
         // Return home
         if (route.params?.onboarding) {
             navigation.dispatch(
@@ -51,7 +59,12 @@ const Mnemonic = ({route}: Props) => {
             // so we can close it and return to the home screen
             navigation.getParent()?.dispatch(StackActions.popToTop());
         }
-    }, [navigation, route.params?.onboarding]);
+    }, [
+        isWalletInitialized,
+        navigation,
+        route.params?.onboarding,
+        setWalletInit,
+    ]);
 
     const displayMnemonic = () => {
         const components: JSX.Element[] = [];

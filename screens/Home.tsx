@@ -65,6 +65,8 @@ import {liberalAlert, conservativeAlert} from '../components/alert';
 import {getUniqueTXs, checkNetworkIsReachable} from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
+import {ENet} from '../types/enums';
+
 type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
 const Home = ({route}: Props) => {
@@ -119,6 +121,7 @@ const Home = ({route}: Props) => {
 
     // Locked wallet for single wallet mode
     const singleWallet = [wallets[walletsIndex]];
+    const walletModeIndex = walletMode === 'multi' ? walletsIndex : 0;
 
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
@@ -127,7 +130,7 @@ const Home = ({route}: Props) => {
             // Don't want user tot think their testnet money
             // is spendable
             accumulator.plus(
-                currentValue.network === 'bitcoin'
+                currentValue.network === ENet.Bitcoin
                     ? currentValue.balance
                     : new BigNumber(0),
             ),
@@ -146,10 +149,13 @@ const Home = ({route}: Props) => {
                 transactions = transactions.concat(w?.transactions);
             }
         } else {
-            transactions = transactions.concat(wallet?.transactions);
+            transactions = wallet
+                ? transactions.concat(wallet.transactions)
+                : transactions;
         }
 
-        const txs = wallets.length > 0 ? getUniqueTXs(transactions) : [];
+        const txs =
+            wallets.length > 0 ? getUniqueTXs(transactions) : transactions;
 
         // Sort by timestamp
         return txs.sort((a: TTransaction, b: TTransaction) => {
@@ -321,17 +327,7 @@ const Home = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        if (!isWalletInitialized) {
-            navigation.dispatch(
-                CommonActions.reset({
-                    index: 1,
-                    routes: [{name: 'OnboardingRoot'}],
-                }),
-            );
-        }
-    }, [isWalletInitialized]);
-
-    useEffect(() => {
+        // TODO: handle restored wallet from onboarding
         if (route.params?.restoreMeta) {
             if (route.params?.restoreMeta.load) {
                 // set loading
@@ -508,7 +504,7 @@ const Home = ({route}: Props) => {
                                     onScrollEnd={index => {
                                         updateWalletsIndex(index);
                                     }}
-                                    defaultIndex={walletsIndex}
+                                    defaultIndex={walletModeIndex}
                                 />
                             </View>
                         )}

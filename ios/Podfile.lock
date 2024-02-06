@@ -350,8 +350,6 @@ PODS:
     - React-Core
   - react-native-secure-key-store (2.0.10):
     - React-Core
-  - react-native-splash-screen (3.3.0):
-    - React-Core
   - React-perflogger (0.71.13)
   - React-RCTActionSheet (0.71.13):
     - React-Core/RCTActionSheetHeaders (= 0.71.13)
@@ -559,7 +557,6 @@ DEPENDENCIES:
   - react-native-quick-crypto (from `../node_modules/react-native-quick-crypto`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-secure-key-store (from `../node_modules/react-native-secure-key-store`)
-  - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -669,8 +666,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-secure-key-store:
     :path: "../node_modules/react-native-secure-key-store"
-  react-native-splash-screen:
-    :path: "../node_modules/react-native-splash-screen"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -777,7 +772,6 @@ SPEC CHECKSUMS:
   react-native-quick-crypto: 455c1b411db006dba1026a30681ececb19180187
   react-native-safe-area-context: 9697629f7b2cda43cf52169bb7e0767d330648c2
   react-native-secure-key-store: 910e6df6bc33cb790aba6ee24bc7818df1fe5898
-  react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   React-perflogger: 431a655960a02f01257d631b2a9bfbb02fd21064
   React-RCTActionSheet: 38c8d496d0faa63013d16f709e10a3acf6b5f100
   React-RCTAnimation: 6da4d599f3262ed8021433ddd96de45ac9e731b1

@@ -159,7 +159,7 @@ describe('testing parsed descriptor parts', () => {
         const parsedDescriptor = parseDescriptor(descriptor);
 
         expect(parsedDescriptor.type).toEqual('wpkh');
-        expect(parsedDescriptor.network).toEqual('bitcoin');
+        expect(parsedDescriptor.network).toEqual(ENet.Bitcoin);
         expect(parsedDescriptor.keyPath).toEqual('/0/*');
         expect(parsedDescriptor.path.replace(/'/g, 'h')).toEqual('m/84h/0h/0h');
         expect(parsedDescriptor.fingerprint).toEqual('c65d79d8');

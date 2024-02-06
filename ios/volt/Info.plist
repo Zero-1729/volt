@@ -20,6 +20,29 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>volt</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>bitcoin</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>volt</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lightning</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -38,7 +61,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>${PRODUCT_NAME} needs access to the camera to scan QR Codes</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto Medium.ttf</string>
