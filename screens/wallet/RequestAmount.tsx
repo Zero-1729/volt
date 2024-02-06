@@ -266,8 +266,7 @@ const RequestAmount = () => {
                                         color: ColorScheme.Text.Alt,
                                     },
                                 ]}>
-                                {/* TODO: fix polarity fn to avoid clearing amount and persist shown values to receive screen. ATM skip is shown despite satsAmount and fiatAmount still showing */}
-                                {amount === ''
+                                {satsAmount.value.isZero()
                                     ? capitalizeFirst(t('skip'))
                                     : capitalizeFirst(t('continue'))}
                             </Text>
