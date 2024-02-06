@@ -155,3 +155,8 @@ export const displayNumberedSeed = (seed: string) => {
     // Return an array of numbered Mnemonic phrases
     return words.map((word, i) => `${i + 1}. ${word}`);
 };
+
+// Return language translated number
+export const i18nNumber = (num: number, locale: string) => {
+    return num.toLocaleString(locale);
+};
