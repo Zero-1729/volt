@@ -1,5 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {ReactElement, memo, useRef, useEffect, useContext} from 'react';
+import React, {
+    ReactElement,
+    memo,
+    useRef,
+    useEffect,
+    useContext,
+    useState,
+} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
@@ -286,8 +293,9 @@ const RootNavigator = (): ReactElement => {
     const appState = useRef(AppState.currentState);
     const renderCount = useRenderCount();
 
-    const {wallets} = useContext(AppStorageContext);
+    const {onboarding, wallets, setOnboarding} = useContext(AppStorageContext);
     const walletState = useRef(wallets);
+    const onboardingState = useRef(onboarding);
 
     const {t} = useTranslation('wallet');
 
@@ -351,7 +359,9 @@ const RootNavigator = (): ReactElement => {
         subscribe(listener): () => void {
             // Deep linking when app open
             const onReceiveLink = ({url}: {url: string}) => {
-                rootNavigation.navigate('SelectWallet', {invoice: url});
+                if (!onboardingState.current) {
+                    rootNavigation.navigate('SelectWallet', {invoice: url});
+                }
 
                 return listener(url);
             };
@@ -386,9 +396,14 @@ const RootNavigator = (): ReactElement => {
             return;
         }
 
+        // Update if newly onboarded so we can check clippy and deep links later
+        if (onboarding) {
+            setOnboarding(false);
+        }
+
         // Check for deep link if app newly launched
         // Ensure that we have wallets before checking
-        if (renderCount <= 2) {
+        if (renderCount <= 2 && !onboardingState.current) {
             checkDeepLinkAndClipboard();
         }
 
@@ -400,7 +415,8 @@ const RootNavigator = (): ReactElement => {
                 // Ensure that we have wallets before checking
                 if (
                     appState.current.match(/background/) &&
-                    incomingState === 'active'
+                    incomingState === 'active' &&
+                    !onboardingState.current
                 ) {
                     checkAndSetClipboard();
                 }
