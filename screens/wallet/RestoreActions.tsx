@@ -64,8 +64,14 @@ const ImportAction = ({route}: Props) => {
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
 
-    const {isAdvancedMode, restoreWallet, defaultToTestnet} =
-        useContext(AppStorageContext);
+    const {
+        isAdvancedMode,
+        restoreWallet,
+        defaultToTestnet,
+        setWalletInit,
+        isWalletInitialized,
+        onboarding,
+    } = useContext(AppStorageContext);
 
     const [importText, setImportText] = useState('');
     const [network, setNetwork] = useState<ENet>(
@@ -141,6 +147,11 @@ const ImportAction = ({route}: Props) => {
     };
 
     const handleSuccessRoute = () => {
+        if (!isWalletInitialized) {
+            setWalletInit(true);
+            return;
+        }
+
         // Route to home and display success alert
         // If onboarding, reset to home screen
         if (route.params?.onboarding) {
