@@ -65,6 +65,8 @@ const SelectWallet = ({route}: Props) => {
 
     const networkState = useNetInfo();
 
+    const walletModeIndex = walletMode === 'multi' ? walletsIndex : 0;
+
     const [walletId, updateWalletId] = useState(wallets[walletsIndex].id);
 
     const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
@@ -381,7 +383,7 @@ const SelectWallet = ({route}: Props) => {
                             onScrollEnd={index => {
                                 updateWalletId(wallets[index].id);
                             }}
-                            defaultIndex={walletsIndex}
+                            defaultIndex={walletModeIndex}
                         />
                     </View>
 

@@ -121,6 +121,7 @@ const Home = ({route}: Props) => {
 
     // Locked wallet for single wallet mode
     const singleWallet = [wallets[walletsIndex]];
+    const walletModeIndex = walletMode === 'multi' ? walletsIndex : 0;
 
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
@@ -503,7 +504,7 @@ const Home = ({route}: Props) => {
                                     onScrollEnd={index => {
                                         updateWalletsIndex(index);
                                     }}
-                                    defaultIndex={walletsIndex}
+                                    defaultIndex={walletModeIndex}
                                 />
                             </View>
                         )}
