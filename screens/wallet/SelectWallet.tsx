@@ -34,7 +34,7 @@ import Color from '../../constants/Color';
 
 import BigNumber from 'bignumber.js';
 
-import {LongBottomButton} from '../../components/button';
+import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
 import {WalletCard} from '../../components/card';
@@ -43,6 +43,7 @@ import {TInvoiceData} from '../../types/wallet';
 import {useNetInfo} from '@react-native-community/netinfo';
 
 import InfoIcon from '../../assets/svg/info-16.svg';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'SelectWallet'>;
 
@@ -421,6 +422,29 @@ const SelectWallet = ({route}: Props) => {
                             </Text>
                         </View>
                     )}
+                </View>
+
+                <View
+                    style={[
+                        tailwind('absolute'),
+                        {bottom: NativeWindowMetrics.bottomButtonOffset + 72},
+                    ]}>
+                    <PlainButton
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate('HomeScreen', {
+                                    screen: 'HomeScreen',
+                                }),
+                            );
+                        }}>
+                        <Text
+                            style={[
+                                tailwind('text-sm font-bold'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {capitalizeFirst(t('cancel'))}
+                        </Text>
+                    </PlainButton>
                 </View>
 
                 <LongBottomButton
