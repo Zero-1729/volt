@@ -326,6 +326,7 @@ const Home = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
+        // TODO: handle restored wallet from onboarding
         if (route.params?.restoreMeta) {
             if (route.params?.restoreMeta.load) {
                 // set loading
