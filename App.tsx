@@ -23,7 +23,7 @@ import Color from './constants/Color';
 const App = () => {
     const [isReady, setIsReady] = useState<boolean>(false);
 
-    const {appLanguage, wallets} = useContext(AppStorageContext);
+    const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
 
     const ColorScheme = Color(useColorScheme());
 
@@ -32,12 +32,12 @@ const App = () => {
             return <></>;
         }
 
-        if (wallets.length > 0) {
+        if (isWalletInitialized) {
             return <RootNavigator />;
         }
 
         return <OnboardingNavigator />;
-    }, [isReady, wallets]);
+    }, [isReady, isWalletInitialized]);
 
     useEffect(() => {
         if (Platform.OS === 'android') {
