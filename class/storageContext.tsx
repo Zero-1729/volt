@@ -57,7 +57,7 @@ import {
     doesWalletExist,
 } from '../modules/wallet-utils';
 
-import {extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
+import {WalletPaths, extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -902,6 +902,16 @@ export const AppStorageProvider = ({children}: Props) => {
                 if (backupMaterialType === 'xprv') {
                     xpub = getPubKeyFromXprv(backupMaterial, network);
                 }
+            }
+
+            // Set xpub if from mnemonic
+            if (backupMaterialType === 'mnemonic') {
+                const metas = getMetaFromMnemonic(
+                    backupMaterial,
+                    WalletPaths[walletType][net],
+                    backupNetwork,
+                );
+                xpub = metas.xpub;
             }
 
             // Check if wallet is a duplicate
