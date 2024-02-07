@@ -31,7 +31,7 @@
   "dependencies": {
     "@bitcoinerlab/descriptors": "^1.0.2",
     "@bitcoinerlab/secp256k1": "^1.0.2",
-    "@breeztech/react-native-breez-sdk": "^0.2.12",
+    "@breeztech/react-native-breez-sdk": "^0.2.15",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@formatjs/intl-datetimeformat": "^6.12.2",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
