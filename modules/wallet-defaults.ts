@@ -2,7 +2,13 @@
 import {ENet} from './../types/enums';
 import {TAccountPaths, TExtendedKeyInfo} from '../types/wallet';
 
-export const validWalletTypes = ['p2tr', 'wpkh', 'shp2wpkh', 'p2pkh'];
+export const validWalletTypes = [
+    'p2tr',
+    'wpkh',
+    'shp2wpkh',
+    'p2pkh',
+    'unified',
+];
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
@@ -151,3 +157,6 @@ export const DUST_LIMIT = 546;
 
 // Wallet name character limit
 export const WALLET_NAME_LENGTH = 15;
+
+// Default wallet type
+export const DEFAULT_WALLET_TYPE = 'unified';
