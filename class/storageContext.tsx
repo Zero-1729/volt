@@ -58,7 +58,12 @@ import {
     doesWalletExist,
 } from '../modules/wallet-utils';
 
-import {WalletPaths, extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
+import {
+    DEFAULT_WALLET_TYPE,
+    WalletPaths,
+    extendedKeyInfo,
+    validWalletTypes,
+} from '../modules/wallet-defaults';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -821,6 +826,7 @@ export const AppStorageProvider = ({children}: Props) => {
             let PrivateDescriptor!: string;
 
             switch (newWallet.type) {
+                case 'unified':
                 case 'p2tr':
                     const descriptorsPTR = fromDescriptorPTR(
                         newWallet.mnemonic,
@@ -881,7 +887,7 @@ export const AppStorageProvider = ({children}: Props) => {
         ) => {
             // Default network and wallet type
             var net = backupNetwork;
-            var walletType = 'p2tr'; // p2tr
+            var walletType = DEFAULT_WALLET_TYPE; // unified
 
             var fingerprint = '';
             var path = '';
@@ -1019,6 +1025,10 @@ export const AppStorageProvider = ({children}: Props) => {
                 });
             }
 
+            // is P2TR or Unified
+            const isP2TR =
+                walletArgs.type === 'p2tr' || walletArgs.type === 'unified';
+
             // Alternatively, generate Descriptor from Extended Keys
             if (
                 backupMaterialType === 'xprv' ||
@@ -1033,36 +1043,31 @@ export const AppStorageProvider = ({children}: Props) => {
 
                     switch (backupMaterialType) {
                         case EBackupMaterial.Xpub:
-                            descriptor =
-                                walletArgs.type === 'p2tr'
-                                    ? fromDescriptorPublicPTR(
-                                          walletArgs.xpub,
-                                          walletArgs.fingerprint,
-                                          'p2tr',
-                                          walletArgs.network,
-                                      )
-                                    : await fromDescriptorTemplatePublic(
-                                          // BDK expects a tpub or xpub, so we need to convert it
-                                          // if it's an exotic prefix
-                                          normalizeExtKey(
-                                              walletArgs.xpub,
-                                              'pub',
-                                          ),
-                                          walletArgs.fingerprint,
-                                          walletArgs.type,
-                                          walletArgs.network,
-                                      );
+                            descriptor = isP2TR
+                                ? fromDescriptorPublicPTR(
+                                      walletArgs.xpub,
+                                      walletArgs.fingerprint,
+                                      'p2tr',
+                                      walletArgs.network,
+                                  )
+                                : await fromDescriptorTemplatePublic(
+                                      // BDK expects a tpub or xpub, so we need to convert it
+                                      // if it's an exotic prefix
+                                      normalizeExtKey(walletArgs.xpub, 'pub'),
+                                      walletArgs.fingerprint,
+                                      walletArgs.type,
+                                      walletArgs.network,
+                                  );
 
                             break;
 
                         case EBackupMaterial.Xprv:
-                            const {internal, external, priv} =
-                                walletArgs.type === 'p2tr'
-                                    ? fromDescriptorPTR(
-                                          walletArgs.xprv,
-                                          walletArgs.network,
-                                      )
-                                    : createDescriptorFromXprv(walletArgs.xprv);
+                            const {internal, external, priv} = isP2TR
+                                ? fromDescriptorPTR(
+                                      walletArgs.xprv,
+                                      walletArgs.network,
+                                  )
+                                : createDescriptorFromXprv(walletArgs.xprv);
 
                             descriptor = {
                                 InternalDescriptor: internal,
