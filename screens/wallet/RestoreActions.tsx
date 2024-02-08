@@ -70,7 +70,6 @@ const ImportAction = ({route}: Props) => {
         defaultToTestnet,
         setWalletInit,
         isWalletInitialized,
-        onboarding,
     } = useContext(AppStorageContext);
 
     const [importText, setImportText] = useState('');

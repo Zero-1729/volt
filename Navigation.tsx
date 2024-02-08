@@ -1,12 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {
-    ReactElement,
-    memo,
-    useRef,
-    useEffect,
-    useContext,
-    useState,
-} from 'react';
+import React, {ReactElement, memo, useRef, useEffect, useContext} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
