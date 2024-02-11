@@ -3,6 +3,7 @@ import 'react';
 
 import BigNumber from 'bignumber.js';
 
+import {UnifiedLNWallet} from '../class/wallet/unified';
 import {TaprootWallet} from '../class/wallet/p2tr';
 import {SegWitNativeWallet} from '../class/wallet/segwit/wpkh';
 import {SegWitP2SHWallet} from '../class/wallet/segwit/shp2wpkh';
@@ -17,6 +18,7 @@ import {ENet} from './enums';
 export type TNetwork = ENet | Network;
 
 export type TWalletType =
+    | UnifiedLNWallet
     | TaprootWallet
     | SegWitNativeWallet
     | LegacyWallet
