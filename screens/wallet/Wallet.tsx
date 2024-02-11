@@ -17,6 +17,12 @@ import VText from '../../components/text';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
+import {
+    listPayments,
+    nodeInfo,
+    Payment,
+} from '@breeztech/react-native-breez-sdk';
+
 import BDK from 'bdk-rn';
 
 import BigNumber from 'bignumber.js';
@@ -76,7 +82,7 @@ const Wallet = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-
+    const [LNPayments, setLNPayments] = useState<Payment[]>([]);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
@@ -113,6 +119,51 @@ const Wallet = ({route}: Props) => {
 
         return w;
     }, []);
+
+    const walletTxs =
+        walletData.type === 'unified' ? LNPayments : walletData.transactions;
+    const walletBalance = walletData.balance;
+
+    const getBalance = async () => {
+        const nodeState = await nodeInfo();
+        const balanceLn = nodeState.channelsBalanceMsat;
+
+        // Update balance after converting to sats
+        updateWalletBalance(currentWalletID, new BigNumber(balanceLn / 1000));
+    };
+
+    const showPayments = async () => {
+        const payments = await listPayments({
+            // TODO: figure out a more sane option for this
+            limit: walletData.transactions.length + 10,
+        });
+
+        // Update transactions
+        updateWalletTransactions(
+            currentWalletID,
+            payments,
+            walletData.type === 'unified',
+        );
+
+        setLNPayments(payments);
+    };
+
+    const jointSync = async () => {
+        if (walletData.type === 'unified') {
+            setLoadingBalance(true);
+            setRefreshing(true);
+            setLoadLock(true);
+
+            await getBalance();
+            await showPayments();
+
+            setLoadLock(false);
+            setLoadingBalance(false);
+            setRefreshing(false);
+        } else {
+            refreshWallet();
+        }
+    };
 
     const syncWallet = useCallback(async () => {
         // initWallet only called one time
@@ -349,7 +400,7 @@ const Wallet = ({route}: Props) => {
         // Attempt to sync balance when reload triggered
         // E.g. from completed transaction
         if (route.params?.reload) {
-            refreshWallet();
+            jointSync();
         }
     }, [route.params?.reload]);
 
@@ -512,7 +563,7 @@ const Wallet = ({route}: Props) => {
                             ]}>
                             <Balance
                                 fontColor={'white'}
-                                balance={walletData.balance}
+                                balance={walletBalance}
                                 balanceFontSize={'text-4xl'}
                                 disableFiat={false}
                                 loading={loadingBalance}
@@ -627,12 +678,12 @@ const Wallet = ({route}: Props) => {
                         style={[tailwind('w-full h-full items-center pb-10')]}>
                         <FlatList
                             refreshing={refreshing}
-                            onRefresh={refreshWallet}
+                            onRefresh={jointSync}
                             scrollEnabled={true}
                             style={[
                                 tailwind(
                                     `${
-                                        walletData.transactions.length > 0
+                                        walletTxs.length > 0
                                             ? 'w-11/12'
                                             : 'w-full'
                                     } mt-2 z-30`,
@@ -641,13 +692,11 @@ const Wallet = ({route}: Props) => {
                             contentContainerStyle={[
                                 tailwind(
                                     `${
-                                        walletData.transactions.length > 0
-                                            ? ''
-                                            : 'h-full'
+                                        walletTxs.length > 0 ? '' : 'h-full'
                                     } items-center`,
                                 ),
                             ]}
-                            data={walletData.transactions.sort(
+                            data={walletTxs.sort(
                                 (a: TTransaction, b: TTransaction) => {
                                     return +b.timestamp - +a.timestamp;
                                 },
