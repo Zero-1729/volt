@@ -10894,6 +10894,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lottie-react-native@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "lottie-react-native@npm:6.6.0"
+  peerDependencies:
+    "@dotlottie/react-player": ^1.6.1
+    "@lottiefiles/react-lottie-player": ^3.5.3
+    react: "*"
+    react-native: ">=0.46"
+    react-native-windows: ">=0.63.x"
+  peerDependenciesMeta:
+    "@dotlottie/react-player":
+      optional: true
+    "@lottiefiles/react-lottie-player":
+      optional: true
+    react-native-windows:
+      optional: true
+  checksum: c989a1765caf7d6a80d72eb1c4702648cc744b07c13f1085f6f4233992264686191d84ff88233b6083ae2548261fccd9375cb9de1f81364f3f2477928d6f5c3b
+  languageName: node
+  linkType: hard
+
 "lower-case@npm:^2.0.2":
   version: 2.0.2
   resolution: "lower-case@npm:2.0.2"
@@ -16645,6 +16665,7 @@ __metadata:
     jest: ^29.6.2
     junderw-crc32c: ^1.2.0
     ledger-bitcoin: ^0.2.3
+    lottie-react-native: ^6.6.0
     merkle-lib: ^2.0.10
     metro-react-native-babel-preset: ^0.77.0
     minimaldata: ^1.0.2

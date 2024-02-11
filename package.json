@@ -76,6 +76,7 @@
     "intl-messageformat": "^10.5.10",
     "junderw-crc32c": "^1.2.0",
     "ledger-bitcoin": "^0.2.3",
+    "lottie-react-native": "^6.6.0",
     "merkle-lib": "^2.0.10",
     "minimaldata": "^1.0.2",
     "node-fetch": "^3.2.10",
