@@ -12,14 +12,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url("https://mvn.breez.technology/releases")
-        }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.4.2")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        implementation("breez_sdk:bindings-android:0.2.15")
     }
 }
