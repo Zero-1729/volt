@@ -64,6 +64,7 @@ export const DescriptorType: {[index: string]: string} = {
 */
 export const WalletPaths: {[index: string]: TAccountPaths} = {
     // Experimental
+    unified: {bitcoin: "m/86'/0'/0'", testnet: "m/86'/1'/0'"},
     p2tr: {bitcoin: "m/86'/0'/0'", testnet: "m/86'/1'/0'"},
     wpkh: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
     p2pkh: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
