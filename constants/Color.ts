@@ -50,6 +50,7 @@ const Color = (currentTheme: ColorThemeType) => {
             p2pkh: {bitcoin: 'darkgrey', testnet: 'grey'}, // Grey
             shp2wpkh: {bitcoin: '#008000', testnet: '#408000'}, // Green
             p2tr: {bitcoin: '#004b94', testnet: '#1E90FF'}, // Blue
+            unified: {bitcoin: '#FFA500', testnet: '#FF8C00'}, // Orange
         },
     };
 
