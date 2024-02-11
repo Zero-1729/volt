@@ -14,7 +14,7 @@ import {PlainButton} from './button';
 
 import {TXBalance} from './balance';
 
-import {TxListItemProps, TxLNListItemProps} from '../types/props';
+import {TxListItemProps} from '../types/props';
 
 import Color from '../constants/Color';
 
@@ -24,7 +24,15 @@ import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
 
-export const TransactionLNListItem = (props: TxLNListItemProps) => {
+export const UnifiedTransactionListItem = (props: TxListItemProps) => {
+    if (props.tx.isLightning) {
+        return <TransactionLNListItem {...props} />;
+    } else {
+        return <TransactionListItem {...props} />;
+    }
+};
+
+export const TransactionLNListItem = (props: TxListItemProps) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
