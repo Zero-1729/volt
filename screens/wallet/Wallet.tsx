@@ -55,7 +55,10 @@ import {fetchFiatRate} from '../../modules/currency';
 import {Balance} from '../../components/balance';
 
 import {liberalAlert} from '../../components/alert';
-import {TransactionListItem} from '../../components/transaction';
+import {
+    TransactionListItem,
+    TransactionLNListItem,
+} from '../../components/transaction';
 
 import {TBalance, TTransaction} from '../../types/wallet';
 
@@ -350,6 +353,46 @@ const Wallet = ({route}: Props) => {
         }
     }, [route.params?.reload]);
 
+    const renderListItemW = (item: any) => {
+        if (walletData.type === 'unified') {
+            return (
+                <TransactionLNListItem
+                    callback={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'TransactionDetails',
+                                params: {
+                                    tx: {...item.item},
+                                    source: 'conservative',
+                                    walletId: currentWalletID,
+                                },
+                            }),
+                        );
+                    }}
+                    tx={item.item}
+                />
+            );
+        } else {
+            return (
+                <TransactionListItem
+                    callback={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'TransactionDetails',
+                                params: {
+                                    tx: {...item.item},
+                                    source: 'conservative',
+                                    walletId: currentWalletID,
+                                },
+                            }),
+                        );
+                    }}
+                    tx={item.item}
+                />
+            );
+        }
+    };
+
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
     return (
@@ -609,24 +652,10 @@ const Wallet = ({route}: Props) => {
                                     return +b.timestamp - +a.timestamp;
                                 },
                             )}
-                            renderItem={item => (
-                                <TransactionListItem
-                                    callback={() => {
-                                        navigation.dispatch(
-                                            CommonActions.navigate({
-                                                name: 'TransactionDetails',
-                                                params: {
-                                                    tx: {...item.item},
-                                                    source: 'conservative',
-                                                    walletId: currentWalletID,
-                                                },
-                                            }),
-                                        );
-                                    }}
-                                    tx={item.item}
-                                />
-                            )}
-                            keyExtractor={item => item.txid}
+                            renderItem={item => renderListItemW(item)}
+                            keyExtractor={item =>
+                                item.txid ? item.txid : item.id
+                            }
                             initialNumToRender={25}
                             contentInsetAdjustmentBehavior="automatic"
                             ListEmptyComponent={
