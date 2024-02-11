@@ -9,3 +9,9 @@ export const enum ENet {
     Bitcoin = 'bitcoin',
     Testnet = 'testnet',
 }
+
+export const enum EBreezDetails {
+    Success = 'success',
+    Received = 'received',
+    Failed = 'failed',
+}
