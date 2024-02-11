@@ -245,11 +245,6 @@
 			"marginLeft": 16
 		}
 	},
-	"mr-0": {
-		"style": {
-			"marginRight": 0
-		}
-	},
 	"mr-1": {
 		"style": {
 			"marginRight": 4
@@ -328,6 +323,11 @@
 	"flex": {
 		"style": {
 			"display": "flex"
+		}
+	},
+	"contents": {
+		"style": {
+			"display": "contents"
 		}
 	},
 	"hidden": {

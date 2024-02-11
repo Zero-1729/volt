@@ -193,10 +193,6 @@
   margin-left: 1rem
 }
 
-.mr-0 {
-  margin-right: 0px
-}
-
 .mr-1 {
   margin-right: 0.25rem
 }
@@ -259,6 +255,10 @@
 
 .flex {
   display: flex
+}
+
+.contents {
+  display: contents
 }
 
 .hidden {
