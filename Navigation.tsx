@@ -66,8 +66,13 @@ import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Changelog from './screens/settings/Changelog';
 
-import {TTransaction, TMiniWallet, TInvoiceData} from './types/wallet';
-import {ENet} from './types/enums';
+import {
+    TTransaction,
+    TMiniWallet,
+    TInvoiceData,
+    TBreezPaymentDetails,
+} from './types/wallet';
+import {ENet, EBreezDetails} from './types/enums';
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
@@ -145,6 +150,11 @@ export type WalletParamList = {
         status: boolean;
         fname: string;
         errorMsg: string;
+    };
+    LNTransactionStatus: {
+        status: boolean;
+        details: TBreezPaymentDetails;
+        detailsType: EBreezDetails;
     };
     TransactionStatus: {
         unsignedPsbt: string;
