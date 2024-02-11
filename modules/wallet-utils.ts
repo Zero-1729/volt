@@ -13,15 +13,17 @@ import {WalletTypeDetails, DUST_LIMIT} from './wallet-defaults';
 
 const bip32 = BIP32Factory(ecc);
 
+import {listPayments} from '@breeztech/react-native-breez-sdk';
+
 import Crypto from 'react-native-quick-crypto';
 
 import {
     TDescriptorSymbols,
     TMiniWallet,
     TNetwork,
-    TTransaction,
     TWalletType,
     TInvoiceData,
+    TTransaction,
 } from '../types/wallet';
 import {EBackupMaterial, ENet} from '../types/enums';
 
@@ -626,4 +628,22 @@ export const checkInvoiceAndWallet = (
     }
 
     return true;
+};
+
+export const getLNPayments = async (
+    txCount: number,
+): Promise<TTransaction[]> => {
+    const payments = await listPayments({
+        // TODO: figure out a more sane option for this
+        limit: txCount + 10,
+    });
+
+    let txs: TTransaction[] = [];
+
+    for (let i = 0; i < payments.length; i++) {
+        txs.push({...payments[i], isLightning: true} as TTransaction);
+    }
+
+    // Return formatted LN payments
+    return txs;
 };
