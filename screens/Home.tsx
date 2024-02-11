@@ -26,13 +26,11 @@ import {
     mnemonicToSeed,
     NodeConfig,
     nodeInfo,
-    listPayments,
     NodeConfigVariant,
     defaultConfig,
     EnvironmentType,
     connect,
     BreezEventVariant,
-    Payment,
 } from '@breeztech/react-native-breez-sdk';
 
 import {runOnJS} from 'react-native-reanimated';
@@ -83,7 +81,11 @@ import {FiatBalance} from '../components/balance';
 import {fetchFiatRate} from '../modules/currency';
 import {liberalAlert, conservativeAlert} from '../components/alert';
 
-import {getUniqueTXs, checkNetworkIsReachable} from '../modules/wallet-utils';
+import {
+    getUniqueTXs,
+    checkNetworkIsReachable,
+    getLNPayments,
+} from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
 import {ENet} from '../types/enums';
@@ -472,18 +474,11 @@ const Home = ({route}: Props) => {
         updateWalletBalance(currentWalletID, new BigNumber(balanceLn / 1000));
     };
 
-    const showPayments = async () => {
-        // TODO: figure out a more sane option for this
-        const payments = await listPayments({
-            limit: wallet.transactions.length + 10,
-        });
+    const fetchPayments = async () => {
+        const txs = await getLNPayments(wallet.transactions.length);
 
         // Update transactions
-        updateWalletTransactions(
-            currentWalletID,
-            payments,
-            wallet.type === 'unified',
-        );
+        updateWalletTransactions(currentWalletID, txs);
     };
 
     const jointSync = async () => {
@@ -492,7 +487,7 @@ const Home = ({route}: Props) => {
             setRefreshing(true);
 
             await getBalance();
-            await showPayments();
+            await fetchPayments();
 
             setLoadingBalance(false);
             setRefreshing(false);
