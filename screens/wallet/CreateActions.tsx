@@ -70,8 +70,12 @@ const CreateAction = () => {
     );
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [account, setAccount] = useState('p2tr'); // Default to taproot
+    const [account, setAccount] = useState('unified'); // Default to taproot
     const [accounts, setAccounts] = useState([
+        {
+            value: 'unified',
+            label: 'Lightning (BIP86)',
+        },
         {
             value: 'p2tr',
             label: 'Taproot (BIP86)',
@@ -85,6 +89,7 @@ const CreateAction = () => {
     ]);
 
     const accountInfo: {[index: string]: string[]} = {
+        unified: ['Lightning (bc1p...)', 'Lightning Testnet (tb1p...)'],
         p2tr: ['Taproot (bc1p...)', 'Taproot Testnet (tb1p...)'],
         wpkh: [
             'Native SegWit Bech32 (bc1q...)',
