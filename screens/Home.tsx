@@ -221,7 +221,7 @@ const Home = ({route}: Props) => {
                     CommonActions.navigate('WalletRoot', {
                         screen: 'LNTransactionStatus',
                         params: {
-                            status: true,
+                            status: false,
                             details: event.details,
                             detailsType: 'failed',
                         },
