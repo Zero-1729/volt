@@ -463,6 +463,44 @@ const Home = ({route}: Props) => {
             );
         }
     };
+
+    const getBalance = async () => {
+        const nodeState = await nodeInfo();
+        const balanceLn = nodeState.channelsBalanceMsat;
+
+        // Update balance after converting to sats
+        updateWalletBalance(currentWalletID, new BigNumber(balanceLn / 1000));
+    };
+
+    const showPayments = async () => {
+        // TODO: figure out a more sane option for this
+        const payments = await listPayments({
+            limit: wallet.transactions.length + 10,
+        });
+
+        // Update transactions
+        updateWalletTransactions(
+            currentWalletID,
+            payments,
+            wallet.type === 'unified',
+        );
+    };
+
+    const jointSync = async () => {
+        if (wallet.type === 'unified') {
+            setLoadingBalance(true);
+            setRefreshing(true);
+
+            await getBalance();
+            await showPayments();
+
+            setLoadingBalance(false);
+            setRefreshing(false);
+        } else {
+            refreshWallet();
+        }
+    };
+
     // Fetch the fiat rate on currency change
     useEffect(() => {
         // Avoid fiat rate update call when offline
@@ -714,7 +752,7 @@ const Home = ({route}: Props) => {
                                 ]}>
                                 <FlatList
                                     refreshing={refreshing}
-                                    onRefresh={refreshWallet}
+                                    onRefresh={jointSync}
                                     scrollEnabled={true}
                                     style={tailwind('w-full')}
                                     contentContainerStyle={[
