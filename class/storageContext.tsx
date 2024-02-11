@@ -1115,8 +1115,8 @@ export const AppStorageProvider = ({children}: Props) => {
                             network: network,
                             mnemonic: mnemonic,
                         });
-
                         break;
+
                     case 'p2tr':
                         newWallet = new TaprootWallet({
                             name: name,
@@ -1124,8 +1124,8 @@ export const AppStorageProvider = ({children}: Props) => {
                             network: network,
                             mnemonic: mnemonic,
                         });
-
                         break;
+
                     case 'wpkh':
                         newWallet = new SegWitNativeWallet({
                             name: name,
@@ -1133,7 +1133,6 @@ export const AppStorageProvider = ({children}: Props) => {
                             network: network,
                             mnemonic: mnemonic,
                         });
-
                         break;
 
                     case 'shp2wpkh':
