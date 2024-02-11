@@ -17,11 +17,7 @@ import VText from '../../components/text';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
-import {
-    listPayments,
-    nodeInfo,
-    Payment,
-} from '@breeztech/react-native-breez-sdk';
+import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 import BDK from 'bdk-rn';
 
@@ -50,6 +46,7 @@ import {
 import {
     getMiniWallet,
     checkNetworkIsReachable,
+    getLNPayments,
 } from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
@@ -61,10 +58,7 @@ import {fetchFiatRate} from '../../modules/currency';
 import {Balance} from '../../components/balance';
 
 import {liberalAlert} from '../../components/alert';
-import {
-    TransactionListItem,
-    TransactionLNListItem,
-} from '../../components/transaction';
+import {UnifiedTransactionListItem} from '../../components/transaction';
 
 import {TBalance, TTransaction} from '../../types/wallet';
 
@@ -82,7 +76,6 @@ const Wallet = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-    const [LNPayments, setLNPayments] = useState<Payment[]>([]);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
@@ -120,8 +113,7 @@ const Wallet = ({route}: Props) => {
         return w;
     }, []);
 
-    const walletTxs =
-        walletData.type === 'unified' ? LNPayments : walletData.transactions;
+    const walletTxs = walletData.transactions;
     const walletBalance = walletData.balance;
 
     const getBalance = async () => {
@@ -132,20 +124,11 @@ const Wallet = ({route}: Props) => {
         updateWalletBalance(currentWalletID, new BigNumber(balanceLn / 1000));
     };
 
-    const showPayments = async () => {
-        const payments = await listPayments({
-            // TODO: figure out a more sane option for this
-            limit: walletData.transactions.length + 10,
-        });
+    const fetchPayments = async () => {
+        const txs = await getLNPayments(walletData.transactions.length);
 
         // Update transactions
-        updateWalletTransactions(
-            currentWalletID,
-            payments,
-            walletData.type === 'unified',
-        );
-
-        setLNPayments(payments);
+        updateWalletTransactions(currentWalletID, txs);
     };
 
     const jointSync = async () => {
@@ -155,7 +138,7 @@ const Wallet = ({route}: Props) => {
             setLoadLock(true);
 
             await getBalance();
-            await showPayments();
+            await fetchPayments();
 
             setLoadLock(false);
             setLoadingBalance(false);
@@ -403,46 +386,6 @@ const Wallet = ({route}: Props) => {
             jointSync();
         }
     }, [route.params?.reload]);
-
-    const renderListItemW = (item: any) => {
-        if (walletData.type === 'unified') {
-            return (
-                <TransactionLNListItem
-                    callback={() => {
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'TransactionDetails',
-                                params: {
-                                    tx: {...item.item},
-                                    source: 'conservative',
-                                    walletId: currentWalletID,
-                                },
-                            }),
-                        );
-                    }}
-                    tx={item.item}
-                />
-            );
-        } else {
-            return (
-                <TransactionListItem
-                    callback={() => {
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'TransactionDetails',
-                                params: {
-                                    tx: {...item.item},
-                                    source: 'conservative',
-                                    walletId: currentWalletID,
-                                },
-                            }),
-                        );
-                    }}
-                    tx={item.item}
-                />
-            );
-        }
-    };
 
     // Receive Wallet ID and fetch wallet data to display
     // Include functions to change individual wallet settings
@@ -701,7 +644,26 @@ const Wallet = ({route}: Props) => {
                                     return +b.timestamp - +a.timestamp;
                                 },
                             )}
-                            renderItem={item => renderListItemW(item)}
+                            renderItem={item => {
+                                return (
+                                    <UnifiedTransactionListItem
+                                        callback={() => {
+                                            navigation.dispatch(
+                                                CommonActions.navigate({
+                                                    name: 'TransactionDetails',
+                                                    params: {
+                                                        tx: {...item.item},
+                                                        source: 'conservative',
+                                                        walletId:
+                                                            currentWalletID,
+                                                    },
+                                                }),
+                                            );
+                                        }}
+                                        tx={item.item}
+                                    />
+                                );
+                            }}
                             keyExtractor={item =>
                                 item.txid ? item.txid : item.id
                             }
