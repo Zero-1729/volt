@@ -68,10 +68,7 @@ import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/card';
-import {
-    TransactionListItem,
-    TransactionLNListItem,
-} from '../components/transaction';
+import {UnifiedTransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
 import {TBalance, TTransaction} from '../types/wallet';
@@ -429,46 +426,6 @@ const Home = ({route}: Props) => {
         networkState,
     ]);
 
-    const renderListItemW = (item: any) => {
-        if (wallet.type === 'unified') {
-            return (
-                <TransactionLNListItem
-                    callback={() => {
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'TransactionDetails',
-                                params: {
-                                    tx: {...item.item},
-                                    source: 'conservative',
-                                    walletId: currentWalletID,
-                                },
-                            }),
-                        );
-                    }}
-                    tx={item.item}
-                />
-            );
-        } else {
-            return (
-                <TransactionListItem
-                    callback={() => {
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'TransactionDetails',
-                                params: {
-                                    tx: {...item.item},
-                                    source: 'conservative',
-                                    walletId: currentWalletID,
-                                },
-                            }),
-                        );
-                    }}
-                    tx={item.item}
-                />
-            );
-        }
-    };
-
     const getBalance = async () => {
         const nodeState = await nodeInfo();
         const balanceLn = nodeState.channelsBalanceMsat;
@@ -764,7 +721,31 @@ const Home = ({route}: Props) => {
                                         ),
                                     ]}
                                     data={extractAllTransactions()}
-                                    renderItem={item => renderListItemW(item)}
+                                    renderItem={item => {
+                                        return (
+                                            <UnifiedTransactionListItem
+                                                callback={() => {
+                                                    navigation.dispatch(
+                                                        CommonActions.navigate(
+                                                            'WalletRoot',
+                                                            {
+                                                                screen: 'TransactionDetails',
+                                                                params: {
+                                                                    tx: {
+                                                                        ...item.item,
+                                                                    },
+                                                                    source: 'liberal',
+                                                                    walletId:
+                                                                        currentWalletID,
+                                                                },
+                                                            },
+                                                        ),
+                                                    );
+                                                }}
+                                                tx={item.item}
+                                            />
+                                        );
+                                    }}
                                     keyExtractor={item =>
                                         item.id ? item.id : item.txid
                                     }
