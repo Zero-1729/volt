@@ -161,3 +161,6 @@ export const WALLET_NAME_LENGTH = 15;
 
 // Default wallet type
 export const DEFAULT_WALLET_TYPE = 'unified';
+
+// Default Breez receive minimum (msats)
+export const BREEZ_MIN_RECEIVE = 2_500_000; // 2,500 sats
