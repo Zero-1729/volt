@@ -19,6 +19,24 @@ import Carousel from 'react-native-reanimated-carousel';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../Navigation';
 
+import {_BREEZ_SDK_API_KEY_, _BREEZ_INVITE_CODE_} from './../modules/env';
+
+import {
+    BreezEvent,
+    mnemonicToSeed,
+    NodeConfig,
+    nodeInfo,
+    listPayments,
+    NodeConfigVariant,
+    defaultConfig,
+    EnvironmentType,
+    connect,
+    BreezEventVariant,
+    Payment,
+} from '@breeztech/react-native-breez-sdk';
+
+import {runOnJS} from 'react-native-reanimated';
+
 import VText from '../components/text';
 
 import {useTranslation} from 'react-i18next';
@@ -136,6 +154,119 @@ const Home = ({route}: Props) => {
             ),
         new BigNumber(0),
     );
+
+    let BreezSub!: any;
+
+    // Init Breez node
+    const initNode = useCallback(async () => {
+        // Get node info
+        try {
+            const info = await nodeInfo();
+            if (info?.id) {
+                console.log('[Breez SDK] Node already initialized');
+                return;
+            }
+        } catch (e) {
+            console.log('[Breez SDK] Error initializing Breez node:', e);
+        }
+
+        // SDK events listener
+        const onBreezEvent = (event: BreezEvent) => {
+            if (event.type === BreezEventVariant.NEW_BLOCK) {
+                console.log('[Breez SDK] New Block');
+            }
+
+            if (event.type === BreezEventVariant.SYNCED) {
+                console.log('[Breez SDK] Synced');
+            }
+
+            if (event.type === BreezEventVariant.BACKUP_STARTED) {
+                console.log('[Breez SDK] Backup started');
+            }
+
+            if (event.type === BreezEventVariant.BACKUP_SUCCEEDED) {
+                console.log('[Breez SDK] Backup succeeded');
+            }
+
+            if (event.type === BreezEventVariant.BACKUP_FAILED) {
+                console.log('[Breez SDK] Backup failed');
+                console.log('[Breez SDK] Event details: ', event.details);
+            }
+
+            if (event.type === BreezEventVariant.INVOICE_PAID) {
+                console.log('[Breez SDK] Invoice paid');
+                console.log('[Breez SDK] Payment details: ', event.details);
+
+                // Route to LN payment status screen
+                navigation.dispatch(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'LNTransactionStatus',
+                        params: {
+                            status: true,
+                            details: event.details,
+                            detailsType: 'received',
+                        },
+                    }),
+                );
+            }
+
+            if (event.type === BreezEventVariant.PAYMENT_FAILED) {
+                console.log('[Breez SDK] Payment failed');
+                console.log('[Breez SDK] Event details: ', event.details);
+
+                // Route to LN payment status screen
+                navigation.dispatch(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'LNTransactionStatus',
+                        params: {
+                            status: true,
+                            details: event.details,
+                            detailsType: 'failed',
+                        },
+                    }),
+                );
+            }
+
+            if (event.type === BreezEventVariant.PAYMENT_SUCCEED) {
+                console.log('[Breez SDK] Payment sent');
+                console.log('[Breez SDK] Event details: ', event.details);
+
+                // Route to LN payment status screen
+                navigation.dispatch(
+                    CommonActions.navigate('WalletRoot', {
+                        screen: 'LNTransactionStatus',
+                        params: {
+                            status: true,
+                            details: event.details,
+                            detailsType: 'success',
+                        },
+                    }),
+                );
+            }
+        };
+
+        // Create the default config
+        const seed = await mnemonicToSeed(wallet.mnemonic);
+
+        const nodeConfig: NodeConfig = {
+            type: NodeConfigVariant.GREENLIGHT,
+            config: {
+                inviteCode: _BREEZ_INVITE_CODE_,
+            },
+        };
+
+        const config = await defaultConfig(
+            EnvironmentType.PRODUCTION,
+            _BREEZ_SDK_API_KEY_,
+            nodeConfig,
+        );
+
+        // handle error
+        // "BreezServices already initialized"
+
+        // Connect to the Breez SDK make it ready for use
+        BreezSub = await connect(config, seed, onBreezEvent);
+    }, [_BREEZ_INVITE_CODE_, _BREEZ_SDK_API_KEY_, wallet.mnemonic]);
 
     // List out all transactions across all wallets
     const extractAllTransactions = (): TTransaction[] => {
@@ -320,7 +451,12 @@ const Home = ({route}: Props) => {
             singleSyncFiatRate(appFiatCurrency.short);
         }
 
+        if (wallet.type === 'unified') {
+            runOnJS(initNode)();
+        }
+
         () => {
+            BreezSub.remove();
             setRefreshing(false);
             setLoadingBalance(false);
         };
