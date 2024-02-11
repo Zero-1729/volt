@@ -70,7 +70,10 @@ import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/card';
-import {TransactionListItem} from '../components/transaction';
+import {
+    TransactionListItem,
+    TransactionLNListItem,
+} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
 import {TBalance, TTransaction} from '../types/wallet';
@@ -421,6 +424,45 @@ const Home = ({route}: Props) => {
         networkState,
     ]);
 
+    const renderListItemW = (item: any) => {
+        if (wallet.type === 'unified') {
+            return (
+                <TransactionLNListItem
+                    callback={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'TransactionDetails',
+                                params: {
+                                    tx: {...item.item},
+                                    source: 'conservative',
+                                    walletId: currentWalletID,
+                                },
+                            }),
+                        );
+                    }}
+                    tx={item.item}
+                />
+            );
+        } else {
+            return (
+                <TransactionListItem
+                    callback={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'TransactionDetails',
+                                params: {
+                                    tx: {...item.item},
+                                    source: 'conservative',
+                                    walletId: currentWalletID,
+                                },
+                            }),
+                        );
+                    }}
+                    tx={item.item}
+                />
+            );
+        }
+    };
     // Fetch the fiat rate on currency change
     useEffect(() => {
         // Avoid fiat rate update call when offline
@@ -686,30 +728,10 @@ const Home = ({route}: Props) => {
                                         ),
                                     ]}
                                     data={extractAllTransactions()}
-                                    renderItem={item => (
-                                        <TransactionListItem
-                                            callback={() => {
-                                                navigation.dispatch(
-                                                    CommonActions.navigate(
-                                                        'WalletRoot',
-                                                        {
-                                                            screen: 'TransactionDetails',
-                                                            params: {
-                                                                tx: {
-                                                                    ...item.item,
-                                                                },
-                                                                source: 'liberal',
-                                                                walletId:
-                                                                    currentWalletID,
-                                                            },
-                                                        },
-                                                    ),
-                                                );
-                                            }}
-                                            tx={item.item}
-                                        />
-                                    )}
-                                    keyExtractor={item => item.txid}
+                                    renderItem={item => renderListItemW(item)}
+                                    keyExtractor={item =>
+                                        item.id ? item.id : item.txid
+                                    }
                                     initialNumToRender={25}
                                     contentInsetAdjustmentBehavior="automatic"
                                     ListEmptyComponent={
