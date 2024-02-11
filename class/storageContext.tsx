@@ -863,6 +863,7 @@ export const AppStorageProvider = ({children}: Props) => {
         // Declare and set if watch-only
         newWallet.setWatchOnly();
 
+        // TODO: not working for LN unified wallet
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
 
