@@ -44,6 +44,7 @@ import Xpub from './screens/wallet/Xpub';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
+import LNTransactionStatus from './screens/wallet/LNTransactionStatus';
 
 import Apps from './screens/Apps';
 
@@ -228,6 +229,10 @@ const WalletRoot = () => {
                 <WalletStack.Screen
                     name="TransactionDetails"
                     component={TransactionDetails}
+                />
+                <WalletStack.Screen
+                    name="LNTransactionStatus"
+                    component={LNTransactionStatus}
                 />
                 <WalletStack.Screen
                     name="TransactionStatus"
