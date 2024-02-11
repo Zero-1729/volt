@@ -61,7 +61,11 @@ export const getUniqueTXs = (transactions: TTransaction[]): TTransaction[] => {
     const uniqueTXs: TTransaction[] = [];
 
     transactions.forEach(tx => {
-        if (!uniqueTXs.some(item => item.txid === tx.txid)) {
+        if (
+            !uniqueTXs.some(item =>
+                item.isLightning ? item.id === tx.id : item.txid === tx.txid,
+            )
+        ) {
             uniqueTXs.push({...tx});
         }
     });
