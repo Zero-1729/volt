@@ -295,7 +295,10 @@ const Home = ({route}: Props) => {
 
         // Sort by timestamp
         return txs.sort((a: TTransaction, b: TTransaction) => {
-            return +b.timestamp - +a.timestamp;
+            return (
+                +(b?.isLightning ? b.paymentTime : b.timestamp) -
+                +(a?.isLightning ? a.paymentTime : a.timestamp)
+            );
         });
     };
 
