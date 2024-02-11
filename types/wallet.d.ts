@@ -73,7 +73,8 @@ export type TUtxo = LocalUtxo & {
 };
 
 // Transaction Type
-export type TTransaction = {
+// For both LN and Bitcoin transactions
+export type TTransaction = Payment & {
     network: NetType; // Network type
     txid: string; // Transaction ID
     block_height: number; // Block height
@@ -94,6 +95,7 @@ export type TTransaction = {
     rbf: boolean; // Whether transaction is RBF
     isSelfOrBoost: boolean; // Whether transaction is CPFP, or RBF tx payed to self
     memo?: string; // Transaction memo
+    isLightning?: boolean; // Whether transaction is a lightning transaction
 };
 
 // Wallet Unit Type
