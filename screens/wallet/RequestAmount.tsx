@@ -21,6 +21,8 @@ import Close from '../../assets/svg/x-24.svg';
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
 import {capitalizeFirst, formatFiat} from '../../modules/transform';
+import {BREEZ_MIN_RECEIVE} from '../../modules/wallet-defaults';
+import {openChannelFee} from '@breeztech/react-native-breez-sdk';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -31,6 +33,7 @@ type DisplayUnit = {
 import {PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
 import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
+import {liberalAlert} from '../../components/alert';
 
 const RequestAmount = () => {
     const tailwind = useTailwind();
@@ -39,8 +42,13 @@ const RequestAmount = () => {
     const navigation = useNavigation();
 
     const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
-    const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
+    const {fiatRate, appFiatCurrency, getWalletData, currentWalletID} =
+        useContext(AppStorageContext);
+
+    const wallet = getWalletData(currentWalletID);
+    const walletType = wallet.type;
 
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
@@ -170,6 +178,58 @@ const RequestAmount = () => {
         );
     };
 
+    const handleRoute = async () => {
+        const feeMsat = await openChannelFee({
+            amountMsat: satsAmount.value.multipliedBy(1000).toNumber(),
+        });
+
+        const firstTx = wallet.transactions.length === 0;
+
+        // Warn user for first tx that amount will be deducted for channel open
+        // first open channel
+        if (walletType === 'unified' && firstTx && feeMsat.feeMsat > 0) {
+            liberalAlert(
+                e('error'),
+                e('open_channel_fee_error', {number: feeMsat.feeMsat / 1000}),
+                e('ok'),
+            );
+        }
+
+        // Warn user that amount will trigger a new channel open
+        if (walletType === 'unified' && !firstTx && feeMsat.feeMsat) {
+            liberalAlert(e('error'), e('new_channel_open_warn'), e('ok'));
+        }
+
+        // Warn user in lightning wallet that amount must be higher than minimum of
+        // 2_500_000 msats
+        if (
+            walletType === 'unified' &&
+            satsAmount.value
+                .multipliedBy(1000)
+                .isLessThanOrEqualTo(BREEZ_MIN_RECEIVE)
+        ) {
+            liberalAlert(t('error'), e('breez_min_receive_error'), t('ok'));
+        } else {
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'Receive',
+                    params: {
+                        sats: satsAmount.value.toString(),
+                        fiat: fiatAmount.value.toString(),
+                        amount: amount,
+                    },
+                }),
+            );
+        }
+    };
+
+    // If we are in LN we shouldn't attempt to show skip since we are forcing
+    // user to add an amount before generating an invoice
+    const skipText =
+        walletType === 'unified'
+            ? capitalizeFirst(t('continue'))
+            : capitalizeFirst(t('skip'));
+
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
             <View
@@ -233,22 +293,22 @@ const RequestAmount = () => {
                 {/* Continue button */}
                 <View
                     style={[
-                        tailwind('absolute'),
+                        tailwind(
+                            `absolute ${
+                                walletType === 'unified' &&
+                                satsAmount.value.isZero()
+                                    ? 'opacity-40'
+                                    : ''
+                            }`,
+                        ),
                         {bottom: bottomOffset.bottom},
                     ]}>
                     <PlainButton
-                        onPress={() => {
-                            navigation.dispatch(
-                                CommonActions.navigate({
-                                    name: 'Receive',
-                                    params: {
-                                        sats: satsAmount.value.toString(),
-                                        fiat: fiatAmount.value.toString(),
-                                        amount: amount,
-                                    },
-                                }),
-                            );
-                        }}>
+                        disabled={
+                            satsAmount.value.isZero() &&
+                            walletType === 'unified'
+                        }
+                        onPress={handleRoute}>
                         <View
                             style={[
                                 tailwind(
@@ -267,7 +327,7 @@ const RequestAmount = () => {
                                     },
                                 ]}>
                                 {satsAmount.value.isZero()
-                                    ? capitalizeFirst(t('skip'))
+                                    ? skipText
                                     : capitalizeFirst(t('continue'))}
                             </Text>
                         </View>
