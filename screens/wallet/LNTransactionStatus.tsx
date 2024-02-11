@@ -1,11 +1,21 @@
-import {Text, View, useColorScheme, StyleSheet} from 'react-native';
-import React, {useContext, useEffect} from 'react';
+import {
+    Text,
+    View,
+    useColorScheme,
+    StyleSheet,
+    Platform,
+    AppState,
+    Dimensions,
+} from 'react-native';
+import React, {useEffect, useRef, useCallback} from 'react';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    useFocusEffect,
+} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
-
-import {AppStorageContext} from '../../class/storageContext';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -13,7 +23,6 @@ import {useTranslation} from 'react-i18next';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
-import NativeOffsets from '../../constants/NativeWindowMetrics';
 
 import {capitalizeFirst} from '../../modules/transform';
 import {useTailwind} from 'tailwind-rn';
@@ -21,10 +30,15 @@ import Color from '../../constants/Color';
 
 import {EBreezDetails} from './../../types/enums';
 
-import {LongBottomButton, PlainButton} from '../../components/button';
+import {LongBottomButton} from '../../components/button';
 
 import Success from '../../assets/svg/check-circle-fill-24.svg';
 import Failed from '../../assets/svg/x-circle-fill-24.svg';
+import {FiatBalance} from '../../components/balance';
+
+import Lottie from 'lottie-react-native';
+
+import confettiSrc from '../../assets/lottie/confetti-yellow.json';
 
 type Props = NativeStackScreenProps<WalletParamList, 'LNTransactionStatus'>;
 
@@ -33,26 +47,65 @@ const LNTransactionStatus = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
+    const {height, width} = Dimensions.get('window');
+
+    const lottieAnim = useRef<Lottie>(null);
+    const appState = useRef(AppState.currentState);
+
     const {t} = useTranslation('wallet');
 
-    const {isAdvancedMode} = useContext(AppStorageContext);
+    const txTitle = () => {
+        let msg!: string;
 
-    const bottomOffset = NativeOffsets.bottom + 110;
-
-    const getDetails = () => {
-        const detailsType = route.params.detailsType;
-        const details = route.params.details;
-
-        switch (detailsType) {
+        switch (route.params.detailsType) {
             case EBreezDetails.Received:
+                msg = t('payment_received');
+                break;
             case EBreezDetails.Success:
-                return capitalizeFirst(t('success'));
+                msg = t('payment_success');
+                break;
             case EBreezDetails.Failed:
-                return details.error;
-            default:
-                return '';
+                msg = t('payment_failed');
+                break;
         }
+
+        return msg;
     };
+
+    // TEMP: fix iOS animation autoPlay
+    // @see https://github.com/lottie-react-native/lottie-react-native/issues/832
+    useFocusEffect(
+        useCallback(() => {
+            if (Platform.OS === 'ios') {
+                lottieAnim.current?.reset();
+                setTimeout(() => {
+                    lottieAnim.current?.play();
+                }, 0);
+            }
+        }, []),
+    );
+
+    // TEMP: fix iOS animation on app to foreground
+    useEffect(() => {
+        const appStateSubscription = AppState.addEventListener(
+            'change',
+            nextAppState => {
+                if (
+                    appState.current.match(/inactive|background/) &&
+                    nextAppState === 'active'
+                ) {
+                    console.log('yes');
+                    lottieAnim.current?.play();
+                }
+
+                appState.current = nextAppState;
+            },
+        );
+
+        return () => {
+            appStateSubscription.remove();
+        };
+    }, []);
 
     useEffect(() => {
         // vibrate on successful send
@@ -66,13 +119,32 @@ const LNTransactionStatus = ({route}: Props) => {
             <View
                 style={[
                     styles.statusContainer,
-                    tailwind('w-full h-full relative justify-center'),
+                    tailwind('w-full h-full justify-center'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
                 {!!route.params.status && (
                     <View style={[tailwind('h-full justify-center')]}>
+                        <View
+                            style={[
+                                styles.confettiContainer,
+                                {width: width, height: height},
+                            ]}
+                            pointerEvents="none">
+                            <Lottie
+                                style={[styles.confetti]}
+                                ref={lottieAnim}
+                                onLayout={(_): void =>
+                                    lottieAnim.current?.play()
+                                }
+                                source={confettiSrc}
+                                resizeMode="cover"
+                                autoPlay
+                                loop
+                            />
+                        </View>
+
                         <Text
                             style={[
                                 tailwind(
@@ -109,31 +181,51 @@ const LNTransactionStatus = ({route}: Props) => {
                                 )}
                             </View>
 
-                            <View style={[tailwind('w-4/5 mt-4 items-center')]}>
+                            {route.params.detailsType === 'received' && (
+                                <View style={[tailwind('mt-4 items-center')]}>
+                                    <FiatBalance
+                                        balance={200000}
+                                        loading={false}
+                                        balanceFontSize={'text-2xl'}
+                                        fontColor={ColorScheme.Text.Default}
+                                        ignoreHideBalance={true}
+                                    />
+                                </View>
+                            )}
+
+                            <View
+                                style={[
+                                    tailwind(
+                                        `w-4/5 ${
+                                            route.params.detailsType ===
+                                            'received'
+                                                ? ''
+                                                : 'mt-4'
+                                        } items-center`,
+                                    ),
+                                ]}>
                                 <Text
                                     style={[
                                         tailwind('text-lg font-bold'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {route.params.status
-                                        ? t('tx_sent')
-                                        : t('tx_failed')}
+                                    {txTitle()}
                                 </Text>
                             </View>
 
-                            {isAdvancedMode && (
+                            {route.params.detailsType === 'received' && (
                                 <View style={[tailwind('items-center w-4/5')]}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-sm text-center mt-4',
+                                                'text-sm text-center mt-2',
                                             ),
                                             {
                                                 color: ColorScheme.Text
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        {getDetails()}
+                                        {route.params.details.description}
                                     </Text>
                                 </View>
                             )}
@@ -176,5 +268,13 @@ const styles = StyleSheet.create({
     statusContainer: {
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
+    },
+    confetti: {
+        ...StyleSheet.absoluteFillObject,
+        flex: 1,
+    },
+    confettiContainer: {
+        ...StyleSheet.absoluteFillObject,
+        flex: 1,
     },
 });
