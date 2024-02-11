@@ -14,6 +14,11 @@ import {FeesRecommended} from '@mempool/mempool.js/lib/interfaces';
 
 import {Network} from 'bdk-rn/lib/lib/enums';
 import {ENet} from './enums';
+import {
+    InvoicePaidDetails,
+    Payment,
+    PaymentFailedData,
+} from '@breeztech/react-native-breez-sdk';
 
 export type TNetwork = ENet | Network;
 
@@ -152,3 +157,14 @@ export type TAccountPaths = {
 export type TMempoolFeeRates = {
     economyFee: number;
 } & FeesRecommended;
+
+// Breez LN payment details type
+export type TBreezPaymentDetails = PaymentFailedData &
+    Payment &
+    InvoicePaidDetails;
+
+export type TBreezDetails = {
+    success: Payment;
+    received: InvoicePaidDetails;
+    failed: PaymentFailedData;
+};
