@@ -139,23 +139,6 @@ const LNTransactionStatus = ({route}: Props) => {
                             )}
                         </View>
 
-                        {route.params.status && (
-                            <PlainButton
-                                style={[
-                                    tailwind('absolute self-center'),
-                                    {bottom: bottomOffset},
-                                ]}
-                                onPress={}>
-                                <Text
-                                    style={[
-                                        tailwind('font-bold text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
-                                    prev_mempool
-                                </Text>
-                            </PlainButton>
-                        )}
-
                         <View
                             style={[
                                 tailwind(
@@ -173,7 +156,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                         }),
                                     );
                                 }}
-                                title={t('back_to_wallet')}
+                                title={capitalizeFirst(t('continue'))}
                                 textColor={ColorScheme.Text.Alt}
                                 backgroundColor={
                                     ColorScheme.Background.Inverted
