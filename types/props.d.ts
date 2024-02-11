@@ -5,6 +5,8 @@ import {SvgProps} from 'react-native-svg';
 import {BalanceType, Unit, TransactionType} from './wallet';
 import BigNumber from 'bignumber.js';
 
+import {Payment} from '@breeztech/react-native-breez-sdk';
+
 // Base Prop Type
 export type BaseProps = PropsWithChildren<{
     style?: React.CSSProperties | StyleProp<ViewStyle>;
@@ -66,6 +68,11 @@ export type WalletCardProps = CardProps & {
 
 export type TxListItemProps = BaseProps & {
     tx: TransactionType;
+    callback?: () => void;
+};
+
+export type TxLNListItemProps = BaseProps & {
+    tx: Payment;
     callback?: () => void;
 };
 
