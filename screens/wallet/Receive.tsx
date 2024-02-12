@@ -229,7 +229,7 @@ const Receive = ({route}: Props) => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 justify-between items-center absolute top-6 flex',
+                            'w-5/6 justify-center items-center absolute top-6 flex',
                         ),
                     ]}>
                     <PlainButton
@@ -237,11 +237,11 @@ const Receive = ({route}: Props) => {
                         onPress={() => {
                             navigation.dispatch(StackActions.popToTop());
                         }}>
-                        <Close fill={ColorScheme.SVG.Default} width={32} />
+                        <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                     <Text
                         style={[
-                            tailwind('text-lg w-full text-center font-bold'),
+                            tailwind('text-lg font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         {invoice_title}
