@@ -74,6 +74,7 @@ import {
     TBreezPaymentDetails,
 } from './types/wallet';
 import {ENet, EBreezDetails} from './types/enums';
+import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
@@ -126,7 +127,9 @@ export type WalletParamList = {
         feeRate: number;
         dummyPsbtVSize: number;
         invoiceData: TInvoiceData;
-        wallet: TMiniWallet;
+        wallet?: TMiniWallet;
+        bolt11?: LnInvoice;
+        source?: string;
     };
     WalletView: {
         reload: boolean;
