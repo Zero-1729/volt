@@ -75,6 +75,28 @@ const LNTransactionStatus = ({route}: Props) => {
         return msg;
     };
 
+    const sats = () => {
+        let amount!: number;
+
+        switch (route.params.detailsType) {
+            case EBreezDetails.Received:
+                amount =
+                    (route.params.details.payment?.amountMsat as number) /
+                    1_000;
+                break;
+            case EBreezDetails.Success:
+                amount = route.params.details.amountMsat / 1_000;
+                break;
+            case EBreezDetails.Failed:
+                amount =
+                    (route.params.details.invoice?.amountMsat as number) /
+                    1_000;
+                break;
+        }
+
+        return amount;
+    };
+
     // TEMP: fix iOS animation autoPlay
     // @see https://github.com/lottie-react-native/lottie-react-native/issues/832
     useFocusEffect(
@@ -190,10 +212,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                         tailwind('mt-4 mb-2 items-center'),
                                     ]}>
                                     <FiatBalance
-                                        balance={
-                                            route.params.details.amountMsat /
-                                            1_000
-                                        }
+                                        balance={sats()}
                                         loading={false}
                                         balanceFontSize={'text-2xl'}
                                         fontColor={ColorScheme.Text.Default}
