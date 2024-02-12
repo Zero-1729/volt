@@ -155,7 +155,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                 ),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {capitalizeFirst(t('status'))}
+                            {t('lightning_invoice')}
                         </Text>
 
                         <View
