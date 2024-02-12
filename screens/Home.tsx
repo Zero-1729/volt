@@ -609,7 +609,7 @@ const Home = ({route}: Props) => {
                             ),
                         ]}>
                         <View
-                            style={tailwind('justify-around w-full mt-3 mb-3')}>
+                            style={tailwind('justify-around mt-2 w-full mb-3')}>
                             {wallets.length > 0 && (
                                 <>
                                     <VText
