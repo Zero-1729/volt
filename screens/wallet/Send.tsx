@@ -51,6 +51,9 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {useTranslation} from 'react-i18next';
 import {sendPayment} from '@breeztech/react-native-breez-sdk';
 import {getScreenEdges} from '../../modules/screen';
+import ExpiryTimer from '../../components/expiry';
+
+import {isInvoiceExpired, getCountdownStart} from '../../modules/wallet-utils';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -72,6 +75,16 @@ const SendView = ({route}: Props) => {
         useContext(AppStorageContext);
 
     const isLightning = !!route.params.bolt11;
+
+    const isExpired = isInvoiceExpired(
+        route.params.bolt11?.timestamp as number,
+        route.params.bolt11?.expiry as number,
+    );
+
+    const expiryEpoch = getCountdownStart(
+        route.params.bolt11?.timestamp as number,
+        route.params.bolt11?.expiry as number,
+    );
 
     const screenTitle = isLightning
         ? t('lightning_invoice')
@@ -289,6 +302,7 @@ const SendView = ({route}: Props) => {
                             style={[tailwind('absolute z-10 left-6')]}>
                             <Close fill={ColorScheme.SVG.Default} />
                         </PlainButton>
+
                         <Text
                             style={[
                                 tailwind('text-sm font-bold'),
@@ -296,6 +310,13 @@ const SendView = ({route}: Props) => {
                             ]}>
                             {screenTitle}
                         </Text>
+
+                        <View
+                            style={[
+                                tailwind('absolute right-6 justify-center'),
+                            ]}>
+                            <ExpiryTimer expiryDate={expiryEpoch} />
+                        </View>
                     </View>
                     <View
                         style={[
@@ -312,7 +333,7 @@ const SendView = ({route}: Props) => {
                                             color: ColorScheme.Text.GrayedText,
                                         },
                                     ]}>
-                                    {t('amount')}
+                                    {capitalizeFirst(t('amount'))}
                                 </Text>
                             </View>
                             {isMax && (
@@ -555,8 +576,13 @@ const SendView = ({route}: Props) => {
                             </Text>
                         </View>
                     )}
+
                     <LongBottomButton
-                        disabled={loading || (!isLightning && loadingPsbt)}
+                        disabled={
+                            loading ||
+                            (!isLightning && loadingPsbt) ||
+                            isExpired
+                        }
                         onPress={handleSend}
                         title={capitalizeFirst(t('send'))}
                         textColor={ColorScheme.Text.Alt}
