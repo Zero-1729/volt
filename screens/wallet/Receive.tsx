@@ -204,7 +204,7 @@ const Receive = ({route}: Props) => {
         // Copy backup material to Clipboard
         // Temporarily set copied message
         // and revert after a few seconds
-        Clipboard.setString(walletData.address.address);
+        Clipboard.setString(walletInvoiceText as string);
 
         setPlainAddress(capitalizeFirst(t('copied_to_clipboard')));
 
