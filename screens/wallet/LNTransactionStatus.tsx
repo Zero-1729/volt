@@ -190,7 +190,10 @@ const LNTransactionStatus = ({route}: Props) => {
                                         tailwind('mt-4 mb-2 items-center'),
                                     ]}>
                                     <FiatBalance
-                                        balance={200000}
+                                        balance={
+                                            route.params.details.amountMsat /
+                                            1_000
+                                        }
                                         loading={false}
                                         balanceFontSize={'text-2xl'}
                                         fontColor={ColorScheme.Text.Default}
