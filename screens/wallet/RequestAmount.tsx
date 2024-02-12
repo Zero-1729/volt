@@ -180,7 +180,7 @@ const RequestAmount = () => {
 
     const handleRoute = async () => {
         const feeMsat = await openChannelFee({
-            amountMsat: satsAmount.value.multipliedBy(1000).toNumber(),
+            amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
         });
 
         const firstTx = wallet.transactions.length === 0;
@@ -190,38 +190,31 @@ const RequestAmount = () => {
         // first open channel
         if (walletType === 'unified' && firstTx && feeMsat.feeMsat > 0) {
             liberalAlert(
-                e('error'),
-                e('open_channel_fee_error', {number: feeMsat.feeMsat / 1000}),
-                e('ok'),
+                capitalizeFirst(t('warning')),
+                e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
+                capitalizeFirst(e('ok')),
             );
         }
 
         // Warn user that amount will trigger a new channel open
-        if (walletType === 'unified' && !firstTx && feeMsat.feeMsat) {
-            liberalAlert(e('error'), e('new_channel_open_warn'), e('ok'));
-        }
-
-        // Warn user in lightning wallet that amount must be higher than minimum of
-        // 2_500_000 msats
-        if (
-            walletType === 'unified' &&
-            satsAmount.value
-                .multipliedBy(1000)
-                .isLessThanOrEqualTo(BREEZ_MIN_RECEIVE)
-        ) {
-            liberalAlert(t('error'), e('breez_min_receive_error'), t('ok'));
-        } else {
-            navigation.dispatch(
-                CommonActions.navigate({
-                    name: 'Receive',
-                    params: {
-                        sats: satsAmount.value.toString(),
-                        fiat: fiatAmount.value.toString(),
-                        amount: amount,
-                    },
-                }),
+        if (walletType === 'unified' && !firstTx && feeMsat.feeMsat > 0) {
+            liberalAlert(
+                capitalizeFirst(t('warning')),
+                e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
+                capitalizeFirst(e('ok')),
             );
         }
+
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'Receive',
+                params: {
+                    sats: satsAmount.value.toString(),
+                    fiat: fiatAmount.value.toString(),
+                    amount: amount,
+                },
+            }),
+        );
     };
 
     // If we are in LN we shouldn't attempt to show skip since we are forcing
