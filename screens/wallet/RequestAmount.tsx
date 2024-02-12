@@ -21,7 +21,6 @@ import Close from '../../assets/svg/x-24.svg';
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
 import {capitalizeFirst, formatFiat} from '../../modules/transform';
-import {BREEZ_MIN_RECEIVE} from '../../modules/wallet-defaults';
 import {openChannelFee} from '@breeztech/react-native-breez-sdk';
 
 type DisplayUnit = {
