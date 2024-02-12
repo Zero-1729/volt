@@ -38,7 +38,7 @@ import {FiatBalance} from '../../components/balance';
 
 import Lottie from 'lottie-react-native';
 
-import confettiSrc from '../../assets/lottie/confetti-yellow.json';
+import eNutsConfetti from '../../assets/lottie/e-nuts-confetti.json';
 
 type Props = NativeStackScreenProps<WalletParamList, 'LNTransactionStatus'>;
 
@@ -53,6 +53,9 @@ const LNTransactionStatus = ({route}: Props) => {
     const appState = useRef(AppState.currentState);
 
     const {t} = useTranslation('wallet');
+
+    const confettiSrc = eNutsConfetti;
+    const receivedPayment = route.params.detailsType === 'received';
 
     const txTitle = () => {
         let msg!: string;
@@ -140,8 +143,8 @@ const LNTransactionStatus = ({route}: Props) => {
                                 }
                                 source={confettiSrc}
                                 resizeMode="cover"
-                                autoPlay
-                                loop
+                                autoPlay={!receivedPayment}
+                                loop={!receivedPayment}
                             />
                         </View>
 
@@ -182,7 +185,10 @@ const LNTransactionStatus = ({route}: Props) => {
                             </View>
 
                             {route.params.detailsType === 'received' && (
-                                <View style={[tailwind('mt-4 items-center')]}>
+                                <View
+                                    style={[
+                                        tailwind('mt-4 mb-2 items-center'),
+                                    ]}>
                                     <FiatBalance
                                         balance={200000}
                                         loading={false}
@@ -206,7 +212,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                 ]}>
                                 <Text
                                     style={[
-                                        tailwind('text-lg font-bold'),
+                                        tailwind('text-lg'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
                                     {txTitle()}
