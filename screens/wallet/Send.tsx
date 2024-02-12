@@ -555,7 +555,7 @@ const SendView = ({route}: Props) => {
                         </View>
                     )}
                     <LongBottomButton
-                        disabled={loading || loadingPsbt}
+                        disabled={loading || (!isLightning && loadingPsbt)}
                         onPress={handleSend}
                         title={capitalizeFirst(t('send'))}
                         textColor={ColorScheme.Text.Alt}
