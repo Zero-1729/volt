@@ -75,7 +75,7 @@ const Receive = ({route}: Props) => {
 
     const {t} = useTranslation('wallet');
 
-    const {currentWalletID, getWalletData, appFiatCurrency} =
+    const {currentWalletID, getWalletData, appFiatCurrency, isAdvancedMode} =
         useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
 
@@ -191,11 +191,13 @@ const Receive = ({route}: Props) => {
 
     const invoice_text_title =
         walletData.type === 'unified'
-            ? t('ln_invoice_address')
+            ? t('lightning_invoice')
             : t('invoice_address');
 
     const invoice_title =
-        walletData.type === 'unified' ? t('ln_invoice') : t('bitcoin_invoice');
+        walletData.type === 'unified'
+            ? t('lightning_invoice')
+            : t('bitcoin_invoice');
 
     // Copy data to clipboard
     const copyDescToClipboard = () => {
@@ -296,7 +298,9 @@ const Receive = ({route}: Props) => {
                                     tailwind('text-sm mt-4'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {t('loading_invoice')}
+                                {isAdvancedMode
+                                    ? t('loading_invoice_advanced')
+                                    : t('loading_invoice')}
                             </Text>
                         </View>
                     ) : (
