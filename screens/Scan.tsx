@@ -12,6 +12,8 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
+import {parseInvoice} from '@breeztech/react-native-breez-sdk';
+
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
 
@@ -198,22 +200,10 @@ const Scan = ({route}: Props) => {
         }, 1000 * 5);
     };
 
-    const handleInvalidInvoice = (invoice: string) => {
+    const handleInvalidInvoice = async (invoice: string) => {
         // TODO: update to handle unified invoice format (LN & BTC)
         //       Make ln priority if unified or LN wallet
         let decodedInvoice;
-
-        // Handle single btc supported address
-        if (!invoice.startsWith('bitcoin:')) {
-            let btcAddress = invoice;
-
-            if (!isValidAddress(btcAddress)) {
-                updateScannerAlert(e('invalid_btc_address_error'));
-                return {decodedInvoice: null, isOnchain: null};
-            }
-
-            invoice = 'bitcoin:' + btcAddress;
-        }
 
         // Only support:
         // - Unified and regular BIP21 Invoice
@@ -232,12 +222,41 @@ const Scan = ({route}: Props) => {
         }
 
         // Check if LN invoice and handle separately
+        // Call on Breez to work on this
         if (
             invoice.startsWith('lightning:') ||
             invoice.toLowerCase().startsWith('lnbc') ||
             invoice.toLowerCase().startsWith('lnurl')
         ) {
-            return {decodedInvoice: decodedInvoice, isOnchain: false};
+            // Only support bolt11 for now
+            if (invoice.toLowerCase().startsWith('lnbc')) {
+                try {
+                    const parsedBolt11Invoice = await parseInvoice(invoice);
+
+                    return {
+                        decodedInvoice: parsedBolt11Invoice,
+                        isOnchain: false,
+                    };
+                } catch (err: any) {
+                    updateScannerAlert(err);
+                    return {decodedInvoice: null, isOnchain: null};
+                }
+            } else {
+                updateScannerAlert(e('lightning_not_support'));
+                return {decodedInvoice: null, isOnchain: null};
+            }
+        }
+
+        // Handle single btc supported address
+        if (!invoice.startsWith('bitcoin:')) {
+            let btcAddress = invoice;
+
+            if (!isValidAddress(btcAddress)) {
+                updateScannerAlert(e('invalid_btc_address_error'));
+                return {decodedInvoice: null, isOnchain: null};
+            }
+
+            invoice = 'bitcoin:' + btcAddress;
         }
 
         // Attempt to decode BIP21 QR
@@ -269,7 +288,7 @@ const Scan = ({route}: Props) => {
         return {decodedInvoice: decodedInvoice, isOnchain: true};
     };
 
-    const onQRDetected = (event: any) => {
+    const onQRDetected = async (event: any) => {
         if (scanLock) {
             return;
         }
@@ -279,7 +298,7 @@ const Scan = ({route}: Props) => {
         const decodedQRState: {
             decodedInvoice: any;
             isOnchain: boolean | null;
-        } = handleInvalidInvoice(_QR);
+        } = await handleInvalidInvoice(_QR);
 
         if (decodedQRState.decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic
@@ -335,7 +354,9 @@ const Scan = ({route}: Props) => {
     const handleClipboard = async () => {
         const clipboardData = await Clipboard.getString();
 
-        const {decodedInvoice} = handleInvalidInvoice(clipboardData);
+        const {decodedInvoice, isOnchain} = await handleInvalidInvoice(
+            clipboardData,
+        );
 
         if (decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic
@@ -344,33 +365,60 @@ const Scan = ({route}: Props) => {
                 RNHapticFeedbackOptions,
             );
 
-            if (decodedInvoice.options.amount) {
-                // Update amount to sats
-                decodedInvoice.options.amount = convertBTCtoSats(
-                    decodedInvoice.options.amount,
-                );
+            // Lightning handling
+            if (!isOnchain) {
+                // call on breez to attempt to pay and route screen
+                const parsedBolt11Invoice = decodedInvoice;
+                const bolt11Msat = parsedBolt11Invoice.amountMsat;
 
+                if (!bolt11Msat) {
+                    updateScannerAlert(e('missing_bolt11_invoice_amount'));
+                    return;
+                }
+
+                // Navigate to send screen to handle LN payment
                 runOnJS(navigation.dispatch)(
                     CommonActions.navigate('WalletRoot', {
-                        screen: 'FeeSelection',
+                        screen: 'Send',
                         params: {
-                            invoiceData: decodedInvoice,
                             wallet: route.params.wallet,
-                            source: 'conservative',
+                            feeRate: 0,
+                            dummyPsbtVsize: 0,
+                            invoiceData: null,
+                            bolt11: parsedBolt11Invoice,
                         },
                     }),
                 );
             } else {
-                runOnJS(navigation.dispatch)(
-                    CommonActions.navigate('WalletRoot', {
-                        screen: 'SendAmount',
-                        params: {
-                            invoiceData: decodedInvoice,
-                            wallet: route.params.wallet,
-                            source: 'conserative',
-                        },
-                    }),
-                );
+                // BTC handling
+                if (decodedInvoice.options.amount) {
+                    // Update amount to sats
+                    decodedInvoice.options.amount = convertBTCtoSats(
+                        decodedInvoice.options.amount,
+                    );
+
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'FeeSelection',
+                            params: {
+                                invoiceData: decodedInvoice,
+                                wallet: route.params.wallet,
+                                source: 'conservative',
+                            },
+                        }),
+                    );
+                } else {
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'SendAmount',
+                            params: {
+                                invoiceData: decodedInvoice,
+                                wallet: route.params.wallet,
+                                source: 'conserative',
+                            },
+                        }),
+                    );
+                }
             }
         }
     };
