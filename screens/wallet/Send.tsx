@@ -98,6 +98,7 @@ const SendView = ({route}: Props) => {
         ? route.params.bolt11?.amountMsat / 1_000
         : route.params.invoiceData?.options?.amount || 0;
 
+    // TODO: handle by checking maxPayableMsat, invoice Msats and other fees
     const isMax = isLightning
         ? false
         : route.params.invoiceData?.options?.amount?.toString() ===

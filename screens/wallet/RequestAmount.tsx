@@ -185,6 +185,7 @@ const RequestAmount = () => {
 
         const firstTx = wallet.transactions.length === 0;
 
+        // TODO: probably move these as info displayed somewhere in the app
         // Warn user for first tx that amount will be deducted for channel open
         // first open channel
         if (walletType === 'unified' && firstTx && feeMsat.feeMsat > 0) {

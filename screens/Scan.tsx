@@ -338,6 +338,7 @@ const Scan = ({route}: Props) => {
                 }
             } else {
                 // If LN Invoice
+                // TODO: add support for Bolt11
                 updateScannerAlert(e('lightning_not_support'));
             }
         }
