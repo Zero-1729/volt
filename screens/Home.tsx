@@ -634,7 +634,7 @@ const Home = ({route}: Props) => {
                                         <View
                                             style={[
                                                 tailwind(
-                                                    'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row items-center',
+                                                    'rounded-sm w-full mt-1 opacity-80 h-8 flex-row',
                                                 ),
                                                 {
                                                     backgroundColor:
