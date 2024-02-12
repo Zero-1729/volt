@@ -179,6 +179,25 @@ const SelectWallet = ({route}: Props) => {
             return;
         }
 
+        // Handle ln invoice
+        if (isLightning) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'Send',
+                    params: {
+                        wallet: wallet,
+                        feeRate: 0,
+                        dummyPsbtVsize: 0,
+                        invoiceData: null,
+                        bolt11: bolt11,
+                        source: 'liberal',
+                    },
+                }),
+            );
+
+            return;
+        }
+
         // Check wallet and invoice
         if (
             checkInvoiceAndWallet(
