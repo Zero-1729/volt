@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {Text, View, useColorScheme} from 'react-native';
 import React from 'react';
 
@@ -6,6 +7,7 @@ import Color from '../constants/Color';
 import {useTranslation} from 'react-i18next';
 
 import {useCountdown} from '../modules/hooks';
+import {capitalizeFirst} from '../modules/transform';
 
 type TimerProps = {
     day: number;
@@ -37,11 +39,22 @@ type ExpiredProps = {
 };
 
 const Expired = (props: ExpiredProps) => {
+    const ColorScheme = Color(useColorScheme());
+    const tailwind = useTailwind();
     const {t} = useTranslation('wallet');
 
     return (
-        <View>
-            <Text style={{color: props.color}}>{t('expired_invoice')}</Text>
+        <View
+            style={[
+                tailwind('rounded-full py-1'),
+                {
+                    backgroundColor: ColorScheme.Background.Inverted,
+                    paddingHorizontal: 12,
+                },
+            ]}>
+            <Text style={{color: props.color}}>
+                {capitalizeFirst(t('expired'))}
+            </Text>
         </View>
     );
 };
@@ -53,7 +66,7 @@ const ExpiryTimer = ({expiryDate}: {expiryDate: number}) => {
     const tailwind = useTailwind();
 
     if (days + hours + minutes + seconds <= 0) {
-        return <Expired color={ColorScheme.Text.DescText} />;
+        return <Expired color={ColorScheme.Text.Alt} />;
     } else {
         return (
             <View style={[tailwind('flex-row items-center')]}>
