@@ -651,3 +651,25 @@ export const getLNPayments = async (
     // Return formatted LN payments
     return txs;
 };
+
+// Get seconds left until invoice expires
+export const getInvoiceExpiryLeft = (
+    timestamp: number,
+    expiry: number,
+): number => {
+    return Math.floor(timestamp + expiry - +new Date() / 1_000);
+};
+
+export const isInvoiceExpired = (
+    timestamp: number,
+    expiry: number,
+): boolean => {
+    const timeElapsed = getInvoiceExpiryLeft(timestamp, expiry);
+
+    return timeElapsed <= 0;
+};
+
+// Get countdown start
+export const getCountdownStart = (timestamp: number, expiry: number) => {
+    return Math.floor(timestamp + expiry - +new Date() / 1_000);
+};
