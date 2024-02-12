@@ -304,9 +304,9 @@ const Scan = ({route}: Props) => {
             // To highlight the successful scan, we'll trigger a success haptic
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
 
-            const amount = decodedQRState.decodedInvoice.options.amount;
-
             if (decodedQRState.isOnchain) {
+                const amount = decodedQRState.decodedInvoice.options.amount;
+
                 if (amount) {
                     // Route to Fee screen with amount (onChain)
                     // Update amount to sats
@@ -338,8 +338,33 @@ const Scan = ({route}: Props) => {
                 }
             } else {
                 // If LN Invoice
-                // TODO: add support for Bolt11
-                updateScannerAlert(e('lightning_not_support'));
+                // call on breez to attempt to pay and route screen
+                try {
+                    const parsedBolt11Invoice = decodedQRState.decodedInvoice;
+                    const bolt11Msat = parsedBolt11Invoice.amountMsat;
+
+                    if (!bolt11Msat) {
+                        updateScannerAlert(e('missing_bolt11_invoice_amount'));
+                        return;
+                    }
+
+                    // Navigate to send screen to handle LN payment
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'Send',
+                            params: {
+                                wallet: route.params.wallet,
+                                feeRate: 0,
+                                dummyPsbtVsize: 0,
+                                invoiceData: null,
+                                bolt11: parsedBolt11Invoice,
+                            },
+                        }),
+                    );
+                } catch (err: any) {
+                    updateScannerAlert(e('lightning_not_support'));
+                    return;
+                }
             }
         }
     };
