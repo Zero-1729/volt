@@ -99,7 +99,7 @@ const SendView = ({route}: Props) => {
         : route.params.invoiceData?.options?.amount || 0;
 
     const isMax = isLightning
-        ? route.params.wallet
+        ? false
         : route.params.invoiceData?.options?.amount?.toString() ===
           route.params.wallet?.balance.toString();
 
