@@ -16,7 +16,11 @@ import {InitStackParamList} from '../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -44,6 +48,7 @@ import {useNetInfo} from '@react-native-community/netinfo';
 
 import InfoIcon from '../../assets/svg/info-16.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'SelectWallet'>;
 
@@ -57,6 +62,8 @@ const SelectWallet = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const navigation = useNavigation();
+    const [bolt11, setBolt11] = useState<LnInvoice>();
+    const [isLightning, setIsLightning] = useState(false);
     const [decodedInvoice, setDecodedInvoice] = useState<TInvoiceData>(
         {} as TInvoiceData,
     );
@@ -76,9 +83,48 @@ const SelectWallet = ({route}: Props) => {
 
     const cardHeight = 220;
 
+    const sats = decodedInvoice.options?.amount
+        ? decodedInvoice.options?.amount * 100_000_000
+        : undefined;
+
+    const amount = isLightning
+        ? bolt11?.amountMsat
+            ? bolt11?.amountMsat / 1_000
+            : undefined
+        : sats;
+
+    const hasMessage = decodedInvoice.options?.message || bolt11?.description;
+    const messageText = !isLightning
+        ? decodedInvoice.options?.message
+        : bolt11?.description;
+
     const decodeInvoice = (invoice: string) => {
-        // TODO: handle decoding Lightning invoices
+        // Only handling Bolt11 Lightning invoices
         return decodeURI.decode(invoice) as TInvoiceData;
+    };
+
+    const decodeBolt11 = async (invoice: string) => {
+        const decodedBolt11 = await parseInvoice(invoice);
+        setBolt11(decodedBolt11);
+        setIsLightning(true);
+    };
+
+    const handleLightning = async (invoice: string) => {
+        const decodedBolt11 = await parseInvoice(invoice);
+
+        navigation.dispatch(
+            CommonActions.navigate('WalletRoot', {
+                screen: 'Send',
+                params: {
+                    wallet: null,
+                    feeRate: 0,
+                    dummyPsbtVsize: 0,
+                    invoiceData: null,
+                    bolt11: decodedBolt11,
+                    source: 'liberal',
+                },
+            }),
+        );
     };
 
     useEffect(() => {
@@ -88,6 +134,12 @@ const SelectWallet = ({route}: Props) => {
             route.params?.invoice.startsWith('lnbc') ||
             route.params?.invoice.startsWith('bitcoin:')
         ) {
+            // Handle Bolt11 Invoice
+            if (route.params?.invoice.startsWith('lnbc')) {
+                decodeBolt11(route.params?.invoice);
+                return;
+            }
+
             // If LN report we aren't supporting it yet
             if (!route.params?.invoice.startsWith('bitcoin:')) {
                 conservativeAlert(
@@ -210,10 +262,6 @@ const SelectWallet = ({route}: Props) => {
         );
     };
 
-    const sats = decodedInvoice.options?.amount
-        ? decodedInvoice.options?.amount * 100_000_000
-        : undefined;
-
     const invoiceOptionsEmpty = decodedInvoice.options
         ? Object.keys(decodedInvoice.options).length === 0
         : true;
@@ -265,11 +313,11 @@ const SelectWallet = ({route}: Props) => {
                             {decodedInvoice.options.label}
                         </Text>
                     )}
-                    {decodedInvoice.options?.amount && sats && (
+                    {amount && (
                         <View
                             style={[tailwind('w-full items-center flex mb-2')]}>
                             <FiatBalance
-                                balance={sats}
+                                balance={amount}
                                 loading={false}
                                 balanceFontSize={'text-4xl'}
                                 fontColor={ColorScheme.Text.Default}
@@ -299,7 +347,7 @@ const SelectWallet = ({route}: Props) => {
                                     Amount
                                 </VText>
                                 <DisplaySatsAmount
-                                    amount={new BigNumber(sats)}
+                                    amount={new BigNumber(amount)}
                                     fontSize="text-sm"
                                     isApprox={false}
                                     textColor={ColorScheme.Text.GrayText}
@@ -308,34 +356,36 @@ const SelectWallet = ({route}: Props) => {
                         </View>
                     )}
 
-                    <View
-                        style={[
-                            tailwind(
-                                'w-full items-center flex justify-between mb-4',
-                            ),
-                        ]}>
-                        <VText
+                    {!isLightning && (
+                        <View
                             style={[
-                                tailwind('font-bold w-full mb-2'),
-                                {color: ColorScheme.Text.Default},
+                                tailwind(
+                                    'w-full items-center flex justify-between mb-4',
+                                ),
                             ]}>
-                            Address
-                        </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full'),
-                                {color: ColorScheme.Text.GrayText},
-                            ]}>
-                            {decodedInvoice.address}
-                        </VText>
-                    </View>
+                            <VText
+                                style={[
+                                    tailwind('font-bold w-full mb-2'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                Address
+                            </VText>
+                            <VText
+                                style={[
+                                    tailwind('w-full'),
+                                    {color: ColorScheme.Text.GrayText},
+                                ]}>
+                                {decodedInvoice.address}
+                            </VText>
+                        </View>
+                    )}
 
                     {/* Display the message */}
-                    {decodedInvoice.options?.message && (
+                    {hasMessage && (
                         <>
                             <View
                                 style={[
-                                    tailwind('w-full mb-6 opacity-20'),
+                                    tailwind('w-full mb-4 opacity-20'),
                                     styles.invoiceLineBreaker,
                                     {
                                         borderColor:
@@ -351,7 +401,7 @@ const SelectWallet = ({route}: Props) => {
                                     tailwind('font-bold'),
                                     {color: ColorScheme.Text.GrayText},
                                 ]}>
-                                {decodedInvoice.options.message}
+                                {messageText}
                             </Text>
                         </>
                     )}
