@@ -54,6 +54,8 @@
     "psbt": "psbt",
     "successful": "نجاح",
     "success": "نجاح",
+    "complete": "نجاح",
+    "pending": "قيد الانتظار",
     "failed": "فشل",
     "status": "حالة",
     "unconfirmed": "غير مؤكد",

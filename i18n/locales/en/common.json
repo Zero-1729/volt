@@ -54,6 +54,8 @@
     "psbt": "psbt",
     "success": "success",
     "successful": "successful",
+    "pending": "pending",
+    "complete": "complete",
     "failed": "failed",
     "status": "status",
     "unconfirmed": "unconfirmed",

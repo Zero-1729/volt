@@ -56,7 +56,7 @@
     "enabled": "Enabled",
     "see_more": "See more",
     "view_on_mempool": "View on Mempool.space",
-    "copied_tx_id": "Copied transaction ID!",
+    "copied_tx_id": "Copied transaction ID",
     "waiting_in_mempool": "Waiting in mempool",
     "fee_rate_too_low": "Fee rate must be higher than",
     "fee_boost_tx": "Fee boost transaction",
@@ -106,5 +106,12 @@
     "read_clipboard_lightning_text": "You have a lightning {{spec}} invoice in your clipboard",
     "read_clipboard_bitcoin_text": "You have a bitcoin invoice in your clipboard",
     "select_wallet_title": "Select Wallet",
-    "select_wallet_swipe_notice": "Swipe to change wallet to pay invoice"
+    "select_wallet_swipe_notice": "Swipe to change wallet to pay invoice",
+    "loading_invoice_advanced": "Generating {{spec}} Lightning Invoice",
+    "loading_invoice": "Generating Lightning Invoice",
+    "lightning_invoice": "Lightning Invoice",
+    "payment_received": "Received Payment",
+    "payment_success": "Payment Sent",
+    "payment_failed": "Payment Failed",
+    "invoice_description": "Description"
 }
