@@ -311,12 +311,14 @@ const SendView = ({route}: Props) => {
                             {screenTitle}
                         </Text>
 
-                        <View
-                            style={[
-                                tailwind('absolute right-6 justify-center'),
-                            ]}>
-                            <ExpiryTimer expiryDate={expiryEpoch} />
-                        </View>
+                        {isLightning && (
+                            <View
+                                style={[
+                                    tailwind('absolute right-6 justify-center'),
+                                ]}>
+                                <ExpiryTimer expiryDate={expiryEpoch} />
+                            </View>
+                        )}
                     </View>
                     <View
                         style={[
