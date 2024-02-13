@@ -178,30 +178,32 @@ const RequestAmount = () => {
     };
 
     const handleRoute = async () => {
-        const feeMsat = await openChannelFee({
-            amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
-        });
+        if (walletType === 'unified') {
+            const feeMsat = await openChannelFee({
+                amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
+            });
 
-        const firstTx = wallet.transactions.length === 0;
+            const firstTx = wallet.transactions.length === 0;
 
-        // TODO: probably move these as info displayed somewhere in the app
-        // Warn user for first tx that amount will be deducted for channel open
-        // first open channel
-        if (walletType === 'unified' && firstTx && feeMsat.feeMsat > 0) {
-            liberalAlert(
-                capitalizeFirst(t('warning')),
-                e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
-                capitalizeFirst(e('ok')),
-            );
-        }
+            // TODO: probably move these as info displayed somewhere in the app
+            // Warn user for first tx that amount will be deducted for channel open
+            // first open channel
+            if (firstTx && feeMsat.feeMsat > 0) {
+                liberalAlert(
+                    capitalizeFirst(t('warning')),
+                    e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
+                    capitalizeFirst(e('ok')),
+                );
+            }
 
-        // Warn user that amount will trigger a new channel open
-        if (walletType === 'unified' && !firstTx && feeMsat.feeMsat > 0) {
-            liberalAlert(
-                capitalizeFirst(t('warning')),
-                e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
-                capitalizeFirst(e('ok')),
-            );
+            // Warn user that amount will trigger a new channel open
+            if (!firstTx && feeMsat.feeMsat > 0) {
+                liberalAlert(
+                    capitalizeFirst(t('warning')),
+                    e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
+                    capitalizeFirst(e('ok')),
+                );
+            }
         }
 
         navigation.dispatch(
