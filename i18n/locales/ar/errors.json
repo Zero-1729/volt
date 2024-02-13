@@ -36,5 +36,6 @@
     "lightning_not_supported": "البرق غير مدعوم",
     "multi_wallets_exist_error": "لديك {{n, number}} محفظة إضافية. تمكين وضع المحفظة المتعددة لرؤيتهم؟",
     "new_channel_open_warn": "سيتم خصم {{n, number}} سات من مبلغ الاستقبال لفتح قناة جديدة",
-    "missing_bolt11_invoice_amount": "المبلغ مفقود في فاتورة Bolt11"
+    "missing_bolt11_invoice_amount": "المبلغ مفقود في فاتورة Bolt11",
+    "tx_fail_creation_erorr": "فشل في إنشاء المعاملة"
 }

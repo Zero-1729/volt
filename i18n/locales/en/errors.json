@@ -36,5 +36,6 @@
     "lightning_not_support": "Lightning is not yet supported",
     "multi_wallets_exist_error": "You have {{n, number}} more wallets. Enable multi wallet mode to see them?",
     "new_channel_open_warn": "{{n, number}} sats will be deducted from the receiving amount to open a new channel",
-    "missing_bolt11_invoice_amount": "Missing amount in Bolt11 invoice"
+    "missing_bolt11_invoice_amount": "Missing amount in Bolt11 invoice",
+    "tx_fail_creation_erorr": "Failed to create transaction"
 }
