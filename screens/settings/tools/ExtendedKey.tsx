@@ -191,11 +191,11 @@ const ExtendedKey = () => {
                     </VText>
 
                     <PlainButton
-                        style={[tailwind('absolute right-0 top-0')]}
+                        style={[tailwind('absolute right-0')]}
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
-                        <Close width={32} fill={ColorScheme.SVG.Default} />
+                        <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                 </View>
 
