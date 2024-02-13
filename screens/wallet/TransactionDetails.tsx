@@ -211,8 +211,10 @@ const TransactionDetailsView = ({route}: Props) => {
     const confirmationCount =
         route.params.tx.confirmations > 6
             ? '6+'
-            : route.params.tx.confirmations > 0
+            : route.params.tx.confirmed
             ? i18nNumber(route.params.tx.confirmations, i18n.language)
+            : isAdvancedMode
+            ? ''
             : capitalizeFirst(t('unconfirmed'));
 
     const confirmationInfo = isLNTx
