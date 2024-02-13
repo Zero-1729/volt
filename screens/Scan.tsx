@@ -205,6 +205,12 @@ const Scan = ({route}: Props) => {
         //       Make ln priority if unified or LN wallet
         let decodedInvoice;
 
+        // See if single BTC address
+        // Handle single btc supported address
+        if (isValidAddress(invoice.toLowerCase())) {
+            invoice = 'bitcoin:' + invoice;
+        }
+
         // Only support:
         // - Unified and regular BIP21 Invoice
         // - Bolt11 Invoice
@@ -245,18 +251,6 @@ const Scan = ({route}: Props) => {
                 updateScannerAlert(e('lightning_not_support'));
                 return {decodedInvoice: null, isOnchain: null};
             }
-        }
-
-        // Handle single btc supported address
-        if (!invoice.startsWith('bitcoin:')) {
-            let btcAddress = invoice;
-
-            if (!isValidAddress(btcAddress)) {
-                updateScannerAlert(e('invalid_btc_address_error'));
-                return {decodedInvoice: null, isOnchain: null};
-            }
-
-            invoice = 'bitcoin:' + btcAddress;
         }
 
         // Attempt to decode BIP21 QR
