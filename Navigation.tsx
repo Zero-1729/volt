@@ -62,6 +62,7 @@ import Network from './screens/settings/Network';
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
 import ExtendedKey from './screens/settings/tools/ExtendedKey';
+import MnemonicTool from './screens/settings/tools/MnemonicTool';
 
 import About from './screens/settings/About';
 import License from './screens/settings/License';
@@ -194,6 +195,10 @@ const SettingsRoot = () => {
                 <SettingsStack.Screen name="License" component={License} />
                 <SettingsStack.Screen name="Changelog" component={Changelog} />
                 <SettingsStack.Screen name="XKeyTool" component={ExtendedKey} />
+                <SettingsStack.Screen
+                    name="MnemonicTool"
+                    component={MnemonicTool}
+                />
             </SettingsStack.Group>
         </SettingsStack.Navigator>
     );
