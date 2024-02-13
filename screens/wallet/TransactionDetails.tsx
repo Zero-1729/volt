@@ -236,7 +236,9 @@ const TransactionDetailsView = ({route}: Props) => {
     };
 
     useEffect(() => {
-        loadNodeInfo();
+        if (isLNTx) {
+            loadNodeInfo();
+        }
     });
 
     return (
