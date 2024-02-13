@@ -496,11 +496,12 @@ export const canSendToInvoice = (
 ): Boolean => {
     // check that network matches
     // Handle special case for WPKH & P2TR
-    const prefixTip = invoice.address[0];
-    const prefixStub =
+    const prefixTip = invoice.address[0].toLowerCase();
+    const prefixStub = (
         prefixTip === 'b' || prefixTip === 't'
             ? invoice.address.slice(0, 4)
-            : prefixTip;
+            : prefixTip
+    ).toLowerCase();
     const invoicePrefixInfo = prefixInfo[prefixStub];
 
     switch (invoicePrefixInfo?.type) {
