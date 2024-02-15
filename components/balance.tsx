@@ -15,7 +15,7 @@ import {AppStorageContext} from '../class/storageContext';
 import Color from '../constants/Color';
 import Font from '../constants/Font';
 
-import {formatSats, formatBTC} from '../modules/transform';
+import {formatSats, formatBTC, SATS_TO_BTC_RATE} from '../modules/transform';
 
 import {normalizeFiat} from '../modules/transform';
 
@@ -292,6 +292,60 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                     ]}
                 />
             )}
+        </View>
+    );
+};
+
+export const DisplayBTCAmount = (props: DisplaySatsAmountProps) => {
+    const ColorScheme = Color(useColorScheme());
+    const tailwind = useTailwind();
+
+    const {i18n} = useTranslation('common');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    return (
+        <View style={[tailwind('flex-row')]}>
+            {props.isApprox && (
+                <Text
+                    style={[
+                        tailwind('self-center'),
+                        {
+                            color: props.textColor
+                                ? props.textColor
+                                : ColorScheme.Text.Default,
+                            textAlign: langDir,
+                        },
+                    ]}>
+                    ~{' '}
+                </Text>
+            )}
+            <Text
+                numberOfLines={1}
+                style={[
+                    tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                        textAlign: langDir,
+                    },
+                ]}>
+                ₿
+            </Text>
+
+            <Text
+                style={[
+                    tailwind(`${props.fontSize} self-center font-bold`),
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                        textAlign: langDir,
+                    },
+                ]}>
+                {props.amount.isZero() ? '0' : formatBTC(props.amount)}
+            </Text>
         </View>
     );
 };
