@@ -27,8 +27,6 @@ import {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTranslation} from 'react-i18next';
 
-import {getTxData} from '../../modules/mempool';
-
 import {useTailwind} from 'tailwind-rn';
 
 import Color from '../../constants/Color';
@@ -37,12 +35,8 @@ import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 
-import {
-    syncBdkWallet,
-    getBdkWalletBalance,
-    createBDKWallet,
-    getBdkWalletTransactions,
-} from '../../modules/bdk';
+import {getBdkWalletBalance, createBDKWallet} from '../../modules/bdk';
+import {syncBDKWallet, fetchOnchainTransactions} from '../../modules/shared';
 import {
     getMiniWallet,
     checkNetworkIsReachable,
@@ -162,14 +156,7 @@ const Wallet = ({route}: Props) => {
         // set in Balance fetch
         const w = bdkWallet ? bdkWallet : await initWallet();
 
-        const W = await syncBdkWallet(
-            w,
-            () => {},
-            walletData.network,
-            electrumServerURL,
-        );
-
-        return W;
+        return await syncBDKWallet(w, walletData.network, electrumServerURL);
     }, []);
 
     // Refresh control
@@ -233,104 +220,29 @@ const Wallet = ({route}: Props) => {
             );
 
             // update wallet balance
-            updateWalletBalance(currentWalletID, balance);
+            updateWalletBalance(currentWalletID, {
+                onchain: balance,
+                lightning: new BigNumber(0),
+            });
 
             try {
-                const {transactions, UTXOs} = await getBdkWalletTransactions(
+                const {txs, address, utxo} = await fetchOnchainTransactions(
                     w,
-                    walletData.network === 'testnet'
-                        ? electrumServerURL.testnet
-                        : electrumServerURL.bitcoin,
+                    walletData,
+                    updated,
+                    electrumServerURL,
                 );
 
-                // Store newly formatted transactions from mempool.space data
-                const newTxs = updated ? [] : transactions;
-
-                const addressLock = !updated;
-
-                let tempReceiveAddress = walletData.address;
-                let addressIndexCount = walletData.index;
-
-                // Only attempt wallet address update if wallet balance is updated
-                // TODO: avoid mempool for now and scrap this from BDK raw tx info (Script)
-                if (updated) {
-                    // iterate over all the transactions and include the missing optional fields for the TTransaction
-                    for (let i = 0; i < transactions.length; i++) {
-                        const tmp: TTransaction = {
-                            ...transactions[i],
-                            address: '',
-                        };
-
-                        const TxData = await getTxData(
-                            transactions[i].txid,
-                            transactions[i].network,
-                        );
-
-                        // Transaction inputs (remote owned addresses)
-                        for (let j = 0; j < TxData.vin.length; j++) {
-                            // Add address we own based on whether we sent
-                            // the transaction and the value received matches
-                            if (
-                                transactions[i].value ===
-                                    TxData.vin[j].prevout.value &&
-                                transactions[i].type === 'outbound'
-                            ) {
-                                tmp.address =
-                                    TxData.vin[j].prevout.scriptpubkey_address;
-                            }
-
-                            // Check if receive address is used
-                            // Then push tx index
-                            if (
-                                TxData.vin[j].prevout.scriptpubkey_address ===
-                                walletData.address.address
-                            ) {
-                                walletData.generateNewAddress();
-                            }
-                        }
-
-                        // Transaction outputs (local owned addresses)
-                        for (let k = 0; k < TxData.vout.length; k++) {
-                            // Add address we own based on whether we received
-                            // the transaction and the value received matches
-                            if (
-                                transactions[i].value ===
-                                    TxData.vout[k].value &&
-                                transactions[i].type === 'inbound'
-                            ) {
-                                tmp.address =
-                                    TxData.vout[k].scriptpubkey_address;
-
-                                // Update temp address
-                                if (
-                                    !addressLock &&
-                                    walletData.address.address ===
-                                        TxData.vout[k].scriptpubkey_address
-                                ) {
-                                    tempReceiveAddress =
-                                        walletData.generateNewAddress(
-                                            addressIndexCount,
-                                        );
-                                    addressIndexCount++;
-                                }
-                            }
-                        }
-
-                        // Update new transactions list
-                        newTxs.push({...tmp});
-                    }
-
-                    // update wallet address
-                    updateWalletAddress(currentWalletID, tempReceiveAddress);
-                }
+                // update wallet address
+                updateWalletAddress(currentWalletID, address);
 
                 // We make this update in case of pending txs
                 // and because we already have this data from the balance update BDK call
                 // update wallet transactions
-                updateWalletTransactions(currentWalletID, newTxs);
+                updateWalletTransactions(currentWalletID, txs);
 
                 // update wallet UTXOs
-                updateWalletUTXOs(currentWalletID, UTXOs);
+                updateWalletUTXOs(currentWalletID, utxo);
 
                 setLoadLock(false);
             } catch (err: any) {
