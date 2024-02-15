@@ -265,13 +265,14 @@ const SelectWallet = ({route}: Props) => {
                 <WalletCard
                     loading={false}
                     maxedCard={
-                        item.balance.isZero() && item.transactions.length > 0
+                        item.balance.lightning
+                            .plus(item.balance.onchain)
+                            .isZero() && item.transactions.length > 0
                     }
-                    balance={item.balance}
+                    balance={item.balance.lightning.plus(item.balance.onchain)}
                     network={item.network}
                     isWatchOnly={item.isWatchOnly}
                     label={item.name}
-                    walletBalance={item.balance}
                     walletType={item.type}
                     hideBalance={hideTotalBalance}
                     unit={item.units}
