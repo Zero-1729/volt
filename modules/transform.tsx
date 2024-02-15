@@ -72,7 +72,7 @@ export const formatBTC = (sats: BigNumber) => {
         return addCommas(BTC.toFixed(8), SEPARATOR);
     }
 
-    return addCommas(BTC.toString(), SEPARATOR);
+    return addCommas(BTC.toFixed(2), SEPARATOR);
 };
 
 const formatWithUnits = (value: number) => {
