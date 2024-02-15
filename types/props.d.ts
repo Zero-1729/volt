@@ -2,7 +2,7 @@
 import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import {BalanceType, Unit, TTransaction} from './wallet';
+import {Unit, TTransaction} from './wallet';
 import BigNumber from 'bignumber.js';
 
 // Base Prop Type
@@ -52,8 +52,7 @@ export type CardProps = BaseProps & {
 };
 
 export type WalletCardProps = CardProps & {
-    balance: BalanceType;
-    walletBalance: BalanceType;
+    balance: BigNumber;
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
@@ -70,18 +69,19 @@ export type TxListItemProps = BaseProps & {
 };
 
 export type TxBalanceProps = BaseProps & {
-    balance: BalanceType;
+    balance: BigNumber;
     balanceFontSize?: string;
     fontColor?: string;
 };
 
 export type BalanceProps = BaseProps & {
-    balance: BalanceType;
+    balance: BigNumber;
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
     fontColor: string;
     balanceFontSize?: string;
     loading: boolean;
     disableFiat: boolean; // false by default
+    disabled?: boolean;
 };
 
 export type FiatBalanceProps = BaseProps & {

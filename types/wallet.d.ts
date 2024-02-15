@@ -34,7 +34,8 @@ export type TMiniWallet = {
     name: string;
     type: string;
     network: string;
-    balance: number;
+    balanceOnchain: number;
+    balanceLightning: number;
     privateDescriptor: string;
     externalDescriptor?: string;
     internalDescriptor?: string;
@@ -58,11 +59,14 @@ export type TAddressAmount = {
 };
 
 // Wallet balance type
-export type TBalance = BigNumber;
+export type TBalance = {
+    onchain: BigNumber;
+    lightning: BigNumber;
+};
 
 // Wallet balance fiat rate
 export type TFiatRate = {
-    rate: TBalance;
+    rate: BigNumber;
     lastUpdated: Date;
     source: string;
 };
@@ -71,7 +75,7 @@ export type TFiatRate = {
 export type TUtxo = LocalUtxo & {
     txid: string; // Transaction ID
     vout: number; // Transaction output index
-    value: TBalance; // Transaction output value in sats
+    value: BigNumber; // Transaction output value in sats
     address: string; // Transaction output address
     flagged?: boolean; // Whether flagged by user to avoid spending, i.e. dust
     scriptpubkey: string;
@@ -90,10 +94,10 @@ export type TTransaction = Payment & {
     size: number; // Transaction size in bytes
     vsize: number; // Transaction size in virtual bytes
     weight: number; // Transaction weight
-    fee: BalanceType; // Transaction fee in sats
-    value: BalanceType; // Transaction value in sats
-    received: BalanceType; // Transaction received value in sats
-    sent: BalanceType; // Transaction sent value in sats
+    fee: number; // Transaction fee in sats
+    value: number; // Transaction value in sats
+    received: number; // Transaction received value in sats
+    sent: number; // Transaction sent value in sats
     timestamp: Date; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
     inputs?: TUTXO[]; // Transaction inputs

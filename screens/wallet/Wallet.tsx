@@ -114,14 +114,22 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     const walletTxs = walletData.transactions;
-    const walletBalance = walletData.balance;
+    // TODO: sort out displaying balance for unified
+    // actually showing both balances and not picking
+    const walletBalance =
+        walletData.type !== 'unified'
+            ? walletData.balance.onchain
+            : walletData.balance.onchain.plus(walletData.balance.lightning);
 
     const getBalance = async () => {
         const nodeState = await nodeInfo();
         const balanceLn = nodeState.channelsBalanceMsat;
 
         // Update balance after converting to sats
-        updateWalletBalance(currentWalletID, new BigNumber(balanceLn / 1000));
+        updateWalletBalance(currentWalletID, {
+            onchain: walletData.balance.onchain,
+            lightning: new BigNumber(balanceLn / 1000),
+        });
     };
 
     const fetchPayments = async () => {
@@ -190,7 +198,7 @@ const Wallet = ({route}: Props) => {
             const triggered = await fetchFiatRate(
                 appFiatCurrency.short,
                 fiatRate,
-                (rate: TBalance) => {
+                (rate: BigNumber) => {
                     // Then fetch fiat rate
                     updateFiatRate({
                         ...fiatRate,
@@ -221,7 +229,7 @@ const Wallet = ({route}: Props) => {
             // Update wallet balance first
             const {balance, updated} = await getBdkWalletBalance(
                 w,
-                walletData.balance,
+                walletData.balance.onchain,
             );
 
             // update wallet balance
@@ -363,8 +371,8 @@ const Wallet = ({route}: Props) => {
     ]);
 
     // Check if wallet balance is empty
-    const isWalletBroke = (balance: BigNumber) => {
-        return new BigNumber(0).eq(balance);
+    const isWalletBroke = (balance: TBalance) => {
+        return new BigNumber(0).eq(balance.onchain.plus(balance.lightning));
     };
 
     const hideSendButton =
