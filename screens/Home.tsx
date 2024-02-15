@@ -91,7 +91,6 @@ type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
 const Home = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
-
     const tailwind = useTailwind();
 
     const {t} = useTranslation('wallet');
@@ -149,12 +148,19 @@ const Home = ({route}: Props) => {
             // Only show balances from bitcoin mainnet
             // Don't want user tot think their testnet money
             // is spendable
-            accumulator.plus(
-                currentValue.network === ENet.Bitcoin
-                    ? currentValue.balance
-                    : new BigNumber(0),
-            ),
-        new BigNumber(0),
+            ({
+                onchain: accumulator.onchain.plus(
+                    currentValue.network === ENet.Bitcoin
+                        ? currentValue.balance.onchain
+                        : new BigNumber(0),
+                ),
+                lightning: accumulator.lightning.plus(
+                    currentValue.network === ENet.Bitcoin
+                        ? currentValue.balance.lightning
+                        : new BigNumber(0),
+                ),
+            }),
+        {onchain: new BigNumber(0), lightning: new BigNumber(0)},
     );
 
     let BreezSub!: any;
@@ -323,7 +329,7 @@ const Home = ({route}: Props) => {
                     await fetchFiatRate(
                         ticker,
                         fiatRate,
-                        (rate: TBalance) => {
+                        (rate: BigNumber) => {
                             updateFiatRate({
                                 ...fiatRate,
                                 rate: rate,
@@ -375,7 +381,7 @@ const Home = ({route}: Props) => {
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
             fiatRate,
-            (rate: TBalance) => {
+            (rate: BigNumber) => {
                 // Then fetch fiat rate
                 updateFiatRate({
                     ...fiatRate,
@@ -396,7 +402,7 @@ const Home = ({route}: Props) => {
         }
 
         // Sync wallet
-        const {balance} = await getBdkWalletBalance(w, wallet.balance);
+        const {balance} = await getBdkWalletBalance(w, wallet.balance.onchain);
         const {transactions} = await getBdkWalletTransactions(
             w,
             wallet.network === 'testnet'
@@ -408,7 +414,10 @@ const Home = ({route}: Props) => {
         setRefreshing(false);
 
         // Update wallet balance
-        updateWalletBalance(currentWalletID, balance);
+        updateWalletBalance(currentWalletID, {
+            onchain: balance,
+            lightning: wallet.balance.lightning,
+        });
 
         // Update wallet transactions
         updateWalletTransactions(currentWalletID, transactions);
@@ -431,7 +440,10 @@ const Home = ({route}: Props) => {
         const balanceLn = nodeState.channelsBalanceMsat;
 
         // Update balance after converting to sats
-        updateWalletBalance(currentWalletID, new BigNumber(balanceLn / 1000));
+        updateWalletBalance(currentWalletID, {
+            onchain: wallet.balance.onchain,
+            lightning: new BigNumber(balanceLn / 1000),
+        });
     };
 
     const fetchPayments = async () => {
@@ -525,14 +537,17 @@ const Home = ({route}: Props) => {
             <View style={[tailwind('w-full absolute')]}>
                 {/* Avoid gesture handler triggering click event */}
                 <WalletCard
+                    // This is for onchain behaviour only
                     maxedCard={
-                        item.balance.isZero() && item.transactions.length > 0
+                        wallet.type !== 'unified' &&
+                        item.balance.onchain.isZero() &&
+                        item.transactions.length > 0
                     }
-                    balance={item.balance}
+                    // Combine the balances
+                    balance={item.balance.lightning.plus(item.balance.onchain)}
                     network={item.network}
                     isWatchOnly={item.isWatchOnly}
                     label={item.name}
-                    walletBalance={item.balance}
                     walletType={item.type}
                     loading={loadingBalance}
                     hideBalance={hideTotalBalance}
@@ -625,7 +640,9 @@ const Home = ({route}: Props) => {
 
                                     {!hideTotalBalance ? (
                                         <FiatBalance
-                                            balance={totalBalance.toNumber()}
+                                            balance={totalBalance.onchain
+                                                .plus(totalBalance.lightning)
+                                                .toNumber()}
                                             loading={loadingBalance}
                                             balanceFontSize={'text-3xl'}
                                             fontColor={ColorScheme.Text.Default}
