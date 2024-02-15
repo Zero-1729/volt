@@ -216,7 +216,7 @@ export const WalletCard = (props: WalletCardProps) => {
                                 fontColor={'white'}
                                 balance={props.balance}
                                 balanceFontSize={'text-2xl'}
-                                disableFiat={true}
+                                disableFiat={false}
                                 loading={props.loading}
                             />
                         </View>
