@@ -27,7 +27,11 @@ import {useTranslation} from 'react-i18next';
 
 import decodeURI from 'bip21';
 
-import {checkInvoiceAndWallet, isValidAddress} from '../modules/wallet-utils';
+import {
+    checkInvoiceAndWallet,
+    isValidAddress,
+    decodeInvoiceType,
+} from '../modules/wallet-utils';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
 
@@ -211,16 +215,16 @@ const Scan = ({route}: Props) => {
             invoice = 'bitcoin:' + invoice;
         }
 
+        const invoiceType = await decodeInvoiceType(invoice);
+
         // Only support:
         // - Unified and regular BIP21 Invoice
         // - Bolt11 Invoice
         // - LNURL
         if (
             !(
-                invoice.startsWith('bitcoin:') ||
-                invoice.startsWith('lightning:') ||
-                invoice.toLowerCase().startsWith('lnbc') ||
-                invoice.toLowerCase().startsWith('lnurl')
+                invoiceType.type === 'bitcoin' ||
+                invoiceType.type === 'lightning'
             )
         ) {
             updateScannerAlert(e('unsupported_invoice_type'));
@@ -230,12 +234,11 @@ const Scan = ({route}: Props) => {
         // Check if LN invoice and handle separately
         // Call on Breez to work on this
         if (
-            invoice.startsWith('lightning:') ||
-            invoice.toLowerCase().startsWith('lnbc') ||
-            invoice.toLowerCase().startsWith('lnurl')
+            invoiceType.type === 'lightning' ||
+            invoiceType.type === 'bitcoin'
         ) {
             // Only support bolt11 for now
-            if (invoice.toLowerCase().startsWith('lnbc')) {
+            if (invoiceType.spec === 'bolt11') {
                 try {
                     const parsedBolt11Invoice = await parseInvoice(invoice);
 
@@ -253,18 +256,20 @@ const Scan = ({route}: Props) => {
             }
         }
 
-        // Attempt to decode BIP21 QR
-        try {
-            decodedInvoice = decodeURI.decode(invoice);
+        if (invoiceType.type === 'bitcoin') {
+            // Attempt to decode BIP21 QR
+            try {
+                decodedInvoice = decodeURI.decode(invoice);
 
-            // BIP21 QR could contain upper case address, so we'll convert to lower case
-            if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
+                // BIP21 QR could contain upper case address, so we'll convert to lower case
+                if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
+                    updateScannerAlert(e('invalid_invoice_error'));
+                    return {decodedInvoice: null, isOnchain: null};
+                }
+            } catch (err: any) {
                 updateScannerAlert(e('invalid_invoice_error'));
                 return {decodedInvoice: null, isOnchain: null};
             }
-        } catch (err: any) {
-            updateScannerAlert(e('invalid_invoice_error'));
-            return {decodedInvoice: null, isOnchain: null};
         }
 
         // Check and report errors from wallet and invoice

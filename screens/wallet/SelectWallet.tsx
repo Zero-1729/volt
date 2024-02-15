@@ -16,11 +16,7 @@ import {InitStackParamList} from '../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {
-    useNavigation,
-    CommonActions,
-    StackActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -29,7 +25,11 @@ import {conservativeAlert} from '../../components/alert';
 import {useTranslation} from 'react-i18next';
 
 import decodeURI from 'bip21';
-import {getMiniWallet, checkInvoiceAndWallet} from '../../modules/wallet-utils';
+import {
+    getMiniWallet,
+    checkInvoiceAndWallet,
+    decodeInvoiceType,
+} from '../../modules/wallet-utils';
 import {capitalizeFirst, convertBTCtoSats} from '../../modules/transform';
 
 import {useTailwind} from 'tailwind-rn';
@@ -109,39 +109,24 @@ const SelectWallet = ({route}: Props) => {
         setIsLightning(true);
     };
 
-    const handleLightning = async (invoice: string) => {
-        const decodedBolt11 = await parseInvoice(invoice);
+    const handleInvoiceType = async (invoice: string) => {
+        const invoiceType = await decodeInvoiceType(invoice);
 
-        navigation.dispatch(
-            CommonActions.navigate('WalletRoot', {
-                screen: 'Send',
-                params: {
-                    wallet: null,
-                    feeRate: 0,
-                    dummyPsbtVsize: 0,
-                    invoiceData: null,
-                    bolt11: decodedBolt11,
-                    source: 'liberal',
-                },
-            }),
-        );
-    };
-
-    useEffect(() => {
         if (
-            route.params?.invoice.startsWith('lightning') ||
-            route.params?.invoice.startsWith('lnurl') ||
-            route.params?.invoice.startsWith('lnbc') ||
-            route.params?.invoice.startsWith('bitcoin:')
+            invoiceType.type === 'lightning' ||
+            invoiceType.type === 'bitcoin'
         ) {
             // Handle Bolt11 Invoice
-            if (route.params?.invoice.startsWith('lnbc')) {
+            if (
+                invoiceType.type === 'lightning' &&
+                invoiceType.spec === 'bolt11'
+            ) {
                 decodeBolt11(route.params?.invoice);
                 return;
             }
 
             // If LN report we aren't supporting it yet
-            if (!route.params?.invoice.startsWith('bitcoin:')) {
+            if (!(invoiceType?.spec === 'bolt11')) {
                 conservativeAlert(
                     capitalizeFirst(t('error')),
                     e('unsupported_invoice_type'),
@@ -153,6 +138,7 @@ const SelectWallet = ({route}: Props) => {
                 return;
             }
 
+            // handle bitcoin BIP21 invoice
             setDecodedInvoice(decodeInvoice(route.params?.invoice));
         } else {
             conservativeAlert(
@@ -163,6 +149,10 @@ const SelectWallet = ({route}: Props) => {
 
             navigation.dispatch(CommonActions.navigate('HomeScreen'));
         }
+    };
+
+    useEffect(() => {
+        handleInvoiceType(route.params?.invoice);
     }, []);
 
     const handleRoute = () => {
