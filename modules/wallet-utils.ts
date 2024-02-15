@@ -13,7 +13,11 @@ import {WalletTypeDetails, DUST_LIMIT} from './wallet-defaults';
 
 const bip32 = BIP32Factory(ecc);
 
-import {listPayments} from '@breeztech/react-native-breez-sdk';
+import {
+    listPayments,
+    parseInput,
+    InputTypeVariant,
+} from '@breeztech/react-native-breez-sdk';
 
 import Crypto from 'react-native-quick-crypto';
 
@@ -676,4 +680,77 @@ export const isInvoiceExpired = (
 // Get countdown start
 export const getCountdownStart = (timestamp: number, expiry: number) => {
     return Math.floor(timestamp + expiry - +new Date() / 1_000);
+};
+export const decodeInvoiceType = async (
+    invoice: string,
+): Promise<{
+    type: string;
+    spec?: string;
+    invoice: string;
+    invalid: boolean;
+}> => {
+    if (invoice.startsWith('bitcoin:')) {
+        return {
+            type: 'bitcoin',
+            spec: 'bip21',
+            invoice: invoice,
+            invalid: false,
+        };
+    }
+
+    if (invoice.startsWith('lightning')) {
+        const strippedInvoice = invoice.replace('lightning:', '');
+
+        const specType = await parseInput(strippedInvoice);
+
+        let spec = 'bolt11';
+
+        switch (specType.type) {
+            case InputTypeVariant.BOLT11:
+                spec = 'bolt11';
+                break;
+            case InputTypeVariant.LN_URL_PAY:
+            case InputTypeVariant.LN_URL_WITHDRAW:
+            case InputTypeVariant.LN_URL_AUTH:
+                spec = 'lnurl';
+                break;
+            default:
+                return {
+                    type: 'unsupported',
+                    invoice: invoice,
+                    invalid: true,
+                };
+        }
+
+        return {
+            type: 'lightning',
+            invoice: strippedInvoice,
+            spec: spec,
+            invalid: false,
+        };
+    }
+
+    if (invoice.startsWith('lnbc')) {
+        return {
+            type: 'lightning',
+            spec: 'lnbc',
+            invoice: invoice,
+            invalid: false,
+        };
+    }
+
+    if (invoice.startsWith('lnurl')) {
+        return {
+            type: 'lightning',
+            spec: 'lnurl',
+            invoice: invoice,
+            invalid: false,
+        };
+    }
+
+    return {
+        type: 'unsupported',
+        invoice: invoice,
+        invalid: true,
+    };
 };
