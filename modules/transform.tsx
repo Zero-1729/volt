@@ -82,7 +82,7 @@ const formatWithUnits = (value: number) => {
     const UNITS = ['', 'k', 'M', 'B', 'T', 'Q'];
     const DECIMAL = 2;
     const EXP = Math.floor(Math.log(value) / Math.log(RATE));
-    const Limit = 1_000_000_000; // The displayable value limit (i.e. < 1B)
+    const Limit = 100_000_000; // The displayable value limit (i.e. < 100M)
 
     if (value > Limit) {
         // Avoid Zero Division
@@ -94,7 +94,7 @@ const formatWithUnits = (value: number) => {
         return `${val} ${unit}`;
     }
 
-    // Return value as is, if below a billion
+    // Return value as is, if below a 100M
     return value.toFixed(2);
 };
 
