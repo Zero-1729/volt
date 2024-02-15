@@ -681,6 +681,48 @@ export const isInvoiceExpired = (
 export const getCountdownStart = (timestamp: number, expiry: number) => {
     return Math.floor(timestamp + expiry - +new Date() / 1_000);
 };
+
+// Function for syncing and returning new BDK wallet balance and Breez balance
+
+// Function for syncing and returning new BDK wallet and Breez transactions
+
+const determinLnType = async (
+    invoice: string,
+): Promise<{
+    type: string;
+    invoice: string;
+    invalid: boolean;
+    spec: string;
+}> => {
+    const specType = await parseInput(invoice);
+    let spec = '';
+
+    switch (specType.type) {
+        case InputTypeVariant.BOLT11:
+            spec = 'bolt11';
+            break;
+        case InputTypeVariant.LN_URL_PAY:
+        case InputTypeVariant.LN_URL_WITHDRAW:
+        case InputTypeVariant.LN_URL_AUTH:
+            spec = 'lnurl';
+            break;
+        default:
+            return {
+                type: 'unsupported',
+                invoice: invoice,
+                invalid: true,
+                spec: spec,
+            };
+    }
+
+    return {
+        type: 'lightning',
+        invoice: invoice,
+        invalid: false,
+        spec: spec,
+    };
+};
+
 export const decodeInvoiceType = async (
     invoice: string,
 ): Promise<{
@@ -698,54 +740,15 @@ export const decodeInvoiceType = async (
         };
     }
 
-    if (invoice.startsWith('lightning')) {
-        const strippedInvoice = invoice.replace('lightning:', '');
+    // Check LN
+    if (
+        invoice.startsWith('lnbc') ||
+        invoice.startsWith('lnurl') ||
+        invoice.startsWith('lightning')
+    ) {
+        const determinedLnType = await determinLnType(invoice);
 
-        const specType = await parseInput(strippedInvoice);
-
-        let spec = 'bolt11';
-
-        switch (specType.type) {
-            case InputTypeVariant.BOLT11:
-                spec = 'bolt11';
-                break;
-            case InputTypeVariant.LN_URL_PAY:
-            case InputTypeVariant.LN_URL_WITHDRAW:
-            case InputTypeVariant.LN_URL_AUTH:
-                spec = 'lnurl';
-                break;
-            default:
-                return {
-                    type: 'unsupported',
-                    invoice: invoice,
-                    invalid: true,
-                };
-        }
-
-        return {
-            type: 'lightning',
-            invoice: strippedInvoice,
-            spec: spec,
-            invalid: false,
-        };
-    }
-
-    if (invoice.startsWith('lnbc')) {
-        return {
-            type: 'lightning',
-            spec: 'lnbc',
-            invoice: invoice,
-            invalid: false,
-        };
-    }
-
-    if (invoice.startsWith('lnurl')) {
-        return {
-            type: 'lightning',
-            spec: 'lnurl',
-            invoice: invoice,
-            invalid: false,
-        };
+        return determinedLnType;
     }
 
     return {
