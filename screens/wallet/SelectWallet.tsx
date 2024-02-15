@@ -241,6 +241,7 @@ const SelectWallet = ({route}: Props) => {
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: wallet,
+                            isLightning: isLightning,
                             source: 'liberal',
                         },
                     }),

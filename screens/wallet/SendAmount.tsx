@@ -94,17 +94,21 @@ const SendAmount = ({route}: Props) => {
         name: appFiatCurrency.short,
     });
 
-    const isMax = amount === route.params.wallet.balance.toString();
+    const walletBalance = new BigNumber(
+        route.params.isLightning
+            ? route.params.wallet.balanceLightning
+            : route.params.wallet.balanceOnchain,
+    );
+
+    const isMax = amount === walletBalance.toString();
     const isAmountEmpty = Number(amount) === 0;
 
-    const isOverBalance = new BigNumber(satsAmount.value).gt(
-        route.params.wallet.balance,
-    );
+    const isOverBalance = new BigNumber(satsAmount.value).gt(walletBalance);
 
     const isBelowDust = new BigNumber(satsAmount.value).lt(DUST_LIMIT);
 
     const triggerMax = () => {
-        const maxSats = route.params.wallet.balance.toString();
+        const maxSats = walletBalance.toString();
 
         setAmount(maxSats);
 
@@ -229,7 +233,7 @@ const SendAmount = ({route}: Props) => {
 
     const displayBalance = (fontSize: string) => {
         const bottomUnitSats = bottomUnit?.name === 'sats';
-        const rawBalance = new BigNumber(route.params.wallet.balance); // sats
+        const rawBalance = walletBalance; // sats
         const fiatBalance = normalizeFiat(rawBalance, fiatRate.rate);
 
         return bottomUnitSats ? (
@@ -336,7 +340,7 @@ const SendAmount = ({route}: Props) => {
                                     ),
                                 ]}
                                 disabled={
-                                    route.params.wallet.balance.toString() ===
+                                    walletBalance.toString() ===
                                     satsAmount.value.toString()
                                 }
                                 onPress={triggerMax}>
@@ -360,7 +364,7 @@ const SendAmount = ({route}: Props) => {
                     amount={amount}
                     onAmountChange={updateAmount}
                     isSats={bottomUnit.name === 'sats'}
-                    maxAmount={route.params.wallet.balance.toString()}
+                    maxAmount={walletBalance.toString()}
                 />
 
                 {/* Continue button */}

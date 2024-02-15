@@ -331,6 +331,7 @@ const Scan = ({route}: Props) => {
                             params: {
                                 invoiceData: decodedQRState.decodedInvoice,
                                 wallet: route.params.wallet,
+                                isLightning: false,
                             },
                         }),
                     );
@@ -439,6 +440,7 @@ const Scan = ({route}: Props) => {
                             params: {
                                 invoiceData: decodedInvoice,
                                 wallet: route.params.wallet,
+                                isLightning: false,
                                 source: 'conserative',
                             },
                         }),
