@@ -367,6 +367,7 @@ const Home = ({route}: Props) => {
         // Only attempt load if connected to network
         if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
+            setLoadingBalance(false);
             return;
         }
 
@@ -398,6 +399,7 @@ const Home = ({route}: Props) => {
         // Check net again, just in case there is a drop mid execution
         if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
+            setLoadingBalance(false);
             return;
         }
 
@@ -455,6 +457,16 @@ const Home = ({route}: Props) => {
 
     const jointSync = async () => {
         if (wallet.type === 'unified') {
+            // Check network available
+            if (!checkNetworkIsReachable(networkState)) {
+                setRefreshing(false);
+                setLoadingBalance(false);
+                return;
+            }
+
+            // create node init if not already
+            await initNode();
+
             setLoadingBalance(true);
             setRefreshing(true);
 
@@ -510,14 +522,13 @@ const Home = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        // TODO: handle restored wallet from onboarding
         if (route.params?.restoreMeta) {
             if (route.params?.restoreMeta.load) {
                 // set loading
                 setLoadingBalance(true);
 
                 // Reload the wallet
-                refreshWallet();
+                jointSync();
             }
 
             // Simple helper to show successful import and navigate back home
