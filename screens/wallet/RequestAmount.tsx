@@ -20,7 +20,11 @@ import Close from '../../assets/svg/x-24.svg';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
-import {capitalizeFirst, formatFiat} from '../../modules/transform';
+import {
+    SATS_TO_BTC_RATE,
+    capitalizeFirst,
+    formatFiat,
+} from '../../modules/transform';
 import {openChannelFee} from '@breeztech/react-native-breez-sdk';
 
 type DisplayUnit = {
@@ -31,7 +35,11 @@ type DisplayUnit = {
 
 import {PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
-import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
+import {
+    DisplayFiatAmount,
+    DisplaySatsAmount,
+    DisplayBTCAmount,
+} from '../../components/balance';
 import {liberalAlert} from '../../components/alert';
 
 const RequestAmount = () => {
@@ -168,7 +176,13 @@ const RequestAmount = () => {
     };
 
     const renderSatAmount = (fontSize: string) => {
-        return (
+        return satsAmount.value.gte(SATS_TO_BTC_RATE) ? (
+            <DisplayBTCAmount
+                amount={satsAmount.value}
+                fontSize={fontSize}
+                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
+            />
+        ) : (
             <DisplaySatsAmount
                 amount={satsAmount.value}
                 fontSize={fontSize}

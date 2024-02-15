@@ -37,6 +37,7 @@ import {
     capitalizeFirst,
     formatFiat,
     normalizeFiat,
+    SATS_TO_BTC_RATE,
 } from '../../modules/transform';
 
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -50,7 +51,11 @@ type DisplayUnit = {
 
 import {PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
-import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
+import {
+    DisplayFiatAmount,
+    DisplaySatsAmount,
+    DisplayBTCAmount,
+} from '../../components/balance';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SendAmount'>;
 
@@ -222,7 +227,13 @@ const SendAmount = ({route}: Props) => {
     };
 
     const renderSatAmount = (fontSize: string) => {
-        return (
+        return satsAmount.value.gte(SATS_TO_BTC_RATE) ? (
+            <DisplayBTCAmount
+                amount={satsAmount.value}
+                fontSize={fontSize}
+                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
+            />
+        ) : (
             <DisplaySatsAmount
                 amount={satsAmount.value}
                 fontSize={fontSize}

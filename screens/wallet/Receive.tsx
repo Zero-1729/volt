@@ -53,7 +53,11 @@ import {AppStorageContext} from '../../class/storageContext';
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Close from '../../assets/svg/x-24.svg';
 
-import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
+import {
+    DisplayFiatAmount,
+    DisplaySatsAmount,
+    DisplayBTCAmount,
+} from '../../components/balance';
 
 import ShareIcon from '../../assets/svg/share-android-24.svg';
 
@@ -263,7 +267,19 @@ const Receive = ({route}: Props) => {
                                     'mb-4 flex justify-center items-center',
                                 ),
                             ]}>
-                            <View style={[tailwind('opacity-40 mb-1')]}>
+                            {/* Make it approx if it doesn't match bottom unit value for requested amount */}
+                            {state.bitcoinValue < 100_000_000 ? (
+                                <DisplaySatsAmount
+                                    amount={state.bitcoinValue}
+                                    fontSize={'text-2xl'}
+                                />
+                            ) : (
+                                <DisplayBTCAmount
+                                    amount={state.bitcoinValue}
+                                    fontSize="text-2xl"
+                                />
+                            )}
+                            <View style={[tailwind('opacity-40')]}>
                                 {/* Make it approx if it doesn't match bottom unit value for requested amount */}
                                 <DisplayFiatAmount
                                     amount={formatFiat(state.fiatValue)}
@@ -273,17 +289,6 @@ const Receive = ({route}: Props) => {
                                         state.fiatValue.toString()
                                     }
                                     symbol={appFiatCurrency.symbol}
-                                />
-                            </View>
-                            <View>
-                                {/* Make it approx if it doesn't match bottom unit value for requested amount */}
-                                <DisplaySatsAmount
-                                    amount={state.bitcoinValue}
-                                    fontSize={'text-2xl'}
-                                    isApprox={
-                                        route.params.amount !==
-                                        state.bitcoinValue.toString()
-                                    }
                                 />
                             </View>
                         </View>
