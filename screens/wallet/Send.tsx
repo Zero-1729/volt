@@ -91,7 +91,7 @@ const SendView = ({route}: Props) => {
         : t('transaction_summary');
     const hasLabel = route.params.invoiceData?.options?.label;
     const hasMessage = isLightning
-        ? isLightning
+        ? route.params.bolt11.description
         : route.params.invoiceData?.options?.message;
     const messageTitle = isLightning
         ? capitalizeFirst(t('invoice_description'))
@@ -107,15 +107,18 @@ const SendView = ({route}: Props) => {
                   : capitalizeFirst(t('transaction'))
           }...`;
 
-    const sats = route.params.bolt11?.amountMsat
-        ? route.params.bolt11?.amountMsat / 1_000
-        : route.params.invoiceData?.options?.amount || 0;
+    const sats = new BigNumber(
+        isLightning
+            ? (route.params.bolt11?.amountMsat as number) / 1_000
+            : route.params.invoiceData?.options?.amount || 0,
+    );
 
     // TODO: handle by checking maxPayableMsat, invoice Msats and other fees
     const isMax = isLightning
-        ? false
+        ? route.params.wallet?.balanceLightning ===
+          (route.params.bolt11?.amountMsat as number) / 1_000
         : route.params.invoiceData?.options?.amount?.toString() ===
-          route.params.wallet?.balance.toString();
+          route.params.wallet?.balanceOnchain.toString();
 
     const createTransaction = async () => {
         // Navigate to status screen
@@ -243,7 +246,7 @@ const SendView = ({route}: Props) => {
                 route.params.feeRate,
                 route.params.invoiceData,
                 route.params.wallet as TComboWallet,
-                new BigNumber(route.params.wallet.balance),
+                new BigNumber(route.params.wallet.balanceOnchain),
                 electrumServerURL,
                 (e: any) => {
                     conservativeAlert(
@@ -323,7 +326,11 @@ const SendView = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                '-mt-12 items-center w-full h-4/6 relative',
+                                `-mt-12 items-center w-full h-4/6 relative ${
+                                    isLightning && !hasMessage
+                                        ? 'justify-center'
+                                        : ''
+                                }`,
                             ),
                         ]}>
                         <View style={[tailwind('items-center')]}>
@@ -349,7 +356,7 @@ const SendView = ({route}: Props) => {
                             )}
                             {!isMax && (
                                 <FiatBalance
-                                    balance={sats}
+                                    balance={sats.toNumber()}
                                     loading={false}
                                     balanceFontSize={'text-4xl'}
                                     fontColor={ColorScheme.Text.Default}
