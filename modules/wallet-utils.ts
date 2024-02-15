@@ -476,13 +476,14 @@ export const normalizeExtKey = (xkey: string, key_type: string) => {
 };
 
 export const getMiniWallet = (wallet: TWalletType): TMiniWallet => {
-    const balance = wallet.balance.toNumber();
+    const balance = wallet.balance;
 
     return {
         name: wallet.name,
         type: wallet.type,
         network: wallet.network,
-        balance: balance,
+        balanceOnchain: balance.onchain.toNumber(),
+        balanceLightning: balance.lightning.toNumber(),
         privateDescriptor: wallet.privateDescriptor,
         externalDescriptor: wallet.externalDescriptor,
         internalDescriptor: wallet.internalDescriptor,
@@ -568,7 +569,7 @@ export const checkInvoiceAndWallet = (
     alert: any,
     singleMode: boolean,
 ) => {
-    const balance = new BigNumber(wallet.balance);
+    const balance = new BigNumber(wallet.balanceOnchain);
     const invoiceHasAmount = !!invoice?.options?.amount;
     const invoiceAmount = new BigNumber(Number(invoice?.options?.amount));
 
@@ -615,7 +616,9 @@ export const checkInvoiceAndWallet = (
     // Check balance if too broke
     if (
         invoiceHasAmount &&
-        invoiceAmount.multipliedBy(100000000).isGreaterThan(wallet.balance)
+        invoiceAmount
+            .multipliedBy(100000000)
+            .isGreaterThan(wallet.balanceOnchain)
     ) {
         alert(
             `Wallet balance insufficient, add funds to wallet ${

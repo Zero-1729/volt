@@ -16,7 +16,6 @@ import {
     TUtxo,
     TElectrumServerURLs,
     TNetwork,
-    TBalance,
     TAddressAmount,
     TComboWallet,
 } from '../types/wallet';
@@ -94,7 +93,7 @@ export const formatTXFromBDK = async (
     };
 
     // Returned formatted tx
-    return formattedTx;
+    return formattedTx as TTransaction;
 };
 
 // Test Electrum server connection
@@ -400,7 +399,7 @@ export const syncBdkWallet = async (
 // Fetch Wallet Balance using wallet descriptor, metas, and electrum server
 export const getBdkWalletBalance = async (
     wallet: BDK.Wallet,
-    oldBalance: TBalance,
+    oldBalance: BigNumber,
 ): Promise<{
     balance: BigNumber;
     updated: boolean;
