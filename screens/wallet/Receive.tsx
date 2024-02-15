@@ -374,7 +374,7 @@ const Receive = ({route}: Props) => {
                     <View
                         style={[
                             tailwind('absolute'),
-                            {bottom: bottomOffset.bottom},
+                            {bottom: bottomOffset.bottom - 6},
                         ]}>
                         {/* Share Button */}
                         <PlainButton
