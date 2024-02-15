@@ -144,6 +144,7 @@ export type WalletParamList = {
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
+        isLightning?: boolean;
         source: string;
     };
     TransactionDetails: {
