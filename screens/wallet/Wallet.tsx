@@ -96,8 +96,8 @@ const Wallet = ({route}: Props) => {
     const walletData = getWalletData(currentWalletID);
 
     // Get card color from wallet type
-    const CardColor =
-        ColorScheme.WalletColors[walletData.type][walletData.network];
+    const CardColor = ColorScheme.WalletColors[walletData.type][walletData.network];
+    const CardAccent = ColorScheme.WalletColors[walletData.type].accent;
 
     const walletName = walletData.name;
 
@@ -445,12 +445,9 @@ const Wallet = ({route}: Props) => {
                         {!hideSendButton && (
                             <View
                                 style={[
-                                    tailwind(
-                                        'rounded-full py-3 mr-4 w-1/2 opacity-60',
-                                    ),
+                                    tailwind('rounded-full py-3 mr-4 w-1/2'),
                                     {
-                                        backgroundColor:
-                                            ColorScheme.Background.Inverted,
+                                        backgroundColor: CardAccent,
                                     },
                                 ]}>
                                 <PlainButton
@@ -471,9 +468,8 @@ const Wallet = ({route}: Props) => {
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-base text-center font-bold',
+                                                'text-base text-white text-center font-bold',
                                             ),
-                                            {color: ColorScheme.Text.Alt},
                                         ]}>
                                         {capitalizeFirst(t('send'))}
                                     </Text>
@@ -485,11 +481,10 @@ const Wallet = ({route}: Props) => {
                                 tailwind(
                                     `rounded-full py-3 ${
                                         hideSendButton ? 'w-full' : 'w-1/2'
-                                    } opacity-60`,
+                                    }`,
                                 ),
                                 {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
+                                    backgroundColor: CardAccent,
                                 },
                             ]}>
                             <PlainButton
@@ -503,9 +498,8 @@ const Wallet = ({route}: Props) => {
                                 <Text
                                     style={[
                                         tailwind(
-                                            'text-base text-center font-bold',
+                                            'text-base text-white text-center font-bold',
                                         ),
-                                        {color: ColorScheme.Text.Alt},
                                     ]}>
                                     {capitalizeFirst(t('receive'))}
                                 </Text>
