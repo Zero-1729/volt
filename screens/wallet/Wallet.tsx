@@ -60,6 +60,9 @@ import {TBalance, TTransaction} from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
 
+import Swap from './../../components/swap';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
 const Wallet = ({route}: Props) => {
@@ -110,6 +113,17 @@ const Wallet = ({route}: Props) => {
         return w;
     }, []);
 
+    const bottomSwapRef = React.useRef<BottomSheetModal>(null);
+    const [openSwap, setOpenSwap] = useState(-1);
+
+    const openSwapModal = () => {
+        if (openSwap !== 1) {
+            bottomSwapRef.current?.present();
+        } else {
+            bottomSwapRef.current?.close();
+        }
+    };
+
     const walletTxs = walletData.transactions;
     // TODO: sort out displaying balance for unified
     // actually showing both balances and not picking
@@ -152,6 +166,8 @@ const Wallet = ({route}: Props) => {
             refreshWallet();
         }
     };
+
+    const handleSwap = async (swapType: string) => {};
 
     const syncWallet = useCallback(async () => {
         // initWallet only called one time
@@ -326,255 +342,310 @@ const Wallet = ({route}: Props) => {
                     {backgroundColor: CardColor},
                 ]}
             />
-            {/* adjust styling below to ensure content in View covers entire screen */}
-            {/* Adjust styling below to ensure it covers entire app height */}
-            <View
-                style={[
-                    tailwind('w-full h-full'),
-                    {backgroundColor: CardColor},
-                ]}>
-                {/* Top panel */}
+            <BottomSheetModalProvider>
+                {/* adjust styling below to ensure content in View covers entire screen */}
+                {/* Adjust styling below to ensure it covers entire app height */}
                 <View
                     style={[
-                        tailwind(
-                            `relative ${
-                                walletData.type === 'unified'
-                                    ? 'h-1/2'
-                                    : 'h-1/2'
-                            } items-center justify-center`,
-                        ),
+                        tailwind('w-full h-full'),
                         {backgroundColor: CardColor},
                     ]}>
+                    {/* Top panel */}
                     <View
                         style={[
                             tailwind(
-                                'absolute w-full top-2 flex-row items-center justify-between',
+                                `relative ${
+                                    walletData.type === 'unified'
+                                        ? 'h-1/2'
+                                        : 'h-1/2'
+                                } items-center justify-center`,
                             ),
+                            {backgroundColor: CardColor},
                         ]}>
-                        <PlainButton
-                            style={[tailwind('items-center flex-row left-6')]}
-                            onPress={() => {
-                                navigation.dispatch(
-                                    CommonActions.navigate('HomeScreen'),
-                                );
-                            }}>
-                            <Back style={tailwind('mr-2')} fill={'white'} />
-                        </PlainButton>
-
-                        <Text
-                            style={[
-                                tailwind(
-                                    'text-white self-center text-center w-1/2 font-bold',
-                                ),
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode={'middle'}>
-                            {walletName}
-                        </Text>
-
-                        <PlainButton
-                            style={[tailwind('right-6')]}
-                            onPress={() => {
-                                navigation.dispatch(
-                                    CommonActions.navigate({
-                                        name: 'WalletInfo',
-                                    }),
-                                );
-                            }}>
-                            <Dots width={32} fill={'white'} />
-                        </PlainButton>
-                    </View>
-
-                    {/* Watch-only */}
-                    {walletData.isWatchOnly && (
                         <View
                             style={[
                                 tailwind(
-                                    'absolute top-11 rounded-full bg-black opacity-50',
+                                    'absolute w-full top-2 flex-row items-center justify-between',
                                 ),
                             ]}>
+                            <PlainButton
+                                style={[
+                                    tailwind('items-center flex-row left-6'),
+                                ]}
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate('HomeScreen'),
+                                    );
+                                }}>
+                                <Back style={tailwind('mr-2')} fill={'white'} />
+                            </PlainButton>
+
                             <Text
                                 style={[
                                     tailwind(
-                                        'text-sm py-1 px-6 text-white font-bold',
+                                        'text-white self-center text-center w-1/2 font-bold',
+                                    ),
+                                ]}
+                                numberOfLines={1}
+                                ellipsizeMode={'middle'}>
+                                {walletName}
+                            </Text>
+
+                            <PlainButton
+                                style={[tailwind('right-6')]}
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'WalletInfo',
+                                        }),
+                                    );
+                                }}>
+                                <Dots width={32} fill={'white'} />
+                            </PlainButton>
+                        </View>
+
+                        {/* Watch-only */}
+                        {walletData.isWatchOnly && (
+                            <View
+                                style={[
+                                    tailwind(
+                                        'absolute top-11 rounded-full bg-black opacity-50',
                                     ),
                                 ]}>
-                                {t('watch_only')}
-                            </Text>
-                        </View>
-                    )}
+                                <Text
+                                    style={[
+                                        tailwind(
+                                            'text-sm py-1 px-6 text-white font-bold',
+                                        ),
+                                    ]}>
+                                    {t('watch_only')}
+                                </Text>
+                            </View>
+                        )}
 
-                    {/* Balance */}
-                    <View
-                        style={[
-                            tailwind(
-                                `items-center w-5/6 ${
-                                    hideTotalBalance ? '-mt-20' : '-mt-8'
-                                }`,
-                            ),
-                        ]}>
-                        {/* Balance component */}
+                        {/* Balance */}
                         <View
                             style={[
                                 tailwind(
-                                    `${
-                                        hideTotalBalance
-                                            ? 'absolute mt-8'
-                                            : 'items-center'
-                                    } w-full`,
+                                    `items-center w-5/6 ${
+                                        hideTotalBalance ? '-mt-20' : '-mt-8'
+                                    }`,
                                 ),
-                                {
-                                    marginTop:
-                                        walletData.type === 'unified' ? -86 : 0,
-                                },
                             ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm text-white opacity-60'),
-                                ]}>
-                                {!checkNetworkIsReachable(networkState)
-                                    ? t('offline_balance')
-                                    : t('current_balance')}
-                            </Text>
-                            <Balance
-                                fontColor={'white'}
-                                balance={
-                                    walletData.type === 'unified'
-                                        ? walletBalance
-                                        : walletData.balance.onchain
-                                }
-                                balanceFontSize={'text-3xl'}
-                                disableFiat={false}
-                                loading={loadingBalance}
-                            />
-                        </View>
-                    </View>
-
-                    {/* Combined balance for unified wallets */}
-                    {walletData.type === 'unified' && (
-                        <>
+                            {/* Balance component */}
                             <View
                                 style={[
-                                    tailwind('absolute w-5/6'),
-                                    styles.bottomConverter,
+                                    tailwind(
+                                        `${
+                                            hideTotalBalance
+                                                ? 'absolute mt-8'
+                                                : 'items-center'
+                                        } w-full`,
+                                    ),
+                                    {
+                                        marginTop:
+                                            walletData.type === 'unified'
+                                                ? -86
+                                                : 0,
+                                    },
                                 ]}>
-                                <View style={[tailwind('w-full items-start')]}>
-                                    <View
-                                        style={[
-                                            tailwind(
-                                                'w-full flex-row items-center justify-between opacity-60',
-                                            ),
-                                        ]}>
-                                        <Text
-                                            style={[
-                                                tailwind('text-sm text-white'),
-                                            ]}>
-                                            Lightning
-                                        </Text>
-                                        <Balance
-                                            disabled={true}
-                                            fontColor={'white'}
-                                            balance={
-                                                walletData.balance.lightning
-                                            }
-                                            balanceFontSize={'text-lg'}
-                                            disableFiat={false}
-                                            loading={loadingBalance}
-                                        />
-                                    </View>
-                                </View>
-
-                                <View
+                                <Text
                                     style={[
                                         tailwind(
-                                            'w-full flex-row items-center justify-between',
+                                            'text-sm text-white opacity-60',
                                         ),
+                                    ]}>
+                                    {!checkNetworkIsReachable(networkState)
+                                        ? t('offline_balance')
+                                        : t('current_balance')}
+                                </Text>
+                                <Balance
+                                    fontColor={'white'}
+                                    balance={
+                                        walletData.type === 'unified'
+                                            ? walletBalance
+                                            : walletData.balance.onchain
+                                    }
+                                    balanceFontSize={'text-3xl'}
+                                    disableFiat={false}
+                                    loading={loadingBalance}
+                                />
+                            </View>
+                        </View>
+
+                        {/* Combined balance for unified wallets */}
+                        {walletData.type === 'unified' && (
+                            <>
+                                <View
+                                    style={[
+                                        tailwind('absolute w-5/6'),
+                                        styles.bottomConverter,
                                     ]}>
                                     <View
                                         style={[
-                                            tailwind('w-1/3 opacity-20'),
-                                            styles.divider,
-                                        ]}
-                                    />
-
-                                    <View
-                                        style={[
-                                            tailwind(
-                                                'rounded-full items-center px-6 py-2',
-                                            ),
-                                            {
-                                                backgroundColor: CardAccent,
-                                            },
+                                            tailwind('w-full items-start'),
                                         ]}>
-                                        <PlainButton>
-                                            <SwapIcon fill={'white'} />
-                                        </PlainButton>
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'w-full flex-row items-center justify-between opacity-60',
+                                                ),
+                                            ]}>
+                                            <Text
+                                                style={[
+                                                    tailwind(
+                                                        'text-sm text-white',
+                                                    ),
+                                                ]}>
+                                                Lightning
+                                            </Text>
+                                            <Balance
+                                                disabled={true}
+                                                fontColor={'white'}
+                                                balance={
+                                                    walletData.balance.lightning
+                                                }
+                                                balanceFontSize={'text-lg'}
+                                                disableFiat={false}
+                                                loading={loadingBalance}
+                                            />
+                                        </View>
                                     </View>
 
                                     <View
                                         style={[
-                                            tailwind('w-1/3 opacity-20'),
-                                            styles.divider,
-                                        ]}
-                                    />
-                                </View>
-
-                                <View style={[tailwind('w-full items-start')]}>
-                                    <View
-                                        style={[
                                             tailwind(
-                                                'w-full flex-row items-center justify-between opacity-60',
+                                                'w-full flex-row items-center justify-between',
                                             ),
                                         ]}>
-                                        <Text
+                                        <View
                                             style={[
-                                                tailwind('text-sm text-white'),
-                                            ]}>
-                                            On-chain
-                                        </Text>
+                                                tailwind('w-1/3 opacity-20'),
+                                                styles.divider,
+                                            ]}
+                                        />
 
-                                        <Balance
-                                            disabled={true}
-                                            fontColor={'white'}
-                                            balance={walletData.balance.onchain}
-                                            balanceFontSize={'text-lg'}
-                                            disableFiat={false}
-                                            loading={loadingBalance}
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'rounded-full items-center px-6 py-2',
+                                                ),
+                                                {
+                                                    backgroundColor: CardAccent,
+                                                },
+                                            ]}>
+                                            <PlainButton
+                                                onPress={openSwapModal}>
+                                                <SwapIcon fill={'white'} />
+                                            </PlainButton>
+                                        </View>
+
+                                        <View
+                                            style={[
+                                                tailwind('w-1/3 opacity-20'),
+                                                styles.divider,
+                                            ]}
                                         />
                                     </View>
-                                </View>
-                            </View>
-                        </>
-                    )}
 
-                    {/* Send and receive */}
-                    <View
-                        style={[
-                            tailwind(
-                                'absolute bottom-6 w-full items-center px-4 justify-around flex-row',
-                            ),
-                        ]}>
-                        {/* Hide send if Balance is empty or it is a watch-only wallet */}
-                        {!hideSendButton && (
+                                    <View
+                                        style={[
+                                            tailwind('w-full items-start'),
+                                        ]}>
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'w-full flex-row items-center justify-between opacity-60',
+                                                ),
+                                            ]}>
+                                            <Text
+                                                style={[
+                                                    tailwind(
+                                                        'text-sm text-white',
+                                                    ),
+                                                ]}>
+                                                On-chain
+                                            </Text>
+
+                                            <Balance
+                                                disabled={true}
+                                                fontColor={'white'}
+                                                balance={
+                                                    walletData.balance.onchain
+                                                }
+                                                balanceFontSize={'text-lg'}
+                                                disableFiat={false}
+                                                loading={loadingBalance}
+                                            />
+                                        </View>
+                                    </View>
+                                </View>
+                            </>
+                        )}
+
+                        {/* Send and receive */}
+                        <View
+                            style={[
+                                tailwind(
+                                    'absolute bottom-6 w-full items-center px-4 justify-around flex-row',
+                                ),
+                            ]}>
+                            {/* Hide send if Balance is empty or it is a watch-only wallet */}
+                            {!hideSendButton && (
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'rounded-full py-3 mr-4 w-1/2',
+                                        ),
+                                        {
+                                            backgroundColor: CardAccent,
+                                        },
+                                    ]}>
+                                    <PlainButton
+                                        onPress={() => {
+                                            const miniwallet =
+                                                getMiniWallet(walletData);
+
+                                            navigation.dispatch(
+                                                CommonActions.navigate(
+                                                    'ScanRoot',
+                                                    {
+                                                        screen: 'Scan',
+                                                        params: {
+                                                            screen: 'send',
+                                                            wallet: miniwallet,
+                                                        },
+                                                    },
+                                                ),
+                                            );
+                                        }}>
+                                        <Text
+                                            style={[
+                                                tailwind(
+                                                    'text-base text-white text-center font-bold',
+                                                ),
+                                            ]}>
+                                            {capitalizeFirst(t('send'))}
+                                        </Text>
+                                    </PlainButton>
+                                </View>
+                            )}
                             <View
                                 style={[
-                                    tailwind('rounded-full py-3 mr-4 w-1/2'),
+                                    tailwind(
+                                        `rounded-full py-3 ${
+                                            hideSendButton ? 'w-full' : 'w-1/2'
+                                        }`,
+                                    ),
                                     {
                                         backgroundColor: CardAccent,
                                     },
                                 ]}>
                                 <PlainButton
                                     onPress={() => {
-                                        const miniwallet =
-                                            getMiniWallet(walletData);
-
                                         navigation.dispatch(
-                                            CommonActions.navigate('ScanRoot', {
-                                                screen: 'Scan',
-                                                params: {
-                                                    screen: 'send',
-                                                    wallet: miniwallet,
-                                                },
+                                            CommonActions.navigate({
+                                                name: 'RequestAmount',
                                             }),
                                         );
                                     }}>
@@ -584,152 +655,139 @@ const Wallet = ({route}: Props) => {
                                                 'text-base text-white text-center font-bold',
                                             ),
                                         ]}>
-                                        {capitalizeFirst(t('send'))}
+                                        {capitalizeFirst(t('receive'))}
                                     </Text>
                                 </PlainButton>
                             </View>
-                        )}
-                        <View
-                            style={[
-                                tailwind(
-                                    `rounded-full py-3 ${
-                                        hideSendButton ? 'w-full' : 'w-1/2'
-                                    }`,
-                                ),
-                                {
-                                    backgroundColor: CardAccent,
-                                },
-                            ]}>
-                            <PlainButton
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'RequestAmount',
-                                        }),
-                                    );
-                                }}>
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-base text-white text-center font-bold',
-                                        ),
-                                    ]}>
-                                    {capitalizeFirst(t('receive'))}
-                                </Text>
-                            </PlainButton>
                         </View>
                     </View>
-                </View>
 
-                {/* Transactions List */}
-                <View
-                    style={[
-                        styles.transactionList,
-                        tailwind(
-                            `${
-                                walletData.type === 'unified'
-                                    ? 'h-1/2'
-                                    : 'h-1/2'
-                            } w-full items-center z-10`,
-                        ),
-                        {
-                            backgroundColor: ColorScheme.Background.Primary,
-                        },
-                    ]}>
-                    <View style={[tailwind('mt-6 w-11/12')]}>
-                        <VText
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right' ? 'mr-4' : 'ml-4'
-                                    } text-base font-bold`,
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {capitalizeFirst(t('transactions'))}
-                        </VText>
-                    </View>
-
+                    {/* Transactions List */}
                     <View
-                        style={[tailwind('w-full h-full items-center pb-10')]}>
-                        <FlatList
-                            refreshing={refreshing}
-                            onRefresh={jointSync}
-                            scrollEnabled={true}
+                        style={[
+                            styles.transactionList,
+                            tailwind(
+                                `${
+                                    walletData.type === 'unified'
+                                        ? 'h-1/2'
+                                        : 'h-1/2'
+                                } w-full items-center z-10`,
+                            ),
+                            {
+                                backgroundColor: ColorScheme.Background.Primary,
+                            },
+                        ]}>
+                        <View style={[tailwind('mt-6 w-11/12')]}>
+                            <VText
+                                style={[
+                                    tailwind(
+                                        `${
+                                            langDir === 'right'
+                                                ? 'mr-4'
+                                                : 'ml-4'
+                                        } text-base font-bold`,
+                                    ),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {capitalizeFirst(t('transactions'))}
+                            </VText>
+                        </View>
+
+                        <View
                             style={[
-                                tailwind(
-                                    `${
-                                        walletTxs.length > 0
-                                            ? 'w-11/12'
-                                            : 'w-full'
-                                    } mt-2 z-30`,
-                                ),
-                            ]}
-                            contentContainerStyle={[
-                                tailwind(
-                                    `${
-                                        walletTxs.length > 0 ? '' : 'h-full'
-                                    } items-center`,
-                                ),
-                            ]}
-                            data={walletTxs.sort(
-                                (a: TTransaction, b: TTransaction) => {
-                                    return +b.timestamp - +a.timestamp;
-                                },
-                            )}
-                            renderItem={item => {
-                                return (
-                                    <UnifiedTransactionListItem
-                                        callback={() => {
-                                            navigation.dispatch(
-                                                CommonActions.navigate({
-                                                    name: 'TransactionDetails',
-                                                    params: {
-                                                        tx: {...item.item},
-                                                        source: 'conservative',
-                                                        walletId:
-                                                            currentWalletID,
-                                                    },
-                                                }),
-                                            );
-                                        }}
-                                        tx={item.item}
-                                    />
-                                );
-                            }}
-                            keyExtractor={item =>
-                                item.txid ? item.txid : item.id
-                            }
-                            initialNumToRender={25}
-                            contentInsetAdjustmentBehavior="automatic"
-                            ListEmptyComponent={
-                                <View
-                                    style={[
-                                        tailwind(
-                                            'w-4/5 h-5/6 items-center justify-center',
-                                        ),
-                                    ]}>
-                                    <Box
-                                        width={32}
-                                        fill={ColorScheme.SVG.GrayFill}
-                                        style={tailwind('mb-4 -mt-6')}
-                                    />
-                                    <Text
+                                tailwind('w-full h-full items-center pb-10'),
+                            ]}>
+                            <FlatList
+                                refreshing={refreshing}
+                                onRefresh={jointSync}
+                                scrollEnabled={true}
+                                style={[
+                                    tailwind(
+                                        `${
+                                            walletTxs.length > 0
+                                                ? 'w-11/12'
+                                                : 'w-full'
+                                        } mt-2 z-30`,
+                                    ),
+                                ]}
+                                contentContainerStyle={[
+                                    tailwind(
+                                        `${
+                                            walletTxs.length > 0 ? '' : 'h-full'
+                                        } items-center`,
+                                    ),
+                                ]}
+                                data={walletTxs.sort(
+                                    (a: TTransaction, b: TTransaction) => {
+                                        return +b.timestamp - +a.timestamp;
+                                    },
+                                )}
+                                renderItem={item => {
+                                    return (
+                                        <UnifiedTransactionListItem
+                                            callback={() => {
+                                                navigation.dispatch(
+                                                    CommonActions.navigate({
+                                                        name: 'TransactionDetails',
+                                                        params: {
+                                                            tx: {...item.item},
+                                                            source: 'conservative',
+                                                            walletId:
+                                                                currentWalletID,
+                                                        },
+                                                    }),
+                                                );
+                                            }}
+                                            tx={item.item}
+                                        />
+                                    );
+                                }}
+                                keyExtractor={item =>
+                                    item.txid ? item.txid : item.id
+                                }
+                                initialNumToRender={25}
+                                contentInsetAdjustmentBehavior="automatic"
+                                ListEmptyComponent={
+                                    <View
                                         style={[
-                                            tailwind('w-full text-center'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
+                                            tailwind(
+                                                'w-4/5 h-5/6 items-center justify-center',
+                                            ),
                                         ]}>
-                                        {t('no_transactions_text')}
-                                    </Text>
-                                </View>
-                            }
-                        />
+                                        <Box
+                                            width={32}
+                                            fill={ColorScheme.SVG.GrayFill}
+                                            style={tailwind('mb-4 -mt-6')}
+                                        />
+                                        <Text
+                                            style={[
+                                                tailwind('w-full text-center'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .GrayedText,
+                                                },
+                                            ]}>
+                                            {t('no_transactions_text')}
+                                        </Text>
+                                    </View>
+                                }
+                            />
+                        </View>
+
+                        {walletData.type === 'unified' && (
+                            <View style={[tailwind('absolute bottom-0')]}>
+                                <Swap
+                                    swapRef={bottomSwapRef}
+                                    triggerSwap={handleSwap}
+                                    onSelectSwap={idx => {
+                                        setOpenSwap(idx);
+                                    }}
+                                />
+                            </View>
+                        )}
                     </View>
                 </View>
-            </View>
+            </BottomSheetModalProvider>
         </SafeAreaView>
     );
 };
