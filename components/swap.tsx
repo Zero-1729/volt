@@ -29,7 +29,7 @@ type SwapProps = {
 
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
-    const snapPoints = useMemo(() => ['40'], []);
+    const snapPoints = useMemo(() => ['45'], []);
     const [selected, setSelected] = React.useState<SwapType>(SwapType.SwapIn);
 
     const {t} = useTranslation('wallet');
@@ -125,7 +125,7 @@ const Swap = (props: SwapProps) => {
                     <View
                         style={[
                             tailwind('w-4/5 absolute'),
-                            {bottom: NativeWindowMetrics.bottom + 32},
+                            {bottom: NativeWindowMetrics.bottom + 24},
                         ]}>
                         <LongButton
                             title={capitalizeFirst(t('swap'))}
