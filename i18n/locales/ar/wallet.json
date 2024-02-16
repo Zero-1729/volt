@@ -112,5 +112,9 @@
     "payment_received": "تم استلام المبلغ",
     "payment_success": "ارسلت الدفعه",
     "payment_failed": "عملية الدفع فشلت",
-    "invoice_description": "وصف الفاتورة"
+    "invoice_description": "وصف الفاتورة",
+    "swap_in": "مبادلة في",
+    "swap_out": "مبادلة خارج",
+    "swap_in_message": "تحويل الأموال من رصيد السلسلة إلى البرق",
+    "swap_out_message": "تحويل الأموال من البرق إلى رصيد السلسلة"
 }

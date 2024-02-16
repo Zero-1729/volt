@@ -113,5 +113,9 @@
     "payment_received": "Received Payment",
     "payment_success": "Payment Sent",
     "payment_failed": "Payment Failed",
-    "invoice_description": "Description"
+    "invoice_description": "Description",
+    "swap_in": "Swap In",
+    "swap_out": "Swap Out",
+    "swap_in_message": "Transfer money from on chain balance into Lightning",
+    "swap_out_message": "Transfer money from lightning to on chain balance"
 }
