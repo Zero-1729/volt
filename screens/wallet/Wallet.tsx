@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React, {useCallback, useContext, useEffect, useState} from 'react';
@@ -34,6 +35,7 @@ import Color from '../../constants/Color';
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
+import SwapIcon from '../../assets/svg/arrow-switch-16.svg';
 
 import {getBdkWalletBalance, createBDKWallet} from '../../modules/bdk';
 import {syncBDKWallet, fetchOnchainTransactions} from '../../modules/shared';
@@ -96,7 +98,8 @@ const Wallet = ({route}: Props) => {
     const walletData = getWalletData(currentWalletID);
 
     // Get card color from wallet type
-    const CardColor = ColorScheme.WalletColors[walletData.type][walletData.network];
+    const CardColor =
+        ColorScheme.WalletColors[walletData.type][walletData.network];
     const CardAccent = ColorScheme.WalletColors[walletData.type].accent;
 
     const walletName = walletData.name;
@@ -333,7 +336,13 @@ const Wallet = ({route}: Props) => {
                 {/* Top panel */}
                 <View
                     style={[
-                        tailwind('relative h-1/2 items-center justify-center'),
+                        tailwind(
+                            `relative ${
+                                walletData.type === 'unified'
+                                    ? 'h-1/2'
+                                    : 'h-1/2'
+                            } items-center justify-center`,
+                        ),
                         {backgroundColor: CardColor},
                     ]}>
                     <View
@@ -404,15 +413,6 @@ const Wallet = ({route}: Props) => {
                                 }`,
                             ),
                         ]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm text-white opacity-60 mb-2'),
-                            ]}>
-                            {!checkNetworkIsReachable(networkState)
-                                ? t('offline_balance')
-                                : t('current_balance')}
-                        </Text>
-
                         {/* Balance component */}
                         <View
                             style={[
@@ -423,16 +423,129 @@ const Wallet = ({route}: Props) => {
                                             : 'items-center'
                                     } w-full`,
                                 ),
+                                {
+                                    marginTop:
+                                        walletData.type === 'unified' ? -86 : 0,
+                                },
                             ]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm text-white opacity-60'),
+                                ]}>
+                                {!checkNetworkIsReachable(networkState)
+                                    ? t('offline_balance')
+                                    : t('current_balance')}
+                            </Text>
                             <Balance
                                 fontColor={'white'}
-                                balance={walletBalance}
-                                balanceFontSize={'text-4xl'}
+                                balance={
+                                    walletData.type === 'unified'
+                                        ? walletBalance
+                                        : walletData.balance.onchain
+                                }
+                                balanceFontSize={'text-3xl'}
                                 disableFiat={false}
                                 loading={loadingBalance}
                             />
                         </View>
                     </View>
+
+                    {/* Combined balance for unified wallets */}
+                    {walletData.type === 'unified' && (
+                        <>
+                            <View
+                                style={[
+                                    tailwind('absolute w-5/6'),
+                                    styles.bottomConverter,
+                                ]}>
+                                <View style={[tailwind('w-full items-start')]}>
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'w-full flex-row items-center justify-between opacity-60',
+                                            ),
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm text-white'),
+                                            ]}>
+                                            Lightning
+                                        </Text>
+                                        <Balance
+                                            disabled={true}
+                                            fontColor={'white'}
+                                            balance={
+                                                walletData.balance.lightning
+                                            }
+                                            balanceFontSize={'text-lg'}
+                                            disableFiat={false}
+                                            loading={loadingBalance}
+                                        />
+                                    </View>
+                                </View>
+
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'w-full flex-row items-center justify-between',
+                                        ),
+                                    ]}>
+                                    <View
+                                        style={[
+                                            tailwind('w-1/3 opacity-20'),
+                                            styles.divider,
+                                        ]}
+                                    />
+
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'rounded-full items-center px-6 py-2',
+                                            ),
+                                            {
+                                                backgroundColor: CardAccent,
+                                            },
+                                        ]}>
+                                        <PlainButton>
+                                            <SwapIcon fill={'white'} />
+                                        </PlainButton>
+                                    </View>
+
+                                    <View
+                                        style={[
+                                            tailwind('w-1/3 opacity-20'),
+                                            styles.divider,
+                                        ]}
+                                    />
+                                </View>
+
+                                <View style={[tailwind('w-full items-start')]}>
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'w-full flex-row items-center justify-between opacity-60',
+                                            ),
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm text-white'),
+                                            ]}>
+                                            On-chain
+                                        </Text>
+
+                                        <Balance
+                                            disabled={true}
+                                            fontColor={'white'}
+                                            balance={walletData.balance.onchain}
+                                            balanceFontSize={'text-lg'}
+                                            disableFiat={false}
+                                            loading={loadingBalance}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
+                        </>
+                    )}
 
                     {/* Send and receive */}
                     <View
@@ -512,7 +625,13 @@ const Wallet = ({route}: Props) => {
                 <View
                     style={[
                         styles.transactionList,
-                        tailwind('h-1/2 w-full items-center z-10'),
+                        tailwind(
+                            `${
+                                walletData.type === 'unified'
+                                    ? 'h-1/2'
+                                    : 'h-1/2'
+                            } w-full items-center z-10`,
+                        ),
                         {
                             backgroundColor: ColorScheme.Background.Primary,
                         },
@@ -624,5 +743,12 @@ const styles = StyleSheet.create({
     transactionList: {
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
+    },
+    bottomConverter: {
+        bottom: 98,
+    },
+    divider: {
+        height: 1,
+        backgroundColor: 'black',
     },
 });
