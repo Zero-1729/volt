@@ -381,6 +381,7 @@ const _generateAddress = (
 
             address = P2WPKHData.address;
             break;
+        case 'unified':
         case 'p2tr':
             // Initialize ecc library
             bitcoin.initEccLib(ecc);
