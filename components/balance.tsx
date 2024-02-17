@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
@@ -15,7 +15,7 @@ import {AppStorageContext} from '../class/storageContext';
 import Color from '../constants/Color';
 import Font from '../constants/Font';
 
-import {formatSats, formatBTC, SATS_TO_BTC_RATE} from '../modules/transform';
+import {formatSats, formatBTC} from '../modules/transform';
 
 import {normalizeFiat} from '../modules/transform';
 
@@ -409,6 +409,8 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
+    const {appFiatCurrency} = useContext(AppStorageContext);
+
     return (
         <View
             style={[
@@ -420,7 +422,7 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
                     {color: ColorScheme.Text.Default},
                 ]}>
                 {props.isApprox ? '~' : ''}
-                {props.symbol}
+                {appFiatCurrency.symbol}
             </Text>
             <Text
                 style={[
