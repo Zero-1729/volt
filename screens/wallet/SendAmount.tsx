@@ -93,11 +93,7 @@ const SendAmount = ({route}: Props) => {
         symbol: 'sats',
         name: 'sats',
     });
-    const [fiatAmount, setFiatAmount] = useState<DisplayUnit>({
-        value: new BigNumber(0),
-        symbol: appFiatCurrency.symbol,
-        name: appFiatCurrency.short,
-    });
+    const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
     const walletBalance = new BigNumber(
         route.params.isLightning
@@ -123,11 +119,7 @@ const SendAmount = ({route}: Props) => {
             name: 'sats',
         });
 
-        setFiatAmount({
-            value: calculateFiatEquivalent(maxSats),
-            symbol: appFiatCurrency.symbol,
-            name: appFiatCurrency.short,
-        });
+        setFiatAmount(calculateFiatEquivalent(maxSats));
     };
 
     const updateAmount = (value: string) => {
@@ -149,14 +141,11 @@ const SendAmount = ({route}: Props) => {
             name: 'sats',
         });
 
-        setFiatAmount({
-            value:
-                bottomUnit.name !== 'sats'
-                    ? new BigNumber(value || 0)
-                    : calculateFiatEquivalent(value),
-            symbol: appFiatCurrency.symbol,
-            name: appFiatCurrency.short,
-        });
+        setFiatAmount(
+            bottomUnit.name !== 'sats'
+                ? new BigNumber(value || 0)
+                : calculateFiatEquivalent(value),
+        );
     };
 
     const calculateSatsEquivalent = (value: string): string => {
@@ -217,10 +206,9 @@ const SendAmount = ({route}: Props) => {
         return (
             <>
                 <DisplayFiatAmount
-                    amount={formatFiat(fiatAmount.value)}
+                    amount={formatFiat(fiatAmount)}
                     isApprox={topUnit?.name !== 'sats' && amount.length > 0}
                     fontSize={fontSize}
-                    symbol={fiatAmount?.symbol}
                 />
             </>
         );
@@ -258,7 +246,6 @@ const SendAmount = ({route}: Props) => {
                 amount={fiatBalance}
                 fontSize={fontSize}
                 isApprox={topUnit?.name !== 'sats' && amount.length > 0}
-                symbol={fiatAmount?.symbol}
             />
         );
     };

@@ -79,7 +79,7 @@ const Receive = ({route}: Props) => {
 
     const {t} = useTranslation('wallet');
 
-    const {currentWalletID, getWalletData, appFiatCurrency, isAdvancedMode} =
+    const {currentWalletID, getWalletData, isAdvancedMode} =
         useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
 
@@ -288,7 +288,6 @@ const Receive = ({route}: Props) => {
                                         route.params.amount !==
                                         state.fiatValue.toString()
                                     }
-                                    symbol={appFiatCurrency.symbol}
                                 />
                             </View>
                         </View>

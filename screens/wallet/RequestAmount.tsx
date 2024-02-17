@@ -73,11 +73,7 @@ const RequestAmount = () => {
         symbol: 'sats',
         name: 'sats',
     });
-    const [fiatAmount, setFiatAmount] = useState<DisplayUnit>({
-        value: new BigNumber(0),
-        symbol: appFiatCurrency.symbol,
-        name: appFiatCurrency.short,
-    });
+    const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
     const updateAmount = (value: string) => {
         // When newly swapped, the value is reset to new number from user
@@ -98,14 +94,11 @@ const RequestAmount = () => {
             name: 'sats',
         });
 
-        setFiatAmount({
-            value:
-                bottomUnit.name !== 'sats'
-                    ? new BigNumber(value || 0)
-                    : calculateFiatEquivalent(value),
-            symbol: appFiatCurrency.symbol,
-            name: appFiatCurrency.short,
-        });
+        setFiatAmount(
+            bottomUnit.name !== 'sats'
+                ? new BigNumber(value || 0)
+                : calculateFiatEquivalent(value),
+        );
     };
 
     const calculateSatsEquivalent = (value: string): string => {
@@ -166,10 +159,9 @@ const RequestAmount = () => {
         return (
             <>
                 <DisplayFiatAmount
-                    amount={formatFiat(fiatAmount.value)}
+                    amount={formatFiat(fiatAmount)}
                     isApprox={topUnit?.name !== 'sats' && amount.length > 0}
                     fontSize={fontSize}
-                    symbol={fiatAmount?.symbol}
                 />
             </>
         );
@@ -225,7 +217,7 @@ const RequestAmount = () => {
                 name: 'Receive',
                 params: {
                     sats: satsAmount.value.toString(),
-                    fiat: fiatAmount.value.toString(),
+                    fiat: fiatAmount.toString(),
                     amount: amount,
                 },
             }),
