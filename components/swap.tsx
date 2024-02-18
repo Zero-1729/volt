@@ -15,6 +15,7 @@ import {capitalizeFirst} from '../modules/transform';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 import CheckIcon from '../assets/svg/check-circle-fill-16.svg';
+import BigNumber from 'bignumber.js';
 
 enum SwapType {
     SwapIn = 'swap_in',
@@ -25,12 +26,26 @@ type SwapProps = {
     swapRef: React.RefObject<BottomSheetModal>;
     onSelectSwap: (idx: number) => void;
     triggerSwap: (swapType: string) => void;
+    lightningBalance: BigNumber;
+    onchainBalance: BigNumber;
+    onchainMinimum: BigNumber;
+    lightningMinimum: BigNumber;
 };
 
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['45'], []);
-    const [selected, setSelected] = React.useState<SwapType>(SwapType.SwapIn);
+    const onchainBroke =
+        props.onchainBalance.isLessThan(props.onchainMinimum) ||
+        props.onchainBalance.isZero();
+
+    const lightningBroke =
+        props.lightningBalance.isLessThan(props.lightningMinimum) ||
+        props.lightningBalance.isZero();
+
+    const [selected, setSelected] = React.useState<SwapType>(
+        onchainBroke ? SwapType.SwapOut : SwapType.SwapIn,
+    );
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -55,14 +70,21 @@ const Swap = (props: SwapProps) => {
                 <View style={[tailwind('w-full px-2 h-full items-center')]}>
                     {/* Swap In */}
                     <PlainButton
+                        disabled={onchainBroke}
                         onPress={() => {
-                            setSelected(SwapType.SwapIn);
+                            if (!onchainBroke) {
+                                setSelected(SwapType.SwapIn);
+                            }
                         }}
                         style={[
                             tailwind(
-                                'items-center p-4 mt-2 w-full mb-4 border rounded-md',
+                                `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
+                                    onchainBroke ? 'opacity-60' : 'opacity-100'
+                                }`,
                             ),
-                            {borderColor: ColorScheme.Background.Greyed},
+                            {
+                                borderColor: ColorScheme.Background.Greyed,
+                            },
                         ]}>
                         <View
                             style={[
@@ -107,12 +129,19 @@ const Swap = (props: SwapProps) => {
 
                     {/* Swap Out */}
                     <PlainButton
+                        disabled={lightningBroke}
                         onPress={() => {
-                            setSelected(SwapType.SwapOut);
+                            if (!lightningBroke) {
+                                setSelected(SwapType.SwapOut);
+                            }
                         }}
                         style={[
                             tailwind(
-                                'items-center p-4 w-full border rounded-md',
+                                `items-center p-4 w-full border rounded-md ${
+                                    lightningBroke
+                                        ? 'opacity-60'
+                                        : 'opacity-100'
+                                }`,
                             ),
                             {borderColor: ColorScheme.Background.Greyed},
                         ]}>
