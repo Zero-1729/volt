@@ -777,6 +777,10 @@ const Wallet = ({route}: Props) => {
                         {walletData.type === 'unified' && (
                             <View style={[tailwind('absolute bottom-0')]}>
                                 <Swap
+                                    lightningBalance={
+                                        walletData.balance.lightning
+                                    }
+                                    onchainBalance={walletData.balance.onchain}
                                     swapRef={bottomSwapRef}
                                     triggerSwap={handleSwap}
                                     onSelectSwap={idx => {
