@@ -32,7 +32,8 @@ const Swap = (props: SwapProps) => {
     const snapPoints = useMemo(() => ['45'], []);
     const [selected, setSelected] = React.useState<SwapType>(SwapType.SwapIn);
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const ColorScheme = Color(useColorScheme());
 
@@ -63,7 +64,16 @@ const Swap = (props: SwapProps) => {
                             ),
                             {borderColor: ColorScheme.Background.Greyed},
                         ]}>
-                        <View style={[tailwind('w-full flex-row')]}>
+                        <View
+                            style={[
+                                tailwind(
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }`,
+                                ),
+                            ]}>
                             <VText
                                 style={[
                                     tailwind('text-sm font-semibold'),
@@ -73,7 +83,15 @@ const Swap = (props: SwapProps) => {
                             </VText>
                             {selected === SwapType.SwapIn && (
                                 <CheckIcon
-                                    style={[tailwind('ml-2')]}
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : 'ml-2'
+                                            }`,
+                                        ),
+                                    ]}
                                     fill={ColorScheme.Text.Default}
                                 />
                             )}
@@ -98,7 +116,16 @@ const Swap = (props: SwapProps) => {
                             ),
                             {borderColor: ColorScheme.Background.Greyed},
                         ]}>
-                        <View style={[tailwind('w-full flex-row')]}>
+                        <View
+                            style={[
+                                tailwind(
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }`,
+                                ),
+                            ]}>
                             <VText
                                 style={[
                                     tailwind('text-sm font-semibold'),
@@ -108,7 +135,15 @@ const Swap = (props: SwapProps) => {
                             </VText>
                             {selected === SwapType.SwapOut && (
                                 <CheckIcon
-                                    style={[tailwind('ml-2')]}
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : 'ml-2'
+                                            }`,
+                                        ),
+                                    ]}
                                     fill={ColorScheme.Text.Default}
                                 />
                             )}
