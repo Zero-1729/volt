@@ -163,7 +163,7 @@ const Swap = (props: SwapProps) => {
                             {bottom: NativeWindowMetrics.bottom + 24},
                         ]}>
                         <LongButton
-                            title={capitalizeFirst(t('swap'))}
+                            title={capitalizeFirst(t('continue'))}
                             onPress={() => {
                                 props.triggerSwap(selected);
                             }}
