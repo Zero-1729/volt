@@ -13,6 +13,10 @@ import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 import {capitalizeFirst} from '../modules/transform';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
+import {
+    ONCHAIN_SWAP_BALANCE_MIN,
+    LIGHTNING_SWAP_BALANCE_MIN,
+} from '../modules/wallet-defaults';
 
 import CheckIcon from '../assets/svg/check-circle-fill-16.svg';
 import BigNumber from 'bignumber.js';
@@ -26,21 +30,19 @@ type SwapProps = {
     swapRef: React.RefObject<BottomSheetModal>;
     onSelectSwap: (idx: number) => void;
     triggerSwap: (swapType: string) => void;
-    lightningBalance: BigNumber;
     onchainBalance: BigNumber;
-    onchainMinimum: BigNumber;
-    lightningMinimum: BigNumber;
+    lightningBalance: BigNumber;
 };
 
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['45'], []);
     const onchainBroke =
-        props.onchainBalance.isLessThan(props.onchainMinimum) ||
+        props.onchainBalance.isLessThan(ONCHAIN_SWAP_BALANCE_MIN) ||
         props.onchainBalance.isZero();
 
     const lightningBroke =
-        props.lightningBalance.isLessThan(props.lightningMinimum) ||
+        props.lightningBalance.isLessThan(LIGHTNING_SWAP_BALANCE_MIN) ||
         props.lightningBalance.isZero();
 
     const [selected, setSelected] = React.useState<SwapType>(
