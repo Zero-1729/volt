@@ -167,7 +167,16 @@ const Wallet = ({route}: Props) => {
         }
     };
 
-    const handleSwap = async (swapType: string) => {};
+    const handleSwap = async (swapType: string) => {
+        if (swapType === 'swap_in') {
+            // const feeInfo = await openChannelFee();
+            const swapInfo = await receiveOnchain({});
+
+            console.log('swap info: ', swapInfo);
+        } else {
+            console.log('unhandled swap type: ', swapType);
+        }
+    };
 
     const syncWallet = useCallback(async () => {
         // initWallet only called one time
