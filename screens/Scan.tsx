@@ -23,6 +23,8 @@ import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
+import Toast, { ToastConfig } from 'react-native-toast-message';
+
 import {useTranslation} from 'react-i18next';
 
 import decodeURI from 'bip21';
@@ -51,6 +53,7 @@ import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst, convertBTCtoSats} from '../modules/transform';
+import {toastConfig} from '../components/toast';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -227,7 +230,12 @@ const Scan = ({route}: Props) => {
                 invoiceType.type === 'lightning'
             )
         ) {
-            updateScannerAlert(e('unsupported_invoice_type'));
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: t('Scanner'),
+                text2: e('unsupported_invoice_type'),
+            });
             return {decodedInvoice: null, isOnchain: null};
         }
 
@@ -247,11 +255,21 @@ const Scan = ({route}: Props) => {
                         isOnchain: false,
                     };
                 } catch (err: any) {
-                    updateScannerAlert(err);
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Scanner'),
+                        text2: err,
+                    });
                     return {decodedInvoice: null, isOnchain: null};
                 }
             } else {
-                updateScannerAlert(e('lightning_not_support'));
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Scanner'),
+                    text2: e('lightning_not_support'),
+                });
                 return {decodedInvoice: null, isOnchain: null};
             }
         }
@@ -263,16 +281,27 @@ const Scan = ({route}: Props) => {
 
                 // BIP21 QR could contain upper case address, so we'll convert to lower case
                 if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
-                    updateScannerAlert(e('invalid_invoice_error'));
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Scanner'),
+                        text2: e('invalid_invoice_error'),
+                    });
                     return {decodedInvoice: null, isOnchain: null};
                 }
             } catch (err: any) {
-                updateScannerAlert(e('invalid_invoice_error'));
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Scanner'),
+                    text2: e('invalid_invoice_error'),
+                });
                 return {decodedInvoice: null, isOnchain: null};
             }
         }
 
         // Check and report errors from wallet and invoice
+        // TODO: fix to use toast
         if (
             !checkInvoiceAndWallet(
                 route.params.wallet,
@@ -344,7 +373,12 @@ const Scan = ({route}: Props) => {
                     const bolt11Msat = parsedBolt11Invoice.amountMsat;
 
                     if (!bolt11Msat) {
-                        updateScannerAlert(e('missing_bolt11_invoice_amount'));
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: t('Scanner'),
+                            text2: e('missing_bolt11_invoice_amount'),
+                        });
                         return;
                     }
 
@@ -362,7 +396,12 @@ const Scan = ({route}: Props) => {
                         }),
                     );
                 } catch (err: any) {
-                    updateScannerAlert(e('lightning_not_support'));
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Scanner'),
+                        text2: e('lightning_not_support'),
+                    });
                     return;
                 }
             }
@@ -398,7 +437,12 @@ const Scan = ({route}: Props) => {
                 const bolt11Msat = parsedBolt11Invoice.amountMsat;
 
                 if (!bolt11Msat) {
-                    updateScannerAlert(e('missing_bolt11_invoice_amount'));
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Scanner'),
+                        text2: e('missing_bolt11_invoice_amount'),
+                    });
                     return;
                 }
 
@@ -560,6 +604,8 @@ const Scan = ({route}: Props) => {
 
             {/* Display loading or camera unavailable; handle differently */}
             {!Camera && <LoadingView isCamAvailable={true} />}
+
+            <Toast config={toastConfig as ToastConfig} />
         </SafeAreaView>
     );
 };
