@@ -241,10 +241,7 @@ const Scan = ({route}: Props) => {
 
         // Check if LN invoice and handle separately
         // Call on Breez to work on this
-        if (
-            invoiceType.type === 'lightning' ||
-            invoiceType.type === 'bitcoin'
-        ) {
+        if (invoiceType.type === 'lightning') {
             // Only support bolt11 for now
             if (invoiceType.spec === 'bolt11') {
                 try {
