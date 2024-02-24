@@ -265,7 +265,7 @@ const Scan = ({route}: Props) => {
                     topOffset: 54,
                     type: 'Liberal',
                     text1: t('Scanner'),
-                    text2: e('lightning_not_support'),
+                    text2: e('unsupported_invoice_type'),
                 });
                 return {decodedInvoice: null, isOnchain: null};
             }
