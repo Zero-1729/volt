@@ -45,13 +45,14 @@ import ShareIcon from '../../assets/svg/share-24.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
-import {conservativeAlert} from '../../components/alert';
 import {PartiallySignedTransaction} from 'bdk-rn';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {useTranslation} from 'react-i18next';
 import {sendPayment} from '@breeztech/react-native-breez-sdk';
 import {getScreenEdges} from '../../modules/screen';
 import ExpiryTimer from '../../components/expiry';
+
+import Toast from 'react-native-toast-message';
 
 import {isInvoiceExpired, getCountdownStart} from '../../modules/wallet-utils';
 
@@ -144,19 +145,21 @@ const SendView = ({route}: Props) => {
             if (result.payment.status === 'complete') {
                 setLoading(false);
             } else {
-                conservativeAlert(
-                    capitalizeFirst(t('error')),
-                    result.payment.error as string,
-                    capitalizeFirst(t('cancel')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('error')),
+                    text2: result.payment.error as string,
+                });
                 setLoading(false);
             }
         } catch (error: any) {
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                error,
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: error,
+            });
             setLoading(false);
         }
     };
@@ -249,11 +252,12 @@ const SendView = ({route}: Props) => {
                 new BigNumber(route.params.wallet.balanceOnchain),
                 electrumServerURL,
                 (e: any) => {
-                    conservativeAlert(
-                        capitalizeFirst(t('error')),
-                        t('tx_fail_creation_error'),
-                        capitalizeFirst(t('cancel')),
-                    );
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: t('tx_fail_creation_error'),
+                    });
 
                     console.log(
                         '[Send] Error creating transaction: ',
