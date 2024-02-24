@@ -11,7 +11,7 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
-import {DeletionAlert, actionAlert, liberalAlert} from '../../components/alert';
+import {DeletionAlert, actionAlert} from '../../components/alert';
 
 import {useTranslation} from 'react-i18next';
 
@@ -33,6 +33,7 @@ import {getMiniWallet} from '../../modules/wallet-utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ENet} from '../../types/enums';
 import {capitalizeFirst} from '../../modules/transform';
+import Toast from 'react-native-toast-message';
 
 const Info = () => {
     const tailwind = useTailwind();
@@ -118,12 +119,13 @@ const Info = () => {
     const showDialog = () => {
         // Avoid deletion while loading
         if (loadLock) {
-            liberalAlert(
-                capitalizeFirst(t('notice')),
-                e('wait_for_wallet_to_load_error'),
-                capitalizeFirst(t('cancel')),
-                true,
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('notice')),
+                text2: t('wait_for_wallet_to_load_error'),
+                visibilityTime: 2000,
+            });
             return;
         }
 
