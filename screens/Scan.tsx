@@ -220,8 +220,8 @@ const Scan = ({route}: Props) => {
         const invoiceType = await decodeInvoiceType(invoice);
 
         // Only support:
+        // - Bolt 11 Invoice
         // - Unified and regular BIP21 Invoice
-        // - Bolt11 Invoice
         // - LNURL
         if (
             !(
