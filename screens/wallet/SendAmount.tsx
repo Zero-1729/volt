@@ -21,7 +21,7 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {conservativeAlert} from '../../components/alert';
+import Toast from 'react-native-toast-message';
 
 import Close from '../../assets/svg/x-24.svg';
 
@@ -375,13 +375,14 @@ const SendAmount = ({route}: Props) => {
                         disabled={amount === '' || isOverBalance}
                         onPress={() => {
                             if (isBelowDust) {
-                                conservativeAlert(
-                                    e('dust_limit_title'),
-                                    `${e(
+                                Toast.show({
+                                    topOffset: 54,
+                                    type: 'Liberal',
+                                    text1: e('dust_limit_title'),
+                                    text2: `${e(
                                         'dust_limit_message',
                                     )} ${DUST_LIMIT} ${t('satoshi')}.`,
-                                    capitalizeFirst(t('cancel')),
-                                );
+                                });
                                 return;
                             }
 
@@ -401,11 +402,12 @@ const SendAmount = ({route}: Props) => {
                                     }),
                                 );
                             } else {
-                                conservativeAlert(
-                                    e('no_internet_title'),
-                                    e('no_internet_message'),
-                                    capitalizeFirst(t('cancel')),
-                                );
+                                Toast.show({
+                                    topOffset: 54,
+                                    type: 'Liberal',
+                                    text1: e('no_internet_title'),
+                                    text2: e('no_internet_message'),
+                                });
                                 return;
                             }
                         }}>
