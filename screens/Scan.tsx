@@ -226,7 +226,8 @@ const Scan = ({route}: Props) => {
         if (
             !(
                 invoiceType.type === 'bitcoin' ||
-                invoiceType.type === 'lightning'
+                invoiceType.type === 'lightning' ||
+                invoiceType.type === 'unified'
             )
         ) {
             Toast.show({
