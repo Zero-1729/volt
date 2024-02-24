@@ -128,6 +128,7 @@ const Home = ({route}: Props) => {
         walletsIndex,
         updateWalletsIndex,
         walletMode,
+        isAdvancedMode,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -172,7 +173,7 @@ const Home = ({route}: Props) => {
         try {
             const info = await nodeInfo();
             if (info?.id) {
-                if (process.env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
@@ -184,7 +185,7 @@ const Home = ({route}: Props) => {
                 return;
             }
         } catch (error: any) {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
@@ -206,7 +207,7 @@ const Home = ({route}: Props) => {
             }
 
             if (event.type === BreezEventVariant.BACKUP_STARTED) {
-                if (process.env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
@@ -218,7 +219,7 @@ const Home = ({route}: Props) => {
             }
 
             if (event.type === BreezEventVariant.BACKUP_SUCCEEDED) {
-                if (process.env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                     console.log('[Breez SDK] Backup succeeded');
                     Toast.show({
                         topOffset: 54,
