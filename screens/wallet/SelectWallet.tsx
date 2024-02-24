@@ -114,14 +114,36 @@ const SelectWallet = ({route}: Props) => {
 
         if (
             invoiceType.type === 'lightning' ||
-            invoiceType.type === 'bitcoin'
+            invoiceType.type === 'bitcoin' ||
+            invoiceType.type === 'unified'
         ) {
+            let invoiceBolt11!: string;
+            let btcInvoice!: string;
+
+            // Handle unified BIP21 QR
+            if (invoiceType.type === 'unified') {
+                const embededBolt11 = invoiceType.invoice?.split('&lightning=');
+
+                if (embededBolt11.length > 1) {
+                    invoiceBolt11 =
+                        invoiceType.invoice?.split('&lightning=').pop() ?? '';
+                } else {
+                    btcInvoice =
+                        invoiceType.invoice
+                            ?.split('&lightning=')[0]
+                            .toLowerCase() ?? '';
+                }
+            }
+
             // Handle Bolt11 Invoice
             if (
-                invoiceType.type === 'lightning' &&
-                invoiceType.spec === 'bolt11'
+                (invoiceType.type === 'lightning' &&
+                    invoiceType.spec === 'bolt11') ||
+                invoiceBolt11
             ) {
-                decodeBolt11(route.params?.invoice);
+                decodeBolt11(
+                    invoiceBolt11 ? invoiceBolt11 : route.params?.invoice,
+                );
                 return;
             }
 
@@ -140,7 +162,9 @@ const SelectWallet = ({route}: Props) => {
             }
 
             // handle bitcoin BIP21 invoice
-            setDecodedInvoice(decodeInvoice(route.params?.invoice));
+            setDecodedInvoice(
+                decodeInvoice(btcInvoice ? btcInvoice : route.params?.invoice),
+            );
         } else {
             Toast.show({
                 topOffset: 54,
