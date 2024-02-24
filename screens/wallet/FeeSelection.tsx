@@ -29,7 +29,6 @@ import BigNumber from 'bignumber.js';
 import {TComboWallet} from '../../types/wallet';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
-import {conservativeAlert} from '../../components/alert';
 import Prompt from 'react-native-prompt-android';
 
 import {useTailwind} from 'tailwind-rn';
@@ -50,6 +49,7 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {getPrivateDescriptors} from '../../modules/descriptors';
 import {psbtFromInvoice} from '../../modules/bdk';
 import {getScreenEdges} from '../../modules/screen';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
@@ -102,14 +102,15 @@ const FeeSelection = ({route}: Props) => {
             selectedFeeRate,
             route.params.invoiceData,
             route.params.wallet as TComboWallet,
-            new BigNumber(route.params.wallet.balance),
+            new BigNumber(route.params.wallet.balanceOnchain),
             electrumServerURL,
             (err: any) => {
-                conservativeAlert(
-                    capitalizeFirst(t('error')),
-                    e('tx_fail_creation_error'),
-                    capitalizeFirst(t('cancel')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('error')),
+                    text2: e('tx_fail_creation_error'),
+                });
 
                 console.log(
                     '[Fee Selection] Failed to create tx: ',
@@ -141,11 +142,12 @@ const FeeSelection = ({route}: Props) => {
             rates = fetchedRates as TMempoolFeeRates;
         } catch (err: any) {
             // Error assumed to be 503; mempool unavailable due to sync
-            conservativeAlert(
-                t('feerate'),
-                e('failed_fee_rate_fetch'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: t('feerate'),
+                text2: e('failed_fee_rate_fetch'),
+            });
         }
 
         // Set the fee rate from modal or use fastest
@@ -156,27 +158,31 @@ const FeeSelection = ({route}: Props) => {
     const updateCustomFeeRate = (value: string | undefined) => {
         const rate = Number(value);
         const amount = Number(route.params.invoiceData.options?.amount);
-        const isMaxSend = new BigNumber(route.params.wallet.balance).eq(amount);
+        const isMaxSend = new BigNumber(route.params.wallet.balanceOnchain).eq(
+            amount,
+        );
         const fee = rate * psbtVSize;
 
         // Warn user that fee rate invalid
         if (Number.isNaN(rate)) {
-            conservativeAlert(
-                e('invalid_fee_rate'),
-                e('invalid_fee_rate_message'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: e('invalid_fee_rate'),
+                text2: e('invalid_fee_rate_message'),
+            });
 
             return;
         }
 
         // Avoid too high fee rate
         if (isFeeTooHigh(fee, isMaxSend)) {
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                e('fee_too_high_error'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: e('fee_too_high_error'),
+            });
             return;
         }
 
