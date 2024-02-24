@@ -53,7 +53,6 @@ import {fetchFiatRate} from '../../modules/currency';
 
 import {Balance} from '../../components/balance';
 
-import {liberalAlert} from '../../components/alert';
 import {UnifiedTransactionListItem} from '../../components/transaction';
 
 import {TBalance, TTransaction} from '../../types/wallet';
@@ -62,6 +61,7 @@ import {capitalizeFirst} from '../../modules/transform';
 
 import Swap from './../../components/swap';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -227,11 +227,13 @@ const Wallet = ({route}: Props) => {
                 console.log('[Fiat Rate] Did not fetch fiat rate');
             }
         } catch (err: any) {
-            liberalAlert(
-                capitalizeFirst(t('network')),
-                e('failed_to_fetch_rate'),
-                capitalizeFirst(t('ok')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('network')),
+                text2: e('failed_to_fetch_rate'),
+                visibilityTime: 2000,
+            });
 
             console.log('[Fiat Rate] Error fetching fiat rate', err.message);
 
@@ -274,11 +276,13 @@ const Wallet = ({route}: Props) => {
 
                 setLoadLock(false);
             } catch (err: any) {
-                liberalAlert(
-                    capitalizeFirst(t('network')),
-                    e('error_fetching_txs'),
-                    capitalizeFirst(t('ok')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('network')),
+                    text2: t('error_fetching_txs'),
+                    visibilityTime: 2000,
+                });
 
                 setLoadingBalance(false);
                 setRefreshing(false);
