@@ -271,7 +271,30 @@ const Scan = ({route}: Props) => {
             }
         }
 
-        if (invoiceType.type === 'bitcoin') {
+        // Bip21
+        if (invoiceType.type === 'bitcoin' || invoiceType.type === 'unified') {
+            // Handle LN if unified wallet and ln balance sufficient
+            if (invoiceType.type === 'unified') {
+                if (route.params.wallet.balanceLightning < 0) {
+                    // attempt LN
+
+                    const bolt11 = (
+                        invoiceType.invoice.split('lightning=').pop() as string
+                    ).toLowerCase();
+
+                    try {
+                        const parsedBolt11Invoice = await parseInvoice(bolt11);
+
+                        return {
+                            decodedInvoice: parsedBolt11Invoice,
+                            isOnchain: false,
+                        };
+                    } catch (err: any) {
+                        // continue to bip21
+                    }
+                }
+            }
+
             // Attempt to decode BIP21 QR
             try {
                 decodedInvoice = decodeURI.decode(invoice);
