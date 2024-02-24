@@ -19,6 +19,8 @@ import Carousel from 'react-native-reanimated-carousel';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../Navigation';
 
+import Toast from 'react-native-toast-message';
+
 import {_BREEZ_SDK_API_KEY_, _BREEZ_INVITE_CODE_} from './../modules/env';
 
 import {
@@ -76,7 +78,6 @@ import {TBalance, TTransaction} from '../types/wallet';
 import {FiatBalance} from '../components/balance';
 
 import {fetchFiatRate} from '../modules/currency';
-import {liberalAlert, conservativeAlert} from '../components/alert';
 
 import {
     getUniqueTXs,
@@ -171,11 +172,27 @@ const Home = ({route}: Props) => {
         try {
             const info = await nodeInfo();
             if (info?.id) {
-                console.log('[Breez SDK] Node already initialized');
+                if (process.env.NODE_ENV === 'development') {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Breez SDK'),
+                        text2: t('Node already initialized'),
+                        visibilityTime: 2000,
+                    });
+                }
                 return;
             }
-        } catch (e) {
-            console.log('[Breez SDK] Error initializing Breez node:', e);
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development') {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
         }
 
         // SDK events listener
@@ -189,11 +206,28 @@ const Home = ({route}: Props) => {
             }
 
             if (event.type === BreezEventVariant.BACKUP_STARTED) {
-                console.log('[Breez SDK] Backup started');
+                if (process.env.NODE_ENV === 'development') {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Breez SDK'),
+                        text2: t('breez_backup_started'),
+                        autoHide: false,
+                    });
+                }
             }
 
             if (event.type === BreezEventVariant.BACKUP_SUCCEEDED) {
-                console.log('[Breez SDK] Backup succeeded');
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('[Breez SDK] Backup succeeded');
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Breez SDK'),
+                        text2: t('breez'),
+                        autoHide: false,
+                    });
+                }
             }
 
             if (event.type === BreezEventVariant.BACKUP_FAILED) {
@@ -311,7 +345,17 @@ const Home = ({route}: Props) => {
         await syncBdkWallet(
             w,
             (status: boolean) => {
-                console.log('[BDK] synced wallet', status);
+                if (process.env.NODE_ENV === 'development') {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('BDK'),
+                        text2: status
+                            ? t('Synced wallet')
+                            : t('Failed to sync'),
+                        autoHide: false,
+                    });
+                }
             },
             wallet.network,
             electrumServerURL,
@@ -340,11 +384,13 @@ const Home = ({route}: Props) => {
                     );
                 } catch (e: any) {
                     // Report network error
-                    liberalAlert(
-                        capitalizeFirst(t('network')),
-                        `${e.message}`,
-                        capitalizeFirst(t('ok')),
-                    );
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('network')),
+                        text2: e.message,
+                        visibilityTime: 2000,
+                    });
 
                     // Kill loading
                     setLoadingBalance(false);
@@ -532,11 +578,12 @@ const Home = ({route}: Props) => {
             }
 
             // Simple helper to show successful import and navigate back home
-            conservativeAlert(
-                route.params.restoreMeta.title,
-                route.params.restoreMeta.message,
-                capitalizeFirst(t('ok')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: route.params.restoreMeta.title,
+                text2: route.params.restoreMeta.message,
+            });
 
             // Vibrate to let user know the action was successful
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);

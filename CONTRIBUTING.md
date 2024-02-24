@@ -87,7 +87,7 @@ For strings in the common, these are any single words or short phrases that are 
 
 Nevertheless, strings that are not common should be translated in the relevant namespace. For example, the string `send` is used in the `SendScreen`, so it should be translated in the `wallet` namespace. These strings should begin with a capitalized letter.
 
-As for for strings that are errors and warnings, they should go in the `error` namespace. For example, the string `Invalid mnemonic` should be translated in the `error` namespace. These messages are contained and reported by the `Alert` components in `./components/Alert.tsx`, such as `conservativeAlert`.
+As for for strings that are errors and warnings, they should go in the `error` namespace. For example, the string `Invalid mnemonic` should be translated in the `error` namespace. These messages are contained and can be reported by the `Alert` or `Toast` components in `./components/Alert.tsx` and `./components/toast.tsx`, respectively.
 
 > **Note**: remember to add the new language to the `i18n/languages.ts` file, and update the relevant `index.ts` to include the any new namespaces.
 

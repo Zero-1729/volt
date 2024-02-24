@@ -118,6 +118,7 @@
     "react-native-share": "^9.2.3",
     "react-native-svg": "^13.13.0",
     "react-native-svg-transformer": "^1.0.0",
+    "react-native-toast-message": "^2.2.0",
     "react-native-tooltip": "^5.2.0",
     "rn-nodeify": "^10.3.0",
     "scryptsy": "^2.1.0",

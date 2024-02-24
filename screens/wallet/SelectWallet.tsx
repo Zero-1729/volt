@@ -20,7 +20,6 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {conservativeAlert} from '../../components/alert';
 
 import {useTranslation} from 'react-i18next';
 
@@ -49,6 +48,7 @@ import {useNetInfo} from '@react-native-community/netinfo';
 import InfoIcon from '../../assets/svg/info-16.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'SelectWallet'>;
 
@@ -127,11 +127,12 @@ const SelectWallet = ({route}: Props) => {
 
             // If LN report we aren't supporting it yet
             if (!(invoiceType?.spec === 'bolt11')) {
-                conservativeAlert(
-                    capitalizeFirst(t('error')),
-                    e('unsupported_invoice_type'),
-                    capitalizeFirst(t('cancel')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('error')),
+                    text2: e('unsupported_invoice_type'),
+                });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
 
@@ -141,11 +142,12 @@ const SelectWallet = ({route}: Props) => {
             // handle bitcoin BIP21 invoice
             setDecodedInvoice(decodeInvoice(route.params?.invoice));
         } else {
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                e('invalid_invoice_error'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: e('invalid_invoice_error'),
+            });
 
             navigation.dispatch(CommonActions.navigate('HomeScreen'));
         }
@@ -161,11 +163,12 @@ const SelectWallet = ({route}: Props) => {
 
         // Check network connection first
         if (!networkState?.isInternetReachable) {
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                e('no_internet_message'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: e('no_internet_message'),
+            });
             return;
         }
 
@@ -195,11 +198,12 @@ const SelectWallet = ({route}: Props) => {
                 decodedInvoice,
                 (msg: string) => {
                     // TODO: Check and translate error
-                    conservativeAlert(
-                        capitalizeFirst(t('error')),
-                        msg,
-                        capitalizeFirst(t('cancel')),
-                    );
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: msg,
+                    });
 
                     // route home
                     navigation.dispatch(

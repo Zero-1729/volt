@@ -9,6 +9,10 @@ import React, {
 } from 'react';
 import {StatusBar, useColorScheme, Platform, NativeModules} from 'react-native';
 
+import Toast, {ToastConfig} from 'react-native-toast-message';
+
+import {toastConfig} from './components/toast';
+
 import {AppStorageContext} from './class/storageContext';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
@@ -66,6 +70,7 @@ const App = () => {
                 backgroundColor={ColorScheme.Background.Primary}
             />
             <RootScreen />
+            <Toast config={toastConfig as ToastConfig} />
         </SafeAreaProvider>
     );
 };

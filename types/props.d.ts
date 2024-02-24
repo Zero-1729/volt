@@ -14,6 +14,7 @@ export type BaseProps = PropsWithChildren<{
 }>;
 
 export type VTextProps = {
+    numberOfLines?: number;
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     children?: React.ReactNode;
 };

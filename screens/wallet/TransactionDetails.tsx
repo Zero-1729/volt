@@ -13,7 +13,7 @@ import {SafeAreaView, Edges} from 'react-native-safe-area-context';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
-import {conservativeAlert} from '../../components/alert';
+import Toast from 'react-native-toast-message';
 
 import BumpFee from '../../components/bump';
 
@@ -127,11 +127,12 @@ const TransactionDetailsView = ({route}: Props) => {
         let isConfirmedAlready = status.errorMessage.includes('confirmed');
 
         if (isConfirmedAlready) {
-            conservativeAlert(
-                capitalizeFirst(t('warning')),
-                e('tx_already_confirmed_error'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('dust_limit_title')),
+                text2: e('tx_already_confirmed_error'),
+            });
         }
 
         if (status.broadcasted || isConfirmedAlready) {
@@ -146,11 +147,12 @@ const TransactionDetailsView = ({route}: Props) => {
             );
         } else {
             // show error alert
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                e('bump_fee_error'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: e('bump_fee_error'),
+            });
 
             console.log('[Fee Bump] Could not bump fee: ', status.errorMessage);
         }
