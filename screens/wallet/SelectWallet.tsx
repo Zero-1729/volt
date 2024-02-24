@@ -28,6 +28,8 @@ import {
     getMiniWallet,
     checkInvoiceAndWallet,
     decodeInvoiceType,
+    getCountdownStart,
+    isInvoiceExpired,
 } from '../../modules/wallet-utils';
 import {capitalizeFirst, convertBTCtoSats} from '../../modules/transform';
 
@@ -37,6 +39,7 @@ import Color from '../../constants/Color';
 
 import BigNumber from 'bignumber.js';
 
+import ExpiryTimer from '../../components/expiry';
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
@@ -67,6 +70,8 @@ const SelectWallet = ({route}: Props) => {
     const [decodedInvoice, setDecodedInvoice] = useState<TInvoiceData>(
         {} as TInvoiceData,
     );
+    const [expiryEpoch, setExpiryEpoch] = useState<number>(0);
+    const [isExpired, setIsExpired] = useState(false);
 
     const {wallets, hideTotalBalance, getWalletData, walletsIndex, walletMode} =
         useContext(AppStorageContext);
@@ -107,6 +112,20 @@ const SelectWallet = ({route}: Props) => {
         const decodedBolt11 = await parseInvoice(invoice);
         setBolt11(decodedBolt11);
         setIsLightning(true);
+
+        setExpiryEpoch(
+            getCountdownStart(
+                decodedBolt11.timestamp as number,
+                decodedBolt11.expiry as number,
+            ),
+        );
+
+        setIsExpired(
+            isInvoiceExpired(
+                decodedBolt11.timestamp as number,
+                decodedBolt11.expiry as number,
+            ),
+        );
     };
 
     const handleInvoiceType = async (invoice: string) => {
@@ -326,6 +345,14 @@ const SelectWallet = ({route}: Props) => {
                         ]}>
                         {t('select_wallet_title')}
                     </Text>
+                    {isLightning && (
+                        <View
+                            style={[
+                                tailwind('absolute right-0 justify-center'),
+                            ]}>
+                            <ExpiryTimer expiryDate={expiryEpoch} />
+                        </View>
+                    )}
                 </View>
 
                 {/*Display the invoice data */}
@@ -537,6 +564,7 @@ const SelectWallet = ({route}: Props) => {
                 </View>
 
                 <LongBottomButton
+                    disabled={isExpired}
                     title={'Pay Invoice'}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
