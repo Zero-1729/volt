@@ -732,7 +732,9 @@ export const decodeInvoiceType = async (
     invoice: string;
     invalid: boolean;
 }> => {
-    if (invoice.startsWith('bitcoin:')) {
+    const lowercasedInvoice = invoice.toLowerCase();
+
+    if (lowercasedInvoice.startsWith('bitcoin:')) {
         return {
             type: 'bitcoin',
             spec: 'bip21',
@@ -743,11 +745,11 @@ export const decodeInvoiceType = async (
 
     // Check LN
     if (
-        invoice.startsWith('lnbc') ||
-        invoice.startsWith('lnurl') ||
-        invoice.startsWith('lightning')
+        lowercasedInvoice.startsWith('lnbc') ||
+        lowercasedInvoice.startsWith('lnurl') ||
+        lowercasedInvoice.startsWith('lightning')
     ) {
-        const determinedLnType = await determinLnType(invoice);
+        const determinedLnType = await determinLnType(lowercasedInvoice);
 
         return determinedLnType;
     }
