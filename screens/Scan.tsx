@@ -275,7 +275,7 @@ const Scan = ({route}: Props) => {
         if (invoiceType.type === 'bitcoin' || invoiceType.type === 'unified') {
             // Handle LN if unified wallet and ln balance sufficient
             if (invoiceType.type === 'unified') {
-                if (route.params.wallet.balanceLightning < 0) {
+                if (route.params.wallet.balanceLightning > 0) {
                     // attempt LN
 
                     const bolt11 = (
