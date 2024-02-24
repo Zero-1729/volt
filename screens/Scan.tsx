@@ -23,7 +23,7 @@ import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import Toast, { ToastConfig } from 'react-native-toast-message';
+import Toast, {ToastConfig} from 'react-native-toast-message';
 
 import {useTranslation} from 'react-i18next';
 
@@ -49,7 +49,6 @@ import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
 import InfoIcon from '../assets/svg/info-16.svg';
 
-import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst, convertBTCtoSats} from '../modules/transform';
@@ -146,11 +145,12 @@ const Scan = ({route}: Props) => {
     const cameraRef = React.useRef<Camera>(null);
 
     const onError = (error: any) => {
-        conservativeAlert(
-            t('qr_scan'),
-            error.message,
-            capitalizeFirst(t('ok')),
-        );
+        Toast.show({
+            topOffset: 54,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('qr_scan')),
+            text2: error.message,
+        });
     };
 
     const requestCamPerms = async () => {
@@ -197,14 +197,13 @@ const Scan = ({route}: Props) => {
         setScanLock(false);
     };
 
-    const updateScannerAlert = (message: string) => {
-        setScannerAlertMsg(message);
-        setScanLock(true);
-
-        // Lock for 5 seconds
-        setTimeout(() => {
-            clearScannerAlert();
-        }, 1000 * 5);
+    const updateToast = (message: string) => {
+        Toast.show({
+            topOffset: 54,
+            type: 'Liberal',
+            text1: t('Scanner'),
+            text2: message,
+        });
     };
 
     const handleInvalidInvoice = async (invoice: string) => {
@@ -306,7 +305,7 @@ const Scan = ({route}: Props) => {
             !checkInvoiceAndWallet(
                 route.params.wallet,
                 decodedInvoice,
-                updateScannerAlert,
+                updateToast,
                 walletMode === 'single',
             )
         ) {
