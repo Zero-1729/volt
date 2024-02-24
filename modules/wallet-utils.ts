@@ -735,6 +735,15 @@ export const decodeInvoiceType = async (
     const lowercasedInvoice = invoice.toLowerCase();
 
     if (lowercasedInvoice.startsWith('bitcoin:')) {
+        if (lowercasedInvoice.includes('&lightning=')) {
+            return {
+                type: 'unified',
+                spec: 'bip21',
+                invoice: invoice,
+                invalid: false,
+            };
+        }
+
         return {
             type: 'bitcoin',
             spec: 'bip21',
