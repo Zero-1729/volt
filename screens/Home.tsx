@@ -78,7 +78,6 @@ import {TBalance, TTransaction} from '../types/wallet';
 import {FiatBalance} from '../components/balance';
 
 import {fetchFiatRate} from '../modules/currency';
-import env from 'react-native-dotenv';
 
 import {
     getUniqueTXs,
@@ -173,7 +172,7 @@ const Home = ({route}: Props) => {
         try {
             const info = await nodeInfo();
             if (info?.id) {
-                if (env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development') {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
@@ -185,15 +184,12 @@ const Home = ({route}: Props) => {
                 return;
             }
         } catch (error: any) {
-            if (env.NODE_ENV === 'development') {
+            if (process.env.NODE_ENV === 'development') {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
-                    text1: t('loading_wallet'),
-                    text2:
-                        t('Error initializing Breez node') +
-                        ': ' +
-                        error.message,
+                    text1: t('Breez SDK'),
+                    text2: error.message,
                     autoHide: false,
                 });
             }
@@ -210,7 +206,7 @@ const Home = ({route}: Props) => {
             }
 
             if (event.type === BreezEventVariant.BACKUP_STARTED) {
-                if (env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development') {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
@@ -222,7 +218,7 @@ const Home = ({route}: Props) => {
             }
 
             if (event.type === BreezEventVariant.BACKUP_SUCCEEDED) {
-                if (env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log('[Breez SDK] Backup succeeded');
                     Toast.show({
                         topOffset: 54,
@@ -349,7 +345,7 @@ const Home = ({route}: Props) => {
         await syncBdkWallet(
             w,
             (status: boolean) => {
-                if (env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development') {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
