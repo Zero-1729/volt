@@ -40,7 +40,7 @@ import {
     DisplaySatsAmount,
     DisplayBTCAmount,
 } from '../../components/balance';
-import {liberalAlert} from '../../components/alert';
+import Toast from 'react-native-toast-message';
 
 const RequestAmount = () => {
     const tailwind = useTailwind();
@@ -195,20 +195,28 @@ const RequestAmount = () => {
             // Warn user for first tx that amount will be deducted for channel open
             // first open channel
             if (firstTx && feeMsat.feeMsat > 0) {
-                liberalAlert(
-                    capitalizeFirst(t('warning')),
-                    e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
-                    capitalizeFirst(e('ok')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('warning')),
+                    text2: e('new_channel_open_warn', {
+                        n: feeMsat.feeMsat / 1_000,
+                    }),
+                    visibilityTime: 2000,
+                });
             }
 
             // Warn user that amount will trigger a new channel open
             if (!firstTx && feeMsat.feeMsat > 0) {
-                liberalAlert(
-                    capitalizeFirst(t('warning')),
-                    e('new_channel_open_warn', {n: feeMsat.feeMsat / 1_000}),
-                    capitalizeFirst(e('ok')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('warning')),
+                    text2: e('new_channel_open_warn', {
+                        n: feeMsat.feeMsat / 1_000,
+                    }),
+                    visibilityTime: 2000,
+                });
             }
         }
 
