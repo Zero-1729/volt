@@ -40,18 +40,13 @@ import Back from '../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-import {
-    conservativeAlert,
-    liberalAlert,
-    errorAlert,
-} from '../../components/alert';
-
 import {EBackupMaterial, ENet} from '../../types/enums';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AddWalletParamList} from '../../Navigation';
 
 import {capitalizeFirst} from '../../modules/transform';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<AddWalletParamList, 'RestoreActions'>;
 
@@ -96,11 +91,12 @@ const ImportAction = ({route}: Props) => {
                 const lines = dataByLines.length;
 
                 if (lines > 1) {
-                    conservativeAlert(
-                        capitalizeFirst(t('error')),
-                        t('import_support_error'),
-                        capitalizeFirst(t('cancel')),
-                    );
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: e('import_support_error'),
+                    });
                     return;
                 }
 
@@ -113,11 +109,12 @@ const ImportAction = ({route}: Props) => {
 
     const handleFolderError = (err: Error) => {
         // Handle when any error in the folder action is reported
-        conservativeAlert(
-            capitalizeFirst(t('error')),
-            err.message,
-            capitalizeFirst(t('cancel')),
-        );
+        Toast.show({
+            topOffset: 54,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('error')),
+            text2: err.message,
+        });
 
         return;
     };
@@ -191,11 +188,12 @@ const ImportAction = ({route}: Props) => {
             validateMnenomic(mnemonic);
         } catch {
             // Let user know the mnemonic is valid
-            errorAlert(
-                capitalizeFirst(t('mnemonic')),
-                e('mnemonic_invalid_error'),
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('mnemonic')),
+                text2: e('mnemonic_invalid_error'),
+            });
             return;
         }
 
@@ -210,22 +208,24 @@ const ImportAction = ({route}: Props) => {
             handleSuccessRoute();
         } catch (err: any) {
             // Let user know the mnemonic is valid
-            errorAlert(
-                capitalizeFirst(t('mnemonic')),
-                err.message,
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('mnemonic')),
+                text2: err.message,
+            });
         }
     };
 
     const handleDescriptor = async (descriptor: string) => {
         try {
             if (!isDescriptorPattern(descriptor)) {
-                errorAlert(
-                    capitalizeFirst(t('descriptor')),
-                    e('descriptor_valid_error'),
-                    capitalizeFirst(t('cancel')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('descriptor')),
+                    text2: e('descriptor_valid_error'),
+                });
 
                 return;
             }
@@ -241,11 +241,12 @@ const ImportAction = ({route}: Props) => {
 
             handleSuccessRoute();
         } catch (err: any) {
-            errorAlert(
-                capitalizeFirst(t('descriptor')),
-                err.message,
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('descriptor')),
+                text2: err.message,
+            });
         }
     };
 
@@ -262,11 +263,12 @@ const ImportAction = ({route}: Props) => {
 
             handleSuccessRoute();
         } catch (err: any) {
-            errorAlert(
-                capitalizeFirst(t('extended_key')),
-                err.message,
-                capitalizeFirst(t('cancel')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('extended_keu')),
+                text2: err.message,
+            });
         }
     };
 
@@ -333,12 +335,13 @@ const ImportAction = ({route}: Props) => {
         if (isExtendedKey(material)) {
             // Check if ext key is supported
             if (!isSupportedExtKey(material)) {
-                // Report unsupported extended keys
-                liberalAlert(
-                    t('extended_key'),
-                    e('unsupported_ext_key_error'),
-                    capitalizeFirst(t('cancel')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('extended_key')),
+                    text2: e('unsupported_ext_key_error'),
+                    visibilityTime: 2000,
+                });
                 return;
             }
 
@@ -347,11 +350,12 @@ const ImportAction = ({route}: Props) => {
                 isValidExtendedKey(material);
             } catch (err: any) {
                 // Report invalid ext key
-                errorAlert(
-                    capitalizeFirst(t('extended_key')),
-                    err.message,
-                    capitalizeFirst(t('cancel')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('extended_key')),
+                    text2: err.message,
+                });
                 return;
             }
 
@@ -361,7 +365,13 @@ const ImportAction = ({route}: Props) => {
             return;
         }
 
-        liberalAlert(t('import'), e('import_material_error'), t('try_again'));
+        Toast.show({
+            topOffset: 54,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('import')),
+            text2: e('import_material_error'),
+            visibilityTime: 2000,
+        });
     };
 
     const importInstructions = isAdvancedMode
