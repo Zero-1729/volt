@@ -505,7 +505,7 @@ const Scan = ({route}: Props) => {
                                 invoiceData: decodedInvoice,
                                 wallet: route.params.wallet,
                                 isLightning: false,
-                                source: 'conserative',
+                                source: 'conservative',
                             },
                         }),
                     );
