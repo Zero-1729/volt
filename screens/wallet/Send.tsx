@@ -26,7 +26,7 @@ import {TComboWallet} from '../../types/wallet';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import ExportPsbt from '../../components/psbt';
-import {FiatBalance, Balance} from '../../components/balance';
+import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
 import {
     useNavigation,
@@ -368,12 +368,10 @@ const SendView = ({route}: Props) => {
                                 />
                             )}
                             {!isMax && (
-                                <Balance
-                                    loading={false}
-                                    disableFiat={true}
-                                    balance={sats}
-                                    balanceFontSize={'text-sm'}
-                                    fontColor={ColorScheme.Text.DescText}
+                                <DisplaySatsAmount
+                                    amount={sats}
+                                    fontSize={'text-sm'}
+                                    textColor={ColorScheme.Text.DescText}
                                 />
                             )}
                         </View>
