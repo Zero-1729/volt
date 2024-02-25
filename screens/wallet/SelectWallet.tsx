@@ -70,7 +70,7 @@ const SelectWallet = ({route}: Props) => {
     const [decodedInvoice, setDecodedInvoice] = useState<TInvoiceData>(
         {} as TInvoiceData,
     );
-    const [expiryEpoch, setExpiryEpoch] = useState<number>(0);
+    const [expiryEpoch, setExpiryEpoch] = useState<number>();
     const [isExpired, setIsExpired] = useState(false);
 
     const {wallets, hideTotalBalance, getWalletData, walletsIndex, walletMode} =
@@ -345,7 +345,7 @@ const SelectWallet = ({route}: Props) => {
                         ]}>
                         {t('select_wallet_title')}
                     </Text>
-                    {isLightning && (
+                    {isLightning && expiryEpoch && (
                         <View
                             style={[
                                 tailwind('absolute right-0 justify-center'),
