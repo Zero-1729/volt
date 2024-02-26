@@ -800,9 +800,6 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const _addNewWallet = async (newWallet: TWalletType) => {
-        // Set wallet ID
-        _setCurrentWalletID(newWallet.id);
-
         // If we have a mnemonic, generate extended key material
         // Function applied when newly generated wallet and if mnemonic imported
         if (newWallet.mnemonic !== '') {
