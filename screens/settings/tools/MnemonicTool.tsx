@@ -317,7 +317,13 @@ const MnemonicTool = () => {
                             borderColor: ColorScheme.Background.CheckBoxOutline,
                             borderRadius: 2,
                         }}
-                        style={[tailwind('flex-row absolute -right-4')]}
+                        style={[
+                            tailwind(
+                                `flex-row absolute ${
+                                    langDir === 'right' ? 'right-0' : '-right-4'
+                                }`,
+                            ),
+                        ]}
                         onPress={() => {
                             RNHapticFeedback.trigger(
                                 'rigid',
