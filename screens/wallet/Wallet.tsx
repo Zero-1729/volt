@@ -91,6 +91,7 @@ const Wallet = ({route}: Props) => {
         hideTotalBalance,
         updateWalletAddress,
         electrumServerURL,
+        isAdvancedMode,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -441,7 +442,12 @@ const Wallet = ({route}: Props) => {
                             style={[
                                 tailwind(
                                     `items-center w-5/6 ${
-                                        hideTotalBalance ? '-mt-20' : '-mt-8'
+                                        hideTotalBalance
+                                            ? '-mt-20'
+                                            : isAdvancedMode &&
+                                              walletData.type === 'unified'
+                                            ? '-mt-8'
+                                            : 'mt-12'
                                     }`,
                                 ),
                             ]}>
@@ -487,7 +493,7 @@ const Wallet = ({route}: Props) => {
                         </View>
 
                         {/* Combined balance for unified wallets */}
-                        {walletData.type === 'unified' && (
+                        {walletData.type === 'unified' && isAdvancedMode && (
                             <>
                                 <View
                                     style={[
