@@ -6,6 +6,7 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.volt.modules.SplashScreen.SplashScreenModule
 
 class MainActivity : ReactActivity() {
 
@@ -17,6 +18,7 @@ class MainActivity : ReactActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
             setTheme(R.style.AppTheme)
+            SplashScreenModule.show(this)
             super.onCreate(savedInstanceState)
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_SECURE,
