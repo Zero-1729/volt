@@ -10,6 +10,7 @@ data/git-branch-data.json
 
 # Xcode
 #
+ios/.xcode*
 build/
 *.pbxuser
 !default.pbxuser
