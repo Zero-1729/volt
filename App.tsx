@@ -7,7 +7,7 @@ import React, {
     useEffect,
     useState,
 } from 'react';
-import {StatusBar, useColorScheme} from 'react-native';
+import {StatusBar, useColorScheme, NativeModules, Platform} from 'react-native';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 
@@ -46,6 +46,10 @@ const App = () => {
     useEffect(() => {
         // Enable privacy blur for IOS; blur screen when screen inactive
         Privacy?.enabled(true);
+
+        if (Platform.OS === 'android') {
+            setTimeout(NativeModules.SplashScreenModule.hide, 100);
+        }
 
         // Set app ready
         setIsReady(true);
