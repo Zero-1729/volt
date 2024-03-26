@@ -166,5 +166,8 @@
     "Camera",
     "LocationWhenInUse"
   ],
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "yarn@3.4.1",
+  "resolutions": {
+    "browserify-sign": "4.2.2"
+  }
 }
