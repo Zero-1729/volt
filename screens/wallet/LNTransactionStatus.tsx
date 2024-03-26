@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
     Text,
     View,
@@ -15,7 +16,7 @@ import {
     useFocusEffect,
 } from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {WalletParamList} from '../../Navigation';
+import {InitStackParamList} from '../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -28,6 +29,11 @@ import {capitalizeFirst} from '../../modules/transform';
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
+import {
+    Payment,
+    InvoicePaidDetails,
+    PaymentFailedData,
+} from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from './../../types/enums';
 
 import {LongBottomButton} from '../../components/button';
@@ -40,7 +46,7 @@ import Lottie from 'lottie-react-native';
 
 import eNutsConfetti from '../../assets/lottie/e-nuts-confetti.json';
 
-type Props = NativeStackScreenProps<WalletParamList, 'LNTransactionStatus'>;
+type Props = NativeStackScreenProps<InitStackParamList, 'LNTransactionStatus'>;
 
 const LNTransactionStatus = ({route}: Props) => {
     const tailwind = useTailwind();
@@ -81,16 +87,16 @@ const LNTransactionStatus = ({route}: Props) => {
         switch (route.params.detailsType) {
             case EBreezDetails.Received:
                 amount =
-                    (route.params.details.payment?.amountMsat as number) /
-                    1_000;
+                    ((route.params.details as InvoicePaidDetails).payment
+                        ?.amountMsat as number) / 1_000;
                 break;
             case EBreezDetails.Success:
-                amount = route.params.details.amountMsat / 1_000;
+                amount = (route.params.details as Payment).amountMsat / 1_000;
                 break;
             case EBreezDetails.Failed:
                 amount =
-                    (route.params.details.invoice?.amountMsat as number) /
-                    1_000;
+                    ((route.params.details as PaymentFailedData).invoice
+                        ?.amountMsat as number) / 1_000;
                 break;
         }
 
@@ -140,7 +146,7 @@ const LNTransactionStatus = ({route}: Props) => {
     }, [route.params.status]);
 
     return (
-        <SafeAreaView edges={['right', 'left', 'bottom']}>
+        <SafeAreaView
             <View
                 style={[
                     styles.statusContainer,
@@ -253,7 +259,10 @@ const LNTransactionStatus = ({route}: Props) => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        {route.params.details.description}
+                                        {
+                                            (route.params.details as Payment)
+                                                .description
+                                        }
                                     </Text>
                                 </View>
                             )}
