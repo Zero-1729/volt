@@ -153,7 +153,7 @@ const defaultContext: defaultContextType = {
     isWalletInitialized: false,
     walletMode: 'single',
     isAdvancedMode: false,
-    defaultToTestnet: true,
+    defaultToTestnet: false, // Default to Taproot LN on Mainnet
     electrumServerURL: {
         // Default and alternates for testnet and bitcoin
         testnet: 'ssl://electrum.blockstream.info:60002',
