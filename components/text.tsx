@@ -17,6 +17,21 @@ const VText = (props: VTextProps) => {
     );
 };
 
+export const VTextDouble = (props: VTextProps) => {
+    const {i18n} = useTranslation('common');
+
+    const alignment = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    return (
+        <Text
+            numberOfLines={2}
+            ellipsizeMode="middle"
+            style={[{textAlign: alignment}, ...props.style]}>
+            {props.children}
+        </Text>
+    );
+};
+
 export const VTextSingle = (props: VTextProps) => {
     const {i18n} = useTranslation('common');
 
