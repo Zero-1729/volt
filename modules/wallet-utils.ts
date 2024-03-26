@@ -191,6 +191,11 @@ const _deserializeExtendedKey = (key: string): Buffer => {
     return Buffer.from(decodedBuffArray);
 };
 
+const _singleSha256 = (data: Buffer) => {
+    // Return sha256(data)
+    return Crypto.createHash('sha256').update(data).digest();
+};
+
 const _doubleSha256 = (data: Buffer) => {
     const hashed = Crypto.createHash('sha256').update(data).digest();
     const hashed1 = Crypto.createHash('sha256').update(hashed).digest();
@@ -768,4 +773,10 @@ export const decodeInvoiceType = async (
         invoice: invoice,
         invalid: true,
     };
+};
+
+export const getXPub256 = (xpub: string): string => {
+    const decoded = _deserializeExtendedKey(xpub);
+
+    return _singleSha256(decoded).toString('hex');
 };
