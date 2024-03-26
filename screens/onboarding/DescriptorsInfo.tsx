@@ -64,7 +64,7 @@ const DescriptorsInfo = () => {
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({
-                                name: 'SelectMode',
+                                name: 'MoreInfo',
                             }),
                         );
                     }}

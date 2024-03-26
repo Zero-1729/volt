@@ -15,6 +15,7 @@ export type BaseProps = PropsWithChildren<{
 
 export type VTextProps = {
     numberOfLines?: number;
+    ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     children?: React.ReactNode;
 };

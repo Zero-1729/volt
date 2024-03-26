@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {ReactElement} from 'react';
 import {View, useColorScheme} from 'react-native';
-import VText from './text';
+import VText, {VTextMulti, VTextDouble} from './text';
 import {
     BaseToast,
     ErrorToast,
@@ -20,12 +20,14 @@ export const toastConfig = {
         const colorScheme = Color(useColorScheme());
         const tailwind = useTailwind();
 
+        const isBreezError = text2.includes('(Greenlight)');
+
         return (
             <View
                 style={[
                     tailwind('rounded px-4 justify-center'),
                     {
-                        height: 80,
+                        height: isBreezError ? 120 : 80,
                         width: '92%',
                         backgroundColor: colorScheme.Background.Secondary,
                     },
@@ -37,14 +39,23 @@ export const toastConfig = {
                     ]}>
                     {text1}
                 </VText>
-                <VText
-                    numberOfLines={2}
-                    style={[
-                        tailwind('text-sm'),
-                        {color: colorScheme.Text.DescText},
-                    ]}>
-                    {text2}
-                </VText>
+                {isBreezError ? (
+                    <VTextMulti
+                        style={[
+                            tailwind('text-sm'),
+                            {color: colorScheme.Text.DescText},
+                        ]}>
+                        {text2}
+                    </VTextMulti>
+                ) : (
+                    <VTextDouble
+                        style={[
+                            tailwind('text-sm'),
+                            {color: colorScheme.Text.DescText},
+                        ]}>
+                        {text2}
+                    </VTextDouble>
+                )}
             </View>
         );
     },

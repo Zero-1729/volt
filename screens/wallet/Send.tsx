@@ -136,6 +136,22 @@ const SendView = ({route}: Props) => {
     };
 
     const handleBolt11Payment = async () => {
+        // Handle if wallet broke and warn
+        const walletBalanceLN = route.params.wallet?.balanceLightning as number;
+        const bolt11AmountSats =
+            (route.params.bolt11?.amountMsat as number) / 1_000;
+
+        if (walletBalanceLN > bolt11AmountSats) {
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: t('insufficient_funds'),
+            });
+
+            return;
+        }
+
         try {
             const bolt11 = route.params.bolt11;
             const result = await sendPayment({

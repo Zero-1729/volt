@@ -163,9 +163,10 @@ export type TMempoolFeeRates = {
 } & FeesRecommended;
 
 // Breez LN payment details type
-export type TBreezPaymentDetails = PaymentFailedData &
-    Payment &
-    InvoicePaidDetails;
+export type TBreezPaymentDetails =
+    | PaymentFailedData
+    | Payment
+    | InvoicePaidDetails;
 
 export type TBreezDetails = {
     success: Payment;
