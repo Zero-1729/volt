@@ -126,32 +126,62 @@ const Wallet = ({route}: Props) => {
     };
 
     const walletTxs = walletData.transactions;
-    // TODO: sort out displaying balance for unified
-    // actually showing both balances and not picking
     const walletBalance =
         walletData.type !== 'unified'
             ? walletData.balance.onchain
             : walletData.balance.onchain.plus(walletData.balance.lightning);
 
     const getBalance = async () => {
-        const nodeState = await nodeInfo();
-        const balanceLn = nodeState.channelsBalanceMsat;
+        try {
+            const nodeState = await nodeInfo();
+            const balanceLn = nodeState.channelsBalanceMsat;
 
-        // Update balance after converting to sats
-        updateWalletBalance(currentWalletID, {
-            onchain: walletData.balance.onchain,
-            lightning: new BigNumber(balanceLn / 1000),
-        });
+            // Update balance after converting to sats
+            updateWalletBalance(currentWalletID, {
+                onchain: walletData.balance.onchain,
+                lightning: new BigNumber(balanceLn / 1000),
+            });
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+
+            return;
+        }
     };
 
     const fetchPayments = async () => {
-        const txs = await getLNPayments(walletData.transactions.length);
+        try {
+            const txs = await getLNPayments(walletData.transactions.length);
 
-        // Update transactions
-        updateWalletTransactions(currentWalletID, txs);
+            // Update transactions
+            updateWalletTransactions(currentWalletID, txs);
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+
+            return;
+        }
     };
 
     const jointSync = async () => {
+        if (!checkNetworkIsReachable(networkState)) {
+            return;
+        }
+
         if (walletData.type === 'unified') {
             setLoadingBalance(true);
             setRefreshing(true);
@@ -188,6 +218,26 @@ const Wallet = ({route}: Props) => {
         return await syncBDKWallet(w, walletData.network, electrumServerURL);
     }, []);
 
+    // Fetch fiat rate
+    const fetchFiat = async () => {
+        const triggered = await fetchFiatRate(
+            appFiatCurrency.short,
+            fiatRate,
+            (rate: BigNumber) => {
+                // Then fetch fiat rate
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: rate,
+                    lastUpdated: new Date(),
+                });
+            },
+        );
+
+        if (!triggered) {
+            console.log('[Fiat Rate] Did not fetch fiat rate');
+        }
+    };
+
     // Refresh control
     const refreshWallet = useCallback(async () => {
         // Avoid duplicate loading
@@ -209,39 +259,6 @@ const Wallet = ({route}: Props) => {
         setLoadingBalance(true);
 
         const w = await syncWallet();
-
-        try {
-            const triggered = await fetchFiatRate(
-                appFiatCurrency.short,
-                fiatRate,
-                (rate: BigNumber) => {
-                    // Then fetch fiat rate
-                    updateFiatRate({
-                        ...fiatRate,
-                        rate: rate,
-                        lastUpdated: new Date(),
-                    });
-                },
-            );
-
-            if (!triggered) {
-                console.log('[Fiat Rate] Did not fetch fiat rate');
-            }
-        } catch (err: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('network')),
-                text2: e('failed_to_fetch_rate'),
-                visibilityTime: 2000,
-            });
-
-            console.log('[Fiat Rate] Error fetching fiat rate', err.message);
-
-            setLoadingBalance(false);
-            setRefreshing(false);
-            return;
-        }
 
         if (!loadingBalance) {
             // Update wallet balance first
