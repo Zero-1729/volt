@@ -118,7 +118,7 @@ const CreateAction = () => {
             setNewWalletName('');
             setLoading(true);
 
-            // Default wallet type is Segwit p2tr on Testnet
+            // Default wallet type is Taproot p2tr on Mainnet
             await addWallet(walletName, type, network);
 
             // Vibrate to let user know the action was successful
