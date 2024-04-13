@@ -71,7 +71,6 @@ const Wallet = ({route}: Props) => {
     const navigation = useNavigation();
 
     const {t, i18n} = useTranslation('wallet');
-    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
@@ -200,12 +199,9 @@ const Wallet = ({route}: Props) => {
 
     const handleSwap = async (swapType: string) => {
         if (swapType === 'swap_in') {
-            // const feeInfo = await openChannelFee();
-            const swapInfo = await receiveOnchain({});
-
-            console.log('swap info: ', swapInfo);
+            console.log('[Swap] Init Swap In');
         } else {
-            console.log('unhandled swap type: ', swapType);
+            console.log('[Swap] Init Swap Out');
         }
     };
 
