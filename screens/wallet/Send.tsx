@@ -115,7 +115,9 @@ const SendView = ({route}: Props) => {
             : route.params.invoiceData?.options?.amount || 0,
     );
 
-    // TODO: handle by checking maxPayableMsat, invoice Msats and other fees
+    // Note: this is just a match check to determine if 'Max' entered in prev screen.
+    // For onchain BDK will handle max
+    // For Breez, we need to do some work
     const isMax = isLightning
         ? route.params.wallet?.balanceLightning ===
           (route.params.bolt11?.amountMsat as number) / 1_000

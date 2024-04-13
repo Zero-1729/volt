@@ -215,6 +215,7 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     // Fetch fiat rate
+    // TODO: efficiently call this in fetch or default to periodically calling it instead.
     const fetchFiat = async () => {
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
