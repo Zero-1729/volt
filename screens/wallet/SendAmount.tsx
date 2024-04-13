@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
@@ -259,7 +260,11 @@ const SendAmount = ({route}: Props) => {
     };
 
     return (
-        <SafeAreaView edges={edges}>
+        <SafeAreaView
+            edges={edges}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[tailwind('w-full h-full items-center justify-center')]}>
                 <View

@@ -252,7 +252,11 @@ const FeeSelection = ({route}: Props) => {
     }, []);
 
     return (
-        <SafeAreaView edges={edges}>
+        <SafeAreaView
+            edges={edges}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind('w-full h-full items-center relative'),

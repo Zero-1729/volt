@@ -29,7 +29,10 @@ const Intro = () => {
     const {t} = useTranslation('onboarding');
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind(

@@ -183,7 +183,11 @@ const Backup = () => {
     const warning = t('backup_clarification');
 
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView
+            edges={['bottom', 'right', 'left']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}

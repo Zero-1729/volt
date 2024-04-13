@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useContext, useEffect} from 'react';
 import {
@@ -325,7 +326,10 @@ const SelectWallet = ({route}: Props) => {
         : true;
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind(

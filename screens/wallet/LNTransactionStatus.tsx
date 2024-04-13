@@ -147,6 +147,9 @@ const LNTransactionStatus = ({route}: Props) => {
 
     return (
         <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     styles.statusContainer,

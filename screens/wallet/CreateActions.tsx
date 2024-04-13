@@ -156,7 +156,11 @@ const CreateAction = () => {
     };
 
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView
+            edges={['bottom', 'right', 'left']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind('w-full h-full items-center'),

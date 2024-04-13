@@ -493,7 +493,10 @@ const Home = ({route}: Props) => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind('h-full items-center justify-start relative'),

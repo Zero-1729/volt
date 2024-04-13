@@ -168,7 +168,10 @@ const Info = () => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             {/* Display Wallet Info, addresses, and other related data / settings */}
             <View
                 style={[

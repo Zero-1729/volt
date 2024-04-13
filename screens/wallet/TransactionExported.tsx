@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 import React, {useState, useEffect} from 'react';
@@ -59,7 +60,11 @@ const TransactionExported = ({route}: Props) => {
     }, [statusInfo.status]);
 
     return (
-        <SafeAreaView edges={['right', 'left', 'bottom']}>
+        <SafeAreaView
+            edges={['right', 'left', 'bottom']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     styles.statusContainer,

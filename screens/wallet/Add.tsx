@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
@@ -40,7 +41,11 @@ const Add = ({route}: Props) => {
     const {isAdvancedMode, isWalletInitialized} = useContext(AppStorageContext);
 
     return (
-        <SafeAreaView edges={['left', 'bottom', 'right']}>
+        <SafeAreaView
+            edges={['left', 'bottom', 'right']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind('w-full h-full items-center'),

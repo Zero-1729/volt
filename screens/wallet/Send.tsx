@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useContext, useEffect} from 'react';
 import {
@@ -298,7 +299,11 @@ const SendView = ({route}: Props) => {
     }, []);
 
     return (
-        <SafeAreaView edges={edges}>
+        <SafeAreaView
+            edges={edges}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[tailwind('w-full h-full items-center justify-center')]}>
                 <BottomSheetModalProvider>

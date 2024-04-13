@@ -246,7 +246,11 @@ const TransactionDetailsView = ({route}: Props) => {
     });
 
     return (
-        <SafeAreaView edges={edges}>
+        <SafeAreaView
+            edges={edges}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <BottomSheetModalProvider>
                 <View
                     style={[
