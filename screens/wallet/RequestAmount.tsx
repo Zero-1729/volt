@@ -195,26 +195,26 @@ const RequestAmount = () => {
             // TODO: probably move these as info displayed somewhere in the app
             // Warn user for first tx that amount will be deducted for channel open
             // first open channel
-            if (firstTx && feeMsat.feeMsat > 0) {
+            if (firstTx && (feeMsat.feeMsat as number) > 0) {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
                     text1: capitalizeFirst(t('warning')),
                     text2: e('new_channel_open_warn', {
-                        n: feeMsat.feeMsat / 1_000,
+                        n: feeMsat.feeMsat ?? 1_000 / 1_000,
                     }),
                     visibilityTime: 2000,
                 });
             }
 
             // Warn user that amount will trigger a new channel open
-            if (!firstTx && feeMsat.feeMsat > 0) {
+            if (!firstTx && (feeMsat.feeMsat as number) > 0) {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
                     text1: capitalizeFirst(t('warning')),
                     text2: e('new_channel_open_warn', {
-                        n: feeMsat.feeMsat / 1_000,
+                        n: (feeMsat.feeMsat as number) / 1_000,
                     }),
                     visibilityTime: 2000,
                 });
