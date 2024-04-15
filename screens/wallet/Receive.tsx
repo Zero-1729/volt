@@ -596,6 +596,7 @@ const Receive = ({route}: Props) => {
                             tailwind(
                                 'h-full w-full items-center justify-end absolute bottom-0',
                             ),
+                            {zIndex: -9},
                         ]}>
                         <Carousel
                             ref={carouselRef}
@@ -639,7 +640,18 @@ const Receive = ({route}: Props) => {
                     </View>
                 )}
 
-                {!isLNWallet && onchainPanel()}
+                {!isLNWallet && (
+                    <View
+                        style={[
+                            styles.carouselContainer,
+                            tailwind(
+                                'h-full w-full items-center justify-end absolute bottom-0',
+                            ),
+                            {zIndex: -9},
+                        ]}>
+                        {onchainPanel()}
+                    </View>
+                )}
             </View>
         </SafeAreaView>
     );
