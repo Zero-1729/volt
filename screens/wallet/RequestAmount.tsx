@@ -386,14 +386,20 @@ const RequestAmount = () => {
                                             'text-sm text-center mr-2 font-bold',
                                         ),
                                         {
-                                            color: ColorScheme.Text.DescText,
+                                            color: lnInvoiceDesc
+                                                ? ColorScheme.Text.Default
+                                                : ColorScheme.Text.DescText,
                                         },
                                     ]}>
                                     {t('ln_description')}
                                 </VText>
                                 <BottomArrow
                                     width={16}
-                                    fill={ColorScheme.SVG.GrayFill}
+                                    fill={
+                                        lnInvoiceDesc
+                                            ? ColorScheme.SVG.Default
+                                            : ColorScheme.SVG.GrayFill
+                                    }
                                 />
                             </View>
                         </PlainButton>
