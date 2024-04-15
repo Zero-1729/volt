@@ -125,7 +125,6 @@ const LNTransactionStatus = ({route}: Props) => {
                     appState.current.match(/inactive|background/) &&
                     nextAppState === 'active'
                 ) {
-                    console.log('yes');
                     lottieAnim.current?.play();
                 }
 
