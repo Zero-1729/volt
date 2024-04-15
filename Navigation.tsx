@@ -149,6 +149,7 @@ export type WalletParamList = {
         amount: string;
         sats: string;
         fiat: string;
+        lnDescription?: string;
     };
     FeeSelection: {
         invoiceData: TInvoiceData;
