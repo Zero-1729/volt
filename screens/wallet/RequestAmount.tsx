@@ -99,7 +99,9 @@ const RequestAmount = () => {
     // TODO: remove and make sure only onchain generated in next screen
     const hideContinueButton =
         satsAmount.value.isZero() ||
-        (satsAmount.value.gte(maxReceivableAmount) && walletType === 'unified');
+        (satsAmount.value.gte(maxReceivableAmount) &&
+            !maxReceivableAmount.isZero() &&
+            walletType === 'unified');
 
     useEffect(() => {
         setMaxReceivableAmount();
