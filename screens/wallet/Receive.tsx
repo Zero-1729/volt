@@ -135,12 +135,15 @@ const Receive = ({route}: Props) => {
 
         const satsAmt = mSats / 1_000;
 
+        // Description
+        const ln_desc = route.params.lnDescription
+            ? route.params.lnDescription
+            : `Volt LN invoice for ${addCommas(satsAmt.toString())} sats`;
+
         try {
             const receivePaymentResp = await receivePayment({
                 amountMsat: mSats,
-                description: `Volt LN invoice for ${addCommas(
-                    satsAmt.toString(),
-                )} sats`,
+                description: ln_desc,
             });
 
             setLNInvoice(receivePaymentResp.lnInvoice);
