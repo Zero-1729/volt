@@ -29,7 +29,7 @@ import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from '../../components/button';
 
-import NativeBottomPadding from '../../constants/NativeWindowMetrics';
+import NativeDims from '../../constants/NativeWindowMetrics';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
@@ -262,7 +262,7 @@ const About = () => {
                 <View
                     style={[
                         tailwind('w-full absolute items-center justify-center'),
-                        NativeBottomPadding,
+                        {bottom: NativeDims.bottom},
                     ]}>
                     <PlainButton
                         onPress={() => {
