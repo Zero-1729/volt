@@ -43,7 +43,7 @@ import {
     DisplaySatsAmount,
     DisplayBTCAmount,
 } from '../../components/balance';
-import Toast from 'react-native-toast-message';
+import {actionAlert} from '../../components/alert';
 
 const RequestAmount = () => {
     const tailwind = useTailwind();
@@ -208,51 +208,44 @@ const RequestAmount = () => {
 
     const handleRoute = async () => {
         if (walletType === 'unified') {
-            const feeMsat = await openChannelFee({
+            const channelOpenFee = await openChannelFee({
                 amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
             });
 
-            const firstTx = wallet.transactions.length === 0;
+            const info = await nodeInfo();
+            const beyondMaxLiquidity = satsAmount.value.gte(
+                info.inboundLiquidityMsats / 1_000,
+            );
 
-            // TODO: probably move these as info displayed somewhere in the app
-            // Warn user for first tx that amount will be deducted for channel open
-            // first open channel
-            if (firstTx && (feeMsat.feeMsat as number) > 0) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('warning')),
-                    text2: e('new_channel_open_warn', {
-                        n: feeMsat.feeMsat ?? 1_000 / 1_000,
-                    }),
-                    visibilityTime: 2000,
-                });
-            }
+            const feeSats = (channelOpenFee.feeMsat as number) / 1_000;
 
             // Warn user that amount will trigger a new channel open
-            if (!firstTx && (feeMsat.feeMsat as number) > 0) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('warning')),
-                    text2: e('new_channel_open_warn', {
-                        n: (feeMsat.feeMsat as number) / 1_000,
+            // In cases were first tx or if larger than channel liquidity
+            if (beyondMaxLiquidity && feeSats > 0) {
+                actionAlert(
+                    capitalizeFirst(t('channel_opening')),
+                    e('new_channel_open_warn', {
+                        n: feeSats,
                     }),
-                    visibilityTime: 2000,
-                });
+                    t('ok'),
+                    capitalizeFirst(t('cancel')),
+                    () => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'Receive',
+                                params: {
+                                    sats: satsAmount.value.toString(),
+                                    fiat: fiatAmount.toString(),
+                                    amount: amount,
+                                },
+                            }),
+                        );
+                    },
+                );
             }
         }
 
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'Receive',
-                params: {
-                    sats: satsAmount.value.toString(),
-                    fiat: fiatAmount.toString(),
-                    amount: amount,
-                },
-            }),
-        );
+        return;
     };
 
     // If we are in LN we shouldn't attempt to show skip since we are forcing
