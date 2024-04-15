@@ -25,6 +25,7 @@ const BottomOffset =
 
 export default {
     width: Frame.width,
+    height: Frame.height,
     left: Insets.left,
     right: Insets.right,
     bottom: BottomOffset,
