@@ -520,6 +520,11 @@
 			"justifyContent": "flex-start"
 		}
 	},
+	"justify-end": {
+		"style": {
+			"justifyContent": "flex-end"
+		}
+	},
 	"justify-center": {
 		"style": {
 			"justifyContent": "center"

@@ -72,6 +72,8 @@ import {PlainButton} from '../../components/button';
 import NativeDims from '../../constants/NativeWindowMetrics';
 import {useSharedValue} from 'react-native-reanimated';
 
+import Dot from '../../components/dots';
+
 // Prop type for params passed to this screen
 // from the RequestAmount screen
 type Props = NativeStackScreenProps<WalletParamList, 'Receive'>;
@@ -217,7 +219,9 @@ const Receive = ({route}: Props) => {
 
         return (
             <View
-                style={[tailwind('items-center justify-center h-full w-full')]}>
+                style={[
+                    tailwind('items-center justify-center h-full w-full -mt-6'),
+                ]}>
                 {!loadingInvoice && isAmountInvoice && (
                     <View
                         style={[
@@ -260,8 +264,8 @@ const Receive = ({route}: Props) => {
                             backgroundColor: 'white',
                         }}
                         data={BTCInvoice}
-                        padding={8}
-                        pieceSize={8}
+                        padding={7}
+                        pieceSize={7}
                         color={ColorScheme.Background.Default}
                         isPiecesGlued={true}
                         pieceBorderRadius={4}
@@ -378,7 +382,9 @@ const Receive = ({route}: Props) => {
 
         return (
             <View
-                style={[tailwind('items-center justify-center h-full w-full')]}>
+                style={[
+                    tailwind('items-center justify-center h-full w-full -mt-6'),
+                ]}>
                 <Text
                     style={[
                         tailwind('text-base mb-4 font-bold'),
@@ -586,7 +592,9 @@ const Receive = ({route}: Props) => {
                     <View
                         style={[
                             styles.carouselContainer,
-                            tailwind('bottom-0 absolute'),
+                            tailwind(
+                                'h-full w-full items-center justify-end absolute bottom-0',
+                            ),
                         ]}>
                         <Carousel
                             ref={carouselRef}
@@ -607,6 +615,19 @@ const Receive = ({route}: Props) => {
                                 progressValue.value = absoluteProgress;
                             }}
                         />
+
+                        <View
+                            style={[styles.dots, {bottom: NativeDims.bottom}]}
+                            pointerEvents="none">
+                            {panels.map((_slide, index) => (
+                                <Dot
+                                    key={index}
+                                    index={index}
+                                    animValue={progressValue}
+                                    length={panels.length}
+                                />
+                            ))}
+                        </View>
                     </View>
                 )}
 
@@ -624,5 +645,13 @@ const styles = StyleSheet.create({
     },
     carouselContainer: {
         flex: 1,
+    },
+    dots: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignSelf: 'center',
+        marginTop: 16,
+        width: 26,
+        position: 'absolute',
     },
 });
