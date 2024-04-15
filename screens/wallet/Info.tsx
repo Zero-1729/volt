@@ -35,6 +35,8 @@ import {ENet} from '../../types/enums';
 import {capitalizeFirst} from '../../modules/transform';
 import Toast from 'react-native-toast-message';
 
+import {disconnect} from '@breeztech/react-native-breez-sdk';
+
 const Info = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
@@ -162,6 +164,11 @@ const Info = () => {
 
             // Delete wallet from store
             await deleteWallet(currentWalletID);
+
+            if (walletData.type === 'unified') {
+                // Disconnect from Breez SDK
+                await disconnect();
+            }
         } catch (err) {
             console.error('[Wallet Screen] Error deleting wallet: ', err);
         }
