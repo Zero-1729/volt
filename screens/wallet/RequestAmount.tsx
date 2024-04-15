@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useEffect, useState} from 'react';
-import {useColorScheme, View, Text} from 'react-native';
+import {useColorScheme, View, Text, Alert, Platform} from 'react-native';
+import Prompt from 'react-native-prompt-android';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
-import VText from '../../components/text';
+import VText, {VTextSingle} from '../../components/text';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -21,6 +22,10 @@ import {AppStorageContext} from '../../class/storageContext';
 import Close from '../../assets/svg/x-24.svg';
 
 import bottomOffset from '../../constants/NativeWindowMetrics';
+
+import Toast, {ToastConfig} from 'react-native-toast-message';
+
+import BottomArrow from '../../assets/svg/chevron-down-16.svg';
 
 import {
     SATS_TO_BTC_RATE,
@@ -44,6 +49,7 @@ import {
     DisplayBTCAmount,
 } from '../../components/balance';
 import {actionAlert} from '../../components/alert';
+import {toastConfig} from '../../components/toast';
 
 const RequestAmount = () => {
     const tailwind = useTailwind();
@@ -63,6 +69,7 @@ const RequestAmount = () => {
     const [maxReceivableAmount, updateMaxReceivableAmount] = useState(
         new BigNumber(0),
     );
+    const [lnInvoiceDesc, setLNInvoiceDesc] = useState<string>('');
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
         value: new BigNumber(0),
@@ -97,6 +104,61 @@ const RequestAmount = () => {
     useEffect(() => {
         setMaxReceivableAmount();
     }, []);
+
+    const _handleDescription = (text: string | undefined) => {
+        const chars = text as string;
+
+        if (chars.length <= 90) {
+            setLNInvoiceDesc(chars);
+        } else {
+            Toast.show({
+                topOffset: 60,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('warn')),
+                text2: e('ln_description_length'),
+                position: 'top',
+                visibilityTime: 2000,
+            });
+        }
+    };
+
+    const updateDescription = () => {
+        if (Platform.OS === 'android') {
+            Prompt(
+                capitalizeFirst(t('ln_description')),
+                t('ln_description_text'),
+                [
+                    {text: capitalizeFirst(t('cancel'))},
+                    {
+                        text: capitalizeFirst(t('set')),
+                        onPress: _handleDescription,
+                    },
+                ],
+                {
+                    type: 'numeric',
+                },
+            );
+        } else {
+            Alert.prompt(
+                capitalizeFirst(t('ln_description')),
+                t('ln_description_text'),
+                [
+                    {
+                        text: capitalizeFirst(t('cancel')),
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+                    {
+                        text: capitalizeFirst(t('set')),
+                        onPress: _handleDescription,
+                    },
+                ],
+                'plain-text',
+                '',
+                'number-pad',
+            );
+        }
+    };
 
     const updateAmount = (value: string) => {
         // When newly swapped, the value is reset to new number from user
@@ -237,10 +299,23 @@ const RequestAmount = () => {
                                     sats: satsAmount.value.toString(),
                                     fiat: fiatAmount.toString(),
                                     amount: amount,
+                                    lnDescription: lnInvoiceDesc,
                                 },
                             }),
                         );
                     },
+                );
+            } else {
+                navigation.dispatch(
+                    CommonActions.navigate({
+                        name: 'Receive',
+                        params: {
+                            sats: satsAmount.value.toString(),
+                            fiat: fiatAmount.toString(),
+                            amount: amount,
+                            lnDescription: lnInvoiceDesc,
+                        },
+                    }),
                 );
             }
         }
@@ -292,19 +367,67 @@ const RequestAmount = () => {
                         {capitalizeFirst(t('receive'))}
                     </Text>
 
+                    {/* Invoice description */}
+                    {isLightning && (
+                        <PlainButton onPress={updateDescription}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'items-center mt-4 rounded-full px-4 py-1 flex-row',
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <VText
+                                    style={[
+                                        tailwind(
+                                            'text-sm text-center mr-2 font-bold',
+                                        ),
+                                        {
+                                            color: ColorScheme.Text.DescText,
+                                        },
+                                    ]}>
+                                    {t('ln_description')}
+                                </VText>
+                                <BottomArrow
+                                    width={16}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            </View>
+                        </PlainButton>
+                    )}
+
+                    {isLightning && lnInvoiceDesc.length > 0 && (
+                        <View style={[tailwind('mt-3 w-5/6 items-center')]}>
+                            <VTextSingle
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {lnInvoiceDesc}
+                            </VTextSingle>
+                        </View>
+                    )}
+
                     {isLightning &&
                         satsAmount.value.gte(maxReceivableAmount) && (
-                            <View style={[tailwind('mt-6')]}>
+                            <View style={[tailwind('mt-4')]}>
                                 <VText
                                     style={[
                                         tailwind('text-sm text-center'),
                                         {
-                                            color: ColorScheme.Text.GrayedText,
+                                            color: ColorScheme.Text.GrayText,
                                         },
                                     ]}>
-                                    {t('max_receivable_lightning', {
-                                        sats: formatSats(maxReceivableAmount),
-                                    })}
+                                    {capitalizeFirst(t('note')) +
+                                        ': ' +
+                                        t('max_receivable_lightning', {
+                                            sats: formatSats(
+                                                maxReceivableAmount,
+                                            ),
+                                        })}
                                 </VText>
                             </View>
                         )}
@@ -381,6 +504,7 @@ const RequestAmount = () => {
                         </View>
                     </PlainButton>
                 </View>
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );
