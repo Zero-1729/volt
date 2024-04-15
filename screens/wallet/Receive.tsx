@@ -18,6 +18,7 @@ import {
     Share,
     StyleSheet,
     ActivityIndicator,
+    Platform,
 } from 'react-native';
 
 import {
@@ -601,7 +602,14 @@ const Receive = ({route}: Props) => {
                             style={[tailwind('items-center')]}
                             data={panels}
                             width={NativeDims.width}
-                            height={NativeDims.height * 0.8 - 20}
+                            // Adjust height for iOS
+                            // to account for top stack height
+                            height={
+                                Platform.OS === 'ios'
+                                    ? NativeDims.height -
+                                      NativeDims.navBottom * 3.2
+                                    : NativeDims.height
+                            }
                             loop={false}
                             panGestureHandlerProps={{
                                 activeOffsetX: [-10, 10],
