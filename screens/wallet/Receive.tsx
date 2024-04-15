@@ -29,6 +29,9 @@ import {
 
 import {receivePayment, LnInvoice} from '@breeztech/react-native-breez-sdk';
 
+import Toast, {ToastConfig} from 'react-native-toast-message';
+import {toastConfig} from '../../components/toast';
+
 import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 
 import ExpiryTimer from '../../components/expiry';
@@ -162,6 +165,16 @@ const Receive = ({route}: Props) => {
             setLoadingInvoice(false);
         } catch (error) {
             console.log('Error getting node info', error);
+
+            // TODO: display notification that couldn't do it
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'WalletView',
+                    params: {
+                        reload: false,
+                    },
+                }),
+            );
         }
     };
 
@@ -187,8 +200,7 @@ const Receive = ({route}: Props) => {
         return `bitcoin:${address}`;
     };
 
-    // Set the plain address and bitcoin invoice URI
-    const [plainAddress, setPlainAddress] = useState('');
+    // Set bitcoin invoice URI
     const BTCInvoice = useMemo(
         () => getFormattedAddress(walletData.address.address),
         [state.bitcoinValue],
@@ -201,11 +213,15 @@ const Receive = ({route}: Props) => {
         // and revert after a few seconds
         Clipboard.setString(invoice);
 
-        setPlainAddress(capitalizeFirst(t('copied_to_clipboard')));
-
-        setTimeout(() => {
-            setPlainAddress('');
-        }, 450);
+        Toast.show({
+            topOffset: 60,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('clipboard')),
+            text2: capitalizeFirst(t('copied_to_clipboard')),
+            visibilityTime: 1000,
+            autoHide: true,
+            position: 'top',
+        });
     };
 
     const isAmountInvoice =
@@ -293,18 +309,6 @@ const Receive = ({route}: Props) => {
                     </View>
                 )}
 
-                {plainAddress.length > 0 && (
-                    <View>
-                        <Text
-                            style={[
-                                tailwind('mt-4'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {plainAddress}
-                        </Text>
-                    </View>
-                )}
-
                 {/* Bottom buttons */}
                 {!loadingInvoice && (
                     <View style={[tailwind('items-center mt-6')]}>
@@ -367,13 +371,13 @@ const Receive = ({route}: Props) => {
         ColorScheme,
         BTCInvoice,
         loadingInvoice,
-        plainAddress,
         state,
         t,
         tailwind,
         route.params.amount,
         isAmountInvoice,
         styles,
+        Toast,
     ]);
 
     const lnPanel = useCallback((): ReactElement => {
@@ -431,18 +435,6 @@ const Receive = ({route}: Props) => {
                                 {LNInvoice?.bolt11}
                             </Text>
                         </PlainButton>
-                    </View>
-                )}
-
-                {plainAddress.length > 0 && (
-                    <View>
-                        <Text
-                            style={[
-                                tailwind('mt-4'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {plainAddress}
-                        </Text>
                     </View>
                 )}
 
@@ -504,15 +496,7 @@ const Receive = ({route}: Props) => {
                 )}
             </View>
         );
-    }, [
-        ColorScheme,
-        tailwind,
-        LNInvoice,
-        loadingInvoice,
-        plainAddress,
-        t,
-        styles,
-    ]);
+    }, [ColorScheme, tailwind, LNInvoice, loadingInvoice, t, styles, Toast]);
 
     const panels = useMemo(
         (): Slide[] => [lnPanel, onchainPanel],
@@ -652,6 +636,8 @@ const Receive = ({route}: Props) => {
                         {onchainPanel()}
                     </View>
                 )}
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );

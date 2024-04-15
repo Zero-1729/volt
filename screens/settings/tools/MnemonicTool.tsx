@@ -19,6 +19,9 @@ import {useTranslation} from 'react-i18next';
 import {LongBottomButton, PlainButton} from '../../../components/button';
 import {TextSingleInput} from '../../../components/input';
 
+import Toast, {ToastConfig} from 'react-native-toast-message';
+import {toastConfig} from '../../../components/toast';
+
 import Close from '../../../assets/svg/x-24.svg';
 import ArrowUp from '../../../assets/svg/chevron-up-16.svg';
 import ArrowDown from '../../../assets/svg/chevron-down-16.svg';
@@ -44,7 +47,6 @@ import {capitalizeFirst} from '../../../modules/transform';
 import {WalletPaths} from '../../../modules/wallet-defaults';
 
 const MnemonicTool = () => {
-    const [resultMessageText, setResulteMessageText] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [mnemonic, setMnemonic] = useState('');
     const [isTestnet, setIsTestnet] = useState(false);
@@ -76,17 +78,20 @@ const MnemonicTool = () => {
         setMaterial(value);
 
         setResultMessage('');
-        setResulteMessageText('');
     };
 
     const copyXpubToClipboard = () => {
         Clipboard.setString(resultMessage);
 
-        setResulteMessageText(capitalizeFirst(t('copied_to_clipboard!')));
-
-        setTimeout(() => {
-            setResulteMessageText(resultMessage);
-        }, 450);
+        Toast.show({
+            topOffset: 60,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('clipboard')),
+            text2: capitalizeFirst(t('copied_to_clipboard')),
+            visibilityTime: 1000,
+            autoHide: true,
+            position: 'top',
+        });
     };
 
     const handleButtonPress = () => {
@@ -145,7 +150,6 @@ const MnemonicTool = () => {
 
         try {
             setResultMessage(result);
-            setResulteMessageText(result);
         } catch (err: any) {
             errorAlert(
                 t('mnemonic'),
@@ -169,7 +173,6 @@ const MnemonicTool = () => {
 
         // Clear result message
         setResultMessage('');
-        setResulteMessageText('');
     };
 
     const onBlur = () => {
@@ -337,7 +340,7 @@ const MnemonicTool = () => {
                 </View>
 
                 {/* Result */}
-                {resultMessageText.length > 0 && (
+                {resultMessage.length > 0 && (
                     <View style={[tailwind('mt-8 w-5/6')]}>
                         <VText
                             style={[
@@ -363,7 +366,7 @@ const MnemonicTool = () => {
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {resultMessageText}
+                                {resultMessage}
                             </VText>
                         </PlainButton>
                     </View>
@@ -390,6 +393,8 @@ const MnemonicTool = () => {
                             : ColorScheme.Background.Secondary
                     }
                 />
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );
