@@ -89,6 +89,11 @@ const RequestAmount = () => {
 
     const isLightning = walletType === 'unified';
 
+    // TODO: remove and make sure only onchain generated in next screen
+    const hideContinueButton =
+        satsAmount.value.isZero() ||
+        (satsAmount.value.gte(maxReceivableAmount) && walletType === 'unified');
+
     useEffect(() => {
         setMaxReceivableAmount();
     }, []);
@@ -351,19 +356,13 @@ const RequestAmount = () => {
                     style={[
                         tailwind(
                             `absolute ${
-                                walletType === 'unified' &&
-                                satsAmount.value.isZero()
-                                    ? 'opacity-40'
-                                    : ''
+                                hideContinueButton ? 'opacity-40' : ''
                             }`,
                         ),
                         {bottom: bottomOffset.bottom},
                     ]}>
                     <PlainButton
-                        disabled={
-                            satsAmount.value.isZero() &&
-                            walletType === 'unified'
-                        }
+                        disabled={hideContinueButton}
                         onPress={handleRoute}>
                         <View
                             style={[
