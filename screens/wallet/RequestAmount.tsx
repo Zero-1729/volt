@@ -135,7 +135,7 @@ const RequestAmount = () => {
                     },
                 ],
                 {
-                    type: 'numeric',
+                    type: 'default',
                 },
             );
         } else {
@@ -155,7 +155,7 @@ const RequestAmount = () => {
                 ],
                 'plain-text',
                 '',
-                'number-pad',
+                'default',
             );
         }
     };
