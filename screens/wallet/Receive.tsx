@@ -7,6 +7,9 @@ import React, {
     useEffect,
     useMemo,
     useReducer,
+    ReactElement,
+    useCallback,
+    useRef,
 } from 'react';
 import {
     useColorScheme,
@@ -25,7 +28,8 @@ import {
 
 import {receivePayment, LnInvoice} from '@breeztech/react-native-breez-sdk';
 
-import VText from '../../components/text';
+import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
+
 import ExpiryTimer from '../../components/expiry';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -65,11 +69,13 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {PlainButton} from '../../components/button';
 
-import bottomOffset from '../../constants/NativeWindowMetrics';
+import NativeDims from '../../constants/NativeWindowMetrics';
+import {useSharedValue} from 'react-native-reanimated';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
 type Props = NativeStackScreenProps<WalletParamList, 'Receive'>;
+type Slide = () => ReactElement;
 
 const Receive = ({route}: Props) => {
     const tailwind = useTailwind();
@@ -82,7 +88,9 @@ const Receive = ({route}: Props) => {
     const {currentWalletID, getWalletData, isAdvancedMode} =
         useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
+    const isLNWallet = walletData.type === 'unified';
 
+    const progressValue = useSharedValue(0);
     const [loadingInvoice, setLoadingInvoice] = useState(
         walletData.type === 'unified',
     );
@@ -183,35 +191,12 @@ const Receive = ({route}: Props) => {
         [state.bitcoinValue],
     );
 
-    const BitcoinInvoice =
-        walletData.type === 'unified'
-            ? (LNInvoice?.bolt11 as string)
-            : BTCInvoice;
-
-    const walletInvoice =
-        walletData.type === 'unified' ? LNInvoice?.bolt11 : BitcoinInvoice;
-
-    const walletInvoiceText =
-        walletData.type === 'unified'
-            ? walletInvoice
-            : walletData.address.address;
-
-    const invoice_text_title =
-        walletData.type === 'unified'
-            ? t('lightning_invoice')
-            : t('invoice_address');
-
-    const invoice_title =
-        walletData.type === 'unified'
-            ? t('lightning_invoice')
-            : t('bitcoin_invoice');
-
     // Copy data to clipboard
-    const copyDescToClipboard = () => {
+    const copyDescToClipboard = (invoice: string) => {
         // Copy backup material to Clipboard
         // Temporarily set copied message
         // and revert after a few seconds
-        Clipboard.setString(walletInvoiceText as string);
+        Clipboard.setString(invoice);
 
         setPlainAddress(capitalizeFirst(t('copied_to_clipboard')));
 
@@ -220,144 +205,84 @@ const Receive = ({route}: Props) => {
         }, 450);
     };
 
-    const qrStyles = {
-        padding: walletData.type === 'unified' ? 4 : 10,
-        pieceSize: walletData.type === 'unified' ? 4 : 6,
-        paddingRadius: walletData.type === 'unified' ? 2 : 4,
-    };
+    const isAmountInvoice =
+        (!isLNWallet && !state.bitcoinValue.isZero()) || isLNWallet;
 
-    return (
-        <SafeAreaView
-            edges={['bottom', 'right', 'left']}
-            style={[
-                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
-            ]}>
+    const carouselRef = useRef<ICarouselInstance>(null);
+
+    const onchainPanel = useCallback((): ReactElement => {
+        const copyToClip = () => {
+            copyDescToClipboard(BTCInvoice);
+        };
+
+        return (
             <View
-                style={[
-                    tailwind('w-full h-full items-center justify-center'),
-                    {backgroundColor: ColorScheme.Background.Default},
-                ]}>
-                <View
-                    style={[
-                        tailwind(
-                            'w-5/6 justify-center items-center absolute top-6 flex',
-                        ),
-                    ]}>
-                    <PlainButton
-                        style={[tailwind('absolute left-0 z-10')]}
-                        onPress={() => {
-                            navigation.dispatch(StackActions.popToTop());
-                        }}>
-                        <Close fill={ColorScheme.SVG.Default} />
-                    </PlainButton>
-                    <Text
+                style={[tailwind('items-center justify-center h-full w-full')]}>
+                {!loadingInvoice && isAmountInvoice && (
+                    <View
                         style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
+                            tailwind('mb-4 flex justify-center items-center'),
                         ]}>
-                        {invoice_title}
-                    </Text>
-                    {/* Invoice Timeout */}
-                    {LNInvoice?.expiry && (
-                        <View style={[tailwind('absolute right-0')]}>
-                            <ExpiryTimer expiryDate={LNInvoice?.expiry} />
-                        </View>
-                    )}
-                </View>
-
-                {/* Click should toggle unit amount or display fiat amount below */}
-                <View style={[tailwind('w-5/6 -mt-12 items-center')]}>
-                    {!loadingInvoice && !state.bitcoinValue.isZero() && (
-                        <View
-                            style={[
-                                tailwind(
-                                    'mb-4 flex justify-center items-center',
-                                ),
-                            ]}>
+                        {/* Make it approx if it doesn't match bottom unit value for requested amount */}
+                        {state.bitcoinValue < 100_000_000 ? (
+                            <DisplaySatsAmount
+                                amount={state.bitcoinValue}
+                                fontSize={'text-2xl'}
+                            />
+                        ) : (
+                            <DisplayBTCAmount
+                                amount={state.bitcoinValue}
+                                fontSize="text-2xl"
+                            />
+                        )}
+                        <View style={[tailwind('opacity-40')]}>
                             {/* Make it approx if it doesn't match bottom unit value for requested amount */}
-                            {state.bitcoinValue < 100_000_000 ? (
-                                <DisplaySatsAmount
-                                    amount={state.bitcoinValue}
-                                    fontSize={'text-2xl'}
-                                />
-                            ) : (
-                                <DisplayBTCAmount
-                                    amount={state.bitcoinValue}
-                                    fontSize="text-2xl"
-                                />
-                            )}
-                            <View style={[tailwind('opacity-40')]}>
-                                {/* Make it approx if it doesn't match bottom unit value for requested amount */}
-                                <DisplayFiatAmount
-                                    amount={formatFiat(state.fiatValue)}
-                                    fontSize={'text-base'}
-                                    isApprox={
-                                        route.params.amount !==
-                                        state.fiatValue.toString()
-                                    }
-                                />
-                            </View>
-                        </View>
-                    )}
-
-                    {/* QR code */}
-                    {loadingInvoice ? (
-                        <View style={[tailwind('items-center')]}>
-                            <ActivityIndicator />
-                            <Text
-                                style={[
-                                    tailwind('text-sm mt-4'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {isAdvancedMode
-                                    ? t('loading_invoice_advanced')
-                                    : t('loading_invoice')}
-                            </Text>
-                        </View>
-                    ) : (
-                        <View
-                            style={[
-                                styles.qrCodeContainer,
-                                tailwind('rounded'),
-                                {borderColor: ColorScheme.Background.QRBorder},
-                            ]}>
-                            <QRCodeStyled
-                                style={{
-                                    backgroundColor: 'white',
-                                }}
-                                data={walletInvoice}
-                                padding={qrStyles.padding}
-                                pieceSize={qrStyles.pieceSize}
-                                color={ColorScheme.Background.Default}
-                                isPiecesGlued={true}
-                                pieceBorderRadius={qrStyles.paddingRadius}
+                            <DisplayFiatAmount
+                                amount={formatFiat(state.fiatValue)}
+                                fontSize={'text-base'}
+                                isApprox={
+                                    route.params.amount !==
+                                    state.fiatValue.toString()
+                                }
                             />
                         </View>
-                    )}
+                    </View>
+                )}
+
+                <View
+                    style={[
+                        styles.qrCodeContainer,
+                        tailwind('rounded'),
+                        {borderColor: ColorScheme.Background.QRBorder},
+                    ]}>
+                    <QRCodeStyled
+                        style={{
+                            backgroundColor: 'white',
+                        }}
+                        data={BTCInvoice}
+                        padding={8}
+                        pieceSize={8}
+                        color={ColorScheme.Background.Default}
+                        isPiecesGlued={true}
+                        pieceBorderRadius={4}
+                    />
                 </View>
 
                 {/* Bitcoin address info */}
                 {!loadingInvoice && (
                     <View
                         style={[
-                            tailwind('p-4 mt-4 w-3/5 rounded'),
+                            tailwind('p-4 mt-4 w-4/5 rounded'),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
-                        <VText
-                            style={[
-                                tailwind('mb-4 font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {invoice_text_title}
-                        </VText>
                         <PlainButton
                             style={[tailwind('w-full')]}
-                            onPress={copyDescToClipboard}>
+                            onPress={copyToClip}>
                             <Text
                                 ellipsizeMode="middle"
                                 numberOfLines={1}
                                 style={[{color: ColorScheme.Text.Default}]}>
-                                {walletInvoiceText}
+                                {BTCInvoice}
                             </Text>
                         </PlainButton>
                     </View>
@@ -377,19 +302,15 @@ const Receive = ({route}: Props) => {
 
                 {/* Bottom buttons */}
                 {!loadingInvoice && (
-                    <View
-                        style={[
-                            tailwind('absolute'),
-                            {bottom: bottomOffset.bottom - 6},
-                        ]}>
+                    <View style={[tailwind('items-center mt-6')]}>
                         {/* Share Button */}
                         <PlainButton
                             style={[tailwind('mb-6')]}
                             onPress={() => {
                                 Share.share({
-                                    message: BitcoinInvoice,
+                                    message: BTCInvoice,
                                     title: 'Share Address',
-                                    url: BitcoinInvoice,
+                                    url: BTCInvoice,
                                 });
                             }}>
                             <View
@@ -436,6 +357,261 @@ const Receive = ({route}: Props) => {
                     </View>
                 )}
             </View>
+        );
+    }, [
+        ColorScheme,
+        BTCInvoice,
+        loadingInvoice,
+        plainAddress,
+        state,
+        t,
+        tailwind,
+        route.params.amount,
+        isAmountInvoice,
+        styles,
+    ]);
+
+    const lnPanel = useCallback((): ReactElement => {
+        const copyToClip = () => {
+            copyDescToClipboard(LNInvoice?.bolt11 as string);
+        };
+
+        return (
+            <View
+                style={[tailwind('items-center justify-center h-full w-full')]}>
+                <Text
+                    style={[
+                        tailwind('text-base mb-4 font-bold'),
+                        {color: ColorScheme.Text.Default},
+                    ]}>
+                    {capitalizeFirst(t('lightning'))}
+                </Text>
+                <View
+                    style={[
+                        styles.qrCodeContainer,
+                        tailwind('rounded'),
+                        {
+                            borderColor: ColorScheme.Background.QRBorder,
+                        },
+                    ]}>
+                    <QRCodeStyled
+                        style={{
+                            backgroundColor: 'white',
+                        }}
+                        data={LNInvoice?.bolt11}
+                        padding={4}
+                        pieceSize={4}
+                        color={ColorScheme.Background.Default}
+                        isPiecesGlued={true}
+                        pieceBorderRadius={2}
+                    />
+                </View>
+
+                {/* Bitcoin address info */}
+                {!loadingInvoice && (
+                    <View
+                        style={[
+                            tailwind('p-4 mt-4 w-4/5 rounded'),
+                            {backgroundColor: ColorScheme.Background.Greyed},
+                        ]}>
+                        <PlainButton
+                            style={[tailwind('w-full')]}
+                            onPress={copyToClip}>
+                            <Text
+                                ellipsizeMode="middle"
+                                numberOfLines={1}
+                                style={[{color: ColorScheme.Text.Default}]}>
+                                {LNInvoice?.bolt11}
+                            </Text>
+                        </PlainButton>
+                    </View>
+                )}
+
+                {plainAddress.length > 0 && (
+                    <View>
+                        <Text
+                            style={[
+                                tailwind('mt-4'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {plainAddress}
+                        </Text>
+                    </View>
+                )}
+
+                {/* Bottom buttons */}
+                {!loadingInvoice && (
+                    <View style={[tailwind('items-center mt-6')]}>
+                        {/* Share Button */}
+                        <PlainButton
+                            style={[tailwind('mb-6')]}
+                            onPress={() => {
+                                Share.share({
+                                    message: LNInvoice?.bolt11 as string,
+                                    title: 'Share Address',
+                                    url: LNInvoice?.bolt11 as string,
+                                });
+                            }}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'rounded-full items-center flex-row justify-center px-6 py-3',
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Inverted,
+                                    },
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm mr-2 font-bold'),
+                                        {
+                                            color: ColorScheme.Text.Alt,
+                                        },
+                                    ]}>
+                                    {capitalizeFirst(t('share'))}
+                                </Text>
+                                <ShareIcon fill={ColorScheme.SVG.Inverted} />
+                            </View>
+                        </PlainButton>
+
+                        {/* Enter receive amount */}
+                        <PlainButton
+                            style={[tailwind('mb-4')]}
+                            onPress={() => {
+                                navigation.dispatch(
+                                    CommonActions.navigate({
+                                        name: 'RequestAmount',
+                                    }),
+                                );
+                            }}>
+                            <Text
+                                style={[
+                                    tailwind('font-bold text-center'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('edit_amount')}
+                            </Text>
+                        </PlainButton>
+                    </View>
+                )}
+            </View>
+        );
+    }, [
+        ColorScheme,
+        tailwind,
+        LNInvoice,
+        loadingInvoice,
+        plainAddress,
+        t,
+        styles,
+    ]);
+
+    const panels = useMemo(
+        (): Slide[] => [lnPanel, onchainPanel],
+        [onchainPanel, lnPanel],
+    );
+
+    return (
+        <SafeAreaView
+            edges={['bottom', 'right', 'left']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
+            <View
+                style={[
+                    tailwind('w-full h-full items-center justify-center'),
+                    {backgroundColor: ColorScheme.Background.Default},
+                ]}>
+                <View
+                    style={[
+                        tailwind(
+                            'w-5/6 justify-center items-center absolute top-6 flex',
+                        ),
+                    ]}>
+                    <PlainButton
+                        style={[tailwind('absolute left-0 z-10')]}
+                        onPress={() => {
+                            navigation.dispatch(StackActions.popToTop());
+                        }}>
+                        <Close fill={ColorScheme.SVG.Default} />
+                    </PlainButton>
+
+                    <Text
+                        style={[
+                            tailwind('text-lg font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        {t('bitcoin_invoice')}
+                    </Text>
+
+                    {/* Invoice Timeout */}
+                    {LNInvoice?.expiry && (
+                        <View style={[tailwind('absolute right-0')]}>
+                            <ExpiryTimer expiryDate={LNInvoice?.expiry} />
+                        </View>
+                    )}
+                </View>
+
+                {/* Invoice Panel */}
+                {loadingInvoice && (
+                    <View
+                        style={[
+                            tailwind(
+                                'items-center w-full h-full justify-center',
+                            ),
+                            // To avoid lagging due to Carousel load from conditional rendering
+                            // we fake a loading screen
+                            {
+                                zIndex: 999,
+                                backgroundColor: ColorScheme.Background.Primary,
+                            },
+                        ]}>
+                        <ActivityIndicator />
+                        <Text
+                            style={[
+                                tailwind('text-sm mt-4'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {isAdvancedMode
+                                ? t('loading_invoice_advanced', {
+                                      spec: 'Bolt11',
+                                  })
+                                : t('loading_invoice')}
+                        </Text>
+                    </View>
+                )}
+
+                {isLNWallet && (
+                    <View
+                        style={[
+                            styles.carouselContainer,
+                            tailwind('bottom-0 absolute'),
+                        ]}>
+                        <Carousel
+                            ref={carouselRef}
+                            style={[tailwind('items-center')]}
+                            data={panels}
+                            width={NativeDims.width}
+                            height={NativeDims.height * 0.8 - 20}
+                            loop={false}
+                            panGestureHandlerProps={{
+                                activeOffsetX: [-10, 10],
+                            }}
+                            testID="ReceiveSlider"
+                            renderItem={({index}): ReactElement => {
+                                const Slide = panels[index];
+                                return <Slide key={index} />;
+                            }}
+                            onProgressChange={(_, absoluteProgress): void => {
+                                progressValue.value = absoluteProgress;
+                            }}
+                        />
+                    </View>
+                )}
+
+                {!isLNWallet && onchainPanel()}
+            </View>
         </SafeAreaView>
     );
 };
@@ -445,5 +621,8 @@ export default Receive;
 const styles = StyleSheet.create({
     qrCodeContainer: {
         borderWidth: 2,
+    },
+    carouselContainer: {
+        flex: 1,
     },
 });
