@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+import VText from '../../components/text';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -25,8 +26,9 @@ import {
     SATS_TO_BTC_RATE,
     capitalizeFirst,
     formatFiat,
+    formatSats,
 } from '../../modules/transform';
-import {openChannelFee} from '@breeztech/react-native-breez-sdk';
+import {openChannelFee, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -58,6 +60,9 @@ const RequestAmount = () => {
     const wallet = getWalletData(currentWalletID);
     const walletType = wallet.type;
 
+    const [maxReceivableAmount, updateMaxReceivableAmount] = useState(
+        new BigNumber(0),
+    );
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
         value: new BigNumber(0),
@@ -75,6 +80,18 @@ const RequestAmount = () => {
         name: 'sats',
     });
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
+
+    const setMaxReceivableAmount = async () => {
+        updateMaxReceivableAmount(
+            new BigNumber((await nodeInfo()).maxReceivableMsat / 1_000),
+        );
+    };
+
+    const isLightning = walletType === 'unified';
+
+    useEffect(() => {
+        setMaxReceivableAmount();
+    }, []);
 
     const updateAmount = (value: string) => {
         // When newly swapped, the value is reset to new number from user
@@ -251,11 +268,19 @@ const RequestAmount = () => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 items-center justify-center flex-row absolute top-6 flex',
+                            `w-5/6 items-center justify-center ${
+                                isLightning ? 'flex' : 'flex flex-row'
+                            } absolute top-6`,
                         ),
                     ]}>
                     <PlainButton
-                        style={[tailwind('absolute left-0 z-10')]}
+                        style={[
+                            tailwind(
+                                `absolute left-0 z-10 ${
+                                    isLightning ? 'top-0' : ''
+                                } `,
+                            ),
+                        ]}
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
@@ -268,6 +293,23 @@ const RequestAmount = () => {
                         ]}>
                         {capitalizeFirst(t('receive'))}
                     </Text>
+
+                    {isLightning &&
+                        satsAmount.value.gte(maxReceivableAmount) && (
+                            <View style={[tailwind('mt-6')]}>
+                                <VText
+                                    style={[
+                                        tailwind('text-sm text-center'),
+                                        {
+                                            color: ColorScheme.Text.GrayedText,
+                                        },
+                                    ]}>
+                                    {t('max_receivable_lightning', {
+                                        sats: formatSats(maxReceivableAmount),
+                                    })}
+                                </VText>
+                            </View>
+                        )}
                 </View>
 
                 {/* Screen for amount */}
