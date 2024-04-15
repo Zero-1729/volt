@@ -449,9 +449,8 @@ const RootNavigator = (): ReactElement => {
 
         // Get node info
         try {
-            await disconnect();
-
             const info = await nodeInfo();
+
             if (info?.id) {
                 if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                     Toast.show({
