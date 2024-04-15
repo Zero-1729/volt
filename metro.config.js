@@ -1,3 +1,4 @@
+const path = require("path");
 const { getDefaultConfig, mergeConfig } = require("@react-native/metro-config");
 
 const defaultConfig = getDefaultConfig(__dirname);
@@ -15,7 +16,12 @@ const config = {
   },
   resolver: {
     assetExts: assetExts.filter((ext) => ext !== "svg"),
-    sourceExts: [...sourceExts, "svg"]
+    sourceExts: [...sourceExts, "svg"],
+    extraNodeModules: {
+			buffer: path.resolve(__dirname, './node_modules/@craftzdog/react-native-buffer'),
+			crypto: path.resolve(__dirname, './node_modules/react-native-quick-crypto'),
+			stream: path.resolve(__dirname, './node_modules/stream-browserify'),
+		},
   }
 };
 

@@ -1,6 +1,6 @@
 {
   "name": "volt",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "license": "MIT",
   "scripts": {
     "tsc:check": "tsc -p tsconfig.json --noEmit",
@@ -62,7 +62,7 @@
     "bip66": "^1.1.5",
     "bip68": "^1.0.4",
     "bip69": "^2.1.4",
-    "bitcoinjs-lib": "^6.1.1",
+    "bitcoinjs-lib": "^6.1.5",
     "bitcoinjs-message": "^2.2.0",
     "bs58": "^5.0.0",
     "coinselect": "^3.1.12",
@@ -160,7 +160,8 @@
     "_stream_writable": "readable-stream/writable",
     "_stream_duplex": "readable-stream/duplex",
     "_stream_passthrough": "readable-stream/passthrough",
-    "stream": "stream-browserify"
+    "stream": "stream-browserify",
+    "buffer": "@craftzdog/react-native-buffer"
   },
   "reactNativePermissionsIOS": [
     "Camera",
