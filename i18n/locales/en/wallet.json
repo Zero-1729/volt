@@ -117,5 +117,7 @@
     "swap_in": "Swap In",
     "swap_out": "Swap Out",
     "swap_in_message": "Transfer money from on chain balance into Lightning",
-    "swap_out_message": "Transfer money from lightning to on chain balance"
+    "swap_out_message": "Transfer money from lightning to on chain balance",
+    "channel_opening": "Channel Opening",
+    "max_receivable_lightning": "Cannot receive more than {{sats}} sats for Lightning Invoice"
 }
