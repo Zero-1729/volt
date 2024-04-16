@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {ReactElement, memo, useRef, useEffect, useContext, useCallback} from 'react';
+import React, {ReactElement, memo, useRef, useEffect, useContext} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
@@ -40,7 +40,7 @@ import {useTranslation} from 'react-i18next';
 import {actionAlert} from './components/alert';
 
 import Home from './screens/Home';
-import SelectWallet from './screens/wallet/SelectWallet';
+import PayInvoice from './screens/wallet/PayInvoice';
 
 // Wallet screens
 import Add from './screens/wallet/Add';
@@ -103,7 +103,7 @@ export type InitStackParamList = {
             load: boolean;
         };
     };
-    SelectWallet: {
+    PayInvoice: {
         invoice: string;
     };
     AddWalletRoot: {
@@ -381,7 +381,7 @@ const RootNavigator = (): ReactElement => {
                 capitalizeFirst(t('pay')),
                 capitalizeFirst(t('cancel')),
                 () => {
-                    rootNavigation.navigate('SelectWallet', {
+                    rootNavigation.navigate('PayInvoice', {
                         invoice: clipboardResult.content,
                     });
                 },
@@ -395,14 +395,14 @@ const RootNavigator = (): ReactElement => {
         prefixes: ['bitcoin', 'lightning'],
         config: {
             screens: {
-                SelectWallet: '',
+                PayInvoice: '',
             },
         },
         subscribe(listener): () => void {
             // Deep linking when app open
             const onReceiveLink = ({url}: {url: string}) => {
                 if (!onboardingState.current) {
-                    rootNavigation.navigate('SelectWallet', {invoice: url});
+                    rootNavigation.navigate('PayInvoice', {invoice: url});
                 }
 
                 return listener(url);
@@ -424,7 +424,7 @@ const RootNavigator = (): ReactElement => {
         const url = await Linking.getInitialURL();
 
         if (url) {
-            rootNavigation.navigate('SelectWallet', {invoice: url});
+            rootNavigation.navigate('PayInvoice', {invoice: url});
             return;
         }
 
@@ -646,8 +646,8 @@ const RootNavigator = (): ReactElement => {
                     component={LNTransactionStatus}
                 />
                 <InitScreenStack.Screen
-                    name="SelectWallet"
-                    component={SelectWallet}
+                    name="PayInvoice"
+                    component={PayInvoice}
                 />
                 <InitScreenStack.Screen
                     name="AddWalletRoot"
