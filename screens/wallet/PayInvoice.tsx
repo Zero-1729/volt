@@ -49,21 +49,19 @@ import {BaseWallet} from '../../class/wallet/base';
 import {TInvoiceData} from '../../types/wallet';
 import {useNetInfo} from '@react-native-community/netinfo';
 
-import InfoIcon from '../../assets/svg/info-16.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
 import Toast from 'react-native-toast-message';
 
-type Props = NativeStackScreenProps<InitStackParamList, 'SelectWallet'>;
+type Props = NativeStackScreenProps<InitStackParamList, 'PayInvoice'>;
 
-const SelectWallet = ({route}: Props) => {
+const PayInvoice = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const tailwind = useTailwind();
 
-    const {t, i18n} = useTranslation('wallet');
+    const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
-    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const navigation = useNavigation();
     const [bolt11, setBolt11] = useState<LnInvoice>();
@@ -78,8 +76,6 @@ const SelectWallet = ({route}: Props) => {
         useContext(AppStorageContext);
 
     const networkState = useNetInfo();
-
-    const walletModeIndex = walletMode === 'multi' ? walletsIndex : 0;
 
     const [walletId, updateWalletId] = useState(wallets[walletsIndex].id);
 
@@ -237,29 +233,24 @@ const SelectWallet = ({route}: Props) => {
 
         // Check wallet and invoice
         if (
-            checkInvoiceAndWallet(
-                wallet,
-                decodedInvoice,
-                (msg: string) => {
-                    // TODO: Check and translate error
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: msg,
-                    });
+            checkInvoiceAndWallet(wallet, decodedInvoice, (msg: string) => {
+                // TODO: Check and translate error
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('error')),
+                    text2: msg,
+                });
 
-                    // route home
-                    navigation.dispatch(
-                        CommonActions.navigate('HomeScreen', {
-                            screen: 'HomeScreen',
-                        }),
-                    );
+                // route home
+                navigation.dispatch(
+                    CommonActions.navigate('HomeScreen', {
+                        screen: 'HomeScreen',
+                    }),
+                );
 
-                    return;
-                },
-                walletMode === 'single',
-            )
+                return;
+            })
         ) {
             // Navigate handling
             if (invoiceHasAmount) {
@@ -347,7 +338,7 @@ const SelectWallet = ({route}: Props) => {
                             tailwind('text-center font-bold text-xl w-full'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        {t('select_wallet_title')}
+                        {t('pay_invoice_title')}
                     </Text>
                     {isLightning && expiryEpoch && (
                         <View
@@ -504,44 +495,9 @@ const SelectWallet = ({route}: Props) => {
                             onScrollEnd={index => {
                                 updateWalletId(wallets[index].id);
                             }}
-                            defaultIndex={walletModeIndex}
+                            defaultIndex={0}
                         />
                     </View>
-
-                    {walletMode === 'multi' && (
-                        <View
-                            style={[
-                                tailwind(
-                                    `w-full ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } justify-center items-center`,
-                                ),
-                            ]}>
-                            <InfoIcon
-                                style={[
-                                    tailwind(
-                                        `${
-                                            langDir === 'right'
-                                                ? 'ml-2'
-                                                : 'mr-2'
-                                        }`,
-                                    ),
-                                ]}
-                                width={14}
-                                height={14}
-                                fill={ColorScheme.SVG.GrayFill}
-                            />
-                            <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
-                                {t('select_wallet_swipe_notice')}
-                            </Text>
-                        </View>
-                    )}
                 </View>
 
                 <View
@@ -579,7 +535,7 @@ const SelectWallet = ({route}: Props) => {
     );
 };
 
-export default SelectWallet;
+export default PayInvoice;
 
 const styles = StyleSheet.create({
     invoiceLineBreaker: {
