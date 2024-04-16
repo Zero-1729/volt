@@ -149,7 +149,7 @@ const SendView = ({route}: Props) => {
                 topOffset: 54,
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
-                text2: t('insufficient_funds'),
+                text2: t('ln_insufficient_funds'),
             });
 
             setLoading(false);
