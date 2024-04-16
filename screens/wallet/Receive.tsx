@@ -27,7 +27,12 @@ import {
     StackActions,
 } from '@react-navigation/native';
 
-import {receivePayment, LnInvoice} from '@breeztech/react-native-breez-sdk';
+import {
+    receivePayment,
+    LnInvoice,
+    BreezEventVariant,
+} from '@breeztech/react-native-breez-sdk';
+import {EBreezDetails} from '../../types/enums';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast';
@@ -91,7 +96,7 @@ const Receive = ({route}: Props) => {
 
     const {t} = useTranslation('wallet');
 
-    const {currentWalletID, getWalletData, isAdvancedMode} =
+    const {currentWalletID, getWalletData, isAdvancedMode, breezEvent} =
         useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
     const isLNWallet = walletData.type === 'unified';
@@ -185,6 +190,34 @@ const Receive = ({route}: Props) => {
             displayLNInvoice();
         }
     }, []);
+
+    useEffect(() => {
+        if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
+            // // Route to LN payment status screen
+            navigation.dispatch(StackActions.popToTop());
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: true,
+                    details: breezEvent.details,
+                    detailsType: EBreezDetails.Received,
+                }),
+            );
+            return;
+        }
+
+        if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
+            // Route to LN payment status screen
+            navigation.dispatch(StackActions.popToTop());
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: false,
+                    details: breezEvent.details,
+                    detailsType: EBreezDetails.Failed,
+                }),
+            );
+            return;
+        }
+    }, [breezEvent]);
 
     // Format as Bitcoin URI
     const getFormattedAddress = (address: string) => {
