@@ -23,6 +23,7 @@ import {
     fromDescriptorPTR,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
+import {BreezEvent} from '@breeztech/react-native-breez-sdk';
 
 import {TLanguage, TCurrency} from '../types/settings';
 import {EBackupMaterial, ENet} from '../types/enums';
@@ -73,6 +74,7 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
+    breezEvent: BreezEvent;
     appLanguage: TLanguage;
     appFiatCurrency: TCurrency;
     loadLock: boolean;
@@ -89,6 +91,7 @@ type defaultContextType = {
     isDevMode: boolean;
     onboarding: boolean;
     electrumServerURL: TElectrumServerURLs;
+    setBreezEvent: (event: BreezEvent) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
     updateFiatRate: (fiatObj: TFiatRate) => void;
@@ -127,6 +130,7 @@ type defaultContextType = {
 const defaultContext: defaultContextType = {
     loadLock: false,
     onboarding: true,
+    breezEvent: {} as BreezEvent,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -160,6 +164,7 @@ const defaultContext: defaultContextType = {
         testnet: 'ssl://electrum.blockstream.info:60002',
         bitcoin: 'ssl://electrum.blockstream.info:50002',
     },
+    setBreezEvent: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -196,6 +201,7 @@ export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
+    const [breezEvent, _setBreezEvent] = useState(defaultContext.breezEvent);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -231,6 +237,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('loadLock');
     const {getItem: _getOnboarding, setItem: _updateOnboarding} =
         useAsyncStorage('onboarding');
+    const {getItem: _getBreezEvent, setItem: _updateBreezEvent} =
+        useAsyncStorage('breezEvent');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -306,6 +314,35 @@ export const AppStorageProvider = ({children}: Props) => {
         },
         [_setOnboarding, _updateOnboarding],
     );
+
+    const setBreezEvent = useCallback(
+        async (event: BreezEvent) => {
+            // handle clear
+            if (event === ({} as BreezEvent)) {
+                await _setBreezEvent({} as BreezEvent);
+                await _updateBreezEvent(JSON.stringify({}));
+            }
+
+            try {
+                await _setBreezEvent(event);
+                await _updateBreezEvent(JSON.stringify(event));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Breez event) Error loading data: ${e} [${event}]`,
+                );
+                throw new Error('Error setting breez event');
+            }
+        },
+        [_setBreezEvent, _updateBreezEvent],
+    );
+
+    const _loadBreezEvent = async () => {
+        const be = await _getBreezEvent();
+
+        if (be !== null) {
+            _setBreezEvent(JSON.parse(be));
+        }
+    };
 
     const setAppLanguage = useCallback(
         async (languageObject: TLanguage) => {
@@ -1229,6 +1266,10 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
+        _loadBreezEvent();
+    }, []);
+
+    useEffect(() => {
         _loadAppLanguage();
     }, []);
 
@@ -1291,6 +1332,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 setLoadLock,
                 electrumServerURL,
                 setElectrumServerURL,
+                breezEvent,
+                setBreezEvent,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,
