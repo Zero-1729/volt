@@ -102,6 +102,7 @@ type defaultContextType = {
         id: string,
         transactions: TTransaction[],
     ) => void;
+    updateWalletPayments: (id: string, payments: TTransaction[]) => void;
     updateWalletUTXOs: (id: string, utxo: TUtxo[]) => void;
     updateWalletBalance: (id: string, balance: TBalance) => void;
     updateWalletAddress: (id: string, address: TAddress) => void;
@@ -169,6 +170,7 @@ const defaultContext: defaultContextType = {
     addWallet: () => {},
     updateAppUnit: () => {},
     updateWalletTransactions: () => {},
+    updateWalletPayments: () => {},
     updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
     updateWalletAddress: () => {},
@@ -729,6 +731,22 @@ export const AppStorageProvider = ({children}: Props) => {
             // Update the transactions in the current wallet
             const tmp = [...wallets];
             tmp[index].transactions = transactions;
+
+            // Update wallets list
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
+    const updateWalletPayments = useCallback(
+        async (id: string, payments: TTransaction[]) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            // Get the current wallet
+            // Update the payments in the current wallet
+            const tmp = [...wallets];
+            tmp[index].payments = payments;
 
             // Update wallets list
             _setWallets(tmp);
@@ -1301,6 +1319,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 getWalletData,
                 updateAppUnit,
                 updateWalletTransactions,
+                updateWalletPayments,
                 updateWalletUTXOs,
                 updateWalletBalance,
                 updateWalletAddress,
