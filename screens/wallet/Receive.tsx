@@ -21,6 +21,8 @@ import {
     Platform,
 } from 'react-native';
 
+import VText from '../../components/text';
+
 import {
     useNavigation,
     CommonActions,
@@ -430,6 +432,17 @@ const Receive = ({route}: Props) => {
                     ]}>
                     {capitalizeFirst(t('lightning'))}
                 </Text>
+
+                <View style={[tailwind('items-center w-4/5 mb-4')]}>
+                    <VText
+                        style={[
+                            tailwind('text-center'),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {t('keep_receive_open')}
+                    </VText>
+                </View>
+
                 <View
                     style={[
                         styles.qrCodeContainer,

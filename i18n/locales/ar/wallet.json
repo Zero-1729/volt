@@ -120,5 +120,6 @@
     "channel_opening": "افتتاح القناة",
     "max_receivable_lightning": "لا يمكن استلام أكثر من {{sats}} ساتوشي لفاتورة البرق",
     "ln_description": "تعيين الوصف",
-    "ln_description_text": "أدخل وصفًا (تسعون حرفًا كحد أقصى)"
+    "ln_description_text": "أدخل وصفًا (تسعون حرفًا كحد أقصى)",
+    "keep_receive_open": "اترك هذه الصفحة مفتوحة حتى يتم دفع الفاتورة"
 }

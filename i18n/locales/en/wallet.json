@@ -121,5 +121,6 @@
     "channel_opening": "Channel Opening",
     "max_receivable_lightning": "Cannot receive more than {{sats}} sats for Lightning Invoice",
     "ln_description": "Invoice Description",
-    "ln_description_text": "Enter a description (90 chars max)"
+    "ln_description_text": "Enter a description (90 chars max)",
+    "keep_receive_open": "Keep this page open until invoice is paid"
 }
