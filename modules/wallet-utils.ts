@@ -577,7 +577,6 @@ export const checkInvoiceAndWallet = (
     wallet: TMiniWallet,
     invoice: TInvoiceData,
     alert: any,
-    singleMode: boolean,
 ) => {
     const balance = new BigNumber(wallet.balanceOnchain);
     const invoiceHasAmount = !!invoice?.options?.amount;
@@ -606,11 +605,7 @@ export const checkInvoiceAndWallet = (
 
     // Check balance if zero
     if (balance.isZero()) {
-        alert(
-            `Wallet is empty, add funds to wallet ${
-                singleMode ? '' : 'or select a different wallet.'
-            }`,
-        );
+        alert('Wallet is empty, add funds to wallet');
         return false;
     }
 
@@ -630,11 +625,7 @@ export const checkInvoiceAndWallet = (
             .multipliedBy(100000000)
             .isGreaterThan(wallet.balanceOnchain)
     ) {
-        alert(
-            `Wallet balance insufficient, add funds to wallet ${
-                singleMode ? '' : 'or select a different wallet.'
-            }`,
-        );
+        alert('Wallet balance insufficient, add funds to wallet');
         return false;
     }
 
