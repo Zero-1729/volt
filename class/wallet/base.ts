@@ -55,6 +55,7 @@ export class BaseWallet {
             lightning: new BigNumber(obj.balance.lightning),
         };
         wallet.transactions = obj.transactions as TTransaction[];
+        wallet.payments = obj.payments as TTransaction[];
         wallet.UTXOs = obj.UTXOs as TUtxo[];
         wallet.syncedBalance = obj.syncedBalance as number;
         wallet.lastSynced = obj.lastSynced;
@@ -93,6 +94,7 @@ export class BaseWallet {
     balance: TBalance;
 
     transactions: TTransaction[];
+    payments: TTransaction[];
     UTXOs: TUtxo[];
 
     addresses: Array<string>;
@@ -137,7 +139,8 @@ export class BaseWallet {
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = args.network ? args.network : ENet.Testnet; // Can have 'bitcoin' or 'testnet' wallet
 
-        this.transactions = []; // List of wallet transactions
+        this.transactions = []; // List of onchain transactions
+        this.payments = []; // Lightning payments
         this.UTXOs = []; // Set of wallet UTXOs
 
         this.hardwareWalletEnabled = false;
@@ -254,6 +257,10 @@ export class BaseWallet {
 
     updateTransanctions(transactions: TTransaction[]) {
         this.transactions = transactions;
+    }
+
+    updatePayments(payments: TTransaction[]) {
+        this.payments = payments;
     }
 
     setXprv(xprv: string) {
