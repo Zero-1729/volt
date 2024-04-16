@@ -760,7 +760,16 @@ export const AppStorageProvider = ({children}: Props) => {
             // Get the current wallet
             // Update the balance in the current wallet
             const tmp = [...wallets];
-            tmp[index].balance = balance;
+
+            const oldLNBalance = tmp[index].balance.lightning;
+            const oldOnchainBalance = tmp[index].balance.onchain;
+
+            tmp[index].balance.lightning = !balance.lightning.isZero()
+                ? balance.lightning
+                : oldLNBalance;
+            tmp[index].balance.onchain = !balance.onchain.isZero()
+                ? balance.onchain
+                : oldOnchainBalance;
 
             // Update wallets list
             _setWallets(tmp);
