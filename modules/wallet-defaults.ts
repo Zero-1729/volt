@@ -165,3 +165,31 @@ export const DEFAULT_WALLET_TYPE = 'unified';
 // Balance minimums for inwallet swaps (sats)
 export const LIGHTNING_SWAP_BALANCE_MIN = 1000;
 export const ONCHAIN_SWAP_BALANCE_MIN = 10000;
+
+export const electrumServerList = [
+    // Blockstream
+    {
+        testnet: 'ssl://electrum.blockstream.info:60002',
+        bitcoin: 'ssl://electrum.blockstream.info:50002',
+    },
+    // LukeChilds
+    {
+        testnet: 'ssl://bitcoin.lu.ke:60002',
+        bitcoin: 'ssl://bitcoin.lu.ke:50002',
+    },
+    // Emzy
+    {
+        testnet: 'ssl://https://electrum.emzy.de:60002',
+        bitcoin: 'ssl://https://electrum.emzy.de:50002',
+    },
+    // SethOfPrivacy
+    {
+        testnet: 'ssl://fulcrum.sethforprivacy.com:60002',
+        bitcoin: 'ssl://fulcrum.sethforprivacy.com:50002',
+    },
+    // Bitaroo
+    {
+        testnet: 'ssl://electrum.bitaroo.net:60002',
+        bitcoin: 'ssl://electrum.bitaroo.net:50002',
+    },
+];
