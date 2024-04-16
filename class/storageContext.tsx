@@ -64,6 +64,7 @@ import {
     WalletPaths,
     extendedKeyInfo,
     validWalletTypes,
+    electrumServerList,
 } from '../modules/wallet-defaults';
 
 // App context props type
@@ -596,13 +597,9 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const _loadElectrumServerURL = async () => {
-        const url = await _getElectrumServerURL();
+        const randIdx = Math.floor(Math.random() * electrumServerList.length);
 
-        // Only update setting if a value already exists
-        // ...otherwise, use default
-        if (url !== null) {
-            _setElectrumServerURL(JSON.parse(url));
-        }
+        _setElectrumServerURL(electrumServerList[randIdx]);
     };
 
     const setCurrentWalletID = useCallback(
