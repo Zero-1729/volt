@@ -1895,9 +1895,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gorhom/bottom-sheet@npm:^5.0.0-alpha.9":
-  version: 5.0.0-alpha.9
-  resolution: "@gorhom/bottom-sheet@npm:5.0.0-alpha.9"
+"@gorhom/bottom-sheet@npm:^4.6.1":
+  version: 4.6.1
+  resolution: "@gorhom/bottom-sheet@npm:4.6.1"
   dependencies:
     "@gorhom/portal": 1.0.14
     invariant: ^2.2.4
@@ -1906,14 +1906,14 @@ __metadata:
     "@types/react-native": "*"
     react: "*"
     react-native: "*"
-    react-native-gesture-handler: ">=2.14.0"
-    react-native-reanimated: ">=3.6.0"
+    react-native-gesture-handler: ">=1.10.1"
+    react-native-reanimated: ">=2.2.0"
   peerDependenciesMeta:
     "@types/react":
       optional: true
     "@types/react-native":
       optional: true
-  checksum: edabc33ca86aff35c28030d639ac66f732a9300caebe522a1cb5baf8db8332814e65ffa5fc0ddefeb83d8ec8f4596f052ce53e5b6e43b1b5499f05044218a708
+  checksum: fc30da15c5d7e7c7b81ad2450e6ecb3884f0e040bc1ed5f467b1f846e2598519608a21c14cd50ea8288caac3cdfd9ad2c7742c31c77dd137804f94148105f389
   languageName: node
   linkType: hard
 
@@ -13605,7 +13605,7 @@ __metadata:
     "@formatjs/intl-numberformat": ^8.9.2
     "@formatjs/intl-pluralrules": ^5.2.12
     "@formatjs/intl-relativetimeformat": ^11.2.12
-    "@gorhom/bottom-sheet": ^5.0.0-alpha.9
+    "@gorhom/bottom-sheet": ^4.6.1
     "@mempool/mempool.js": ^2.3.0
     "@react-native-async-storage/async-storage": ^1.23.1
     "@react-native-clipboard/clipboard": ^1.13.2
