@@ -195,7 +195,7 @@ const Receive = ({route}: Props) => {
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
-            // // Route to LN payment status screen
+            // Route to LN payment status screen
             navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
