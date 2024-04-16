@@ -108,6 +108,7 @@ const Home = ({route}: Props) => {
         fiatRate,
         updateFiatRate,
         updateWalletTransactions,
+        updateWalletPayments,
         updateWalletBalance,
         isWalletInitialized,
         electrumServerURL,
@@ -134,7 +135,7 @@ const Home = ({route}: Props) => {
     const totalBalance: TBalance = wallets.reduce(
         (accumulator: TBalance, currentValue: BaseWallet) =>
             // Only show balances from bitcoin mainnet
-            // Don't want user tot think their testnet money
+            // Don't want user to think their testnet money
             // is spendable
             ({
                 onchain: accumulator.onchain.plus(
@@ -158,15 +159,9 @@ const Home = ({route}: Props) => {
         // Filter and show only transactions from current wallet
         // if in single wallet mode
         // else show all transactions across wallets
-        if (walletMode === 'multi') {
-            for (const w of wallets) {
-                transactions = transactions.concat(w?.transactions);
-            }
-        } else {
-            transactions = wallet
-                ? transactions.concat(wallet.transactions)
-                : transactions;
-        }
+        transactions = wallet
+            ? transactions.concat(wallet.transactions).concat(wallet.payments)
+            : transactions;
 
         const txs =
             wallets.length > 0 ? getUniqueTXs(transactions) : transactions;
@@ -186,14 +181,12 @@ const Home = ({route}: Props) => {
         await syncBdkWallet(
             w,
             (status: boolean) => {
-                if (process.env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === 'development' && !status) {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
                         text1: t('BDK'),
-                        text2: status
-                            ? t('Synced wallet')
-                            : t('Failed to sync'),
+                        text2: t('Failed to sync'),
                         autoHide: false,
                     });
                 }
@@ -246,24 +239,6 @@ const Home = ({route}: Props) => {
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
-        // Abort load if no wallets yet
-        if (!isWalletInitialized) {
-            return;
-        }
-
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            return;
-        }
-
-        // start loading
-        setLoadingBalance(true);
-
-        // Set refreshing
-        setRefreshing(true);
-
         const w = await initWallet();
 
         const triggered = await fetchFiatRate(
@@ -305,7 +280,7 @@ const Home = ({route}: Props) => {
         // Update wallet balance
         updateWalletBalance(currentWalletID, {
             onchain: balance,
-            lightning: wallet.balance.lightning,
+            lightning: new BigNumber(0),
         });
 
         // Update wallet transactions
@@ -331,7 +306,7 @@ const Home = ({route}: Props) => {
 
             // Update balance after converting to sats
             updateWalletBalance(currentWalletID, {
-                onchain: wallet.balance.onchain,
+                onchain: new BigNumber(0),
                 lightning: new BigNumber(balanceLn / 1000),
             });
         } catch (error: any) {
@@ -351,10 +326,10 @@ const Home = ({route}: Props) => {
 
     const fetchPayments = async () => {
         try {
-            const txs = await getLNPayments(wallet.transactions.length);
+            const txs = await getLNPayments(wallet.payments.length);
 
             // Update transactions
-            updateWalletTransactions(currentWalletID, txs);
+            updateWalletPayments(currentWalletID, txs);
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
@@ -371,24 +346,44 @@ const Home = ({route}: Props) => {
     };
 
     const jointSync = async () => {
+        // Abort load if no wallets yet
+        if (!isWalletInitialized) {
+            return;
+        }
+
+        // Only attempt load if connected to network
+        if (!checkNetworkIsReachable(networkState)) {
+            setRefreshing(false);
+            setLoadingBalance(false);
+            return;
+        }
+
+        // start loading
+        // Set refreshing
+        setLoadingBalance(true);
+        setRefreshing(true);
+
+        // Avoid duplicate loading
+        if (refreshing || loadingBalance) {
+            return;
+        }
+
+        // Only attempt load if connected to network
+        if (!checkNetworkIsReachable(networkState)) {
+            setRefreshing(false);
+            return;
+        }
+
+        // fetch fiat rate
+        singleSyncFiatRate(appFiatCurrency.short, true);
+
+        // fetch onchain
+        refreshWallet();
+
+        // Also call Breez if LN wallet
         if (wallet.type === 'unified') {
-            // Check network available
-            if (!checkNetworkIsReachable(networkState)) {
-                setRefreshing(false);
-                setLoadingBalance(false);
-                return;
-            }
-
-            setLoadingBalance(true);
-            setRefreshing(true);
-
             await getBalance();
             await fetchPayments();
-
-            setLoadingBalance(false);
-            setRefreshing(false);
-        } else {
-            refreshWallet();
         }
     };
 

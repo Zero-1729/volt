@@ -86,6 +86,7 @@ const Wallet = ({route}: Props) => {
         updateFiatRate,
         updateWalletBalance,
         updateWalletTransactions,
+        updateWalletPayments,
         updateWalletUTXOs,
         hideTotalBalance,
         updateWalletAddress,
@@ -124,7 +125,10 @@ const Wallet = ({route}: Props) => {
         }
     };
 
-    const walletTxs = walletData.transactions;
+    const walletTxs =
+        walletData.type === 'unified'
+            ? [...walletData.transactions, ...walletData?.payments]
+            : walletData.transactions;
     const walletBalance =
         walletData.type !== 'unified'
             ? walletData.balance.onchain
@@ -137,7 +141,7 @@ const Wallet = ({route}: Props) => {
 
             // Update balance after converting to sats
             updateWalletBalance(currentWalletID, {
-                onchain: walletData.balance.onchain,
+                onchain: new BigNumber(0),
                 lightning: new BigNumber(balanceLn / 1000),
             });
         } catch (error: any) {
@@ -157,10 +161,10 @@ const Wallet = ({route}: Props) => {
 
     const fetchPayments = async () => {
         try {
-            const txs = await getLNPayments(walletData.transactions.length);
+            const txs = await getLNPayments(walletData.payments.length);
 
             // Update transactions
-            updateWalletTransactions(currentWalletID, txs);
+            updateWalletPayments(currentWalletID, txs);
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
@@ -177,23 +181,34 @@ const Wallet = ({route}: Props) => {
     };
 
     const jointSync = async () => {
-        if (!checkNetworkIsReachable(networkState)) {
+        // Avoid duplicate loading
+        if (refreshing || loadingBalance) {
             return;
         }
 
-        if (walletData.type === 'unified') {
-            setLoadingBalance(true);
-            setRefreshing(true);
-            setLoadLock(true);
+        // Only attempt load if connected to network
+        if (!checkNetworkIsReachable(networkState)) {
+            setRefreshing(false);
+            return;
+        }
 
+        // Lock load to avoid deleting wallet while loading
+        setLoadLock(true);
+
+        // Set refreshing
+        setRefreshing(true);
+        setLoadingBalance(true);
+
+        // fetch fiat rate
+        fetchFiat();
+
+        // fetch onchain
+        refreshWallet();
+
+        // Also call Breez if LN wallet
+        if (walletData.type === 'unified') {
             await getBalance();
             await fetchPayments();
-
-            setLoadLock(false);
-            setLoadingBalance(false);
-            setRefreshing(false);
-        } else {
-            refreshWallet();
         }
     };
 
@@ -215,7 +230,6 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     // Fetch fiat rate
-    // TODO: efficiently call this in fetch or default to periodically calling it instead.
     const fetchFiat = async () => {
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
@@ -237,24 +251,6 @@ const Wallet = ({route}: Props) => {
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
-        // Avoid duplicate loading
-        if (refreshing || loadingBalance) {
-            return;
-        }
-
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
-            setRefreshing(false);
-            return;
-        }
-
-        // Lock load to avoid deleting wallet while loading
-        setLoadLock(true);
-
-        // Set refreshing
-        setRefreshing(true);
-        setLoadingBalance(true);
-
         const w = await syncWallet();
 
         if (!loadingBalance) {
