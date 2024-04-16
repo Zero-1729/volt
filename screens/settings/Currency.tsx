@@ -35,8 +35,8 @@ import Color from '../../constants/Color';
 
 import {Currencies} from '../../constants/Currency';
 
-import {liberalAlert} from '../../components/alert';
 import {addCommas, capitalizeFirst} from '../../modules/transform';
+import Toast from 'react-native-toast-message';
 
 const Currency = () => {
     const navigation = useNavigation();
@@ -59,11 +59,13 @@ const Currency = () => {
             <PlainButton
                 onPress={() => {
                     if (!checkNetworkIsReachable(networkState)) {
-                        liberalAlert(
-                            capitalizeFirst(t('network')),
-                            e('no_internet_message'),
-                            capitalizeFirst(t('cancel')),
-                        );
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: capitalizeFirst(t('network')),
+                            text2: e('no_internet_message'),
+                            visibilityTime: 2000,
+                        });
                         return;
                     }
 

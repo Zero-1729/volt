@@ -21,6 +21,7 @@
     "edit": "edit",
     "copy": "copy",
     "share": "share",
+    "swap": "swap",
     "reset": "reset",
     "save": "save",
     "done": "done",
@@ -54,8 +55,15 @@
     "psbt": "psbt",
     "success": "success",
     "successful": "successful",
+    "pending": "pending",
+    "complete": "complete",
     "failed": "failed",
     "status": "status",
     "unconfirmed": "unconfirmed",
-    "feerate": "feerate"
+    "feerate": "feerate",
+    "breez_connected": "Connected to Breez services",
+    "breez_backup_started": "Breez backup started",
+    "breez_backup_success": "Breez backup successful",
+    "breez_backup_failed": "Breez backup failed",
+    "scanner": "QR Code"
 }

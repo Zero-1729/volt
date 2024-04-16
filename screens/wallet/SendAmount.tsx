@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
@@ -21,7 +22,7 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {conservativeAlert} from '../../components/alert';
+import Toast from 'react-native-toast-message';
 
 import Close from '../../assets/svg/x-24.svg';
 
@@ -37,6 +38,7 @@ import {
     capitalizeFirst,
     formatFiat,
     normalizeFiat,
+    SATS_TO_BTC_RATE,
 } from '../../modules/transform';
 
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -50,7 +52,11 @@ type DisplayUnit = {
 
 import {PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
-import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
+import {
+    DisplayFiatAmount,
+    DisplaySatsAmount,
+    DisplayBTCAmount,
+} from '../../components/balance';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SendAmount'>;
 
@@ -88,23 +94,23 @@ const SendAmount = ({route}: Props) => {
         symbol: 'sats',
         name: 'sats',
     });
-    const [fiatAmount, setFiatAmount] = useState<DisplayUnit>({
-        value: new BigNumber(0),
-        symbol: appFiatCurrency.symbol,
-        name: appFiatCurrency.short,
-    });
+    const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
-    const isMax = amount === route.params.wallet.balance.toString();
+    const walletBalance = new BigNumber(
+        route.params.isLightning
+            ? route.params.wallet.balanceLightning
+            : route.params.wallet.balanceOnchain,
+    );
+
+    const isMax = amount === walletBalance.toString();
     const isAmountEmpty = Number(amount) === 0;
 
-    const isOverBalance = new BigNumber(satsAmount.value).gt(
-        route.params.wallet.balance,
-    );
+    const isOverBalance = new BigNumber(satsAmount.value).gt(walletBalance);
 
     const isBelowDust = new BigNumber(satsAmount.value).lt(DUST_LIMIT);
 
     const triggerMax = () => {
-        const maxSats = route.params.wallet.balance.toString();
+        const maxSats = walletBalance.toString();
 
         setAmount(maxSats);
 
@@ -114,11 +120,7 @@ const SendAmount = ({route}: Props) => {
             name: 'sats',
         });
 
-        setFiatAmount({
-            value: calculateFiatEquivalent(maxSats),
-            symbol: appFiatCurrency.symbol,
-            name: appFiatCurrency.short,
-        });
+        setFiatAmount(calculateFiatEquivalent(maxSats));
     };
 
     const updateAmount = (value: string) => {
@@ -140,14 +142,11 @@ const SendAmount = ({route}: Props) => {
             name: 'sats',
         });
 
-        setFiatAmount({
-            value:
-                bottomUnit.name !== 'sats'
-                    ? new BigNumber(value || 0)
-                    : calculateFiatEquivalent(value),
-            symbol: appFiatCurrency.symbol,
-            name: appFiatCurrency.short,
-        });
+        setFiatAmount(
+            bottomUnit.name !== 'sats'
+                ? new BigNumber(value || 0)
+                : calculateFiatEquivalent(value),
+        );
     };
 
     const calculateSatsEquivalent = (value: string): string => {
@@ -208,17 +207,22 @@ const SendAmount = ({route}: Props) => {
         return (
             <>
                 <DisplayFiatAmount
-                    amount={formatFiat(fiatAmount.value)}
+                    amount={formatFiat(fiatAmount)}
                     isApprox={topUnit?.name !== 'sats' && amount.length > 0}
                     fontSize={fontSize}
-                    symbol={fiatAmount?.symbol}
                 />
             </>
         );
     };
 
     const renderSatAmount = (fontSize: string) => {
-        return (
+        return satsAmount.value.gte(SATS_TO_BTC_RATE) ? (
+            <DisplayBTCAmount
+                amount={satsAmount.value}
+                fontSize={fontSize}
+                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
+            />
+        ) : (
             <DisplaySatsAmount
                 amount={satsAmount.value}
                 fontSize={fontSize}
@@ -229,7 +233,7 @@ const SendAmount = ({route}: Props) => {
 
     const displayBalance = (fontSize: string) => {
         const bottomUnitSats = bottomUnit?.name === 'sats';
-        const rawBalance = new BigNumber(route.params.wallet.balance); // sats
+        const rawBalance = walletBalance; // sats
         const fiatBalance = normalizeFiat(rawBalance, fiatRate.rate);
 
         return bottomUnitSats ? (
@@ -243,7 +247,6 @@ const SendAmount = ({route}: Props) => {
                 amount={fiatBalance}
                 fontSize={fontSize}
                 isApprox={topUnit?.name !== 'sats' && amount.length > 0}
-                symbol={fiatAmount?.symbol}
             />
         );
     };
@@ -257,7 +260,11 @@ const SendAmount = ({route}: Props) => {
     };
 
     return (
-        <SafeAreaView edges={edges}>
+        <SafeAreaView
+            edges={edges}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[tailwind('w-full h-full items-center justify-center')]}>
                 <View
@@ -336,7 +343,7 @@ const SendAmount = ({route}: Props) => {
                                     ),
                                 ]}
                                 disabled={
-                                    route.params.wallet.balance.toString() ===
+                                    walletBalance.toString() ===
                                     satsAmount.value.toString()
                                 }
                                 onPress={triggerMax}>
@@ -360,7 +367,7 @@ const SendAmount = ({route}: Props) => {
                     amount={amount}
                     onAmountChange={updateAmount}
                     isSats={bottomUnit.name === 'sats'}
-                    maxAmount={route.params.wallet.balance.toString()}
+                    maxAmount={walletBalance.toString()}
                 />
 
                 {/* Continue button */}
@@ -373,13 +380,14 @@ const SendAmount = ({route}: Props) => {
                         disabled={amount === '' || isOverBalance}
                         onPress={() => {
                             if (isBelowDust) {
-                                conservativeAlert(
-                                    e('dust_limit_title'),
-                                    `${e(
+                                Toast.show({
+                                    topOffset: 54,
+                                    type: 'Liberal',
+                                    text1: e('dust_limit_title'),
+                                    text2: `${e(
                                         'dust_limit_message',
                                     )} ${DUST_LIMIT} ${t('satoshi')}.`,
-                                    capitalizeFirst(t('cancel')),
-                                );
+                                });
                                 return;
                             }
 
@@ -399,11 +407,12 @@ const SendAmount = ({route}: Props) => {
                                     }),
                                 );
                             } else {
-                                conservativeAlert(
-                                    e('no_internet_title'),
-                                    e('no_internet_message'),
-                                    capitalizeFirst(t('cancel')),
-                                );
+                                Toast.show({
+                                    topOffset: 54,
+                                    type: 'Liberal',
+                                    text1: e('no_internet_title'),
+                                    text2: e('no_internet_message'),
+                                });
                                 return;
                             }
                         }}>

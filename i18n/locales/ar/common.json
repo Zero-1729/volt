@@ -23,6 +23,7 @@
     "edit": "يحرر",
     "copy": "نسخ",
     "share": "المشاركة",
+    "swap": "تبديل",
     "save": "حفظ",
     "done": "تم",
     "delete": "الحذف",
@@ -54,8 +55,15 @@
     "psbt": "psbt",
     "successful": "نجاح",
     "success": "نجاح",
+    "complete": "نجاح",
+    "pending": "قيد الانتظار",
     "failed": "فشل",
     "status": "حالة",
     "unconfirmed": "غير مؤكد",
-    "feerate": "يشعر"
+    "feerate": "يشعر",
+    "breez_connected": "متصل بخدمات Breez",
+    "breez_backup_started": "بدأ النسخ الاحتياطي Breez",
+    "breez_backup_success": "تم النسخ الاحتياطي لـ Breez بنجاح",
+    "breez_backup_failed": "فشل النسخ الاحتياطي Breez",
+    "scanner": "QR Code"
 }

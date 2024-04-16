@@ -7,6 +7,6 @@
     "select_mode_title": "اختر وضعًا",
     "single_mode_title": "واحد (مستحسن)",
     "single_mode_description": " أنشئ محفظة واحدة موحدة للبيتكوين ومحفظة البرق، والتي تتيح لك تلقي وإرسال كل من داخل وخارج السلسلة.",
-    "multi_mode_title": "عديد",
-    "multi_mode_description": "هذا الوضع مخصص للمستخدمين (المتقدمين) الذين يرغبون في إدارة محافظ متعددة في تطبيق واحد."
+    "bolt_nfc_description": "قم بإعداد وإدارة بطاقات وخواتم Bolt NFC لإجراء الدفعات باستخدام البيتكوين عبر شبكة Lightning Network.",
+    "bolt_nfc_support": "بطاقة وخاتم Bolt NFC"
 }

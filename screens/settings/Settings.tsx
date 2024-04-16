@@ -23,7 +23,7 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Right from './../../assets/svg/chevron-right-24.svg';
 import Left from './../../assets/svg/chevron-left-24.svg';
 
-import NativeBottomPadding from '../../constants/NativeWindowMetrics';
+import NativeDims from '../../constants/NativeWindowMetrics';
 
 import {useTranslation} from 'react-i18next';
 
@@ -48,8 +48,8 @@ const Settings = () => {
 
     const device = Platform.OS;
     const bottomOffset: {[index: string]: number} = {
-        ios: NativeBottomPadding.navBottom + 32,
-        android: NativeBottomPadding.navBottom + 56,
+        ios: NativeDims.navBottom + 32,
+        android: NativeDims.navBottom + 56,
     };
 
     const {
@@ -420,7 +420,7 @@ const Settings = () => {
                 <PlainButton
                     style={[
                         tailwind('items-center justify-center absolute'),
-                        NativeBottomPadding,
+                        {bottom: NativeDims.bottom},
                     ]}
                     onPress={() => {
                         navigation.dispatch(

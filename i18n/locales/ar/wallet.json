@@ -105,5 +105,22 @@
     "read_clipboard_lightning_text": "لديك فاتورة البرق",
     "read_clipboard_bitcoin_text": "لديك فاتورة بيتكوين",
     "select_wallet_title": "حدد المحفظة",
-    "select_wallet_swipe_notice": "اسحب لتغيير المحفظة لدفع الفاتورة"
+    "select_wallet_swipe_notice": "اسحب لتغيير المحفظة لدفع الفاتورة",
+    "loading_invoice_advanced": "إنشاء فاتورة البرق {{spec}}.",
+    "loading_invoice": "توليد فاتورة البرق",
+    "lightning_invoice": "فاتورة البرق",
+    "payment_received": "تم استلام المبلغ",
+    "payment_success": "ارسلت الدفعه",
+    "payment_failed": "عملية الدفع فشلت",
+    "invoice_description": "وصف الفاتورة",
+    "swap_in": "مبادلة في",
+    "swap_out": "مبادلة خارج",
+    "swap_in_message": "تحويل الأموال من رصيد السلسلة إلى البرق",
+    "swap_out_message": "تحويل الأموال من البرق إلى رصيد السلسلة",
+    "channel_opening": "افتتاح القناة",
+    "max_receivable_lightning": "لا يمكن استلام أكثر من {{sats}} ساتوشي لفاتورة البرق",
+    "ln_description": "تعيين الوصف",
+    "ln_description_text": "أدخل وصفًا (تسعون حرفًا كحد أقصى)",
+    "keep_receive_open": "اترك هذه الصفحة مفتوحة حتى يتم دفع الفاتورة",
+    "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة"
 }

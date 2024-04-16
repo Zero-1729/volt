@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
 import {FlatList, useColorScheme, View, Linking} from 'react-native';
@@ -119,7 +120,10 @@ const Apps = () => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind('h-full items-center'),

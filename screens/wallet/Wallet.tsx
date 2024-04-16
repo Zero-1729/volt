@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React, {useCallback, useContext, useEffect, useState} from 'react';
@@ -17,6 +18,8 @@ import VText from '../../components/text';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
+import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+
 import BDK from 'bdk-rn';
 
 import BigNumber from 'bignumber.js';
@@ -25,8 +28,6 @@ import {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTranslation} from 'react-i18next';
 
-import {getTxData} from '../../modules/mempool';
-
 import {useTailwind} from 'tailwind-rn';
 
 import Color from '../../constants/Color';
@@ -34,16 +35,14 @@ import Color from '../../constants/Color';
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
+import SwapIcon from '../../assets/svg/arrow-switch-16.svg';
 
-import {
-    syncBdkWallet,
-    getBdkWalletBalance,
-    createBDKWallet,
-    getBdkWalletTransactions,
-} from '../../modules/bdk';
+import {getBdkWalletBalance, createBDKWallet} from '../../modules/bdk';
+import {syncBDKWallet, fetchOnchainTransactions} from '../../modules/shared';
 import {
     getMiniWallet,
     checkNetworkIsReachable,
+    getLNPayments,
 } from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
@@ -54,12 +53,15 @@ import {fetchFiatRate} from '../../modules/currency';
 
 import {Balance} from '../../components/balance';
 
-import {liberalAlert} from '../../components/alert';
-import {TransactionListItem} from '../../components/transaction';
+import {UnifiedTransactionListItem} from '../../components/transaction';
 
 import {TBalance, TTransaction} from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
+
+import Swap from './../../components/swap';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -69,11 +71,9 @@ const Wallet = ({route}: Props) => {
     const navigation = useNavigation();
 
     const {t, i18n} = useTranslation('wallet');
-    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
@@ -86,10 +86,12 @@ const Wallet = ({route}: Props) => {
         updateFiatRate,
         updateWalletBalance,
         updateWalletTransactions,
+        updateWalletPayments,
         updateWalletUTXOs,
         hideTotalBalance,
         updateWalletAddress,
         electrumServerURL,
+        isAdvancedMode,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -102,6 +104,7 @@ const Wallet = ({route}: Props) => {
     // Get card color from wallet type
     const CardColor =
         ColorScheme.WalletColors[walletData.type][walletData.network];
+    const CardAccent = ColorScheme.WalletColors[walletData.type].accent;
 
     const walletName = walletData.name;
 
@@ -111,24 +114,73 @@ const Wallet = ({route}: Props) => {
         return w;
     }, []);
 
-    const syncWallet = useCallback(async () => {
-        // initWallet only called one time
-        // subsequent call is from 'bdkWallet' state
-        // set in Balance fetch
-        const w = bdkWallet ? bdkWallet : await initWallet();
+    const bottomSwapRef = React.useRef<BottomSheetModal>(null);
+    const [openSwap, setOpenSwap] = useState(-1);
 
-        const W = await syncBdkWallet(
-            w,
-            () => {},
-            walletData.network,
-            electrumServerURL,
-        );
+    const openSwapModal = () => {
+        if (openSwap !== 1) {
+            bottomSwapRef.current?.present();
+        } else {
+            bottomSwapRef.current?.close();
+        }
+    };
 
-        return W;
-    }, []);
+    const walletTxs =
+        walletData.type === 'unified'
+            ? [...walletData.transactions, ...walletData?.payments]
+            : walletData.transactions;
+    const walletBalance =
+        walletData.type !== 'unified'
+            ? walletData.balance.onchain
+            : walletData.balance.onchain.plus(walletData.balance.lightning);
 
-    // Refresh control
-    const refreshWallet = useCallback(async () => {
+    const getBalance = async () => {
+        try {
+            const nodeState = await nodeInfo();
+            const balanceLn = nodeState.channelsBalanceMsat;
+
+            // Update balance after converting to sats
+            updateWalletBalance(currentWalletID, {
+                onchain: new BigNumber(0),
+                lightning: new BigNumber(balanceLn / 1000),
+            });
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+
+            return;
+        }
+    };
+
+    const fetchPayments = async () => {
+        try {
+            const txs = await getLNPayments(walletData.payments.length);
+
+            // Update transactions
+            updateWalletPayments(currentWalletID, txs);
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+
+            return;
+        }
+    };
+
+    const jointSync = async () => {
         // Avoid duplicate loading
         if (refreshing || loadingBalance) {
             return;
@@ -147,153 +199,101 @@ const Wallet = ({route}: Props) => {
         setRefreshing(true);
         setLoadingBalance(true);
 
-        const w = await syncWallet();
+        // fetch fiat rate
+        fetchFiat();
 
-        try {
-            const triggered = await fetchFiatRate(
-                appFiatCurrency.short,
-                fiatRate,
-                (rate: TBalance) => {
-                    // Then fetch fiat rate
-                    updateFiatRate({
-                        ...fiatRate,
-                        rate: rate,
-                        lastUpdated: new Date(),
-                    });
-                },
-            );
+        // fetch onchain
+        refreshWallet();
 
-            if (!triggered) {
-                console.log('[Fiat Rate] Did not fetch fiat rate');
-            }
-        } catch (err: any) {
-            liberalAlert(
-                capitalizeFirst(t('network')),
-                e('failed_to_fetch_rate'),
-                capitalizeFirst(t('ok')),
-            );
-
-            console.log('[Fiat Rate] Error fetching fiat rate', err.message);
-
-            setLoadingBalance(false);
-            setRefreshing(false);
-            return;
+        // Also call Breez if LN wallet
+        if (walletData.type === 'unified') {
+            await getBalance();
+            await fetchPayments();
         }
+    };
+
+    const handleSwap = async (swapType: string) => {
+        if (swapType === 'swap_in') {
+            console.log('[Swap] Init Swap In');
+        } else {
+            console.log('[Swap] Init Swap Out');
+        }
+    };
+
+    const syncWallet = useCallback(async () => {
+        // initWallet only called one time
+        // subsequent call is from 'bdkWallet' state
+        // set in Balance fetch
+        const w = bdkWallet ? bdkWallet : await initWallet();
+
+        return await syncBDKWallet(w, walletData.network, electrumServerURL);
+    }, []);
+
+    // Fetch fiat rate
+    const fetchFiat = async () => {
+        const triggered = await fetchFiatRate(
+            appFiatCurrency.short,
+            fiatRate,
+            (rate: BigNumber) => {
+                // Then fetch fiat rate
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: rate,
+                    lastUpdated: new Date(),
+                });
+            },
+        );
+
+        if (!triggered) {
+            console.log('[Fiat Rate] Did not fetch fiat rate');
+        }
+    };
+
+    // Refresh control
+    const refreshWallet = useCallback(async () => {
+        const w = await syncWallet();
 
         if (!loadingBalance) {
             // Update wallet balance first
             const {balance, updated} = await getBdkWalletBalance(
                 w,
-                walletData.balance,
+                walletData.balance.onchain,
             );
 
             // update wallet balance
-            updateWalletBalance(currentWalletID, balance);
+            updateWalletBalance(currentWalletID, {
+                onchain: balance,
+                lightning: new BigNumber(0),
+            });
 
             try {
-                const {transactions, UTXOs} = await getBdkWalletTransactions(
+                const {txs, address, utxo} = await fetchOnchainTransactions(
                     w,
-                    walletData.network === 'testnet'
-                        ? electrumServerURL.testnet
-                        : electrumServerURL.bitcoin,
+                    walletData,
+                    updated,
+                    electrumServerURL,
                 );
 
-                // Store newly formatted transactions from mempool.space data
-                const newTxs = updated ? [] : transactions;
-
-                const addressLock = !updated;
-
-                let tempReceiveAddress = walletData.address;
-                let addressIndexCount = walletData.index;
-
-                // Only attempt wallet address update if wallet balance is updated
-                // TODO: avoid mempool for now and scrap this from BDK raw tx info (Script)
-                if (updated) {
-                    // iterate over all the transactions and include the missing optional fields for the TTransaction
-                    for (let i = 0; i < transactions.length; i++) {
-                        const tmp: TTransaction = {
-                            ...transactions[i],
-                            address: '',
-                        };
-
-                        const TxData = await getTxData(
-                            transactions[i].txid,
-                            transactions[i].network,
-                        );
-
-                        // Transaction inputs (remote owned addresses)
-                        for (let j = 0; j < TxData.vin.length; j++) {
-                            // Add address we own based on whether we sent
-                            // the transaction and the value received matches
-                            if (
-                                transactions[i].value ===
-                                    TxData.vin[j].prevout.value &&
-                                transactions[i].type === 'outbound'
-                            ) {
-                                tmp.address =
-                                    TxData.vin[j].prevout.scriptpubkey_address;
-                            }
-
-                            // Check if receive address is used
-                            // Then push tx index
-                            if (
-                                TxData.vin[j].prevout.scriptpubkey_address ===
-                                walletData.address.address
-                            ) {
-                                walletData.generateNewAddress();
-                            }
-                        }
-
-                        // Transaction outputs (local owned addresses)
-                        for (let k = 0; k < TxData.vout.length; k++) {
-                            // Add address we own based on whether we received
-                            // the transaction and the value received matches
-                            if (
-                                transactions[i].value ===
-                                    TxData.vout[k].value &&
-                                transactions[i].type === 'inbound'
-                            ) {
-                                tmp.address =
-                                    TxData.vout[k].scriptpubkey_address;
-
-                                // Update temp address
-                                if (
-                                    !addressLock &&
-                                    walletData.address.address ===
-                                        TxData.vout[k].scriptpubkey_address
-                                ) {
-                                    tempReceiveAddress =
-                                        walletData.generateNewAddress(
-                                            addressIndexCount,
-                                        );
-                                    addressIndexCount++;
-                                }
-                            }
-                        }
-
-                        // Update new transactions list
-                        newTxs.push({...tmp});
-                    }
-
-                    // update wallet address
-                    updateWalletAddress(currentWalletID, tempReceiveAddress);
-                }
+                // update wallet address
+                updateWalletAddress(currentWalletID, address);
 
                 // We make this update in case of pending txs
                 // and because we already have this data from the balance update BDK call
                 // update wallet transactions
-                updateWalletTransactions(currentWalletID, newTxs);
+                updateWalletTransactions(currentWalletID, txs);
 
                 // update wallet UTXOs
-                updateWalletUTXOs(currentWalletID, UTXOs);
+                updateWalletUTXOs(currentWalletID, utxo);
 
                 setLoadLock(false);
             } catch (err: any) {
-                liberalAlert(
-                    capitalizeFirst(t('network')),
-                    e('error_fetching_txs'),
-                    capitalizeFirst(t('ok')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('network')),
+                    text2: t('error_fetching_txs'),
+                    visibilityTime: 2000,
+                });
 
                 setLoadingBalance(false);
                 setRefreshing(false);
@@ -326,8 +326,8 @@ const Wallet = ({route}: Props) => {
     ]);
 
     // Check if wallet balance is empty
-    const isWalletBroke = (balance: BigNumber) => {
-        return new BigNumber(0).eq(balance);
+    const isWalletBroke = (balance: TBalance) => {
+        return new BigNumber(0).eq(balance.onchain.plus(balance.lightning));
     };
 
     const hideSendButton =
@@ -346,7 +346,7 @@ const Wallet = ({route}: Props) => {
         // Attempt to sync balance when reload triggered
         // E.g. from completed transaction
         if (route.params?.reload) {
-            refreshWallet();
+            jointSync();
         }
     }, [route.params?.reload]);
 
@@ -366,297 +366,461 @@ const Wallet = ({route}: Props) => {
                     {backgroundColor: CardColor},
                 ]}
             />
-            {/* adjust styling below to ensure content in View covers entire screen */}
-            {/* Adjust styling below to ensure it covers entire app height */}
-            <View
-                style={[
-                    tailwind('w-full h-full'),
-                    {backgroundColor: CardColor},
-                ]}>
-                {/* Top panel */}
+            <BottomSheetModalProvider>
+                {/* adjust styling below to ensure content in View covers entire screen */}
+                {/* Adjust styling below to ensure it covers entire app height */}
                 <View
                     style={[
-                        tailwind('relative h-1/2 items-center justify-center'),
+                        tailwind('w-full h-full'),
                         {backgroundColor: CardColor},
                     ]}>
+                    {/* Top panel */}
                     <View
                         style={[
                             tailwind(
-                                'absolute w-full top-2 flex-row items-center justify-between',
+                                `relative ${
+                                    walletData.type === 'unified'
+                                        ? 'h-1/2'
+                                        : 'h-1/2'
+                                } items-center justify-center`,
                             ),
+                            {backgroundColor: CardColor},
                         ]}>
-                        <PlainButton
-                            style={[tailwind('items-center flex-row left-6')]}
-                            onPress={() => {
-                                navigation.dispatch(
-                                    CommonActions.navigate('HomeScreen'),
-                                );
-                            }}>
-                            <Back style={tailwind('mr-2')} fill={'white'} />
-                        </PlainButton>
-
-                        <Text
-                            style={[
-                                tailwind(
-                                    'text-white self-center text-center w-1/2 font-bold',
-                                ),
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode={'middle'}>
-                            {walletName}
-                        </Text>
-
-                        <PlainButton
-                            style={[tailwind('right-6')]}
-                            onPress={() => {
-                                navigation.dispatch(
-                                    CommonActions.navigate({
-                                        name: 'WalletInfo',
-                                    }),
-                                );
-                            }}>
-                            <Dots width={32} fill={'white'} />
-                        </PlainButton>
-                    </View>
-
-                    {/* Watch-only */}
-                    {walletData.isWatchOnly && (
                         <View
                             style={[
                                 tailwind(
-                                    'absolute top-11 rounded-full bg-black opacity-50',
+                                    'absolute w-full top-2 flex-row items-center justify-between',
                                 ),
                             ]}>
+                            <PlainButton
+                                style={[
+                                    tailwind('items-center flex-row left-6'),
+                                ]}
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate('HomeScreen'),
+                                    );
+                                }}>
+                                <Back style={tailwind('mr-2')} fill={'white'} />
+                            </PlainButton>
+
                             <Text
                                 style={[
                                     tailwind(
-                                        'text-sm py-1 px-6 text-white font-bold',
+                                        'text-white self-center text-center w-1/2 font-bold',
                                     ),
-                                ]}>
-                                {t('watch_only')}
+                                ]}
+                                numberOfLines={1}
+                                ellipsizeMode={'middle'}>
+                                {walletName}
                             </Text>
+
+                            <PlainButton
+                                style={[tailwind('right-6')]}
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate({
+                                            name: 'WalletInfo',
+                                        }),
+                                    );
+                                }}>
+                                <Dots width={32} fill={'white'} />
+                            </PlainButton>
                         </View>
-                    )}
 
-                    {/* Balance */}
-                    <View
-                        style={[
-                            tailwind(
-                                `items-center w-5/6 ${
-                                    hideTotalBalance ? '-mt-20' : '-mt-8'
-                                }`,
-                            ),
-                        ]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm text-white opacity-60 mb-2'),
-                            ]}>
-                            {!checkNetworkIsReachable(networkState)
-                                ? t('offline_balance')
-                                : t('current_balance')}
-                        </Text>
-
-                        {/* Balance component */}
-                        <View
-                            style={[
-                                tailwind(
-                                    `${
-                                        hideTotalBalance
-                                            ? 'absolute mt-8'
-                                            : 'items-center'
-                                    } w-full`,
-                                ),
-                            ]}>
-                            <Balance
-                                fontColor={'white'}
-                                balance={walletData.balance}
-                                balanceFontSize={'text-4xl'}
-                                disableFiat={false}
-                                loading={loadingBalance}
-                            />
-                        </View>
-                    </View>
-
-                    {/* Send and receive */}
-                    <View
-                        style={[
-                            tailwind(
-                                'absolute bottom-6 w-full items-center px-4 justify-around flex-row',
-                            ),
-                        ]}>
-                        {/* Hide send if Balance is empty or it is a watch-only wallet */}
-                        {!hideSendButton && (
+                        {/* Watch-only */}
+                        {walletData.isWatchOnly && (
                             <View
                                 style={[
                                     tailwind(
-                                        'rounded-full py-3 mr-4 w-1/2 opacity-60',
+                                        'absolute top-11 rounded-full bg-black opacity-50',
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind(
+                                            'text-sm py-1 px-6 text-white font-bold',
+                                        ),
+                                    ]}>
+                                    {t('watch_only')}
+                                </Text>
+                            </View>
+                        )}
+
+                        {/* Balance */}
+                        <View
+                            style={[
+                                tailwind(
+                                    `items-center w-5/6 ${
+                                        hideTotalBalance
+                                            ? '-mt-20'
+                                            : isAdvancedMode &&
+                                              walletData.type === 'unified'
+                                            ? '-mt-8'
+                                            : 'mt-12'
+                                    }`,
+                                ),
+                            ]}>
+                            {/* Balance component */}
+                            <View
+                                style={[
+                                    tailwind(
+                                        `${
+                                            hideTotalBalance
+                                                ? 'absolute mt-8'
+                                                : 'items-center'
+                                        } w-full`,
                                     ),
                                     {
-                                        backgroundColor:
-                                            ColorScheme.Background.Inverted,
+                                        marginTop:
+                                            walletData.type === 'unified'
+                                                ? -86
+                                                : 0,
+                                    },
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind(
+                                            'text-sm text-white opacity-60',
+                                        ),
+                                    ]}>
+                                    {!checkNetworkIsReachable(networkState)
+                                        ? t('offline_balance')
+                                        : t('current_balance')}
+                                </Text>
+                                <Balance
+                                    fontColor={'white'}
+                                    balance={
+                                        walletData.type === 'unified'
+                                            ? walletBalance
+                                            : walletData.balance.onchain
+                                    }
+                                    balanceFontSize={'text-3xl'}
+                                    disableFiat={false}
+                                    loading={loadingBalance}
+                                />
+                            </View>
+                        </View>
+
+                        {/* Combined balance for unified wallets */}
+                        {walletData.type === 'unified' && isAdvancedMode && (
+                            <>
+                                <View
+                                    style={[
+                                        tailwind('absolute w-5/6'),
+                                        styles.bottomConverter,
+                                    ]}>
+                                    <View
+                                        style={[
+                                            tailwind('w-full items-start'),
+                                        ]}>
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'w-full flex-row items-center justify-between opacity-60',
+                                                ),
+                                            ]}>
+                                            <Text
+                                                style={[
+                                                    tailwind(
+                                                        'text-sm text-white',
+                                                    ),
+                                                ]}>
+                                                Lightning
+                                            </Text>
+                                            <Balance
+                                                disabled={true}
+                                                fontColor={'white'}
+                                                balance={
+                                                    walletData.balance.lightning
+                                                }
+                                                balanceFontSize={'text-lg'}
+                                                disableFiat={false}
+                                                loading={loadingBalance}
+                                            />
+                                        </View>
+                                    </View>
+
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'w-full flex-row items-center justify-between',
+                                            ),
+                                        ]}>
+                                        <View
+                                            style={[
+                                                tailwind('w-1/3 opacity-20'),
+                                                styles.divider,
+                                            ]}
+                                        />
+
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'rounded-full items-center px-6 py-2',
+                                                ),
+                                                {
+                                                    backgroundColor: CardAccent,
+                                                },
+                                            ]}>
+                                            <PlainButton
+                                                onPress={openSwapModal}>
+                                                <SwapIcon fill={'white'} />
+                                            </PlainButton>
+                                        </View>
+
+                                        <View
+                                            style={[
+                                                tailwind('w-1/3 opacity-20'),
+                                                styles.divider,
+                                            ]}
+                                        />
+                                    </View>
+
+                                    <View
+                                        style={[
+                                            tailwind('w-full items-start'),
+                                        ]}>
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'w-full flex-row items-center justify-between opacity-60',
+                                                ),
+                                            ]}>
+                                            <Text
+                                                style={[
+                                                    tailwind(
+                                                        'text-sm text-white',
+                                                    ),
+                                                ]}>
+                                                On-chain
+                                            </Text>
+
+                                            <Balance
+                                                disabled={true}
+                                                fontColor={'white'}
+                                                balance={
+                                                    walletData.balance.onchain
+                                                }
+                                                balanceFontSize={'text-lg'}
+                                                disableFiat={false}
+                                                loading={loadingBalance}
+                                            />
+                                        </View>
+                                    </View>
+                                </View>
+                            </>
+                        )}
+
+                        {/* Send and receive */}
+                        <View
+                            style={[
+                                tailwind(
+                                    'absolute bottom-6 w-full items-center px-4 justify-around flex-row',
+                                ),
+                            ]}>
+                            {/* Hide send if Balance is empty or it is a watch-only wallet */}
+                            {!hideSendButton && (
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'rounded-full py-3 mr-4 w-1/2',
+                                        ),
+                                        {
+                                            backgroundColor: CardAccent,
+                                        },
+                                    ]}>
+                                    <PlainButton
+                                        onPress={() => {
+                                            const miniwallet =
+                                                getMiniWallet(walletData);
+
+                                            navigation.dispatch(
+                                                CommonActions.navigate(
+                                                    'ScanRoot',
+                                                    {
+                                                        screen: 'Scan',
+                                                        params: {
+                                                            screen: 'send',
+                                                            wallet: miniwallet,
+                                                        },
+                                                    },
+                                                ),
+                                            );
+                                        }}>
+                                        <Text
+                                            style={[
+                                                tailwind(
+                                                    'text-base text-white text-center font-bold',
+                                                ),
+                                            ]}>
+                                            {capitalizeFirst(t('send'))}
+                                        </Text>
+                                    </PlainButton>
+                                </View>
+                            )}
+                            <View
+                                style={[
+                                    tailwind(
+                                        `rounded-full py-3 ${
+                                            hideSendButton ? 'w-full' : 'w-1/2'
+                                        }`,
+                                    ),
+                                    {
+                                        backgroundColor: CardAccent,
                                     },
                                 ]}>
                                 <PlainButton
                                     onPress={() => {
-                                        const miniwallet =
-                                            getMiniWallet(walletData);
-
                                         navigation.dispatch(
-                                            CommonActions.navigate('ScanRoot', {
-                                                screen: 'Scan',
-                                                params: {
-                                                    screen: 'send',
-                                                    wallet: miniwallet,
-                                                },
+                                            CommonActions.navigate({
+                                                name: 'RequestAmount',
                                             }),
                                         );
                                     }}>
                                     <Text
                                         style={[
                                             tailwind(
-                                                'text-base text-center font-bold',
+                                                'text-base text-white text-center font-bold',
                                             ),
-                                            {color: ColorScheme.Text.Alt},
                                         ]}>
-                                        {capitalizeFirst(t('send'))}
+                                        {capitalizeFirst(t('receive'))}
                                     </Text>
                                 </PlainButton>
                             </View>
-                        )}
-                        <View
-                            style={[
-                                tailwind(
-                                    `rounded-full py-3 ${
-                                        hideSendButton ? 'w-full' : 'w-1/2'
-                                    } opacity-60`,
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
-                                },
-                            ]}>
-                            <PlainButton
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'RequestAmount',
-                                        }),
-                                    );
-                                }}>
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-base text-center font-bold',
-                                        ),
-                                        {color: ColorScheme.Text.Alt},
-                                    ]}>
-                                    {capitalizeFirst(t('receive'))}
-                                </Text>
-                            </PlainButton>
                         </View>
                     </View>
-                </View>
 
-                {/* Transactions List */}
-                <View
-                    style={[
-                        styles.transactionList,
-                        tailwind('h-1/2 w-full items-center z-10'),
-                        {
-                            backgroundColor: ColorScheme.Background.Primary,
-                        },
-                    ]}>
-                    <View style={[tailwind('mt-6 w-11/12')]}>
-                        <VText
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right' ? 'mr-4' : 'ml-4'
-                                    } text-base font-bold`,
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {capitalizeFirst(t('transactions'))}
-                        </VText>
-                    </View>
-
+                    {/* Transactions List */}
                     <View
-                        style={[tailwind('w-full h-full items-center pb-10')]}>
-                        <FlatList
-                            refreshing={refreshing}
-                            onRefresh={refreshWallet}
-                            scrollEnabled={true}
+                        style={[
+                            styles.transactionList,
+                            tailwind(
+                                `${
+                                    walletData.type === 'unified'
+                                        ? 'h-1/2'
+                                        : 'h-1/2'
+                                } w-full items-center z-10`,
+                            ),
+                            {
+                                backgroundColor: ColorScheme.Background.Primary,
+                            },
+                        ]}>
+                        <View style={[tailwind('mt-6 w-11/12')]}>
+                            <VText
+                                style={[
+                                    tailwind(
+                                        `${
+                                            langDir === 'right'
+                                                ? 'mr-4'
+                                                : 'ml-4'
+                                        } text-base font-bold`,
+                                    ),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {capitalizeFirst(t('transactions'))}
+                            </VText>
+                        </View>
+
+                        <View
                             style={[
-                                tailwind(
-                                    `${
-                                        walletData.transactions.length > 0
-                                            ? 'w-11/12'
-                                            : 'w-full'
-                                    } mt-2 z-30`,
-                                ),
-                            ]}
-                            contentContainerStyle={[
-                                tailwind(
-                                    `${
-                                        walletData.transactions.length > 0
-                                            ? ''
-                                            : 'h-full'
-                                    } items-center`,
-                                ),
-                            ]}
-                            data={walletData.transactions.sort(
-                                (a: TTransaction, b: TTransaction) => {
-                                    return +b.timestamp - +a.timestamp;
-                                },
-                            )}
-                            renderItem={item => (
-                                <TransactionListItem
-                                    callback={() => {
-                                        navigation.dispatch(
-                                            CommonActions.navigate({
-                                                name: 'TransactionDetails',
-                                                params: {
-                                                    tx: {...item.item},
-                                                    source: 'conservative',
-                                                    walletId: currentWalletID,
-                                                },
-                                            }),
-                                        );
-                                    }}
-                                    tx={item.item}
-                                />
-                            )}
-                            keyExtractor={item => item.txid}
-                            initialNumToRender={25}
-                            contentInsetAdjustmentBehavior="automatic"
-                            ListEmptyComponent={
-                                <View
-                                    style={[
-                                        tailwind(
-                                            'w-4/5 h-5/6 items-center justify-center',
-                                        ),
-                                    ]}>
-                                    <Box
-                                        width={32}
-                                        fill={ColorScheme.SVG.GrayFill}
-                                        style={tailwind('mb-4 -mt-6')}
-                                    />
-                                    <Text
+                                tailwind('w-full h-full items-center pb-10'),
+                            ]}>
+                            <FlatList
+                                refreshing={refreshing}
+                                onRefresh={jointSync}
+                                scrollEnabled={true}
+                                style={[
+                                    tailwind(
+                                        `${
+                                            walletTxs.length > 0
+                                                ? 'w-11/12'
+                                                : 'w-full'
+                                        } mt-2 z-30`,
+                                    ),
+                                ]}
+                                contentContainerStyle={[
+                                    tailwind(
+                                        `${
+                                            walletTxs.length > 0 ? '' : 'h-full'
+                                        } items-center`,
+                                    ),
+                                ]}
+                                data={walletTxs.sort(
+                                    (a: TTransaction, b: TTransaction) => {
+                                        return +b.timestamp - +a.timestamp;
+                                    },
+                                )}
+                                renderItem={item => {
+                                    return (
+                                        <UnifiedTransactionListItem
+                                            callback={() => {
+                                                navigation.dispatch(
+                                                    CommonActions.navigate({
+                                                        name: 'TransactionDetails',
+                                                        params: {
+                                                            tx: {...item.item},
+                                                            source: 'conservative',
+                                                            walletId:
+                                                                currentWalletID,
+                                                        },
+                                                    }),
+                                                );
+                                            }}
+                                            tx={item.item}
+                                        />
+                                    );
+                                }}
+                                keyExtractor={item =>
+                                    item.txid ? item.txid : item.id
+                                }
+                                initialNumToRender={25}
+                                contentInsetAdjustmentBehavior="automatic"
+                                ListEmptyComponent={
+                                    <View
                                         style={[
-                                            tailwind('w-full text-center'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
+                                            tailwind(
+                                                'w-4/5 h-5/6 items-center justify-center',
+                                            ),
                                         ]}>
-                                        {t('no_transactions_text')}
-                                    </Text>
-                                </View>
-                            }
-                        />
+                                        <Box
+                                            width={32}
+                                            fill={ColorScheme.SVG.GrayFill}
+                                            style={tailwind('mb-4 -mt-6')}
+                                        />
+                                        <Text
+                                            style={[
+                                                tailwind('w-full text-center'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .GrayedText,
+                                                },
+                                            ]}>
+                                            {t('no_transactions_text')}
+                                        </Text>
+                                    </View>
+                                }
+                            />
+                        </View>
+
+                        {walletData.type === 'unified' && (
+                            <View style={[tailwind('absolute bottom-0')]}>
+                                <Swap
+                                    lightningBalance={
+                                        walletData.balance.lightning
+                                    }
+                                    onchainBalance={walletData.balance.onchain}
+                                    swapRef={bottomSwapRef}
+                                    triggerSwap={handleSwap}
+                                    onSelectSwap={idx => {
+                                        setOpenSwap(idx);
+                                    }}
+                                />
+                            </View>
+                        )}
                     </View>
                 </View>
-            </View>
+            </BottomSheetModalProvider>
         </SafeAreaView>
     );
 };
@@ -670,5 +834,12 @@ const styles = StyleSheet.create({
     transactionList: {
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
+    },
+    bottomConverter: {
+        bottom: 98,
+    },
+    divider: {
+        height: 1,
+        backgroundColor: 'black',
     },
 });

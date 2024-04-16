@@ -24,6 +24,83 @@ import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
 
+export const UnifiedTransactionListItem = (props: TxListItemProps) => {
+    if (props.tx.isLightning) {
+        return <TransactionLNListItem {...props} />;
+    } else {
+        return <TransactionListItem {...props} />;
+    }
+};
+
+export const TransactionLNListItem = (props: TxListItemProps) => {
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    const {i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    const getTxTimestamp = (time: Date) => {
+        return formatLocaleDate(i18n.language, time);
+    };
+
+    return (
+        <PlainButton
+            onPress={() => {
+                props.callback ? props.callback() : null;
+            }}>
+            <View
+                style={[
+                    tailwind(
+                        `${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`,
+                    ),
+                    {backgroundColor: ColorScheme.Background.Primary},
+                ]}>
+                <View
+                    style={[
+                        tailwind('flex-row items-center w-5/6'),
+                        {
+                            marginLeft: 0,
+                        },
+                    ]}>
+                    <View style={[tailwind('w-full ml-1')]}>
+                        <TXBalance
+                            balance={new BigNum(props.tx.amountMsat / 1000)}
+                            balanceFontSize={'text-lg'}
+                            fontColor={ColorScheme.Text.Default}
+                        />
+                        <VText
+                            style={[
+                                tailwind('text-xs'),
+                                {color: ColorScheme.Text.GrayedText},
+                            ]}>
+                            {getTxTimestamp(new Date(props.tx.paymentTime))}
+                        </VText>
+                    </View>
+                </View>
+                <View
+                    style={[
+                        tailwind(
+                            'w-10 h-10 rounded-full items-center justify-center opacity-80',
+                        ),
+                        {
+                            backgroundColor: ColorScheme.Background.Secondary,
+                        },
+                    ]}>
+                    {props.tx.paymentType === 'received' ? (
+                        <ArrowDown fill={ColorScheme.SVG.Received} />
+                    ) : (
+                        <ArrowUp fill={ColorScheme.SVG.Sent} />
+                    )}
+                </View>
+            </View>
+        </PlainButton>
+    );
+};
+
 export const TransactionListItem = (props: TxListItemProps) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());

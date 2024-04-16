@@ -23,6 +23,7 @@ import {
     fromDescriptorPTR,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
+import {BreezEvent} from '@breeztech/react-native-breez-sdk';
 
 import {TLanguage, TCurrency} from '../types/settings';
 import {EBackupMaterial, ENet} from '../types/enums';
@@ -43,6 +44,7 @@ import {TaprootWallet} from './wallet/p2tr';
 import {SegWitNativeWallet} from './wallet/segwit/wpkh';
 import {SegWitP2SHWallet} from './wallet/segwit/shp2wpkh';
 import {LegacyWallet} from './wallet/p2pkh';
+import {UnifiedLNWallet} from './wallet/unified';
 
 import {
     descriptorFromTemplate,
@@ -57,7 +59,12 @@ import {
     doesWalletExist,
 } from '../modules/wallet-utils';
 
-import {WalletPaths, extendedKeyInfo, validWalletTypes} from '../modules/wallet-defaults';
+import {
+    DEFAULT_WALLET_TYPE,
+    WalletPaths,
+    extendedKeyInfo,
+    validWalletTypes,
+} from '../modules/wallet-defaults';
 
 // App context props type
 type Props = PropsWithChildren<{}>;
@@ -67,6 +74,7 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
+    breezEvent: BreezEvent;
     appLanguage: TLanguage;
     appFiatCurrency: TCurrency;
     loadLock: boolean;
@@ -83,6 +91,7 @@ type defaultContextType = {
     isDevMode: boolean;
     onboarding: boolean;
     electrumServerURL: TElectrumServerURLs;
+    setBreezEvent: (event: BreezEvent) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
     updateFiatRate: (fiatObj: TFiatRate) => void;
@@ -96,6 +105,7 @@ type defaultContextType = {
         id: string,
         transactions: TTransaction[],
     ) => void;
+    updateWalletPayments: (id: string, payments: TTransaction[]) => void;
     updateWalletUTXOs: (id: string, utxo: TUtxo[]) => void;
     updateWalletBalance: (id: string, balance: TBalance) => void;
     updateWalletAddress: (id: string, address: TAddress) => void;
@@ -120,6 +130,7 @@ type defaultContextType = {
 const defaultContext: defaultContextType = {
     loadLock: false,
     onboarding: true,
+    breezEvent: {} as BreezEvent,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -147,12 +158,13 @@ const defaultContext: defaultContextType = {
     isWalletInitialized: false,
     walletMode: 'single',
     isAdvancedMode: false,
-    defaultToTestnet: true,
+    defaultToTestnet: false, // Default to Taproot LN on Mainnet
     electrumServerURL: {
         // Default and alternates for testnet and bitcoin
         testnet: 'ssl://electrum.blockstream.info:60002',
         bitcoin: 'ssl://electrum.blockstream.info:50002',
     },
+    setBreezEvent: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -163,6 +175,7 @@ const defaultContext: defaultContextType = {
     addWallet: () => {},
     updateAppUnit: () => {},
     updateWalletTransactions: () => {},
+    updateWalletPayments: () => {},
     updateWalletUTXOs: () => {},
     updateWalletBalance: () => {},
     updateWalletAddress: () => {},
@@ -188,6 +201,7 @@ export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
+    const [breezEvent, _setBreezEvent] = useState(defaultContext.breezEvent);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -223,6 +237,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('loadLock');
     const {getItem: _getOnboarding, setItem: _updateOnboarding} =
         useAsyncStorage('onboarding');
+    const {getItem: _getBreezEvent, setItem: _updateBreezEvent} =
+        useAsyncStorage('breezEvent');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -298,6 +314,35 @@ export const AppStorageProvider = ({children}: Props) => {
         },
         [_setOnboarding, _updateOnboarding],
     );
+
+    const setBreezEvent = useCallback(
+        async (event: BreezEvent) => {
+            // handle clear
+            if (event === ({} as BreezEvent)) {
+                await _setBreezEvent({} as BreezEvent);
+                await _updateBreezEvent(JSON.stringify({}));
+            }
+
+            try {
+                await _setBreezEvent(event);
+                await _updateBreezEvent(JSON.stringify(event));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Breez event) Error loading data: ${e} [${event}]`,
+                );
+                throw new Error('Error setting breez event');
+            }
+        },
+        [_setBreezEvent, _updateBreezEvent],
+    );
+
+    const _loadBreezEvent = async () => {
+        const be = await _getBreezEvent();
+
+        if (be !== null) {
+            _setBreezEvent(JSON.parse(be));
+        }
+    };
 
     const setAppLanguage = useCallback(
         async (languageObject: TLanguage) => {
@@ -605,6 +650,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 case 'p2pkh':
                     w = LegacyWallet.fromJSON(JSON.stringify(stringyW));
                     break;
+                case 'unified':
+                    w = UnifiedLNWallet.fromJSON(JSON.stringify(stringyW));
+                    break;
             }
 
             return w;
@@ -641,6 +689,9 @@ export const AppStorageProvider = ({children}: Props) => {
                         break;
                     case 'p2pkh':
                         tmp = LegacyWallet.fromJSON(serializedWallet);
+                        break;
+                    case 'unified':
+                        tmp = UnifiedLNWallet.fromJSON(serializedWallet);
                         break;
                     default:
                         throw new Error(
@@ -725,6 +776,22 @@ export const AppStorageProvider = ({children}: Props) => {
         [wallets, _updateWallets, _setWallets],
     );
 
+    const updateWalletPayments = useCallback(
+        async (id: string, payments: TTransaction[]) => {
+            const index = wallets.findIndex(wallet => wallet.id === id);
+
+            // Get the current wallet
+            // Update the payments in the current wallet
+            const tmp = [...wallets];
+            tmp[index].payments = payments;
+
+            // Update wallets list
+            _setWallets(tmp);
+            _updateWallets(JSON.stringify(tmp));
+        },
+        [wallets, _updateWallets, _setWallets],
+    );
+
     const updateWalletUTXOs = useCallback(
         async (id: string, utxos: TUtxo[]) => {
             const index = wallets.findIndex(wallet => wallet.id === id);
@@ -748,7 +815,16 @@ export const AppStorageProvider = ({children}: Props) => {
             // Get the current wallet
             // Update the balance in the current wallet
             const tmp = [...wallets];
-            tmp[index].balance = balance;
+
+            const oldLNBalance = tmp[index].balance.lightning;
+            const oldOnchainBalance = tmp[index].balance.onchain;
+
+            tmp[index].balance.lightning = !balance.lightning.isZero()
+                ? balance.lightning
+                : oldLNBalance;
+            tmp[index].balance.onchain = !balance.onchain.isZero()
+                ? balance.onchain
+                : oldOnchainBalance;
 
             // Update wallets list
             _setWallets(tmp);
@@ -788,9 +864,6 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const _addNewWallet = async (newWallet: TWalletType) => {
-        // Set wallet ID
-        _setCurrentWalletID(newWallet.id);
-
         // If we have a mnemonic, generate extended key material
         // Function applied when newly generated wallet and if mnemonic imported
         if (newWallet.mnemonic !== '') {
@@ -814,6 +887,7 @@ export const AppStorageProvider = ({children}: Props) => {
             let PrivateDescriptor!: string;
 
             switch (newWallet.type) {
+                case 'unified':
                 case 'p2tr':
                     const descriptorsPTR = fromDescriptorPTR(
                         newWallet.mnemonic,
@@ -850,6 +924,7 @@ export const AppStorageProvider = ({children}: Props) => {
         // Declare and set if watch-only
         newWallet.setWatchOnly();
 
+        // TODO: not working for LN unified wallet
         // Generate new initial receive address
         const newAddress = newWallet.generateNewAddress();
 
@@ -874,7 +949,7 @@ export const AppStorageProvider = ({children}: Props) => {
         ) => {
             // Default network and wallet type
             var net = backupNetwork;
-            var walletType = 'p2tr'; // p2tr
+            var walletType = DEFAULT_WALLET_TYPE; // unified
 
             var fingerprint = '';
             var path = '';
@@ -973,6 +1048,11 @@ export const AppStorageProvider = ({children}: Props) => {
 
             // Create wallet based on type
             switch (walletArgs.type) {
+                case 'unified':
+                    newWallet = new UnifiedLNWallet(
+                        walletArgs as TBaseWalletArgs,
+                    );
+                    break;
                 case 'p2tr':
                     newWallet = new TaprootWallet(
                         walletArgs as TBaseWalletArgs,
@@ -1007,6 +1087,10 @@ export const AppStorageProvider = ({children}: Props) => {
                 });
             }
 
+            // is P2TR or Unified
+            const isP2TR =
+                walletArgs.type === 'p2tr' || walletArgs.type === 'unified';
+
             // Alternatively, generate Descriptor from Extended Keys
             if (
                 backupMaterialType === 'xprv' ||
@@ -1021,36 +1105,31 @@ export const AppStorageProvider = ({children}: Props) => {
 
                     switch (backupMaterialType) {
                         case EBackupMaterial.Xpub:
-                            descriptor =
-                                walletArgs.type === 'p2tr'
-                                    ? fromDescriptorPublicPTR(
-                                          walletArgs.xpub,
-                                          walletArgs.fingerprint,
-                                          'p2tr',
-                                          walletArgs.network,
-                                      )
-                                    : await fromDescriptorTemplatePublic(
-                                          // BDK expects a tpub or xpub, so we need to convert it
-                                          // if it's an exotic prefix
-                                          normalizeExtKey(
-                                              walletArgs.xpub,
-                                              'pub',
-                                          ),
-                                          walletArgs.fingerprint,
-                                          walletArgs.type,
-                                          walletArgs.network,
-                                      );
+                            descriptor = isP2TR
+                                ? fromDescriptorPublicPTR(
+                                      walletArgs.xpub,
+                                      walletArgs.fingerprint,
+                                      'p2tr',
+                                      walletArgs.network,
+                                  )
+                                : await fromDescriptorTemplatePublic(
+                                      // BDK expects a tpub or xpub, so we need to convert it
+                                      // if it's an exotic prefix
+                                      normalizeExtKey(walletArgs.xpub, 'pub'),
+                                      walletArgs.fingerprint,
+                                      walletArgs.type,
+                                      walletArgs.network,
+                                  );
 
                             break;
 
                         case EBackupMaterial.Xprv:
-                            const {internal, external, priv} =
-                                walletArgs.type === 'p2tr'
-                                    ? fromDescriptorPTR(
-                                          walletArgs.xprv,
-                                          walletArgs.network,
-                                      )
-                                    : createDescriptorFromXprv(walletArgs.xprv);
+                            const {internal, external, priv} = isP2TR
+                                ? fromDescriptorPTR(
+                                      walletArgs.xprv,
+                                      walletArgs.network,
+                                  )
+                                : createDescriptorFromXprv(walletArgs.xprv);
 
                             descriptor = {
                                 InternalDescriptor: internal,
@@ -1091,6 +1170,15 @@ export const AppStorageProvider = ({children}: Props) => {
                 const mnemonic = await generateMnemonic();
 
                 switch (type) {
+                    case 'unified':
+                        newWallet = new UnifiedLNWallet({
+                            name: name,
+                            type: type,
+                            network: network,
+                            mnemonic: mnemonic,
+                        });
+                        break;
+
                     case 'p2tr':
                         newWallet = new TaprootWallet({
                             name: name,
@@ -1098,8 +1186,8 @@ export const AppStorageProvider = ({children}: Props) => {
                             network: network,
                             mnemonic: mnemonic,
                         });
-
                         break;
+
                     case 'wpkh':
                         newWallet = new SegWitNativeWallet({
                             name: name,
@@ -1107,7 +1195,6 @@ export const AppStorageProvider = ({children}: Props) => {
                             network: network,
                             mnemonic: mnemonic,
                         });
-
                         break;
 
                     case 'shp2wpkh':
@@ -1179,6 +1266,10 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
+        _loadBreezEvent();
+    }, []);
+
+    useEffect(() => {
         _loadAppLanguage();
     }, []);
 
@@ -1241,6 +1332,8 @@ export const AppStorageProvider = ({children}: Props) => {
                 setLoadLock,
                 electrumServerURL,
                 setElectrumServerURL,
+                breezEvent,
+                setBreezEvent,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,
@@ -1269,6 +1362,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 getWalletData,
                 updateAppUnit,
                 updateWalletTransactions,
+                updateWalletPayments,
                 updateWalletUTXOs,
                 updateWalletBalance,
                 updateWalletAddress,

@@ -12,6 +12,8 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
+import {parseInvoice} from '@breeztech/react-native-breez-sdk';
+
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
 
@@ -21,11 +23,17 @@ import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
+import Toast, {ToastConfig} from 'react-native-toast-message';
+
 import {useTranslation} from 'react-i18next';
 
 import decodeURI from 'bip21';
 
-import {checkInvoiceAndWallet, isValidAddress} from '../modules/wallet-utils';
+import {
+    checkInvoiceAndWallet,
+    isValidAddress,
+    decodeInvoiceType,
+} from '../modules/wallet-utils';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
 
@@ -41,10 +49,10 @@ import Close from '../assets/svg/x-24.svg';
 import Color from '../constants/Color';
 import InfoIcon from '../assets/svg/info-16.svg';
 
-import {conservativeAlert} from '../components/alert';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst, convertBTCtoSats} from '../modules/transform';
+import {toastConfig} from '../components/toast';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -137,11 +145,12 @@ const Scan = ({route}: Props) => {
     const cameraRef = React.useRef<Camera>(null);
 
     const onError = (error: any) => {
-        conservativeAlert(
-            t('qr_scan'),
-            error.message,
-            capitalizeFirst(t('ok')),
-        );
+        Toast.show({
+            topOffset: 54,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('qr_scan')),
+            text2: error.message,
+        });
     };
 
     const requestCamPerms = async () => {
@@ -188,70 +197,127 @@ const Scan = ({route}: Props) => {
         setScanLock(false);
     };
 
-    const updateScannerAlert = (message: string) => {
-        setScannerAlertMsg(message);
-        setScanLock(true);
-
-        // Lock for 5 seconds
-        setTimeout(() => {
-            clearScannerAlert();
-        }, 1000 * 5);
+    const updateToast = (message: string) => {
+        Toast.show({
+            topOffset: 54,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('scanner')),
+            text2: message,
+        });
     };
 
-    const handleInvalidInvoice = (invoice: string) => {
+    const handleInvalidInvoice = async (invoice: string) => {
         // TODO: update to handle unified invoice format (LN & BTC)
         //       Make ln priority if unified or LN wallet
         let decodedInvoice;
 
+        // See if single BTC address
         // Handle single btc supported address
-        if (!invoice.startsWith('bitcoin:')) {
-            let btcAddress = invoice;
-
-            if (!isValidAddress(btcAddress)) {
-                updateScannerAlert(e('invalid_btc_address_error'));
-                return {decodedInvoice: null, isOnchain: null};
-            }
-
-            invoice = 'bitcoin:' + btcAddress;
+        if (isValidAddress(invoice.toLowerCase())) {
+            invoice = 'bitcoin:' + invoice;
         }
 
+        const invoiceType = await decodeInvoiceType(invoice);
+
         // Only support:
+        // - Bolt 11 Invoice
         // - Unified and regular BIP21 Invoice
-        // - Bolt11 Invoice
         // - LNURL
         if (
             !(
-                invoice.startsWith('bitcoin:') ||
-                invoice.startsWith('lightning:') ||
-                invoice.toLowerCase().startsWith('lnbc') ||
-                invoice.toLowerCase().startsWith('lnurl')
+                invoiceType.type === 'bitcoin' ||
+                invoiceType.type === 'lightning' ||
+                invoiceType.type === 'unified'
             )
         ) {
-            updateScannerAlert(e('unsupported_invoice_type'));
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('scanner')),
+                text2: e('unsupported_invoice_type'),
+            });
             return {decodedInvoice: null, isOnchain: null};
         }
 
         // Check if LN invoice and handle separately
-        if (
-            invoice.startsWith('lightning:') ||
-            invoice.toLowerCase().startsWith('lnbc') ||
-            invoice.toLowerCase().startsWith('lnurl')
-        ) {
-            return {decodedInvoice: decodedInvoice, isOnchain: false};
-        }
+        // Call on Breez to work on this
+        if (invoiceType.type === 'lightning') {
+            // Only support bolt11 for now
+            if (invoiceType.spec === 'bolt11') {
+                try {
+                    const parsedBolt11Invoice = await parseInvoice(invoice);
 
-        // Attempt to decode BIP21 QR
-        try {
-            decodedInvoice = decodeURI.decode(invoice);
-
-            // BIP21 QR could contain upper case address, so we'll convert to lower case
-            if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
-                updateScannerAlert(e('invalid_invoice_error'));
+                    return {
+                        decodedInvoice: parsedBolt11Invoice,
+                        isOnchain: false,
+                    };
+                } catch (err: any) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('scanner')),
+                        text2: err,
+                    });
+                    return {decodedInvoice: null, isOnchain: null};
+                }
+            } else {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('scanner')),
+                    text2: e('unsupported_invoice_type'),
+                });
                 return {decodedInvoice: null, isOnchain: null};
             }
-        } catch (err: any) {
-            updateScannerAlert(e('invalid_invoice_error'));
-            return {decodedInvoice: null, isOnchain: null};
+        }
+
+        // Bip21
+        if (invoiceType.type === 'bitcoin' || invoiceType.type === 'unified') {
+            // Handle LN if unified wallet and ln balance sufficient
+            if (invoiceType.type === 'unified') {
+                if (route.params.wallet.balanceLightning > 0) {
+                    // attempt LN
+
+                    const bolt11 = (
+                        invoiceType.invoice.split('lightning=').pop() as string
+                    ).toLowerCase();
+
+                    try {
+                        const parsedBolt11Invoice = await parseInvoice(bolt11);
+
+                        return {
+                            decodedInvoice: parsedBolt11Invoice,
+                            isOnchain: false,
+                        };
+                    } catch (err: any) {
+                        // continue to bip21
+                    }
+                }
+            }
+
+            // Attempt to decode BIP21 QR
+            try {
+                decodedInvoice = decodeURI.decode(invoice);
+
+                // BIP21 QR could contain upper case address, so we'll convert to lower case
+                if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('scanner')),
+                        text2: e('invalid_invoice_error'),
+                    });
+                    return {decodedInvoice: null, isOnchain: null};
+                }
+            } catch (err: any) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('scanner')),
+                    text2: e('invalid_invoice_error'),
+                });
+                return {decodedInvoice: null, isOnchain: null};
+            }
         }
 
         // Check and report errors from wallet and invoice
@@ -259,8 +325,7 @@ const Scan = ({route}: Props) => {
             !checkInvoiceAndWallet(
                 route.params.wallet,
                 decodedInvoice,
-                updateScannerAlert,
-                walletMode === 'single',
+                updateToast,
             )
         ) {
             return {decodedInvoice: null, isOnchain: null};
@@ -269,7 +334,7 @@ const Scan = ({route}: Props) => {
         return {decodedInvoice: decodedInvoice, isOnchain: true};
     };
 
-    const onQRDetected = (event: any) => {
+    const onQRDetected = async (event: any) => {
         if (scanLock) {
             return;
         }
@@ -279,15 +344,15 @@ const Scan = ({route}: Props) => {
         const decodedQRState: {
             decodedInvoice: any;
             isOnchain: boolean | null;
-        } = handleInvalidInvoice(_QR);
+        } = await handleInvalidInvoice(_QR);
 
         if (decodedQRState.decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
 
-            const amount = decodedQRState.decodedInvoice.options.amount;
-
             if (decodedQRState.isOnchain) {
+                const amount = decodedQRState.decodedInvoice.options.amount;
+
                 if (amount) {
                     // Route to Fee screen with amount (onChain)
                     // Update amount to sats
@@ -313,13 +378,50 @@ const Scan = ({route}: Props) => {
                             params: {
                                 invoiceData: decodedQRState.decodedInvoice,
                                 wallet: route.params.wallet,
+                                isLightning: false,
                             },
                         }),
                     );
                 }
             } else {
                 // If LN Invoice
-                updateScannerAlert(e('lightning_not_support'));
+                // call on breez to attempt to pay and route screen
+                try {
+                    const parsedBolt11Invoice = decodedQRState.decodedInvoice;
+                    const bolt11Msat = parsedBolt11Invoice.amountMsat;
+
+                    if (!bolt11Msat) {
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: capitalizeFirst(t('scanner')),
+                            text2: e('missing_bolt11_invoice_amount'),
+                        });
+                        return;
+                    }
+
+                    // Navigate to send screen to handle LN payment
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'Send',
+                            params: {
+                                wallet: route.params.wallet,
+                                feeRate: 0,
+                                dummyPsbtVsize: 0,
+                                invoiceData: null,
+                                bolt11: parsedBolt11Invoice,
+                            },
+                        }),
+                    );
+                } catch (err: any) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('scanner')),
+                        text2: e('lightning_not_support'),
+                    });
+                    return;
+                }
             }
         }
     };
@@ -335,7 +437,9 @@ const Scan = ({route}: Props) => {
     const handleClipboard = async () => {
         const clipboardData = await Clipboard.getString();
 
-        const {decodedInvoice} = handleInvalidInvoice(clipboardData);
+        const {decodedInvoice, isOnchain} = await handleInvalidInvoice(
+            clipboardData,
+        );
 
         if (decodedInvoice) {
             // To highlight the successful scan, we'll trigger a success haptic
@@ -344,33 +448,66 @@ const Scan = ({route}: Props) => {
                 RNHapticFeedbackOptions,
             );
 
-            if (decodedInvoice.options.amount) {
-                // Update amount to sats
-                decodedInvoice.options.amount = convertBTCtoSats(
-                    decodedInvoice.options.amount,
-                );
+            // Lightning handling
+            if (!isOnchain) {
+                // call on breez to attempt to pay and route screen
+                const parsedBolt11Invoice = decodedInvoice;
+                const bolt11Msat = parsedBolt11Invoice.amountMsat;
 
+                if (!bolt11Msat) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('scanner')),
+                        text2: e('missing_bolt11_invoice_amount'),
+                    });
+                    return;
+                }
+
+                // Navigate to send screen to handle LN payment
                 runOnJS(navigation.dispatch)(
                     CommonActions.navigate('WalletRoot', {
-                        screen: 'FeeSelection',
+                        screen: 'Send',
                         params: {
-                            invoiceData: decodedInvoice,
                             wallet: route.params.wallet,
-                            source: 'conservative',
+                            feeRate: 0,
+                            dummyPsbtVsize: 0,
+                            invoiceData: null,
+                            bolt11: parsedBolt11Invoice,
                         },
                     }),
                 );
             } else {
-                runOnJS(navigation.dispatch)(
-                    CommonActions.navigate('WalletRoot', {
-                        screen: 'SendAmount',
-                        params: {
-                            invoiceData: decodedInvoice,
-                            wallet: route.params.wallet,
-                            source: 'conserative',
-                        },
-                    }),
-                );
+                // BTC handling
+                if (decodedInvoice.options.amount) {
+                    // Update amount to sats
+                    decodedInvoice.options.amount = convertBTCtoSats(
+                        decodedInvoice.options.amount,
+                    );
+
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'FeeSelection',
+                            params: {
+                                invoiceData: decodedInvoice,
+                                wallet: route.params.wallet,
+                                source: 'conservative',
+                            },
+                        }),
+                    );
+                } else {
+                    runOnJS(navigation.dispatch)(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'SendAmount',
+                            params: {
+                                invoiceData: decodedInvoice,
+                                wallet: route.params.wallet,
+                                isLightning: false,
+                                source: 'conservative',
+                            },
+                        }),
+                    );
+                }
             }
         }
     };
@@ -485,6 +622,8 @@ const Scan = ({route}: Props) => {
 
             {/* Display loading or camera unavailable; handle differently */}
             {!Camera && <LoadingView isCamAvailable={true} />}
+
+            <Toast config={toastConfig as ToastConfig} />
         </SafeAreaView>
     );
 };

@@ -1,5 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import React, {useContext, useEffect, useState, useCallback} from 'react';
 
 import {
@@ -18,6 +18,10 @@ import Carousel from 'react-native-reanimated-carousel';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../Navigation';
+
+import Toast from 'react-native-toast-message';
+
+import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 import VText from '../components/text';
 
@@ -52,7 +56,7 @@ import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/card';
-import {TransactionListItem} from '../components/transaction';
+import {UnifiedTransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
 import {TBalance, TTransaction} from '../types/wallet';
@@ -60,9 +64,12 @@ import {TBalance, TTransaction} from '../types/wallet';
 import {FiatBalance} from '../components/balance';
 
 import {fetchFiatRate} from '../modules/currency';
-import {liberalAlert, conservativeAlert} from '../components/alert';
 
-import {getUniqueTXs, checkNetworkIsReachable} from '../modules/wallet-utils';
+import {
+    getUniqueTXs,
+    checkNetworkIsReachable,
+    getLNPayments,
+} from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
 import {ENet} from '../types/enums';
@@ -71,7 +78,6 @@ type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
 const Home = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
-
     const tailwind = useTailwind();
 
     const {t} = useTranslation('wallet');
@@ -102,12 +108,14 @@ const Home = ({route}: Props) => {
         fiatRate,
         updateFiatRate,
         updateWalletTransactions,
+        updateWalletPayments,
         updateWalletBalance,
         isWalletInitialized,
         electrumServerURL,
         walletsIndex,
         updateWalletsIndex,
         walletMode,
+        isAdvancedMode,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -127,14 +135,21 @@ const Home = ({route}: Props) => {
     const totalBalance: TBalance = wallets.reduce(
         (accumulator: TBalance, currentValue: BaseWallet) =>
             // Only show balances from bitcoin mainnet
-            // Don't want user tot think their testnet money
+            // Don't want user to think their testnet money
             // is spendable
-            accumulator.plus(
-                currentValue.network === ENet.Bitcoin
-                    ? currentValue.balance
-                    : new BigNumber(0),
-            ),
-        new BigNumber(0),
+            ({
+                onchain: accumulator.onchain.plus(
+                    currentValue.network === ENet.Bitcoin
+                        ? currentValue.balance.onchain
+                        : new BigNumber(0),
+                ),
+                lightning: accumulator.lightning.plus(
+                    currentValue.network === ENet.Bitcoin
+                        ? currentValue.balance.lightning
+                        : new BigNumber(0),
+                ),
+            }),
+        {onchain: new BigNumber(0), lightning: new BigNumber(0)},
     );
 
     // List out all transactions across all wallets
@@ -144,22 +159,19 @@ const Home = ({route}: Props) => {
         // Filter and show only transactions from current wallet
         // if in single wallet mode
         // else show all transactions across wallets
-        if (walletMode === 'multi') {
-            for (const w of wallets) {
-                transactions = transactions.concat(w?.transactions);
-            }
-        } else {
-            transactions = wallet
-                ? transactions.concat(wallet.transactions)
-                : transactions;
-        }
+        transactions = wallet
+            ? transactions.concat(wallet.transactions).concat(wallet.payments)
+            : transactions;
 
         const txs =
             wallets.length > 0 ? getUniqueTXs(transactions) : transactions;
 
         // Sort by timestamp
         return txs.sort((a: TTransaction, b: TTransaction) => {
-            return +b.timestamp - +a.timestamp;
+            return (
+                +(b?.isLightning ? b.paymentTime : b.timestamp) -
+                +(a?.isLightning ? a.paymentTime : a.timestamp)
+            );
         });
     };
 
@@ -169,7 +181,15 @@ const Home = ({route}: Props) => {
         await syncBdkWallet(
             w,
             (status: boolean) => {
-                console.log('[BDK] synced wallet', status);
+                if (process.env.NODE_ENV === 'development' && !status) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('BDK'),
+                        text2: t('Failed to sync'),
+                        autoHide: false,
+                    });
+                }
             },
             wallet.network,
             electrumServerURL,
@@ -187,7 +207,7 @@ const Home = ({route}: Props) => {
                     await fetchFiatRate(
                         ticker,
                         fiatRate,
-                        (rate: TBalance) => {
+                        (rate: BigNumber) => {
                             updateFiatRate({
                                 ...fiatRate,
                                 rate: rate,
@@ -198,11 +218,13 @@ const Home = ({route}: Props) => {
                     );
                 } catch (e: any) {
                     // Report network error
-                    liberalAlert(
-                        capitalizeFirst(t('network')),
-                        `${e.message}`,
-                        capitalizeFirst(t('ok')),
-                    );
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('network')),
+                        text2: e.message,
+                        visibilityTime: 2000,
+                    });
 
                     // Kill loading
                     setLoadingBalance(false);
@@ -217,29 +239,12 @@ const Home = ({route}: Props) => {
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
-        // Abort load if no wallets yet
-        if (!isWalletInitialized) {
-            return;
-        }
-
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
-            setRefreshing(false);
-            return;
-        }
-
-        // start loading
-        setLoadingBalance(true);
-
-        // Set refreshing
-        setRefreshing(true);
-
         const w = await initWallet();
 
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
             fiatRate,
-            (rate: TBalance) => {
+            (rate: BigNumber) => {
                 // Then fetch fiat rate
                 updateFiatRate({
                     ...fiatRate,
@@ -256,11 +261,12 @@ const Home = ({route}: Props) => {
         // Check net again, just in case there is a drop mid execution
         if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
+            setLoadingBalance(false);
             return;
         }
 
         // Sync wallet
-        const {balance} = await getBdkWalletBalance(w, wallet.balance);
+        const {balance} = await getBdkWalletBalance(w, wallet.balance.onchain);
         const {transactions} = await getBdkWalletTransactions(
             w,
             wallet.network === 'testnet'
@@ -272,7 +278,10 @@ const Home = ({route}: Props) => {
         setRefreshing(false);
 
         // Update wallet balance
-        updateWalletBalance(currentWalletID, balance);
+        updateWalletBalance(currentWalletID, {
+            onchain: balance,
+            lightning: new BigNumber(0),
+        });
 
         // Update wallet transactions
         updateWalletTransactions(currentWalletID, transactions);
@@ -289,6 +298,94 @@ const Home = ({route}: Props) => {
         updateFiatRate,
         networkState,
     ]);
+
+    const getBalance = async () => {
+        try {
+            const nodeState = await nodeInfo();
+            const balanceLn = nodeState.channelsBalanceMsat;
+
+            // Update balance after converting to sats
+            updateWalletBalance(currentWalletID, {
+                onchain: new BigNumber(0),
+                lightning: new BigNumber(balanceLn / 1000),
+            });
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+
+            return;
+        }
+    };
+
+    const fetchPayments = async () => {
+        try {
+            const txs = await getLNPayments(wallet.payments.length);
+
+            // Update transactions
+            updateWalletPayments(currentWalletID, txs);
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+
+            return;
+        }
+    };
+
+    const jointSync = async () => {
+        // Abort load if no wallets yet
+        if (!isWalletInitialized) {
+            return;
+        }
+
+        // Only attempt load if connected to network
+        if (!checkNetworkIsReachable(networkState)) {
+            setRefreshing(false);
+            setLoadingBalance(false);
+            return;
+        }
+
+        // start loading
+        // Set refreshing
+        setLoadingBalance(true);
+        setRefreshing(true);
+
+        // Avoid duplicate loading
+        if (refreshing || loadingBalance) {
+            return;
+        }
+
+        // Only attempt load if connected to network
+        if (!checkNetworkIsReachable(networkState)) {
+            setRefreshing(false);
+            return;
+        }
+
+        // fetch fiat rate
+        singleSyncFiatRate(appFiatCurrency.short, true);
+
+        // fetch onchain
+        refreshWallet();
+
+        // Also call Breez if LN wallet
+        if (wallet.type === 'unified') {
+            await getBalance();
+            await fetchPayments();
+        }
+    };
 
     // Fetch the fiat rate on currency change
     useEffect(() => {
@@ -327,22 +424,28 @@ const Home = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        // TODO: handle restored wallet from onboarding
+        if (!checkNetworkIsReachable(networkState)) {
+            return;
+        }
+    }, [currentWalletID]);
+
+    useEffect(() => {
         if (route.params?.restoreMeta) {
             if (route.params?.restoreMeta.load) {
                 // set loading
                 setLoadingBalance(true);
 
                 // Reload the wallet
-                refreshWallet();
+                jointSync();
             }
 
             // Simple helper to show successful import and navigate back home
-            conservativeAlert(
-                route.params.restoreMeta.title,
-                route.params.restoreMeta.message,
-                capitalizeFirst(t('ok')),
-            );
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: route.params.restoreMeta.title,
+                text2: route.params.restoreMeta.message,
+            });
 
             // Vibrate to let user know the action was successful
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
@@ -354,14 +457,17 @@ const Home = ({route}: Props) => {
             <View style={[tailwind('w-full absolute')]}>
                 {/* Avoid gesture handler triggering click event */}
                 <WalletCard
+                    // This is for onchain behaviour only
                     maxedCard={
-                        item.balance.isZero() && item.transactions.length > 0
+                        wallet.type !== 'unified' &&
+                        item.balance.onchain.isZero() &&
+                        item.transactions.length > 0
                     }
-                    balance={item.balance}
+                    // Combine the balances
+                    balance={item.balance.lightning.plus(item.balance.onchain)}
                     network={item.network}
                     isWatchOnly={item.isWatchOnly}
                     label={item.name}
-                    walletBalance={item.balance}
                     walletType={item.type}
                     loading={loadingBalance}
                     hideBalance={hideTotalBalance}
@@ -382,7 +488,10 @@ const Home = ({route}: Props) => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind('h-full items-center justify-start relative'),
@@ -438,7 +547,7 @@ const Home = ({route}: Props) => {
                             ),
                         ]}>
                         <View
-                            style={tailwind('justify-around w-full mt-3 mb-3')}>
+                            style={tailwind('justify-around mt-2 w-full mb-3')}>
                             {wallets.length > 0 && (
                                 <>
                                     <VText
@@ -454,7 +563,9 @@ const Home = ({route}: Props) => {
 
                                     {!hideTotalBalance ? (
                                         <FiatBalance
-                                            balance={totalBalance.toNumber()}
+                                            balance={totalBalance.onchain
+                                                .plus(totalBalance.lightning)
+                                                .toNumber()}
                                             loading={loadingBalance}
                                             balanceFontSize={'text-3xl'}
                                             fontColor={ColorScheme.Text.Default}
@@ -463,7 +574,7 @@ const Home = ({route}: Props) => {
                                         <View
                                             style={[
                                                 tailwind(
-                                                    'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row items-center',
+                                                    'rounded-sm w-full mt-1 opacity-80 h-8 flex-row',
                                                 ),
                                                 {
                                                     backgroundColor:
@@ -536,7 +647,7 @@ const Home = ({route}: Props) => {
                                 ]}>
                                 <FlatList
                                     refreshing={refreshing}
-                                    onRefresh={refreshWallet}
+                                    onRefresh={jointSync}
                                     scrollEnabled={true}
                                     style={tailwind('w-full')}
                                     contentContainerStyle={[
@@ -550,30 +661,34 @@ const Home = ({route}: Props) => {
                                         ),
                                     ]}
                                     data={extractAllTransactions()}
-                                    renderItem={item => (
-                                        <TransactionListItem
-                                            callback={() => {
-                                                navigation.dispatch(
-                                                    CommonActions.navigate(
-                                                        'WalletRoot',
-                                                        {
-                                                            screen: 'TransactionDetails',
-                                                            params: {
-                                                                tx: {
-                                                                    ...item.item,
+                                    renderItem={item => {
+                                        return (
+                                            <UnifiedTransactionListItem
+                                                callback={() => {
+                                                    navigation.dispatch(
+                                                        CommonActions.navigate(
+                                                            'WalletRoot',
+                                                            {
+                                                                screen: 'TransactionDetails',
+                                                                params: {
+                                                                    tx: {
+                                                                        ...item.item,
+                                                                    },
+                                                                    source: 'liberal',
+                                                                    walletId:
+                                                                        currentWalletID,
                                                                 },
-                                                                source: 'liberal',
-                                                                walletId:
-                                                                    currentWalletID,
                                                             },
-                                                        },
-                                                    ),
-                                                );
-                                            }}
-                                            tx={item.item}
-                                        />
-                                    )}
-                                    keyExtractor={item => item.txid}
+                                                        ),
+                                                    );
+                                                }}
+                                                tx={item.item}
+                                            />
+                                        );
+                                    }}
+                                    keyExtractor={item =>
+                                        item.id ? item.id : item.txid
+                                    }
                                     initialNumToRender={25}
                                     contentInsetAdjustmentBehavior="automatic"
                                     ListEmptyComponent={

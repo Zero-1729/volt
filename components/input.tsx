@@ -22,7 +22,7 @@ import DocumentPicker from 'react-native-document-picker';
 
 import Color from '../constants/Color';
 
-import bottomOffset from '../constants/NativeWindowMetrics';
+import nativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 import {PlainButton} from './button';
 
@@ -184,7 +184,7 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
         <View
             style={[
                 tailwind('absolute w-full items-center justify-center flex'),
-                {bottom: bottomOffset.bottomButtonOffset + 68},
+                {bottom: nativeWindowMetrics.bottomButtonOffset + 68},
             ]}>
             {/* Row 0 */}
             <View style={[tailwind('w-full flex-row mb-6')]}>

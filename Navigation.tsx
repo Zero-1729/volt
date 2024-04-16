@@ -1,12 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {
-    ReactElement,
-    memo,
-    useRef,
-    useEffect,
-    useContext,
-    useState,
-} from 'react';
+import React, {ReactElement, memo, useRef, useEffect, useContext, useCallback} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
@@ -18,6 +11,23 @@ import {
     DefaultTheme,
     LinkingOptions,
 } from '@react-navigation/native';
+
+import Toast from 'react-native-toast-message';
+
+import {_BREEZ_SDK_API_KEY_, _BREEZ_INVITE_CODE_} from './modules/env';
+
+import {
+    BreezEvent,
+    mnemonicToSeed,
+    NodeConfig,
+    nodeInfo,
+    NodeConfigVariant,
+    defaultConfig,
+    EnvironmentType,
+    connect,
+    BreezEventVariant,
+} from '@breeztech/react-native-breez-sdk';
+import {getXPub256} from './modules/wallet-utils';
 
 import Color from './constants/Color';
 
@@ -51,6 +61,7 @@ import Xpub from './screens/wallet/Xpub';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
+import LNTransactionStatus from './screens/wallet/LNTransactionStatus';
 
 import Apps from './screens/Apps';
 
@@ -68,13 +79,20 @@ import Network from './screens/settings/Network';
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
 import ExtendedKey from './screens/settings/tools/ExtendedKey';
+import MnemonicTool from './screens/settings/tools/MnemonicTool';
 
 import About from './screens/settings/About';
 import License from './screens/settings/License';
 import Changelog from './screens/settings/Changelog';
 
-import {TTransaction, TMiniWallet, TInvoiceData} from './types/wallet';
-import {ENet} from './types/enums';
+import {
+    TTransaction,
+    TMiniWallet,
+    TInvoiceData,
+    TBreezPaymentDetails,
+} from './types/wallet';
+import {ENet, EBreezDetails} from './types/enums';
+import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
@@ -95,6 +113,11 @@ export type InitStackParamList = {
     SettingsRoot: undefined;
     ScanRoot: undefined;
     Apps: undefined;
+    LNTransactionStatus: {
+        status: boolean;
+        details: TBreezPaymentDetails;
+        detailsType: EBreezDetails;
+    };
 };
 
 // Add Wallet Param List for screens
@@ -117,6 +140,7 @@ export type WalletParamList = {
         amount: string;
         sats: string;
         fiat: string;
+        lnDescription?: string;
     };
     FeeSelection: {
         invoiceData: TInvoiceData;
@@ -127,7 +151,9 @@ export type WalletParamList = {
         feeRate: number;
         dummyPsbtVSize: number;
         invoiceData: TInvoiceData;
-        wallet: TMiniWallet;
+        wallet?: TMiniWallet;
+        bolt11?: LnInvoice;
+        source?: string;
     };
     WalletView: {
         reload: boolean;
@@ -141,6 +167,7 @@ export type WalletParamList = {
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
+        isLightning?: boolean;
         source: string;
     };
     TransactionDetails: {
@@ -187,6 +214,10 @@ const SettingsRoot = () => {
                 <SettingsStack.Screen name="License" component={License} />
                 <SettingsStack.Screen name="Changelog" component={Changelog} />
                 <SettingsStack.Screen name="XKeyTool" component={ExtendedKey} />
+                <SettingsStack.Screen
+                    name="MnemonicTool"
+                    component={MnemonicTool}
+                />
             </SettingsStack.Group>
         </SettingsStack.Navigator>
     );
@@ -293,9 +324,20 @@ const RootNavigator = (): ReactElement => {
     const appState = useRef(AppState.currentState);
     const renderCount = useRenderCount();
 
-    const {onboarding, wallets, setOnboarding} = useContext(AppStorageContext);
+    const {
+        onboarding,
+        wallets,
+        setOnboarding,
+        isAdvancedMode,
+        getWalletData,
+        currentWalletID,
+        isWalletInitialized,
+        setBreezEvent,
+    } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
+    const wallet = getWalletData(currentWalletID);
+    const BreezSub = useRef<any>(null);
 
     const {t} = useTranslation('wallet');
 
@@ -390,6 +432,158 @@ const RootNavigator = (): ReactElement => {
         checkAndSetClipboard();
     };
 
+    // Breez startup
+    const initNode = async () => {
+        // No point putting in any effort if mnemonic missing
+        if (wallet?.mnemonic.length === 0) {
+            return;
+        }
+
+        // Get node info
+        try {
+            const info = await nodeInfo();
+
+            if (info?.id) {
+                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Breez SDK'),
+                        text2: t('Node already initialized'),
+                        visibilityTime: 2000,
+                    });
+                }
+                return;
+            }
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+        }
+
+        // SDK events listener
+        const onBreezEvent = (event: BreezEvent) => {
+            if (event.type === BreezEventVariant.NEW_BLOCK) {
+                console.log('[Breez SDK] New Block');
+            }
+
+            if (event.type === BreezEventVariant.SYNCED) {
+                console.log('[Breez SDK] Synced');
+            }
+
+            if (event.type === BreezEventVariant.BACKUP_STARTED) {
+                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Breez SDK'),
+                        text2: t('breez_backup_started'),
+                        autoHide: false,
+                    });
+                }
+            }
+
+            if (event.type === BreezEventVariant.BACKUP_SUCCEEDED) {
+                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                    console.log('[Breez SDK] Backup succeeded');
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Breez SDK'),
+                        text2: t('breez_backup_success'),
+                        autoHide: false,
+                    });
+                }
+            }
+
+            if (event.type === BreezEventVariant.BACKUP_FAILED) {
+                console.log('[Breez SDK] Backup failed');
+                console.log('[Breez SDK] Event details: ', event.details);
+
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: t('breez_backup_failed'),
+                    autoHide: false,
+                });
+            }
+
+            if (event.type === BreezEventVariant.INVOICE_PAID) {
+                console.log('[Breez SDK] Invoice paid');
+                console.log('[Breez SDK] Payment details: ', event.details);
+
+                // Handle navigation to LNTransactionStatus in Wallet Receive screen
+                setBreezEvent(event);
+            }
+
+            if (event.type === BreezEventVariant.PAYMENT_FAILED) {
+                console.log('[Breez SDK] Payment failed');
+                console.log('[Breez SDK] Event details: ', event.details);
+
+                // Handle navigation to LNTransactionStatus in Wallet Receive & Send screen
+                setBreezEvent(event);
+            }
+
+            if (event.type === BreezEventVariant.PAYMENT_SUCCEED) {
+                console.log('[Breez SDK] Payment sent');
+                console.log('[Breez SDK] Event details: ', event.details);
+
+                // Handle navigation to LNTransactionStatus in Wallet Send screen
+                setBreezEvent(event);
+            }
+        };
+
+        // Create the default config
+        const seed = await mnemonicToSeed(wallet.mnemonic);
+
+        const nodeConfig: NodeConfig = {
+            type: NodeConfigVariant.GREENLIGHT,
+            config: {
+                inviteCode: _BREEZ_INVITE_CODE_,
+            },
+        };
+
+        const config = await defaultConfig(
+            EnvironmentType.PRODUCTION,
+            _BREEZ_SDK_API_KEY_,
+            nodeConfig,
+        );
+
+        // Set directory for the wallet
+        const xpub256 = getXPub256(wallet.xpub);
+        config.workingDir = config.workingDir + `/volt/${xpub256}`;
+
+        try {
+            // Connect to the Breez SDK make it ready for use
+            BreezSub.current = await connect(config, seed, onBreezEvent);
+
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: t('Breez SDK'),
+                text2: t('breez_connected'),
+                autoHide: false,
+            });
+        } catch (error: any) {
+            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: error.message,
+                    autoHide: false,
+                });
+            }
+        }
+    };
+
     useEffect(() => {
         // Block if newly onboarded
         if (walletState.current.length === 0) {
@@ -426,8 +620,14 @@ const RootNavigator = (): ReactElement => {
             },
         );
 
+        // Init LN connection
+        if (isWalletInitialized && wallet.type === 'unified') {
+            initNode();
+        }
+
         return () => {
             // Kill subscription
+            BreezSub.current.remove();
             appStateSub.remove();
         };
     }, []);
@@ -441,6 +641,10 @@ const RootNavigator = (): ReactElement => {
                 screenOptions={{headerShown: false}}
                 initialRouteName="HomeScreen">
                 <InitScreenStack.Screen name="HomeScreen" component={Home} />
+                <InitScreenStack.Screen
+                    name="LNTransactionStatus"
+                    component={LNTransactionStatus}
+                />
                 <InitScreenStack.Screen
                     name="SelectWallet"
                     component={SelectWallet}

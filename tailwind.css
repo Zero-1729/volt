@@ -193,10 +193,6 @@
   margin-left: 1rem
 }
 
-.mr-0 {
-  margin-right: 0px
-}
-
 .mr-1 {
   margin-right: 0.25rem
 }
@@ -259,6 +255,10 @@
 
 .flex {
   display: flex
+}
+
+.contents {
+  display: contents
 }
 
 .hidden {
@@ -397,6 +397,10 @@
   flex-wrap: wrap
 }
 
+.items-start {
+  align-items: flex-start
+}
+
 .items-end {
   align-items: flex-end
 }
@@ -407,6 +411,10 @@
 
 .justify-start {
   justify-content: flex-start
+}
+
+.justify-end {
+  justify-content: flex-end
 }
 
 .justify-center {
@@ -703,6 +711,10 @@
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity))
+}
+
+.opacity-100 {
+  opacity: 1
 }
 
 .opacity-20 {

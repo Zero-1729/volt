@@ -2,6 +2,7 @@
 Meta.md
 TODO.md
 .vscode
+data/git-branch-data.json
 
 # MacOS
 #
@@ -9,6 +10,7 @@ TODO.md
 
 # Xcode
 #
+ios/.xcode*
 build/
 *.pbxuser
 !default.pbxuser
@@ -51,6 +53,7 @@ package-lock.json
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.env*
 
 # eslint
 coverage/**

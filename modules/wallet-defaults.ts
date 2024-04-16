@@ -2,10 +2,17 @@
 import {ENet} from './../types/enums';
 import {TAccountPaths, TExtendedKeyInfo} from '../types/wallet';
 
-export const validWalletTypes = ['p2tr', 'wpkh', 'shp2wpkh', 'p2pkh'];
+export const validWalletTypes = [
+    'p2tr',
+    'wpkh',
+    'shp2wpkh',
+    'p2pkh',
+    'unified',
+];
 
 // Wallet name aliases
 export const WalletTypeDetails: {[index: string]: string[]} = {
+    unified: ['Lightning', 'bc1p', 'bc1p'],
     p2tr: ['Taproot', 'bc1p...', 'tb1p...'],
     wpkh: ['Native Segwit', 'bc1q...', 'tb1q...'],
     p2pkh: ['Legacy', '1...', 'm...'],
@@ -14,6 +21,7 @@ export const WalletTypeDetails: {[index: string]: string[]} = {
 
 // Descriptor type reverse aliases
 export const DescriptorType: {[index: string]: string} = {
+    unified: 'Lightning',
     p2tr: 'P2TR',
     wpkh: 'WPKH',
     p2pkh: 'P2PKH',
@@ -56,6 +64,7 @@ export const DescriptorType: {[index: string]: string} = {
 */
 export const WalletPaths: {[index: string]: TAccountPaths} = {
     // Experimental
+    unified: {bitcoin: "m/86'/0'/0'", testnet: "m/86'/1'/0'"},
     p2tr: {bitcoin: "m/86'/0'/0'", testnet: "m/86'/1'/0'"},
     wpkh: {bitcoin: "m/84'/0'/0'", testnet: "m/84'/1'/0'"},
     p2pkh: {bitcoin: "m/44'/0'/0'", testnet: "m/44'/1'/0'"},
@@ -149,3 +158,10 @@ export const DUST_LIMIT = 546;
 
 // Wallet name character limit
 export const WALLET_NAME_LENGTH = 15;
+
+// Default wallet type
+export const DEFAULT_WALLET_TYPE = 'unified';
+
+// Balance minimums for inwallet swaps (sats)
+export const LIGHTNING_SWAP_BALANCE_MIN = 1000;
+export const ONCHAIN_SWAP_BALANCE_MIN = 10000;

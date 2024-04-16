@@ -29,7 +29,7 @@ import ShareIcon from '../../assets/svg/share-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
-import {conservativeAlert} from '../../components/alert';
+import Toast from 'react-native-toast-message';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -62,11 +62,12 @@ const Xpub = () => {
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(
                 err => {
-                    conservativeAlert(
-                        capitalizeFirst(t('error')),
-                        e('failed_to_write_file'),
-                        capitalizeFirst(t('cancel')),
-                    );
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: e('failed_to_write_file'),
+                    });
 
                     console.log('[Export] Failed to write file: ', err.message);
                 },
@@ -78,11 +79,12 @@ const Xpub = () => {
             })
                 .catch(err => {
                     if (err.message !== 'User did not share') {
-                        conservativeAlert(
-                            capitalizeFirst(t('error')),
-                            e('failed_to_share_file'),
-                            capitalizeFirst(t('cancel')),
-                        );
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: capitalizeFirst(t('error')),
+                            text2: e('failed_to_share_file'),
+                        });
 
                         console.log(
                             '[Share] Failed to share file: ',
@@ -117,7 +119,11 @@ const Xpub = () => {
     const warning = t('backup_clarification');
 
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView
+            edges={['bottom', 'right', 'left']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}

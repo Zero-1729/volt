@@ -37,7 +37,7 @@ import ShareIcon from '../../assets/svg/share-24.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import {EBackupMaterial} from '../../types/enums';
-import {conservativeAlert} from '../../components/alert';
+import Toast from 'react-native-toast-message';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -122,11 +122,12 @@ const Backup = () => {
 
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
-                conservativeAlert(
-                    capitalizeFirst(t('error')),
-                    e.message,
-                    capitalizeFirst(t('cancel')),
-                );
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('error')),
+                    text2: e.message,
+                });
             });
             await Share.open({
                 url: 'file://' + pathData,
@@ -135,11 +136,12 @@ const Backup = () => {
             })
                 .catch(e => {
                     if (e.message !== 'User did not share') {
-                        conservativeAlert(
-                            capitalizeFirst(t('error')),
-                            e.message,
-                            capitalizeFirst(t('cancel')),
-                        );
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: capitalizeFirst(t('error')),
+                            text2: e.message,
+                        });
                     }
                 })
                 .finally(() => {
@@ -181,7 +183,11 @@ const Backup = () => {
     const warning = t('backup_clarification');
 
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView
+            edges={['bottom', 'right', 'left']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}

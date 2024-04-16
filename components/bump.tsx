@@ -32,11 +32,10 @@ import BigNumber from 'bignumber.js';
 
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
-import {conservativeAlert} from './alert';
-
 import {bumpFeeBDKPsbt} from '../modules/bdk';
 import {getPrivateDescriptors} from '../modules/descriptors';
 import {getMiniWallet} from '../modules/wallet-utils';
+import Toast from 'react-native-toast-message';
 
 type BumpTxFeeProps = {
     bumpRef: React.RefObject<BottomSheetModal>;
@@ -155,13 +154,14 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
 
         // TODO: add more checks to report here
         if (rate <= oldTxFeeRate) {
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                capitalizeFirst(
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: capitalizeFirst(
                     `${e('fee_rate_too_low')} ${oldTxFeeRate} ${t('satoshi')}`,
                 ),
-                capitalizeFirst(t('cancel')),
-            );
+            });
             return;
         }
 

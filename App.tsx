@@ -7,7 +7,11 @@ import React, {
     useEffect,
     useState,
 } from 'react';
-import {StatusBar, useColorScheme, Platform, NativeModules} from 'react-native';
+import {StatusBar, useColorScheme, NativeModules, Platform} from 'react-native';
+
+import Toast, {ToastConfig} from 'react-native-toast-message';
+
+import {toastConfig} from './components/toast';
 
 import {AppStorageContext} from './class/storageContext';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -40,12 +44,12 @@ const App = () => {
     }, [isReady, isWalletInitialized]);
 
     useEffect(() => {
+        // Enable privacy blur for IOS; blur screen when screen inactive
+        Privacy?.enabled(true);
+
         if (Platform.OS === 'android') {
             setTimeout(NativeModules.SplashScreenModule.hide, 100);
         }
-
-        // Enable privacy blur for IOS; blur screen when screen inactive
-        Privacy?.enabled(true);
 
         // Set app ready
         setIsReady(true);
@@ -66,6 +70,7 @@ const App = () => {
                 backgroundColor={ColorScheme.Background.Primary}
             />
             <RootScreen />
+            <Toast config={toastConfig as ToastConfig} />
         </SafeAreaProvider>
     );
 };

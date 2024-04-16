@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useContext, useEffect} from 'react';
 import {
@@ -20,12 +21,17 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {conservativeAlert} from '../../components/alert';
 
 import {useTranslation} from 'react-i18next';
 
 import decodeURI from 'bip21';
-import {getMiniWallet, checkInvoiceAndWallet} from '../../modules/wallet-utils';
+import {
+    getMiniWallet,
+    checkInvoiceAndWallet,
+    decodeInvoiceType,
+    getCountdownStart,
+    isInvoiceExpired,
+} from '../../modules/wallet-utils';
 import {capitalizeFirst, convertBTCtoSats} from '../../modules/transform';
 
 import {useTailwind} from 'tailwind-rn';
@@ -34,6 +40,7 @@ import Color from '../../constants/Color';
 
 import BigNumber from 'bignumber.js';
 
+import ExpiryTimer from '../../components/expiry';
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
@@ -44,6 +51,8 @@ import {useNetInfo} from '@react-native-community/netinfo';
 
 import InfoIcon from '../../assets/svg/info-16.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'SelectWallet'>;
 
@@ -57,9 +66,13 @@ const SelectWallet = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const navigation = useNavigation();
+    const [bolt11, setBolt11] = useState<LnInvoice>();
+    const [isLightning, setIsLightning] = useState(false);
     const [decodedInvoice, setDecodedInvoice] = useState<TInvoiceData>(
         {} as TInvoiceData,
     );
+    const [expiryEpoch, setExpiryEpoch] = useState<number>();
+    const [isExpired, setIsExpired] = useState(false);
 
     const {wallets, hideTotalBalance, getWalletData, walletsIndex, walletMode} =
         useContext(AppStorageContext);
@@ -76,41 +89,116 @@ const SelectWallet = ({route}: Props) => {
 
     const cardHeight = 220;
 
+    const sats = decodedInvoice.options?.amount
+        ? decodedInvoice.options?.amount * 100_000_000
+        : undefined;
+
+    const amount = isLightning
+        ? bolt11?.amountMsat
+            ? bolt11?.amountMsat / 1_000
+            : undefined
+        : sats;
+
+    const hasMessage = decodedInvoice.options?.message || bolt11?.description;
+    const messageText = !isLightning
+        ? decodedInvoice.options?.message
+        : bolt11?.description;
+
     const decodeInvoice = (invoice: string) => {
-        // TODO: handle decoding Lightning invoices
+        // Only handling Bolt11 Lightning invoices
         return decodeURI.decode(invoice) as TInvoiceData;
     };
 
-    useEffect(() => {
+    const decodeBolt11 = async (invoice: string) => {
+        const decodedBolt11 = await parseInvoice(invoice);
+        setBolt11(decodedBolt11);
+        setIsLightning(true);
+
+        setExpiryEpoch(
+            getCountdownStart(
+                decodedBolt11.timestamp as number,
+                decodedBolt11.expiry as number,
+            ),
+        );
+
+        setIsExpired(
+            isInvoiceExpired(
+                decodedBolt11.timestamp as number,
+                decodedBolt11.expiry as number,
+            ),
+        );
+    };
+
+    const handleInvoiceType = async (invoice: string) => {
+        const invoiceType = await decodeInvoiceType(invoice);
+
         if (
-            route.params?.invoice.startsWith('lightning') ||
-            route.params?.invoice.startsWith('lnurl') ||
-            route.params?.invoice.startsWith('lnbc') ||
-            route.params?.invoice.startsWith('bitcoin:')
+            invoiceType.type === 'lightning' ||
+            invoiceType.type === 'bitcoin' ||
+            invoiceType.type === 'unified'
         ) {
-            // If LN report we aren't supporting it yet
-            if (!route.params?.invoice.startsWith('bitcoin:')) {
-                conservativeAlert(
-                    capitalizeFirst(t('error')),
-                    e('unsupported_invoice_type'),
-                    capitalizeFirst(t('cancel')),
+            let invoiceBolt11!: string;
+            let btcInvoice!: string;
+
+            // Handle unified BIP21 QR
+            if (invoiceType.type === 'unified') {
+                const embededBolt11 = invoiceType.invoice?.split('&lightning=');
+
+                if (embededBolt11.length > 1) {
+                    invoiceBolt11 =
+                        invoiceType.invoice?.split('&lightning=').pop() ?? '';
+                } else {
+                    btcInvoice =
+                        invoiceType.invoice
+                            ?.split('&lightning=')[0]
+                            .toLowerCase() ?? '';
+                }
+            }
+
+            // Handle Bolt11 Invoice
+            if (
+                (invoiceType.type === 'lightning' &&
+                    invoiceType.spec === 'bolt11') ||
+                invoiceBolt11
+            ) {
+                decodeBolt11(
+                    invoiceBolt11 ? invoiceBolt11 : route.params?.invoice,
                 );
+                return;
+            }
+
+            // If LN report we aren't supporting it yet
+            if (!(invoiceType?.spec === 'bolt11')) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('error')),
+                    text2: e('unsupported_invoice_type'),
+                });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
 
                 return;
             }
 
-            setDecodedInvoice(decodeInvoice(route.params?.invoice));
-        } else {
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                e('invalid_invoice_error'),
-                capitalizeFirst(t('cancel')),
+            // handle bitcoin BIP21 invoice
+            setDecodedInvoice(
+                decodeInvoice(btcInvoice ? btcInvoice : route.params?.invoice),
             );
+        } else {
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: e('invalid_invoice_error'),
+            });
 
             navigation.dispatch(CommonActions.navigate('HomeScreen'));
         }
+    };
+
+    useEffect(() => {
+        handleInvoiceType(route.params?.invoice);
     }, []);
 
     const handleRoute = () => {
@@ -119,11 +207,31 @@ const SelectWallet = ({route}: Props) => {
 
         // Check network connection first
         if (!networkState?.isInternetReachable) {
-            conservativeAlert(
-                capitalizeFirst(t('error')),
-                e('no_internet_message'),
-                capitalizeFirst(t('cancel')),
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('error')),
+                text2: e('no_internet_message'),
+            });
+            return;
+        }
+
+        // Handle ln invoice
+        if (isLightning) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'Send',
+                    params: {
+                        wallet: wallet,
+                        feeRate: 0,
+                        dummyPsbtVsize: 0,
+                        invoiceData: null,
+                        bolt11: bolt11,
+                        source: 'liberal',
+                    },
+                }),
             );
+
             return;
         }
 
@@ -134,11 +242,12 @@ const SelectWallet = ({route}: Props) => {
                 decodedInvoice,
                 (msg: string) => {
                     // TODO: Check and translate error
-                    conservativeAlert(
-                        capitalizeFirst(t('error')),
-                        msg,
-                        capitalizeFirst(t('cancel')),
-                    );
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: msg,
+                    });
 
                     // route home
                     navigation.dispatch(
@@ -180,6 +289,7 @@ const SelectWallet = ({route}: Props) => {
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: wallet,
+                            isLightning: isLightning,
                             source: 'liberal',
                         },
                     }),
@@ -194,13 +304,14 @@ const SelectWallet = ({route}: Props) => {
                 <WalletCard
                     loading={false}
                     maxedCard={
-                        item.balance.isZero() && item.transactions.length > 0
+                        item.balance.lightning
+                            .plus(item.balance.onchain)
+                            .isZero() && item.transactions.length > 0
                     }
-                    balance={item.balance}
+                    balance={item.balance.lightning.plus(item.balance.onchain)}
                     network={item.network}
                     isWatchOnly={item.isWatchOnly}
                     label={item.name}
-                    walletBalance={item.balance}
                     walletType={item.type}
                     hideBalance={hideTotalBalance}
                     unit={item.units}
@@ -210,16 +321,15 @@ const SelectWallet = ({route}: Props) => {
         );
     };
 
-    const sats = decodedInvoice.options?.amount
-        ? decodedInvoice.options?.amount * 100_000_000
-        : undefined;
-
     const invoiceOptionsEmpty = decodedInvoice.options
         ? Object.keys(decodedInvoice.options).length === 0
         : true;
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind(
@@ -239,6 +349,14 @@ const SelectWallet = ({route}: Props) => {
                         ]}>
                         {t('select_wallet_title')}
                     </Text>
+                    {isLightning && expiryEpoch && (
+                        <View
+                            style={[
+                                tailwind('absolute right-0 justify-center'),
+                            ]}>
+                            <ExpiryTimer expiryDate={expiryEpoch} />
+                        </View>
+                    )}
                 </View>
 
                 {/*Display the invoice data */}
@@ -265,11 +383,11 @@ const SelectWallet = ({route}: Props) => {
                             {decodedInvoice.options.label}
                         </Text>
                     )}
-                    {decodedInvoice.options?.amount && sats && (
+                    {amount && (
                         <View
                             style={[tailwind('w-full items-center flex mb-2')]}>
                             <FiatBalance
-                                balance={sats}
+                                balance={amount}
                                 loading={false}
                                 balanceFontSize={'text-4xl'}
                                 fontColor={ColorScheme.Text.Default}
@@ -299,7 +417,7 @@ const SelectWallet = ({route}: Props) => {
                                     Amount
                                 </VText>
                                 <DisplaySatsAmount
-                                    amount={new BigNumber(sats)}
+                                    amount={new BigNumber(amount)}
                                     fontSize="text-sm"
                                     isApprox={false}
                                     textColor={ColorScheme.Text.GrayText}
@@ -308,34 +426,36 @@ const SelectWallet = ({route}: Props) => {
                         </View>
                     )}
 
-                    <View
-                        style={[
-                            tailwind(
-                                'w-full items-center flex justify-between mb-4',
-                            ),
-                        ]}>
-                        <VText
+                    {!isLightning && (
+                        <View
                             style={[
-                                tailwind('font-bold w-full mb-2'),
-                                {color: ColorScheme.Text.Default},
+                                tailwind(
+                                    'w-full items-center flex justify-between mb-4',
+                                ),
                             ]}>
-                            Address
-                        </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full'),
-                                {color: ColorScheme.Text.GrayText},
-                            ]}>
-                            {decodedInvoice.address}
-                        </VText>
-                    </View>
+                            <VText
+                                style={[
+                                    tailwind('font-bold w-full mb-2'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                Address
+                            </VText>
+                            <VText
+                                style={[
+                                    tailwind('w-full'),
+                                    {color: ColorScheme.Text.GrayText},
+                                ]}>
+                                {decodedInvoice.address}
+                            </VText>
+                        </View>
+                    )}
 
                     {/* Display the message */}
-                    {decodedInvoice.options?.message && (
+                    {hasMessage && (
                         <>
                             <View
                                 style={[
-                                    tailwind('w-full mb-6 opacity-20'),
+                                    tailwind('w-full mb-4 opacity-20'),
                                     styles.invoiceLineBreaker,
                                     {
                                         borderColor:
@@ -351,7 +471,7 @@ const SelectWallet = ({route}: Props) => {
                                     tailwind('font-bold'),
                                     {color: ColorScheme.Text.GrayText},
                                 ]}>
-                                {decodedInvoice.options.message}
+                                {messageText}
                             </Text>
                         </>
                     )}
@@ -448,6 +568,7 @@ const SelectWallet = ({route}: Props) => {
                 </View>
 
                 <LongBottomButton
+                    disabled={isExpired}
                     title={'Pay Invoice'}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}

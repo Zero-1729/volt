@@ -28,7 +28,10 @@ const DescriptorsInfo = () => {
     const {t} = useTranslation('onboarding');
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
                 style={[
                     tailwind(
@@ -64,7 +67,7 @@ const DescriptorsInfo = () => {
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({
-                                name: 'SelectMode',
+                                name: 'MoreInfo',
                             }),
                         );
                     }}

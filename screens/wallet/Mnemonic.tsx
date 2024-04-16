@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useCallback} from 'react';
 
 import {Text, View, useColorScheme} from 'react-native';
@@ -93,7 +94,11 @@ const Mnemonic = ({route}: Props) => {
     };
 
     return (
-        <SafeAreaView edges={['bottom', 'right', 'left']}>
+        <SafeAreaView
+            edges={['bottom', 'right', 'left']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View style={[tailwind('w-full h-full items-center relative')]}>
                 <View
                     style={[

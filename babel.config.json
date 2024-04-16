@@ -1,9 +1,12 @@
 {
-    "presets": ["module:metro-react-native-babel-preset"],
+    "presets": [["module:@react-native/babel-preset", {"useTransformReactJSXExperimental": true}]],
     "plugins": [
-        [
-            "@babel/plugin-transform-modules-commonjs"
-        ],
+        ["module:react-native-dotenv", {
+            "safe": true,
+            "allowUndefined": false,
+            "path": ".env",
+            "moduleName": "@env"
+        }],
         [
             "module-resolver",
             {

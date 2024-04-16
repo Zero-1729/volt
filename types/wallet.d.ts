@@ -3,6 +3,7 @@ import 'react';
 
 import BigNumber from 'bignumber.js';
 
+import {UnifiedLNWallet} from '../class/wallet/unified';
 import {TaprootWallet} from '../class/wallet/p2tr';
 import {SegWitNativeWallet} from '../class/wallet/segwit/wpkh';
 import {SegWitP2SHWallet} from '../class/wallet/segwit/shp2wpkh';
@@ -13,10 +14,16 @@ import {FeesRecommended} from '@mempool/mempool.js/lib/interfaces';
 
 import {Network} from 'bdk-rn/lib/lib/enums';
 import {ENet} from './enums';
+import {
+    InvoicePaidDetails,
+    Payment,
+    PaymentFailedData,
+} from '@breeztech/react-native-breez-sdk';
 
 export type TNetwork = ENet | Network;
 
 export type TWalletType =
+    | UnifiedLNWallet
     | TaprootWallet
     | SegWitNativeWallet
     | LegacyWallet
@@ -27,7 +34,8 @@ export type TMiniWallet = {
     name: string;
     type: string;
     network: string;
-    balance: number;
+    balanceOnchain: number;
+    balanceLightning: number;
     privateDescriptor: string;
     externalDescriptor?: string;
     internalDescriptor?: string;
@@ -51,11 +59,14 @@ export type TAddressAmount = {
 };
 
 // Wallet balance type
-export type TBalance = BigNumber;
+export type TBalance = {
+    onchain: BigNumber;
+    lightning: BigNumber;
+};
 
 // Wallet balance fiat rate
 export type TFiatRate = {
-    rate: TBalance;
+    rate: BigNumber;
     lastUpdated: Date;
     source: string;
 };
@@ -64,7 +75,7 @@ export type TFiatRate = {
 export type TUtxo = LocalUtxo & {
     txid: string; // Transaction ID
     vout: number; // Transaction output index
-    value: TBalance; // Transaction output value in sats
+    value: BigNumber; // Transaction output value in sats
     address: string; // Transaction output address
     flagged?: boolean; // Whether flagged by user to avoid spending, i.e. dust
     scriptpubkey: string;
@@ -73,7 +84,8 @@ export type TUtxo = LocalUtxo & {
 };
 
 // Transaction Type
-export type TTransaction = {
+// For both LN and Bitcoin transactions
+export type TTransaction = Payment & {
     network: NetType; // Network type
     txid: string; // Transaction ID
     block_height: number; // Block height
@@ -82,10 +94,10 @@ export type TTransaction = {
     size: number; // Transaction size in bytes
     vsize: number; // Transaction size in virtual bytes
     weight: number; // Transaction weight
-    fee: BalanceType; // Transaction fee in sats
-    value: BalanceType; // Transaction value in sats
-    received: BalanceType; // Transaction received value in sats
-    sent: BalanceType; // Transaction sent value in sats
+    fee: number; // Transaction fee in sats
+    value: number; // Transaction value in sats
+    received: number; // Transaction received value in sats
+    sent: number; // Transaction sent value in sats
     timestamp: Date; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
     inputs?: TUTXO[]; // Transaction inputs
@@ -94,6 +106,7 @@ export type TTransaction = {
     rbf: boolean; // Whether transaction is RBF
     isSelfOrBoost: boolean; // Whether transaction is CPFP, or RBF tx payed to self
     memo?: string; // Transaction memo
+    isLightning?: boolean; // Whether transaction is a lightning transaction
 };
 
 // Wallet Unit Type
@@ -148,3 +161,15 @@ export type TAccountPaths = {
 export type TMempoolFeeRates = {
     economyFee: number;
 } & FeesRecommended;
+
+// Breez LN payment details type
+export type TBreezPaymentDetails =
+    | PaymentFailedData
+    | Payment
+    | InvoicePaidDetails;
+
+export type TBreezDetails = {
+    success: Payment;
+    received: InvoicePaidDetails;
+    failed: PaymentFailedData;
+};

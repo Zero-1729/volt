@@ -7,6 +7,6 @@
     "select_mode_title": "Select a mode",
     "single_mode_title": "Single (Recommended)",
     "single_mode_description": "Create a single unified Bitcoin and Lightning wallet, which allows you to receive and send both on and off-chain",
-    "multi_mode_description": "This mode is for (advanced) users who want to manage multiple wallets in a single app.",
-    "multi_mode_title": "Multi"
+    "bolt_nfc_description": "Set up and managing Bolt NFC cards & rings for making payments with bitcoin over the Lightning Network.",
+    "bolt_nfc_support": "Bolt NFC Card & Ring"
 }

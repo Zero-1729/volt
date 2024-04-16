@@ -112,6 +112,52 @@ const Index = () => {
                         </View>
                     </View>
                 </PlainButton>
+
+                {/* Mnemonic Converter Tool */}
+                <PlainButton
+                    style={[tailwind('w-5/6 mb-6')]}
+                    onPress={() => {
+                        navigation.dispatch(
+                            CommonActions.navigate({
+                                name: 'MnemonicTool',
+                            }),
+                        );
+                    }}>
+                    <View
+                        style={[
+                            tailwind(
+                                `items-center ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } justify-between`,
+                            ),
+                        ]}>
+                        <VText
+                            style={[
+                                tailwind('text-sm'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {t('mnemonic_converter')}
+                        </VText>
+
+                        <View style={[tailwind('items-center')]}>
+                            {langDir === 'right' ? (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            ) : (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
+                        </View>
+                    </View>
+                </PlainButton>
             </View>
         </SafeAreaView>
     );

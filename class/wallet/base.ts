@@ -50,8 +50,12 @@ export class BaseWallet {
         wallet.addresses = obj.addresses;
         wallet.address = obj.address as TAddress;
         wallet.birthday = obj.birthday as Date;
-        wallet.balance = new BigNumber(obj.balance);
+        wallet.balance = {
+            onchain: new BigNumber(obj.balance.onchain),
+            lightning: new BigNumber(obj.balance.lightning),
+        };
         wallet.transactions = obj.transactions as TTransaction[];
+        wallet.payments = obj.payments as TTransaction[];
         wallet.UTXOs = obj.UTXOs as TUtxo[];
         wallet.syncedBalance = obj.syncedBalance as number;
         wallet.lastSynced = obj.lastSynced;
@@ -90,6 +94,7 @@ export class BaseWallet {
     balance: TBalance;
 
     transactions: TTransaction[];
+    payments: TTransaction[];
     UTXOs: TUtxo[];
 
     addresses: Array<string>;
@@ -128,13 +133,14 @@ export class BaseWallet {
             symbol: 's',
         }; // Default unit to display wallet balance is sats
 
-        this.balance = new BigNumber(0); // By default the balance is in sats
+        this.balance = {onchain: new BigNumber(0), lightning: new BigNumber(0)}; // By default the balance is in sats
         this.gap_limit = GAP_LIMIT; // Gap limit for wallet
         this.syncedBalance = 0; // Last balance synced from node
         this.lastSynced = 0; // Timestamp of last wallet sync
         this.network = args.network ? args.network : ENet.Testnet; // Can have 'bitcoin' or 'testnet' wallet
 
-        this.transactions = []; // List of wallet transactions
+        this.transactions = []; // List of onchain transactions
+        this.payments = []; // Lightning payments
         this.UTXOs = []; // Set of wallet UTXOs
 
         this.hardwareWalletEnabled = false;
@@ -233,8 +239,8 @@ export class BaseWallet {
         this.isWatchOnly = isWatchOnly;
     }
 
-    updateBalance(sats: TBalance) {
-        this.balance = sats;
+    updateBalance(balances: TBalance) {
+        this.balance = balances;
     }
 
     updateName(text: string) {
@@ -251,6 +257,10 @@ export class BaseWallet {
 
     updateTransanctions(transactions: TTransaction[]) {
         this.transactions = transactions;
+    }
+
+    updatePayments(payments: TTransaction[]) {
+        this.payments = payments;
     }
 
     setXprv(xprv: string) {

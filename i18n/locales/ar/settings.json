@@ -27,5 +27,9 @@
     "price_on": "في",
     "last_updated": "آخر تحديث {{date, last_updated}}",
     "convert": "تحول",
-    "converted_xpub_text": "تحويل المفتاح العام الموسع"
+    "converted_xpub_text": "تحويل المفتاح العام الموسع",
+    "mnemonic_converter": "محول ذاكري",
+    "mnemonic_converter_description": "تتيح لك هذه الأداة تحويل أساليب الإستذكار إلى واصفات ومفاتيح موسعة.",
+    "mnemonic_converter_placeholder": "أدخل كلمة تذكيرية هنا...",
+    "select_material": "حدد المواد"
 }

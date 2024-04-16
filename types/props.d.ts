@@ -2,7 +2,7 @@
 import React, {PropsWithChildren} from 'react';
 import {SvgProps} from 'react-native-svg';
 
-import {BalanceType, Unit, TransactionType} from './wallet';
+import {Unit, TTransaction} from './wallet';
 import BigNumber from 'bignumber.js';
 
 // Base Prop Type
@@ -14,6 +14,8 @@ export type BaseProps = PropsWithChildren<{
 }>;
 
 export type VTextProps = {
+    numberOfLines?: number;
+    ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     children?: React.ReactNode;
 };
@@ -52,8 +54,7 @@ export type CardProps = BaseProps & {
 };
 
 export type WalletCardProps = CardProps & {
-    balance: BalanceType;
-    walletBalance: BalanceType;
+    balance: BigNumber;
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
@@ -65,23 +66,24 @@ export type WalletCardProps = CardProps & {
 };
 
 export type TxListItemProps = BaseProps & {
-    tx: TransactionType;
+    tx: TTransaction;
     callback?: () => void;
 };
 
 export type TxBalanceProps = BaseProps & {
-    balance: BalanceType;
+    balance: BigNumber;
     balanceFontSize?: string;
     fontColor?: string;
 };
 
 export type BalanceProps = BaseProps & {
-    balance: BalanceType;
+    balance: BigNumber;
     // Below takes in a valid 'Tailwind' font size (i.e., 'text-2xl')
     fontColor: string;
     balanceFontSize?: string;
     loading: boolean;
     disableFiat: boolean; // false by default
+    disabled?: boolean;
 };
 
 export type FiatBalanceProps = BaseProps & {
@@ -147,5 +149,4 @@ export type DisplayFiatAmountProps = BaseProps & {
     amount: string;
     isApprox?: boolean;
     fontSize: string;
-    symbol: string;
 };

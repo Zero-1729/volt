@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {Text, View, useColorScheme, StyleSheet} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
@@ -55,6 +55,7 @@ export const TXBalance = (props: TxBalanceProps) => {
 
     const {i18n} = useTranslation('common');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+    const fontFamily = appUnit.name === 'sats' ? {...Font.SatSymbol} : {};
 
     return (
         <>
@@ -79,7 +80,7 @@ export const TXBalance = (props: TxBalanceProps) => {
                                 color: props.fontColor,
                                 marginTop: appUnit.name === 'sats' ? 1.5 : 0,
                             },
-                            {...Font.SatSymbol},
+                            fontFamily,
                         ]}>
                         {appUnit.symbol}
                     </VTextSingle>
@@ -110,7 +111,6 @@ export const Balance = (props: BalanceProps) => {
         updateAppUnit,
         fiatRate,
     } = useContext(AppStorageContext);
-    const [unit, setUnit] = useState(appUnit);
 
     const {i18n} = useTranslation('common');
 
@@ -119,32 +119,29 @@ export const Balance = (props: BalanceProps) => {
     // Toggle between BTC and sats
     // and fiat if enabled
     const toggleUnit = () => {
-        if (unit.name === 'sats' && !props.disableFiat) {
-            // NOTE: we do not set the unit to fiat here, as we want to keep the unit as BTC or sats
-            setUnit({
+        if (props.disabled) {
+            return;
+        }
+
+        if (appUnit.name === 'sats') {
+            updateAppUnit({
                 name: appFiatCurrency.short,
                 symbol: appFiatCurrency.symbol,
             });
         } else {
-            toggleBTCtoSats();
-        }
-    };
-
-    // Generic function to toggle between BTC and sats
-    const toggleBTCtoSats = () => {
-        if (unit.name === 'BTC') {
-            setUnit({name: 'sats', symbol: 's'});
-            updateAppUnit({name: 'sats', symbol: 's'});
-        } else {
-            setUnit({name: 'BTC', symbol: '₿'});
-            updateAppUnit({name: 'BTC', symbol: '₿'});
+            // Toggle between BTC and sats
+            if (appUnit.name === 'BTC') {
+                updateAppUnit({name: 'sats', symbol: 's'});
+            } else {
+                updateAppUnit({name: 'BTC', symbol: '₿'});
+            }
         }
     };
 
     return (
         <View>
             {!hideTotalBalance ? (
-                <PlainButton onPress={toggleUnit}>
+                <PlainButton onPress={toggleUnit} disabled={props.disabled}>
                     <View
                         style={[
                             tailwind(
@@ -175,11 +172,9 @@ export const Balance = (props: BalanceProps) => {
                                         appUnit.name === 'sats' ? 'mt-0.5' : ''
                                     } mr-2`,
                                 ),
-                                unit.name === 'sats' || props.disableFiat
-                                    ? Font.SatSymbol
-                                    : {},
+                                appUnit.name === 'sats' ? Font.SatSymbol : {},
                             ]}>
-                            {unit.symbol}
+                            {appUnit.symbol}
                         </Text>
 
                         {/* Display balance in sats or BTC */}
@@ -199,7 +194,7 @@ export const Balance = (props: BalanceProps) => {
                             ]}>
                             {_getBalance(
                                 new BigNumber(props.balance),
-                                unit,
+                                appUnit,
                                 fiatRate,
                                 props.disableFiat,
                             )}
@@ -301,6 +296,60 @@ export const FiatBalance = (props: FiatBalanceProps) => {
     );
 };
 
+export const DisplayBTCAmount = (props: DisplaySatsAmountProps) => {
+    const ColorScheme = Color(useColorScheme());
+    const tailwind = useTailwind();
+
+    const {i18n} = useTranslation('common');
+
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    return (
+        <View style={[tailwind('flex-row')]}>
+            {props.isApprox && (
+                <Text
+                    style={[
+                        tailwind('self-center'),
+                        {
+                            color: props.textColor
+                                ? props.textColor
+                                : ColorScheme.Text.Default,
+                            textAlign: langDir,
+                        },
+                    ]}>
+                    ~{' '}
+                </Text>
+            )}
+            <Text
+                numberOfLines={1}
+                style={[
+                    tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                        textAlign: langDir,
+                    },
+                ]}>
+                ₿
+            </Text>
+
+            <Text
+                style={[
+                    tailwind(`${props.fontSize} self-center font-bold`),
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                        textAlign: langDir,
+                    },
+                ]}>
+                {props.amount.isZero() ? '0' : formatBTC(props.amount)}
+            </Text>
+        </View>
+    );
+};
+
 export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
@@ -360,6 +409,8 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
+    const {appFiatCurrency} = useContext(AppStorageContext);
+
     return (
         <View
             style={[
@@ -371,7 +422,7 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
                     {color: ColorScheme.Text.Default},
                 ]}>
                 {props.isApprox ? '~' : ''}
-                {props.symbol}
+                {appFiatCurrency.symbol}
             </Text>
             <Text
                 style={[

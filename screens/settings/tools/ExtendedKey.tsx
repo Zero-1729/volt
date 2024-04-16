@@ -19,6 +19,9 @@ import {useTranslation} from 'react-i18next';
 import {LongBottomButton, PlainButton} from '../../../components/button';
 import {TextSingleInput} from '../../../components/input';
 
+import Toast, {ToastConfig} from 'react-native-toast-message';
+import {toastConfig} from '../../../components/toast';
+
 import Close from '../../../assets/svg/x-24.svg';
 import ArrowUp from '../../../assets/svg/chevron-up-16.svg';
 import ArrowDown from '../../../assets/svg/chevron-down-16.svg';
@@ -38,7 +41,6 @@ import {EBackupMaterial} from '../../../types/enums';
 import {capitalizeFirst} from '../../../modules/transform';
 
 const ExtendedKey = () => {
-    const [resultMessageText, setResulteMessageText] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [xkey, setXKey] = useState('');
 
@@ -69,17 +71,20 @@ const ExtendedKey = () => {
         setVersion(value);
 
         setResultMessage('');
-        setResulteMessageText('');
     };
 
     const copyXpubToClipboard = () => {
         Clipboard.setString(resultMessage);
 
-        setResulteMessageText(capitalizeFirst(t('copied_to_clipboard!')));
-
-        setTimeout(() => {
-            setResulteMessageText(resultMessage);
-        }, 450);
+        Toast.show({
+            topOffset: 60,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('clipboard')),
+            text2: capitalizeFirst(t('copied_to_clipboard')),
+            visibilityTime: 1000,
+            autoHide: true,
+            position: 'top',
+        });
     };
 
     const handleButtonPress = () => {
@@ -135,7 +140,6 @@ const ExtendedKey = () => {
             const key = convertXKey(xkey, conversionVersion);
 
             setResultMessage(key);
-            setResulteMessageText(key);
         } catch (err: any) {
             errorAlert(t('ext_key'), err.message, capitalizeFirst(t('cancel')));
         }
@@ -155,7 +159,6 @@ const ExtendedKey = () => {
 
         // Clear result message
         setResultMessage('');
-        setResulteMessageText('');
     };
 
     const onBlur = () => {
@@ -191,11 +194,11 @@ const ExtendedKey = () => {
                     </VText>
 
                     <PlainButton
-                        style={[tailwind('absolute right-0 top-0')]}
+                        style={[tailwind('absolute right-0')]}
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
-                        <Close width={32} fill={ColorScheme.SVG.Default} />
+                        <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                 </View>
 
@@ -274,7 +277,7 @@ const ExtendedKey = () => {
                 </View>
 
                 {/* Result */}
-                {resultMessageText.length > 0 && (
+                {resultMessage.length > 0 && (
                     <View style={[tailwind('mt-8 w-5/6')]}>
                         <VText
                             style={[
@@ -300,7 +303,7 @@ const ExtendedKey = () => {
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {resultMessageText}
+                                {resultMessage}
                             </VText>
                         </PlainButton>
                     </View>
@@ -327,6 +330,8 @@ const ExtendedKey = () => {
                             : ColorScheme.Background.Secondary
                     }
                 />
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );

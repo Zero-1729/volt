@@ -567,45 +567,35 @@ export const getPrivateDescriptors = (privateExternalDescriptor: string) => {
     let privInternalDescriptor = strippedDescriptor.replace('0/*', '1/*');
     let privExternalDescriptor = strippedDescriptor;
 
-    // Check `tr()` descriptor
-    const isPTR = privExternalDescriptor.slice(0, 3) === 'tr(';
-
-    // Special check `tr()` descriptor
     // To warp private descriptor to prepend fingerprint and origin path
     // TODO: Find a way to investigate and fix better; somehow the public descriptor gets balance but not the private one
-    if (isPTR) {
-        const descriptorTRParts = parseDescriptor(strippedDescriptor);
+    const descriptorTRParts = parseDescriptor(strippedDescriptor);
 
-        // Rebuild Internal descriptor
-        const rIDesc = (
-            descriptorTRParts.scriptPrefix +
-            '[' +
-            descriptorTRParts.fingerprint +
-            descriptorTRParts.originPath +
-            ']' +
-            descriptorTRParts.keyOnly +
-            descriptorTRParts.keyPath +
-            descriptorTRParts.scriptSuffix
-        ).replace('0/*', '1/*');
+    // Rebuild Internal descriptor
+    const rIDesc = (
+        descriptorTRParts.scriptPrefix +
+        '[' +
+        descriptorTRParts.fingerprint +
+        descriptorTRParts.originPath +
+        ']' +
+        descriptorTRParts.keyOnly +
+        descriptorTRParts.keyPath +
+        descriptorTRParts.scriptSuffix
+    ).replace('0/*', '1/*');
 
-        // Rebuild External descriptor
-        const rEDesc =
-            descriptorTRParts.scriptPrefix +
-            '[' +
-            descriptorTRParts.fingerprint +
-            descriptorTRParts.originPath +
-            ']' +
-            descriptorTRParts.keyOnly +
-            descriptorTRParts.keyPath +
-            descriptorTRParts.scriptSuffix;
+    // Rebuild External descriptor
+    const rEDesc =
+        descriptorTRParts.scriptPrefix +
+        '[' +
+        descriptorTRParts.fingerprint +
+        descriptorTRParts.originPath +
+        ']' +
+        descriptorTRParts.keyOnly +
+        descriptorTRParts.keyPath +
+        descriptorTRParts.scriptSuffix;
 
-        privInternalDescriptor = rIDesc;
-        privExternalDescriptor = rEDesc;
-    } else {
-        privInternalDescriptor = _reformatDescriptorToBDK(
-            privInternalDescriptor,
-        );
-    }
+    privInternalDescriptor = rIDesc;
+    privExternalDescriptor = rEDesc;
 
     // re-include checksum
     privInternalDescriptor =

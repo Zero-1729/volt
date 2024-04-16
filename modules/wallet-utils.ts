@@ -13,15 +13,21 @@ import {WalletTypeDetails, DUST_LIMIT} from './wallet-defaults';
 
 const bip32 = BIP32Factory(ecc);
 
+import {
+    listPayments,
+    parseInput,
+    InputTypeVariant,
+} from '@breeztech/react-native-breez-sdk';
+
 import Crypto from 'react-native-quick-crypto';
 
 import {
     TDescriptorSymbols,
     TMiniWallet,
     TNetwork,
-    TTransaction,
     TWalletType,
     TInvoiceData,
+    TTransaction,
 } from '../types/wallet';
 import {EBackupMaterial, ENet} from '../types/enums';
 
@@ -59,7 +65,11 @@ export const getUniqueTXs = (transactions: TTransaction[]): TTransaction[] => {
     const uniqueTXs: TTransaction[] = [];
 
     transactions.forEach(tx => {
-        if (!uniqueTXs.some(item => item.txid === tx.txid)) {
+        if (
+            !uniqueTXs.some(item =>
+                item.isLightning ? item.id === tx.id : item.txid === tx.txid,
+            )
+        ) {
             uniqueTXs.push({...tx});
         }
     });
@@ -179,6 +189,11 @@ const _deserializeExtendedKeyCheck = (key: string): Buffer => {
 const _deserializeExtendedKey = (key: string): Buffer => {
     const decodedBuffArray = b58.decode(key);
     return Buffer.from(decodedBuffArray);
+};
+
+const _singleSha256 = (data: Buffer) => {
+    // Return sha256(data)
+    return Crypto.createHash('sha256').update(data).digest();
 };
 
 const _doubleSha256 = (data: Buffer) => {
@@ -371,6 +386,7 @@ const _generateAddress = (
 
             address = P2WPKHData.address;
             break;
+        case 'unified':
         case 'p2tr':
             // Initialize ecc library
             bitcoin.initEccLib(ecc);
@@ -470,13 +486,14 @@ export const normalizeExtKey = (xkey: string, key_type: string) => {
 };
 
 export const getMiniWallet = (wallet: TWalletType): TMiniWallet => {
-    const balance = wallet.balance.toNumber();
+    const balance = wallet.balance;
 
     return {
         name: wallet.name,
         type: wallet.type,
         network: wallet.network,
-        balance: balance,
+        balanceOnchain: balance.onchain.toNumber(),
+        balanceLightning: balance.lightning.toNumber(),
         privateDescriptor: wallet.privateDescriptor,
         externalDescriptor: wallet.externalDescriptor,
         internalDescriptor: wallet.internalDescriptor,
@@ -490,11 +507,12 @@ export const canSendToInvoice = (
 ): Boolean => {
     // check that network matches
     // Handle special case for WPKH & P2TR
-    const prefixTip = invoice.address[0];
-    const prefixStub =
+    const prefixTip = invoice.address[0].toLowerCase();
+    const prefixStub = (
         prefixTip === 'b' || prefixTip === 't'
             ? invoice.address.slice(0, 4)
-            : prefixTip;
+            : prefixTip
+    ).toLowerCase();
     const invoicePrefixInfo = prefixInfo[prefixStub];
 
     switch (invoicePrefixInfo?.type) {
@@ -547,7 +565,7 @@ export const doesWalletExist = (
 export const checkNetworkIsReachable = (networkState: NetInfoState) => {
     if (networkState.isInternetReachable === null) {
         return networkState.isConnected === null
-            ? true
+            ? false
             : networkState.isConnected;
     } else {
         return networkState.isInternetReachable;
@@ -559,9 +577,8 @@ export const checkInvoiceAndWallet = (
     wallet: TMiniWallet,
     invoice: TInvoiceData,
     alert: any,
-    singleMode: boolean,
 ) => {
-    const balance = new BigNumber(wallet.balance);
+    const balance = new BigNumber(wallet.balanceOnchain);
     const invoiceHasAmount = !!invoice?.options?.amount;
     const invoiceAmount = new BigNumber(Number(invoice?.options?.amount));
 
@@ -588,11 +605,7 @@ export const checkInvoiceAndWallet = (
 
     // Check balance if zero
     if (balance.isZero()) {
-        alert(
-            `Wallet is empty, add funds to wallet ${
-                singleMode ? '' : 'or select a different wallet.'
-            }`,
-        );
+        alert('Wallet is empty, add funds to wallet');
         return false;
     }
 
@@ -608,13 +621,11 @@ export const checkInvoiceAndWallet = (
     // Check balance if too broke
     if (
         invoiceHasAmount &&
-        invoiceAmount.multipliedBy(100000000).isGreaterThan(wallet.balance)
+        invoiceAmount
+            .multipliedBy(100000000)
+            .isGreaterThan(wallet.balanceOnchain)
     ) {
-        alert(
-            `Wallet balance insufficient, add funds to wallet ${
-                singleMode ? '' : 'or select a different wallet.'
-            }`,
-        );
+        alert('Wallet balance insufficient, add funds to wallet');
         return false;
     }
 
@@ -626,4 +637,137 @@ export const checkInvoiceAndWallet = (
     }
 
     return true;
+};
+
+export const getLNPayments = async (
+    txCount: number,
+): Promise<TTransaction[]> => {
+    const payments = await listPayments({
+        // TODO: figure out a more sane option for this
+        limit: txCount + 10,
+    });
+
+    let txs: TTransaction[] = [];
+
+    for (let i = 0; i < payments.length; i++) {
+        txs.push({...payments[i], isLightning: true} as TTransaction);
+    }
+
+    // Return formatted LN payments
+    return txs;
+};
+
+// Get seconds left until invoice expires
+export const getInvoiceExpiryLeft = (
+    timestamp: number,
+    expiry: number,
+): number => {
+    return Math.floor(timestamp + expiry - +new Date() / 1_000);
+};
+
+export const isInvoiceExpired = (
+    timestamp: number,
+    expiry: number,
+): boolean => {
+    const timeElapsed = getInvoiceExpiryLeft(timestamp, expiry);
+
+    return timeElapsed <= 0;
+};
+
+// Get countdown start
+export const getCountdownStart = (timestamp: number, expiry: number) => {
+    return Math.floor(timestamp + expiry - +new Date() / 1_000);
+};
+
+// Function for syncing and returning new BDK wallet balance and Breez balance
+
+// Function for syncing and returning new BDK wallet and Breez transactions
+
+const determinLnType = async (
+    invoice: string,
+): Promise<{
+    type: string;
+    invoice: string;
+    invalid: boolean;
+    spec: string;
+}> => {
+    const specType = await parseInput(invoice);
+    let spec = '';
+
+    switch (specType.type) {
+        case InputTypeVariant.BOLT11:
+            spec = 'bolt11';
+            break;
+        case InputTypeVariant.LN_URL_PAY:
+        case InputTypeVariant.LN_URL_WITHDRAW:
+        case InputTypeVariant.LN_URL_AUTH:
+            spec = 'lnurl';
+            break;
+        default:
+            return {
+                type: 'unsupported',
+                invoice: invoice,
+                invalid: true,
+                spec: spec,
+            };
+    }
+
+    return {
+        type: 'lightning',
+        invoice: invoice,
+        invalid: false,
+        spec: spec,
+    };
+};
+
+export const decodeInvoiceType = async (
+    invoice: string,
+): Promise<{
+    type: string;
+    spec?: string;
+    invoice: string;
+    invalid: boolean;
+}> => {
+    const lowercasedInvoice = invoice.toLowerCase();
+
+    if (lowercasedInvoice.startsWith('bitcoin:')) {
+        if (lowercasedInvoice.includes('&lightning=')) {
+            return {
+                type: 'unified',
+                spec: 'bip21',
+                invoice: invoice,
+                invalid: false,
+            };
+        }
+
+        return {
+            type: 'bitcoin',
+            spec: 'bip21',
+            invoice: invoice,
+            invalid: false,
+        };
+    }
+
+    // Check LN
+    if (
+        lowercasedInvoice.startsWith('lnbc') ||
+        lowercasedInvoice.startsWith('lnurl') ||
+        lowercasedInvoice.startsWith('lightning')
+    ) {
+        const determinedLnType = await determinLnType(lowercasedInvoice);
+
+        return determinedLnType;
+    }
+
+    return {
+        type: 'unsupported',
+        invoice: invoice,
+        invalid: true,
+    };
+};
+
+export const getXPub256 = (xpub: string): string => {
+    const decoded = _deserializeExtendedKey(xpub);
+
+    return _singleSha256(decoded).toString('hex');
 };
