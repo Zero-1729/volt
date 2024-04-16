@@ -496,7 +496,7 @@ const RootNavigator = (): ReactElement => {
                         topOffset: 54,
                         type: 'Liberal',
                         text1: t('Breez SDK'),
-                        text2: t('breez'),
+                        text2: t('breez_backup_success'),
                         autoHide: false,
                     });
                 }
@@ -505,6 +505,14 @@ const RootNavigator = (): ReactElement => {
             if (event.type === BreezEventVariant.BACKUP_FAILED) {
                 console.log('[Breez SDK] Backup failed');
                 console.log('[Breez SDK] Event details: ', event.details);
+
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Breez SDK'),
+                    text2: t('breez_backup_failed'),
+                    autoHide: false,
+                });
             }
 
             if (event.type === BreezEventVariant.INVOICE_PAID) {
