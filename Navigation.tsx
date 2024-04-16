@@ -1,12 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {
-    ReactElement,
-    memo,
-    useRef,
-    useEffect,
-    useContext,
-    useCallback,
-} from 'react';
+import React, {ReactElement, memo, useRef, useEffect, useContext, useCallback} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
@@ -32,9 +25,7 @@ import {
     defaultConfig,
     EnvironmentType,
     connect,
-    disconnect,
     BreezEventVariant,
-    InvoicePaidDetails,
 } from '@breeztech/react-native-breez-sdk';
 import {getXPub256} from './modules/wallet-utils';
 
@@ -341,6 +332,7 @@ const RootNavigator = (): ReactElement => {
         getWalletData,
         currentWalletID,
         isWalletInitialized,
+        setBreezEvent,
     } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
@@ -441,7 +433,7 @@ const RootNavigator = (): ReactElement => {
     };
 
     // Breez startup
-    const initNode = useCallback(async () => {
+    const initNode = async () => {
         // No point putting in any effort if mnemonic missing
         if (wallet?.mnemonic.length === 0) {
             return;
@@ -519,36 +511,24 @@ const RootNavigator = (): ReactElement => {
                 console.log('[Breez SDK] Invoice paid');
                 console.log('[Breez SDK] Payment details: ', event.details);
 
-                // Route to LN payment status screen
-                rootNavigation.navigate('LNTransactionStatus', {
-                    status: true,
-                    details: event.details,
-                    detailsType: EBreezDetails.Received,
-                });
+                // Handle navigation to LNTransactionStatus in Wallet Receive screen
+                setBreezEvent(event);
             }
 
             if (event.type === BreezEventVariant.PAYMENT_FAILED) {
                 console.log('[Breez SDK] Payment failed');
                 console.log('[Breez SDK] Event details: ', event.details);
 
-                // Route to LN payment status screen
-                rootNavigation.navigate('LNTransactionStatus', {
-                    status: false,
-                    details: event.details,
-                    detailsType: EBreezDetails.Failed,
-                });
+                // Handle navigation to LNTransactionStatus in Wallet Receive & Send screen
+                setBreezEvent(event);
             }
 
             if (event.type === BreezEventVariant.PAYMENT_SUCCEED) {
                 console.log('[Breez SDK] Payment sent');
                 console.log('[Breez SDK] Event details: ', event.details);
 
-                // Route to LN payment status screen
-                rootNavigation.navigate('LNTransactionStatus', {
-                    status: true,
-                    details: event.details,
-                    detailsType: EBreezDetails.Success,
-                });
+                // Handle navigation to LNTransactionStatus in Wallet Send screen
+                setBreezEvent(event);
             }
         };
 
@@ -586,7 +566,7 @@ const RootNavigator = (): ReactElement => {
                 });
             }
         }
-    }, [isAdvancedMode, wallet.id, wallet.mnemonic, wallet.xpub]);
+    };
 
     useEffect(() => {
         // Block if newly onboarded
