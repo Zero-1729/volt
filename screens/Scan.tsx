@@ -201,7 +201,7 @@ const Scan = ({route}: Props) => {
         Toast.show({
             topOffset: 54,
             type: 'Liberal',
-            text1: t('Scanner'),
+            text1: capitalizeFirst(t('scanner')),
             text2: message,
         });
     };
@@ -233,7 +233,7 @@ const Scan = ({route}: Props) => {
             Toast.show({
                 topOffset: 54,
                 type: 'Liberal',
-                text1: t('Scanner'),
+                text1: capitalizeFirst(t('scanner')),
                 text2: e('unsupported_invoice_type'),
             });
             return {decodedInvoice: null, isOnchain: null};
@@ -255,7 +255,7 @@ const Scan = ({route}: Props) => {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
-                        text1: t('Scanner'),
+                        text1: capitalizeFirst(t('scanner')),
                         text2: err,
                     });
                     return {decodedInvoice: null, isOnchain: null};
@@ -264,7 +264,7 @@ const Scan = ({route}: Props) => {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
-                    text1: t('Scanner'),
+                    text1: capitalizeFirst(t('scanner')),
                     text2: e('unsupported_invoice_type'),
                 });
                 return {decodedInvoice: null, isOnchain: null};
@@ -304,7 +304,7 @@ const Scan = ({route}: Props) => {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
-                        text1: t('Scanner'),
+                        text1: capitalizeFirst(t('scanner')),
                         text2: e('invalid_invoice_error'),
                     });
                     return {decodedInvoice: null, isOnchain: null};
@@ -313,7 +313,7 @@ const Scan = ({route}: Props) => {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
-                    text1: t('Scanner'),
+                    text1: capitalizeFirst(t('scanner')),
                     text2: e('invalid_invoice_error'),
                 });
                 return {decodedInvoice: null, isOnchain: null};
@@ -321,13 +321,11 @@ const Scan = ({route}: Props) => {
         }
 
         // Check and report errors from wallet and invoice
-        // TODO: fix to use toast
         if (
             !checkInvoiceAndWallet(
                 route.params.wallet,
                 decodedInvoice,
                 updateToast,
-                walletMode === 'single',
             )
         ) {
             return {decodedInvoice: null, isOnchain: null};
@@ -396,7 +394,7 @@ const Scan = ({route}: Props) => {
                         Toast.show({
                             topOffset: 54,
                             type: 'Liberal',
-                            text1: t('Scanner'),
+                            text1: capitalizeFirst(t('scanner')),
                             text2: e('missing_bolt11_invoice_amount'),
                         });
                         return;
@@ -419,7 +417,7 @@ const Scan = ({route}: Props) => {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
-                        text1: t('Scanner'),
+                        text1: capitalizeFirst(t('scanner')),
                         text2: e('lightning_not_support'),
                     });
                     return;
@@ -460,7 +458,7 @@ const Scan = ({route}: Props) => {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
-                        text1: t('Scanner'),
+                        text1: capitalizeFirst(t('scanner')),
                         text2: e('missing_bolt11_invoice_amount'),
                     });
                     return;

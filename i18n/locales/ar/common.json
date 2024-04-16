@@ -64,5 +64,6 @@
     "breez_connected": "متصل بخدمات Breez",
     "breez_backup_started": "بدأ النسخ الاحتياطي Breez",
     "breez_backup_success": "تم النسخ الاحتياطي لـ Breez بنجاح",
-    "breez_backup_failed": "فشل النسخ الاحتياطي Breez"
+    "breez_backup_failed": "فشل النسخ الاحتياطي Breez",
+    "scanner": "QR Code"
 }
