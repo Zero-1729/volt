@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {
     Text,
@@ -8,7 +9,7 @@ import {
     AppState,
     Dimensions,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback} from 'react';
+import React, {useEffect, useRef, useCallback, useContext} from 'react';
 
 import {
     useNavigation,
@@ -19,6 +20,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {AppStorageContext} from '../../class/storageContext';
 
 import {useTranslation} from 'react-i18next';
 
@@ -33,6 +35,7 @@ import {
     Payment,
     InvoicePaidDetails,
     PaymentFailedData,
+    BreezEvent,
 } from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from './../../types/enums';
 
@@ -52,6 +55,8 @@ const LNTransactionStatus = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
+
+    const {breezEvent, setBreezEvent} = useContext(AppStorageContext);
 
     const {height, width} = Dimensions.get('window');
 
@@ -134,6 +139,11 @@ const LNTransactionStatus = ({route}: Props) => {
 
         return () => {
             appStateSubscription.remove();
+
+            // Clear the breez event
+            if (breezEvent) {
+                setBreezEvent({} as BreezEvent);
+            }
         };
     }, []);
 
