@@ -49,7 +49,11 @@ import {WalletParamList} from '../../Navigation';
 import {PartiallySignedTransaction} from 'bdk-rn';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {useTranslation} from 'react-i18next';
-import {sendPayment} from '@breeztech/react-native-breez-sdk';
+import {
+    sendPayment,
+    BreezEventVariant,
+} from '@breeztech/react-native-breez-sdk';
+import {EBreezDetails} from '../../types/enums';
 import {getScreenEdges} from '../../modules/screen';
 import ExpiryTimer from '../../components/expiry';
 
@@ -73,8 +77,13 @@ const SendView = ({route}: Props) => {
     const [loadingPsbt, setLoadingPsbt] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    const {fiatRate, appFiatCurrency, isAdvancedMode, electrumServerURL} =
-        useContext(AppStorageContext);
+    const {
+        fiatRate,
+        appFiatCurrency,
+        isAdvancedMode,
+        electrumServerURL,
+        breezEvent,
+    } = useContext(AppStorageContext);
 
     const isLightning = !!route.params.bolt11;
 
@@ -300,6 +309,34 @@ const SendView = ({route}: Props) => {
             loadUPsbt();
         }
     }, []);
+
+    useEffect(() => {
+        if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
+            // Route to LN payment status screen
+            navigation.dispatch(StackActions.popToTop());
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: true,
+                    details: breezEvent.details,
+                    detailsType: EBreezDetails.Success,
+                }),
+            );
+            return;
+        }
+
+        if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
+            // Route to LN payment status screen
+            navigation.dispatch(StackActions.popToTop());
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: false,
+                    details: breezEvent.details,
+                    detailsType: EBreezDetails.Failed,
+                }),
+            );
+            return;
+        }
+    }, [breezEvent]);
 
     return (
         <SafeAreaView
