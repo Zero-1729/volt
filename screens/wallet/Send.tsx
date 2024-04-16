@@ -144,7 +144,7 @@ const SendView = ({route}: Props) => {
         const bolt11AmountSats =
             (route.params.bolt11?.amountMsat as number) / 1_000;
 
-        if (walletBalanceLN > bolt11AmountSats) {
+        if (walletBalanceLN < bolt11AmountSats) {
             Toast.show({
                 topOffset: 54,
                 type: 'Liberal',
@@ -152,6 +152,7 @@ const SendView = ({route}: Props) => {
                 text2: t('insufficient_funds'),
             });
 
+            setLoading(false);
             return;
         }
 
