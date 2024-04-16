@@ -17,19 +17,15 @@ import {
     ONCHAIN_SWAP_BALANCE_MIN,
     LIGHTNING_SWAP_BALANCE_MIN,
 } from '../modules/wallet-defaults';
+import {SwapType} from '../types/enums';
 
 import CheckIcon from '../assets/svg/check-circle-fill-16.svg';
 import BigNumber from 'bignumber.js';
 
-enum SwapType {
-    SwapIn = 'swap_in',
-    SwapOut = 'swap_out',
-}
-
 type SwapProps = {
     swapRef: React.RefObject<BottomSheetModal>;
     onSelectSwap: (idx: number) => void;
-    triggerSwap: (swapType: string) => void;
+    triggerSwap: (swapType: SwapType) => void;
     onchainBalance: BigNumber;
     lightningBalance: BigNumber;
 };
