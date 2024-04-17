@@ -124,6 +124,8 @@
     "ln_description_text": "Enter a description (90 chars max)",
     "keep_receive_open": "Keep this page open until invoice is paid",
     "ln_insufficient_funds": "Insufficient funds to pay invoice",
+    "balance_below_min": "Balance below {{swap_min}} sats minimum"
+    "ln_insufficient_funds": "Insufficient funds to pay invoice",
     "manual": "Manual",
     "manual_message": "Enter a Lightning Address or Node ID",
     "paying_ln_address": "Paying Lightning Address",
