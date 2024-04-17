@@ -78,9 +78,7 @@ const SwapOut = ({route}: Props) => {
 
     const progressValue = useSharedValue(0);
 
-    const amount = new BigNumber(
-        route.params.satsAmount > 0 ? route.params.satsAmount : 56_000,
-    );
+    const amount = new BigNumber(route.params.satsAmount);
     const btcAddress = wallet.address.address;
 
     const handleCloseButton = () => {
