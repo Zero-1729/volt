@@ -17,7 +17,6 @@ import Close from '../../assets/svg/x-24.svg';
 import {
     capitalizeFirst,
     formatFiat,
-    formatSats,
     normalizeFiat,
     SATS_TO_BTC_RATE,
 } from '../../modules/transform';
@@ -44,10 +43,9 @@ import BigNumber from 'bignumber.js';
 import {AppStorageContext} from '../../class/storageContext';
 import {useTranslation} from 'react-i18next';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast';
-
-const ASSUMED_MIN_SATS = 50_000;
 
 type Props = NativeStackScreenProps<WalletParamList, 'SwapAmount'>;
 
@@ -102,7 +100,6 @@ const SwapAmount = ({route}: Props) => {
     const isBeyondMax = satsAmount.value.gt(maximumSwapAmount);
 
     const handleCloseButton = () => {
-        console.log('close');
         navigation.dispatch(CommonActions.goBack());
     };
 
@@ -370,7 +367,7 @@ const SwapAmount = ({route}: Props) => {
             setLoading(false);
         } else {
             const _feeInfo = await fetchReverseSwapFees({
-                sendAmountSat: ASSUMED_MIN_SATS,
+                sendAmountSat: balance.toNumber(),
             });
 
             setMinimumSwapAmount(new BigNumber(_feeInfo.min));
