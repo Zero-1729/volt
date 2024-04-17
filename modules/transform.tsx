@@ -158,3 +158,18 @@ export const displayNumberedSeed = (seed: string) => {
 export const i18nNumber = (num: number, locale: string) => {
     return num.toLocaleString(locale);
 };
+
+export const calculateFiatEquivalent = (
+    value: string,
+    rate: BigNumber,
+): BigNumber => {
+    if (value.length > 0) {
+        const satoshis = new BigNumber(value);
+
+        return new BigNumber(
+            satoshis.multipliedBy(0.00000001).multipliedBy(rate).toFixed(2),
+        );
+    }
+
+    return new BigNumber(0);
+};
