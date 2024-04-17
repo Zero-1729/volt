@@ -63,6 +63,7 @@ import Swap from './../../components/swap';
 import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
+import {SwapType} from '../../types/enums';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -227,12 +228,18 @@ const Wallet = ({route}: Props) => {
         }
     };
 
-    const handleSwap = async (swapType: string) => {
-        if (swapType === 'swap_in') {
-            console.log('[Swap] Init Swap In');
-        } else {
-            console.log('[Swap] Init Swap Out');
-        }
+    const handleSwap = async (swapType: SwapType) => {
+        // Close the modal
+        bottomSwapRef.current?.close();
+
+        navigation.dispatch(
+            CommonActions.navigate('WalletRoot', {
+                screen: 'SwapAmount',
+                params: {
+                    swapType: swapType,
+                },
+            }),
+        );
     };
 
     const navigateScanScreen = () => {
