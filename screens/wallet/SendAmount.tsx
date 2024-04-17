@@ -43,12 +43,7 @@ import {
 
 import {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
-
-type DisplayUnit = {
-    value: BigNumber;
-    symbol: string;
-    name: string;
-};
+import {DisplayUnit} from '../../types/wallet';
 
 import {PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
