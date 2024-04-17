@@ -39,6 +39,7 @@ import {
     formatFiat,
     normalizeFiat,
     SATS_TO_BTC_RATE,
+    calculateFiatEquivalent,
 } from '../../modules/transform';
 
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -115,7 +116,7 @@ const SendAmount = ({route}: Props) => {
             name: 'sats',
         });
 
-        setFiatAmount(calculateFiatEquivalent(maxSats));
+        setFiatAmount(calculateFiatEquivalent(maxSats, fiatRate.rate));
     };
 
     const updateAmount = (value: string) => {
@@ -140,7 +141,7 @@ const SendAmount = ({route}: Props) => {
         setFiatAmount(
             bottomUnit.name !== 'sats'
                 ? new BigNumber(value || 0)
-                : calculateFiatEquivalent(value),
+                : calculateFiatEquivalent(value, fiatRate.rate),
         );
     };
 
@@ -155,21 +156,6 @@ const SendAmount = ({route}: Props) => {
         }
 
         return '0';
-    };
-
-    const calculateFiatEquivalent = (value: string): BigNumber => {
-        if (value.length > 0) {
-            const satoshis = new BigNumber(value);
-
-            return new BigNumber(
-                satoshis
-                    .multipliedBy(0.00000001)
-                    .multipliedBy(fiatRate.rate)
-                    .toFixed(2),
-            );
-        }
-
-        return new BigNumber(0);
     };
 
     const swapPolarity = () => {
