@@ -173,3 +173,9 @@ export type TBreezDetails = {
     received: InvoicePaidDetails;
     failed: PaymentFailedData;
 };
+
+export type DisplayUnit = {
+    value: BigNumber;
+    symbol: string;
+    name: string;
+};
