@@ -59,6 +59,10 @@ import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 import Xpub from './screens/wallet/Xpub';
 
+// Swap screens
+import SwapAmount from './screens/wallet/SwapAmount';
+
+// Transaction details screen
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
 import LNTransactionStatus from './screens/wallet/LNTransactionStatus';
@@ -91,7 +95,7 @@ import {
     TInvoiceData,
     TBreezPaymentDetails,
 } from './types/wallet';
-import {ENet, EBreezDetails} from './types/enums';
+import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
 // Root Param List for Home Screen
@@ -154,6 +158,11 @@ export type WalletParamList = {
         wallet?: TMiniWallet;
         bolt11?: LnInvoice;
         source?: string;
+    };
+    SwapAmount: {
+        swapType: SwapType;
+        lnBalance: number;
+        onchainBalance: number;
     };
     WalletView: {
         reload: boolean;
@@ -272,6 +281,8 @@ const WalletRoot = () => {
                 />
                 <WalletStack.Screen name="SendAmount" component={SendAmount} />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
+
+                <WalletStack.Screen name="SwapAmount" component={SwapAmount} />
             </WalletStack.Group>
         </WalletStack.Navigator>
     );
