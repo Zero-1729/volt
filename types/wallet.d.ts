@@ -174,6 +174,12 @@ export type TBreezDetails = {
     failed: PaymentFailedData;
 };
 
+export type DisplayUnit = {
+    value: BigNumber;
+    symbol: string;
+    name: string;
+};
+
 export type TLnManualPayloadType = {
     kind: string;
     text: string;
