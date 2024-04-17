@@ -350,7 +350,7 @@ const SwapAmount = ({route}: Props) => {
         setMaximumSwapAmount(new BigNumber(swapInfo.maxAllowedDeposit));
 
         if (!isSwapOut) {
-            setBottomText(t('swap'));
+            setBottomText(t('continue'));
         }
     };
 
@@ -379,14 +379,14 @@ const SwapAmount = ({route}: Props) => {
             });
 
             setSwapFees(fees);
-            setBottomText(t('swap'));
+            setBottomText(t('continue'));
             setFeeLoadingText('');
         } catch (e: any) {
             if (e.message.includes('too low')) {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
-                    text1: t('swap'),
+                    text1: t('continue'),
                     text2: t('swap_amount_too_low'),
                     visibilityTime: 1750,
                 });
@@ -396,7 +396,7 @@ const SwapAmount = ({route}: Props) => {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
-                    text1: t('swap'),
+                    text1: t('continue'),
                     text2: e.message,
                     visibilityTime: 2000,
                 });
@@ -462,7 +462,7 @@ const SwapAmount = ({route}: Props) => {
             Toast.show({
                 topOffset: 54,
                 type: 'Liberal',
-                text1: t('swap'),
+                text1: t('continue'),
                 text2: t('swap_amount_too_low'),
                 visibilityTime: 2000,
                 onHide: () => {
@@ -501,7 +501,7 @@ const SwapAmount = ({route}: Props) => {
                             tailwind('text-base font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        {capitalizeFirst(t('swap'))}
+                        {capitalizeFirst(t('continue'))}
                     </Text>
                 </View>
 
