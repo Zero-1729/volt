@@ -69,6 +69,7 @@ const SwapAmount = ({route}: Props) => {
     const [loading, setLoading] = useState(true);
     const [amount, setAmount] = useState<string>('');
     const [loadingFeeText, setFeeLoadingText] = useState('');
+    const [showMinText, setShowMinText] = useState<boolean>(false);
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
     const [bottomText, setBottomText] = useState<string>(
         isSwapOut ? t('get_swap_fees') : t('get_limits'),
@@ -348,6 +349,28 @@ const SwapAmount = ({route}: Props) => {
         );
     };
 
+    const displayMinimum = (fontSize: string) => {
+        const bottomUnitSats = bottomUnit?.name === 'sats';
+        const rawMin = new BigNumber(minimumSwapAmount);
+        const minAmount = normalizeFiat(rawMin, fiatRate.rate);
+
+        return bottomUnitSats ? (
+            <DisplaySatsAmount
+                textColor={ColorScheme.Text.DescText}
+                amount={rawMin}
+                fontSize={fontSize}
+                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
+            />
+        ) : (
+            <DisplayFiatAmount
+                textColor={ColorScheme.Text.DescText}
+                amount={minAmount}
+                fontSize={fontSize}
+                isApprox={topUnit?.name !== 'sats' && amount.length > 0}
+            />
+        );
+    };
+
     const handleFetchLimits = async () => {
         const swapInfo = await receiveOnchain({});
 
@@ -471,13 +494,11 @@ const SwapAmount = ({route}: Props) => {
                 text2: t('swap_amount_too_low'),
                 visibilityTime: 2000,
                 onHide: () => {
-                    setFeeLoadingText(
-                        `Minimum amount: ${formatSats(minimumSwapAmount)} sats`,
-                    );
+                    setShowMinText(true);
                 },
             });
         } else {
-            setFeeLoadingText('');
+            setShowMinText(false);
         }
     }, [minimumSwapAmount]);
 
@@ -531,6 +552,20 @@ const SwapAmount = ({route}: Props) => {
                         {displayBalance('text-base')}
                     </View>
                 </View>
+
+                {/* Minimum Sats warn */}
+                {showMinText && (
+                    <View style={[tailwind('absolute flex-row'), {top: 120}]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm mr-2'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {t('minimum_amount')}
+                        </Text>
+                        {displayMinimum('text-sm')}
+                    </View>
+                )}
 
                 {/* Screen for amount */}
                 <View
