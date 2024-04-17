@@ -31,6 +31,7 @@ import {
     ReverseSwapPairInfo,
     receiveOnchain,
     fetchReverseSwapFees,
+    maxReverseSwapAmount,
 } from '@breeztech/react-native-breez-sdk';
 
 import {
@@ -105,19 +106,26 @@ const SwapAmount = ({route}: Props) => {
         navigation.dispatch(CommonActions.goBack());
     };
 
-    const handleSwapRoute = () => {
+    const handleSwapRoute = async () => {
         if (isSwapOut) {
             if (!swapFees?.totalEstimatedFees) {
                 getFeeInfo(true);
                 return;
             }
 
+            let maxSwapAmount;
+
+            if (isMax) {
+                maxSwapAmount = (await maxReverseSwapAmount()).totalSat;
+            }
+
             navigation.dispatch(
                 CommonActions.navigate('SwapOut', {
                     lnBalance: route.params.lnBalance,
                     onchainBalance: route.params.onchainBalance,
-                    satsAmount: satsAmount,
+                    satsAmount: maxSwapAmount ? maxSwapAmount : satsAmount,
                     fees: swapFees,
+                    maxed: isMax,
                 }),
             );
         } else {
