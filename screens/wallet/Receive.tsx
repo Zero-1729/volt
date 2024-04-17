@@ -254,7 +254,6 @@ const Receive = ({route}: Props) => {
             text1: capitalizeFirst(t('clipboard')),
             text2: capitalizeFirst(t('copied_to_clipboard')),
             visibilityTime: 1000,
-            autoHide: true,
             position: 'top',
         });
     };

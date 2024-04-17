@@ -126,7 +126,7 @@ const Info = () => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('notice')),
                 text2: t('wait_for_wallet_to_load_error'),
-                visibilityTime: 2000,
+                visibilityTime: 1750,
             });
             return;
         }

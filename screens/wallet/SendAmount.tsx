@@ -368,6 +368,7 @@ const SendAmount = ({route}: Props) => {
                                     text2: `${e(
                                         'dust_limit_message',
                                     )} ${DUST_LIMIT} ${t('satoshi')}.`,
+                                    visibilityTime: 1750,
                                 });
                                 return;
                             }
@@ -393,6 +394,7 @@ const SendAmount = ({route}: Props) => {
                                     type: 'Liberal',
                                     text1: e('no_internet_title'),
                                     text2: e('no_internet_message'),
+                                    visibilityTime: 1750,
                                 });
                                 return;
                             }

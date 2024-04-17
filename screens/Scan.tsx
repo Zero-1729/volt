@@ -146,6 +146,7 @@ const Scan = ({route}: Props) => {
             type: 'Liberal',
             text1: capitalizeFirst(t('qr_scan')),
             text2: error.message,
+            visibilityTime: 2000,
         });
     };
 
@@ -199,6 +200,7 @@ const Scan = ({route}: Props) => {
             type: 'Liberal',
             text1: capitalizeFirst(t('scanner')),
             text2: message,
+            visibilityTime: 2000,
         });
     };
 
@@ -231,6 +233,7 @@ const Scan = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('scanner')),
                 text2: e('unsupported_invoice_type'),
+                visibilityTime: 1750,
             });
             return {decodedInvoice: null, isOnchain: null};
         }
@@ -253,6 +256,7 @@ const Scan = ({route}: Props) => {
                         type: 'Liberal',
                         text1: capitalizeFirst(t('scanner')),
                         text2: err,
+                        visibilityTime: 2000,
                     });
                     return {decodedInvoice: null, isOnchain: null};
                 }
@@ -262,6 +266,7 @@ const Scan = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('scanner')),
                     text2: e('unsupported_invoice_type'),
+                    visibilityTime: 1750,
                 });
                 return {decodedInvoice: null, isOnchain: null};
             }
@@ -302,6 +307,7 @@ const Scan = ({route}: Props) => {
                         type: 'Liberal',
                         text1: capitalizeFirst(t('scanner')),
                         text2: e('invalid_invoice_error'),
+                        visibilityTime: 1750,
                     });
                     return {decodedInvoice: null, isOnchain: null};
                 }
@@ -311,6 +317,7 @@ const Scan = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('scanner')),
                     text2: e('invalid_invoice_error'),
+                    visibilityTime: 1750,
                 });
                 return {decodedInvoice: null, isOnchain: null};
             }
@@ -392,6 +399,7 @@ const Scan = ({route}: Props) => {
                             type: 'Liberal',
                             text1: capitalizeFirst(t('scanner')),
                             text2: e('missing_bolt11_invoice_amount'),
+                            visibilityTime: 1750,
                         });
                         return;
                     }
@@ -415,6 +423,7 @@ const Scan = ({route}: Props) => {
                         type: 'Liberal',
                         text1: capitalizeFirst(t('scanner')),
                         text2: e('lightning_not_support'),
+                        visibilityTime: 1750,
                     });
                     return;
                 }
@@ -456,6 +465,7 @@ const Scan = ({route}: Props) => {
                         type: 'Liberal',
                         text1: capitalizeFirst(t('scanner')),
                         text2: e('missing_bolt11_invoice_amount'),
+                        visibilityTime: 1750,
                     });
                     return;
                 }

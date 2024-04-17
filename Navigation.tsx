@@ -471,7 +471,7 @@ const RootNavigator = (): ReactElement => {
                         type: 'Liberal',
                         text1: t('Breez SDK'),
                         text2: t('Node already initialized'),
-                        visibilityTime: 2000,
+                        visibilityTime: 1750,
                     });
                 }
                 return;
@@ -483,7 +483,7 @@ const RootNavigator = (): ReactElement => {
                     type: 'Liberal',
                     text1: t('Breez SDK'),
                     text2: error.message,
-                    autoHide: false,
+                    visibilityTime: 2000,
                 });
             }
         }
@@ -505,7 +505,7 @@ const RootNavigator = (): ReactElement => {
                         type: 'Liberal',
                         text1: t('Breez SDK'),
                         text2: t('breez_backup_started'),
-                        autoHide: false,
+                        visibilityTime: 1750,
                     });
                 }
             }
@@ -518,7 +518,7 @@ const RootNavigator = (): ReactElement => {
                         type: 'Liberal',
                         text1: t('Breez SDK'),
                         text2: t('breez_backup_success'),
-                        autoHide: false,
+                        visibilityTime: 1750,
                     });
                 }
             }
@@ -532,7 +532,7 @@ const RootNavigator = (): ReactElement => {
                     type: 'Liberal',
                     text1: t('Breez SDK'),
                     text2: t('breez_backup_failed'),
-                    autoHide: false,
+                    visibilityTime: 1750,
                 });
             }
 
@@ -590,7 +590,7 @@ const RootNavigator = (): ReactElement => {
                 type: 'Liberal',
                 text1: t('Breez SDK'),
                 text2: t('breez_connected'),
-                autoHide: false,
+                visibilityTime: 1750,
             });
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
@@ -599,7 +599,7 @@ const RootNavigator = (): ReactElement => {
                     type: 'Liberal',
                     text1: t('Breez SDK'),
                     text2: error.message,
-                    autoHide: false,
+                    visibilityTime: 2000,
                 });
             }
         }

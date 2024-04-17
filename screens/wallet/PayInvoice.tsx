@@ -170,6 +170,7 @@ const PayInvoice = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
                     text2: e('unsupported_invoice_type'),
+                    visibilityTime: 1750,
                 });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -187,6 +188,7 @@ const PayInvoice = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
                 text2: e('invalid_invoice_error'),
+                visibilityTime: 1750,
             });
 
             navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -208,6 +210,7 @@ const PayInvoice = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
                 text2: e('no_internet_message'),
+                visibilityTime: 1750,
             });
             return;
         }
@@ -234,12 +237,12 @@ const PayInvoice = ({route}: Props) => {
         // Check wallet and invoice
         if (
             checkInvoiceAndWallet(wallet, decodedInvoice, (msg: string) => {
-                // TODO: Check and translate error
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
                     text2: msg,
+                    visibilityTime: 2000,
                 });
 
                 // route home

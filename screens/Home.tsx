@@ -187,7 +187,7 @@ const Home = ({route}: Props) => {
                         type: 'Liberal',
                         text1: t('BDK'),
                         text2: t('Failed to sync'),
-                        autoHide: false,
+                        visibilityTime: 1750,
                     });
                 }
             },
@@ -316,7 +316,7 @@ const Home = ({route}: Props) => {
                     type: 'Liberal',
                     text1: t('Breez SDK'),
                     text2: error.message,
-                    autoHide: false,
+                    visibilityTime: 2000,
                 });
             }
 
@@ -337,7 +337,7 @@ const Home = ({route}: Props) => {
                     type: 'Liberal',
                     text1: t('Breez SDK'),
                     text2: error.message,
-                    autoHide: false,
+                    visibilityTime: 2000,
                 });
             }
 
@@ -445,6 +445,7 @@ const Home = ({route}: Props) => {
                 type: 'Liberal',
                 text1: route.params.restoreMeta.title,
                 text2: route.params.restoreMeta.message,
+                visibilityTime: 1750,
             });
 
             // Vibrate to let user know the action was successful
