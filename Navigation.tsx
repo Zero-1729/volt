@@ -35,6 +35,7 @@ import {
     EnvironmentType,
     connect,
     BreezEventVariant,
+    ReverseSwapPairInfo,
 } from '@breeztech/react-native-breez-sdk';
 import {getXPub256} from './modules/wallet-utils';
 
@@ -74,6 +75,7 @@ import Xpub from './screens/wallet/Xpub';
 
 // Swap screens
 import SwapAmount from './screens/wallet/SwapAmount';
+import SwapOut from './screens/wallet/SwapOut';
 
 // Transaction details screen
 import TransactionDetails from './screens/wallet/TransactionDetails';
@@ -259,6 +261,13 @@ export type WalletParamList = {
         lnBalance: number;
         onchainBalance: number;
     };
+    SwapOut: {
+        lnBalance: number;
+        onchainBalance: number;
+        satsAmount: number;
+        fees: ReverseSwapPairInfo;
+        maxed: boolean;
+    };
     WalletView: {
         reload: boolean;
     };
@@ -405,6 +414,7 @@ const WalletRoot = () => {
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
 
                 <WalletStack.Screen name="SwapAmount" component={SwapAmount} />
+                <WalletStack.Screen name="SwapOut" component={SwapOut} />
             </WalletStack.Group>
         </WalletStack.Navigator>
     );
