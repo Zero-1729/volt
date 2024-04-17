@@ -3,7 +3,7 @@ import {View, useColorScheme} from 'react-native';
 
 import VText from './text';
 
-import {LongButton, PlainButton} from './button';
+import {LongBottomButton, PlainButton} from './button';
 
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {BottomModal} from './bmodal';
@@ -11,7 +11,7 @@ import Color from '../constants/Color';
 
 import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
-import {capitalizeFirst} from '../modules/transform';
+import {capitalizeFirst, formatSats} from '../modules/transform';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 import {
     ONCHAIN_SWAP_BALANCE_MIN,
@@ -20,6 +20,7 @@ import {
 import {SwapType} from '../types/enums';
 
 import CheckIcon from '../assets/svg/check-circle-fill-16.svg';
+import InfoIcon from '../assets/svg/info-16.svg';
 import BigNumber from 'bignumber.js';
 
 type SwapProps = {
@@ -32,7 +33,7 @@ type SwapProps = {
 
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
-    const snapPoints = useMemo(() => ['45'], []);
+    const snapPoints = useMemo(() => ['46'], []);
     const onchainBroke =
         props.onchainBalance.isLessThan(ONCHAIN_SWAP_BALANCE_MIN) ||
         props.onchainBalance.isZero();
@@ -123,6 +124,24 @@ const Swap = (props: SwapProps) => {
                             ]}>
                             {t('swap_in_message')}
                         </VText>
+
+                        <View
+                            style={[
+                                tailwind('w-full items-center flex-row mt-2'),
+                            ]}>
+                            <InfoIcon fill={ColorScheme.SVG.GrayFill} />
+                            <VText
+                                style={[
+                                    tailwind('text-sm ml-2'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {t('balance_below_min', {
+                                    swap_min: formatSats(
+                                        new BigNumber(ONCHAIN_SWAP_BALANCE_MIN),
+                                    ),
+                                })}
+                            </VText>
+                        </View>
                     </PlainButton>
 
                     {/* Swap Out */}
@@ -182,14 +201,35 @@ const Swap = (props: SwapProps) => {
                             ]}>
                             {t('swap_out_message')}
                         </VText>
+
+                        <View
+                            style={[
+                                tailwind('w-full items-center flex-row mt-2'),
+                            ]}>
+                            <InfoIcon fill={ColorScheme.SVG.GrayFill} />
+                            <VText
+                                style={[
+                                    tailwind('text-sm ml-2'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {t('balance_below_min', {
+                                    swap_min: formatSats(
+                                        new BigNumber(
+                                            LIGHTNING_SWAP_BALANCE_MIN,
+                                        ),
+                                    ),
+                                })}
+                            </VText>
+                        </View>
                     </PlainButton>
 
                     <View
                         style={[
-                            tailwind('w-4/5 absolute'),
-                            {bottom: NativeWindowMetrics.bottom + 24},
+                            tailwind('w-full absolute items-center'),
+                            {bottom: NativeWindowMetrics.bottom - 16},
                         ]}>
-                        <LongButton
+                        <LongBottomButton
+                            disabled={onchainBroke && lightningBroke}
                             title={capitalizeFirst(t('continue'))}
                             onPress={() => {
                                 props.triggerSwap(selected);

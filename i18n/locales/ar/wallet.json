@@ -121,5 +121,6 @@
     "ln_description": "تعيين الوصف",
     "ln_description_text": "أدخل وصفًا (تسعون حرفًا كحد أقصى)",
     "keep_receive_open": "اترك هذه الصفحة مفتوحة حتى يتم دفع الفاتورة",
-    "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة"
+    "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة",
+    "balance_below_min": "الرصيد أقل من {{swap_min}} هو الحد الأدنى"
 }

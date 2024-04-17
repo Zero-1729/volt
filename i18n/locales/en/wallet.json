@@ -122,5 +122,6 @@
     "ln_description": "Invoice Description",
     "ln_description_text": "Enter a description (90 chars max)",
     "keep_receive_open": "Keep this page open until invoice is paid",
-    "ln_insufficient_funds": "Insufficient funds to pay invoice"
+    "ln_insufficient_funds": "Insufficient funds to pay invoice",
+    "balance_below_min": "Balance below {{swap_min}} sats minimum"
 }
