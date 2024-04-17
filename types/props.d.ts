@@ -149,4 +149,5 @@ export type DisplayFiatAmountProps = BaseProps & {
     amount: string;
     isApprox?: boolean;
     fontSize: string;
+    textColor?: string;
 };
