@@ -161,26 +161,34 @@ const SwapAmount = ({route}: Props) => {
         // We reset instead of preserve previous top unit value
         // because we assume the user changes unit to get a new value
         // in the new bottom unit and not to preserve the previous value
-        const fiatToSatsEqv = new BigNumber(calculateSatsEquivalent(value));
-        const satsToFiatEqv = calculateFiatEquivalent(value);
+
+        // The fiat equivalent (fiat if fiat and sats to fiat if sats)
+        const fiatEqv =
+            bottomUnit.name !== 'sats'
+                ? new BigNumber(value)
+                : new BigNumber(calculateFiatEquivalent(value));
+        // The sats equivalent (sats if sats and fiat to sats if fiat)
+        const satsEqv =
+            bottomUnit.name === 'sats'
+                ? new BigNumber(value)
+                : new BigNumber(calculateSatsEquivalent(value));
         const maxSwapFiatAmount = calculateFiatEquivalent(
             maximumSwapAmount.toString(),
         );
 
         const isMaxing =
             bottomUnit.name === 'sats'
-                ? fiatToSatsEqv.isEqualTo(maximumSwapAmount)
-                : satsToFiatEqv.isEqualTo(maxSwapFiatAmount);
+                ? satsEqv.isEqualTo(maximumSwapAmount)
+                : fiatEqv.isEqualTo(maxSwapFiatAmount);
 
         const isLarger =
             bottomUnit.name === 'sats'
                 ? maximumSwapAmount.lt(value)
-                : satsToFiatEqv.gt(maxSwapFiatAmount);
+                : fiatEqv.gt(maxSwapFiatAmount);
 
         // clear swap
         if (swapFees?.totalEstimatedFees) {
             setSwapFees({} as ReverseSwapPairInfo);
-            setBottomText(t('get_swap_fees'));
         }
 
         // clear loading text
@@ -207,15 +215,13 @@ const SwapAmount = ({route}: Props) => {
             value:
                 bottomUnit.name === 'sats'
                     ? new BigNumber(value || 0)
-                    : fiatToSatsEqv,
+                    : satsEqv,
             symbol: 'sats',
             name: 'sats',
         });
 
         setFiatAmount(
-            bottomUnit.name !== 'sats'
-                ? new BigNumber(value || 0)
-                : satsToFiatEqv,
+            bottomUnit.name !== 'sats' ? new BigNumber(value || 0) : fiatEqv,
         );
 
         if (value === '') {
