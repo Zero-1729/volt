@@ -55,10 +55,10 @@ const Color = (currentTheme: ColorThemeType) => {
             }, // Green
             p2tr: {bitcoin: '#004b94', testnet: '#1E90FF', accent: '#002d58'}, // Blue
             unified: {
-                bitcoin: '#F7931A',
-                testnet: '#FF8C00',
-                accent: '#94580f',
-            }, // Orange
+                bitcoin: '#E20788',
+                testnet: '#E20788',
+                accent: '#811E58',
+            }, // OFF2024
         },
     };
 
