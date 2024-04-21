@@ -419,7 +419,11 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
             <Text
                 style={[
                     tailwind(`mr-2 font-bold ${props.fontSize}`),
-                    {color: ColorScheme.Text.Default},
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                    },
                 ]}>
                 {props.isApprox ? '~' : ''}
                 {appFiatCurrency.symbol}
@@ -427,7 +431,11 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
             <Text
                 style={[
                     tailwind(`font-bold ${props.fontSize}`),
-                    {color: ColorScheme.Text.Default},
+                    {
+                        color: props.textColor
+                            ? props.textColor
+                            : ColorScheme.Text.Default,
+                    },
                 ]}>
                 {props.amount}
             </Text>
