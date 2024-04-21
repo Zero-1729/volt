@@ -159,6 +159,7 @@ const SendView = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
                 text2: t('ln_insufficient_funds'),
+                visibilityTime: 1750,
             });
 
             setLoading(false);
@@ -179,6 +180,7 @@ const SendView = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
                     text2: result.payment.error as string,
+                    visibilityTime: 2000,
                 });
                 setLoading(false);
             }
@@ -188,6 +190,7 @@ const SendView = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
                 text2: error,
+                visibilityTime: 2000,
             });
             setLoading(false);
         }
@@ -286,6 +289,7 @@ const SendView = ({route}: Props) => {
                         type: 'Liberal',
                         text1: capitalizeFirst(t('error')),
                         text2: t('tx_fail_creation_error'),
+                        visibilityTime: 2000,
                     });
 
                     console.log(

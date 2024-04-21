@@ -64,7 +64,7 @@ const Currency = () => {
                             type: 'Liberal',
                             text1: capitalizeFirst(t('network')),
                             text2: e('no_internet_message'),
-                            visibilityTime: 2000,
+                            visibilityTime: 1750,
                         });
                         return;
                     }

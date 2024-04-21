@@ -110,6 +110,7 @@ const FeeSelection = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
                     text2: e('tx_fail_creation_error'),
+                    visibilityTime: 1750,
                 });
 
                 console.log(
@@ -147,6 +148,7 @@ const FeeSelection = ({route}: Props) => {
                 type: 'Liberal',
                 text1: t('feerate'),
                 text2: e('failed_fee_rate_fetch'),
+                visibilityTime: 1750,
             });
         }
 
@@ -170,6 +172,7 @@ const FeeSelection = ({route}: Props) => {
                 type: 'Liberal',
                 text1: e('invalid_fee_rate'),
                 text2: e('invalid_fee_rate_message'),
+                visibilityTime: 1750,
             });
 
             return;
@@ -182,6 +185,7 @@ const FeeSelection = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
                 text2: e('fee_too_high_error'),
+                visibilityTime: 1750,
             });
             return;
         }

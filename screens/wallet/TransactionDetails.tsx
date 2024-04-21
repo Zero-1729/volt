@@ -132,6 +132,7 @@ const TransactionDetailsView = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('dust_limit_title')),
                 text2: e('tx_already_confirmed_error'),
+                visibilityTime: 1750,
             });
         }
 
@@ -152,6 +153,7 @@ const TransactionDetailsView = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
                 text2: e('bump_fee_error'),
+                visibilityTime: 1750,
             });
 
             console.log('[Fee Bump] Could not bump fee: ', status.errorMessage);

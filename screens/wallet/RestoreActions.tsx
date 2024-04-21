@@ -96,6 +96,7 @@ const ImportAction = ({route}: Props) => {
                         type: 'Liberal',
                         text1: capitalizeFirst(t('error')),
                         text2: e('import_support_error'),
+                        visibilityTime: 1750,
                     });
                     return;
                 }
@@ -114,6 +115,7 @@ const ImportAction = ({route}: Props) => {
             type: 'Liberal',
             text1: capitalizeFirst(t('error')),
             text2: err.message,
+            visibilityTime: 2000,
         });
 
         return;
@@ -193,6 +195,7 @@ const ImportAction = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('mnemonic')),
                 text2: e('mnemonic_invalid_error'),
+                visibilityTime: 1750,
             });
             return;
         }
@@ -213,6 +216,7 @@ const ImportAction = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('mnemonic')),
                 text2: err.message,
+                visibilityTime: 2000,
             });
         }
     };
@@ -225,6 +229,7 @@ const ImportAction = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('descriptor')),
                     text2: e('descriptor_valid_error'),
+                    visibilityTime: 1750,
                 });
 
                 return;
@@ -246,6 +251,7 @@ const ImportAction = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('descriptor')),
                 text2: err.message,
+                visibilityTime: 2000,
             });
         }
     };
@@ -268,6 +274,7 @@ const ImportAction = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('extended_keu')),
                 text2: err.message,
+                visibilityTime: 2000,
             });
         }
     };
@@ -340,7 +347,7 @@ const ImportAction = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('extended_key')),
                     text2: e('unsupported_ext_key_error'),
-                    visibilityTime: 2000,
+                    visibilityTime: 1750,
                 });
                 return;
             }
@@ -355,6 +362,7 @@ const ImportAction = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('extended_key')),
                     text2: err.message,
+                    visibilityTime: 2000,
                 });
                 return;
             }
@@ -370,7 +378,7 @@ const ImportAction = ({route}: Props) => {
             type: 'Liberal',
             text1: capitalizeFirst(t('import')),
             text2: e('import_material_error'),
-            visibilityTime: 2000,
+            visibilityTime: 1750,
         });
     };
 

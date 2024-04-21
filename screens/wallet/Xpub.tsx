@@ -67,6 +67,7 @@ const Xpub = () => {
                         type: 'Liberal',
                         text1: capitalizeFirst(t('error')),
                         text2: e('failed_to_write_file'),
+                        visibilityTime: 1750,
                     });
 
                     console.log('[Export] Failed to write file: ', err.message);
@@ -84,6 +85,7 @@ const Xpub = () => {
                             type: 'Liberal',
                             text1: capitalizeFirst(t('error')),
                             text2: e('failed_to_share_file'),
+                            visibilityTime: 1750,
                         });
 
                         console.log(

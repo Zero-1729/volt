@@ -127,6 +127,7 @@ const Backup = () => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
                     text2: e.message,
+                    visibilityTime: 2000,
                 });
             });
             await Share.open({
@@ -141,6 +142,7 @@ const Backup = () => {
                             type: 'Liberal',
                             text1: capitalizeFirst(t('error')),
                             text2: e.message,
+                            visibilityTime: 2000,
                         });
                     }
                 })

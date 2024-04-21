@@ -151,7 +151,7 @@ const Wallet = ({route}: Props) => {
                     type: 'Liberal',
                     text1: t('Breez SDK'),
                     text2: error.message,
-                    autoHide: false,
+                    visibilityTime: 2000,
                 });
             }
 
@@ -172,7 +172,7 @@ const Wallet = ({route}: Props) => {
                     type: 'Liberal',
                     text1: t('Breez SDK'),
                     text2: error.message,
-                    autoHide: false,
+                    visibilityTime: 2000,
                 });
             }
 
@@ -292,7 +292,7 @@ const Wallet = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('network')),
                     text2: t('error_fetching_txs'),
-                    visibilityTime: 2000,
+                    visibilityTime: 1750,
                 });
 
                 setLoadingBalance(false);
