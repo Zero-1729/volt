@@ -2,12 +2,12 @@ PODS:
   - bdk-rn (0.29.0):
     - React
   - boost (1.83.0)
-  - breez_sdk (0.3.8):
-    - BreezSDK (= 0.3.8)
+  - breez_sdk (0.3.9):
+    - BreezSDK (= 0.3.9)
     - React-Core
-  - breez_sdkFFI (0.3.8)
-  - BreezSDK (0.3.8):
-    - breez_sdkFFI (= 0.3.8)
+  - breez_sdkFFI (0.3.9)
+  - BreezSDK (0.3.9):
+    - breez_sdkFFI (= 0.3.9)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.73.6)
@@ -80,7 +80,7 @@ PODS:
     - hermes-engine/Pre-built (= 0.73.6)
   - hermes-engine/Pre-built (0.73.6)
   - libevent (2.1.12)
-  - lottie-ios (4.4.1)
+  - lottie-ios (4.4.3)
   - lottie-react-native (6.7.0):
     - glog
     - lottie-ios (~> 4.4.1)
@@ -1470,9 +1470,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   bdk-rn: 0b3d1975bad08b2b511fa3fb85249735d626afc6
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
-  breez_sdk: a1ae07523e1b7873fed258333f7639ccf701fc35
-  breez_sdkFFI: 3e6fc521466ffd4b89298356be5b553af4bb5714
-  BreezSDK: 2aedefebd3fddd67ea3fa1f78e96595486cc26a2
+  breez_sdk: 2ca6cae60a7a64153860609586636294aec9c0a1
+  breez_sdkFFI: a3e6468a66bf14641207a0af9d15e288c873be47
+  BreezSDK: 54eed1bd79343a088fe5c4d33a41a91b65367a54
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
   FBLazyVector: f64d1e2ea739b4d8f7e4740cde18089cd97fe864
@@ -1489,7 +1489,7 @@ SPEC CHECKSUMS:
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: 9cecf9953a681df7556b8cc9c74905de8f3293c0
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  lottie-ios: e047b1d2e6239b787cc5e9755b988869cf190494
+  lottie-ios: fcb5e73e17ba4c983140b7d21095c834b3087418
   lottie-react-native: 13cd0c4782c3e6bb26bfa4cc2d08bfb84f6d1ab6
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: 7169b2b1c44399c76a47b5deaaba715eeeb476c0
