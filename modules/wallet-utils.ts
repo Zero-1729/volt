@@ -1,5 +1,3 @@
-import {Buffer} from 'buffer';
-
 import * as bip39 from 'bip39';
 import * as b58 from 'bs58';
 import * as b58c from 'bs58check';
