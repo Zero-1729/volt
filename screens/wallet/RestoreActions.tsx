@@ -283,7 +283,8 @@ const ImportAction = ({route}: Props) => {
         // We assume it is a mnemonic if it meets the following:
         // (1) it has more than one word separated by a space
         // (2) it has 12 or 24 words
-        const textWordLength = text.split(' ').length;
+        const possibleMnemonic = text.replace('\n', ' ');
+        const textWordLength = possibleMnemonic.split(' ').length;
         const isSingleWord = textWordLength === 1;
         const isMnemonicLength = textWordLength === 12 || textWordLength === 24;
 
@@ -327,7 +328,8 @@ const ImportAction = ({route}: Props) => {
         // Check if mnemonic
         if (isMnemonic(material)) {
             // Handle import of Mnemonic
-            handleMnemonic(material);
+            const mnemonicMaterial = material.replace('\n', ' ');
+            handleMnemonic(mnemonicMaterial);
             return;
         }
 
