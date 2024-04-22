@@ -1,3 +1,5 @@
+require('crypto');
+
 import {NumberFormat} from '@formatjs/intl-numberformat';
 
 // React Native doesn't support full spec of Intl API yet.
