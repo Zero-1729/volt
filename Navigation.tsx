@@ -57,6 +57,7 @@ import FeeSelection from './screens/wallet/FeeSelection';
 import TransactionExported from './screens/wallet/TransactionExported';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
+import SendLN from './screens/wallet/SendLN';
 import Xpub from './screens/wallet/Xpub';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
@@ -170,6 +171,7 @@ export type WalletParamList = {
         isLightning?: boolean;
         source: string;
     };
+    SendLN: undefined;
     TransactionDetails: {
         tx: TTransaction;
         source: string;
@@ -271,6 +273,7 @@ const WalletRoot = () => {
                     component={RequestAmount}
                 />
                 <WalletStack.Screen name="SendAmount" component={SendAmount} />
+                <WalletStack.Screen name="SendLN" component={SendLN} />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
             </WalletStack.Group>
         </WalletStack.Navigator>
