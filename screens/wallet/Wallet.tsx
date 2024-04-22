@@ -60,6 +60,7 @@ import {TBalance, TTransaction} from '../../types/wallet';
 import {capitalizeFirst} from '../../modules/transform';
 
 import Swap from './../../components/swap';
+import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
 
@@ -115,13 +116,27 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     const bottomSwapRef = React.useRef<BottomSheetModal>(null);
+    const bottomSendRef = React.useRef<BottomSheetModal>(null);
     const [openSwap, setOpenSwap] = useState(-1);
+    const [openSend, setOpenSend] = useState(-1);
 
     const openSwapModal = () => {
         if (openSwap !== 1) {
             bottomSwapRef.current?.present();
         } else {
             bottomSwapRef.current?.close();
+        }
+    };
+
+    const openSendModal = () => {
+        if (walletData.type === 'unified') {
+            if (openSend !== 1) {
+                bottomSendRef.current?.present();
+            } else {
+                bottomSendRef.current?.close();
+            }
+        } else {
+            navigateScanScreen();
         }
     };
 
@@ -217,6 +232,30 @@ const Wallet = ({route}: Props) => {
             console.log('[Swap] Init Swap In');
         } else {
             console.log('[Swap] Init Swap Out');
+        }
+    };
+
+    const navigateScanScreen = () => {
+        const miniwallet = getMiniWallet(walletData);
+
+        navigation.dispatch(
+            CommonActions.navigate('ScanRoot', {
+                screen: 'Scan',
+                params: {
+                    screen: 'send',
+                    wallet: miniwallet,
+                },
+            }),
+        );
+    };
+
+    const handleSend = async (sendType: string) => {
+        if (sendType === 'scan') {
+            bottomSendRef.current?.close();
+            navigateScanScreen();
+        } else {
+            bottomSendRef.current?.close();
+            navigation.dispatch(CommonActions.navigate('SendLN'));
         }
     };
 
@@ -630,24 +669,7 @@ const Wallet = ({route}: Props) => {
                                             backgroundColor: CardAccent,
                                         },
                                     ]}>
-                                    <PlainButton
-                                        onPress={() => {
-                                            const miniwallet =
-                                                getMiniWallet(walletData);
-
-                                            navigation.dispatch(
-                                                CommonActions.navigate(
-                                                    'ScanRoot',
-                                                    {
-                                                        screen: 'Scan',
-                                                        params: {
-                                                            screen: 'send',
-                                                            wallet: miniwallet,
-                                                        },
-                                                    },
-                                                ),
-                                            );
-                                        }}>
+                                    <PlainButton onPress={openSendModal}>
                                         <Text
                                             style={[
                                                 tailwind(
@@ -814,6 +836,18 @@ const Wallet = ({route}: Props) => {
                                     triggerSwap={handleSwap}
                                     onSelectSwap={idx => {
                                         setOpenSwap(idx);
+                                    }}
+                                />
+                            </View>
+                        )}
+
+                        {walletData.type === 'unified' && (
+                            <View style={[tailwind('absolute bottom-0')]}>
+                                <Send
+                                    sendOptionsRef={bottomSendRef}
+                                    triggerSendOptions={handleSend}
+                                    onSelectSendOption={idx => {
+                                        setOpenSend(idx);
                                     }}
                                 />
                             </View>
