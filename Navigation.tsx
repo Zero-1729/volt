@@ -91,6 +91,7 @@ import {
     TMiniWallet,
     TInvoiceData,
     TBreezPaymentDetails,
+    TLnManualPayloadType,
 } from './types/wallet';
 import {ENet, EBreezDetails} from './types/enums';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
@@ -168,10 +169,14 @@ export type WalletParamList = {
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
-        isLightning?: boolean;
         source: string;
+        isLightning?: boolean;
+        isLnManual?: boolean;
+        lnManualPayload?: TLnManualPayloadType;
     };
-    SendLN: undefined;
+    SendLN: {
+        lnManualPayload?: TLnManualPayloadType;
+    };
     TransactionDetails: {
         tx: TTransaction;
         source: string;
