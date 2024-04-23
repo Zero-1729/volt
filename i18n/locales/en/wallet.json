@@ -122,5 +122,9 @@
     "ln_description": "Invoice Description",
     "ln_description_text": "Enter a description (90 chars max)",
     "keep_receive_open": "Keep this page open until invoice is paid",
-    "ln_insufficient_funds": "Insufficient funds to pay invoice"
+    "ln_insufficient_funds": "Insufficient funds to pay invoice",
+    "manual": "Manual",
+    "manual_message": "Enter a Lightning Address or Node ID",
+    "paying_ln_address": "Paying Lightning Address",
+    "paying_node_id": "Paying Node ID"
 }

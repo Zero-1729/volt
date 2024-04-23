@@ -173,3 +173,10 @@ export type TBreezDetails = {
     received: InvoicePaidDetails;
     failed: PaymentFailedData;
 };
+
+export type TLnManualPayloadType = {
+    kind: string;
+    text: string;
+    description: string;
+    amount?: number;
+};

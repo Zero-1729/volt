@@ -121,5 +121,9 @@
     "ln_description": "تعيين الوصف",
     "ln_description_text": "أدخل وصفًا (تسعون حرفًا كحد أقصى)",
     "keep_receive_open": "اترك هذه الصفحة مفتوحة حتى يتم دفع الفاتورة",
-    "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة"
+    "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة",
+    "manual": "يدوي",
+    "manual_message": "أدخل عنوان Lightning أو معرف العقدة",
+    "paying_ln_address": "دفع عنوان البرق",
+    "paying_node_id": "دفع معرف العقدة"
 }

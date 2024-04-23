@@ -57,6 +57,7 @@ import FeeSelection from './screens/wallet/FeeSelection';
 import TransactionExported from './screens/wallet/TransactionExported';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
+import SendLN from './screens/wallet/SendLN';
 import Xpub from './screens/wallet/Xpub';
 
 import TransactionDetails from './screens/wallet/TransactionDetails';
@@ -90,6 +91,7 @@ import {
     TMiniWallet,
     TInvoiceData,
     TBreezPaymentDetails,
+    TLnManualPayloadType,
 } from './types/wallet';
 import {ENet, EBreezDetails} from './types/enums';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
@@ -167,8 +169,13 @@ export type WalletParamList = {
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
-        isLightning?: boolean;
         source: string;
+        isLightning?: boolean;
+        isLnManual?: boolean;
+        lnManualPayload?: TLnManualPayloadType;
+    };
+    SendLN: {
+        lnManualPayload?: TLnManualPayloadType;
     };
     TransactionDetails: {
         tx: TTransaction;
@@ -271,6 +278,7 @@ const WalletRoot = () => {
                     component={RequestAmount}
                 />
                 <WalletStack.Screen name="SendAmount" component={SendAmount} />
+                <WalletStack.Screen name="SendLN" component={SendLN} />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
             </WalletStack.Group>
         </WalletStack.Navigator>

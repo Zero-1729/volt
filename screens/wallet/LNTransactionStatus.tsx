@@ -56,7 +56,8 @@ const LNTransactionStatus = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {breezEvent, setBreezEvent} = useContext(AppStorageContext);
+    const {breezEvent, setBreezEvent, isAdvancedMode} =
+        useContext(AppStorageContext);
 
     const {height, width} = Dimensions.get('window');
 
@@ -167,8 +168,8 @@ const LNTransactionStatus = ({route}: Props) => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                {!!route.params.status && (
-                    <View style={[tailwind('h-full justify-center')]}>
+                <View style={[tailwind('h-full justify-center')]}>
+                    {!!route.params.status && (
                         <View
                             style={[
                                 styles.confettiContainer,
@@ -187,80 +188,75 @@ const LNTransactionStatus = ({route}: Props) => {
                                 loop={!receivedPayment}
                             />
                         </View>
+                    )}
 
-                        <Text
-                            style={[
-                                tailwind(
-                                    'text-lg absolute font-bold text-center w-full top-6 px-4',
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {t('lightning_invoice')}
-                        </Text>
+                    <Text
+                        style={[
+                            tailwind(
+                                'text-lg absolute font-bold text-center w-full top-6 px-4',
+                            ),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        {t('lightning_invoice')}
+                    </Text>
+
+                    <View
+                        style={[
+                            tailwind('-mt-12 justify-center px-4 items-center'),
+                        ]}>
+                        <View style={[tailwind('items-center')]}>
+                            {!route.params.status && (
+                                <Failed
+                                    style={[tailwind('self-center')]}
+                                    fill={ColorScheme.SVG.Default}
+                                    height={128}
+                                    width={128}
+                                />
+                            )}
+
+                            {route.params.status && (
+                                <Success
+                                    style={[tailwind('self-center')]}
+                                    fill={ColorScheme.SVG.Default}
+                                    height={128}
+                                    width={128}
+                                />
+                            )}
+                        </View>
+
+                        {route.params.detailsType === 'received' && (
+                            <View style={[tailwind('mt-4 mb-2 items-center')]}>
+                                <FiatBalance
+                                    balance={sats()}
+                                    loading={false}
+                                    balanceFontSize={'text-2xl'}
+                                    fontColor={ColorScheme.Text.Default}
+                                    ignoreHideBalance={true}
+                                />
+                            </View>
+                        )}
 
                         <View
                             style={[
                                 tailwind(
-                                    '-mt-12 justify-center px-4 items-center',
+                                    `w-4/5 ${
+                                        route.params.detailsType === 'received'
+                                            ? ''
+                                            : 'mt-4'
+                                    } items-center`,
                                 ),
                             ]}>
-                            <View style={[tailwind('items-center')]}>
-                                {!route.params.status && (
-                                    <Failed
-                                        style={[tailwind('self-center')]}
-                                        fill={ColorScheme.SVG.Default}
-                                        height={128}
-                                        width={128}
-                                    />
-                                )}
-
-                                {route.params.status && (
-                                    <Success
-                                        style={[tailwind('self-center')]}
-                                        fill={ColorScheme.SVG.Default}
-                                        height={128}
-                                        width={128}
-                                    />
-                                )}
-                            </View>
-
-                            {route.params.detailsType === 'received' && (
-                                <View
-                                    style={[
-                                        tailwind('mt-4 mb-2 items-center'),
-                                    ]}>
-                                    <FiatBalance
-                                        balance={sats()}
-                                        loading={false}
-                                        balanceFontSize={'text-2xl'}
-                                        fontColor={ColorScheme.Text.Default}
-                                        ignoreHideBalance={true}
-                                    />
-                                </View>
-                            )}
-
-                            <View
+                            <Text
                                 style={[
-                                    tailwind(
-                                        `w-4/5 ${
-                                            route.params.detailsType ===
-                                            'received'
-                                                ? ''
-                                                : 'mt-4'
-                                        } items-center`,
-                                    ),
+                                    tailwind('text-lg'),
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-lg'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
-                                    {txTitle()}
-                                </Text>
-                            </View>
+                                {txTitle()}
+                            </Text>
 
-                            {route.params.detailsType === 'received' && (
-                                <View style={[tailwind('items-center w-4/5')]}>
+                            {route.params.detailsType ===
+                                EBreezDetails.Failed &&
+                                isAdvancedMode && (
                                     <Text
                                         style={[
                                             tailwind(
@@ -271,41 +267,50 @@ const LNTransactionStatus = ({route}: Props) => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        {
-                                            (route.params.details as Payment)
-                                                .description
-                                        }
+                                        {route.params.details?.error}
                                     </Text>
-                                </View>
-                            )}
+                                )}
                         </View>
 
-                        <View
-                            style={[
-                                tailwind(
-                                    'absolute bottom-0 items-center w-full',
-                                ),
-                            ]}>
-                            <LongBottomButton
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate('WalletRoot', {
-                                            screen: 'WalletView',
-                                            params: {
-                                                reload: route.params.status,
-                                            },
-                                        }),
-                                    );
-                                }}
-                                title={capitalizeFirst(t('continue'))}
-                                textColor={ColorScheme.Text.Alt}
-                                backgroundColor={
-                                    ColorScheme.Background.Inverted
-                                }
-                            />
-                        </View>
+                        {route.params.detailsType === 'received' && (
+                            <View style={[tailwind('items-center w-4/5')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm text-center mt-2'),
+                                        {
+                                            color: ColorScheme.Text.GrayedText,
+                                        },
+                                    ]}>
+                                    {
+                                        (route.params.details as Payment)
+                                            .description
+                                    }
+                                </Text>
+                            </View>
+                        )}
                     </View>
-                )}
+
+                    <View
+                        style={[
+                            tailwind('absolute bottom-0 items-center w-full'),
+                        ]}>
+                        <LongBottomButton
+                            onPress={() => {
+                                navigation.dispatch(
+                                    CommonActions.navigate('WalletRoot', {
+                                        screen: 'WalletView',
+                                        params: {
+                                            reload: route.params.status,
+                                        },
+                                    }),
+                                );
+                            }}
+                            title={capitalizeFirst(t('continue'))}
+                            textColor={ColorScheme.Text.Alt}
+                            backgroundColor={ColorScheme.Background.Inverted}
+                        />
+                    </View>
+                </View>
             </View>
         </SafeAreaView>
     );

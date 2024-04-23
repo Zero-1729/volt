@@ -1,5 +1,9 @@
 require('crypto');
 
+// Polyfill TextEncoder/TextDecoder including TextEncoder().encodeInto
+// https://github.com/anonyco/FastestSmallestTextEncoderDecoder
+require('fastestsmallesttextencoderdecoder-encodeinto');
+
 import {NumberFormat} from '@formatjs/intl-numberformat';
 
 // React Native doesn't support full spec of Intl API yet.
