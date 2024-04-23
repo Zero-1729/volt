@@ -360,9 +360,7 @@ const SummaryPanel = (props: {
             });
 
             setLoadingPay(false);
-        } catch (err) {
-            console.error(err);
-
+        } catch (err: any) {
             setLoadingPay(false);
         }
     };
