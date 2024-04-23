@@ -104,9 +104,9 @@ const SendAmount = ({route}: Props) => {
 
     const isMax = amount === walletBalance.toString();
     const isAmountEmpty = Number(amount) === 0;
+    const isLNManual = route.params.isLnManual;
 
     const isOverBalance = new BigNumber(satsAmount.value).gt(walletBalance);
-
     const isBelowDust = new BigNumber(satsAmount.value).lt(DUST_LIMIT);
 
     const triggerMax = () => {
@@ -379,7 +379,7 @@ const SendAmount = ({route}: Props) => {
                     <PlainButton
                         disabled={amount === '' || isOverBalance}
                         onPress={() => {
-                            if (isBelowDust) {
+                            if (isBelowDust && !route.params.isLightning) {
                                 Toast.show({
                                     topOffset: 54,
                                     type: 'Liberal',
@@ -389,6 +389,30 @@ const SendAmount = ({route}: Props) => {
                                     )} ${DUST_LIMIT} ${t('satoshi')}.`,
                                     visibilityTime: 1750,
                                 });
+                                return;
+                            }
+
+                            if (
+                                checkNetworkIsReachable(networkState) &&
+                                isLNManual
+                            ) {
+                                navigation.dispatch(
+                                    CommonActions.navigate('WalletRoot', {
+                                        screen: 'SendLN',
+                                        params: {
+                                            lnManualPayload: {
+                                                amount: satsAmount.value.toString(),
+                                                kind: route.params
+                                                    .lnManualPayload?.kind,
+                                                text: route.params
+                                                    .lnManualPayload?.text,
+                                                description:
+                                                    route.params.lnManualPayload
+                                                        ?.description,
+                                            },
+                                        },
+                                    }),
+                                );
                                 return;
                             }
 
