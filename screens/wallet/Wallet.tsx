@@ -542,7 +542,7 @@ const Wallet = ({route}: Props) => {
                         </View>
 
                         {/* Combined balance for unified wallets */}
-                        {walletData.type === 'unified' && isAdvancedMode && (
+                        {walletData.type === 'unified' && (
                             <>
                                 <View
                                     style={[
