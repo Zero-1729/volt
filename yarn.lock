@@ -6833,6 +6833,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fastestsmallesttextencoderdecoder-encodeinto@npm:^1.0.22":
+  version: 1.0.22
+  resolution: "fastestsmallesttextencoderdecoder-encodeinto@npm:1.0.22"
+  checksum: 50444df9a1dfc47f510a27b0bb0f249de3ef1d21c552824ade458f72b488ad3c3f19b1a46c86ee29acf6c3e7cdcd4a40d7f2638a5c5353186658d78f7dffe0a6
+  languageName: node
+  linkType: hard
+
 "fastq@npm:^1.6.0":
   version: 1.17.1
   resolution: "fastq@npm:1.17.1"
@@ -13651,6 +13658,7 @@ __metadata:
     eslint: ^8.57.0
     eslint-plugin-ft-flow: latest
     events: ^3.3.0
+    fastestsmallesttextencoderdecoder-encodeinto: ^1.0.22
     i18next: ^23.7.18
     intl-messageformat: ^10.5.10
     jest: ^29.6.3

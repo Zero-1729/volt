@@ -70,6 +70,7 @@
     "detox": "^18.19.0",
     "ecpair": "^2.1.0",
     "events": "^3.3.0",
+    "fastestsmallesttextencoderdecoder-encodeinto": "^1.0.22",
     "i18next": "^23.7.18",
     "intl-messageformat": "^10.5.10",
     "ledger-bitcoin": "^0.2.3",
