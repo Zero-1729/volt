@@ -164,7 +164,10 @@ const PayInvoice = ({route}: Props) => {
             }
 
             // If LN report we aren't supporting it yet
-            if (!(invoiceType?.spec === 'bolt11')) {
+            if (
+                !(invoiceType?.spec === 'bolt11') &&
+                invoiceType.type === 'lightning'
+            ) {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
