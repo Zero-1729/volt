@@ -92,6 +92,7 @@ type defaultContextType = {
     onboarding: boolean;
     electrumServerURL: TElectrumServerURLs;
     isPINActive: boolean;
+    isBiometricsActive: boolean;
     setBreezEvent: (event: BreezEvent) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
@@ -126,6 +127,7 @@ type defaultContextType = {
     setElectrumServerURL: (url: string) => void;
     updateWalletsIndex: (idx: number) => void;
     setPINActive: (active: boolean) => void;
+    setBiometricsActive: (active: boolean) => void;
 };
 
 // Default app context values
@@ -167,6 +169,7 @@ const defaultContext: defaultContextType = {
         bitcoin: 'ssl://electrum.blockstream.info:50002',
     },
     isPINActive: false,
+    isBiometricsActive: false,
     setBreezEvent: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
@@ -196,6 +199,7 @@ const defaultContext: defaultContextType = {
     setElectrumServerURL: () => {},
     updateWalletsIndex: () => {},
     setPINActive: () => {},
+    setBiometricsActive: () => {},
 };
 
 // Note: context 'value' will default to 'defaultContext' if no Provider is found
@@ -237,6 +241,9 @@ export const AppStorageProvider = ({children}: Props) => {
         defaultContext.electrumServerURL,
     );
     const [isPINActive, _setPINActive] = useState(defaultContext.isPINActive);
+    const [isBiometricsActive, _setBiometricsActive] = useState(
+        defaultContext.isBiometricsActive,
+    );
 
     const {getItem: _getLoadLock, setItem: _updateLoadLock} =
         useAsyncStorage('loadLock');
@@ -274,8 +281,34 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('electrumServerURL');
     const {getItem: _getPINActive, setItem: _updatePINActive} =
         useAsyncStorage('isPINActive');
+    const {getItem: _getBiometricsActive, setItem: _updateBiometricsActive} =
+        useAsyncStorage('isBiometricsActive');
 
     // |> Create functions for getting, setting, and other data manipulation
+    const _loadBiometricsActive = async () => {
+        const ba = await _getBiometricsActive();
+
+        if (ba !== null) {
+            _setBiometricsActive(JSON.parse(ba));
+        }
+    };
+
+    const setBiometricsActive = useCallback(
+        async (active: boolean) => {
+            try {
+                _setBiometricsActive(active);
+                _updateBiometricsActive(JSON.stringify(active));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Biometrics setting) Error loading data: ${e}`,
+                );
+
+                throw new Error('Unable to set biometrics option');
+            }
+        },
+        [_setBiometricsActive, _updateBiometricsActive],
+    );
+
     const _loadPINActive = async () => {
         const pa = await _getPINActive();
 
@@ -1292,6 +1325,10 @@ export const AppStorageProvider = ({children}: Props) => {
     // Add effects
     // Load settings from disk on app start
     useEffect(() => {
+        _loadBiometricsActive();
+    }, []);
+
+    useEffect(() => {
         _loadPINActive();
     }, []);
 
@@ -1363,6 +1400,8 @@ export const AppStorageProvider = ({children}: Props) => {
     return (
         <AppStorageContext.Provider
             value={{
+                isBiometricsActive,
+                setBiometricsActive,
                 isPINActive,
                 setPINActive,
                 onboarding,
