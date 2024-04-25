@@ -24,12 +24,16 @@ import Color from '../constants/Color';
 
 import nativeWindowMetrics from '../constants/NativeWindowMetrics';
 
+import FingerPrint from '../assets/svg/touch-id-24.svg';
+import FaceId from '../assets/svg/face-id-24.svg';
+
 import {PlainButton} from './button';
 
 import {
     TextInputProps,
     TextLongInputProps,
     NumpadRequestInputProps,
+    PinNumpadInputProps,
 } from '../types/props';
 
 import Folder from './../assets/svg/file-directory-fill-24.svg';
@@ -350,6 +354,205 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
                     }}
                     onLongPress={() => {
                         props.onAmountChange('');
+                    }}>
+                    <LeftArrow fill={ColorScheme.SVG.Default} />
+                </Pressable>
+            </View>
+        </View>
+    );
+};
+
+export const PinNumpad = (props: PinNumpadInputProps) => {
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    const safelyConcat = (text: string, char: string) => {
+        // Can't go beyond 8 decimal places
+        if (text.split('.')[1]?.length >= props.pinLimit) {
+            return text;
+        }
+
+        return text + char;
+    };
+
+    const safelyDelete = (text: string) => {
+        if (props.pin === text) {
+            return '';
+        }
+
+        return text.slice(0, -1);
+    };
+
+    return (
+        <View style={[tailwind('w-full items-center justify-center flex')]}>
+            {/* Row 0 */}
+            <View style={[tailwind('w-full flex-row mb-12')]}>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '1'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        1
+                    </Text>
+                </PlainButton>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '2'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        2
+                    </Text>
+                </PlainButton>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '3'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        3
+                    </Text>
+                </PlainButton>
+            </View>
+
+            {/* Row 1 */}
+            <View style={[tailwind('w-full flex-row mb-12')]}>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '4'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        4
+                    </Text>
+                </PlainButton>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '5'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        5
+                    </Text>
+                </PlainButton>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '6'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        6
+                    </Text>
+                </PlainButton>
+            </View>
+
+            {/* Row 2 */}
+            <View style={[tailwind('w-full flex-row mb-12')]}>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '7'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        7
+                    </Text>
+                </PlainButton>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '8'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        8
+                    </Text>
+                </PlainButton>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '9'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        9
+                    </Text>
+                </PlainButton>
+            </View>
+
+            {/* Row 3 */}
+            <View style={[tailwind('w-full flex-row')]}>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={props.triggerBiometrics}>
+                    {Platform.OS === 'android' ? (
+                        <FingerPrint
+                            fill={ColorScheme.SVG.Default}
+                            width={40}
+                            height={40}
+                        />
+                    ) : (
+                        <FaceId
+                            fill={ColorScheme.SVG.Default}
+                            width={40}
+                            height={40}
+                        />
+                    )}
+                </PlainButton>
+                <PlainButton
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyConcat(props.pin, '0'));
+                    }}>
+                    <Text
+                        style={[
+                            tailwind('text-xl font-bold'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        0
+                    </Text>
+                </PlainButton>
+                <Pressable
+                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    onPress={() => {
+                        props.onPinChange(safelyDelete(props.pin));
+                    }}
+                    onLongPress={() => {
+                        props.onPinChange('');
                     }}>
                     <LeftArrow fill={ColorScheme.SVG.Default} />
                 </Pressable>
