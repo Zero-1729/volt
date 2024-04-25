@@ -30,6 +30,7 @@ import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
 import {capitalizeFirst} from '../../modules/transform';
+import {setKeychainItem} from '../../class/keychainContext';
 
 const Wallet = () => {
     const navigation = useNavigation();
@@ -53,7 +54,48 @@ const Wallet = () => {
         setTotalBalanceHidden,
         isPINActive,
         setPINActive,
+        isBiometricsActive,
+        setBiometricsActive,
     } = useContext(AppStorageContext);
+
+    const handleBiometrics = () => {
+        // TODO: request Biometrics to turn it off
+        if (isBiometricsActive) {
+            setBiometricsActive(false);
+        }
+
+        if (!isBiometricsActive) {
+            RNHapticFeedback.trigger('rigid', RNHapticFeedbackOptions);
+
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'SetBiometrics',
+                    params: {
+                        standalone: true,
+                    },
+                }),
+            );
+        }
+    };
+
+    const handleSetPIN = async () => {
+        // TODO: request PIN before turning it off
+        if (isPINActive) {
+            setPINActive(!isPINActive);
+            await setKeychainItem('pin', '');
+        }
+
+        // Otherwise, go through flow to setup pin in 'SetPIN' screen
+        if (!isPINActive) {
+            RNHapticFeedback.trigger('rigid', RNHapticFeedbackOptions);
+
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'WelcomePIN',
+                }),
+            );
+        }
+    };
 
     return (
         <SafeAreaView>
@@ -284,14 +326,7 @@ const Wallet = () => {
                                                 'flex-row absolute -right-4',
                                             ),
                                         ]}
-                                        onPress={() => {
-                                            RNHapticFeedback.trigger(
-                                                'rigid',
-                                                RNHapticFeedbackOptions,
-                                            );
-
-                                            setPINActive(!isPINActive);
-                                        }}
+                                        onPress={handleSetPIN}
                                         disableBuiltInState={true}
                                     />
                                 </View>
@@ -328,23 +363,23 @@ const Wallet = () => {
                                                 tailwind('text-sm font-medium'),
                                                 {
                                                     color: ColorScheme.Text
-                                                        .GrayedText,
+                                                        .Default,
                                                 },
                                             ]}>
                                             {t('enable_biometrics_mode')}
                                         </VText>
                                         <Checkbox
-                                            disabled={false}
+                                            onPress={handleBiometrics}
                                             fillColor={
                                                 ColorScheme.Background
-                                                    .CardGreyed
+                                                    .CheckBoxFilled
                                             }
                                             unfillColor={
                                                 ColorScheme.Background
                                                     .CheckBoxUnfilled
                                             }
                                             size={18}
-                                            isChecked={isPINActive}
+                                            isChecked={isBiometricsActive}
                                             iconStyle={{
                                                 borderWidth: 1,
                                                 borderRadius: 2,
@@ -353,7 +388,7 @@ const Wallet = () => {
                                                 borderWidth: 1,
                                                 borderColor:
                                                     ColorScheme.Background
-                                                        .CardGreyed,
+                                                        .CheckBoxOutline,
                                                 borderRadius: 2,
                                             }}
                                             style={[
@@ -371,7 +406,7 @@ const Wallet = () => {
                                                 tailwind('text-xs'),
                                                 {
                                                     color: ColorScheme.Text
-                                                        .GrayedText,
+                                                        .DescText,
                                                 },
                                             ]}>
                                             {t(
