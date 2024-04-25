@@ -22,7 +22,9 @@ export const setKeychainItem = async (
     value: string,
 ): Promise<IKeychainResponse<string>> => {
     try {
-        const response = await Keychain.setGenericPassword(key, value);
+        const response = await Keychain.setGenericPassword(key, value, {
+            service: key,
+        });
 
         return {data: '', error: !!response};
     } catch (error: any) {
