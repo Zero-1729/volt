@@ -80,6 +80,13 @@ import Currency from './screens/settings/Currency';
 import Wallet from './screens/settings/Wallet';
 import Network from './screens/settings/Network';
 
+// PIN screens
+import SetPIN from './screens/settings/pin/SetPIN';
+import WelcomePIN from './screens/settings/pin/Welcome';
+import ConfirmPIN from './screens/settings/pin/ConfirmPIN';
+import DonePIN from './screens/settings/pin/Done';
+import SetBiometrics from './screens/settings/pin/SetBiometrics';
+
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
 import ExtendedKey from './screens/settings/tools/ExtendedKey';
@@ -124,6 +131,32 @@ export type InitStackParamList = {
         details: TBreezPaymentDetails;
         detailsType: EBreezDetails;
     };
+};
+
+// Settings Param List for screens
+export type SettingsParamList = {
+    Settings: undefined;
+    Currency: undefined;
+    Language: undefined;
+    Wallet: undefined;
+    Network: undefined;
+    About: undefined;
+
+    WelcomePIN: undefined;
+    SetPIN: undefined;
+    ConfirmPIN: {
+        pin: string;
+    };
+    DonePIN: undefined;
+    SetBiometrics: {
+        standalone: boolean;
+    };
+
+    SettingsTools: undefined;
+    License: undefined;
+    Changelog: undefined;
+    XKeyTool: undefined;
+    MnemonicTool: undefined;
 };
 
 // Add Wallet Param List for screens
@@ -206,7 +239,7 @@ export type ScanParamList = {
     };
 };
 
-const SettingsStack = createNativeStackNavigator();
+const SettingsStack = createNativeStackNavigator<SettingsParamList>();
 const SettingsRoot = () => {
     return (
         <SettingsStack.Navigator screenOptions={{headerShown: false}}>
@@ -216,6 +249,17 @@ const SettingsRoot = () => {
             <SettingsStack.Screen name="Wallet" component={Wallet} />
             <SettingsStack.Screen name="Network" component={Network} />
             <SettingsStack.Screen name="About" component={About} />
+
+            {/* Set PIN */}
+            <SettingsStack.Screen name="WelcomePIN" component={WelcomePIN} />
+            <SettingsStack.Screen name="SetPIN" component={SetPIN} />
+            <SettingsStack.Screen name="ConfirmPIN" component={ConfirmPIN} />
+            <SettingsStack.Screen name="DonePIN" component={DonePIN} />
+            <SettingsStack.Screen
+                name="SetBiometrics"
+                component={SetBiometrics}
+            />
+
             <SettingsStack.Screen
                 name="SettingsTools"
                 component={SettingsTools}
