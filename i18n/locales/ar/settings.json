@@ -31,5 +31,9 @@
     "mnemonic_converter": "محول ذاكري",
     "mnemonic_converter_description": "تتيح لك هذه الأداة تحويل أساليب الإستذكار إلى واصفات ومفاتيح موسعة.",
     "mnemonic_converter_placeholder": "أدخل كلمة تذكيرية هنا...",
-    "select_material": "حدد المواد"
+    "select_material": "حدد المواد",
+    "enable_pin_mode": "تمكين PIN",
+    "enable_pin_mode_description": "تمكين PIN لأمان التطبيق.",
+    "enable_biometrics_mode": "تمكين القياسات الحيوية",
+    "enable_biometrics_mode_description": "تمكين القياسات الحيوية لمزيد من الأمان."
 }

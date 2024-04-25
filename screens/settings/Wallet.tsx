@@ -51,18 +51,9 @@ const Wallet = () => {
         setIsAdvancedMode,
         hideTotalBalance,
         setTotalBalanceHidden,
-        walletMode,
-        setWalletModeType,
+        isPINActive,
+        setPINActive,
     } = useContext(AppStorageContext);
-
-    const toggleToMultiMode = () => {
-        // Toggle multi mode on and off
-        if (walletMode === 'single') {
-            setWalletModeType('multi');
-        } else {
-            setWalletModeType('single');
-        }
-    };
 
     return (
         <SafeAreaView>
@@ -245,7 +236,7 @@ const Wallet = () => {
                             </VText>
                         </View>
 
-                        {/* Toggle Multi mode */}
+                        {/* Toggle PIN mode */}
                         <View
                             style={tailwind(
                                 'justify-center w-full items-center flex-row mt-8 mb-10',
@@ -264,7 +255,7 @@ const Wallet = () => {
                                             tailwind('text-sm font-medium'),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        {t('enable_multi_wallet')}
+                                        {t('enable_pin_mode')}
                                     </VText>
                                     <Checkbox
                                         fillColor={
@@ -276,7 +267,7 @@ const Wallet = () => {
                                                 .CheckBoxUnfilled
                                         }
                                         size={18}
-                                        isChecked={walletMode === 'multi'}
+                                        isChecked={isPINActive}
                                         iconStyle={{
                                             borderWidth: 1,
                                             borderRadius: 2,
@@ -299,7 +290,7 @@ const Wallet = () => {
                                                 RNHapticFeedbackOptions,
                                             );
 
-                                            toggleToMultiMode();
+                                            setPINActive(!isPINActive);
                                         }}
                                         disableBuiltInState={true}
                                     />
@@ -311,11 +302,86 @@ const Wallet = () => {
                                             tailwind('text-xs'),
                                             {color: ColorScheme.Text.DescText},
                                         ]}>
-                                        {t('enable_multi_wallet_description')}
+                                        {t('enable_pin_mode_description')}
                                     </VText>
                                 </View>
                             </View>
                         </View>
+
+                        {/* Toggle Biometrics mode */}
+                        {isPINActive && (
+                            <View
+                                style={tailwind(
+                                    'justify-center w-full items-center flex-row mb-10',
+                                )}>
+                                <View style={tailwind('w-5/6')}>
+                                    <View
+                                        style={tailwind(
+                                            `w-full ${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } items-center mb-2`,
+                                        )}>
+                                        <VText
+                                            style={[
+                                                tailwind('text-sm font-medium'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .GrayedText,
+                                                },
+                                            ]}>
+                                            {t('enable_biometrics_mode')}
+                                        </VText>
+                                        <Checkbox
+                                            disabled={false}
+                                            fillColor={
+                                                ColorScheme.Background
+                                                    .CardGreyed
+                                            }
+                                            unfillColor={
+                                                ColorScheme.Background
+                                                    .CheckBoxUnfilled
+                                            }
+                                            size={18}
+                                            isChecked={isPINActive}
+                                            iconStyle={{
+                                                borderWidth: 1,
+                                                borderRadius: 2,
+                                            }}
+                                            innerIconStyle={{
+                                                borderWidth: 1,
+                                                borderColor:
+                                                    ColorScheme.Background
+                                                        .CardGreyed,
+                                                borderRadius: 2,
+                                            }}
+                                            style={[
+                                                tailwind(
+                                                    'flex-row absolute -right-4',
+                                                ),
+                                            ]}
+                                            disableBuiltInState={true}
+                                        />
+                                    </View>
+
+                                    <View style={tailwind('w-full')}>
+                                        <VText
+                                            style={[
+                                                tailwind('text-xs'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .GrayedText,
+                                                },
+                                            ]}>
+                                            {t(
+                                                'enable_biometrics_mode_description',
+                                            )}
+                                        </VText>
+                                    </View>
+                                </View>
+                            </View>
+                        )}
                     </View>
                 </View>
             </View>
