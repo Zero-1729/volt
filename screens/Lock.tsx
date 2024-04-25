@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {View, useColorScheme, Text, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -15,19 +15,31 @@ import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 import {PinNumpad} from '../components/input';
 import {useTranslation} from 'react-i18next';
 
+import {getKeychainItem} from '../class/keychainContext';
+import {AppStorageContext} from '../class/storageContext';
+
 const Lock = () => {
+    // TODO: Might have security hole if user too fast, test and fix
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
     const navigation = useNavigation();
 
+    const {isBiometricsActive} = useContext(AppStorageContext);
+
     const {t} = useTranslation('wallet');
     const [pin, setPin] = useState('');
+    const [validPin, setValidPin] = useState('');
+
+    const fetchPin = async () => {
+        const storedPIN = await getKeychainItem('pin');
+        setValidPin(storedPIN.data);
+    };
 
     const updatePin = (value: string) => {
         setPin(value);
 
         if (value.length === 4) {
-            // TODO: handle pin validation
+            validPin === value ? OpenApp() : setPin('');
         }
     };
 
@@ -43,6 +55,10 @@ const Lock = () => {
     const requestBiometrics = () => {
         OpenApp();
     };
+
+    useEffect(() => {
+        fetchPin();
+    }, []);
 
     return (
         <SafeAreaView>
@@ -106,6 +122,7 @@ const Lock = () => {
                             </View>
                         </View>
                     </View>
+
                     <View
                         style={[
                             tailwind('w-full absolute'),
