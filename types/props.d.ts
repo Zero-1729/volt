@@ -138,6 +138,13 @@ export type NumpadRequestInputProps = BaseProps & {
     maxAmount?: string;
 };
 
+export type PinNumpadInputProps = BaseProps & {
+    pin: string;
+    onPinChange: (pin: string) => void;
+    triggerBiometrics?: () => void;
+    pinLimit: number;
+};
+
 export type DisplaySatsAmountProps = BaseProps & {
     amount: BigNumber;
     isApprox?: boolean;
