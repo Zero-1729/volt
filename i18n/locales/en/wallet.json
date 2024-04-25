@@ -126,5 +126,8 @@
     "manual": "Manual",
     "manual_message": "Enter a Lightning Address or Node ID",
     "paying_ln_address": "Paying Lightning Address",
-    "paying_node_id": "Paying Node ID"
+    "paying_node_id": "Paying Node ID",
+    "ln_mnemonic_backup_message": "To protect your funds, back up your mnemonic phrase. It is the only way to restore your Lightning wallet.",
+    "descriptor_backup_message": "To protect your funds, back up your wallet descriptor. Not all wallets support this yet.",
+    "xprv_backup_message": "To protect your funds, back up your extended private key."
 }

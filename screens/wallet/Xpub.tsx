@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 
-import {Text, View, useColorScheme, Platform, StyleSheet} from 'react-native';
+import {Text, View, useColorScheme, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -27,9 +27,8 @@ import {WalletTypeDetails} from '../../modules/wallet-defaults';
 import CloseIcon from '../../assets/svg/x-24.svg';
 import ShareIcon from '../../assets/svg/share-24.svg';
 
-import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
-
-import Toast from 'react-native-toast-message';
+import Toast, {ToastConfig} from 'react-native-toast-message';
+import {toastConfig} from '../../components/toast';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -45,7 +44,7 @@ const Xpub = () => {
     const {t: e} = useTranslation('errors');
 
     const walletData = getWalletData(currentWalletID);
-    const [backupData, setBackupData] = useState<string>(walletData.xpub);
+    const backupData = walletData.xpub;
 
     const walletType = WalletTypeDetails[walletData.type];
     const walletTypeName =
@@ -110,11 +109,14 @@ const Xpub = () => {
         // and revert after a few seconds
         Clipboard.setString(walletData.xpub);
 
-        setBackupData(capitalizeFirst(t('copied_to_clipboard')));
-
-        setTimeout(() => {
-            setBackupData(walletData.xpub);
-        }, 450);
+        Toast.show({
+            topOffset: 24,
+            type: 'Liberal',
+            text1: capitalizeFirst(t('clipboard')),
+            text2: capitalizeFirst(t('copied_to_clipboard')),
+            visibilityTime: 1000,
+            position: 'top',
+        });
     };
 
     const info = t('backup_description');
@@ -163,10 +165,7 @@ const Xpub = () => {
                     </View>
 
                     {/* Display wallet name */}
-                    <View
-                        style={tailwind(
-                            'absolute top-14 justify-center w-full',
-                        )}>
+                    <View style={tailwind('justify-center w-full')}>
                         <Text
                             style={[
                                 tailwind(
@@ -257,11 +256,7 @@ const Xpub = () => {
                         </Text>
                     </PlainButton>
 
-                    <View
-                        style={[
-                            styles.infoContainer,
-                            tailwind('absolute flex w-full'),
-                        ]}>
+                    <View style={[tailwind('mt-6 flex w-full')]}>
                         <Text
                             style={[
                                 tailwind('text-sm text-center mb-4'),
@@ -279,15 +274,11 @@ const Xpub = () => {
                         </Text>
                     </View>
                 </View>
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );
 };
 
 export default Xpub;
-
-const styles = StyleSheet.create({
-    infoContainer: {
-        bottom: NativeWindowMetrics.bottom + 24,
-    },
-});

@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React, {
+    ReactElement,
+    useCallback,
+    useContext,
+    useState,
+    useRef,
+    useMemo,
+} from 'react';
 
 import {Text, View, useColorScheme, Platform, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -12,8 +19,11 @@ import {useNavigation, CommonActions} from '@react-navigation/core';
 
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Checkbox from 'react-native-bouncy-checkbox';
+import {runOnJS} from 'react-native-reanimated';
 
 import {useTailwind} from 'tailwind-rn';
+
+import NativeDims from '../../constants/NativeWindowMetrics';
 
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
@@ -31,15 +41,19 @@ import {WalletTypeDetails} from '../../modules/wallet-defaults';
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
+import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
+
 import CloseIcon from '../../assets/svg/x-24.svg';
 import ShareIcon from '../../assets/svg/share-24.svg';
 
-import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
-
 import {EBackupMaterial} from '../../types/enums';
-import Toast from 'react-native-toast-message';
+import Toast, {ToastConfig} from 'react-native-toast-message';
+import {toastConfig} from '../../components/toast';
 
 import {capitalizeFirst} from '../../modules/transform';
+import {useSharedValue} from 'react-native-reanimated';
+
+type Slide = () => ReactElement;
 
 const Backup = () => {
     const navigation = useNavigation();
@@ -48,6 +62,9 @@ const Backup = () => {
 
     const {currentWalletID, getWalletData, isAdvancedMode} =
         useContext(AppStorageContext);
+
+    const carouselRef = useRef<ICarouselInstance>(null);
+    const progressValue = useSharedValue(0);
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -59,57 +76,42 @@ const Backup = () => {
 
     const [showPrivateDescriptor, setShowPrivateDescriptor] = useState(false);
 
+    const getQRData = useCallback(
+        (material: string) => {
+            // Only show mnemonic if mnemonic available and toggled
+            if (
+                material === EBackupMaterial.Mnemonic &&
+                walletData.mnemonic !== ''
+            ) {
+                return walletData.mnemonic;
+            }
+
+            // Shows descriptor if available or toggled
+            if (
+                walletData.externalDescriptor ||
+                material === EBackupMaterial.Descriptor
+            ) {
+                return showPrivateDescriptor
+                    ? walletData.privateDescriptor
+                    : walletData.externalDescriptor;
+            }
+
+            return walletData.externalDescriptor;
+        },
+        [walletData, showPrivateDescriptor],
+    );
+
+    // Could be either mnemonic or xprv if available
+    const baseBackupTitle =
+        walletData.mnemonic !== '' ? 'Mnemonic' : 'Extended Key';
+
     // Key material currently stored in wallet
-    const isSingleMaterial = walletData.mnemonic === '';
-    const walletAvailMaterial: string =
-        walletData.mnemonic !== ''
-            ? EBackupMaterial.Mnemonic
-            : walletData.externalDescriptor !== ''
-            ? EBackupMaterial.Descriptor
-            : 'Extended Public Key (XPUB)';
+    const [currentBackup, setCurrentBackup] = useState<string>(
+        EBackupMaterial.Mnemonic,
+    );
 
-    const togglePrivateDescriptor = () => {
-        if (showPrivateDescriptor) {
-            RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
-
-            setShowPrivateDescriptor(false);
-
-            setBackupData(walletData.externalDescriptor);
-        } else {
-            setShowPrivateDescriptor(true);
-
-            setBackupData(walletData.privateDescriptor);
-        }
-    };
-
-    const getQRData = (material: string) => {
-        // Only show mnemonic if mnemonic available and toggled
-        if (
-            material === EBackupMaterial.Mnemonic &&
-            walletData.mnemonic !== ''
-        ) {
-            return walletData.mnemonic;
-        }
-
-        // Shows descriptor if available or toggled
-        if (
-            walletData.externalDescriptor ||
-            material === EBackupMaterial.Descriptor
-        ) {
-            return showPrivateDescriptor
-                ? walletData.privateDescriptor
-                : walletData.externalDescriptor;
-        }
-
-        // Fallback to xpub, assuming first two unavailable (i.e., in case only watch only xpub restore)
-        // NOTE: don't seem to make this the case as xpub import creates public descriptor
-        return walletData.xpub;
-    };
-
-    const [backupMaterial, setBackupMaterial] =
-        useState<string>(walletAvailMaterial);
-    const [backupData, setBackupData] = useState<string>(
-        getQRData(walletAvailMaterial),
+    const [descriptorData, setupDescriptorData] = useState<string>(
+        getQRData(EBackupMaterial.Descriptor),
     );
 
     // Write public descriptor file to device
@@ -156,33 +158,295 @@ const Backup = () => {
         }
     };
 
-    // Update the displayed backup data and current backup material type
-    const updateData = (material: string) => {
-        // Clear the Private Descriptor toggle
-        // It's super sensitive and should be reset
-        if (material !== EBackupMaterial.Descriptor) {
-            setShowPrivateDescriptor(false);
-        }
+    // Copy data to clipboard
+    const copyToClipboard = useCallback(
+        (data: string) => {
+            // Copy backup material to Clipboard
+            // Temporarily set copied message
+            // and revert after a few seconds
+            Clipboard.setString(data);
 
-        setBackupData(getQRData(material));
-        setBackupMaterial(material);
-    };
+            Toast.show({
+                topOffset: 24,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('clipboard')),
+                text2: capitalizeFirst(t('copied_to_clipboard')),
+                visibilityTime: 1000,
+                position: 'top',
+            });
+        },
+        [t],
+    );
 
-    const copyDescToClipboard = () => {
-        // Copy backup material to Clipboard
-        // Temporarily set copied message
-        // and revert after a few seconds
-        Clipboard.setString(getQRData(backupMaterial));
-
-        setBackupData(capitalizeFirst(t('copied_to_clipboard')));
-
-        setTimeout(() => {
-            setBackupData(getQRData(backupMaterial));
-        }, 450);
-    };
-
-    const info = t('backup_description');
     const warning = t('backup_clarification');
+
+    const mainPanel = useCallback((): ReactElement => {
+        const baseBackup =
+            walletData.mnemonic !== ''
+                ? getQRData(EBackupMaterial.Mnemonic)
+                : getQRData(EBackupMaterial.Xprv);
+
+        const copyMainData = () => {
+            copyToClipboard(baseBackup);
+        };
+
+        return (
+            <View
+                style={[
+                    tailwind('items-center justify-center h-full w-full'),
+                    styles.infoContainer,
+                ]}>
+                {/* Display QR code with seed */}
+                <View
+                    style={[
+                        tailwind('rounded self-center mb-4'),
+                        {
+                            borderWidth: 2,
+                            borderColor: ColorScheme.Background.QRBorder,
+                        },
+                    ]}>
+                    <QRCodeStyled
+                        style={{
+                            backgroundColor: 'white',
+                        }}
+                        data={baseBackup}
+                        pieceSize={7}
+                        padding={10}
+                        color={ColorScheme.Background.Default}
+                        pieceCornerType={'rounded'}
+                        isPiecesGlued={true}
+                        pieceBorderRadius={2}
+                    />
+                </View>
+
+                {/* Display either seed or ext key */}
+                <PlainButton
+                    style={[tailwind('items-center mb-4 w-5/6')]}
+                    onPress={copyMainData}>
+                    <Text
+                        style={[
+                            tailwind(
+                                'text-sm w-full p-3 text-center rounded-sm',
+                            ),
+                            {
+                                backgroundColor: ColorScheme.Background.Greyed,
+                                color: ColorScheme.Text.Default,
+                            },
+                        ]}
+                        numberOfLines={2}
+                        ellipsizeMode={'middle'}>
+                        {baseBackup}
+                    </Text>
+                </PlainButton>
+
+                <View style={[tailwind('mt-2 flex w-5/6')]}>
+                    <Text
+                        style={[
+                            tailwind('text-sm text-center mb-4'),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {baseBackupTitle === 'Mnemonic'
+                            ? t('ln_mnemonic_backup_message')
+                            : t('xprv_backup_message')}
+                    </Text>
+
+                    <Text
+                        style={[
+                            tailwind('text-sm text-center'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        {warning}
+                    </Text>
+                </View>
+            </View>
+        );
+    }, [
+        walletData.mnemonic,
+        getQRData,
+        tailwind,
+        ColorScheme,
+        baseBackupTitle,
+        t,
+        warning,
+        copyToClipboard,
+    ]);
+
+    const descriptorPanel = useCallback((): ReactElement => {
+        const copyDescriptor = () => {
+            copyToClipboard(getQRData(EBackupMaterial.Descriptor));
+        };
+
+        const togglePrivateDescriptor = () => {
+            if (showPrivateDescriptor) {
+                RNHapticFeedback.trigger(
+                    'impactLight',
+                    RNHapticFeedbackOptions,
+                );
+
+                setShowPrivateDescriptor(false);
+
+                setupDescriptorData(walletData.externalDescriptor);
+            } else {
+                setShowPrivateDescriptor(true);
+
+                setupDescriptorData(walletData.privateDescriptor);
+            }
+        };
+
+        return (
+            <View
+                style={[
+                    tailwind('items-center justify-center h-full w-full'),
+                    styles.infoContainer,
+                ]}>
+                {/* Display QR code with seed */}
+                <View
+                    style={[
+                        tailwind('rounded self-center mb-4'),
+                        {
+                            borderWidth: 2,
+                            borderColor: ColorScheme.Background.QRBorder,
+                        },
+                    ]}>
+                    <QRCodeStyled
+                        style={{
+                            backgroundColor: 'white',
+                        }}
+                        data={descriptorData}
+                        pieceSize={5}
+                        padding={10}
+                        color={ColorScheme.Background.Default}
+                        pieceCornerType={'rounded'}
+                        isPiecesGlued={true}
+                        pieceBorderRadius={2}
+                    />
+                </View>
+
+                {/* Display either seed or descriptor */}
+                <PlainButton
+                    style={[tailwind('items-center mb-4 w-5/6')]}
+                    onPress={copyDescriptor}>
+                    <Text
+                        style={[
+                            tailwind(
+                                'text-sm w-full p-3 text-center rounded-sm',
+                            ),
+                            {
+                                backgroundColor: ColorScheme.Background.Greyed,
+                                color: ColorScheme.Text.Default,
+                            },
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode={'middle'}>
+                        {descriptorData}
+                    </Text>
+                </PlainButton>
+
+                {/* Toggle with private key version */}
+                {/* Only available if not watch-only */}
+                {!walletData.isWatchOnly && (
+                    <View
+                        style={[
+                            tailwind(
+                                `mb-4 self-center w-4/5 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                }`,
+                            ),
+                        ]}>
+                        <VText
+                            style={[
+                                tailwind('text-sm'),
+                                {
+                                    color: showPrivateDescriptor
+                                        ? ColorScheme.Text.Default
+                                        : ColorScheme.Text.GrayedText,
+                                },
+                            ]}>
+                            {!showPrivateDescriptor
+                                ? t('display_priv_descriptor')
+                                : t('display_pub_descriptor')}
+                        </VText>
+                        {/* btn */}
+                        <Checkbox
+                            fillColor={ColorScheme.Background.CheckBoxFilled}
+                            unfillColor={
+                                ColorScheme.Background.CheckBoxUnfilled
+                            }
+                            size={18}
+                            isChecked={showPrivateDescriptor}
+                            iconStyle={{
+                                borderWidth: 1,
+                                borderRadius: 2,
+                            }}
+                            innerIconStyle={{
+                                borderWidth: 1,
+                                borderColor: showPrivateDescriptor
+                                    ? ColorScheme.Background.CheckBoxOutline
+                                    : 'grey',
+                                borderRadius: 2,
+                            }}
+                            style={[
+                                tailwind(
+                                    `flex-row absolute ${
+                                        langDir === 'right'
+                                            ? 'right-0'
+                                            : '-right-4'
+                                    }`,
+                                ),
+                            ]}
+                            onPress={() => {
+                                RNHapticFeedback.trigger(
+                                    'rigid',
+                                    RNHapticFeedbackOptions,
+                                );
+
+                                togglePrivateDescriptor();
+                            }}
+                            disableBuiltInState={true}
+                        />
+                    </View>
+                )}
+
+                <View style={[tailwind('mt-6 flex w-5/6')]}>
+                    <Text
+                        style={[
+                            tailwind('text-sm text-center mb-4'),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {t('descriptor_backup_message')}
+                    </Text>
+
+                    <Text
+                        style={[
+                            tailwind('text-sm text-center'),
+                            {color: ColorScheme.Text.Default},
+                        ]}>
+                        {warning}
+                    </Text>
+                </View>
+            </View>
+        );
+    }, [
+        tailwind,
+        ColorScheme,
+        descriptorData,
+        walletData.isWatchOnly,
+        walletData.externalDescriptor,
+        walletData.privateDescriptor,
+        langDir,
+        showPrivateDescriptor,
+        t,
+        warning,
+        copyToClipboard,
+        getQRData,
+    ]);
+
+    const panels = useMemo(
+        (): Slide[] => [mainPanel, descriptorPanel],
+        [mainPanel, descriptorPanel],
+    );
 
     return (
         <SafeAreaView
@@ -195,7 +459,7 @@ const Backup = () => {
                     {/* Top panel */}
                     <View style={[tailwind('absolute top-6  w-full left-0')]}>
                         {/* Allow exporting public descriptor to file */}
-                        {backupMaterial === EBackupMaterial.Descriptor &&
+                        {currentBackup === EBackupMaterial.Descriptor &&
                             Platform.OS === 'ios' &&
                             !showPrivateDescriptor && (
                                 <PlainButton
@@ -226,7 +490,7 @@ const Backup = () => {
                     {/* Display wallet name */}
                     <View
                         style={tailwind(
-                            'absolute top-14 justify-center w-full',
+                            'absolute top-16 justify-center w-full',
                         )}>
                         <Text
                             style={[
@@ -240,265 +504,146 @@ const Backup = () => {
                             {walletData.name}
                         </Text>
 
-                        {/* Display wallet type */}
+                        {/* Display wallet type (advanced mode) */}
                         <Text
                             style={[
-                                tailwind('text-base self-center mb-10'),
+                                tailwind('text-base self-center mb-6'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
                             {isAdvancedMode
                                 ? walletTypeName
                                 : capitalizeFirst(t('backup'))}
                         </Text>
-                    </View>
 
-                    {/* Display wallet seed */}
-                    <View
-                        style={[
-                            tailwind(
-                                'flex-row self-center items-center justify-center rounded-full p-2 px-6 mb-4 bg-blue-800',
-                            ),
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        {/* Display the single backup material if restored non-mnemonic */}
-                        {isSingleMaterial ? (
-                            <>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm font-bold'),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                        },
-                                    ]}>
-                                    {backupMaterial}
-                                </Text>
-                            </>
-                        ) : (
-                            <>
-                                {/* Display the backup material selector if restored mnemonic */}
-                                <PlainButton
-                                    style={[tailwind('mr-4')]}
-                                    disabled={
-                                        backupMaterial ===
-                                            EBackupMaterial.Mnemonic ||
-                                        walletData.mnemonic === ''
-                                    }
-                                    onPress={() => {
-                                        updateData(EBackupMaterial.Mnemonic);
-                                    }}>
-                                    <Text
-                                        style={[
-                                            tailwind(
-                                                `text-sm ${
-                                                    backupMaterial ===
-                                                    EBackupMaterial.Mnemonic
-                                                        ? 'font-bold'
-                                                        : ''
-                                                }`,
-                                            ),
-                                            {
-                                                color:
-                                                    backupMaterial ===
-                                                    EBackupMaterial.Mnemonic
-                                                        ? ColorScheme.Text
-                                                              .Default
-                                                        : ColorScheme.Text
-                                                              .GrayedText,
-                                            },
-                                        ]}>
-                                        Mnemonic
-                                    </Text>
-                                </PlainButton>
-                                <View
-                                    style={[
-                                        tailwind('h-6 w-0.5 mr-4 rounded-full'),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background
-                                                    .CardGreyed,
-                                        },
-                                    ]}
-                                />
-                                <PlainButton
-                                    disabled={
-                                        backupMaterial ===
-                                        EBackupMaterial.Descriptor
-                                    }
-                                    onPress={() => {
-                                        updateData(EBackupMaterial.Descriptor);
-                                    }}>
-                                    <Text
-                                        style={[
-                                            tailwind(
-                                                `text-sm ${
-                                                    backupMaterial ===
-                                                    EBackupMaterial.Descriptor
-                                                        ? 'font-bold'
-                                                        : ''
-                                                }`,
-                                            ),
-                                            {
-                                                color:
-                                                    backupMaterial ===
-                                                    EBackupMaterial.Descriptor
-                                                        ? ColorScheme.Text
-                                                              .Default
-                                                        : ColorScheme.Text
-                                                              .GrayedText,
-                                            },
-                                        ]}>
-                                        Descriptor
-                                    </Text>
-                                </PlainButton>
-                            </>
-                        )}
-                    </View>
-
-                    {/* Display QR code with seed */}
-                    <View
-                        style={[
-                            tailwind('rounded self-center mb-4'),
-                            {
-                                borderWidth: 2,
-                                borderColor: ColorScheme.Background.QRBorder,
-                            },
-                        ]}>
-                        <QRCodeStyled
-                            style={{
-                                backgroundColor: 'white',
-                            }}
-                            data={getQRData(backupMaterial)}
-                            pieceSize={
-                                backupMaterial !== EBackupMaterial.Descriptor
-                                    ? 7
-                                    : 5
-                            }
-                            padding={10}
-                            color={ColorScheme.Background.Default}
-                            pieceCornerType={'rounded'}
-                            isPiecesGlued={true}
-                            pieceBorderRadius={2}
-                        />
-                    </View>
-
-                    {/* Display either seed or descriptor */}
-                    <PlainButton
-                        style={[tailwind('items-center mb-4')]}
-                        onPress={copyDescToClipboard}>
-                        <Text
+                        {/* Display wallet seed selector */}
+                        <View
                             style={[
                                 tailwind(
-                                    'text-sm w-full p-3 text-center rounded-sm',
+                                    'flex-row self-center items-center justify-center rounded-full p-2 px-6 mb-4 bg-blue-800',
                                 ),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
-                                    color: ColorScheme.Text.Default,
                                 },
-                            ]}
-                            numberOfLines={
-                                backupMaterial === EBackupMaterial.Mnemonic
-                                    ? 2
-                                    : 1
-                            }
-                            ellipsizeMode={'middle'}>
-                            {backupData}
-                        </Text>
-                    </PlainButton>
-
-                    {/* Toggle with private key version */}
-                    {/* Only available if not watch-only */}
-                    {!walletData.isWatchOnly &&
-                        backupMaterial === EBackupMaterial.Descriptor && (
-                            <View
-                                style={[
-                                    tailwind(
-                                        `mb-4 self-center w-11/12 ${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        }`,
-                                    ),
-                                ]}>
-                                <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {
-                                            color: showPrivateDescriptor
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
-                                    {!showPrivateDescriptor
-                                        ? t('display_priv_descriptor')
-                                        : t('display_pub_descriptor')}
-                                </VText>
-                                {/* btn */}
-                                <Checkbox
-                                    fillColor={
-                                        ColorScheme.Background.CheckBoxFilled
-                                    }
-                                    unfillColor={
-                                        ColorScheme.Background.CheckBoxUnfilled
-                                    }
-                                    size={18}
-                                    isChecked={showPrivateDescriptor}
-                                    iconStyle={{
-                                        borderWidth: 1,
-                                        borderRadius: 2,
-                                    }}
-                                    innerIconStyle={{
-                                        borderWidth: 1,
-                                        borderColor: showPrivateDescriptor
-                                            ? ColorScheme.Background
-                                                  .CheckBoxOutline
-                                            : 'grey',
-                                        borderRadius: 2,
-                                    }}
+                            ]}>
+                            {/* Display the single backup material if restored non-mnemonic */}
+                            {/* Display the backup material selector if restored mnemonic */}
+                            <PlainButton
+                                style={[tailwind('mr-4')]}
+                                onPress={() => {
+                                    carouselRef.current?.prev();
+                                    runOnJS(setCurrentBackup)(
+                                        EBackupMaterial.Mnemonic,
+                                    );
+                                }}>
+                                <Text
                                     style={[
                                         tailwind(
-                                            `flex-row absolute ${
-                                                langDir === 'right'
-                                                    ? 'right-0'
-                                                    : '-right-4'
+                                            `text-sm ${
+                                                currentBackup ===
+                                                EBackupMaterial.Mnemonic
+                                                    ? 'font-bold'
+                                                    : ''
                                             }`,
                                         ),
-                                    ]}
-                                    onPress={() => {
-                                        RNHapticFeedback.trigger(
-                                            'rigid',
-                                            RNHapticFeedbackOptions,
-                                        );
+                                        {
+                                            color:
+                                                currentBackup ===
+                                                EBackupMaterial.Mnemonic
+                                                    ? ColorScheme.Text.Default
+                                                    : ColorScheme.Text
+                                                          .GrayedText,
+                                        },
+                                    ]}>
+                                    {baseBackupTitle}
+                                </Text>
+                            </PlainButton>
+                            <View
+                                style={[
+                                    tailwind('h-6 w-0.5 mr-4 rounded-full'),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.CardGreyed,
+                                    },
+                                ]}
+                            />
+                            <PlainButton
+                                onPress={() => {
+                                    carouselRef.current?.next();
+                                    runOnJS(setCurrentBackup)(
+                                        EBackupMaterial.Descriptor,
+                                    );
+                                }}>
+                                <Text
+                                    style={[
+                                        tailwind(
+                                            `text-sm ${
+                                                currentBackup ===
+                                                EBackupMaterial.Descriptor
+                                                    ? 'font-bold'
+                                                    : ''
+                                            }`,
+                                        ),
+                                        {
+                                            color:
+                                                currentBackup ===
+                                                EBackupMaterial.Descriptor
+                                                    ? ColorScheme.Text.Default
+                                                    : ColorScheme.Text
+                                                          .GrayedText,
+                                        },
+                                    ]}>
+                                    Descriptor
+                                </Text>
+                            </PlainButton>
+                        </View>
+                    </View>
 
-                                        togglePrivateDescriptor();
-                                    }}
-                                    disableBuiltInState={true}
-                                />
-                            </View>
-                        )}
-
+                    {/* Main Carousel */}
                     <View
                         style={[
-                            styles.infoContainer,
-                            tailwind('absolute flex w-full'),
+                            styles.carouselContainer,
+                            tailwind(
+                                'h-full w-full items-center justify-end absolute bottom-0',
+                            ),
+                            {zIndex: -9},
                         ]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm text-center mb-4'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
-                            {info}
-                        </Text>
-
-                        <Text
-                            style={[
-                                tailwind('text-sm text-center'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {warning}
-                        </Text>
+                        <Carousel
+                            ref={carouselRef}
+                            style={[tailwind('items-center')]}
+                            data={panels}
+                            enabled={false}
+                            width={NativeDims.width}
+                            // Adjust height for iOS
+                            // to account for top stack height
+                            height={
+                                Platform.OS === 'ios'
+                                    ? NativeDims.height -
+                                      NativeDims.navBottom * 3.2
+                                    : NativeDims.height
+                            }
+                            defaultIndex={
+                                currentBackup === EBackupMaterial.Descriptor
+                                    ? 1
+                                    : 0
+                            }
+                            loop={false}
+                            panGestureHandlerProps={{
+                                activeOffsetX: [-10, 10],
+                            }}
+                            testID="ReceiveSlider"
+                            renderItem={({index}): ReactElement => {
+                                const Slide = panels[index];
+                                return <Slide key={index} />;
+                            }}
+                            onProgressChange={(_, absoluteProgress): void => {
+                                progressValue.value = absoluteProgress;
+                            }}
+                        />
                     </View>
                 </View>
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );
@@ -508,6 +653,12 @@ export default Backup;
 
 const styles = StyleSheet.create({
     infoContainer: {
-        bottom: NativeWindowMetrics.bottom + 24,
+        marginTop: 56,
+    },
+    carouselContainer: {
+        flex: 1,
+    },
+    qrCodContainer: {
+        borderWidth: 2,
     },
 });
