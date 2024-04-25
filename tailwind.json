@@ -195,6 +195,11 @@
 			"marginBottom": 40
 		}
 	},
+	"mb-12": {
+		"style": {
+			"marginBottom": 48
+		}
+	},
 	"mb-16": {
 		"style": {
 			"marginBottom": 64

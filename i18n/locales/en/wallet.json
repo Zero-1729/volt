@@ -129,5 +129,6 @@
     "paying_node_id": "Paying Node ID",
     "ln_mnemonic_backup_message": "To protect your funds, back up your mnemonic phrase. It is the only way to restore your Lightning wallet.",
     "descriptor_backup_message": "To protect your funds, back up your wallet descriptor. Not all wallets support this yet.",
-    "xprv_backup_message": "To protect your funds, back up your extended private key."
+    "xprv_backup_message": "To protect your funds, back up your extended private key.",
+    "lock_screen_message": "Enter your PIN code"
 }
