@@ -116,6 +116,7 @@ const Lock = () => {
                             onPinChange={updatePin}
                             triggerBiometrics={requestBiometrics}
                             pinLimit={4}
+                            showBiometrics={isBiometricsActive}
                         />
                     </View>
                 </View>
