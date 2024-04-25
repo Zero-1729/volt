@@ -91,6 +91,7 @@ type defaultContextType = {
     isDevMode: boolean;
     onboarding: boolean;
     electrumServerURL: TElectrumServerURLs;
+    isPINActive: boolean;
     setBreezEvent: (event: BreezEvent) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
@@ -124,6 +125,7 @@ type defaultContextType = {
     setOnboarding: (onboarding: boolean) => void;
     setElectrumServerURL: (url: string) => void;
     updateWalletsIndex: (idx: number) => void;
+    setPINActive: (active: boolean) => void;
 };
 
 // Default app context values
@@ -164,6 +166,7 @@ const defaultContext: defaultContextType = {
         testnet: 'ssl://electrum.blockstream.info:60002',
         bitcoin: 'ssl://electrum.blockstream.info:50002',
     },
+    isPINActive: false,
     setBreezEvent: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
@@ -192,6 +195,7 @@ const defaultContext: defaultContextType = {
     setOnboarding: () => {},
     setElectrumServerURL: () => {},
     updateWalletsIndex: () => {},
+    setPINActive: () => {},
 };
 
 // Note: context 'value' will default to 'defaultContext' if no Provider is found
@@ -232,6 +236,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [electrumServerURL, _setElectrumServerURL] = useState(
         defaultContext.electrumServerURL,
     );
+    const [isPINActive, _setPINActive] = useState(defaultContext.isPINActive);
 
     const {getItem: _getLoadLock, setItem: _updateLoadLock} =
         useAsyncStorage('loadLock');
@@ -267,8 +272,34 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('currentWalletID');
     const {getItem: _getElectrumServerURL, setItem: _updateElectrumServerURL} =
         useAsyncStorage('electrumServerURL');
+    const {getItem: _getPINActive, setItem: _updatePINActive} =
+        useAsyncStorage('isPINActive');
 
     // |> Create functions for getting, setting, and other data manipulation
+    const _loadPINActive = async () => {
+        const pa = await _getPINActive();
+
+        if (pa !== null) {
+            _setPINActive(JSON.parse(pa));
+        }
+    };
+
+    const setPINActive = useCallback(
+        async (set: boolean) => {
+            try {
+                _setPINActive(set);
+                _updatePINActive(JSON.stringify(set));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (PIN setting) Error loading data: ${e}`,
+                );
+
+                throw new Error('Unable to set PIN option');
+            }
+        },
+        [_setPINActive, _updatePINActive],
+    );
+
     const _loadLock = async () => {
         const ll = await _getLoadLock();
 
@@ -1233,6 +1264,7 @@ export const AppStorageProvider = ({children}: Props) => {
     // Resets app data
     const resetAppData = useCallback(async () => {
         try {
+            await setPINActive(false);
             await setLoadLock(false);
             await setOnboarding(true);
             await setAppLanguage(defaultContext.appLanguage);
@@ -1259,6 +1291,10 @@ export const AppStorageProvider = ({children}: Props) => {
 
     // Add effects
     // Load settings from disk on app start
+    useEffect(() => {
+        _loadPINActive();
+    }, []);
+
     useEffect(() => {
         _loadLock();
     }, []);
@@ -1327,6 +1363,8 @@ export const AppStorageProvider = ({children}: Props) => {
     return (
         <AppStorageContext.Provider
             value={{
+                isPINActive,
+                setPINActive,
                 onboarding,
                 walletsIndex,
                 updateWalletsIndex,
