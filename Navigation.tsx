@@ -693,7 +693,9 @@ const RootNavigator = (): ReactElement => {
             ref={navigationRef}
             linking={linking}
             theme={Theme}>
-            <InitScreenStack.Navigator screenOptions={{headerShown: false}}>
+            <InitScreenStack.Navigator
+                screenOptions={{headerShown: false}}
+                initialRouteName={isPINActive ? 'Lock' : 'HomeScreen'}>
                 <InitScreenStack.Screen name="Lock" component={Lock} />
                 <InitScreenStack.Screen name="HomeScreen" component={Home} />
                 <InitScreenStack.Screen
