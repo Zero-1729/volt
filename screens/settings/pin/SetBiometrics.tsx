@@ -25,6 +25,11 @@ import {AppStorageContext} from '../../../class/storageContext';
 
 type Props = NativeStackScreenProps<SettingsParamList, 'SetBiometrics'>;
 
+import RNBiometrics from '../../../modules/biometrics';
+import {BiometryTypes} from 'react-native-biometrics';
+import {toastConfig} from '../../../components/toast';
+import Toast, {ToastConfig} from 'react-native-toast-message';
+
 const SetBiometrics = ({route}: Props) => {
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -34,13 +39,108 @@ const SetBiometrics = ({route}: Props) => {
 
     const {setBiometricsActive} = useContext(AppStorageContext);
 
-    const handleDone = () => {
-        // TODO: handle setup biometrics
-        setBiometricsActive(true);
-
+    const handleRoute = () => {
         navigation.dispatch(
             CommonActions.navigate('SettingsRoot', {screen: 'Wallet'}),
         );
+    };
+
+    const handleBiometrics = async () => {
+        try {
+            const {available, biometryType, error} =
+                await RNBiometrics.isSensorAvailable();
+
+            if (error) {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Biometrics'),
+                    text2: t('biometrics_error'),
+                    visibilityTime: 1750,
+                });
+                return;
+            }
+
+            if (available) {
+                // TODO: display toast or route to settings
+                if (biometryType === BiometryTypes.FaceID) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Biometrics'),
+                        text2: t('face_id_supported'),
+                        visibilityTime: 1750,
+                    });
+
+                    // Setup FaceID
+                    RNBiometrics.simplePrompt({
+                        promptMessage: 'Confirm FaceID',
+                    })
+                        .then(({success}) => {
+                            if (success) {
+                                setBiometricsActive(true);
+                                handleRoute();
+                            }
+                        })
+                        .catch((err: any) => {
+                            Toast.show({
+                                topOffset: 54,
+                                type: 'Liberal',
+                                text1: t('Biometrics'),
+                                text2: err.message,
+                                visibilityTime: 1750,
+                            });
+                        });
+                } else if (
+                    available &&
+                    biometryType === BiometryTypes.Biometrics
+                ) {
+                    RNBiometrics.simplePrompt({
+                        promptMessage: 'Confirm biometrics',
+                    })
+                        .then(({success}) => {
+                            if (success) {
+                                setBiometricsActive(true);
+                                handleRoute();
+                            }
+                        })
+                        .catch((err: any) => {
+                            Toast.show({
+                                topOffset: 54,
+                                type: 'Liberal',
+                                text1: t('Biometrics'),
+                                text2: err.message,
+                                visibilityTime: 1750,
+                            });
+                        });
+                } else {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Biometrics'),
+                        text2: error,
+                        visibilityTime: 1750,
+                    });
+                }
+            }
+        } catch (err: any) {
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: t('Biometrics'),
+                text2: err.message,
+                visibilityTime: 1750,
+            });
+
+            // TODO: handle settings off
+        }
+    };
+
+    const handleDone = () => {
+        // TODO: handle setup biometrics
+        // setBiometricsActive(true);
+
+        handleBiometrics();
     };
 
     const skipAlong = () => {
@@ -113,6 +213,8 @@ const SetBiometrics = ({route}: Props) => {
                         />
                     </View>
                 </View>
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );
