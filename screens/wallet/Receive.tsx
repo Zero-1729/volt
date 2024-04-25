@@ -273,7 +273,7 @@ const Receive = ({route}: Props) => {
                 style={[
                     tailwind('items-center justify-center h-full w-full -mt-6'),
                 ]}>
-                {!loadingInvoice && isAmountInvoice && (
+                {isAmountInvoice && (
                     <View
                         style={[
                             tailwind('mb-4 flex justify-center items-center'),
@@ -324,87 +324,83 @@ const Receive = ({route}: Props) => {
                 </View>
 
                 {/* Bitcoin address info */}
-                {!loadingInvoice && (
-                    <View
-                        style={[
-                            tailwind('p-4 mt-4 w-4/5 rounded'),
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        <PlainButton
-                            style={[tailwind('w-full')]}
-                            onPress={copyToClip}>
-                            <Text
-                                ellipsizeMode="middle"
-                                numberOfLines={1}
-                                style={[{color: ColorScheme.Text.Default}]}>
-                                {BTCInvoice}
-                            </Text>
-                        </PlainButton>
-                    </View>
-                )}
+                <View
+                    style={[
+                        tailwind('p-4 mt-4 w-4/5 rounded'),
+                        {backgroundColor: ColorScheme.Background.Greyed},
+                    ]}>
+                    <PlainButton
+                        style={[tailwind('w-full')]}
+                        onPress={copyToClip}>
+                        <Text
+                            ellipsizeMode="middle"
+                            numberOfLines={1}
+                            style={[{color: ColorScheme.Text.Default}]}>
+                            {BTCInvoice}
+                        </Text>
+                    </PlainButton>
+                </View>
 
                 {/* Bottom buttons */}
-                {!loadingInvoice && (
-                    <View style={[tailwind('items-center mt-6')]}>
-                        {/* Share Button */}
-                        <PlainButton
-                            style={[tailwind('mb-6')]}
-                            onPress={() => {
-                                Share.share({
-                                    message: BTCInvoice,
-                                    title: 'Share Address',
-                                    url: BTCInvoice,
-                                });
-                            }}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'rounded-full items-center flex-row justify-center px-6 py-3',
-                                    ),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Inverted,
-                                    },
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm mr-2 font-bold'),
-                                        {
-                                            color: ColorScheme.Text.Alt,
-                                        },
-                                    ]}>
-                                    {capitalizeFirst(t('share'))}
-                                </Text>
-                                <ShareIcon fill={ColorScheme.SVG.Inverted} />
-                            </View>
-                        </PlainButton>
 
-                        {/* Enter receive amount */}
-                        <PlainButton
-                            style={[tailwind('mb-4')]}
-                            onPress={() => {
-                                navigation.dispatch(
-                                    CommonActions.navigate({
-                                        name: 'RequestAmount',
-                                    }),
-                                );
-                            }}>
+                <View style={[tailwind('items-center mt-6')]}>
+                    {/* Share Button */}
+                    <PlainButton
+                        style={[tailwind('mb-6')]}
+                        onPress={() => {
+                            Share.share({
+                                message: BTCInvoice,
+                                title: 'Share Address',
+                                url: BTCInvoice,
+                            });
+                        }}>
+                        <View
+                            style={[
+                                tailwind(
+                                    'rounded-full items-center flex-row justify-center px-6 py-3',
+                                ),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Inverted,
+                                },
+                            ]}>
                             <Text
                                 style={[
-                                    tailwind('font-bold text-center'),
-                                    {color: ColorScheme.Text.Default},
+                                    tailwind('text-sm mr-2 font-bold'),
+                                    {
+                                        color: ColorScheme.Text.Alt,
+                                    },
                                 ]}>
-                                {t('edit_amount')}
+                                {capitalizeFirst(t('share'))}
                             </Text>
-                        </PlainButton>
-                    </View>
-                )}
+                            <ShareIcon fill={ColorScheme.SVG.Inverted} />
+                        </View>
+                    </PlainButton>
+
+                    {/* Enter receive amount */}
+                    <PlainButton
+                        style={[tailwind('mb-4')]}
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({
+                                    name: 'RequestAmount',
+                                }),
+                            );
+                        }}>
+                        <Text
+                            style={[
+                                tailwind('font-bold text-center'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {t('edit_amount')}
+                        </Text>
+                    </PlainButton>
+                </View>
             </View>
         );
     }, [
         ColorScheme,
         BTCInvoice,
-        loadingInvoice,
         state,
         t,
         tailwind,
@@ -432,36 +428,62 @@ const Receive = ({route}: Props) => {
                     {capitalizeFirst(t('lightning'))}
                 </Text>
 
-                <View style={[tailwind('items-center w-4/5 mb-4')]}>
-                    <VText
-                        style={[
-                            tailwind('text-center'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
-                        {t('keep_receive_open')}
-                    </VText>
-                </View>
+                {!loadingInvoice && (
+                    <View
+                        style={[tailwind('items-center w-4/5 mb-4 flex-row')]}>
+                        <ActivityIndicator />
+                        <VText
+                            style={[
+                                tailwind('ml-2 text-center'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {t('keep_receive_open')}
+                        </VText>
+                    </View>
+                )}
 
-                <View
-                    style={[
-                        styles.qrCodeContainer,
-                        tailwind('rounded'),
-                        {
-                            borderColor: ColorScheme.Background.QRBorder,
-                        },
-                    ]}>
-                    <QRCodeStyled
-                        style={{
-                            backgroundColor: 'white',
-                        }}
-                        data={LNInvoice?.bolt11}
-                        padding={4}
-                        pieceSize={4}
-                        color={ColorScheme.Background.Default}
-                        isPiecesGlued={true}
-                        pieceBorderRadius={2}
-                    />
-                </View>
+                {loadingInvoice ? (
+                    <View
+                        style={[
+                            tailwind(
+                                'items-center justify-center h-full w-full',
+                            ),
+                        ]}>
+                        <ActivityIndicator />
+                        <Text
+                            style={[
+                                tailwind('text-sm mt-4'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {isAdvancedMode
+                                ? t('loading_invoice_advanced', {
+                                      spec: 'Bolt11',
+                                  })
+                                : t('loading_invoice')}
+                        </Text>
+                    </View>
+                ) : (
+                    <View
+                        style={[
+                            styles.qrCodeContainer,
+                            tailwind('rounded'),
+                            {
+                                borderColor: ColorScheme.Background.QRBorder,
+                            },
+                        ]}>
+                        <QRCodeStyled
+                            style={{
+                                backgroundColor: 'white',
+                            }}
+                            data={LNInvoice?.bolt11}
+                            padding={4}
+                            pieceSize={4}
+                            color={ColorScheme.Background.Default}
+                            isPiecesGlued={true}
+                            pieceBorderRadius={2}
+                        />
+                    </View>
+                )}
 
                 {/* Bitcoin address info */}
                 {!loadingInvoice && (
@@ -588,35 +610,6 @@ const Receive = ({route}: Props) => {
                         </View>
                     )}
                 </View>
-
-                {/* Invoice Panel */}
-                {loadingInvoice && (
-                    <View
-                        style={[
-                            tailwind(
-                                'items-center w-full h-full justify-center',
-                            ),
-                            // To avoid lagging due to Carousel load from conditional rendering
-                            // we fake a loading screen
-                            {
-                                zIndex: 999,
-                                backgroundColor: ColorScheme.Background.Primary,
-                            },
-                        ]}>
-                        <ActivityIndicator />
-                        <Text
-                            style={[
-                                tailwind('text-sm mt-4'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {isAdvancedMode
-                                ? t('loading_invoice_advanced', {
-                                      spec: 'Bolt11',
-                                  })
-                                : t('loading_invoice')}
-                        </Text>
-                    </View>
-                )}
 
                 {isLNWallet && (
                     <View
