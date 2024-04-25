@@ -17,6 +17,9 @@ import {useTranslation} from 'react-i18next';
 
 import {getKeychainItem} from '../class/keychainContext';
 import {AppStorageContext} from '../class/storageContext';
+import RNBiometrics from '../modules/biometrics';
+import {toastConfig} from '../components/toast';
+import Toast, {ToastConfig} from 'react-native-toast-message';
 
 const Lock = () => {
     // TODO: Might have security hole if user too fast, test and fix
@@ -53,11 +56,31 @@ const Lock = () => {
     };
 
     const requestBiometrics = () => {
-        OpenApp();
+        RNBiometrics.simplePrompt({
+            promptMessage: 'Confirm fingerprint',
+        })
+            .then(({success}) => {
+                if (success) {
+                    OpenApp();
+                }
+            })
+            .catch((error: any) => {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Biometrics'),
+                    text2: error.message,
+                    visibilityTime: 1750,
+                });
+            });
     };
 
     useEffect(() => {
         fetchPin();
+
+        if (isBiometricsActive) {
+            requestBiometrics();
+        }
     }, []);
 
     return (
@@ -137,6 +160,8 @@ const Lock = () => {
                         />
                     </View>
                 </View>
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );
