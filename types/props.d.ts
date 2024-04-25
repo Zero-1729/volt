@@ -143,6 +143,7 @@ export type PinNumpadInputProps = BaseProps & {
     onPinChange: (pin: string) => void;
     triggerBiometrics?: () => void;
     pinLimit: number;
+    showBiometrics: boolean;
 };
 
 export type DisplaySatsAmountProps = BaseProps & {
