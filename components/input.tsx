@@ -515,24 +515,35 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
             </View>
 
             {/* Row 3 */}
-            <View style={[tailwind('w-full flex-row')]}>
-                <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
-                    onPress={props.triggerBiometrics}>
-                    {Platform.OS === 'android' ? (
-                        <FingerPrint
-                            fill={ColorScheme.SVG.Default}
-                            width={40}
-                            height={40}
-                        />
-                    ) : (
-                        <FaceId
-                            fill={ColorScheme.SVG.Default}
-                            width={40}
-                            height={40}
-                        />
-                    )}
-                </PlainButton>
+            <View
+                style={[
+                    tailwind(
+                        `w-full flex-row  ${
+                            props.showBiometrics
+                                ? 'justify-center'
+                                : 'justify-end'
+                        }`,
+                    ),
+                ]}>
+                {props.showBiometrics && (
+                    <PlainButton
+                        style={[tailwind('w-1/3 items-center justify-center')]}
+                        onPress={props.triggerBiometrics}>
+                        {Platform.OS === 'android' ? (
+                            <FingerPrint
+                                fill={ColorScheme.SVG.Default}
+                                width={40}
+                                height={40}
+                            />
+                        ) : (
+                            <FaceId
+                                fill={ColorScheme.SVG.Default}
+                                width={40}
+                                height={40}
+                            />
+                        )}
+                    </PlainButton>
+                )}
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
