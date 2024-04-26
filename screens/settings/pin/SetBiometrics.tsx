@@ -38,6 +38,7 @@ const SetBiometrics = ({route}: Props) => {
     const {t} = useTranslation('settings');
 
     const {setBiometricsActive} = useContext(AppStorageContext);
+    const [doneSetup, setDoneSetup] = React.useState<boolean>(false);
 
     const handleRoute = () => {
         navigation.dispatch(
@@ -62,24 +63,14 @@ const SetBiometrics = ({route}: Props) => {
             }
 
             if (available) {
-                // TODO: display toast or route to settings
                 if (biometryType === BiometryTypes.FaceID) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: t('face_id_supported'),
-                        visibilityTime: 1750,
-                    });
-
-                    // Setup FaceID
                     RNBiometrics.simplePrompt({
                         promptMessage: 'Confirm FaceID',
                     })
                         .then(({success}) => {
                             if (success) {
                                 setBiometricsActive(true);
-                                handleRoute();
+                                setDoneSetup(true);
                             }
                         })
                         .catch((err: any) => {
@@ -96,7 +87,7 @@ const SetBiometrics = ({route}: Props) => {
                     biometryType === BiometryTypes.Biometrics
                 ) {
                     RNBiometrics.simplePrompt({
-                        promptMessage: 'Confirm biometrics',
+                        promptMessage: 'Confirm Biometrics',
                     })
                         .then(({success}) => {
                             if (success) {
@@ -131,14 +122,14 @@ const SetBiometrics = ({route}: Props) => {
                 text2: err.message,
                 visibilityTime: 1750,
             });
-
-            // TODO: handle settings off
         }
     };
 
     const handleDone = () => {
-        // TODO: handle setup biometrics
-        // setBiometricsActive(true);
+        if (doneSetup) {
+            handleRoute();
+            return;
+        }
 
         handleBiometrics();
     };
@@ -175,7 +166,9 @@ const SetBiometrics = ({route}: Props) => {
                                 tailwind('text-xl font-bold text-white mb-2'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {t('setup_bio')}
+                            {doneSetup
+                                ? t('setup_bio_success')
+                                : t('setup_bio')}
                         </Text>
 
                         <Text
@@ -183,7 +176,9 @@ const SetBiometrics = ({route}: Props) => {
                                 tailwind('text-base text-center'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            {t('setup_bio_desc')}
+                            {doneSetup
+                                ? t('setup_bio_done_desc')
+                                : t('setup_bio_desc')}
                         </Text>
                     </View>
 
@@ -192,21 +187,25 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('absolute w-5/6'),
                             {bottom: NativeWindowMetrics.bottomButtonOffset},
                         ]}>
-                        <PlainButton onPress={skipAlong}>
-                            <Text
-                                style={[
-                                    tailwind(
-                                        'text-base text-center font-bold mb-6',
-                                    ),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
-                                {route.params?.standalone
-                                    ? capitalizeFirst(t('cancel'))
-                                    : capitalizeFirst(t('skip'))}
-                            </Text>
-                        </PlainButton>
+                        {!doneSetup && (
+                            <PlainButton onPress={skipAlong}>
+                                <Text
+                                    style={[
+                                        tailwind(
+                                            'text-base text-center font-bold mb-6',
+                                        ),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {route.params?.standalone
+                                        ? capitalizeFirst(t('cancel'))
+                                        : capitalizeFirst(t('skip'))}
+                                </Text>
+                            </PlainButton>
+                        )}
                         <LongButton
-                            title={capitalizeFirst(t('enable'))}
+                            title={capitalizeFirst(
+                                doneSetup ? t('done') : t('enable'),
+                            )}
                             textColor={ColorScheme.Text.Alt}
                             backgroundColor={ColorScheme.Background.Inverted}
                             onPress={handleDone}
