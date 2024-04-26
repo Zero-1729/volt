@@ -41,7 +41,8 @@ const Lock = () => {
     const updatePin = (value: string) => {
         setPin(value);
 
-        if (value.length === 4) {
+        // Only check if valid pin loaded
+        if (value.length === 4 || validPin.length === 4) {
             validPin === value ? OpenApp() : setPin('');
         }
     };
