@@ -271,7 +271,7 @@ const Receive = ({route}: Props) => {
         return (
             <View
                 style={[
-                    tailwind('items-center justify-center h-full w-full -mt-6'),
+                    tailwind('items-center justify-center h-full w-full mt-6'),
                 ]}>
                 {isAmountInvoice && (
                     <View
@@ -418,28 +418,32 @@ const Receive = ({route}: Props) => {
         return (
             <View
                 style={[
-                    tailwind('items-center justify-center h-full w-full -mt-6'),
+                    tailwind('items-center justify-center h-full w-full mt-6'),
                 ]}>
-                <Text
-                    style={[
-                        tailwind('text-base mb-4 font-bold'),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
-                    {capitalizeFirst(t('lightning'))}
-                </Text>
-
                 {!loadingInvoice && (
-                    <View
-                        style={[tailwind('items-center w-4/5 mb-4 flex-row')]}>
-                        <ActivityIndicator />
-                        <VText
+                    <>
+                        <Text
                             style={[
-                                tailwind('ml-2 text-center'),
-                                {color: ColorScheme.Text.DescText},
+                                tailwind('text-base mb-4 font-bold'),
+                                {color: ColorScheme.Text.Default},
                             ]}>
-                            {t('keep_receive_open')}
-                        </VText>
-                    </View>
+                            {capitalizeFirst(t('lightning'))}
+                        </Text>
+
+                        <View
+                            style={[
+                                tailwind('items-center w-4/5 mb-4 flex-row'),
+                            ]}>
+                            <ActivityIndicator />
+                            <VText
+                                style={[
+                                    tailwind('ml-2 text-center'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {t('keep_receive_open')}
+                            </VText>
+                        </View>
+                    </>
                 )}
 
                 {loadingInvoice ? (
