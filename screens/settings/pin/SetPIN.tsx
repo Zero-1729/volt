@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
@@ -16,7 +16,12 @@ import {useTranslation} from 'react-i18next';
 
 import {PinNumpad} from '../../../components/input';
 
-const SetPIN = () => {
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {SettingsParamList} from '../../../Navigation';
+
+type Props = NativeStackScreenProps<SettingsParamList, 'SetPIN'>;
+
+const SetPIN = ({route}: Props) => {
     const [tmpPIN, setTmpPIN] = useState<string>('');
 
     const navigation = useNavigation();
@@ -24,6 +29,10 @@ const SetPIN = () => {
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('settings');
+
+    const isChangePIN = route.params?.isChangePIN
+        ? route.params.isChangePIN
+        : false;
 
     const updateTmpPIN = (pin: string): void => {
         setTmpPIN(pin);
@@ -36,7 +45,10 @@ const SetPIN = () => {
 
     const moveToConfirm = (pin: string) => {
         navigation.dispatch(
-            CommonActions.navigate({name: 'ConfirmPIN', params: {pin: pin}}),
+            CommonActions.navigate({
+                name: 'ConfirmPIN',
+                params: {pin: pin, isChangePIN: isChangePIN},
+            }),
         );
     };
 
