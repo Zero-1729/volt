@@ -145,11 +145,16 @@ export type SettingsParamList = {
 
     ChangePIN: undefined;
     WelcomePIN: undefined;
-    SetPIN: undefined;
+    SetPIN: {
+        isChangePIN?: boolean;
+    };
     ConfirmPIN: {
         pin: string;
+        isChangePIN?: boolean;
     };
-    DonePIN: undefined;
+    DonePIN: {
+        isChangePIN?: boolean;
+    };
     SetBiometrics: {
         standalone: boolean;
     };
