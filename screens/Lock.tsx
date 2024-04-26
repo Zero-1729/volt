@@ -22,7 +22,6 @@ import {toastConfig} from '../components/toast';
 import Toast, {ToastConfig} from 'react-native-toast-message';
 
 const Lock = () => {
-    // TODO: Might have security hole if user too fast, test and fix
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
     const navigation = useNavigation();
@@ -42,7 +41,7 @@ const Lock = () => {
         setPin(value);
 
         // Only check if valid pin loaded
-        if (value.length === 4 || validPin.length === 4) {
+        if (value.length === 4 && validPin.length === 4) {
             validPin === value ? OpenApp() : setPin('');
         }
     };
