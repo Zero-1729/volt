@@ -32,6 +32,8 @@ import Color from '../../constants/Color';
 import {capitalizeFirst} from '../../modules/transform';
 import {setKeychainItem} from '../../class/keychainContext';
 
+import RNBiometrics from '../../modules/biometrics';
+
 const Wallet = () => {
     const navigation = useNavigation();
 
@@ -58,10 +60,26 @@ const Wallet = () => {
         setBiometricsActive,
     } = useContext(AppStorageContext);
 
+    const requestBiometrics = async () => {
+        const {available} = await RNBiometrics.isSensorAvailable();
+
+        if (!available) {
+            return;
+        }
+
+        RNBiometrics.simplePrompt({
+            promptMessage: 'Confirm fingerprint',
+        }).then(({success}) => {
+            if (success) {
+                setBiometricsActive(false);
+                return;
+            }
+        });
+    };
+
     const handleBiometrics = () => {
-        // TODO: request Biometrics to turn it off
         if (isBiometricsActive) {
-            setBiometricsActive(false);
+            requestBiometrics();
         }
 
         if (!isBiometricsActive) {
