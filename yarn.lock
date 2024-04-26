@@ -11231,13 +11231,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gradle-plugin@npm:^0.71.19":
-  version: 0.71.19
-  resolution: "react-native-gradle-plugin@npm:0.71.19"
-  checksum: 2e3ab679f0b81edd81b9fb88a73a16c8b9b6dbef4e7158fd894c42e6dff04ba8d11f1b9663ffa2c30d0d9deee3cd44b033cd280322c010be3c290e4422088a7a
-  languageName: node
-  linkType: hard
-
 "react-native-haptic-feedback@npm:^2.2.0":
   version: 2.2.0
   resolution: "react-native-haptic-feedback@npm:2.2.0"
@@ -13686,7 +13679,6 @@ __metadata:
     react-native-flipper: ^0.212.0
     react-native-fs: ^2.20.0
     react-native-gesture-handler: ^2.15.0
-    react-native-gradle-plugin: ^0.71.19
     react-native-haptic-feedback: ^2.2.0
     react-native-image-picker: ^7.1.2
     react-native-keychain: ^8.2.0
