@@ -81,6 +81,7 @@ import Wallet from './screens/settings/Wallet';
 import Network from './screens/settings/Network';
 
 // PIN screens
+import ChangePIN from './screens/settings/pin/ChangePIN';
 import SetPIN from './screens/settings/pin/SetPIN';
 import WelcomePIN from './screens/settings/pin/Welcome';
 import ConfirmPIN from './screens/settings/pin/ConfirmPIN';
@@ -142,6 +143,7 @@ export type SettingsParamList = {
     Network: undefined;
     About: undefined;
 
+    ChangePIN: undefined;
     WelcomePIN: undefined;
     SetPIN: undefined;
     ConfirmPIN: {
@@ -251,6 +253,7 @@ const SettingsRoot = () => {
             <SettingsStack.Screen name="About" component={About} />
 
             {/* Set PIN */}
+            <SettingsStack.Screen name="ChangePIN" component={ChangePIN} />
             <SettingsStack.Screen name="WelcomePIN" component={WelcomePIN} />
             <SettingsStack.Screen name="SetPIN" component={SetPIN} />
             <SettingsStack.Screen name="ConfirmPIN" component={ConfirmPIN} />
