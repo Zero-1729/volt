@@ -38,6 +38,10 @@ const ConfirmPIN = ({route}: Props) => {
 
     const {t} = useTranslation('settings');
 
+    const isChangePIN = route.params?.isChangePIN
+        ? route.params.isChangePIN
+        : false;
+
     const updateTmpPIN = async (pin: string): Promise<void> => {
         setTmpPIN(pin);
 
@@ -52,12 +56,21 @@ const ConfirmPIN = ({route}: Props) => {
             // Set pin
             await setKeychainItem('pin', pin);
 
-            navigation.dispatch(
-                CommonActions.navigate({
-                    name: 'SetBiometrics',
-                    params: {tmpPIN},
-                }),
-            );
+            if (!route.params.isChangePIN) {
+                navigation.dispatch(
+                    CommonActions.navigate({
+                        name: 'SetBiometrics',
+                        params: {tmpPIN},
+                    }),
+                );
+            } else {
+                navigation.dispatch(
+                    CommonActions.navigate('SettingsRoot', {
+                        screen: 'DonePIN',
+                        params: {isChangePIN: isChangePIN},
+                    }),
+                );
+            }
         }
     };
 
