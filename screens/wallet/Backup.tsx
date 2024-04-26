@@ -53,6 +53,8 @@ import {toastConfig} from '../../components/toast';
 import {capitalizeFirst} from '../../modules/transform';
 import {useSharedValue} from 'react-native-reanimated';
 
+import RNBiometrics from '../../modules/biometrics';
+
 type Slide = () => ReactElement;
 
 const Backup = () => {
@@ -60,7 +62,7 @@ const Backup = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {currentWalletID, getWalletData, isAdvancedMode} =
+    const {currentWalletID, getWalletData, isAdvancedMode, isBiometricsActive} =
         useContext(AppStorageContext);
 
     const carouselRef = useRef<ICarouselInstance>(null);
@@ -287,9 +289,33 @@ const Backup = () => {
 
                 setupDescriptorData(walletData.externalDescriptor);
             } else {
-                setShowPrivateDescriptor(true);
-
-                setupDescriptorData(walletData.privateDescriptor);
+                if (isBiometricsActive) {
+                    RNBiometrics.simplePrompt({
+                        promptMessage: `Confirm ${
+                            Platform.OS === 'ios' ? 'FaceID' : 'Biometrics'
+                        }`,
+                    })
+                        .then(({success}) => {
+                            if (success) {
+                                setShowPrivateDescriptor(true);
+                                setupDescriptorData(
+                                    walletData.privateDescriptor,
+                                );
+                            }
+                        })
+                        .catch((error: any) => {
+                            Toast.show({
+                                topOffset: 54,
+                                type: 'Liberal',
+                                text1: t('Biometrics'),
+                                text2: error.message,
+                                visibilityTime: 1750,
+                            });
+                        });
+                } else {
+                    setShowPrivateDescriptor(true);
+                    setupDescriptorData(walletData.privateDescriptor);
+                }
             }
         };
 
@@ -441,6 +467,7 @@ const Backup = () => {
         warning,
         copyToClipboard,
         getQRData,
+        isBiometricsActive,
     ]);
 
     const panels = useMemo(
@@ -603,14 +630,16 @@ const Backup = () => {
                     <View
                         style={[
                             styles.carouselContainer,
-                            tailwind(
-                                'h-full w-full items-center justify-end absolute bottom-0',
-                            ),
+                            tailwind('h-full w-full'),
                             {zIndex: -9},
                         ]}>
                         <Carousel
                             ref={carouselRef}
-                            style={[tailwind('items-center')]}
+                            style={[
+                                tailwind(
+                                    'items-center justify-center absolute bottom-0 w-full',
+                                ),
+                            ]}
                             data={panels}
                             enabled={false}
                             width={NativeDims.width}
