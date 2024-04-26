@@ -30,9 +30,9 @@ import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
 import {capitalizeFirst} from '../../modules/transform';
-import {setKeychainItem} from '../../class/keychainContext';
 
-import RNBiometrics from '../../modules/biometrics';
+import Right from './../../assets/svg/chevron-right-24.svg';
+import Left from './../../assets/svg/chevron-left-24.svg';
 
 const Wallet = () => {
     const navigation = useNavigation();
@@ -54,65 +54,12 @@ const Wallet = () => {
         setIsAdvancedMode,
         hideTotalBalance,
         setTotalBalanceHidden,
-        isPINActive,
-        setPINActive,
-        isBiometricsActive,
-        setBiometricsActive,
     } = useContext(AppStorageContext);
 
-    const requestBiometrics = async () => {
-        const {available} = await RNBiometrics.isSensorAvailable();
-
-        if (!available) {
-            return;
-        }
-
-        RNBiometrics.simplePrompt({
-            promptMessage: 'Confirm fingerprint',
-        }).then(({success}) => {
-            if (success) {
-                setBiometricsActive(false);
-                return;
-            }
-        });
-    };
-
-    const handleBiometrics = () => {
-        if (isBiometricsActive) {
-            requestBiometrics();
-        }
-
-        if (!isBiometricsActive) {
-            RNHapticFeedback.trigger('rigid', RNHapticFeedbackOptions);
-
-            navigation.dispatch(
-                CommonActions.navigate({
-                    name: 'SetBiometrics',
-                    params: {
-                        standalone: true,
-                    },
-                }),
-            );
-        }
-    };
-
-    const handleSetPIN = async () => {
-        // TODO: request PIN before turning it off
-        if (isPINActive) {
-            setPINActive(!isPINActive);
-            await setKeychainItem('pin', '');
-        }
-
-        // Otherwise, go through flow to setup pin in 'SetPIN' screen
-        if (!isPINActive) {
-            RNHapticFeedback.trigger('rigid', RNHapticFeedbackOptions);
-
-            navigation.dispatch(
-                CommonActions.navigate({
-                    name: 'WelcomePIN',
-                }),
-            );
-        }
+    const gotPIN = () => {
+        navigation.dispatch(
+            CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
+        );
     };
 
     return (
@@ -301,52 +248,51 @@ const Wallet = () => {
                             style={tailwind(
                                 'justify-center w-full items-center flex-row mt-8 mb-10',
                             )}>
-                            <View style={tailwind('w-5/6')}>
+                            <PlainButton
+                                style={tailwind('w-5/6')}
+                                onPress={gotPIN}>
                                 <View
                                     style={tailwind(
-                                        `w-full ${
+                                        `items-center ${
                                             langDir === 'right'
                                                 ? 'flex-row-reverse'
                                                 : 'flex-row'
-                                        } items-center mb-2`,
+                                        } justify-between mt-2 mb-2`,
                                     )}>
                                     <VText
                                         style={[
                                             tailwind('text-sm font-medium'),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        {t('enable_pin_mode')}
+                                        {t('manage_pin')}
                                     </VText>
-                                    <Checkbox
-                                        fillColor={
-                                            ColorScheme.Background
-                                                .CheckBoxFilled
-                                        }
-                                        unfillColor={
-                                            ColorScheme.Background
-                                                .CheckBoxUnfilled
-                                        }
-                                        size={18}
-                                        isChecked={isPINActive}
-                                        iconStyle={{
-                                            borderWidth: 1,
-                                            borderRadius: 2,
-                                        }}
-                                        innerIconStyle={{
-                                            borderWidth: 1,
-                                            borderColor:
-                                                ColorScheme.Background
-                                                    .CheckBoxOutline,
-                                            borderRadius: 2,
-                                        }}
+                                    <View
                                         style={[
                                             tailwind(
-                                                'flex-row absolute -right-4',
+                                                'flex-row justify-between items-center',
                                             ),
-                                        ]}
-                                        onPress={handleSetPIN}
-                                        disableBuiltInState={true}
-                                    />
+                                        ]}>
+                                        {langDir === 'right' && (
+                                            <Left
+                                                style={[tailwind('mr-2')]}
+                                                width={16}
+                                                stroke={
+                                                    ColorScheme.SVG.GrayFill
+                                                }
+                                                fill={ColorScheme.SVG.GrayFill}
+                                            />
+                                        )}
+
+                                        {langDir === 'left' && (
+                                            <Right
+                                                width={16}
+                                                stroke={
+                                                    ColorScheme.SVG.GrayFill
+                                                }
+                                                fill={ColorScheme.SVG.GrayFill}
+                                            />
+                                        )}
+                                    </View>
                                 </View>
 
                                 <View style={tailwind('w-full')}>
@@ -355,86 +301,11 @@ const Wallet = () => {
                                             tailwind('text-xs'),
                                             {color: ColorScheme.Text.DescText},
                                         ]}>
-                                        {t('enable_pin_mode_description')}
+                                        {t('manage_pin_desc')}
                                     </VText>
                                 </View>
-                            </View>
+                            </PlainButton>
                         </View>
-
-                        {/* Toggle Biometrics mode */}
-                        {isPINActive && (
-                            <View
-                                style={tailwind(
-                                    'justify-center w-full items-center flex-row mb-10',
-                                )}>
-                                <View style={tailwind('w-5/6')}>
-                                    <View
-                                        style={tailwind(
-                                            `w-full ${
-                                                langDir === 'right'
-                                                    ? 'flex-row-reverse'
-                                                    : 'flex-row'
-                                            } items-center mb-2`,
-                                        )}>
-                                        <VText
-                                            style={[
-                                                tailwind('text-sm font-medium'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                            ]}>
-                                            {t('enable_biometrics_mode')}
-                                        </VText>
-                                        <Checkbox
-                                            onPress={handleBiometrics}
-                                            fillColor={
-                                                ColorScheme.Background
-                                                    .CheckBoxFilled
-                                            }
-                                            unfillColor={
-                                                ColorScheme.Background
-                                                    .CheckBoxUnfilled
-                                            }
-                                            size={18}
-                                            isChecked={isBiometricsActive}
-                                            iconStyle={{
-                                                borderWidth: 1,
-                                                borderRadius: 2,
-                                            }}
-                                            innerIconStyle={{
-                                                borderWidth: 1,
-                                                borderColor:
-                                                    ColorScheme.Background
-                                                        .CheckBoxOutline,
-                                                borderRadius: 2,
-                                            }}
-                                            style={[
-                                                tailwind(
-                                                    'flex-row absolute -right-4',
-                                                ),
-                                            ]}
-                                            disableBuiltInState={true}
-                                        />
-                                    </View>
-
-                                    <View style={tailwind('w-full')}>
-                                        <VText
-                                            style={[
-                                                tailwind('text-xs'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .DescText,
-                                                },
-                                            ]}>
-                                            {t(
-                                                'enable_biometrics_mode_description',
-                                            )}
-                                        </VText>
-                                    </View>
-                                </View>
-                            </View>
-                        )}
                     </View>
                 </View>
             </View>
