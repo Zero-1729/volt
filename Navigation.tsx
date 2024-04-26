@@ -389,6 +389,7 @@ const RootNavigator = (): ReactElement => {
         currentWalletID,
         isWalletInitialized,
         setBreezEvent,
+        isPINActive,
     } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
