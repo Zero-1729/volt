@@ -21,7 +21,7 @@ import {getKeychainItem} from '../../../class/keychainContext';
 import {PlainButton} from '../../../components/button';
 import {capitalizeFirst} from '../../../modules/transform';
 
-const SetPIN = () => {
+const ChangePIN = () => {
     const [tmpPIN, setTmpPIN] = useState<string>('');
 
     const navigation = useNavigation();
@@ -195,7 +195,7 @@ const SetPIN = () => {
     );
 };
 
-export default SetPIN;
+export default ChangePIN;
 
 const styles = StyleSheet.create({
     carouselContainer: {
