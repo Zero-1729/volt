@@ -472,7 +472,17 @@ const RootNavigator = (): ReactElement => {
             // Deep linking when app open
             const onReceiveLink = ({url}: {url: string}) => {
                 if (!onboardingState.current) {
-                    rootNavigation.navigate('PayInvoice', {invoice: url});
+                    if (isPINActive) {
+                        rootNavigation.navigate('Lock', {
+                            onSuccess: () => {
+                                rootNavigation.navigate('PayInvoice', {
+                                    invoice: url,
+                                });
+                            },
+                        });
+                    } else {
+                        rootNavigation.navigate('PayInvoice', {invoice: url});
+                    }
                 }
 
                 return listener(url);
@@ -494,8 +504,15 @@ const RootNavigator = (): ReactElement => {
         const url = await Linking.getInitialURL();
 
         if (url) {
-            rootNavigation.navigate('PayInvoice', {invoice: url});
-            return;
+            if (isPINActive) {
+                rootNavigation.navigate('Lock', {
+                    onSuccess: () => {
+                        rootNavigation.navigate('PayInvoice', {invoice: url});
+                    },
+                });
+            } else {
+                rootNavigation.navigate('PayInvoice', {invoice: url});
+            }
         }
 
         // Check clipboard
