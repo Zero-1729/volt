@@ -110,7 +110,9 @@ import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
-    Lock: undefined;
+    Lock: {
+        onSuccess?: () => void;
+    };
     HomeScreen: {
         restoreMeta: {
             title: string;
