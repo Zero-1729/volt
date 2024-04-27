@@ -1333,6 +1333,7 @@ export const AppStorageProvider = ({children}: Props) => {
         try {
             await setPINAttempts(0);
             await setPINActive(false);
+            await setBiometricsActive(false);
             await setLoadLock(false);
             await setOnboarding(true);
             await setAppLanguage(defaultContext.appLanguage);
