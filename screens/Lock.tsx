@@ -47,6 +47,8 @@ const Lock = () => {
     };
 
     const OpenApp = () => {
+        setPINAttempts(0);
+
         navigation.dispatch(
             CommonActions.reset({
                 index: 0,
@@ -89,8 +91,8 @@ const Lock = () => {
 
             if (validPin.length === 4 && pin === validPin) {
                 // reset pin attempts
-                setPINAttempts(0);
                 OpenApp();
+                return;
             }
 
             // keep bumping attempts
