@@ -31,9 +31,6 @@ import Color from '../../constants/Color';
 
 import {capitalizeFirst} from '../../modules/transform';
 
-import Right from './../../assets/svg/chevron-right-24.svg';
-import Left from './../../assets/svg/chevron-left-24.svg';
-
 const Wallet = () => {
     const navigation = useNavigation();
 
@@ -55,12 +52,6 @@ const Wallet = () => {
         hideTotalBalance,
         setTotalBalanceHidden,
     } = useContext(AppStorageContext);
-
-    const gotPIN = () => {
-        navigation.dispatch(
-            CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
-        );
-    };
 
     return (
         <SafeAreaView>
@@ -241,70 +232,6 @@ const Wallet = () => {
                                 ]}>
                                 {t('hide_balance_description')}
                             </VText>
-                        </View>
-
-                        {/* Toggle PIN mode */}
-                        <View
-                            style={tailwind(
-                                'justify-center w-full items-center flex-row mt-8 mb-10',
-                            )}>
-                            <PlainButton
-                                style={tailwind('w-5/6')}
-                                onPress={gotPIN}>
-                                <View
-                                    style={tailwind(
-                                        `items-center ${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } justify-between mt-2 mb-2`,
-                                    )}>
-                                    <VText
-                                        style={[
-                                            tailwind('text-sm font-medium'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
-                                        {t('manage_pin')}
-                                    </VText>
-                                    <View
-                                        style={[
-                                            tailwind(
-                                                'flex-row justify-between items-center',
-                                            ),
-                                        ]}>
-                                        {langDir === 'right' && (
-                                            <Left
-                                                style={[tailwind('mr-2')]}
-                                                width={16}
-                                                stroke={
-                                                    ColorScheme.SVG.GrayFill
-                                                }
-                                                fill={ColorScheme.SVG.GrayFill}
-                                            />
-                                        )}
-
-                                        {langDir === 'left' && (
-                                            <Right
-                                                width={16}
-                                                stroke={
-                                                    ColorScheme.SVG.GrayFill
-                                                }
-                                                fill={ColorScheme.SVG.GrayFill}
-                                            />
-                                        )}
-                                    </View>
-                                </View>
-
-                                <View style={tailwind('w-full')}>
-                                    <VText
-                                        style={[
-                                            tailwind('text-xs'),
-                                            {color: ColorScheme.Text.DescText},
-                                        ]}>
-                                        {t('manage_pin_desc')}
-                                    </VText>
-                                </View>
-                            </PlainButton>
                         </View>
                     </View>
                 </View>
