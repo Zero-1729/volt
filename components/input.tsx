@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {
     Text,
@@ -29,6 +29,11 @@ import FaceId from '../assets/svg/face-id-24.svg';
 
 import {PlainButton} from './button';
 
+import RNHapticFeedback from 'react-native-haptic-feedback';
+import {RNHapticFeedbackOptions} from '../constants/Haptic';
+
+import {i18nNumber} from '../modules/transform';
+
 import {
     TextInputProps,
     TextLongInputProps,
@@ -38,6 +43,7 @@ import {
 
 import Folder from './../assets/svg/file-directory-fill-24.svg';
 import LeftArrow from '../assets/svg/chevron-left-24.svg';
+import {AppStorageContext} from '../class/storageContext';
 
 export const TextSingleInput = (props: TextInputProps) => {
     const tailwind = useTailwind();
@@ -366,6 +372,8 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
+    const {appLanguage} = useContext(AppStorageContext);
+
     const safelyConcat = (text: string, char: string) => {
         // Can't go beyond 8 decimal places
         if (text.split('.')[1]?.length >= props.pinLimit) {
@@ -383,6 +391,10 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
         return text.slice(0, -1);
     };
 
+    const vibrateInput = () => {
+        RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+    };
+
     return (
         <View style={[tailwind('w-full items-center justify-center flex')]}>
             {/* Row 0 */}
@@ -390,6 +402,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '1'));
                     }}>
                     <Text
@@ -397,12 +410,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        1
+                        {i18nNumber(1, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '2'));
                     }}>
                     <Text
@@ -410,12 +424,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        2
+                        {i18nNumber(2, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '3'));
                     }}>
                     <Text
@@ -423,7 +438,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        3
+                        {i18nNumber(3, appLanguage.code)}
                     </Text>
                 </PlainButton>
             </View>
@@ -433,6 +448,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '4'));
                     }}>
                     <Text
@@ -440,12 +456,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        4
+                        {i18nNumber(4, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '5'));
                     }}>
                     <Text
@@ -453,12 +470,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        5
+                        {i18nNumber(5, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '6'));
                     }}>
                     <Text
@@ -466,7 +484,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        6
+                        {i18nNumber(6, appLanguage.code)}
                     </Text>
                 </PlainButton>
             </View>
@@ -476,6 +494,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '7'));
                     }}>
                     <Text
@@ -483,12 +502,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        7
+                        {i18nNumber(7, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '8'));
                     }}>
                     <Text
@@ -496,12 +516,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        8
+                        {i18nNumber(8, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '9'));
                     }}>
                     <Text
@@ -509,7 +530,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        9
+                        {i18nNumber(9, appLanguage.code)}
                     </Text>
                 </PlainButton>
             </View>
@@ -547,6 +568,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '0'));
                     }}>
                     <Text
@@ -554,12 +576,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                             tailwind('text-xl font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        0
+                        {i18nNumber(0, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <Pressable
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
+                        vibrateInput();
                         props.onPinChange(safelyDelete(props.pin));
                     }}
                     onLongPress={() => {
