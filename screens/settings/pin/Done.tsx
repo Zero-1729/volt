@@ -45,7 +45,7 @@ const Done = ({route}: Props) => {
         setPINActive(true);
 
         navigation.dispatch(
-            CommonActions.navigate('SettingsRoot', {screen: 'Wallet'}),
+            CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
         );
     };
 
