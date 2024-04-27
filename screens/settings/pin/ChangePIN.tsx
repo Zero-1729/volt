@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -40,17 +41,6 @@ const ChangePIN = () => {
 
     const updateTmpPIN = (pin: string): void => {
         setTmpPIN(pin);
-
-        if (pin.length === 4 && validPin.length === 4) {
-            if (validPin === pin) {
-                // Route to pin setup
-                moveToSetup();
-            } else {
-                // show forgot
-                setFirstWrong(true);
-                setTmpPIN('');
-            }
-        }
     };
 
     const moveToSetup = () => {
@@ -65,6 +55,18 @@ const ChangePIN = () => {
     useEffect(() => {
         initValidPin();
     }, []);
+
+    useEffect(() => {
+        if (tmpPIN.length === 4) {
+            if (tmpPIN === validPin) {
+                moveToSetup();
+                return;
+            }
+
+            setTmpPIN('');
+            setFirstWrong(true);
+        }
+    }, [tmpPIN]);
 
     return (
         <SafeAreaView
