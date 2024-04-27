@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Text, View, useColorScheme} from 'react-native';
+import {Linking, Text, View, useColorScheme} from 'react-native';
 import React, {useContext} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
@@ -18,6 +18,8 @@ import {useTranslation} from 'react-i18next';
 
 import BitcoinAstro from './../../../assets/svg/bitcoin-astro.svg';
 import Success from './../../../assets/svg/check-circle-fill-24.svg';
+import Failed from '../../../assets/svg/x-circle-fill-24.svg';
+
 import NativeWindowMetrics from '../../../constants/NativeWindowMetrics';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -40,6 +42,7 @@ const SetBiometrics = ({route}: Props) => {
 
     const {setBiometricsActive} = useContext(AppStorageContext);
     const [doneSetup, setDoneSetup] = React.useState<boolean>(false);
+    const [doneErrorText, setDoneErrorText] = React.useState<string>('');
 
     const handleRoute = () => {
         navigation.dispatch(
@@ -60,6 +63,8 @@ const SetBiometrics = ({route}: Props) => {
                     text2: t('biometrics_error'),
                     visibilityTime: 1750,
                 });
+
+                setDoneErrorText(t('biometrics_error'));
                 return;
             }
 
@@ -82,6 +87,8 @@ const SetBiometrics = ({route}: Props) => {
                                 text2: err.message,
                                 visibilityTime: 1750,
                             });
+
+                            setDoneErrorText(err.message);
                         });
                 } else if (
                     available &&
@@ -93,7 +100,7 @@ const SetBiometrics = ({route}: Props) => {
                         .then(({success}) => {
                             if (success) {
                                 setBiometricsActive(true);
-                                handleRoute();
+                                setDoneSetup(true);
                             }
                         })
                         .catch((err: any) => {
@@ -104,15 +111,9 @@ const SetBiometrics = ({route}: Props) => {
                                 text2: err.message,
                                 visibilityTime: 1750,
                             });
+
+                            setDoneErrorText(err.message);
                         });
-                } else {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: error,
-                        visibilityTime: 1750,
-                    });
                 }
             }
         } catch (err: any) {
@@ -123,6 +124,8 @@ const SetBiometrics = ({route}: Props) => {
                 text2: err.message,
                 visibilityTime: 1750,
             });
+
+            setDoneErrorText(err.message);
         }
     };
 
@@ -138,11 +141,15 @@ const SetBiometrics = ({route}: Props) => {
     const skipAlong = () => {
         if (route.params?.standalone) {
             navigation.dispatch(
-                CommonActions.navigate('SettingsRoot', {screen: 'Wallet'}),
+                CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
             );
         } else {
             navigation.dispatch(CommonActions.navigate({name: 'DonePIN'}));
         }
+    };
+
+    const openSettings = () => {
+        Linking.openSettings();
     };
 
     return (
@@ -160,7 +167,7 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('items-center w-5/6'),
                             {marginTop: -64},
                         ]}>
-                        {doneSetup ? (
+                        {doneSetup && doneErrorText.length === 0 ? (
                             <Success
                                 fill={ColorScheme.SVG.Default}
                                 width={200}
@@ -168,6 +175,14 @@ const SetBiometrics = ({route}: Props) => {
                             />
                         ) : (
                             <BitcoinAstro height={256} width={256} />
+                        )}
+
+                        {doneErrorText.length > 0 && (
+                            <Failed
+                                fill={ColorScheme.Background.Default}
+                                width={200}
+                                height={200}
+                            />
                         )}
 
                         <Text
@@ -196,7 +211,7 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('absolute w-5/6'),
                             {bottom: NativeWindowMetrics.bottomButtonOffset},
                         ]}>
-                        {!doneSetup && (
+                        {!doneSetup && doneErrorText.length === 0 && (
                             <PlainButton onPress={skipAlong}>
                                 <Text
                                     style={[
@@ -211,6 +226,21 @@ const SetBiometrics = ({route}: Props) => {
                                 </Text>
                             </PlainButton>
                         )}
+
+                        {doneErrorText.length > 0 && (
+                            <PlainButton onPress={openSettings}>
+                                <Text
+                                    style={[
+                                        tailwind(
+                                            'text-base text-center font-bold mb-6',
+                                        ),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {capitalizeFirst(t('open_settings'))}
+                                </Text>
+                            </PlainButton>
+                        )}
+
                         <LongButton
                             title={capitalizeFirst(
                                 doneSetup ? t('done') : t('enable'),
