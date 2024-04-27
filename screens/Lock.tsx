@@ -77,10 +77,6 @@ const Lock = () => {
 
     useEffect(() => {
         fetchPin();
-
-        if (isBiometricsActive) {
-            requestBiometrics();
-        }
     }, []);
 
     return (
