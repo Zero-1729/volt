@@ -45,8 +45,9 @@ const SetBiometrics = ({route}: Props) => {
     const [doneErrorText, setDoneErrorText] = React.useState<string>('');
 
     const handleRoute = () => {
+        // Route back to PIN manager
         navigation.dispatch(
-            CommonActions.navigate('SettingsRoot', {screen: 'Wallet'}),
+            CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
         );
     };
 
