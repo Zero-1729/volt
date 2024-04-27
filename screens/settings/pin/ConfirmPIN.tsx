@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
