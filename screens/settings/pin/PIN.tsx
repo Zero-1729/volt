@@ -171,7 +171,9 @@ const PIN = () => {
                             style={tailwind(
                                 'justify-center w-full items-center flex-row mt-8 mb-10',
                             )}>
-                            <View style={tailwind('w-5/6')}>
+                            <PlainButton
+                                style={[tailwind('w-5/6')]}
+                                onPress={handleSetPIN}>
                                 <View
                                     style={tailwind(
                                         `w-full ${
@@ -228,7 +230,7 @@ const PIN = () => {
                                         {t('enable_pin_mode_description')}
                                     </VText>
                                 </View>
-                            </View>
+                            </PlainButton>
                         </View>
 
                         {/* Toggle Biometrics mode */}
@@ -321,7 +323,9 @@ const PIN = () => {
                             style={tailwind(
                                 'justify-center w-full items-center flex-row mb-10',
                             )}>
-                            <View style={tailwind('w-5/6')}>
+                            <PlainButton
+                                style={tailwind('w-5/6')}
+                                onPress={handleBiometrics}>
                                 <View
                                     style={tailwind(
                                         `w-full ${
@@ -385,7 +389,7 @@ const PIN = () => {
                                         )}
                                     </VText>
                                 </View>
-                            </View>
+                            </PlainButton>
                         </View>
                     </View>
                 </View>
