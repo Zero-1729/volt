@@ -62,7 +62,7 @@ const PIN = () => {
     const bottomPINPassRef = useRef<BottomSheetModal>(null);
     const [pinIdx, setPINIdx] = useState(-1);
 
-    const openPINPassModal = () => {
+    const togglePINPassModal = () => {
         if (pinIdx !== 1) {
             bottomPINPassRef.current?.present();
         } else {
@@ -115,7 +115,7 @@ const PIN = () => {
 
     const handleSetPIN = async () => {
         if (isPINActive) {
-            openPINPassModal();
+            togglePINPassModal();
         }
 
         // Otherwise, go through flow to setup pin in 'SetPIN' screen
