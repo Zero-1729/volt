@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useContext, useEffect, useState} from 'react';
 
 import {View, useColorScheme, Text, StyleSheet} from 'react-native';
@@ -25,7 +26,12 @@ import Toast, {ToastConfig} from 'react-native-toast-message';
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
 import {PlainButton} from '../components/button';
 
-const Lock = () => {
+import {InitStackParamList} from '../Navigation';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+
+type Props = NativeStackScreenProps<InitStackParamList, 'Lock'>;
+
+const Lock = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
     const navigation = useNavigation();
@@ -46,7 +52,12 @@ const Lock = () => {
         setPin(value);
     };
 
-    const OpenApp = () => {
+    const onSuccessRoute = () => {
+        if (route.params?.onSuccess) {
+            route.params.onSuccess();
+            return;
+        }
+
         setPINAttempts(0);
 
         navigation.dispatch(
@@ -63,7 +74,7 @@ const Lock = () => {
         })
             .then(({success}) => {
                 if (success) {
-                    OpenApp();
+                    onSuccessRoute();
                 }
             })
             .catch((error: any) => {
@@ -91,7 +102,8 @@ const Lock = () => {
 
             if (validPin.length === 4 && pin === validPin) {
                 // reset pin attempts
-                OpenApp();
+                onSuccessRoute();
+                setPin('');
                 return;
             }
 
