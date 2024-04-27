@@ -18,15 +18,20 @@ import {useTranslation} from 'react-i18next';
 import {getKeychainItem} from '../class/keychainContext';
 import {AppStorageContext} from '../class/storageContext';
 import RNBiometrics from '../modules/biometrics';
+
 import {toastConfig} from '../components/toast';
 import Toast, {ToastConfig} from 'react-native-toast-message';
+
+import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
+import {PlainButton} from '../components/button';
 
 const Lock = () => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
     const navigation = useNavigation();
 
-    const {isBiometricsActive} = useContext(AppStorageContext);
+    const {isBiometricsActive, pinAttempts, setPINAttempts, resetAppData} =
+        useContext(AppStorageContext);
 
     const {t} = useTranslation('wallet');
     const [pin, setPin] = useState('');
@@ -39,11 +44,6 @@ const Lock = () => {
 
     const updatePin = (value: string) => {
         setPin(value);
-
-        // Only check if valid pin loaded
-        if (value.length === 4 && validPin.length === 4) {
-            validPin === value ? OpenApp() : setPin('');
-        }
     };
 
     const OpenApp = () => {
@@ -78,6 +78,26 @@ const Lock = () => {
     useEffect(() => {
         fetchPin();
     }, []);
+
+    useEffect(() => {
+        // Only check if valid pin loaded
+        if (pin.length === 4) {
+            if (pinAttempts === MAX_PIN_ATTEMPTS) {
+                // WARNING: Reset wallet data
+                resetAppData();
+            }
+
+            if (validPin.length === 4 && pin === validPin) {
+                // reset pin attempts
+                setPINAttempts(0);
+                OpenApp();
+            }
+
+            // keep bumping attempts
+            setPin('');
+            setPINAttempts(pinAttempts + 1);
+        }
+    }, [pin]);
 
     return (
         <SafeAreaView>
