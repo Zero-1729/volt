@@ -61,6 +61,7 @@ import {
 
 import {
     DEFAULT_WALLET_TYPE,
+    MAX_PIN_ATTEMPTS,
     WalletPaths,
     extendedKeyInfo,
     validWalletTypes,
@@ -303,8 +304,10 @@ export const AppStorageProvider = ({children}: Props) => {
     const setPINAttempts = useCallback(
         async (attempts: number) => {
             try {
-                _setPINAttempts(attempts);
-                _updatePINAttempts(JSON.stringify(attempts));
+                if (attempts <= MAX_PIN_ATTEMPTS) {
+                    _setPINAttempts(attempts);
+                    _updatePINAttempts(JSON.stringify(attempts));
+                }
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (PIN attempts) Error loading data: ${e}`,
