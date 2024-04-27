@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
@@ -24,6 +24,7 @@ import {PlainButton} from '../../../components/button';
 import {capitalizeFirst} from '../../../modules/transform';
 
 import Back from './../../../assets/svg/arrow-left-24.svg';
+import {AppStorageContext} from '../../../class/storageContext';
 
 type Props = NativeStackScreenProps<SettingsParamList, 'ConfirmPIN'>;
 
@@ -31,6 +32,8 @@ const ConfirmPIN = ({route}: Props) => {
     const [tmpPIN, setTmpPIN] = useState<string>('');
     const [showBack, setShowBack] = useState<boolean>(false);
     const setPIN = route.params.pin;
+
+    const {setPINActive, isBiometricsActive} = useContext(AppStorageContext);
 
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -54,13 +57,13 @@ const ConfirmPIN = ({route}: Props) => {
             }
 
             // Set pin
-            await setKeychainItem('pin', pin);
+            setKeychainItem('pin', pin);
+            setPINActive(true);
 
-            if (!route.params.isChangePIN) {
+            if (!route.params.isChangePIN && !isBiometricsActive) {
                 navigation.dispatch(
                     CommonActions.navigate({
                         name: 'SetBiometrics',
-                        params: {tmpPIN},
                     }),
                 );
             } else {
