@@ -17,6 +17,7 @@ import {LongButton, PlainButton} from '../../../components/button';
 import {useTranslation} from 'react-i18next';
 
 import BitcoinAstro from './../../../assets/svg/bitcoin-astro.svg';
+import Success from './../../../assets/svg/check-circle-fill-24.svg';
 import NativeWindowMetrics from '../../../constants/NativeWindowMetrics';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -159,7 +160,15 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('items-center w-5/6'),
                             {marginTop: -64},
                         ]}>
-                        <BitcoinAstro height={256} width={256} />
+                        {doneSetup ? (
+                            <Success
+                                fill={ColorScheme.SVG.Default}
+                                width={200}
+                                height={200}
+                            />
+                        ) : (
+                            <BitcoinAstro height={256} width={256} />
+                        )}
 
                         <Text
                             style={[
