@@ -130,6 +130,71 @@ const Lock = () => {
                                 {t('lock_screen_message')}
                             </Text>
 
+                            {pinAttempts > 0 && (
+                                <>
+                                    <View
+                                        style={[
+                                            tailwind('items-center mb-4 w-5/6'),
+                                        ]}>
+                                        {pinAttempts ===
+                                        MAX_PIN_ATTEMPTS - 1 ? (
+                                            <Text
+                                                style={[
+                                                    tailwind(
+                                                        'text-sm text-center',
+                                                    ),
+                                                    {
+                                                        color: ColorScheme.Text
+                                                            .Default,
+                                                    },
+                                                ]}>
+                                                {t('last_attempt_warning')}
+                                            </Text>
+                                        ) : (
+                                            <Text
+                                                style={[
+                                                    tailwind('text-sm'),
+                                                    {
+                                                        color: ColorScheme.Text
+                                                            .Default,
+                                                    },
+                                                ]}>
+                                                {t('pin_attempts', {
+                                                    attempts:
+                                                        MAX_PIN_ATTEMPTS -
+                                                        pinAttempts,
+                                                })}
+                                            </Text>
+                                        )}
+                                    </View>
+
+                                    <PlainButton onPress={() => {}}>
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'rounded-full px-4 py-1 mb-12',
+                                                ),
+                                                {
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Greyed,
+                                                },
+                                            ]}>
+                                            <Text
+                                                style={[
+                                                    tailwind('text-sm'),
+                                                    {
+                                                        color: ColorScheme.Text
+                                                            .DescText,
+                                                    },
+                                                ]}>
+                                                {t('forgot_pin')}
+                                            </Text>
+                                        </View>
+                                    </PlainButton>
+                                </>
+                            )}
+
                             <View
                                 style={[
                                     tailwind('flex-row items-center mb-4'),
