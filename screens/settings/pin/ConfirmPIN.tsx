@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
@@ -47,9 +47,11 @@ const ConfirmPIN = ({route}: Props) => {
 
     const updateTmpPIN = async (pin: string): Promise<void> => {
         setTmpPIN(pin);
+    };
 
-        if (pin.length === 4) {
-            if (pin !== setPIN) {
+    useEffect(() => {
+        if (tmpPIN.length === 4) {
+            if (tmpPIN !== setPIN) {
                 setTmpPIN('');
                 setShowBack(true);
 
@@ -57,7 +59,7 @@ const ConfirmPIN = ({route}: Props) => {
             }
 
             // Set pin
-            setKeychainItem('pin', pin);
+            setKeychainItem('pin', tmpPIN);
             setPINActive(true);
 
             if (!route.params.isChangePIN && !isBiometricsActive) {
@@ -75,7 +77,7 @@ const ConfirmPIN = ({route}: Props) => {
                 );
             }
         }
-    };
+    }, [tmpPIN]);
 
     return (
         <SafeAreaView

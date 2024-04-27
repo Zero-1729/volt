@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
@@ -36,11 +36,6 @@ const SetPIN = ({route}: Props) => {
 
     const updateTmpPIN = (pin: string): void => {
         setTmpPIN(pin);
-
-        if (pin.length === 4) {
-            setTmpPIN('');
-            moveToConfirm(pin);
-        }
     };
 
     const moveToConfirm = (pin: string) => {
@@ -51,6 +46,13 @@ const SetPIN = ({route}: Props) => {
             }),
         );
     };
+
+    useEffect(() => {
+        if (tmpPIN.length === 4) {
+            setTmpPIN('');
+            moveToConfirm(tmpPIN);
+        }
+    }, [tmpPIN]);
 
     return (
         <SafeAreaView
