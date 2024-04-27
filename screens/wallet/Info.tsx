@@ -35,6 +35,9 @@ import {ENet} from '../../types/enums';
 import {capitalizeFirst} from '../../modules/transform';
 import Toast from 'react-native-toast-message';
 
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import PINPass from '../../components/pinpass';
+
 import {disconnect} from '@breeztech/react-native-breez-sdk';
 
 const Info = () => {
@@ -60,6 +63,7 @@ const Info = () => {
         wallets,
         walletMode,
         setWalletModeType,
+        isPINActive,
     } = useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
@@ -85,6 +89,39 @@ const Info = () => {
     const [walletFingerprintText, setWalletFingerprintText] =
         useState(walletFingerprint);
     const [walletPathText, setWalletPathText] = useState(walletPath);
+
+    const bottomPINPassRef = useRef<BottomSheetModal>(null);
+    const [pinIdx, setPINIdx] = useState(-1);
+
+    const togglePINPassModal = () => {
+        if (pinIdx !== 1) {
+            bottomPINPassRef.current?.present();
+        } else {
+            bottomPINPassRef.current?.close();
+        }
+    };
+
+    const handlePassSuccess = async () => {
+        routeToBackup();
+        bottomPINPassRef.current?.close();
+    };
+
+    const routeToBackup = () => {
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'WalletBackup',
+            }),
+        );
+    };
+
+    const handleBackupRoute = () => {
+        if (isPINActive) {
+            togglePINPassModal();
+            return;
+        }
+
+        routeToBackup();
+    };
 
     const CardColor =
         ColorScheme.WalletColors[walletData.type][walletData.network];
@@ -186,369 +223,380 @@ const Info = () => {
                     {backgroundColor: CardColor},
                 ]}
             />
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View
-                    style={[
-                        styles.backgroundContainer,
-                        tailwind('w-full absolute'),
-                        {
-                            backgroundColor: CardColor,
-                        },
-                    ]}
-                />
-                <View
-                    style={[
-                        tailwind(
-                            'flex-row mt-6 w-5/6 justify-center items-center',
-                        ),
-                    ]}>
-                    <PlainButton
+            <BottomSheetModalProvider>
+                <View style={[tailwind('w-full h-full items-center')]}>
+                    <View
+                        style={[
+                            styles.backgroundContainer,
+                            tailwind('w-full absolute'),
+                            {
+                                backgroundColor: CardColor,
+                            },
+                        ]}
+                    />
+                    <View
                         style={[
                             tailwind(
-                                'absolute w-full left-0 items-center flex-row',
+                                'flex-row mt-6 w-5/6 justify-center items-center',
                             ),
-                        ]}
-                        onPress={() => {
-                            navigation.dispatch(CommonActions.goBack());
-                        }}>
-                        <Back fill={'white'} />
-                    </PlainButton>
-                    {/* Wallet name */}
-                    <Text
-                        style={[
-                            tailwind('w-4/6 text-center font-bold'),
-                            {color: 'white'},
-                        ]}
-                        ellipsizeMode="middle"
-                        numberOfLines={1}>
-                        {walletData.name}
-                    </Text>
-                </View>
-
-                {/* Allow user to change wallet name */}
-                <View style={[tailwind('w-5/6 mt-12'), {marginBottom: 64}]}>
-                    <View>
-                        <View style={[tailwind('flex flex-row')]}>
-                            <VText
-                                style={[
-                                    tailwind('text-sm mb-2 mr-1 w-full'),
-                                    {color: 'white'},
-                                ]}>
-                                {t('name')}
-                            </VText>
-                        </View>
-                        <View
+                        ]}>
+                        <PlainButton
                             style={[
-                                styles.renameContainer,
-                                tailwind('px-4 w-full'),
-                            ]}>
-                            <TextSingleInput
-                                placeholderTextColor={
-                                    'rgba(255, 255, 255, 0.6)'
-                                }
-                                refs={nameInput}
-                                maxLength={WALLET_NAME_LENGTH}
-                                shavedHeight={true}
-                                placeholder={walletName}
-                                onChangeText={updateTmpName}
-                                onBlur={() => {
-                                    // Only set new name if name is not empty
-                                    // and name is different from current name
-                                    if (
-                                        tmpName.trim() !== walletName &&
-                                        tmpName.trim().length > 1
-                                    ) {
-                                        RNHapticFeedback.trigger(
-                                            'impactLight',
-                                            RNHapticFeedbackOptions,
-                                        );
-                                        renameWallet(currentWalletID, tmpName);
+                                tailwind(
+                                    'absolute w-full left-0 items-center flex-row',
+                                ),
+                            ]}
+                            onPress={() => {
+                                navigation.dispatch(CommonActions.goBack());
+                            }}>
+                            <Back fill={'white'} />
+                        </PlainButton>
+                        {/* Wallet name */}
+                        <Text
+                            style={[
+                                tailwind('w-4/6 text-center font-bold'),
+                                {color: 'white'},
+                            ]}
+                            ellipsizeMode="middle"
+                            numberOfLines={1}>
+                            {walletData.name}
+                        </Text>
+                    </View>
 
-                                        // Reset tmpName and clear input
-                                        setTmpName('');
-                                        nameInput.current?.clear();
-                                    }
-                                }}
-                                color={'white'}
-                            />
-
-                            {tmpName.length > 0 && (
-                                <View
+                    {/* Allow user to change wallet name */}
+                    <View style={[tailwind('w-5/6 mt-12'), {marginBottom: 64}]}>
+                        <View>
+                            <View style={[tailwind('flex flex-row')]}>
+                                <VText
                                     style={[
-                                        tailwind(
-                                            'absolute right-4 justify-center h-full',
-                                        ),
+                                        tailwind('text-sm mb-2 mr-1 w-full'),
+                                        {color: 'white'},
                                     ]}>
+                                    {t('name')}
+                                </VText>
+                            </View>
+                            <View
+                                style={[
+                                    styles.renameContainer,
+                                    tailwind('px-4 w-full'),
+                                ]}>
+                                <TextSingleInput
+                                    placeholderTextColor={
+                                        'rgba(255, 255, 255, 0.6)'
+                                    }
+                                    refs={nameInput}
+                                    maxLength={WALLET_NAME_LENGTH}
+                                    shavedHeight={true}
+                                    placeholder={walletName}
+                                    onChangeText={updateTmpName}
+                                    onBlur={() => {
+                                        // Only set new name if name is not empty
+                                        // and name is different from current name
+                                        if (
+                                            tmpName.trim() !== walletName &&
+                                            tmpName.trim().length > 1
+                                        ) {
+                                            RNHapticFeedback.trigger(
+                                                'impactLight',
+                                                RNHapticFeedbackOptions,
+                                            );
+                                            renameWallet(
+                                                currentWalletID,
+                                                tmpName,
+                                            );
+
+                                            // Reset tmpName and clear input
+                                            setTmpName('');
+                                            nameInput.current?.clear();
+                                        }
+                                    }}
+                                    color={'white'}
+                                />
+
+                                {tmpName.length > 0 && (
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'absolute right-4 justify-center h-full',
+                                            ),
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm opacity-60'),
+                                                {color: 'white'},
+                                            ]}>
+                                            ({tmpName.length}/
+                                            {WALLET_NAME_LENGTH})
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Wallet Info */}
+                    {/* Wallet Type Path and Master Fingerprint */}
+                    {isAdvancedMode && (
+                        <View style={[tailwind('w-5/6 mb-6 flex-row')]}>
+                            <View style={[tailwind('w-1/2 items-center')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm mb-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {t('derivation_path')}
+                                </Text>
+
+                                <PlainButton onPress={copyPathToClipboard}>
                                     <Text
                                         style={[
-                                            tailwind('text-sm opacity-60'),
-                                            {color: 'white'},
+                                            tailwind('text-sm'),
+                                            {color: ColorScheme.Text.Default},
                                         ]}>
-                                        ({tmpName.length}/{WALLET_NAME_LENGTH})
+                                        {walletPathText}
                                     </Text>
-                                </View>
-                            )}
+                                </PlainButton>
+                            </View>
+
+                            <View style={[tailwind('w-1/2 items-center')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm mb-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {t('master_fingerprint')}
+                                </Text>
+
+                                <PlainButton onPress={copyFingerToClipboard}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        {walletFingerprintText}
+                                    </Text>
+                                </PlainButton>
+                            </View>
                         </View>
-                    </View>
-                </View>
+                    )}
 
-                {/* Wallet Info */}
-                {/* Wallet Type Path and Master Fingerprint */}
-                {isAdvancedMode && (
-                    <View style={[tailwind('w-5/6 mb-6 flex-row')]}>
-                        <View style={[tailwind('w-1/2 items-center')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm mb-2'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                {t('derivation_path')}
-                            </Text>
+                    {/* Wallet Network and Type */}
+                    {isAdvancedMode && (
+                        <View
+                            style={[tailwind('w-5/6 flex-row justify-start')]}>
+                            <View style={[tailwind('w-1/2 items-center')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm mb-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {capitalizeFirst(t('network'))}
+                                </Text>
 
-                            <PlainButton onPress={copyPathToClipboard}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm capitalize'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {walletNetwork}
+                                </Text>
+                            </View>
+
+                            <View style={[tailwind('w-1/2 items-center')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm mb-2'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {t('type')}
+                                </Text>
+
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {walletPathText}
+                                    {walletTypeName}
                                 </Text>
-                            </PlainButton>
+                            </View>
                         </View>
+                    )}
 
-                        <View style={[tailwind('w-1/2 items-center')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm mb-2'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                {t('master_fingerprint')}
-                            </Text>
+                    {/* View Divider */}
+                    {isAdvancedMode && (
+                        <View style={[tailwind('w-full my-8'), HeadingBar]} />
+                    )}
 
-                            <PlainButton onPress={copyFingerToClipboard}>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
-                                    {walletFingerprintText}
-                                </Text>
-                            </PlainButton>
-                        </View>
-                    </View>
-                )}
-
-                {/* Wallet Network and Type */}
-                {isAdvancedMode && (
-                    <View style={[tailwind('w-5/6 flex-row justify-start')]}>
-                        <View style={[tailwind('w-1/2 items-center')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm mb-2'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                {capitalizeFirst(t('network'))}
-                            </Text>
-
-                            <Text
-                                style={[
-                                    tailwind('text-sm capitalize'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {walletNetwork}
-                            </Text>
-                        </View>
-
-                        <View style={[tailwind('w-1/2 items-center')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm mb-2'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
-                                {t('type')}
-                            </Text>
-
+                    {/* Wallet Tools & Info */}
+                    {/* Backup / Export material - Seed and Descriptor */}
+                    <PlainButton
+                        style={[tailwind('w-5/6 mb-6')]}
+                        onPress={handleBackupRoute}>
+                        <View
+                            style={[
+                                tailwind(
+                                    `items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between`,
+                                ),
+                            ]}>
                             <Text
                                 style={[
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {walletTypeName}
+                                {capitalizeFirst(t('backup'))}
                             </Text>
+
+                            <View style={[tailwind('items-center')]}>
+                                {langDir === 'right' && (
+                                    <Left
+                                        width={16}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                    />
+                                )}
+                                {langDir === 'left' && (
+                                    <Right
+                                        width={16}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                    />
+                                )}
+                            </View>
                         </View>
-                    </View>
-                )}
+                    </PlainButton>
 
-                {/* View Divider */}
-                {isAdvancedMode && (
-                    <View style={[tailwind('w-full my-8'), HeadingBar]} />
-                )}
+                    {/* Wallet Xpub */}
+                    <PlainButton
+                        style={[tailwind('w-5/6 mb-6')]}
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({
+                                    name: 'WalletXpub',
+                                }),
+                            );
+                        }}>
+                        <View
+                            style={[
+                                tailwind(
+                                    `items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between`,
+                                ),
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('show_xpub')}
+                            </Text>
 
-                {/* Wallet Tools & Info */}
-                {/* Backup / Export material - Seed and Descriptor */}
-                <PlainButton
-                    style={[tailwind('w-5/6 mb-6')]}
-                    onPress={() => {
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'WalletBackup',
-                            }),
-                        );
-                    }}>
-                    <View
+                            <View style={[tailwind('items-center')]}>
+                                {langDir === 'right' && (
+                                    <Left
+                                        width={16}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                    />
+                                )}
+                                {langDir === 'left' && (
+                                    <Right
+                                        width={16}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                    />
+                                )}
+                            </View>
+                        </View>
+                    </PlainButton>
+
+                    {/* Address Ownership Checker */}
+                    <PlainButton
+                        style={[tailwind('w-5/6')]}
+                        onPress={() => {
+                            const miniwallet = getMiniWallet(walletData);
+
+                            navigation.dispatch(
+                                CommonActions.navigate({
+                                    name: 'AddressOwnership',
+                                    params: {
+                                        wallet: miniwallet,
+                                    },
+                                }),
+                            );
+                        }}>
+                        <View
+                            style={[
+                                tailwind(
+                                    `items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between`,
+                                ),
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('check_address_ownership')}
+                            </Text>
+
+                            <View style={[tailwind('items-center')]}>
+                                {langDir === 'right' && (
+                                    <Left
+                                        width={16}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                    />
+                                )}
+                                {langDir === 'left' && (
+                                    <Right
+                                        width={16}
+                                        stroke={ColorScheme.SVG.GrayFill}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                    />
+                                )}
+                            </View>
+                        </View>
+                    </PlainButton>
+
+                    {/* Delete Wallet btn */}
+                    <PlainButton
+                        onPress={showDialog}
                         style={[
                             tailwind(
-                                `items-center ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } justify-between`,
+                                'absolute bottom-6 px-8 py-3 rounded-full',
                             ),
+                            {
+                                backgroundColor: ColorScheme.Background.Alert,
+                            },
                         ]}>
                         <Text
                             style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
+                                tailwind('font-bold'),
+                                {color: ColorScheme.Text.Alert},
                             ]}>
-                            {capitalizeFirst(t('backup'))}
+                            {capitalizeFirst(t('delete'))}
                         </Text>
+                    </PlainButton>
+                </View>
 
-                        <View style={[tailwind('items-center')]}>
-                            {langDir === 'right' && (
-                                <Left
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            )}
-                            {langDir === 'left' && (
-                                <Right
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            )}
-                        </View>
-                    </View>
-                </PlainButton>
-
-                {/* Wallet Xpub */}
-                <PlainButton
-                    style={[tailwind('w-5/6 mb-6')]}
-                    onPress={() => {
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'WalletXpub',
-                            }),
-                        );
-                    }}>
-                    <View
-                        style={[
-                            tailwind(
-                                `items-center ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } justify-between`,
-                            ),
-                        ]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {t('show_xpub')}
-                        </Text>
-
-                        <View style={[tailwind('items-center')]}>
-                            {langDir === 'right' && (
-                                <Left
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            )}
-                            {langDir === 'left' && (
-                                <Right
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            )}
-                        </View>
-                    </View>
-                </PlainButton>
-
-                {/* Address Ownership Checker */}
-                <PlainButton
-                    style={[tailwind('w-5/6')]}
-                    onPress={() => {
-                        const miniwallet = getMiniWallet(walletData);
-
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'AddressOwnership',
-                                params: {
-                                    wallet: miniwallet,
-                                },
-                            }),
-                        );
-                    }}>
-                    <View
-                        style={[
-                            tailwind(
-                                `items-center ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } justify-between`,
-                            ),
-                        ]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {t('check_address_ownership')}
-                        </Text>
-
-                        <View style={[tailwind('items-center')]}>
-                            {langDir === 'right' && (
-                                <Left
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            )}
-                            {langDir === 'left' && (
-                                <Right
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            )}
-                        </View>
-                    </View>
-                </PlainButton>
-
-                {/* Delete Wallet btn */}
-                <PlainButton
-                    onPress={showDialog}
-                    style={[
-                        tailwind('absolute bottom-6 px-8 py-3 rounded-full'),
-                        {
-                            backgroundColor: ColorScheme.Background.Alert,
-                        },
-                    ]}>
-                    <Text
-                        style={[
-                            tailwind('font-bold'),
-                            {color: ColorScheme.Text.Alert},
-                        ]}>
-                        {capitalizeFirst(t('delete'))}
-                    </Text>
-                </PlainButton>
-            </View>
+                <PINPass
+                    pinPassRef={bottomPINPassRef}
+                    triggerSuccess={handlePassSuccess}
+                    onSelectPinPass={setPINIdx}
+                    pinMode={false}
+                    idx={pinIdx}
+                />
+            </BottomSheetModalProvider>
         </SafeAreaView>
     );
 };
