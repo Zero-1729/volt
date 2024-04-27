@@ -314,82 +314,79 @@ const PIN = () => {
                                         </View>
                                     </View>
                                 </PlainButton>
-
-                                <View
-                                    style={tailwind(
-                                        'justify-center w-full items-center flex-row mb-10',
-                                    )}>
-                                    <View style={tailwind('w-5/6')}>
-                                        <View
-                                            style={tailwind(
-                                                `w-full ${
-                                                    langDir === 'right'
-                                                        ? 'flex-row-reverse'
-                                                        : 'flex-row'
-                                                } items-center mb-2`,
-                                            )}>
-                                            <VText
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm font-medium',
-                                                    ),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .Default,
-                                                    },
-                                                ]}>
-                                                {t('enable_biometrics_mode')}
-                                            </VText>
-                                            <Checkbox
-                                                onPress={handleBiometrics}
-                                                fillColor={
-                                                    ColorScheme.Background
-                                                        .CheckBoxFilled
-                                                }
-                                                unfillColor={
-                                                    ColorScheme.Background
-                                                        .CheckBoxUnfilled
-                                                }
-                                                size={18}
-                                                isChecked={isBiometricsActive}
-                                                iconStyle={{
-                                                    borderWidth: 1,
-                                                    borderRadius: 2,
-                                                }}
-                                                innerIconStyle={{
-                                                    borderWidth: 1,
-                                                    borderColor:
-                                                        ColorScheme.Background
-                                                            .CheckBoxOutline,
-                                                    borderRadius: 2,
-                                                }}
-                                                style={[
-                                                    tailwind(
-                                                        'flex-row absolute -right-4',
-                                                    ),
-                                                ]}
-                                                disableBuiltInState={true}
-                                            />
-                                        </View>
-
-                                        <View style={tailwind('w-full')}>
-                                            <VText
-                                                style={[
-                                                    tailwind('text-xs'),
-                                                    {
-                                                        color: ColorScheme.Text
-                                                            .DescText,
-                                                    },
-                                                ]}>
-                                                {t(
-                                                    'enable_biometrics_mode_description',
-                                                )}
-                                            </VText>
-                                        </View>
-                                    </View>
-                                </View>
                             </>
                         )}
+
+                        <View
+                            style={tailwind(
+                                'justify-center w-full items-center flex-row mb-10',
+                            )}>
+                            <View style={tailwind('w-5/6')}>
+                                <View
+                                    style={tailwind(
+                                        `w-full ${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } items-center mb-2`,
+                                    )}>
+                                    <VText
+                                        style={[
+                                            tailwind('text-sm font-medium'),
+                                            {
+                                                color: ColorScheme.Text.Default,
+                                            },
+                                        ]}>
+                                        {t('enable_biometrics_mode')}
+                                    </VText>
+                                    <Checkbox
+                                        onPress={handleBiometrics}
+                                        fillColor={
+                                            ColorScheme.Background
+                                                .CheckBoxFilled
+                                        }
+                                        unfillColor={
+                                            ColorScheme.Background
+                                                .CheckBoxUnfilled
+                                        }
+                                        size={18}
+                                        isChecked={isBiometricsActive}
+                                        iconStyle={{
+                                            borderWidth: 1,
+                                            borderRadius: 2,
+                                        }}
+                                        innerIconStyle={{
+                                            borderWidth: 1,
+                                            borderColor:
+                                                ColorScheme.Background
+                                                    .CheckBoxOutline,
+                                            borderRadius: 2,
+                                        }}
+                                        style={[
+                                            tailwind(
+                                                'flex-row absolute -right-4',
+                                            ),
+                                        ]}
+                                        disableBuiltInState={true}
+                                    />
+                                </View>
+
+                                <View style={tailwind('w-full')}>
+                                    <VText
+                                        style={[
+                                            tailwind('text-xs'),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .DescText,
+                                            },
+                                        ]}>
+                                        {t(
+                                            'enable_biometrics_mode_description',
+                                        )}
+                                    </VText>
+                                </View>
+                            </View>
+                        </View>
                     </View>
                 </View>
             </View>
