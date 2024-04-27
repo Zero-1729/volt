@@ -116,10 +116,10 @@ const SetPIN = () => {
                             {t('type_4_digit_pin_desc')}
                         </Text>
 
-                        <View style={[tailwind('flex mt-12')]}>
+                        <View style={[tailwind('flex mt-12 items-center')]}>
                             {/* TODO: navigate to screen to reset PIN */}
                             {firstWrong && (
-                                <PlainButton>
+                                <PlainButton onPress={() => {}}>
                                     <View
                                         style={[
                                             tailwind(
