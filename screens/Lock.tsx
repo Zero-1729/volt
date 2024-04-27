@@ -112,7 +112,7 @@ const Lock = () => {
                                 'h-1/2 w-full absolute top-0 items-center justify-center',
                             ),
                         ]}>
-                        <View style={[tailwind('h-1/2 justify-end')]}>
+                        <View style={[tailwind('h-1/2 justify-center')]}>
                             <AppIcon fill={ColorScheme.SVG.Default} />
                         </View>
 
