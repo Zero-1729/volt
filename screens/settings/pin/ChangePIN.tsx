@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
@@ -22,12 +22,17 @@ import {getKeychainItem} from '../../../class/keychainContext';
 import {PlainButton} from '../../../components/button';
 import {capitalizeFirst} from '../../../modules/transform';
 
+import {AppStorageContext} from '../../../class/storageContext';
+import {MAX_PIN_ATTEMPTS} from '../../../modules/wallet-defaults';
+
 const ChangePIN = () => {
     const [tmpPIN, setTmpPIN] = useState<string>('');
 
     const navigation = useNavigation();
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
+
+    const {pinAttempts, setPINAttempts} = useContext(AppStorageContext);
 
     const [validPin, setValidPin] = useState<string>('');
     const [firstWrong, setFirstWrong] = useState<boolean>(false);
@@ -74,6 +79,7 @@ const ChangePIN = () => {
 
             setTmpPIN('');
             setFirstWrong(true);
+            setPINAttempts(pinAttempts + 1);
         }
     }, [tmpPIN]);
 
@@ -129,30 +135,67 @@ const ChangePIN = () => {
 
                         <View style={[tailwind('flex mt-12 items-center')]}>
                             {firstWrong && (
-                                <PlainButton onPress={routeToResetPIN}>
+                                <>
                                     <View
                                         style={[
-                                            tailwind(
-                                                'items-center rounded-full py-1 px-4 mb-6',
-                                            ),
-                                            {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Greyed,
-                                            },
+                                            tailwind('items-center mb-4 w-5/6'),
                                         ]}>
-                                        <Text
+                                        {pinAttempts ===
+                                        MAX_PIN_ATTEMPTS - 1 ? (
+                                            <Text
+                                                style={[
+                                                    tailwind(
+                                                        'text-sm text-center',
+                                                    ),
+                                                    {
+                                                        color: ColorScheme.Text
+                                                            .Default,
+                                                    },
+                                                ]}>
+                                                {t('last_attempt_warning')}
+                                            </Text>
+                                        ) : (
+                                            <Text
+                                                style={[
+                                                    tailwind('text-sm'),
+                                                    {
+                                                        color: ColorScheme.Text
+                                                            .Default,
+                                                    },
+                                                ]}>
+                                                {t('pin_attempts', {
+                                                    attempts:
+                                                        MAX_PIN_ATTEMPTS -
+                                                        pinAttempts,
+                                                })}
+                                            </Text>
+                                        )}
+                                    </View>
+                                    <PlainButton onPress={routeToResetPIN}>
+                                        <View
                                             style={[
-                                                tailwind('text-base'),
+                                                tailwind(
+                                                    'items-center rounded-full py-1 px-4 mb-6',
+                                                ),
                                                 {
-                                                    color: ColorScheme.Text
-                                                        .DescText,
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Greyed,
                                                 },
                                             ]}>
-                                            {t('forgot_pin')}
-                                        </Text>
-                                    </View>
-                                </PlainButton>
+                                            <Text
+                                                style={[
+                                                    tailwind('text-base'),
+                                                    {
+                                                        color: ColorScheme.Text
+                                                            .DescText,
+                                                    },
+                                                ]}>
+                                                {t('forgot_pin')}
+                                            </Text>
+                                        </View>
+                                    </PlainButton>
+                                </>
                             )}
 
                             <View
