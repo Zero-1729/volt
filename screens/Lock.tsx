@@ -88,6 +88,15 @@ const Lock = ({route}: Props) => {
             });
     };
 
+    const routeToResetPIN = () => {
+        navigation.dispatch(
+            CommonActions.navigate('SettingsRoot', {
+                screen: 'ResetPIN',
+                params: {isPINReset: true},
+            }),
+        );
+    };
+
     useEffect(() => {
         fetchPin();
     }, []);
@@ -182,7 +191,7 @@ const Lock = ({route}: Props) => {
                                         )}
                                     </View>
 
-                                    <PlainButton onPress={() => {}}>
+                                    <PlainButton onPress={routeToResetPIN}>
                                         <View
                                             style={[
                                                 tailwind(

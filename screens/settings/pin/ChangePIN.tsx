@@ -52,6 +52,15 @@ const ChangePIN = () => {
         );
     };
 
+    const routeToResetPIN = () => {
+        navigation.dispatch(
+            CommonActions.navigate('SettingsRoot', {
+                screen: 'ResetPIN',
+                params: {isPINReset: true},
+            }),
+        );
+    };
+
     useEffect(() => {
         initValidPin();
     }, []);
@@ -119,9 +128,8 @@ const ChangePIN = () => {
                         </Text>
 
                         <View style={[tailwind('flex mt-12 items-center')]}>
-                            {/* TODO: navigate to screen to reset PIN */}
                             {firstWrong && (
-                                <PlainButton onPress={() => {}}>
+                                <PlainButton onPress={routeToResetPIN}>
                                     <View
                                         style={[
                                             tailwind(
