@@ -11884,17 +11884,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-remote-svg@npm:^2.0.11":
-  version: 2.0.11
-  resolution: "react-native-remote-svg@npm:2.0.11"
-  peerDependencies:
-    react: ">=15"
-    react-native: ">=0.57"
-    react-native-webview: ">=5.2.4"
-  checksum: b6517765c89e8d6466634b7ecccf19136c52cc2b76e127d75db64bc00837828b7633df75598ee602131e807c77ebd823e6b9c84a741ee5e4856be9d9d0d18aad
-  languageName: node
-  linkType: hard
-
 "react-native-safe-area-context@npm:^4.9.0":
   version: 4.10.1
   resolution: "react-native-safe-area-context@npm:4.10.1"
@@ -14232,7 +14221,6 @@ __metadata:
     react-native-quick-crypto: ^0.6.1
     react-native-reanimated: ^3.8.1
     react-native-reanimated-carousel: ^3.5.1
-    react-native-remote-svg: ^2.0.11
     react-native-safe-area-context: ^4.9.0
     react-native-screens: ^3.29.0
     react-native-secure-key-store: ^2.0.10
