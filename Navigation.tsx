@@ -169,9 +169,11 @@ export type SettingsParamList = {
     };
     ResetPIN: {
         isPINReset: boolean;
+        isChangePIN?: boolean;
     };
     MnemonicTest: {
         isPINReset: boolean;
+        isChangePIN: boolean;
     };
 
     SettingsTools: undefined;
