@@ -43,7 +43,11 @@ const SetPIN = ({route}: Props) => {
         navigation.dispatch(
             CommonActions.navigate({
                 name: 'ConfirmPIN',
-                params: {pin: pin, isChangePIN: isChangePIN},
+                params: {
+                    pin: pin,
+                    isChangePIN: isChangePIN,
+                    isPINReset: route.params?.isPINReset,
+                },
             }),
         );
     };

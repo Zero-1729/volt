@@ -73,7 +73,10 @@ const ConfirmPIN = ({route}: Props) => {
                 navigation.dispatch(
                     CommonActions.navigate('SettingsRoot', {
                         screen: 'DonePIN',
-                        params: {isChangePIN: isChangePIN},
+                        params: {
+                            isChangePIN: isChangePIN,
+                            isPINReset: route.params?.isPINReset,
+                        },
                     }),
                 );
             }
