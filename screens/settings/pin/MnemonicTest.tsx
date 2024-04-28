@@ -54,6 +54,7 @@ const MnemonicTest = ({route}: Props) => {
                     name: 'SetPIN',
                     params: {
                         isPINReset: route.params?.isPINReset,
+                        isChangePIN: route.params?.isChangePIN,
                     },
                 }),
             );

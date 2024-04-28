@@ -56,7 +56,7 @@ const ChangePIN = () => {
         navigation.dispatch(
             CommonActions.navigate('SettingsRoot', {
                 screen: 'ResetPIN',
-                params: {isPINReset: true},
+                params: {isPINReset: true, isChangePIN: true},
             }),
         );
     };

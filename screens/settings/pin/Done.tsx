@@ -44,8 +44,20 @@ const Done = ({route}: Props) => {
     const handleDone = () => {
         setPINActive(true);
 
+        if (route.params?.isPINReset && !route.params?.isChangePIN) {
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{name: 'HomeScreen'}],
+                }),
+            );
+            return;
+        }
+
         navigation.dispatch(
-            CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
+            CommonActions.navigate('SettingsRoot', {
+                screen: 'PINManager',
+            }),
         );
     };
 
