@@ -88,6 +88,8 @@ import WelcomePIN from './screens/settings/pin/Welcome';
 import ConfirmPIN from './screens/settings/pin/ConfirmPIN';
 import DonePIN from './screens/settings/pin/Done';
 import SetBiometrics from './screens/settings/pin/SetBiometrics';
+import ResetPIN from './screens/settings/pin/ResetPIN';
+import MnemonicTest from './screens/settings/pin/MnemonicTest';
 
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
@@ -161,6 +163,12 @@ export type SettingsParamList = {
     };
     SetBiometrics: {
         standalone: boolean;
+    };
+    ResetPIN: {
+        isPINReset: boolean;
+    };
+    MnemonicTest: {
+        isPINReset: boolean;
     };
 
     SettingsTools: undefined;
@@ -271,6 +279,11 @@ const SettingsRoot = () => {
             <SettingsStack.Screen
                 name="SetBiometrics"
                 component={SetBiometrics}
+            />
+            <SettingsStack.Screen name="ResetPIN" component={ResetPIN} />
+            <SettingsStack.Screen
+                name="MnemonicTest"
+                component={MnemonicTest}
             />
 
             <SettingsStack.Screen
