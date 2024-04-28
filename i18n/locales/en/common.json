@@ -65,5 +65,8 @@
     "breez_backup_started": "Breez backup started",
     "breez_backup_success": "Breez backup successful",
     "breez_backup_failed": "Breez backup failed",
-    "scanner": "QR Code"
+    "scanner": "QR Code",
+    "forgot_pin": "Forgot PIN?",
+    "last_attempt_warning": "Warning: Last attempt, if you enter the wrong PIN again your wallet will be reset.",
+    "pin_attempts": "{{attempts}} attempts remaining"
 }

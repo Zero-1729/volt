@@ -65,5 +65,8 @@
     "breez_backup_started": "بدأ النسخ الاحتياطي Breez",
     "breez_backup_success": "تم النسخ الاحتياطي لـ Breez بنجاح",
     "breez_backup_failed": "فشل النسخ الاحتياطي Breez",
-    "scanner": "QR Code"
+    "scanner": "QR Code",
+    "forgot_pin": "هل نسيت رقم التعريف الشخصي؟",
+    "last_attempt_warning": "تحذير: المحاولة الأخيرة، إذا قمت بإدخال رقم التعريف الشخصي PIN الخاطئ مرة أخرى، فسيتم إعادة ضبط محفظتك.",
+    "pin_attempts": "{{attempts}} متبقية من المحاولات"
 }
