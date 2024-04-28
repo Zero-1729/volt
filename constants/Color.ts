@@ -27,6 +27,8 @@ const Color = (currentTheme: ColorThemeType) => {
             CardGreyed: isDarkMode ? '#3f3f3f' : '#D5D5D5',
             Alert: '#ff4545',
             QRBorder: isDarkMode ? 'white' : '#E5E5E5',
+            Correct: isDarkMode ? '#34C571' : '#34C571',
+            Wrong: isDarkMode ? '#EB5757' : '#EB5757',
         },
         HeadingBar: isDarkMode ? '#1b1b1b' : '#F3F3F3',
         Text: {
