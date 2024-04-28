@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {
     Text,
@@ -39,6 +40,7 @@ import {
     TextLongInputProps,
     NumpadRequestInputProps,
     PinNumpadInputProps,
+    MnemonicInputProps,
 } from '../types/props';
 
 import Folder from './../assets/svg/file-directory-fill-24.svg';
@@ -590,6 +592,238 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     }}>
                     <LeftArrow fill={ColorScheme.SVG.Default} />
                 </Pressable>
+            </View>
+        </View>
+    );
+};
+
+export const MnemonicInput = (props: MnemonicInputProps) => {
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    const {appLanguage} = useContext(AppStorageContext);
+
+    const vibrateInput = () => {
+        RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
+    };
+
+    const validMnemonics = props.mnemonicList;
+    const [list, setList] = useState<{state: boolean | null; word: string}[]>(
+        Array(12)
+            .fill(null)
+            .map(() => ({state: null, word: ''})),
+    );
+
+    const mnemonicRefs: React.RefObject<TextInput>[] = [...Array(12)].map(() =>
+        React.createRef<TextInput>(),
+    );
+
+    const updateTextItem = (text: string, index: number) => {
+        const nextList = [...list];
+        nextList[index].word = text;
+        setList(nextList);
+    };
+
+    const calculateWordTrue = (index: number) => {
+        if (list[index].word === '') {
+            return;
+        }
+
+        const word = list[index].word;
+
+        const nextList = [...list];
+        nextList[index].state = word === validMnemonics[index];
+        setList(nextList);
+
+        if (word === validMnemonics[index]) {
+            vibrateInput();
+        }
+    };
+
+    const getColumnBackgroundColor = (state: boolean | null) => {
+        if (state === null) {
+            return ColorScheme.Background.Greyed;
+        } else if (state) {
+            return ColorScheme.Background.Correct;
+        } else {
+            return ColorScheme.Background.Wrong;
+        }
+    };
+
+    const getColumnTextColor = (state: boolean | null) => {
+        if (state === null) {
+            return ColorScheme.Text.GrayedText;
+        }
+
+        return ColorScheme.Text.Default;
+    };
+
+    useEffect(() => {
+        if (list.every(item => item.state === true)) {
+            props.onMnemonicCheck(true);
+        }
+    }, [list[list.length - 1].state]);
+
+    return (
+        <View style={[tailwind('w-full items-center justify-center flex-row')]}>
+            {/* Col 0 */}
+            <View style={[tailwind('w-1/2 flex mr-4')]}>
+                {Array(6)
+                    .fill('')
+                    .map((_, index) => (
+                        <PlainButton
+                            key={index}
+                            style={[tailwind('items-center justify-center')]}
+                            onPress={() => {
+                                mnemonicRefs[index].current?.focus();
+                            }}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'flex-row items-center justify-center w-full',
+                                    ),
+                                    {
+                                        marginTop: 6,
+                                        marginBottom: 6,
+                                    },
+                                ]}>
+                                <View
+                                    style={[
+                                        tailwind('items-center justify-center'),
+                                        {
+                                            backgroundColor:
+                                                getColumnBackgroundColor(
+                                                    list[index].state,
+                                                ),
+                                            borderTopLeftRadius: 32,
+                                            borderBottomLeftRadius: 32,
+                                            marginRight: 2,
+                                            height: 40,
+                                            width: '25%',
+                                        },
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-bold'),
+                                            {
+                                                color: getColumnTextColor(
+                                                    list[index].state,
+                                                ),
+                                            },
+                                        ]}>
+                                        {i18nNumber(index, appLanguage.code)}
+                                    </Text>
+                                </View>
+
+                                <TextInput
+                                    keyboardType={'default'}
+                                    spellCheck={false}
+                                    autoCorrect={false}
+                                    autoCapitalize="none"
+                                    selectTextOnFocus={true}
+                                    value={list[index].word}
+                                    ref={mnemonicRefs[index]}
+                                    onBlur={() => {
+                                        calculateWordTrue(index);
+                                    }}
+                                    onChangeText={text => {
+                                        updateTextItem(text, index);
+                                    }}
+                                    style={{
+                                        color: ColorScheme.Text.Default,
+                                        height: 40,
+                                        width: '75%',
+                                        borderTopRightRadius: 32,
+                                        borderBottomRightRadius: 32,
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                        paddingLeft: 8,
+                                        paddingRight: 8,
+                                    }}
+                                />
+                            </View>
+                        </PlainButton>
+                    ))}
+            </View>
+
+            {/* Col 1 */}
+            <View style={[tailwind('w-1/2 flex mr-4')]}>
+                {Array(6)
+                    .fill('')
+                    .map((_, index) => (
+                        <PlainButton
+                            key={index + 6}
+                            style={[tailwind('items-center justify-center')]}
+                            onPress={() => {
+                                mnemonicRefs[index + 6].current?.focus();
+                            }}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'flex-row items-center justify-center w-full',
+                                    ),
+                                    {
+                                        marginTop: 6,
+                                        marginBottom: 6,
+                                    },
+                                ]}>
+                                <View
+                                    style={[
+                                        tailwind('items-center justify-center'),
+                                        {
+                                            backgroundColor:
+                                                getColumnBackgroundColor(
+                                                    list[index + 6].state,
+                                                ),
+                                            borderTopLeftRadius: 32,
+                                            borderBottomLeftRadius: 32,
+                                            marginRight: 2,
+                                            height: 40,
+                                            width: '25%',
+                                        },
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-bold'),
+                                            {
+                                                color: getColumnTextColor(
+                                                    list[index + 6].state,
+                                                ),
+                                            },
+                                        ]}>
+                                        {i18nNumber(index + 6, appLanguage.code)}
+                                    </Text>
+                                </View>
+
+                                <TextInput
+                                    keyboardType={'default'}
+                                    spellCheck={false}
+                                    autoCorrect={false}
+                                    autoCapitalize="none"
+                                    selectTextOnFocus={true}
+                                    value={list[index + 6].word}
+                                    ref={mnemonicRefs[index + 6]}
+                                    onBlur={() => {
+                                        calculateWordTrue(index + 6);
+                                    }}
+                                    onChangeText={text => {
+                                        updateTextItem(text, index + 6);
+                                    }}
+                                    style={{
+                                        color: ColorScheme.Text.Default,
+                                        height: 40,
+                                        width: '75%',
+                                        borderTopRightRadius: 32,
+                                        borderBottomRightRadius: 32,
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                        paddingLeft: 8,
+                                        paddingRight: 8,
+                                    }}
+                                />
+                            </View>
+                        </PlainButton>
+                    ))}
             </View>
         </View>
     );

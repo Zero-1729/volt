@@ -146,6 +146,11 @@ export type PinNumpadInputProps = BaseProps & {
     showBiometrics: boolean;
 };
 
+export type MnemonicInputProps = BaseProps & {
+    mnemonicList: string[];
+    onMnemonicCheck: (state: boolean) => void;
+};
+
 export type DisplaySatsAmountProps = BaseProps & {
     amount: BigNumber;
     isApprox?: boolean;
