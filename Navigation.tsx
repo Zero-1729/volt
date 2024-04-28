@@ -153,13 +153,16 @@ export type SettingsParamList = {
     WelcomePIN: undefined;
     SetPIN: {
         isChangePIN?: boolean;
+        isPINReset?: boolean;
     };
     ConfirmPIN: {
         pin: string;
         isChangePIN?: boolean;
+        isPINReset?: boolean;
     };
     DonePIN: {
         isChangePIN?: boolean;
+        isPINReset?: boolean;
     };
     SetBiometrics: {
         standalone: boolean;
