@@ -508,7 +508,9 @@ const Home = ({route}: Props) => {
                     <PlainButton
                         onPress={() =>
                             navigation.dispatch(
-                                CommonActions.navigate({name: 'SettingsRoot'}),
+                                CommonActions.navigate('SettingsRoot', {
+                                    screen: 'Settings',
+                                }),
                             )
                         }>
                         <Dots
