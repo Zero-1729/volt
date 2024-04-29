@@ -55,7 +55,7 @@ import {useSharedValue} from 'react-native-reanimated';
 
 import RNBiometrics from '../../modules/biometrics';
 
-import {MnemonicDisplayCapsule} from '../../components/shared';
+import {MnemonicDisplayCapsule, GenericSwitch} from '../../components/shared';
 
 type Slide = () => ReactElement;
 
@@ -77,8 +77,11 @@ const Backup = () => {
     const walletType = WalletTypeDetails[walletData.type];
     const walletTypeName =
         walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
+    const CardColor =
+        ColorScheme.WalletColors[walletData.type][walletData.network];
 
     const [showPrivateDescriptor, setShowPrivateDescriptor] = useState(false);
+    const [switchEnabled, setSwitchEnabled] = useState(false);
 
     const getQRData = useCallback(
         (material: string) => {
@@ -186,46 +189,121 @@ const Backup = () => {
 
     const mainPanel = useCallback((): ReactElement => {
         const mnemonics = walletData.mnemonic.split(' ');
+        const baseBackup =
+            walletData.mnemonic !== ''
+                ? getQRData(EBackupMaterial.Mnemonic)
+                : getQRData(EBackupMaterial.Xprv);
+
+        const toggleSwitch = () => {
+            if (switchEnabled) {
+                RNHapticFeedback.trigger(
+                    'impactLight',
+                    RNHapticFeedbackOptions,
+                );
+            }
+
+            setSwitchEnabled(!switchEnabled);
+        };
 
         return (
             <View
                 style={[
                     tailwind('items-center justify-center h-full w-full'),
-                    styles.infoContainer,
+                    switchEnabled || walletData.mnemonic === ''
+                        ? styles.minMarginContainer
+                        : styles.largeMarginContainer,
                 ]}>
-                {/* Display mnemonic */}
-                {/* TODO: find sleek way to show mnemonic & Xprv QR code */}
-                <View
-                    style={[
-                        tailwind(
-                            'w-5/6 flex-row justify-center items-center mb-8',
-                        ),
-                    ]}>
-                    {/* col 0 */}
+                {/* Show mnemonic & QR code version or Xprv QR code */}
+                {switchEnabled || walletData.mnemonic === '' ? (
                     <View
                         style={[
-                            tailwind('items-center justify-center mr-4'),
-                            styles.capsuleContainer,
+                            tailwind('rounded self-center mb-4'),
+                            {
+                                borderWidth: 2,
+                                borderColor: ColorScheme.Background.QRBorder,
+                            },
                         ]}>
-                        {mnemonics.slice(0, 6).map((word, index) => (
-                            <MnemonicDisplayCapsule word={word} index={index} />
-                        ))}
+                        <QRCodeStyled
+                            style={{
+                                backgroundColor: 'white',
+                            }}
+                            data={baseBackup}
+                            pieceSize={7}
+                            padding={10}
+                            color={ColorScheme.Background.Default}
+                            pieceCornerType={'rounded'}
+                            isPiecesGlued={true}
+                            pieceBorderRadius={2}
+                        />
                     </View>
+                ) : (
+                    <View
+                        style={[
+                            tailwind(
+                                'w-5/6 flex-row justify-center items-center mb-6',
+                            ),
+                        ]}>
+                        {/* col 0 */}
+                        <View
+                            style={[
+                                tailwind('items-center justify-center mr-4'),
+                                styles.capsuleContainer,
+                            ]}>
+                            {mnemonics.slice(0, 6).map((word, index) => (
+                                <MnemonicDisplayCapsule
+                                    word={word}
+                                    index={index}
+                                />
+                            ))}
+                        </View>
 
-                    {/* col 1 */}
+                        {/* col 1 */}
+                        <View
+                            style={[
+                                tailwind('items-center justify-center'),
+                                styles.capsuleContainer,
+                            ]}>
+                            {mnemonics.slice(6, 12).map((word, index) => (
+                                <MnemonicDisplayCapsule
+                                    word={word}
+                                    index={index + 6}
+                                />
+                            ))}
+                        </View>
+                    </View>
+                )}
+
+                {walletData.mnemonic !== '' && (
                     <View
                         style={[
-                            tailwind('items-center justify-center'),
-                            styles.capsuleContainer,
+                            tailwind(
+                                'w-5/6 items-center justify-center mb-4 flex-row',
+                            ),
                         ]}>
-                        {mnemonics.slice(6, 12).map((word, index) => (
-                            <MnemonicDisplayCapsule
-                                word={word}
-                                index={index + 6}
-                            />
-                        ))}
+                        <Text
+                            style={[
+                                tailwind('text-sm font-bold mr-4'),
+                                {
+                                    color: switchEnabled
+                                        ? ColorScheme.Text.Default
+                                        : ColorScheme.Text.GrayedText,
+                                },
+                            ]}>
+                            {t('display_mnemonic_qr')}
+                        </Text>
+
+                        <GenericSwitch
+                            trackColor={{
+                                false: ColorScheme.Background.Greyed,
+                                true: CardColor,
+                            }}
+                            thumbColor={ColorScheme.Background.Inverted}
+                            iosBackgroundColor={ColorScheme.Background.Greyed}
+                            onValueChange={toggleSwitch}
+                            value={switchEnabled}
+                        />
                     </View>
-                </View>
+                )}
 
                 <View style={[tailwind('mt-2 flex w-5/6')]}>
                     <Text
@@ -251,10 +329,13 @@ const Backup = () => {
     }, [
         walletData.mnemonic,
         tailwind,
+        CardColor,
         ColorScheme,
         baseBackupTitle,
+        switchEnabled,
         t,
         warning,
+        getQRData,
     ]);
 
     const descriptorPanel = useCallback((): ReactElement => {
@@ -307,7 +388,7 @@ const Backup = () => {
             <View
                 style={[
                     tailwind('items-center justify-center h-full w-full'),
-                    styles.infoContainer,
+                    styles.largeMarginContainer,
                 ]}>
                 {/* Display QR code with seed */}
                 <View
@@ -673,8 +754,11 @@ const Backup = () => {
 export default Backup;
 
 const styles = StyleSheet.create({
-    infoContainer: {
+    largeMarginContainer: {
         marginTop: 56,
+    },
+    minMarginContainer: {
+        marginTop: 32,
     },
     capsuleContainer: {
         width: '46%',
