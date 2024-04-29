@@ -55,6 +55,8 @@ import {useSharedValue} from 'react-native-reanimated';
 
 import RNBiometrics from '../../modules/biometrics';
 
+import {MnemonicDisplayCapsule} from '../../components/shared';
+
 type Slide = () => ReactElement;
 
 const Backup = () => {
@@ -183,14 +185,7 @@ const Backup = () => {
     const warning = t('backup_clarification');
 
     const mainPanel = useCallback((): ReactElement => {
-        const baseBackup =
-            walletData.mnemonic !== ''
-                ? getQRData(EBackupMaterial.Mnemonic)
-                : getQRData(EBackupMaterial.Xprv);
-
-        const copyMainData = () => {
-            copyToClipboard(baseBackup);
-        };
+        const mnemonics = walletData.mnemonic.split(' ');
 
         return (
             <View
@@ -198,48 +193,39 @@ const Backup = () => {
                     tailwind('items-center justify-center h-full w-full'),
                     styles.infoContainer,
                 ]}>
-                {/* Display QR code with seed */}
+                {/* Display mnemonic */}
+                {/* TODO: find sleek way to show mnemonic & Xprv QR code */}
                 <View
                     style={[
-                        tailwind('rounded self-center mb-4'),
-                        {
-                            borderWidth: 2,
-                            borderColor: ColorScheme.Background.QRBorder,
-                        },
+                        tailwind(
+                            'w-5/6 flex-row justify-center items-center mb-8',
+                        ),
                     ]}>
-                    <QRCodeStyled
-                        style={{
-                            backgroundColor: 'white',
-                        }}
-                        data={baseBackup}
-                        pieceSize={7}
-                        padding={10}
-                        color={ColorScheme.Background.Default}
-                        pieceCornerType={'rounded'}
-                        isPiecesGlued={true}
-                        pieceBorderRadius={2}
-                    />
-                </View>
-
-                {/* Display either seed or ext key */}
-                <PlainButton
-                    style={[tailwind('items-center mb-4 w-5/6')]}
-                    onPress={copyMainData}>
-                    <Text
+                    {/* col 0 */}
+                    <View
                         style={[
-                            tailwind(
-                                'text-sm w-full p-3 text-center rounded-sm',
-                            ),
-                            {
-                                backgroundColor: ColorScheme.Background.Greyed,
-                                color: ColorScheme.Text.Default,
-                            },
-                        ]}
-                        numberOfLines={2}
-                        ellipsizeMode={'middle'}>
-                        {baseBackup}
-                    </Text>
-                </PlainButton>
+                            tailwind('items-center justify-center mr-4'),
+                            styles.capsuleContainer,
+                        ]}>
+                        {mnemonics.slice(0, 6).map((word, index) => (
+                            <MnemonicDisplayCapsule word={word} index={index} />
+                        ))}
+                    </View>
+
+                    {/* col 1 */}
+                    <View
+                        style={[
+                            tailwind('items-center justify-center'),
+                            styles.capsuleContainer,
+                        ]}>
+                        {mnemonics.slice(6, 12).map((word, index) => (
+                            <MnemonicDisplayCapsule
+                                word={word}
+                                index={index + 6}
+                            />
+                        ))}
+                    </View>
+                </View>
 
                 <View style={[tailwind('mt-2 flex w-5/6')]}>
                     <Text
@@ -264,13 +250,11 @@ const Backup = () => {
         );
     }, [
         walletData.mnemonic,
-        getQRData,
         tailwind,
         ColorScheme,
         baseBackupTitle,
         t,
         warning,
-        copyToClipboard,
     ]);
 
     const descriptorPanel = useCallback((): ReactElement => {
@@ -350,7 +334,7 @@ const Backup = () => {
 
                 {/* Display either seed or descriptor */}
                 <PlainButton
-                    style={[tailwind('items-center mb-4 w-5/6')]}
+                    style={[tailwind('items-center mb-6 w-5/6')]}
                     onPress={copyDescriptor}>
                     <Text
                         style={[
@@ -371,7 +355,15 @@ const Backup = () => {
                 {/* Toggle with private key version */}
                 {/* Only available if not watch-only */}
                 {!walletData.isWatchOnly && (
-                    <View
+                    <PlainButton
+                        onPress={() => {
+                            RNHapticFeedback.trigger(
+                                'rigid',
+                                RNHapticFeedbackOptions,
+                            );
+
+                            togglePrivateDescriptor();
+                        }}
                         style={[
                             tailwind(
                                 `mb-4 self-center w-4/5 ${
@@ -413,6 +405,14 @@ const Backup = () => {
                                     : 'grey',
                                 borderRadius: 2,
                             }}
+                            onPress={() => {
+                                RNHapticFeedback.trigger(
+                                    'rigid',
+                                    RNHapticFeedbackOptions,
+                                );
+
+                                togglePrivateDescriptor();
+                            }}
                             style={[
                                 tailwind(
                                     `flex-row absolute ${
@@ -422,17 +422,9 @@ const Backup = () => {
                                     }`,
                                 ),
                             ]}
-                            onPress={() => {
-                                RNHapticFeedback.trigger(
-                                    'rigid',
-                                    RNHapticFeedbackOptions,
-                                );
-
-                                togglePrivateDescriptor();
-                            }}
                             disableBuiltInState={true}
                         />
-                    </View>
+                    </PlainButton>
                 )}
 
                 <View style={[tailwind('mt-6 flex w-5/6')]}>
@@ -683,6 +675,9 @@ export default Backup;
 const styles = StyleSheet.create({
     infoContainer: {
         marginTop: 56,
+    },
+    capsuleContainer: {
+        width: '46%',
     },
     carouselContainer: {
         flex: 1,
