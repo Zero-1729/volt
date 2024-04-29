@@ -713,6 +713,11 @@ export const MnemonicInput = (props: MnemonicInputProps) => {
     const updateTextItem = (text: string, index: number) => {
         const nextList = [...list];
         nextList[index].word = text;
+
+        if (text === '') {
+            nextList[index].state = null;
+        }
+
         setList(nextList);
     };
 
