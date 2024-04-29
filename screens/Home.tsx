@@ -55,7 +55,7 @@ import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
-import {WalletCard} from '../components/card';
+import {WalletCard} from '../components/shared';
 import {UnifiedTransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';

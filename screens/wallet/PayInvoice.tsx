@@ -44,7 +44,7 @@ import ExpiryTimer from '../../components/expiry';
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
-import {WalletCard} from '../../components/card';
+import {WalletCard} from '../../components/shared';
 import {BaseWallet} from '../../class/wallet/base';
 import {TInvoiceData} from '../../types/wallet';
 import {useNetInfo} from '@react-native-community/netinfo';
