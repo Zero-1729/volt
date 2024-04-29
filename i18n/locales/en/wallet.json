@@ -21,6 +21,7 @@
     "mnemonic_title": "Backup mnemonic",
     "mnemonic_note": "Please, back up your mnemonic phrase. It is the only way to restore your wallet.",
     "mnemonic_ok_button": "OK, I have backed up",
+    "display_mnemonic_qr": "Display Mnemonic QR Code",
     "balance": "Balance",
     "current_balance": "Current Balance",
     "offline_balance": "Offline Balance",
