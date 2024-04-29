@@ -104,7 +104,7 @@ const Info = () => {
         }
     };
 
-    const handlePassSuccess = async () => {
+    const handlePINSuccess = async () => {
         routeToBackup();
         bottomPINPassRef.current?.close();
     };
@@ -620,7 +620,7 @@ const Info = () => {
 
                 <PINPass
                     pinPassRef={bottomPINPassRef}
-                    triggerSuccess={handlePassSuccess}
+                    triggerSuccess={handlePINSuccess}
                     onSelectPinPass={setPINIdx}
                     pinMode={false}
                 />
