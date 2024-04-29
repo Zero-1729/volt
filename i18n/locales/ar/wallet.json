@@ -125,6 +125,7 @@
     "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة",
     "manual": "يدوي",
     "manual_message": "أدخل عنوان Lightning أو معرف العقدة",
+    "manual_placeholder": "أدخل عنوان Lightning.",
     "paying_ln_address": "دفع عنوان البرق",
     "paying_node_id": "دفع معرف العقدة",
     "ln_mnemonic_backup_message": "لحماية أموالك، قم بعمل نسخة احتياطية من عبارة ذاكرتك. إنها الطريقة الوحيدة لاستعادة محفظة Lightning الخاصة بك.",

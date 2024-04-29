@@ -36,6 +36,7 @@
     "max": "max",
     "export": "export",
     "note": "note",
+    "description": "description",
     "copied_to_clipboard": "copied to clipboard",
     "transaction": "transaction",
     "transactions": "transactions",
