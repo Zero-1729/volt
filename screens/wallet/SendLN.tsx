@@ -517,6 +517,10 @@ const SendLN = ({route}: Props) => {
         try {
             const input = await parseInput(lnurlPayURL);
 
+            if (input.type === InputTypeVariant.LN_URL_ERROR) {
+                throw new Error(t('not_ln_address'));
+            }
+
             // LN Address
             if (input.type === InputTypeVariant.LN_URL_PAY) {
                 const canComment = input.data.commentAllowed;
@@ -557,9 +561,16 @@ const SendLN = ({route}: Props) => {
             Toast.show({
                 topOffset: 54,
                 type: 'Liberal',
-                text1: 'LNURL Pay Error',
+                text1: 'Lightning Address',
                 text2: error.message,
-                visibilityTime: 1750,
+                visibilityTime: 2100,
+                onHide: () => {
+                    navigation.dispatch(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'WalletView',
+                        }),
+                    );
+                },
             });
 
             setLoadingPay(false);
