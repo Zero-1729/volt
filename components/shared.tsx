@@ -226,15 +226,18 @@ export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
             </View>
 
             <View
-                style={{
-                    height: 40,
-                    width: '75%',
-                    borderTopRightRadius: 32,
-                    borderBottomRightRadius: 32,
-                    backgroundColor: ColorScheme.Background.Greyed,
-                    paddingLeft: 8,
-                    paddingRight: 8,
-                }}>
+                style={[
+                    tailwind('justify-center'),
+                    {
+                        height: 40,
+                        width: '75%',
+                        borderTopRightRadius: 32,
+                        borderBottomRightRadius: 32,
+                        backgroundColor: ColorScheme.Background.Greyed,
+                        paddingLeft: 8,
+                        paddingRight: 8,
+                    },
+                ]}>
                 <Text
                     style={[
                         tailwind('text-sm font-bold'),
