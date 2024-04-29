@@ -207,7 +207,7 @@ export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
                 style={[
                     tailwind('items-center justify-center'),
                     {
-                        backgroundColor: ColorScheme.Background.Greyed,
+                        backgroundColor: ColorScheme.Background.CardGreyed,
                         borderTopLeftRadius: 32,
                         borderBottomLeftRadius: 32,
                         marginRight: 2,
@@ -219,7 +219,7 @@ export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
                     style={[
                         tailwind('text-sm font-bold'),
                         {
-                            color: ColorScheme.Text.GrayedText,
+                            color: ColorScheme.Text.Default,
                         },
                     ]}>
                     {i18nNumber(props.index, appLanguage.code)}
