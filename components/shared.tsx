@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
-import {StyleSheet, Text, View, useColorScheme} from 'react-native';
+import {StyleSheet, Text, View, Switch, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -8,7 +8,11 @@ import {PlainButton} from './button';
 
 import {Balance} from './balance';
 
-import {WalletCardProps, MnemonicDisplayProps} from '../types/props';
+import {
+    WalletCardProps,
+    MnemonicDisplayProps,
+    genericSwitchProps,
+} from '../types/props';
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -245,6 +249,20 @@ export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
                 </Text>
             </View>
         </View>
+    );
+};
+
+export const GenericSwitch = (props: genericSwitchProps) => {
+    return (
+        <Switch
+            {...props}
+            style={{transform: [{scaleX: 0.8}, {scaleY: 0.8}]}}
+            thumbColor={props.thumbColor}
+            trackColor={props.trackColor}
+            ios_backgroundColor={props.iosBackgroundColor}
+            onValueChange={props.onValueChange}
+            value={props.value}
+        />
     );
 };
 

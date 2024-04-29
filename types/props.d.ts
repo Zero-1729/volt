@@ -169,3 +169,11 @@ export type MnemonicDisplayProps = {
     index: number;
     word: string;
 };
+
+export type genericSwitchProps = {
+    trackColor: {false: string; true: string};
+    thumbColor: string;
+    iosBackgroundColor: string;
+    onValueChange: () => void;
+    value: boolean;
+};
