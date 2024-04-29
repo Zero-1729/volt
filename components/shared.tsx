@@ -8,7 +8,7 @@ import {PlainButton} from './button';
 
 import {Balance} from './balance';
 
-import {WalletCardProps} from '../types/props';
+import {WalletCardProps, MnemonicDisplayProps} from '../types/props';
 
 import {AppStorageContext} from '../class/storageContext';
 
@@ -20,11 +20,6 @@ import Color from '../constants/Color';
 
 import BITCOIN from '../assets/svg/btc.svg';
 import SIM from '../assets/svg/sim.svg';
-
-type MnemonicDisplayProps = {
-    index: number;
-    word: string;
-};
 
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());

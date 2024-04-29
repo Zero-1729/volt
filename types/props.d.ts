@@ -164,3 +164,8 @@ export type DisplayFiatAmountProps = BaseProps & {
     fontSize: string;
     textColor?: string;
 };
+
+export type MnemonicDisplayProps = {
+    index: number;
+    word: string;
+};
