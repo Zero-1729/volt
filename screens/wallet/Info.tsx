@@ -40,6 +40,8 @@ import PINPass from '../../components/pinpass';
 
 import {disconnect} from '@breeztech/react-native-breez-sdk';
 
+import {biometricAuth} from '../../modules/shared';
+
 const Info = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
@@ -64,6 +66,7 @@ const Info = () => {
         walletMode,
         setWalletModeType,
         isPINActive,
+        isBiometricsActive,
     } = useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
@@ -115,6 +118,32 @@ const Info = () => {
     };
 
     const handleBackupRoute = () => {
+        if (isBiometricsActive) {
+            biometricAuth(
+                success => {
+                    if (success) {
+                        routeToBackup();
+                    }
+                },
+                // prompt response callback
+                () => {
+                    togglePINPassModal();
+                },
+                // prompt error callback
+                error => {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Biometrics'),
+                        text2: error.message,
+                        visibilityTime: 1750,
+                    });
+                },
+            );
+
+            return;
+        }
+
         if (isPINActive) {
             togglePINPassModal();
             return;
@@ -594,7 +623,6 @@ const Info = () => {
                     triggerSuccess={handlePassSuccess}
                     onSelectPinPass={setPINIdx}
                     pinMode={false}
-                    idx={pinIdx}
                 />
             </BottomSheetModalProvider>
         </SafeAreaView>
