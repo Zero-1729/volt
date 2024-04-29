@@ -741,7 +741,7 @@ export const MnemonicInput = (props: MnemonicInputProps) => {
         if (list.every(item => item.state === true)) {
             props.onMnemonicCheck(true);
         }
-    }, [list[list.length - 1].state]);
+    }, [list]);
 
     return (
         <View style={[tailwind('w-full items-center justify-center flex-row')]}>
