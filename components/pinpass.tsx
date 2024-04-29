@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useMemo, useContext, useEffect, useState} from 'react';
-import {View, Text, useColorScheme, Platform, StyleSheet} from 'react-native';
+import React, {useMemo, useEffect, useState} from 'react';
+import {View, Text, useColorScheme, StyleSheet} from 'react-native';
 
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {BottomModal} from './bmodal';
@@ -9,11 +9,8 @@ import Color from '../constants/Color';
 import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 
-import {AppStorageContext} from '../class/storageContext';
-
 import {PinNumpad} from './input';
 
-import RNBiometrics from '../modules/biometrics';
 import {getKeychainItem} from '../class/keychainContext';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
@@ -25,7 +22,6 @@ type PinPassProps = {
     triggerSuccess: () => void;
     onSelectPinPass: (idx: number) => void;
     pinMode: boolean;
-    idx: number;
 };
 
 const PinPass = (props: PinPassProps) => {
@@ -34,7 +30,6 @@ const PinPass = (props: PinPassProps) => {
 
     const snapPoints = useMemo(() => ['70'], []);
 
-    const {isBiometricsActive} = useContext(AppStorageContext);
     const [tmpPIN, setTmpPIN] = useState<string>('');
     const [validPin, setValidPin] = useState<string>('');
 
@@ -42,34 +37,6 @@ const PinPass = (props: PinPassProps) => {
 
     const updatePIN = async (pin: string): Promise<void> => {
         setTmpPIN(pin);
-    };
-
-    const biometricAuth = async () => {
-        const {available} = await RNBiometrics.isSensorAvailable();
-
-        if (!available) {
-            return;
-        }
-
-        RNBiometrics.simplePrompt({
-            promptMessage: `Confirm ${
-                Platform.OS === 'ios' ? 'FaceID' : 'Biometrics'
-            }`,
-        })
-            .then(({success}) => {
-                if (success) {
-                    props.triggerSuccess();
-                }
-            })
-            .catch((error: any) => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Biometrics'),
-                    text2: error.message,
-                    visibilityTime: 1750,
-                });
-            });
     };
 
     useEffect(() => {
@@ -94,14 +61,6 @@ const PinPass = (props: PinPassProps) => {
     useEffect(() => {
         init();
     }, []);
-
-    useEffect(() => {
-        if (props.idx === 0) {
-            if (!props.pinMode && isBiometricsActive && props.idx === 0) {
-                biometricAuth();
-            }
-        }
-    }, [props.idx]);
 
     return (
         <BottomModal
