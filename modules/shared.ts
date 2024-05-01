@@ -8,7 +8,6 @@ import {
 import {createBDKWallet, syncBdkWallet, getBdkWalletTransactions} from './bdk';
 import RNBiometrics from './biometrics';
 import {Platform} from 'react-native';
-import Toast from 'react-native-toast-message';
 
 export const initWallet = async (wallet: TWalletType) => {
     // Create wallet

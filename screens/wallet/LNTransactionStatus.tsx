@@ -87,6 +87,10 @@ const LNTransactionStatus = ({route}: Props) => {
         return msg;
     };
 
+    const failedError = route.params.details
+        ? (route.params.details as PaymentFailedData).error
+        : '';
+
     const sats = () => {
         let amount!: number;
 
@@ -267,7 +271,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        {route.params.details?.error}
+                                        {failedError}
                                     </Text>
                                 )}
                         </View>

@@ -87,7 +87,7 @@ const FeeSelection = ({route}: Props) => {
     const isFeeTooHigh = (fee: number, isMaxAmount: boolean) => {
         const amount = Number(route.params.invoiceData.options?.amount);
 
-        const balance = new BigNumber(route.params.wallet.balance);
+        const balance = new BigNumber(route.params.wallet.balanceOnchain);
 
         return isMaxAmount ? balance.lte(fee) : balance.lte(fee + amount);
     };
