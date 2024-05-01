@@ -34,7 +34,8 @@ const ConfirmPIN = ({route}: Props) => {
     const [showBack, setShowBack] = useState<boolean>(false);
     const setPIN = route.params.pin;
 
-    const {setPINActive, isBiometricsActive} = useContext(AppStorageContext);
+    const {setPINActive, isBiometricsActive, onboarding} =
+        useContext(AppStorageContext);
 
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -70,15 +71,24 @@ const ConfirmPIN = ({route}: Props) => {
                     }),
                 );
             } else {
-                navigation.dispatch(
-                    CommonActions.navigate('SettingsRoot', {
-                        screen: 'DonePIN',
-                        params: {
+                if (!isChangePIN) {
+                    navigation.dispatch(
+                        CommonActions.navigate('DonePIN', {
                             isChangePIN: isChangePIN,
                             isPINReset: route.params?.isPINReset,
-                        },
-                    }),
-                );
+                        }),
+                    );
+                } else {
+                    navigation.dispatch(
+                        CommonActions.navigate('SettingsRoot', {
+                            screen: 'DonePIN',
+                            params: {
+                                isChangePIN: isChangePIN,
+                                isPINReset: route.params?.isPINReset,
+                            },
+                        }),
+                    );
+                }
             }
         }
     }, [tmpPIN]);

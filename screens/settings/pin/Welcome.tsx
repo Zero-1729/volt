@@ -11,12 +11,9 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {CommonActions} from '@react-navigation/native';
 
-import {capitalizeFirst} from '../../../modules/transform';
-
-import {LongBottomButton, PlainButton} from '../../../components/button';
+import {LongBottomButton} from '../../../components/button';
 import {useTranslation} from 'react-i18next';
 
-import Back from './../../../assets/svg/arrow-left-24.svg';
 import BitcoinVault from './../../../assets/svg/bitcoin-vault.svg';
 
 const Welcome = () => {
@@ -40,26 +37,6 @@ const Welcome = () => {
                     style={[
                         tailwind('items-center h-full w-full justify-center'),
                     ]}>
-                    <View style={[tailwind('w-5/6 absolute top-0')]}>
-                        <PlainButton
-                            style={tailwind('items-center flex-row -ml-1')}
-                            onPress={() => {
-                                navigation.dispatch(CommonActions.goBack());
-                            }}>
-                            <Back
-                                style={tailwind('mr-2')}
-                                fill={ColorScheme.SVG.Default}
-                            />
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {capitalizeFirst(t('back'))}
-                            </Text>
-                        </PlainButton>
-                    </View>
-
                     <View
                         style={[
                             tailwind('items-center w-5/6'),

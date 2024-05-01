@@ -41,9 +41,15 @@ const Done = ({route}: Props) => {
         ? t('done_pin_change_message')
         : t('done_pin_setup_message');
 
+    const buttonTitle =
+        route.params?.isPINReset || route.params?.isChangePIN
+            ? capitalizeFirst(t('done'))
+            : capitalizeFirst(t('continue'));
+
     const handleDone = () => {
         setPINActive(true);
 
+        // If we were in Reset flow
         if (route.params?.isPINReset && !route.params?.isChangePIN) {
             navigation.dispatch(
                 CommonActions.reset({
@@ -54,9 +60,22 @@ const Done = ({route}: Props) => {
             return;
         }
 
+        // If in change PIN flow
+        if (route.params?.isChangePIN) {
+            navigation.dispatch(
+                CommonActions.navigate('SettingsRoot', {
+                    screen: 'PINManager',
+                }),
+            );
+
+            return;
+        }
+
+        // TODO: take this out and replace with Onboarding flow
         navigation.dispatch(
-            CommonActions.navigate('SettingsRoot', {
-                screen: 'PINManager',
+            CommonActions.navigate('AddWalletRoot', {
+                screen: 'Add',
+                params: {onboarding: true},
             }),
         );
     };
@@ -96,7 +115,7 @@ const Done = ({route}: Props) => {
                     </View>
 
                     <LongBottomButton
-                        title={capitalizeFirst(t('done'))}
+                        title={buttonTitle}
                         textColor={ColorScheme.Text.Alt}
                         backgroundColor={ColorScheme.Background.Inverted}
                         onPress={handleDone}
