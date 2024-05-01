@@ -435,8 +435,6 @@ const RootNavigator = (): ReactElement => {
     let Theme = {
         dark: ColorScheme.isDarkMode,
         colors: {
-            // Spread the colors from the default theme
-            // and include the custom Navigator theme colors
             ...DefaultTheme.colors,
             ...ColorScheme.NavigatorTheme.colors,
         },
