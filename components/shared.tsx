@@ -194,7 +194,6 @@ export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
 
     return (
         <View
-            key={props.index}
             style={[
                 tailwind('flex-row items-center justify-center w-full'),
                 {

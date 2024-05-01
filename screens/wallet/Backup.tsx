@@ -251,6 +251,7 @@ const Backup = () => {
                             ]}>
                             {mnemonics.slice(0, 6).map((word, index) => (
                                 <MnemonicDisplayCapsule
+                                    key={index}
                                     word={word}
                                     index={index}
                                 />
@@ -265,6 +266,7 @@ const Backup = () => {
                             ]}>
                             {mnemonics.slice(6, 12).map((word, index) => (
                                 <MnemonicDisplayCapsule
+                                    key={index + 6}
                                     word={word}
                                     index={index + 6}
                                 />
