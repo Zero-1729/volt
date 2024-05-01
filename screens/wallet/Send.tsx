@@ -103,7 +103,7 @@ const SendView = ({route}: Props) => {
     const screenTitle = isLightning
         ? t('lightning_invoice')
         : t('transaction_summary');
-    const hasLabel = route.params.invoiceData?.options?.label;
+    const hasLabel = route.params.invoiceData?.options?.label ?? '';
     const hasMessage = isLightning
         ? route.params.bolt11.description
         : route.params.invoiceData?.options?.message;
@@ -606,12 +606,12 @@ const SendView = ({route}: Props) => {
                             </View>
                         )}
 
-                        {(hasLabel || isLightning) && (
+                        {(hasLabel.length > 0 || isLightning) && (
                             <View
                                 style={[
                                     tailwind('justify-between w-4/5 mt-4'),
                                 ]}>
-                                {hasLabel && (
+                                {hasLabel.length > 0 && (
                                     <View
                                         style={[
                                             tailwind(
@@ -684,6 +684,7 @@ const SendView = ({route}: Props) => {
                             </View>
                         )}
                     </View>
+
                     {((isLightning && loading) ||
                         (!isLightning && loadingPsbt)) && (
                         <View
