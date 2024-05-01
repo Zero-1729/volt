@@ -299,7 +299,7 @@ const Backup = () => {
                                 false: ColorScheme.Background.Greyed,
                                 true: CardColor,
                             }}
-                            thumbColor={ColorScheme.Background.Inverted}
+                            thumbColor={'white'}
                             iosBackgroundColor={ColorScheme.Background.Greyed}
                             onValueChange={toggleSwitch}
                             value={switchEnabled}
