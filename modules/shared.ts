@@ -8,6 +8,7 @@ import {
 import {createBDKWallet, syncBdkWallet, getBdkWalletTransactions} from './bdk';
 import RNBiometrics from './biometrics';
 import {Platform} from 'react-native';
+import {Route} from '@react-navigation/native';
 
 export const initWallet = async (wallet: TWalletType) => {
     // Create wallet
@@ -93,4 +94,11 @@ export const biometricAuth = async (
         .catch((error: any) => {
             errorCallback(error);
         });
+};
+
+export const hasOpenedModals = (
+    currentRoute: Route<string> | undefined,
+    modalScreenNames: string[],
+) => {
+    return currentRoute ? modalScreenNames.includes(currentRoute.name) : false;
 };
