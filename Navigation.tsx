@@ -538,7 +538,7 @@ const RootNavigator = (): ReactElement => {
 
             return () => {
                 // Clean up the event listeners
-                subscription.remove();
+                subscription?.remove();
             };
         },
     };
@@ -759,8 +759,8 @@ const RootNavigator = (): ReactElement => {
 
         return () => {
             // Kill subscription
-            BreezSub.current.remove();
-            appStateSub.remove();
+            BreezSub?.current?.remove();
+            appStateSub?.remove();
         };
     }, []);
 
