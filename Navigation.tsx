@@ -10,6 +10,7 @@ import {
     createNavigationContainerRef,
     DefaultTheme,
     LinkingOptions,
+    StackActions,
 } from '@react-navigation/native';
 
 import Toast from 'react-native-toast-message';
@@ -107,8 +108,29 @@ import {
     TBreezPaymentDetails,
     TLnManualPayloadType,
 } from './types/wallet';
+import {hasOpenedModals} from './modules/shared';
 import {ENet, EBreezDetails} from './types/enums';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
+
+// Make sure this is updated to match all screen routes below
+const modalRoutes = [
+    'Scan',
+    'FeeSelection',
+    'WalletBackup',
+    'AddressOwnership',
+    'TransactionDetails',
+    'TransactionStatus',
+    'TransactionExported',
+    'SendAmount',
+    'Receive',
+    'RequestAmount',
+    'WalletXpub',
+    // 'addWalletRoot', Screen not necessary as before wallet created
+    'License',
+    'Changelog',
+    'XKeyTool',
+    'MnemonicTool',
+];
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
@@ -399,6 +421,12 @@ export const rootNavigation = {
             : never
     ): void {
         if (navigationRef.isReady()) {
+            // Close any outstanding modals first
+            const currentRoute = navigationRef.current?.getCurrentRoute();
+            if (hasOpenedModals(currentRoute, modalRoutes)) {
+                navigationRef.current?.dispatch(StackActions.popToTop());
+            }
+
             navigationRef.current?.navigate(...args);
         } else {
             // If navigation not ready
