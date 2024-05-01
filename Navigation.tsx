@@ -329,6 +329,7 @@ const WalletRoot = () => {
 
             {/* TODO: Fix issue routing to 'Send' screen from Wallet as modal, route changed but reverted after few seconds */}
             <WalletStack.Screen name="Send" component={Send} />
+            <WalletStack.Screen name="SendLN" component={SendLN} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen
@@ -358,7 +359,6 @@ const WalletRoot = () => {
                     component={RequestAmount}
                 />
                 <WalletStack.Screen name="SendAmount" component={SendAmount} />
-                <WalletStack.Screen name="SendLN" component={SendLN} />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
             </WalletStack.Group>
         </WalletStack.Navigator>
