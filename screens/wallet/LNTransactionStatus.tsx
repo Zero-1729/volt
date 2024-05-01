@@ -8,6 +8,7 @@ import {
     Platform,
     AppState,
     Dimensions,
+    StatusBar,
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useContext} from 'react';
 
@@ -164,6 +165,7 @@ const LNTransactionStatus = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
+            <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
                 style={[
                     styles.statusContainer,
