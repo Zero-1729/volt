@@ -229,7 +229,6 @@ const PayInvoice = ({route}: Props) => {
                         dummyPsbtVsize: 0,
                         invoiceData: null,
                         bolt11: bolt11,
-                        source: 'liberal',
                     },
                 }),
             );
