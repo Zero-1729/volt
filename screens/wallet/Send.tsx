@@ -84,7 +84,6 @@ const SendView = ({route}: Props) => {
         isAdvancedMode,
         electrumServerURL,
         breezEvent,
-        isPINActive,
         isBiometricsActive,
     } = useContext(AppStorageContext);
 
@@ -172,12 +171,7 @@ const SendView = ({route}: Props) => {
             return;
         }
 
-        if (isPINActive) {
-            handleSend();
-            return;
-        }
-
-        handleSend();
+        togglePINPassModal();
     };
 
     // Note: this is just a match check to determine if 'Max' entered in prev screen.

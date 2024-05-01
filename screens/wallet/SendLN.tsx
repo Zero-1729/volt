@@ -399,8 +399,7 @@ const SendLN = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
-    const {breezEvent, isPINActive, isBiometricsActive} =
-        useContext(AppStorageContext);
+    const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
 
     const {t} = useTranslation('wallet');
@@ -464,9 +463,7 @@ const SendLN = ({route}: Props) => {
                 },
                 // prompt response callback
                 () => {
-                    if (isPINActive) {
-                        togglePINPassModal();
-                    }
+                    togglePINPassModal();
                 },
                 // prompt error callback
                 error => {
@@ -483,12 +480,7 @@ const SendLN = ({route}: Props) => {
             return;
         }
 
-        if (isPINActive) {
-            togglePINPassModal();
-            return;
-        }
-
-        handlePayment();
+        togglePINPassModal();
     };
 
     const handlePayment = async () => {
