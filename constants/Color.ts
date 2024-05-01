@@ -9,6 +9,10 @@ const Color = (currentTheme: ColorThemeType) => {
                 background: isDarkMode ? 'black' : 'white',
             },
         },
+        BarStyle: {
+            Inverted: isDarkMode ? 'light-content' : 'dark-content',
+            Default: isDarkMode ? 'dark-content' : 'light-content',
+        },
         SVG: {
             Default: isDarkMode ? 'white' : 'black',
             GrayFill: isDarkMode ? '#676767' : '#B1B1B1',
