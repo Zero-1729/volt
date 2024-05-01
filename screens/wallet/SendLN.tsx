@@ -6,6 +6,7 @@ import {
     View,
     useColorScheme,
     ActivityIndicator,
+    StatusBar,
 } from 'react-native';
 import React, {
     useContext,
@@ -613,8 +614,9 @@ const SendLN = ({route}: Props) => {
 
     return (
         <SafeAreaView
-            edges={['left', 'right', 'bottom']}
+            edges={['top', 'left', 'right', 'bottom']}
             style={[{backgroundColor: ColorScheme.Background.Primary}]}>
+            <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <BottomSheetModalProvider>
                 <View style={[tailwind('h-full w-full items-center')]}>
                     <View
