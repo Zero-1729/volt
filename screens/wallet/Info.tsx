@@ -65,7 +65,6 @@ const Info = () => {
         wallets,
         walletMode,
         setWalletModeType,
-        isPINActive,
         isBiometricsActive,
     } = useContext(AppStorageContext);
 
@@ -127,9 +126,7 @@ const Info = () => {
                 },
                 // prompt response callback
                 () => {
-                    if (isPINActive) {
-                        togglePINPassModal();
-                    }
+                    togglePINPassModal();
                 },
                 // prompt error callback
                 error => {
@@ -146,12 +143,8 @@ const Info = () => {
             return;
         }
 
-        if (isPINActive) {
-            togglePINPassModal();
-            return;
-        }
-
-        routeToBackup();
+        // IF no biometrics, just call on PIN modal
+        togglePINPassModal();
     };
 
     const CardColor =
