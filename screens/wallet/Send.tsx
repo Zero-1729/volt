@@ -8,11 +8,12 @@ import {
     useColorScheme,
     Platform,
     ActivityIndicator,
+    StatusBar,
 } from 'react-native';
 
 import VText, {VTextSingle, VTextMulti} from '../../components/text';
 
-import {SafeAreaView, Edges} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
@@ -53,7 +54,6 @@ import {
     BreezEventVariant,
 } from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from '../../types/enums';
-import {getScreenEdges} from '../../modules/screen';
 import ExpiryTimer from '../../components/expiry';
 
 import Toast from 'react-native-toast-message';
@@ -70,8 +70,6 @@ const SendView = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
-
-    const edges: Edges = getScreenEdges(route.params.source as string);
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -399,12 +397,16 @@ const SendView = ({route}: Props) => {
 
     return (
         <SafeAreaView
-            edges={edges}
+            edges={['bottom', 'top', 'left', 'right']}
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
+            <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                style={[
+                    tailwind('w-full h-full items-center justify-center'),
+                    {backgroundColor: ColorScheme.Background.Primary},
+                ]}>
                 <BottomSheetModalProvider>
                     <View
                         style={[

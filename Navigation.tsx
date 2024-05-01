@@ -216,7 +216,6 @@ export type WalletParamList = {
         invoiceData: TInvoiceData;
         wallet?: TMiniWallet;
         bolt11?: LnInvoice;
-        source?: string;
     };
     WalletView: {
         reload: boolean;
@@ -328,12 +327,14 @@ const WalletRoot = () => {
             />
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
+            {/* TODO: Fix issue routing to 'Send' screen from Wallet as modal, route changed but reverted after few seconds */}
+            <WalletStack.Screen name="Send" component={Send} />
+
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen
                     name="FeeSelection"
                     component={FeeSelection}
                 />
-                <WalletStack.Screen name="Send" component={Send} />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
