@@ -127,7 +127,9 @@ const Info = () => {
                 },
                 // prompt response callback
                 () => {
-                    togglePINPassModal();
+                    if (isPINActive) {
+                        togglePINPassModal();
+                    }
                 },
                 // prompt error callback
                 error => {

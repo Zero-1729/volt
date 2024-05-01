@@ -463,7 +463,9 @@ const SendLN = ({route}: Props) => {
                 },
                 // prompt response callback
                 () => {
-                    togglePINPassModal();
+                    if (isPINActive) {
+                        togglePINPassModal();
+                    }
                 },
                 // prompt error callback
                 error => {
