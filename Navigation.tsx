@@ -738,12 +738,19 @@ const RootNavigator = (): ReactElement => {
 
         const appStateSub = AppState.addEventListener(
             'change',
-            (incomingState): void => {
+            async (incomingState): Promise<void> => {
+                const currentRoute = navigationRef.current?.getCurrentRoute();
+
+                // Check whether we are in the pay invoice screen (i.e. handling deep link)
+                // and block clipboard check;
+                const isDeepLinkScreen = currentRoute?.name === 'PayInvoice';
+
                 // Check and run clipboard fn if app is active in foreground
                 // Ensure that we have wallets before checking
                 if (
                     appState.current.match(/background/) &&
                     incomingState === 'active' &&
+                    !isDeepLinkScreen &&
                     !onboardingState.current
                 ) {
                     checkAndSetClipboard();
