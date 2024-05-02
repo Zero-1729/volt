@@ -13,25 +13,24 @@ import AppIcon from '../assets/svg/volt-text.svg';
 
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
-import {PinNumpad} from '../components/input';
+import {PinNumpad} from './input';
 import {useTranslation} from 'react-i18next';
 
 import {getKeychainItem} from '../class/keychainContext';
 import {AppStorageContext} from '../class/storageContext';
 import RNBiometrics from '../modules/biometrics';
 
-import {toastConfig} from '../components/toast';
+import {toastConfig} from './toast';
 import Toast, {ToastConfig} from 'react-native-toast-message';
 
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
-import {PlainButton} from '../components/button';
+import {PlainButton} from './button';
 
-import {InitStackParamList} from '../Navigation';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+type lockProps = {
+    onSuccess: () => void;
+};
 
-type Props = NativeStackScreenProps<InitStackParamList, 'Lock'>;
-
-const Lock = ({route}: Props) => {
+const LockScreen = (props: lockProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
     const navigation = useNavigation();
@@ -53,8 +52,8 @@ const Lock = ({route}: Props) => {
     };
 
     const onSuccessRoute = () => {
-        if (route.params?.onSuccess) {
-            route.params.onSuccess();
+        if (props.onSuccess) {
+            props.onSuccess();
             return;
         }
 
@@ -271,7 +270,7 @@ const Lock = ({route}: Props) => {
     );
 };
 
-export default Lock;
+export default LockScreen;
 
 const styles = StyleSheet.create({
     dot: {
