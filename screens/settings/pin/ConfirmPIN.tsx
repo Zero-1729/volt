@@ -34,8 +34,7 @@ const ConfirmPIN = ({route}: Props) => {
     const [showBack, setShowBack] = useState<boolean>(false);
     const setPIN = route.params.pin;
 
-    const {setPINActive, isBiometricsActive, onboarding} =
-        useContext(AppStorageContext);
+    const {setPINActive, isBiometricsActive} = useContext(AppStorageContext);
 
     const navigation = useNavigation();
     const tailwind = useTailwind();
