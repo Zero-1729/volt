@@ -40,15 +40,25 @@ const SetBiometrics = ({route}: Props) => {
 
     const {t} = useTranslation('settings');
 
-    const {setBiometricsActive} = useContext(AppStorageContext);
+    const {setBiometricsActive, isWalletInitialized} =
+        useContext(AppStorageContext);
     const [doneSetup, setDoneSetup] = React.useState<boolean>(false);
     const [doneErrorText, setDoneErrorText] = React.useState<string>('');
 
     const handleRoute = () => {
-        // Route back to PIN manager
-        navigation.dispatch(
-            CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
-        );
+        if (isWalletInitialized) {
+            // Route back to PIN manager
+            navigation.dispatch(
+                CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
+            );
+        } else {
+            navigation.dispatch(
+                CommonActions.navigate('AddWalletRoot', {
+                    screen: 'Add',
+                    params: {onboarding: true},
+                }),
+            );
+        }
     };
 
     const handleBiometrics = async () => {
