@@ -523,13 +523,9 @@ const RootNavigator = (): ReactElement => {
         subscribe(listener): () => void {
             // Deep linking when app open
             const onReceiveLink = ({url}: {url: string}) => {
-                if (!onboardingState.current) {
-                    rootNavigation.navigate('Lock', {
-                        onSuccess: () => {
-                            rootNavigation.navigate('PayInvoice', {
-                                invoice: url,
-                            });
-                        },
+                if (!onboardingState.current && isAuth) {
+                    rootNavigation.navigate('PayInvoice', {
+                        invoice: url,
                     });
                 }
 
