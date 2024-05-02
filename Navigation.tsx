@@ -1,5 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {ReactElement, memo, useRef, useEffect, useContext} from 'react';
+import React, {
+    ReactElement,
+    memo,
+    useRef,
+    useEffect,
+    useContext,
+    useCallback,
+    useState,
+} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
@@ -44,7 +52,7 @@ import Home from './screens/Home';
 import PayInvoice from './screens/wallet/PayInvoice';
 
 // Biometrics Screen
-import Lock from './screens/Lock';
+import LockScreen from './components/lock';
 
 // Wallet screens
 import Add from './screens/wallet/Add';
@@ -134,9 +142,6 @@ const modalRoutes = [
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
-    Lock: {
-        onSuccess?: () => void;
-    };
     HomeScreen: {
         restoreMeta: {
             title: string;
@@ -455,6 +460,9 @@ const RootNavigator = (): ReactElement => {
     const wallet = getWalletData(currentWalletID);
     const BreezSub = useRef<any>(null);
 
+    const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
+    const [isAuth, setIsAuth] = useState(false);
+
     const {t} = useTranslation('wallet');
 
     const ColorScheme = Color(useColorScheme());
@@ -554,6 +562,16 @@ const RootNavigator = (): ReactElement => {
         // Check clipboard
         checkAndSetClipboard();
     };
+
+    const handleAuthSuccess = useCallback(() => {
+        if (triggerClipboardCheck) {
+            // Call clipboard
+            checkDeepLinkAndClipboard();
+        }
+
+        setTriggerClipboardCheck(false);
+        setIsAuth(true);
+    }, [triggerClipboardCheck]);
 
     // Breez startup
     const initNode = async () => {
@@ -762,8 +780,7 @@ const RootNavigator = (): ReactElement => {
             theme={Theme}>
             <InitScreenStack.Navigator
                 screenOptions={{headerShown: false}}
-                initialRouteName={isWalletInitialized ? 'Lock' : 'HomeScreen'}>
-                <InitScreenStack.Screen name="Lock" component={Lock} />
+                initialRouteName={'HomeScreen'}>
                 <InitScreenStack.Screen name="HomeScreen" component={Home} />
                 <InitScreenStack.Screen
                     name="LNTransactionStatus"
@@ -794,6 +811,8 @@ const RootNavigator = (): ReactElement => {
                 </InitScreenStack.Group>
                 <InitScreenStack.Screen name="Apps" component={Apps} />
             </InitScreenStack.Navigator>
+
+            {!isAuth && <LockScreen onSuccess={handleAuthSuccess} />}
         </NavigationContainer>
     );
 };
