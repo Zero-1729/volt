@@ -552,11 +552,8 @@ const RootNavigator = (): ReactElement => {
         const url = await Linking.getInitialURL();
 
         if (url) {
-            rootNavigation.navigate('Lock', {
-                onSuccess: () => {
-                    rootNavigation.navigate('PayInvoice', {invoice: url});
-                },
-            });
+            rootNavigation.navigate('PayInvoice', {invoice: url});
+            return;
         }
 
         // Check clipboard
