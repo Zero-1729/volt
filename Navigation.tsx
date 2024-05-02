@@ -569,8 +569,8 @@ const RootNavigator = (): ReactElement => {
             checkDeepLinkAndClipboard();
         }
 
-        setTriggerClipboardCheck(false);
         setIsAuth(true);
+        setTriggerClipboardCheck(false);
     }, [triggerClipboardCheck]);
 
     // Breez startup
@@ -739,10 +739,10 @@ const RootNavigator = (): ReactElement => {
         // Check for deep link if app newly launched
         // Ensure that we have wallets before checking
         if (renderCount <= 2 && !onboardingState.current) {
-            checkDeepLinkAndClipboard();
+            // Call on trigger for Lock comp
+            setTriggerClipboardCheck(true);
         }
 
-        // TODO: Add check for Auth when app is active
         const appStateSub = AppState.addEventListener(
             'change',
             (incomingState): void => {
