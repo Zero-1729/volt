@@ -42,7 +42,25 @@ const Welcome = () => {
                             tailwind('items-center w-5/6'),
                             {marginTop: -64},
                         ]}>
-                        <BitcoinVault height={256} width={256} />
+                        <View
+                            style={[
+                                {
+                                    width: 256,
+                                    height: 256,
+                                    position: 'relative',
+                                },
+                            ]}>
+                            <View
+                                style={[
+                                    {
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 0,
+                                    },
+                                ]}>
+                                <BitcoinVault height={320} width={320} />
+                            </View>
+                        </View>
 
                         <Text
                             style={[

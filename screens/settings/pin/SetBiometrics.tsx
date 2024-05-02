@@ -175,7 +175,25 @@ const SetBiometrics = ({route}: Props) => {
                                 height={200}
                             />
                         ) : (
-                            <BitcoinAstro height={256} width={256} />
+                            <View
+                                style={[
+                                    {
+                                        width: 320,
+                                        height: 320,
+                                        position: 'relative',
+                                    },
+                                ]}>
+                                <View
+                                    style={[
+                                        {
+                                            position: 'absolute',
+                                            left: 40,
+                                            top: 40,
+                                        },
+                                    ]}>
+                                    <BitcoinAstro height={320} width={320} />
+                                </View>
+                            </View>
                         )}
 
                         {doneErrorText.length > 0 && (

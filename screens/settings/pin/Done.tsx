@@ -95,7 +95,25 @@ const Done = ({route}: Props) => {
                             tailwind('items-center w-5/6'),
                             {marginTop: -64},
                         ]}>
-                        <BitcoinRobe height={256} width={256} />
+                        <View
+                            style={[
+                                {
+                                    width: 256,
+                                    height: 256,
+                                    position: 'relative',
+                                },
+                            ]}>
+                            <View
+                                style={[
+                                    {
+                                        position: 'absolute',
+                                        left: 30,
+                                        top: 48,
+                                    },
+                                ]}>
+                                <BitcoinRobe height={256} width={256} />
+                            </View>
+                        </View>
 
                         <Text
                             style={[
