@@ -29,7 +29,7 @@ import {setKeychainItem} from '../../../class/keychainContext';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SettingsParamList} from '../../../Navigation';
 
-type Props = NativeStackScreenProps<SettingsParamList, 'MnemonicTest'>;
+type Props = NativeStackScreenProps<SettingsParamList, 'ExtKeyTest'>;
 
 const ExtKeyTest = ({route}: Props) => {
     //TODO: include handling for xprv, ATM the xprv in the descriptor is not the same level as xprv stored from wallet creation/restore.
