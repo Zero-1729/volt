@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Text, View, useColorScheme} from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
@@ -21,6 +21,7 @@ import BitcoinBob from './../../../assets/svg/bitcoin-construction.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SettingsParamList} from '../../../Navigation';
+import {AppStorageContext} from '../../../class/storageContext';
 
 type Props = NativeStackScreenProps<SettingsParamList, 'ResetPIN'>;
 
@@ -31,16 +32,35 @@ const ResetPIN = ({route}: Props) => {
 
     const {t} = useTranslation('settings');
 
+    const {currentWalletID, getWalletData} = useContext(AppStorageContext);
+
+    const walletData = getWalletData(currentWalletID);
+
+    const hasMnemonic = walletData.mnemonic.length > 0;
+
     const moveToReset = () => {
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'MnemonicTest',
-                params: {
-                    isPINReset: route.params?.isPINReset,
-                    isChangePIN: route.params?.isChangePIN,
-                },
-            }),
-        );
+        if (hasMnemonic) {
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'MnemonicTest',
+                    params: {
+                        isPINReset: route.params?.isPINReset,
+                        isChangePIN: route.params?.isChangePIN,
+                    },
+                }),
+            );
+        } else {
+            // Handle if xprv / xpub
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'ExtKeyTest',
+                    params: {
+                        isPINReset: route.params?.isPINReset,
+                        isChangePIN: route.params?.isChangePIN,
+                    },
+                }),
+            );
+        }
     };
 
     return (
