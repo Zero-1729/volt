@@ -99,6 +99,7 @@ import DonePIN from './screens/settings/pin/Done';
 import SetBiometrics from './screens/settings/pin/SetBiometrics';
 import ResetPIN from './screens/settings/pin/ResetPIN';
 import MnemonicTest from './screens/settings/pin/MnemonicTest';
+import ExtKeyTest from './screens/settings/pin/ExtKeyTest';
 
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
@@ -199,6 +200,10 @@ export type SettingsParamList = {
         isChangePIN?: boolean;
     };
     MnemonicTest: {
+        isPINReset: boolean;
+        isChangePIN: boolean;
+    };
+    ExtKeyTest: {
         isPINReset: boolean;
         isChangePIN: boolean;
     };
@@ -316,6 +321,7 @@ const SettingsRoot = () => {
                 name="MnemonicTest"
                 component={MnemonicTest}
             />
+            <SettingsStack.Screen name="ExtKeyTest" component={ExtKeyTest} />
 
             <SettingsStack.Screen
                 name="SettingsTools"
