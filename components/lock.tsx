@@ -35,8 +35,16 @@ const LockScreen = (props: lockProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
-    const {isBiometricsActive, pinAttempts, setPINAttempts, resetAppData} =
-        useContext(AppStorageContext);
+    const {
+        isBiometricsActive,
+        pinAttempts,
+        setPINAttempts,
+        resetAppData,
+        getWalletData,
+        currentWalletID,
+    } = useContext(AppStorageContext);
+
+    const walletData = getWalletData(currentWalletID);
 
     const {t} = useTranslation('wallet');
     const [pin, setPin] = useState('');
@@ -275,6 +283,10 @@ const LockScreen = (props: lockProps) => {
                     onSelectPinPass={idx => setOpenModal(idx)}
                     pinMode={true}
                     idx={openModal}
+                    testInfo={{
+                        mnemonic: walletData.mnemonic.length > 0,
+                        isWatchOnly: walletData.isWatchOnly,
+                    }}
                 />
             </BottomSheetModalProvider>
         </SafeAreaView>
