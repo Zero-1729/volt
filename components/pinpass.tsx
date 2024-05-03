@@ -25,6 +25,7 @@ import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
 
 import {AppStorageContext} from '../class/storageContext';
+import { biometricAuth } from '../modules/shared';
 
 type PinPassProps = {
     pinPassRef: React.RefObject<BottomSheetModal>;
@@ -38,7 +39,7 @@ const PinPass = (props: PinPassProps) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {setPINAttempts, pinAttempts, resetAppData} =
+    const {setPINAttempts, pinAttempts, resetAppData, isBiometricsActive} =
         useContext(AppStorageContext);
 
     const snapPoints = useMemo(() => ['75'], []);
@@ -61,6 +62,29 @@ const PinPass = (props: PinPassProps) => {
         );
     };
 
+    const triggerBiometrics = () => {
+        biometricAuth(
+            success => {
+                if (success) {
+                    setPINAttempts(0);
+                    props.triggerSuccess();
+                }
+            },
+            // prompt response callback
+            () => {},
+            // prompt error callback
+            error => {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: t('Biometrics'),
+                    text2: error.message,
+                    visibilityTime: 1750,
+                });
+            },
+        );
+    };
+
     useEffect(() => {
         if (tmpPIN.length === 4) {
             if (pinAttempts === MAX_PIN_ATTEMPTS) {
@@ -69,9 +93,9 @@ const PinPass = (props: PinPassProps) => {
             }
 
             if (tmpPIN === validPin) {
-                props.triggerSuccess();
                 setTmpPIN('');
                 setPINAttempts(0);
+                props.triggerSuccess();
                 return;
             }
 
@@ -209,7 +233,8 @@ const PinPass = (props: PinPassProps) => {
                             pin={tmpPIN}
                             onPinChange={updatePIN}
                             pinLimit={4}
-                            showBiometrics={false}
+                            showBiometrics={isBiometricsActive}
+                            triggerBiometrics={triggerBiometrics}
                         />
                     </View>
                 </View>
