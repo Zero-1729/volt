@@ -77,6 +77,10 @@ const MnemonicInputCapsule = (props: CapsuleInputProps) => {
             return ColorScheme.Text.GrayedText;
         }
 
+        if (state) {
+            return 'white';
+        }
+
         return ColorScheme.Text.Default;
     };
 
