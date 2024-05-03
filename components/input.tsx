@@ -726,7 +726,7 @@ export const MnemonicInput = (props: MnemonicInputProps) => {
             return;
         }
 
-        const word = list[index].word;
+        const word = list[index].word.trim();
 
         const nextList = [...list];
         nextList[index].state = word === validMnemonics[index];
