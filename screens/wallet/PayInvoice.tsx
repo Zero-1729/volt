@@ -8,6 +8,7 @@ import {
     Platform,
     Dimensions,
     StyleSheet,
+    StatusBar,
 } from 'react-native';
 
 import VText from '../../components/text';
@@ -44,7 +45,7 @@ import ExpiryTimer from '../../components/expiry';
 import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
-import {WalletCard} from '../../components/card';
+import {WalletCard} from '../../components/shared';
 import {BaseWallet} from '../../class/wallet/base';
 import {TInvoiceData} from '../../types/wallet';
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -229,7 +230,6 @@ const PayInvoice = ({route}: Props) => {
                         dummyPsbtVsize: 0,
                         invoiceData: null,
                         bolt11: bolt11,
-                        source: 'liberal',
                     },
                 }),
             );
@@ -322,11 +322,14 @@ const PayInvoice = ({route}: Props) => {
         ? Object.keys(decodedInvoice.options).length === 0
         : true;
 
+    // TODO: find a way to close any modals open, e.g. Scan screen open
+
     return (
         <SafeAreaView
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
+            <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
                 style={[
                     tailwind(

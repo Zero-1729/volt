@@ -1,8 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import {StyleSheet, Text, View, useColorScheme} from 'react-native';
-
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import React, {useContext} from 'react';
+import {StyleSheet, Text, View, Switch, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -10,8 +8,15 @@ import {PlainButton} from './button';
 
 import {Balance} from './balance';
 
-import {WalletCardProps} from '../types/props';
+import {
+    WalletCardProps,
+    MnemonicDisplayProps,
+    genericSwitchProps,
+} from '../types/props';
 
+import {AppStorageContext} from '../class/storageContext';
+
+import {i18nNumber} from './../modules/transform';
 import {useTranslation} from 'react-i18next';
 
 import Font from '../constants/Font';
@@ -19,75 +24,6 @@ import Color from '../constants/Color';
 
 import BITCOIN from '../assets/svg/btc.svg';
 import SIM from '../assets/svg/sim.svg';
-
-export const EmptyCard = () => {
-    const navigation = useNavigation();
-
-    const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
-
-    const altGray = {
-        backgroundColor: ColorScheme.isDarkMode ? '#2C2C2C' : '#ededed',
-    };
-
-    return (
-        <View style={tailwind('w-full h-48 relative items-center')}>
-            <View
-                style={[
-                    styles.darkGrayCard,
-                    tailwind(
-                        'w-11/12 h-full absolute -bottom-2 rounded-md z-20 opacity-60',
-                    ),
-                ]}
-            />
-
-            <View
-                style={[tailwind('w-full h-48 p-6 rounded-md z-30'), altGray]}>
-                <Text
-                    style={[
-                        tailwind('text-lg w-full text-left mb-1 font-medium'),
-                        {color: ColorScheme.Text.Default},
-                        Font.RobotoText,
-                    ]}>
-                    New Wallet
-                </Text>
-                <Text
-                    style={[
-                        tailwind('text-xs w-full text-left'),
-                        {color: ColorScheme.Text.DescText},
-                        Font.RobotoText,
-                    ]}>
-                    Create or restore a new wallet
-                </Text>
-
-                <PlainButton
-                    style={[
-                        tailwind(
-                            'absolute bottom-6 left-6 px-8 py-2 rounded-full',
-                        ),
-                        {
-                            backgroundColor: ColorScheme.Background.Inverted,
-                        },
-                    ]}
-                    onPress={() => {
-                        navigation.dispatch(
-                            CommonActions.navigate({name: 'AddWalletRoot'}),
-                        );
-                    }}>
-                    <Text
-                        style={[
-                            tailwind('text-xs font-bold'),
-                            {color: ColorScheme.Text.Alt},
-                            Font.RobotoText,
-                        ]}>
-                        Add
-                    </Text>
-                </PlainButton>
-            </View>
-        </View>
-    );
-};
 
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
@@ -247,6 +183,85 @@ export const WalletCard = (props: WalletCardProps) => {
                 </View>
             </View>
         </PlainButton>
+    );
+};
+
+export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    const {appLanguage} = useContext(AppStorageContext);
+
+    return (
+        <View
+            style={[
+                tailwind('flex-row items-center justify-center w-full'),
+                {
+                    marginTop: 6,
+                    marginBottom: 6,
+                },
+            ]}>
+            <View
+                style={[
+                    tailwind('items-center justify-center'),
+                    {
+                        backgroundColor: ColorScheme.Background.CardGreyed,
+                        borderTopLeftRadius: 32,
+                        borderBottomLeftRadius: 32,
+                        marginRight: 2,
+                        height: 40,
+                        width: '25%',
+                    },
+                ]}>
+                <Text
+                    style={[
+                        tailwind('text-sm font-bold'),
+                        {
+                            color: ColorScheme.Text.Default,
+                        },
+                    ]}>
+                    {i18nNumber(props.index, appLanguage.code)}
+                </Text>
+            </View>
+
+            <View
+                style={[
+                    tailwind('justify-center'),
+                    {
+                        height: 40,
+                        width: '75%',
+                        borderTopRightRadius: 32,
+                        borderBottomRightRadius: 32,
+                        backgroundColor: ColorScheme.Background.Greyed,
+                        paddingLeft: 8,
+                        paddingRight: 8,
+                    },
+                ]}>
+                <Text
+                    style={[
+                        tailwind('text-sm font-bold'),
+                        {
+                            color: ColorScheme.Text.Default,
+                        },
+                    ]}>
+                    {props.word}
+                </Text>
+            </View>
+        </View>
+    );
+};
+
+export const GenericSwitch = (props: genericSwitchProps) => {
+    return (
+        <Switch
+            {...props}
+            style={{transform: [{scaleX: 0.8}, {scaleY: 0.8}]}}
+            thumbColor={props.thumbColor}
+            trackColor={props.trackColor}
+            ios_backgroundColor={props.iosBackgroundColor}
+            onValueChange={props.onValueChange}
+            value={props.value}
+        />
     );
 };
 

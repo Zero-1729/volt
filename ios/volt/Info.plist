@@ -55,6 +55,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Enabling Face ID allows you quick and secure access to your account.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>${PRODUCT_NAME} needs access to the camera to scan QR Codes</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

@@ -55,7 +55,7 @@ import Color from '../constants/Color';
 import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
-import {WalletCard} from '../components/card';
+import {WalletCard} from '../components/shared';
 import {UnifiedTransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
@@ -508,7 +508,9 @@ const Home = ({route}: Props) => {
                     <PlainButton
                         onPress={() =>
                             navigation.dispatch(
-                                CommonActions.navigate({name: 'SettingsRoot'}),
+                                CommonActions.navigate('SettingsRoot', {
+                                    screen: 'Settings',
+                                }),
                             )
                         }>
                         <Dots

@@ -193,3 +193,5 @@ export const electrumServerList = [
         bitcoin: 'ssl://electrum.bitaroo.net:50002',
     },
 ];
+
+export const MAX_PIN_ATTEMPTS = 10;

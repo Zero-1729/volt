@@ -52,7 +52,7 @@ import {
 import {getScreenEdges} from '../../modules/screen';
 import BigNumber from 'bignumber.js';
 
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {nodeInfo, LnPaymentDetails} from '@breeztech/react-native-breez-sdk';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
@@ -116,6 +116,10 @@ const TransactionDetailsView = ({route}: Props) => {
         isLNTx ? route.params.tx.feeMsat / 1000 : route.params.tx.fee,
     );
 
+    const paymentPreimage = route.params.tx.details?.data
+        ? (route.params.tx.details?.data as LnPaymentDetails).paymentPreimage
+        : '';
+
     const handleBumpFee = (status: {
         broadcasted: boolean;
         errorMessage: string;
@@ -176,7 +180,7 @@ const TransactionDetailsView = ({route}: Props) => {
     };
 
     const copyPreimage = () => {
-        copyToClipboard(route.params.tx.details?.data?.paymentPreimage);
+        copyToClipboard(paymentPreimage);
     };
 
     const copyTxId = () => {
@@ -722,12 +726,7 @@ const TransactionDetailsView = ({route}: Props) => {
                                                                         .Default,
                                                                 },
                                                             ]}>
-                                                            {
-                                                                route.params.tx
-                                                                    .details
-                                                                    ?.data
-                                                                    ?.paymentPreimage
-                                                            }
+                                                            {paymentPreimage}
                                                         </Text>
                                                         <CopyIcon
                                                             width={16}

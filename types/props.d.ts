@@ -112,6 +112,13 @@ export type TextInputProps = BaseProps & {
         | React.Dispatch<React.SetStateAction<string>>;
 };
 
+// Base Text Input Prop Type (for reuse)
+export type ExtKeyInputProps = TextInputProps &
+    BaseProps & {
+        handleCorrect: (boolean) => void;
+        extKey: string;
+    };
+
 // Text Long Input Prop Type
 export type TextLongInputProps = BaseProps &
     TextInputProps & {
@@ -138,6 +145,19 @@ export type NumpadRequestInputProps = BaseProps & {
     maxAmount?: string;
 };
 
+export type PinNumpadInputProps = BaseProps & {
+    pin: string;
+    onPinChange: (pin: string) => void;
+    triggerBiometrics?: () => void;
+    pinLimit: number;
+    showBiometrics: boolean;
+};
+
+export type MnemonicInputProps = BaseProps & {
+    mnemonicList: string[];
+    onMnemonicCheck: (state: boolean) => void;
+};
+
 export type DisplaySatsAmountProps = BaseProps & {
     amount: BigNumber;
     isApprox?: boolean;
@@ -150,4 +170,17 @@ export type DisplayFiatAmountProps = BaseProps & {
     isApprox?: boolean;
     fontSize: string;
     textColor?: string;
+};
+
+export type MnemonicDisplayProps = {
+    index: number;
+    word: string;
+};
+
+export type genericSwitchProps = {
+    trackColor: {false: string; true: string};
+    thumbColor: string;
+    iosBackgroundColor: string;
+    onValueChange: () => void;
+    value: boolean;
 };

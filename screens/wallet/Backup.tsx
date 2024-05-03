@@ -53,6 +53,10 @@ import {toastConfig} from '../../components/toast';
 import {capitalizeFirst} from '../../modules/transform';
 import {useSharedValue} from 'react-native-reanimated';
 
+import RNBiometrics from '../../modules/biometrics';
+
+import {MnemonicDisplayCapsule, GenericSwitch} from '../../components/shared';
+
 type Slide = () => ReactElement;
 
 const Backup = () => {
@@ -60,7 +64,7 @@ const Backup = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {currentWalletID, getWalletData, isAdvancedMode} =
+    const {currentWalletID, getWalletData, isAdvancedMode, isBiometricsActive} =
         useContext(AppStorageContext);
 
     const carouselRef = useRef<ICarouselInstance>(null);
@@ -73,8 +77,11 @@ const Backup = () => {
     const walletType = WalletTypeDetails[walletData.type];
     const walletTypeName =
         walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
+    const CardColor =
+        ColorScheme.WalletColors[walletData.type][walletData.network];
 
     const [showPrivateDescriptor, setShowPrivateDescriptor] = useState(false);
+    const [switchEnabled, setSwitchEnabled] = useState(false);
 
     const getQRData = useCallback(
         (material: string) => {
@@ -181,63 +188,124 @@ const Backup = () => {
     const warning = t('backup_clarification');
 
     const mainPanel = useCallback((): ReactElement => {
+        const mnemonics = walletData.mnemonic.split(' ');
         const baseBackup =
             walletData.mnemonic !== ''
                 ? getQRData(EBackupMaterial.Mnemonic)
                 : getQRData(EBackupMaterial.Xprv);
 
-        const copyMainData = () => {
-            copyToClipboard(baseBackup);
+        const toggleSwitch = () => {
+            if (switchEnabled) {
+                RNHapticFeedback.trigger(
+                    'impactLight',
+                    RNHapticFeedbackOptions,
+                );
+            }
+
+            setSwitchEnabled(!switchEnabled);
         };
 
         return (
             <View
                 style={[
                     tailwind('items-center justify-center h-full w-full'),
-                    styles.infoContainer,
+                    switchEnabled || walletData.mnemonic === ''
+                        ? styles.minMarginContainer
+                        : styles.largeMarginContainer,
                 ]}>
-                {/* Display QR code with seed */}
-                <View
-                    style={[
-                        tailwind('rounded self-center mb-4'),
-                        {
-                            borderWidth: 2,
-                            borderColor: ColorScheme.Background.QRBorder,
-                        },
-                    ]}>
-                    <QRCodeStyled
-                        style={{
-                            backgroundColor: 'white',
-                        }}
-                        data={baseBackup}
-                        pieceSize={7}
-                        padding={10}
-                        color={ColorScheme.Background.Default}
-                        pieceCornerType={'rounded'}
-                        isPiecesGlued={true}
-                        pieceBorderRadius={2}
-                    />
-                </View>
-
-                {/* Display either seed or ext key */}
-                <PlainButton
-                    style={[tailwind('items-center mb-4 w-5/6')]}
-                    onPress={copyMainData}>
-                    <Text
+                {/* Show mnemonic & QR code version or Xprv QR code */}
+                {switchEnabled || walletData.mnemonic === '' ? (
+                    <View
+                        style={[
+                            tailwind('rounded self-center mb-4'),
+                            {
+                                borderWidth: 2,
+                                borderColor: ColorScheme.Background.QRBorder,
+                            },
+                        ]}>
+                        <QRCodeStyled
+                            style={{
+                                backgroundColor: 'white',
+                            }}
+                            data={baseBackup}
+                            pieceSize={7}
+                            padding={10}
+                            color={ColorScheme.Background.Default}
+                            pieceCornerType={'rounded'}
+                            isPiecesGlued={true}
+                            pieceBorderRadius={2}
+                        />
+                    </View>
+                ) : (
+                    <View
                         style={[
                             tailwind(
-                                'text-sm w-full p-3 text-center rounded-sm',
+                                'w-5/6 flex-row justify-center items-center mb-6',
                             ),
-                            {
-                                backgroundColor: ColorScheme.Background.Greyed,
-                                color: ColorScheme.Text.Default,
-                            },
-                        ]}
-                        numberOfLines={2}
-                        ellipsizeMode={'middle'}>
-                        {baseBackup}
-                    </Text>
-                </PlainButton>
+                        ]}>
+                        {/* col 0 */}
+                        <View
+                            style={[
+                                tailwind('items-center justify-center mr-4'),
+                                styles.capsuleContainer,
+                            ]}>
+                            {mnemonics.slice(0, 6).map((word, index) => (
+                                <MnemonicDisplayCapsule
+                                    key={index}
+                                    word={word}
+                                    index={index}
+                                />
+                            ))}
+                        </View>
+
+                        {/* col 1 */}
+                        <View
+                            style={[
+                                tailwind('items-center justify-center'),
+                                styles.capsuleContainer,
+                            ]}>
+                            {mnemonics.slice(6, 12).map((word, index) => (
+                                <MnemonicDisplayCapsule
+                                    key={index + 6}
+                                    word={word}
+                                    index={index + 6}
+                                />
+                            ))}
+                        </View>
+                    </View>
+                )}
+
+                {walletData.mnemonic !== '' && (
+                    <View
+                        style={[
+                            tailwind(
+                                'w-5/6 items-center justify-center mb-4 flex-row',
+                            ),
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm font-bold mr-4'),
+                                {
+                                    color: switchEnabled
+                                        ? ColorScheme.Text.Default
+                                        : ColorScheme.Text.GrayedText,
+                                },
+                            ]}>
+                            {t('display_mnemonic_qr')}
+                        </Text>
+
+                        <GenericSwitch
+                            trackColor={{
+                                false: ColorScheme.Background.Greyed,
+                                true: CardColor,
+                            }}
+                            thumbColor={'white'}
+                            iosBackgroundColor={ColorScheme.Background.Greyed}
+                            onValueChange={toggleSwitch}
+                            value={switchEnabled}
+                        />
+                    </View>
+                )}
 
                 <View style={[tailwind('mt-2 flex w-5/6')]}>
                     <Text
@@ -262,13 +330,14 @@ const Backup = () => {
         );
     }, [
         walletData.mnemonic,
-        getQRData,
         tailwind,
+        CardColor,
         ColorScheme,
         baseBackupTitle,
+        switchEnabled,
         t,
         warning,
-        copyToClipboard,
+        getQRData,
     ]);
 
     const descriptorPanel = useCallback((): ReactElement => {
@@ -287,9 +356,33 @@ const Backup = () => {
 
                 setupDescriptorData(walletData.externalDescriptor);
             } else {
-                setShowPrivateDescriptor(true);
-
-                setupDescriptorData(walletData.privateDescriptor);
+                if (isBiometricsActive) {
+                    RNBiometrics.simplePrompt({
+                        promptMessage: `Confirm ${
+                            Platform.OS === 'ios' ? 'FaceID' : 'Biometrics'
+                        }`,
+                    })
+                        .then(({success}) => {
+                            if (success) {
+                                setShowPrivateDescriptor(true);
+                                setupDescriptorData(
+                                    walletData.privateDescriptor,
+                                );
+                            }
+                        })
+                        .catch((error: any) => {
+                            Toast.show({
+                                topOffset: 54,
+                                type: 'Liberal',
+                                text1: t('Biometrics'),
+                                text2: error.message,
+                                visibilityTime: 1750,
+                            });
+                        });
+                } else {
+                    setShowPrivateDescriptor(true);
+                    setupDescriptorData(walletData.privateDescriptor);
+                }
             }
         };
 
@@ -297,7 +390,7 @@ const Backup = () => {
             <View
                 style={[
                     tailwind('items-center justify-center h-full w-full'),
-                    styles.infoContainer,
+                    styles.largeMarginContainer,
                 ]}>
                 {/* Display QR code with seed */}
                 <View
@@ -324,7 +417,7 @@ const Backup = () => {
 
                 {/* Display either seed or descriptor */}
                 <PlainButton
-                    style={[tailwind('items-center mb-4 w-5/6')]}
+                    style={[tailwind('items-center mb-6 w-5/6')]}
                     onPress={copyDescriptor}>
                     <Text
                         style={[
@@ -345,7 +438,15 @@ const Backup = () => {
                 {/* Toggle with private key version */}
                 {/* Only available if not watch-only */}
                 {!walletData.isWatchOnly && (
-                    <View
+                    <PlainButton
+                        onPress={() => {
+                            RNHapticFeedback.trigger(
+                                'rigid',
+                                RNHapticFeedbackOptions,
+                            );
+
+                            togglePrivateDescriptor();
+                        }}
                         style={[
                             tailwind(
                                 `mb-4 self-center w-4/5 ${
@@ -387,6 +488,14 @@ const Backup = () => {
                                     : 'grey',
                                 borderRadius: 2,
                             }}
+                            onPress={() => {
+                                RNHapticFeedback.trigger(
+                                    'rigid',
+                                    RNHapticFeedbackOptions,
+                                );
+
+                                togglePrivateDescriptor();
+                            }}
                             style={[
                                 tailwind(
                                     `flex-row absolute ${
@@ -396,17 +505,9 @@ const Backup = () => {
                                     }`,
                                 ),
                             ]}
-                            onPress={() => {
-                                RNHapticFeedback.trigger(
-                                    'rigid',
-                                    RNHapticFeedbackOptions,
-                                );
-
-                                togglePrivateDescriptor();
-                            }}
                             disableBuiltInState={true}
                         />
-                    </View>
+                    </PlainButton>
                 )}
 
                 <View style={[tailwind('mt-6 flex w-5/6')]}>
@@ -441,6 +542,7 @@ const Backup = () => {
         warning,
         copyToClipboard,
         getQRData,
+        isBiometricsActive,
     ]);
 
     const panels = useMemo(
@@ -603,14 +705,16 @@ const Backup = () => {
                     <View
                         style={[
                             styles.carouselContainer,
-                            tailwind(
-                                'h-full w-full items-center justify-end absolute bottom-0',
-                            ),
+                            tailwind('h-full w-full'),
                             {zIndex: -9},
                         ]}>
                         <Carousel
                             ref={carouselRef}
-                            style={[tailwind('items-center')]}
+                            style={[
+                                tailwind(
+                                    'items-center justify-center absolute bottom-0 w-full',
+                                ),
+                            ]}
                             data={panels}
                             enabled={false}
                             width={NativeDims.width}
@@ -652,8 +756,14 @@ const Backup = () => {
 export default Backup;
 
 const styles = StyleSheet.create({
-    infoContainer: {
+    largeMarginContainer: {
         marginTop: 56,
+    },
+    minMarginContainer: {
+        marginTop: 32,
+    },
+    capsuleContainer: {
+        width: '46%',
     },
     carouselContainer: {
         flex: 1,

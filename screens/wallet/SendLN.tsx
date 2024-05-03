@@ -6,6 +6,7 @@ import {
     View,
     useColorScheme,
     ActivityIndicator,
+    StatusBar,
 } from 'react-native';
 import React, {
     useContext,
@@ -57,6 +58,11 @@ import {EBreezDetails} from '../../types/enums';
 import {toastConfig} from '../../components/toast';
 import {DisplayFiatAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
+
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {biometricAuth} from '../../modules/shared';
+
+import PINPass from '../../components/pinpass';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SendLN'>;
 
@@ -130,7 +136,7 @@ const InputPanel = (): ReactElement => {
         const isNonEmpty = !!splitted[0].trim() && !!splitted[1].trim();
 
         const mailRegExp = new RegExp(
-            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         );
 
         return isNonEmpty && mailRegExp.test(address);
@@ -154,7 +160,7 @@ const InputPanel = (): ReactElement => {
                         tailwind('font-bold w-full mb-4'),
                         {color: ColorScheme.Text.Default},
                     ]}>
-                    {t('to')}
+                    {capitalizeFirst(t('to'))}
                 </VText>
 
                 <View
@@ -183,7 +189,7 @@ const InputPanel = (): ReactElement => {
                             tailwind('font-bold w-full mb-4'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        Description
+                        {capitalizeFirst(t('description'))}
                     </VText>
 
                     <View
@@ -196,7 +202,7 @@ const InputPanel = (): ReactElement => {
                         ]}>
                         <TextSingleInput
                             color={ColorScheme.Text.Default}
-                            placeholder={t('description')}
+                            placeholder={capitalizeFirst(t('description'))}
                             placeholderTextColor={ColorScheme.Text.GrayedText}
                             value={descriptionText}
                             onChangeText={mutateDescription}
@@ -238,9 +244,11 @@ const InputPanel = (): ReactElement => {
 
 const SummaryPanel = (props: {
     text: string | undefined;
-    kind: string;
+    kind: string | undefined;
     amount: number | undefined;
     description: string | undefined;
+    loadingPay: boolean;
+    authAndPay: () => void;
 }): ReactElement => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
@@ -248,122 +256,10 @@ const SummaryPanel = (props: {
 
     const {fiatRate} = useContext(AppStorageContext);
 
-    const [loadingPay, setLoadingPay] = useState(false);
-
     const fiatAmount = normalizeFiat(
         new BigNumber(props.amount as number),
         fiatRate.rate,
     );
-
-    const handlePayment = async () => {
-        setLoadingPay(true);
-
-        // Make payment
-        if (props.kind === 'address') {
-            // Make payment to address
-            payLNAddress(
-                props.text as string,
-                props.amount as number,
-                props.description,
-            );
-        } else {
-            // Make payment to Node ID
-            payNodeID(
-                props.text as string,
-                props.amount as number,
-                props.description as string,
-            );
-        }
-    };
-
-    const payLNAddress = async (
-        lnurlPayURL: string,
-        amtSats: number,
-        comment?: string,
-    ) => {
-        try {
-            const input = await parseInput(lnurlPayURL);
-
-            // LN Address
-            if (input.type === InputTypeVariant.LN_URL_PAY) {
-                const canComment = input.data.commentAllowed;
-
-                // Note: min spendable is in Msat
-                const minAmountSats = input.data.minSendable / 1_000;
-                const amountMSats = amtSats * 1_000;
-
-                if (amtSats < minAmountSats) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: 'LNURL Pay Error',
-                        text2: t('amount_below_min_spendable'),
-                        visibilityTime: 1750,
-                    });
-                }
-
-                await payLnurl({
-                    data: input.data,
-                    amountMsat: amountMSats,
-                    comment: canComment ? comment || '' : '',
-                });
-
-                // Note: sends 'Payment Sent' event, so watch and handle routing
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: 'LNURL Pay',
-                    text2: 'Tip sent!',
-                    visibilityTime: 1750,
-                    onHide: () => {
-                        setLoadingPay(false);
-                    },
-                });
-            }
-        } catch (error: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: 'LNURL Pay Error',
-                text2: error.message,
-                visibilityTime: 1750,
-            });
-
-            setLoadingPay(false);
-        }
-    };
-
-    const stringToBytes = (text: string) => {
-        const encoder = new TextEncoder();
-
-        return Array.from(encoder.encode(text));
-    };
-
-    const payNodeID = async (
-        nodeID: string,
-        amount: number,
-        description: string,
-    ) => {
-        // Make payment to Node ID
-        const amountMsat = amount * 1_000;
-        const bytesValue = stringToBytes(description);
-
-        try {
-            const extraTlvs: TlvEntry[] = [
-                {fieldNumber: 34349334, value: bytesValue},
-            ];
-
-            await sendSpontaneousPayment({
-                nodeId: nodeID,
-                amountMsat,
-                extraTlvs,
-            });
-
-            setLoadingPay(false);
-        } catch (err: any) {
-            setLoadingPay(false);
-        }
-    };
 
     return (
         <View style={[tailwind('items-center w-full h-full')]}>
@@ -470,7 +366,7 @@ const SummaryPanel = (props: {
                             </View>
                         )}
                     </View>
-                    {loadingPay && (
+                    {props.loadingPay && (
                         <View style={[tailwind('items-center mt-6 flex-row')]}>
                             <Text
                                 style={[
@@ -487,8 +383,8 @@ const SummaryPanel = (props: {
                 </View>
 
                 <LongBottomButton
-                    disabled={loadingPay}
-                    onPress={handlePayment}
+                    disabled={props.loadingPay}
+                    onPress={props.authAndPay}
                     title={capitalizeFirst(t('pay'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
@@ -503,7 +399,10 @@ const SendLN = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
-    const {breezEvent} = useContext(AppStorageContext);
+    const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
+    const [loadingPay, setLoadingPay] = useState(false);
+
+    const {t} = useTranslation('wallet');
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
@@ -533,47 +432,231 @@ const SendLN = ({route}: Props) => {
         }
     }, [breezEvent]);
 
+    const bottomPINPassRef = useRef<BottomSheetModal>(null);
+    const [pinIdx, setPINIdx] = useState(-1);
+
+    const manualKind = route.params?.lnManualPayload?.kind;
+    const manualText = route.params?.lnManualPayload?.text;
+    const manualDescription = route.params?.lnManualPayload?.description;
+    const manualAmount = route.params?.lnManualPayload?.amount;
+
+    const togglePINPassModal = () => {
+        if (pinIdx !== 1) {
+            bottomPINPassRef.current?.present();
+        } else {
+            bottomPINPassRef.current?.close();
+        }
+    };
+
+    const handlePINSuccess = async () => {
+        handlePayment();
+        bottomPINPassRef.current?.close();
+    };
+
+    const authAndPay = () => {
+        if (isBiometricsActive) {
+            biometricAuth(
+                success => {
+                    if (success) {
+                        handlePayment();
+                    }
+                },
+                // prompt response callback
+                () => {
+                    togglePINPassModal();
+                },
+                // prompt error callback
+                error => {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Biometrics'),
+                        text2: error.message,
+                        visibilityTime: 1750,
+                    });
+                },
+            );
+
+            return;
+        }
+
+        togglePINPassModal();
+    };
+
+    const handlePayment = async () => {
+        setLoadingPay(true);
+
+        // Make payment
+        if (manualKind === 'address') {
+            // Make payment to address
+            payLNAddress(
+                manualText as string,
+                manualAmount as number,
+                manualDescription,
+            );
+        } else {
+            // Make payment to Node ID
+            payNodeID(
+                manualText as string,
+                manualAmount as number,
+                manualDescription as string,
+            );
+        }
+    };
+
+    const payLNAddress = async (
+        lnurlPayURL: string,
+        amtSats: number,
+        comment?: string,
+    ) => {
+        try {
+            const input = await parseInput(lnurlPayURL);
+
+            if (input.type === InputTypeVariant.LN_URL_ERROR) {
+                throw new Error(t('not_ln_address'));
+            }
+
+            // LN Address
+            if (input.type === InputTypeVariant.LN_URL_PAY) {
+                const canComment = input.data.commentAllowed;
+
+                // Note: min spendable is in Msat
+                const minAmountSats = input.data.minSendable / 1_000;
+                const amountMSats = amtSats * 1_000;
+
+                if (amtSats < minAmountSats) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: 'LNURL Pay Error',
+                        text2: t('amount_below_min_spendable'),
+                        visibilityTime: 1750,
+                    });
+                }
+
+                await payLnurl({
+                    data: input.data,
+                    amountMsat: amountMSats,
+                    comment: canComment ? comment || '' : '',
+                });
+
+                // Note: sends 'Payment Sent' event, so watch and handle routing
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: 'LNURL Pay',
+                    text2: 'Tip sent!',
+                    visibilityTime: 1750,
+                    onHide: () => {
+                        setLoadingPay(false);
+                    },
+                });
+            }
+        } catch (error: any) {
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: 'Lightning Address',
+                text2: error.message,
+                visibilityTime: 2100,
+                onHide: () => {
+                    navigation.dispatch(
+                        CommonActions.navigate('WalletRoot', {
+                            screen: 'WalletView',
+                        }),
+                    );
+                },
+            });
+
+            setLoadingPay(false);
+        }
+    };
+
+    const stringToBytes = (text: string) => {
+        const encoder = new TextEncoder();
+
+        return Array.from(encoder.encode(text));
+    };
+
+    const payNodeID = async (
+        nodeID: string,
+        amount: number,
+        description: string,
+    ) => {
+        // Make payment to Node ID
+        const amountMsat = amount * 1_000;
+        const bytesValue = stringToBytes(description);
+
+        try {
+            const extraTlvs: TlvEntry[] = [
+                {fieldNumber: 34349334, value: bytesValue},
+            ];
+
+            await sendSpontaneousPayment({
+                nodeId: nodeID,
+                amountMsat,
+                extraTlvs,
+            });
+
+            setLoadingPay(false);
+        } catch (err: any) {
+            setLoadingPay(false);
+        }
+    };
+
     return (
         <SafeAreaView
-            edges={['left', 'right', 'bottom']}
+            edges={['top', 'left', 'right', 'bottom']}
             style={[{backgroundColor: ColorScheme.Background.Primary}]}>
-            <View style={[tailwind('h-full w-full items-center')]}>
-                <View
-                    style={[
-                        tailwind(
-                            'absolute top-6 w-full flex-row items-center justify-center',
-                        ),
-                        {zIndex: 999},
-                    ]}>
-                    <PlainButton
-                        onPress={() =>
-                            navigation.dispatch(StackActions.popToTop())
-                        }
-                        style={[tailwind('absolute left-6')]}>
-                        <Close fill={ColorScheme.SVG.Default} />
-                    </PlainButton>
-                    <Text
+            <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
+            <BottomSheetModalProvider>
+                <View style={[tailwind('h-full w-full items-center')]}>
+                    <View
                         style={[
-                            tailwind('text-base font-bold'),
-                            {color: ColorScheme.Text.Default},
+                            tailwind(
+                                'absolute top-6 w-full flex-row items-center justify-center',
+                            ),
+                            {zIndex: 999},
                         ]}>
-                        Send
-                    </Text>
+                        <PlainButton
+                            onPress={() =>
+                                navigation.dispatch(StackActions.popToTop())
+                            }
+                            style={[tailwind('absolute left-6')]}>
+                            <Close fill={ColorScheme.SVG.Default} />
+                        </PlainButton>
+                        <Text
+                            style={[
+                                tailwind('text-base font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            Send
+                        </Text>
+                    </View>
+
+                    {!route.params?.lnManualPayload && <InputPanel />}
+
+                    {route.params?.lnManualPayload && (
+                        <SummaryPanel
+                            authAndPay={authAndPay}
+                            loadingPay={loadingPay}
+                            amount={manualAmount}
+                            kind={manualKind}
+                            text={manualText}
+                            description={manualDescription}
+                        />
+                    )}
                 </View>
 
-                {!route.params?.lnManualPayload && <InputPanel />}
+                <PINPass
+                    pinPassRef={bottomPINPassRef}
+                    triggerSuccess={handlePINSuccess}
+                    onSelectPinPass={setPINIdx}
+                    pinMode={false}
+                />
 
-                {route.params?.lnManualPayload && (
-                    <SummaryPanel
-                        amount={route.params.lnManualPayload.amount}
-                        kind={route.params.lnManualPayload.kind}
-                        text={route.params.lnManualPayload.text}
-                        description={route.params.lnManualPayload.description}
-                    />
-                )}
-            </View>
-
-            <Toast config={toastConfig as ToastConfig} />
+                <Toast config={toastConfig as ToastConfig} />
+            </BottomSheetModalProvider>
         </SafeAreaView>
     );
 };

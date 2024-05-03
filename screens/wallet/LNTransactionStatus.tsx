@@ -8,6 +8,7 @@ import {
     Platform,
     AppState,
     Dimensions,
+    StatusBar,
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useContext} from 'react';
 
@@ -87,6 +88,10 @@ const LNTransactionStatus = ({route}: Props) => {
         return msg;
     };
 
+    const failedError = route.params.details
+        ? (route.params.details as PaymentFailedData).error
+        : '';
+
     const sats = () => {
         let amount!: number;
 
@@ -160,6 +165,7 @@ const LNTransactionStatus = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
+            <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
                 style={[
                     styles.statusContainer,
@@ -267,7 +273,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        {route.params.details?.error}
+                                        {failedError}
                                     </Text>
                                 )}
                         </View>

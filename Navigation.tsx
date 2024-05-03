@@ -1,5 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {ReactElement, memo, useRef, useEffect, useContext} from 'react';
+import React, {
+    ReactElement,
+    memo,
+    useRef,
+    useEffect,
+    useContext,
+    useCallback,
+    useState,
+} from 'react';
 import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
@@ -10,6 +18,7 @@ import {
     createNavigationContainerRef,
     DefaultTheme,
     LinkingOptions,
+    StackActions,
 } from '@react-navigation/native';
 
 import Toast from 'react-native-toast-message';
@@ -41,6 +50,9 @@ import {actionAlert} from './components/alert';
 
 import Home from './screens/Home';
 import PayInvoice from './screens/wallet/PayInvoice';
+
+// Biometrics Screen
+import LockScreen from './components/lock';
 
 // Wallet screens
 import Add from './screens/wallet/Add';
@@ -77,6 +89,18 @@ import Currency from './screens/settings/Currency';
 import Wallet from './screens/settings/Wallet';
 import Network from './screens/settings/Network';
 
+// PIN screens
+import PINManager from './screens/settings/pin/PIN';
+import ChangePIN from './screens/settings/pin/ChangePIN';
+import SetPIN from './screens/settings/pin/SetPIN';
+import WelcomePIN from './screens/settings/pin/Welcome';
+import ConfirmPIN from './screens/settings/pin/ConfirmPIN';
+import DonePIN from './screens/settings/pin/Done';
+import SetBiometrics from './screens/settings/pin/SetBiometrics';
+import ResetPIN from './screens/settings/pin/ResetPIN';
+import MnemonicTest from './screens/settings/pin/MnemonicTest';
+import ExtKeyTest from './screens/settings/pin/ExtKeyTest';
+
 // Settings Tools
 import SettingsTools from './screens/settings/tools/Index';
 import ExtendedKey from './screens/settings/tools/ExtendedKey';
@@ -93,8 +117,29 @@ import {
     TBreezPaymentDetails,
     TLnManualPayloadType,
 } from './types/wallet';
+import {hasOpenedModals} from './modules/shared';
 import {ENet, EBreezDetails} from './types/enums';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
+
+// Make sure this is updated to match all screen routes below
+const modalRoutes = [
+    'Scan',
+    'FeeSelection',
+    'WalletBackup',
+    'AddressOwnership',
+    'TransactionDetails',
+    'TransactionStatus',
+    'TransactionExported',
+    'SendAmount',
+    'Receive',
+    'RequestAmount',
+    'WalletXpub',
+    // 'addWalletRoot', Screen not necessary as before wallet created
+    'License',
+    'Changelog',
+    'XKeyTool',
+    'MnemonicTool',
+];
 
 // Root Param List for Home Screen
 export type InitStackParamList = {
@@ -120,6 +165,54 @@ export type InitStackParamList = {
         details: TBreezPaymentDetails;
         detailsType: EBreezDetails;
     };
+};
+
+// Settings Param List for screens
+export type SettingsParamList = {
+    Settings: undefined;
+    Currency: undefined;
+    Language: undefined;
+    Wallet: undefined;
+    Network: undefined;
+    About: undefined;
+
+    PINManager: undefined;
+    ChangePIN: undefined;
+    WelcomePIN: undefined;
+    SetPIN: {
+        isChangePIN?: boolean;
+        isPINReset?: boolean;
+    };
+    ConfirmPIN: {
+        pin: string;
+        isChangePIN?: boolean;
+        isPINReset?: boolean;
+    };
+    DonePIN: {
+        isChangePIN?: boolean;
+        isPINReset?: boolean;
+    };
+    SetBiometrics: {
+        standalone: boolean;
+    };
+    ResetPIN: {
+        isPINReset: boolean;
+        isChangePIN?: boolean;
+    };
+    MnemonicTest: {
+        isPINReset: boolean;
+        isChangePIN: boolean;
+    };
+    ExtKeyTest: {
+        isPINReset: boolean;
+        isChangePIN: boolean;
+    };
+
+    SettingsTools: undefined;
+    License: undefined;
+    Changelog: undefined;
+    XKeyTool: undefined;
+    MnemonicTool: undefined;
 };
 
 // Add Wallet Param List for screens
@@ -155,7 +248,6 @@ export type WalletParamList = {
         invoiceData: TInvoiceData;
         wallet?: TMiniWallet;
         bolt11?: LnInvoice;
-        source?: string;
     };
     WalletView: {
         reload: boolean;
@@ -202,7 +294,7 @@ export type ScanParamList = {
     };
 };
 
-const SettingsStack = createNativeStackNavigator();
+const SettingsStack = createNativeStackNavigator<SettingsParamList>();
 const SettingsRoot = () => {
     return (
         <SettingsStack.Navigator screenOptions={{headerShown: false}}>
@@ -212,6 +304,25 @@ const SettingsRoot = () => {
             <SettingsStack.Screen name="Wallet" component={Wallet} />
             <SettingsStack.Screen name="Network" component={Network} />
             <SettingsStack.Screen name="About" component={About} />
+
+            {/* Set PIN */}
+            <SettingsStack.Screen name="PINManager" component={PINManager} />
+            <SettingsStack.Screen name="ChangePIN" component={ChangePIN} />
+            <SettingsStack.Screen name="WelcomePIN" component={WelcomePIN} />
+            <SettingsStack.Screen name="SetPIN" component={SetPIN} />
+            <SettingsStack.Screen name="ConfirmPIN" component={ConfirmPIN} />
+            <SettingsStack.Screen name="DonePIN" component={DonePIN} />
+            <SettingsStack.Screen
+                name="SetBiometrics"
+                component={SetBiometrics}
+            />
+            <SettingsStack.Screen name="ResetPIN" component={ResetPIN} />
+            <SettingsStack.Screen
+                name="MnemonicTest"
+                component={MnemonicTest}
+            />
+            <SettingsStack.Screen name="ExtKeyTest" component={ExtKeyTest} />
+
             <SettingsStack.Screen
                 name="SettingsTools"
                 component={SettingsTools}
@@ -249,12 +360,15 @@ const WalletRoot = () => {
             />
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
+            {/* TODO: Fix issue routing to 'Send' screen from Wallet as modal, route changed but reverted after few seconds */}
+            <WalletStack.Screen name="Send" component={Send} />
+            <WalletStack.Screen name="SendLN" component={SendLN} />
+
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen
                     name="FeeSelection"
                     component={FeeSelection}
                 />
-                <WalletStack.Screen name="Send" component={Send} />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
@@ -278,7 +392,6 @@ const WalletRoot = () => {
                     component={RequestAmount}
                 />
                 <WalletStack.Screen name="SendAmount" component={SendAmount} />
-                <WalletStack.Screen name="SendLN" component={SendLN} />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
             </WalletStack.Group>
         </WalletStack.Navigator>
@@ -319,6 +432,12 @@ export const rootNavigation = {
             : never
     ): void {
         if (navigationRef.isReady()) {
+            // Close any outstanding modals first
+            const currentRoute = navigationRef.current?.getCurrentRoute();
+            if (hasOpenedModals(currentRoute, modalRoutes)) {
+                navigationRef.current?.dispatch(StackActions.popToTop());
+            }
+
             navigationRef.current?.navigate(...args);
         } else {
             // If navigation not ready
@@ -347,6 +466,9 @@ const RootNavigator = (): ReactElement => {
     const wallet = getWalletData(currentWalletID);
     const BreezSub = useRef<any>(null);
 
+    const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
+    const [isAuth, setIsAuth] = useState(false);
+
     const {t} = useTranslation('wallet');
 
     const ColorScheme = Color(useColorScheme());
@@ -354,8 +476,6 @@ const RootNavigator = (): ReactElement => {
     let Theme = {
         dark: ColorScheme.isDarkMode,
         colors: {
-            // Spread the colors from the default theme
-            // and include the custom Navigator theme colors
             ...DefaultTheme.colors,
             ...ColorScheme.NavigatorTheme.colors,
         },
@@ -409,8 +529,10 @@ const RootNavigator = (): ReactElement => {
         subscribe(listener): () => void {
             // Deep linking when app open
             const onReceiveLink = ({url}: {url: string}) => {
-                if (!onboardingState.current) {
-                    rootNavigation.navigate('PayInvoice', {invoice: url});
+                if (!onboardingState.current && isAuth) {
+                    rootNavigation.navigate('PayInvoice', {
+                        invoice: url,
+                    });
                 }
 
                 return listener(url);
@@ -421,7 +543,7 @@ const RootNavigator = (): ReactElement => {
 
             return () => {
                 // Clean up the event listeners
-                subscription.remove();
+                subscription?.remove();
             };
         },
     };
@@ -439,6 +561,16 @@ const RootNavigator = (): ReactElement => {
         // Check clipboard
         checkAndSetClipboard();
     };
+
+    const handleAuthSuccess = useCallback(() => {
+        if (triggerClipboardCheck) {
+            // Call clipboard
+            checkDeepLinkAndClipboard();
+        }
+
+        setIsAuth(true);
+        setTriggerClipboardCheck(false);
+    }, [triggerClipboardCheck]);
 
     // Breez startup
     const initNode = async () => {
@@ -606,18 +738,25 @@ const RootNavigator = (): ReactElement => {
         // Check for deep link if app newly launched
         // Ensure that we have wallets before checking
         if (renderCount <= 2 && !onboardingState.current) {
-            checkDeepLinkAndClipboard();
+            // Call on trigger for Lock comp
+            setTriggerClipboardCheck(true);
         }
 
-        // TODO: Add check for Auth when app is active
         const appStateSub = AppState.addEventListener(
             'change',
-            (incomingState): void => {
+            async (incomingState): Promise<void> => {
+                const currentRoute = navigationRef.current?.getCurrentRoute();
+
+                // Check whether we are in the pay invoice screen (i.e. handling deep link)
+                // and block clipboard check;
+                const isDeepLinkScreen = currentRoute?.name === 'PayInvoice';
+
                 // Check and run clipboard fn if app is active in foreground
                 // Ensure that we have wallets before checking
                 if (
                     appState.current.match(/background/) &&
                     incomingState === 'active' &&
+                    !isDeepLinkScreen &&
                     !onboardingState.current
                 ) {
                     checkAndSetClipboard();
@@ -635,8 +774,8 @@ const RootNavigator = (): ReactElement => {
 
         return () => {
             // Kill subscription
-            BreezSub.current.remove();
-            appStateSub.remove();
+            BreezSub?.current?.remove();
+            appStateSub?.remove();
         };
     }, []);
 
@@ -647,7 +786,7 @@ const RootNavigator = (): ReactElement => {
             theme={Theme}>
             <InitScreenStack.Navigator
                 screenOptions={{headerShown: false}}
-                initialRouteName="HomeScreen">
+                initialRouteName={'HomeScreen'}>
                 <InitScreenStack.Screen name="HomeScreen" component={Home} />
                 <InitScreenStack.Screen
                     name="LNTransactionStatus"
@@ -678,6 +817,8 @@ const RootNavigator = (): ReactElement => {
                 </InitScreenStack.Group>
                 <InitScreenStack.Screen name="Apps" component={Apps} />
             </InitScreenStack.Navigator>
+
+            {!isAuth && <LockScreen onSuccess={handleAuthSuccess} />}
         </NavigationContainer>
     );
 };

@@ -255,7 +255,7 @@ const Scan = ({route}: Props) => {
                         topOffset: 54,
                         type: 'Liberal',
                         text1: capitalizeFirst(t('scanner')),
-                        text2: err,
+                        text2: err.message,
                         visibilityTime: 2000,
                     });
                     return {decodedInvoice: null, isOnchain: null};

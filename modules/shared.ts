@@ -6,6 +6,9 @@ import {
     TTransaction,
 } from '../types/wallet';
 import {createBDKWallet, syncBdkWallet, getBdkWalletTransactions} from './bdk';
+import RNBiometrics from './biometrics';
+import {Platform} from 'react-native';
+import {Route} from '@react-navigation/native';
 
 export const initWallet = async (wallet: TWalletType) => {
     // Create wallet
@@ -63,4 +66,39 @@ export const fetchOnchainTransactions = async (
             utxo: UTXOs,
         };
     }
+};
+
+export const biometricAuth = async (
+    successCallback: (success: any) => void,
+    promptErrorCallback: (error: any) => void,
+    errorCallback: (error: any) => void,
+) => {
+    const {available} = await RNBiometrics.isSensorAvailable();
+
+    if (!available) {
+        return;
+    }
+
+    RNBiometrics.simplePrompt({
+        promptMessage: `Confirm ${
+            Platform.OS === 'ios' ? 'FaceID' : 'Biometrics'
+        }`,
+    })
+        .then(({success, error}) => {
+            if (success) {
+                successCallback(success);
+            } else {
+                promptErrorCallback(error);
+            }
+        })
+        .catch((error: any) => {
+            errorCallback(error);
+        });
+};
+
+export const hasOpenedModals = (
+    currentRoute: Route<string> | undefined,
+    modalScreenNames: string[],
+) => {
+    return currentRoute ? modalScreenNames.includes(currentRoute.name) : false;
 };

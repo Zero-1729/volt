@@ -123,6 +123,47 @@ const Settings = () => {
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
+                                CommonActions.navigate({name: 'PINManager'}),
+                            );
+                        }}>
+                        <View
+                            style={[
+                                tailwind(
+                                    `items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between mt-2 mb-6`,
+                                ),
+                            ]}>
+                            <VText
+                                style={[
+                                    tailwind('text-sm font-medium'),
+                                    {color: ColorScheme.Text.Default},
+                                    Font.RobotoText,
+                                ]}>
+                                {t('manage_pin')}
+                            </VText>
+
+                            {langDir === 'left' ? (
+                                <Right
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            ) : (
+                                <Left
+                                    width={16}
+                                    stroke={ColorScheme.SVG.GrayFill}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                />
+                            )}
+                        </View>
+                    </PlainButton>
+
+                    <PlainButton
+                        onPress={() => {
+                            navigation.dispatch(
                                 CommonActions.navigate({name: 'Currency'}),
                             );
                         }}>

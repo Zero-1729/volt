@@ -29,13 +29,8 @@ const MoreInfo = () => {
     const {t} = useTranslation('onboarding');
 
     const setModeAndRoute = () => {
-        // Route to add wallet screen
-        navigation.dispatch(
-            CommonActions.navigate('AddWalletRoot', {
-                screen: 'Add',
-                params: {onboarding: true},
-            }),
-        );
+        // Route to add PIN screen
+        navigation.dispatch(CommonActions.navigate('WelcomePIN'));
     };
 
     return (
@@ -85,7 +80,7 @@ const MoreInfo = () => {
 
                 <LongBottomButton
                     onPress={setModeAndRoute}
-                    title={capitalizeFirst(t('done'))}
+                    title={capitalizeFirst(t('continue'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />

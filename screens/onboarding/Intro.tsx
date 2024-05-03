@@ -49,12 +49,9 @@ const Intro = () => {
                     ]}>
                     <PlainButton
                         onPress={() => {
-                            // Route to add wallet screen
+                            // Route to add PIN screen
                             navigation.dispatch(
-                                CommonActions.navigate('AddWalletRoot', {
-                                    screen: 'Add',
-                                    params: {onboarding: true},
-                                }),
+                                CommonActions.navigate('WelcomePIN'),
                             );
                         }}
                         style={[tailwind('self-end')]}>

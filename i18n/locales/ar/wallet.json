@@ -19,6 +19,7 @@
     "mnemonic_title": "عبارة ذاكري احتياطية",
     "mnemonic_note": "من فضلك، قم بعمل نسخة احتياطية من العبارة ذاكري الخاص بك. هذه هي الطريقة الوحيدة لاستعادة محفظتك.",
     "mnemonic_ok_button": "حسنًا، لقد قمت بعمل نسخة احتياطية",
+    "display_mnemonic_qr": "عرض رمز الاستجابة السريعة ذاكري",
     "balance": "الرصيد",
     "current_balance": "الرصيد الحالي",
     "offline_balance": "الرصيد الغير متصل",
@@ -124,9 +125,12 @@
     "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة",
     "manual": "يدوي",
     "manual_message": "أدخل عنوان Lightning أو معرف العقدة",
+    "manual_placeholder": "أدخل عنوان Lightning.",
     "paying_ln_address": "دفع عنوان البرق",
     "paying_node_id": "دفع معرف العقدة",
     "ln_mnemonic_backup_message": "لحماية أموالك، قم بعمل نسخة احتياطية من عبارة ذاكرتك. إنها الطريقة الوحيدة لاستعادة محفظة Lightning الخاصة بك.",
     "descriptor_backup_message": "لحماية أموالك، قم بعمل نسخة احتياطية من واصف محفظتك. ليست كل المحافظ تدعم هذا حتى الآن.",
-    "xprv_backup_message": "لحماية أموالك، قم بعمل نسخة احتياطية من مفتاحك الخاص الممتد."
+    "xprv_backup_message": "لحماية أموالك، قم بعمل نسخة احتياطية من مفتاحك الخاص الممتد.",
+    "lock_screen_message": "أدخل رمز PIN الخاص بك",
+    "not_ln_address": "العنوان ليس عنوان Lightning."
 }

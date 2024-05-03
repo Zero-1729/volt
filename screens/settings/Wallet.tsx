@@ -51,18 +51,7 @@ const Wallet = () => {
         setIsAdvancedMode,
         hideTotalBalance,
         setTotalBalanceHidden,
-        walletMode,
-        setWalletModeType,
     } = useContext(AppStorageContext);
-
-    const toggleToMultiMode = () => {
-        // Toggle multi mode on and off
-        if (walletMode === 'single') {
-            setWalletModeType('multi');
-        } else {
-            setWalletModeType('single');
-        }
-    };
 
     return (
         <SafeAreaView>
@@ -243,78 +232,6 @@ const Wallet = () => {
                                 ]}>
                                 {t('hide_balance_description')}
                             </VText>
-                        </View>
-
-                        {/* Toggle Multi mode */}
-                        <View
-                            style={tailwind(
-                                'justify-center w-full items-center flex-row mt-8 mb-10',
-                            )}>
-                            <View style={tailwind('w-5/6')}>
-                                <View
-                                    style={tailwind(
-                                        `w-full ${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } items-center mb-2`,
-                                    )}>
-                                    <VText
-                                        style={[
-                                            tailwind('text-sm font-medium'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
-                                        {t('enable_multi_wallet')}
-                                    </VText>
-                                    <Checkbox
-                                        fillColor={
-                                            ColorScheme.Background
-                                                .CheckBoxFilled
-                                        }
-                                        unfillColor={
-                                            ColorScheme.Background
-                                                .CheckBoxUnfilled
-                                        }
-                                        size={18}
-                                        isChecked={walletMode === 'multi'}
-                                        iconStyle={{
-                                            borderWidth: 1,
-                                            borderRadius: 2,
-                                        }}
-                                        innerIconStyle={{
-                                            borderWidth: 1,
-                                            borderColor:
-                                                ColorScheme.Background
-                                                    .CheckBoxOutline,
-                                            borderRadius: 2,
-                                        }}
-                                        style={[
-                                            tailwind(
-                                                'flex-row absolute -right-4',
-                                            ),
-                                        ]}
-                                        onPress={() => {
-                                            RNHapticFeedback.trigger(
-                                                'rigid',
-                                                RNHapticFeedbackOptions,
-                                            );
-
-                                            toggleToMultiMode();
-                                        }}
-                                        disableBuiltInState={true}
-                                    />
-                                </View>
-
-                                <View style={tailwind('w-full')}>
-                                    <VText
-                                        style={[
-                                            tailwind('text-xs'),
-                                            {color: ColorScheme.Text.DescText},
-                                        ]}>
-                                        {t('enable_multi_wallet_description')}
-                                    </VText>
-                                </View>
-                            </View>
                         </View>
                     </View>
                 </View>

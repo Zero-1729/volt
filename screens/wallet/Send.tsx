@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext, useEffect, useRef} from 'react';
 import {
     StyleSheet,
     Text,
@@ -8,11 +8,12 @@ import {
     useColorScheme,
     Platform,
     ActivityIndicator,
+    StatusBar,
 } from 'react-native';
 
 import VText, {VTextSingle, VTextMulti} from '../../components/text';
 
-import {SafeAreaView, Edges} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
@@ -25,7 +26,6 @@ import {psbtFromInvoice} from './../../modules/bdk';
 import {getPrivateDescriptors} from './../../modules/descriptors';
 import {TComboWallet} from '../../types/wallet';
 
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import ExportPsbt from '../../components/psbt';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
@@ -54,12 +54,15 @@ import {
     BreezEventVariant,
 } from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from '../../types/enums';
-import {getScreenEdges} from '../../modules/screen';
 import ExpiryTimer from '../../components/expiry';
 
 import Toast from 'react-native-toast-message';
 
 import {isInvoiceExpired, getCountdownStart} from '../../modules/wallet-utils';
+
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {biometricAuth} from '../../modules/shared';
+import PINPass from '../../components/pinpass';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -67,8 +70,6 @@ const SendView = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
-
-    const edges: Edges = getScreenEdges(route.params.source as string);
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -83,6 +84,7 @@ const SendView = ({route}: Props) => {
         isAdvancedMode,
         electrumServerURL,
         breezEvent,
+        isBiometricsActive,
     } = useContext(AppStorageContext);
 
     const isLightning = !!route.params.bolt11;
@@ -100,7 +102,7 @@ const SendView = ({route}: Props) => {
     const screenTitle = isLightning
         ? t('lightning_invoice')
         : t('transaction_summary');
-    const hasLabel = route.params.invoiceData?.options?.label;
+    const hasLabel = route.params.invoiceData?.options?.label ?? '';
     const hasMessage = isLightning
         ? route.params.bolt11.description
         : route.params.invoiceData?.options?.message;
@@ -123,6 +125,54 @@ const SendView = ({route}: Props) => {
             ? (route.params.bolt11?.amountMsat as number) / 1_000
             : route.params.invoiceData?.options?.amount || 0,
     );
+
+    const bottomExportRef = useRef<BottomSheetModal>(null);
+    const bottomPINPassRef = useRef<BottomSheetModal>(null);
+    const [openExport, setOpenExport] = useState(-1);
+    const [pinIdx, setPINIdx] = useState(-1);
+
+    const togglePINPassModal = () => {
+        if (pinIdx !== 1) {
+            bottomPINPassRef.current?.present();
+        } else {
+            bottomPINPassRef.current?.close();
+        }
+    };
+
+    const handlePINSuccess = async () => {
+        handleSend();
+        bottomPINPassRef.current?.close();
+    };
+
+    const authAndPay = () => {
+        if (isBiometricsActive) {
+            biometricAuth(
+                success => {
+                    if (success) {
+                        handleSend();
+                    }
+                },
+                // prompt response callback
+                () => {
+                    togglePINPassModal();
+                },
+                // prompt error callback
+                error => {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Biometrics'),
+                        text2: error.message,
+                        visibilityTime: 1750,
+                    });
+                },
+            );
+
+            return;
+        }
+
+        togglePINPassModal();
+    };
 
     // Note: this is just a match check to determine if 'Max' entered in prev screen.
     // For onchain BDK will handle max
@@ -189,7 +239,7 @@ const SendView = ({route}: Props) => {
                 topOffset: 54,
                 type: 'Liberal',
                 text1: capitalizeFirst(t('error')),
-                text2: error,
+                text2: error.message,
                 visibilityTime: 2000,
             });
             setLoading(false);
@@ -204,9 +254,6 @@ const SendView = ({route}: Props) => {
             createTransaction();
         }
     };
-
-    const bottomExportRef = React.useRef<BottomSheetModal>(null);
-    const [openExport, setOpenExport] = useState(-1);
 
     const openExportModal = () => {
         if (openExport !== 1) {
@@ -344,12 +391,16 @@ const SendView = ({route}: Props) => {
 
     return (
         <SafeAreaView
-            edges={edges}
+            edges={['bottom', 'top', 'left', 'right']}
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
+            <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                style={[
+                    tailwind('w-full h-full items-center justify-center'),
+                    {backgroundColor: ColorScheme.Background.Primary},
+                ]}>
                 <BottomSheetModalProvider>
                     <View
                         style={[
@@ -549,12 +600,12 @@ const SendView = ({route}: Props) => {
                             </View>
                         )}
 
-                        {(hasLabel || isLightning) && (
+                        {(hasLabel.length > 0 || isLightning) && (
                             <View
                                 style={[
                                     tailwind('justify-between w-4/5 mt-4'),
                                 ]}>
-                                {hasLabel && (
+                                {hasLabel.length > 0 && (
                                     <View
                                         style={[
                                             tailwind(
@@ -627,6 +678,7 @@ const SendView = ({route}: Props) => {
                             </View>
                         )}
                     </View>
+
                     {((isLightning && loading) ||
                         (!isLightning && loadingPsbt)) && (
                         <View
@@ -659,7 +711,7 @@ const SendView = ({route}: Props) => {
                             (!isLightning && loadingPsbt) ||
                             isExpired
                         }
-                        onPress={handleSend}
+                        onPress={authAndPay}
                         title={capitalizeFirst(t('send'))}
                         textColor={ColorScheme.Text.Alt}
                         backgroundColor={ColorScheme.Background.Inverted}
@@ -674,6 +726,13 @@ const SendView = ({route}: Props) => {
                             }}
                         />
                     </View>
+
+                    <PINPass
+                        pinPassRef={bottomPINPassRef}
+                        triggerSuccess={handlePINSuccess}
+                        onSelectPinPass={setPINIdx}
+                        pinMode={false}
+                    />
                 </BottomSheetModalProvider>
             </View>
         </SafeAreaView>
