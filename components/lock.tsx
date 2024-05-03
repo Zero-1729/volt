@@ -4,8 +4,6 @@ import React, {useContext, useEffect, useState, useRef} from 'react';
 import {View, useColorScheme, Text, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {CommonActions, useNavigation} from '@react-navigation/native';
-
 import {useTailwind} from 'tailwind-rn';
 
 import Color from '../constants/Color';
@@ -36,7 +34,6 @@ type lockProps = {
 const LockScreen = (props: lockProps) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
-    const navigation = useNavigation();
 
     const {isBiometricsActive, pinAttempts, setPINAttempts, resetAppData} =
         useContext(AppStorageContext);
@@ -70,19 +67,8 @@ const LockScreen = (props: lockProps) => {
     };
 
     const onSuccessRoute = () => {
-        if (props.onSuccess) {
-            props.onSuccess();
-            return;
-        }
-
         setPINAttempts(0);
-
-        navigation.dispatch(
-            CommonActions.reset({
-                index: 0,
-                routes: [{name: 'HomeScreen'}],
-            }),
-        );
+        props.onSuccess();
     };
 
     const requestBiometrics = () => {
@@ -120,7 +106,6 @@ const LockScreen = (props: lockProps) => {
             if (validPin.length === 4 && pin === validPin) {
                 // reset pin attempts
                 onSuccessRoute();
-                setPINAttempts(0);
                 setPin('');
                 return;
             }
