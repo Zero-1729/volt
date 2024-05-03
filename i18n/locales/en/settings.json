@@ -60,5 +60,8 @@
     "new_pin": "Enter a new 4-digit PIN",
     "reset_pin_desc": "Start PIN reset process. You'll be required to enter your Mnemonic to set a new PIN.",
     "mnemonic_test": "Mnemonic Check",
-    "mnemonic_test_desc": "To reset PIN, please enter your mnemonic to verify your wallet ownership."
+    "mnemonic_test_desc": "To reset PIN, please enter your mnemonic to verify your wallet ownership.",
+    "ext_test": "Extended Key Test",
+    "ext_pub_test_desc": "To reset PIN, please enter your extended public key to verify your wallet ownership.",
+    "enter_ext_pub": "Enter extended public key (e.g. xpub...)"
 }
