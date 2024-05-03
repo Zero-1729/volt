@@ -26,7 +26,7 @@ import {useTranslation} from 'react-i18next';
 import BitcoinNight from '../assets/svg/bitcoin-knight.svg';
 import Success from './../assets/svg/check-circle-fill-24.svg';
 
-import {MnemonicInput, PinNumpad} from './input';
+import {ExtKeyInput, MnemonicInput, PinNumpad} from './input';
 
 import {setKeychainItem} from '../class/keychainContext';
 
@@ -57,18 +57,30 @@ const ResetPINCode = (props: ResetPINProps) => {
 
     const snapPoints = useMemo(() => ['75'], []);
 
-    const {setPINAttempts} = useContext(AppStorageContext);
-
     const [tmpPIN, setTmpPIN] = useState<string>('');
     const [confirmPIN, setConfirmPIN] = useState<string>('');
     const carouselRef = useRef<ICarouselInstance>(null);
     const progressValue = useSharedValue(0);
 
-    const {getWalletData, currentWalletID} = useContext(AppStorageContext);
+    const {getWalletData, currentWalletID, setPINAttempts} =
+        useContext(AppStorageContext);
     const {t} = useTranslation('settings');
 
     const walletMnemonic = getWalletData(currentWalletID).mnemonic;
     const mnemonicList = walletMnemonic.split(' ');
+    const walletXpub = getWalletData(currentWalletID).xpub;
+
+    const [tmpKey, setTmpKey] = useState('');
+
+    const [isCorrectExtKey, setCorrectExtKey] = useState(false);
+
+    const updateKey = (text: string) => {
+        setTmpKey(text);
+    };
+
+    const handleExtKeyCorrect = (matches: boolean) => {
+        setCorrectExtKey(matches);
+    };
 
     const [isCorrectMnemonic, setIsCorrectMnemonic] = useState(false);
 
@@ -83,6 +95,12 @@ const ResetPINCode = (props: ResetPINProps) => {
     const handleSuccessReset = useCallback(() => {
         props.triggerSuccess();
     }, [props]);
+
+    useEffect(() => {
+        if (isCorrectExtKey) {
+            carouselRef.current?.next();
+        }
+    }, [isCorrectExtKey]);
 
     useEffect(() => {
         if (isCorrectMnemonic) {
@@ -202,6 +220,58 @@ const ResetPINCode = (props: ResetPINProps) => {
             </View>
         );
     }, [ColorScheme, mnemonicList, t, tailwind]);
+
+    const extKeyPanel = useCallback((): ReactElement => {
+        return (
+            <View style={[tailwind('w-full h-full items-center')]}>
+                <View style={[tailwind('items-center h-full w-full')]}>
+                    <View
+                        style={[
+                            tailwind(
+                                'w-5/6 absolute top-0 flex-row justify-center',
+                            ),
+                        ]}>
+                        <View style={[tailwind('self-center')]}>
+                            <Text
+                                style={[
+                                    tailwind('text-base font-bold'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('ext_test')}
+                            </Text>
+                        </View>
+                    </View>
+                    <View
+                        style={[
+                            tailwind('w-5/6 justify-center items-center'),
+                            {marginTop: 64, marginBottom: 32},
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-base text-center'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {t('ext_pub_test_desc')}
+                        </Text>
+                    </View>
+
+                    {/* Ext Key */}
+                    <View style={[tailwind('w-5/6')]}>
+                        <ExtKeyInput
+                            handleCorrect={handleExtKeyCorrect}
+                            onChangeText={updateKey}
+                            value={tmpKey}
+                            extKey={walletXpub}
+                            color={ColorScheme.Text.Default}
+                            placeholder={t('enter_ext_pub')}
+                        />
+                    </View>
+                </View>
+            </View>
+        );
+    }, [ColorScheme, t, tailwind, tmpKey, walletXpub]);
+
+    const testPanel = props.testInfo.mnemonic ? mnemonicPanel : extKeyPanel;
 
     const pinPanel = useCallback((): ReactElement => {
         return (
@@ -384,12 +454,12 @@ const ResetPINCode = (props: ResetPINProps) => {
     const panels = useMemo(
         (): Slide[] => [
             welcomePanel,
-            mnemonicPanel,
+            testPanel,
             pinPanel,
             confirmPanel,
             donePanel,
         ],
-        [welcomePanel, mnemonicPanel, pinPanel, confirmPanel, donePanel],
+        [welcomePanel, testPanel, pinPanel, confirmPanel, donePanel],
     );
 
     return (
