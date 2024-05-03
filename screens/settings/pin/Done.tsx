@@ -30,7 +30,7 @@ const Done = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {setPINActive} = useContext(AppStorageContext);
+    const {setPINActive, setPINAttempts} = useContext(AppStorageContext);
 
     const {t} = useTranslation('settings');
 
@@ -50,6 +50,7 @@ const Done = ({route}: Props) => {
 
     const handleDone = () => {
         setPINActive(true);
+        setPINAttempts(0);
 
         // If we were in Reset flow
         if (route.params?.isPINReset && !route.params?.isChangePIN) {

@@ -24,7 +24,6 @@ import Back from './../../../assets/svg/arrow-left-24.svg';
 import {AppStorageContext} from '../../../class/storageContext';
 
 import {ExtKeyInput} from '../../../components/input';
-import {setKeychainItem} from '../../../class/keychainContext';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SettingsParamList} from '../../../Navigation';
@@ -37,8 +36,7 @@ const ExtKeyTest = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {getWalletData, currentWalletID, setPINAttempts} =
-        useContext(AppStorageContext);
+    const {getWalletData, currentWalletID} = useContext(AppStorageContext);
     const walletXpub = getWalletData(currentWalletID).xpub;
 
     const [tmpKey, setTmpKey] = useState('');
@@ -56,9 +54,6 @@ const ExtKeyTest = ({route}: Props) => {
     };
 
     const handleRoute = async () => {
-        setPINAttempts(0);
-        setKeychainItem('pin', '');
-
         navigation.dispatch(
             CommonActions.navigate({
                 name: 'SetPIN',
