@@ -120,6 +120,7 @@ const LockScreen = (props: lockProps) => {
             if (validPin.length === 4 && pin === validPin) {
                 // reset pin attempts
                 onSuccessRoute();
+                setPINAttempts(0);
                 setPin('');
                 return;
             }
