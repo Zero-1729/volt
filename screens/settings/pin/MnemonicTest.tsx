@@ -121,7 +121,11 @@ const MnemonicTest = ({route}: Props) => {
                     </View>
 
                     {/* Checker for Mnemonic */}
-                    <View style={[tailwind('w-5/6 items-center')]}>
+                    <View
+                        style={[
+                            tailwind('w-5/6 items-center'),
+                            {marginLeft: 16},
+                        ]}>
                         <MnemonicInput
                             mnemonicList={mnemonicList}
                             onMnemonicCheck={setIsCorrectMnemonic}
