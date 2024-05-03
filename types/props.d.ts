@@ -112,6 +112,13 @@ export type TextInputProps = BaseProps & {
         | React.Dispatch<React.SetStateAction<string>>;
 };
 
+// Base Text Input Prop Type (for reuse)
+export type ExtKeyInputProps = TextInputProps &
+    BaseProps & {
+        handleCorrect: (boolean) => void;
+        extKey: string;
+    };
+
 // Text Long Input Prop Type
 export type TextLongInputProps = BaseProps &
     TextInputProps & {
