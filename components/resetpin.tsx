@@ -339,21 +339,31 @@ const ResetPINCode = (props: ResetPINProps) => {
                             tailwind('text-sm text-center'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        {t('reset_pin_desc')}
+                        {t('done_pin_change_message')}
                     </Text>
                 </View>
 
-                <Success
-                    fill={ColorScheme.SVG.Default}
-                    width={200}
-                    height={200}
-                />
+                <View
+                    style={[
+                        {
+                            marginTop: -(
+                                32 +
+                                NativeWindowMetrics.height * 0.15
+                            ),
+                        },
+                    ]}>
+                    <Success
+                        fill={ColorScheme.SVG.Default}
+                        width={200}
+                        height={200}
+                    />
+                </View>
 
                 <View
                     style={[
                         tailwind('absolute w-5/6'),
                         {
-                            bottom: NativeWindowMetrics.bottomButtonOffset,
+                            bottom: 24 + NativeWindowMetrics.height * 0.15,
                         },
                     ]}>
                     <LongButton
