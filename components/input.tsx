@@ -38,6 +38,7 @@ import {i18nNumber} from '../modules/transform';
 import {
     TextInputProps,
     TextLongInputProps,
+    ExtKeyInputProps,
     NumpadRequestInputProps,
     PinNumpadInputProps,
     MnemonicInputProps,
@@ -142,6 +143,67 @@ const MnemonicInputCapsule = (props: CapsuleInputProps) => {
                 }}
             />
         </View>
+    );
+};
+
+// Extended Key Input
+export const ExtKeyInput = (props: ExtKeyInputProps) => {
+    const tailwind = useTailwind();
+    const ColorScheme = Color(useColorScheme());
+
+    const {i18n} = useTranslation();
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    const [matches, setMatches] = useState<boolean>(false);
+
+    const borderColor = () => {
+        if (matches) {
+            return ColorScheme.Background.Correct;
+        } else {
+            if (props.value?.length === 0) {
+                return ColorScheme.Background.Greyed;
+            }
+
+            return ColorScheme.Background.Wrong;
+        }
+    };
+
+    useEffect(() => {
+        if (props.value?.trim() === props.extKey) {
+            setMatches(true);
+            props.handleCorrect(true);
+        } else {
+            setMatches(false);
+            props.handleCorrect(false);
+        }
+    }, [props.value]);
+
+    return (
+        <TextInput
+            underlineColorAndroid="transparent"
+            keyboardType={
+                Platform.OS === 'android' ? 'visible-password' : 'default'
+            }
+            maxLength={props.maxLength}
+            spellCheck={false}
+            autoCorrect={false}
+            autoCapitalize="none"
+            selectTextOnFocus={true}
+            value={props.value}
+            ref={props.refs}
+            {...props}
+            style={[
+                tailwind(
+                    `${props.shavedHeight ? 'py-3' : 'py-4'} px-2 text-xs`,
+                ),
+                {
+                    textAlign: props.noTrans ? 'auto' : langDir,
+                    borderWidth: 1,
+                    borderColor: borderColor(),
+                    borderRadius: 6,
+                },
+            ]}
+        />
     );
 };
 
