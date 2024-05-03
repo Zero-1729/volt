@@ -57,6 +57,7 @@
     "change_pin": "Change PIN",
     "change_pin_desc": "Reset your PIN to a new one.",
     "reset_pin": "Reset PIN",
+    "new_pin": "Enter a new 4-digit PIN",
     "reset_pin_desc": "Start PIN reset process. You'll be required to enter your Mnemonic to set a new PIN.",
     "mnemonic_test": "Mnemonic Check",
     "mnemonic_test_desc": "To reset PIN, please enter your mnemonic to verify your wallet ownership."
