@@ -45,6 +45,10 @@ type ResetPINProps = {
     onSelectPinPass: (idx: number) => void;
     pinMode: boolean;
     idx: number;
+    testInfo: {
+        mnemonic: boolean;
+        isWatchOnly: boolean;
+    };
 };
 
 const ResetPINCode = (props: ResetPINProps) => {
