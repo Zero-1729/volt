@@ -41,6 +41,7 @@ import {
     capitalizeFirst,
     normalizeFiat,
     formatSats,
+    i18nNumber,
 } from '../../modules/transform';
 import {useTranslation} from 'react-i18next';
 
@@ -71,12 +72,14 @@ const InputPanel = (): ReactElement => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [inputText, setInputText] = useState<string>('');
     const [descriptionText, setDescriptionText] = useState<string>('');
 
-    const {getWalletData, currentWalletID} = useContext(AppStorageContext);
+    const {getWalletData, currentWalletID, appLanguage} =
+        useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
 
     const mainInputRef = useRef(null);
@@ -194,7 +197,13 @@ const InputPanel = (): ReactElement => {
 
                     <View
                         style={[
-                            tailwind('w-full rounded-md px-2'),
+                            tailwind(
+                                `w-full rounded-md px-2 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                }`,
+                            ),
                             {
                                 borderColor: ColorScheme.Background.Greyed,
                                 borderWidth: 1,
@@ -222,8 +231,17 @@ const InputPanel = (): ReactElement => {
                                             color: ColorScheme.Text.DescText,
                                         },
                                     ]}>
-                                    ({descriptionText.length}/
-                                    {DESCRIPTION_LENGTH_LIMIT})
+                                    (
+                                    {i18nNumber(
+                                        descriptionText.length,
+                                        appLanguage.code,
+                                    )}
+                                    /
+                                    {i18nNumber(
+                                        DESCRIPTION_LENGTH_LIMIT,
+                                        appLanguage.code,
+                                    )}
+                                    )
                                 </Text>
                             </View>
                         )}
@@ -252,7 +270,8 @@ const SummaryPanel = (props: {
 }): ReactElement => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {fiatRate} = useContext(AppStorageContext);
 
@@ -287,7 +306,13 @@ const SummaryPanel = (props: {
                         ]}>
                         <View
                             style={[
-                                tailwind('flex-row p-4 justify-between'),
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } p-4 justify-between`,
+                                ),
                                 {
                                     borderBottomWidth: 1,
                                     borderBottomColor:
@@ -299,7 +324,7 @@ const SummaryPanel = (props: {
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                Amount (sats)
+                                {t('amount_sats')}
                             </Text>
                             <Text
                                 style={[
@@ -313,7 +338,13 @@ const SummaryPanel = (props: {
                         </View>
                         <View
                             style={[
-                                tailwind('flex-row p-4 justify-between'),
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } p-4 justify-between`,
+                                ),
                                 props.description
                                     ? {
                                           borderBottomWidth: 1,
@@ -328,8 +359,8 @@ const SummaryPanel = (props: {
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
                                 {props.kind === 'address'
-                                    ? 'Lightning Address'
-                                    : 'Node ID'}
+                                    ? t('lightning_address')
+                                    : t('node_id')}
                             </Text>
                             <Text
                                 numberOfLines={2}
@@ -338,7 +369,10 @@ const SummaryPanel = (props: {
                                     tailwind('text-sm w-1/2'),
                                     {
                                         color: ColorScheme.Text.Default,
-                                        textAlign: 'right',
+                                        textAlign:
+                                            langDir === 'right'
+                                                ? 'left'
+                                                : 'right',
                                     },
                                 ]}>
                                 {props.text}
@@ -347,14 +381,20 @@ const SummaryPanel = (props: {
                         {props.description && (
                             <View
                                 style={[
-                                    tailwind('flex-row p-4 justify-between'),
+                                    tailwind(
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } p-4 justify-between`,
+                                    ),
                                 ]}>
                                 <Text
                                     style={[
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.DescText},
                                     ]}>
-                                    Description
+                                    {t('description')}
                                 </Text>
                                 <Text
                                     style={[
