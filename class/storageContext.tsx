@@ -37,6 +37,7 @@ import {
     TBaseWalletArgs,
     TAddress,
     TElectrumServerURLs,
+    TMempoolInfo,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -94,8 +95,10 @@ type defaultContextType = {
     electrumServerURL: TElectrumServerURLs;
     isPINActive: boolean;
     isBiometricsActive: boolean;
+    mempoolInfo: TMempoolInfo;
     pinAttempts: number; // maxes out at 10, reset when correct pin entered
     setBreezEvent: (event: BreezEvent) => void;
+    setMempoolInfo: (data: TMempoolInfo) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
     updateFiatRate: (fiatObj: TFiatRate) => void;
@@ -138,6 +141,7 @@ const defaultContext: defaultContextType = {
     loadLock: false,
     onboarding: true,
     breezEvent: {} as BreezEvent,
+    mempoolInfo: {} as TMempoolInfo,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -175,6 +179,7 @@ const defaultContext: defaultContextType = {
     isBiometricsActive: false,
     pinAttempts: 0,
     setBreezEvent: () => {},
+    setMempoolInfo: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -215,6 +220,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
     const [breezEvent, _setBreezEvent] = useState(defaultContext.breezEvent);
+    const [mempoolInfo, _setMempoolInfo] = useState(defaultContext.mempoolInfo);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -257,6 +263,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('onboarding');
     const {getItem: _getBreezEvent, setItem: _updateBreezEvent} =
         useAsyncStorage('breezEvent');
+    const {getItem: _getMempoolInfo, setItem: _updateMempoolInfo} =
+        useAsyncStorage('mempoolInfo');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -439,6 +447,30 @@ export const AppStorageProvider = ({children}: Props) => {
 
         if (be !== null) {
             _setBreezEvent(JSON.parse(be));
+        }
+    };
+
+    const setMempoolInfo = useCallback(async (data: TMempoolInfo) => {
+        if (data === ({} as TMempoolInfo)) {
+            await _setMempoolInfo({} as TMempoolInfo);
+            await _updateMempoolInfo(JSON.stringify({}));
+        }
+
+        try {
+            await _setMempoolInfo(data);
+            await _updateMempoolInfo(JSON.stringify(data));
+        } catch (e) {
+            console.error(
+                `[AsyncStorage] (Mempool Info) Error loading data: ${e}`,
+            );
+            throw new Error('Error setting mempool info data');
+        }
+    }, []);
+
+    const _loadMempoolInfo = async () => {
+        const mi = await _getMempoolInfo();
+        if (mi !== null) {
+            _setMempoolInfo(JSON.parse(mi));
         }
     };
 
@@ -1385,6 +1417,10 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
+        _loadMempoolInfo();
+    }, []);
+
+    useEffect(() => {
         _loadAppLanguage();
     }, []);
 
@@ -1454,7 +1490,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 electrumServerURL,
                 setElectrumServerURL,
                 breezEvent,
+                mempoolInfo,
                 setBreezEvent,
+                setMempoolInfo,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,
