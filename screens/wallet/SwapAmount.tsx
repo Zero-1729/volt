@@ -584,7 +584,7 @@ const SwapAmount = ({route}: Props) => {
                                         tailwind('text-sm font-bold'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {t('swap balance')}
+                                    {capitalizeFirst(t('max'))}
                                 </Text>
                             </PlainButton>
                         </View>
