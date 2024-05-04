@@ -580,17 +580,7 @@ const SendLN = ({route}: Props) => {
                     comment: canComment ? comment || '' : '',
                 });
 
-                // Note: sends 'Payment Sent' event, so watch and handle routing
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: 'LNURL Pay',
-                    text2: 'Tip sent!',
-                    visibilityTime: 1750,
-                    onHide: () => {
-                        setLoadingPay(false);
-                    },
-                });
+                setLoadingPay(false);
             }
         } catch (error: any) {
             Toast.show({
