@@ -480,7 +480,9 @@ const RootNavigator = (): ReactElement => {
         getWalletData,
         currentWalletID,
         isWalletInitialized,
+        mempoolInfo,
         setBreezEvent,
+        setMempoolInfo,
     } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
@@ -489,6 +491,9 @@ const RootNavigator = (): ReactElement => {
 
     const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
+    const mempoolRef = useRef(
+        new WebSocket('wss://mempool.space/api/v1/ws'),
+    ).current;
 
     const {t} = useTranslation('wallet');
 
@@ -592,6 +597,56 @@ const RootNavigator = (): ReactElement => {
         setIsAuth(true);
         setTriggerClipboardCheck(false);
     }, [triggerClipboardCheck]);
+
+    const initMempoolSock = async () => {
+        mempoolRef.onopen = () => {
+            console.log('[Mempool] Connected');
+
+            mempoolRef.send(
+                JSON.stringify({
+                    action: 'want',
+                    data: ['stats'],
+                }),
+            );
+        };
+
+        mempoolRef.onmessage = (e: any) => {
+            const _mempoolInfo = JSON.parse(e.data.toString()).mempoolInfo;
+            const _fees = JSON.parse(e.data.toString()).fees;
+
+            const mempoolUsage = _mempoolInfo?.usage
+                ? _mempoolInfo?.usage
+                : mempoolInfo.usage;
+            const mempoolMax = _mempoolInfo?.maxmempool
+                ? _mempoolInfo?.maxmempool
+                : mempoolInfo.maxmempool;
+            const feeEnv = _fees?.fastestFee
+                ? _fees?.fastestFee
+                : mempoolInfo.fastestFee;
+
+            setMempoolInfo({
+                mempoolCongested: mempoolUsage / mempoolMax >= 2.5,
+                mempoolHighFeeEnv: feeEnv >= 150,
+                economyFee: _fees?.economyFee
+                    ? _fees?.economyFee
+                    : mempoolInfo.economyFee,
+                fastestFee: _fees?.fastestFee
+                    ? _fees?.fastestFee
+                    : mempoolInfo.fastestFee,
+                minimumFee: _fees?.minimumFee
+                    ? _fees?.minimumFee
+                    : mempoolInfo.minimumFee,
+                hourFee: _fees?.hourFee ? _fees?.hourFee : mempoolInfo.hourFee,
+                halfHourFee: _fees?.halfHourFee
+                    ? _fees?.halfHourFee
+                    : mempoolInfo.halfHourFee,
+            });
+        };
+
+        mempoolRef.onerror = (e: any) => {
+            console.log('[Mempool] (error)', e.error);
+        };
+    };
 
     // Breez startup
     const initNode = async () => {
@@ -761,6 +816,7 @@ const RootNavigator = (): ReactElement => {
         if (renderCount <= 2 && !onboardingState.current) {
             // Call on trigger for Lock comp
             setTriggerClipboardCheck(true);
+            initMempoolSock();
         }
 
         const appStateSub = AppState.addEventListener(
@@ -797,6 +853,7 @@ const RootNavigator = (): ReactElement => {
             // Kill subscription
             BreezSub?.current?.remove();
             appStateSub?.remove();
+            mempoolRef.close();
         };
     }, []);
 
