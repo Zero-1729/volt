@@ -170,10 +170,15 @@ const Receive = ({route}: Props) => {
             setLNInvoice(receivePaymentResp.lnInvoice);
 
             setLoadingInvoice(false);
-        } catch (error) {
-            console.log('Error getting node info', error);
+        } catch (error: any) {
+            Toast.show({
+                topOffset: 60,
+                type: 'Liberal',
+                text1: t('error'),
+                text2: error.message,
+                visibilityTime: 2000,
+            });
 
-            // TODO: display notification that couldn't do it
             navigation.dispatch(
                 CommonActions.navigate('WalletRoot', {
                     screen: 'WalletView',
