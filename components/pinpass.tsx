@@ -25,7 +25,7 @@ import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
 
 import {AppStorageContext} from '../class/storageContext';
-import { biometricAuth } from '../modules/shared';
+import {biometricAuth} from '../modules/shared';
 
 type PinPassProps = {
     pinPassRef: React.RefObject<BottomSheetModal>;

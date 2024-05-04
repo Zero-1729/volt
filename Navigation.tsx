@@ -125,7 +125,6 @@ import {
 } from './types/wallet';
 import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
-import {ENet, EBreezDetails} from './types/enums';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
 // Make sure this is updated to match all screen routes below
