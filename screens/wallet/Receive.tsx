@@ -67,6 +67,7 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Close from '../../assets/svg/x-24.svg';
+import Info from '../../assets/svg/info-16.svg';
 
 import {
     DisplayFiatAmount,
@@ -96,10 +97,16 @@ const Receive = ({route}: Props) => {
 
     const navigation = useNavigation();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const {currentWalletID, getWalletData, isAdvancedMode, breezEvent} =
-        useContext(AppStorageContext);
+    const {
+        currentWalletID,
+        getWalletData,
+        isAdvancedMode,
+        breezEvent,
+        mempoolInfo,
+    } = useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
     const isLNWallet = walletData.type === 'unified';
 
@@ -276,7 +283,11 @@ const Receive = ({route}: Props) => {
         return (
             <View
                 style={[
-                    tailwind('items-center justify-center h-full w-full mt-6'),
+                    tailwind(
+                        `items-center justify-center h-full w-full ${
+                            mempoolInfo.mempoolCongested ? 'mt-10' : 'mt-6'
+                        }`,
+                    ),
                 ]}>
                 {isAmountInvoice && (
                     <View
@@ -328,6 +339,41 @@ const Receive = ({route}: Props) => {
                     />
                 </View>
 
+                {/* Message on congestion */}
+                {mempoolInfo?.mempoolCongested && (
+                    <View
+                        style={[
+                            tailwind(
+                                `mt-4 w-5/6 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center`,
+                            ),
+                        ]}>
+                        <Info
+                            width={16}
+                            height={16}
+                            fill={ColorScheme.SVG.GrayFill}
+                        />
+                        <Text
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'mr-2'
+                                            : 'ml-2 text-center'
+                                    } text-sm`,
+                                ),
+                                {
+                                    color: ColorScheme.Text.DescText,
+                                },
+                            ]}>
+                            {t('mempool_congested')}
+                        </Text>
+                    </View>
+                )}
+
                 {/* Bitcoin address info */}
                 <View
                     style={[
@@ -347,7 +393,6 @@ const Receive = ({route}: Props) => {
                 </View>
 
                 {/* Bottom buttons */}
-
                 <View style={[tailwind('items-center mt-6')]}>
                     {/* Share Button */}
                     <PlainButton
