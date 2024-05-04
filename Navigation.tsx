@@ -36,6 +36,9 @@ import {
     connect,
     BreezEventVariant,
     ReverseSwapPairInfo,
+    fetchReverseSwapFees,
+    receiveOnchain,
+    SwapInfo,
 } from '@breeztech/react-native-breez-sdk';
 import {getXPub256} from './modules/wallet-utils';
 
@@ -483,6 +486,8 @@ const RootNavigator = (): ReactElement => {
         mempoolInfo,
         setBreezEvent,
         setMempoolInfo,
+        swapInfo,
+        setSwapInfo,
     } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
@@ -598,6 +603,64 @@ const RootNavigator = (): ReactElement => {
         setTriggerClipboardCheck(false);
     }, [triggerClipboardCheck]);
 
+    // Fetch Swap Info
+    const fetchSwapInfo = async () => {
+        getLNSwapInfo()
+            .then((resp: any) => {
+                setSwapInfo({
+                    swapOut: {
+                        min: resp.data.min,
+                        max: resp.data.max,
+                    },
+                    swapIn: {
+                        min: swapInfo.swapIn.min,
+                        max: swapInfo.swapIn.max,
+                    },
+                });
+            })
+            .catch(e => {
+                console.log('[SwapOut] (error): ', e.data.message);
+            });
+
+        getOnchainSwapInfo()
+            .then((resp: any) => {
+                setSwapInfo({
+                    swapOut: {
+                        min: swapInfo.swapOut.min,
+                        max: swapInfo.swapOut.max,
+                    },
+                    swapIn: {
+                        min: resp.data.min,
+                        max: resp.data.max,
+                    },
+                });
+            })
+            .catch(e => {
+                console.log('[SwapIn] (error): ', e.data.message);
+            });
+    };
+
+    const getLNSwapInfo = async () => {
+        fetchReverseSwapFees({sendAmountSat: 50000})
+            .then((c: ReverseSwapPairInfo) => {
+                return {error: false, data: c};
+            })
+            .catch((e: any) => {
+                return {error: true, data: e};
+            });
+    };
+
+    const getOnchainSwapInfo = async () => {
+        receiveOnchain({})
+            .then((d: SwapInfo) => {
+                return {error: false, data: d};
+            })
+            .catch((e: any) => {
+                return {error: false, data: e};
+            });
+    };
+
+    // Fetch and set Swap Info here
     const initMempoolSock = async () => {
         mempoolRef.onopen = () => {
             console.log('[Mempool] Connected');
@@ -614,12 +677,8 @@ const RootNavigator = (): ReactElement => {
             const _mempoolInfo = JSON.parse(e.data.toString()).mempoolInfo;
             const _fees = JSON.parse(e.data.toString()).fees;
 
-            const mempoolUsage = _mempoolInfo?.usage
-                ? _mempoolInfo?.usage
-                : mempoolInfo.usage;
-            const mempoolMax = _mempoolInfo?.maxmempool
-                ? _mempoolInfo?.maxmempool
-                : mempoolInfo.maxmempool;
+            const mempoolUsage = _mempoolInfo?.usage;
+            const mempoolMax = _mempoolInfo?.maxmempool;
             const feeEnv = _fees?.fastestFee
                 ? _fees?.fastestFee
                 : mempoolInfo.fastestFee;
@@ -817,6 +876,7 @@ const RootNavigator = (): ReactElement => {
             // Call on trigger for Lock comp
             setTriggerClipboardCheck(true);
             initMempoolSock();
+            fetchSwapInfo();
         }
 
         const appStateSub = AppState.addEventListener(
