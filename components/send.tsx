@@ -69,13 +69,22 @@ const SendOptions = (props: SendOptionsProps) => {
                         }}
                         style={[
                             tailwind(
-                                'items-center p-4 mt-2 flex-row w-full mb-4 border rounded-md',
+                                `items-center p-4 mt-2 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } w-full mb-4 border rounded-md`,
                             ),
                             {
                                 borderColor: ColorScheme.Background.Greyed,
                             },
                         ]}>
-                        <View style={tailwind('items-center mr-4 px-1')}>
+                        <View
+                            style={tailwind(
+                                `items-center ${
+                                    langDir === 'right' ? 'ml-4' : 'mr-4'
+                                } px-1`,
+                            )}>
                             <ScanIcon fill={ColorScheme.SVG.Default} />
                         </View>
                         <View style={tailwind('items-center')}>
@@ -114,11 +123,20 @@ const SendOptions = (props: SendOptionsProps) => {
                         }}
                         style={[
                             tailwind(
-                                'items-center flex-row p-4 w-full border rounded-md',
+                                `items-center ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } p-4 w-full border rounded-md`,
                             ),
                             {borderColor: ColorScheme.Background.Greyed},
                         ]}>
-                        <View style={tailwind('items-center mr-4 px-1')}>
+                        <View
+                            style={tailwind(
+                                `items-center ${
+                                    langDir === 'right' ? 'ml-4' : 'mr-4'
+                                } px-1`,
+                            )}>
                             <PencilIcon fill={ColorScheme.SVG.Default} />
                         </View>
                         <View style={tailwind('items-center')}>
