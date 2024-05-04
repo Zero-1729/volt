@@ -496,7 +496,7 @@ const Wallet = ({route}: Props) => {
                                             : isAdvancedMode &&
                                               walletData.type === 'unified'
                                             ? '-mt-8'
-                                            : 'mt-12'
+                                            : ''
                                     }`,
                                 ),
                             ]}>
@@ -560,7 +560,11 @@ const Wallet = ({route}: Props) => {
                                         <View
                                             style={[
                                                 tailwind(
-                                                    'w-full flex-row items-center justify-between opacity-60',
+                                                    `w-full ${
+                                                        langDir === 'right'
+                                                            ? 'flex-row-reverse'
+                                                            : 'flex-row'
+                                                    } items-center justify-between opacity-60`,
                                                 ),
                                             ]}>
                                             <Text
@@ -646,7 +650,11 @@ const Wallet = ({route}: Props) => {
                                         <View
                                             style={[
                                                 tailwind(
-                                                    'w-full flex-row items-center justify-between opacity-60',
+                                                    `w-full ${
+                                                        langDir === 'right'
+                                                            ? 'flex-row-reverse'
+                                                            : 'flex-row'
+                                                    } items-center justify-between opacity-60`,
                                                 ),
                                             ]}>
                                             <Text
