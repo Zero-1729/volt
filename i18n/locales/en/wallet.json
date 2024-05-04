@@ -136,4 +136,5 @@
     "xprv_backup_message": "To protect your funds, back up your extended private key.",
     "lock_screen_message": "Enter your PIN code",
     "not_ln_address": "Not a Lightning Address."
+    "mempool_congested": "The Mempool is currently congested."
 }
