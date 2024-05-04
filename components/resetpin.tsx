@@ -157,7 +157,9 @@ const ResetPINCode = (props: ResetPINProps) => {
                             tailwind('text-sm text-center'),
                             {color: ColorScheme.Text.DescText},
                         ]}>
-                        {t('reset_pin_desc')}
+                        {props.testInfo.isWatchOnly
+                            ? t('reset_pin_e_desc')
+                            : t('reset_pin_m_desc')}
                     </Text>
                 </View>
 

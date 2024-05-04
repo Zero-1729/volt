@@ -130,7 +130,9 @@ const ResetPIN = ({route}: Props) => {
                                 tailwind('text-base text-center'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            {t('reset_pin_desc')}
+                            {walletData.isWatchOnly
+                                ? t('reset_pin_e_desc')
+                                : t('reset_pin_m_desc')}
                         </Text>
                     </View>
 

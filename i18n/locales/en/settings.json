@@ -58,10 +58,11 @@
     "change_pin_desc": "Reset your PIN to a new one.",
     "reset_pin": "Reset PIN",
     "new_pin": "Enter a new 4-digit PIN",
-    "reset_pin_desc": "Start PIN reset process. You'll be required to enter your Mnemonic to set a new PIN.",
+    "reset_pin_m_desc": "Start PIN reset process. You'll be required to enter your Mnemonic to set a new PIN.",
+    "reset_pin_e_desc": "Start PIN reset process. You'll be required to enter your Extended Public Key (XPUB) to set a new PIN.",
     "mnemonic_test": "Mnemonic Check",
     "mnemonic_test_desc": "To reset PIN, please enter your mnemonic to verify your wallet ownership.",
     "ext_test": "Extended Key Test",
-    "ext_pub_test_desc": "To reset PIN, please enter your extended public key to verify your wallet ownership.",
-    "enter_ext_pub": "Enter extended public key (e.g. xpub...)"
+    "ext_pub_test_desc": "To reset PIN, please enter your Extended Public Key (XPUB) to verify your wallet ownership.",
+    "enter_ext_pub": "Enter XPUB (e.g. xpub...)"
 }
