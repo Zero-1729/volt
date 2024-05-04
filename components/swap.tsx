@@ -13,10 +13,6 @@ import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 import {capitalizeFirst, formatSats} from '../modules/transform';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
-import {
-    ONCHAIN_SWAP_BALANCE_MIN,
-    LIGHTNING_SWAP_BALANCE_MIN,
-} from '../modules/wallet-defaults';
 import {SwapType} from '../types/enums';
 
 import CheckIcon from '../assets/svg/check-circle-fill-16.svg';
@@ -29,17 +25,27 @@ type SwapProps = {
     triggerSwap: (swapType: SwapType) => void;
     onchainBalance: BigNumber;
     lightningBalance: BigNumber;
+    swapInfo: {
+        swapIn: {
+            min: number;
+            max: number;
+        };
+        swapOut: {
+            min: number;
+            max: number;
+        };
+    };
 };
 
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['46'], []);
     const onchainBroke =
-        props.onchainBalance.isLessThan(ONCHAIN_SWAP_BALANCE_MIN) ||
+        props.onchainBalance.isLessThan(props.swapInfo.swapIn.min) ||
         props.onchainBalance.isZero();
 
     const lightningBroke =
-        props.lightningBalance.isLessThan(LIGHTNING_SWAP_BALANCE_MIN) ||
+        props.lightningBalance.isLessThan(props.swapInfo.swapOut.min) ||
         props.lightningBalance.isZero();
 
     const [selected, setSelected] = React.useState<SwapType>(
@@ -137,7 +143,9 @@ const Swap = (props: SwapProps) => {
                                 ]}>
                                 {t('balance_below_min', {
                                     swap_min: formatSats(
-                                        new BigNumber(ONCHAIN_SWAP_BALANCE_MIN),
+                                        new BigNumber(
+                                            props.swapInfo.swapIn.min,
+                                        ),
                                     ),
                                 })}
                             </VText>
@@ -215,7 +223,7 @@ const Swap = (props: SwapProps) => {
                                 {t('balance_below_min', {
                                     swap_min: formatSats(
                                         new BigNumber(
-                                            LIGHTNING_SWAP_BALANCE_MIN,
+                                            props.swapInfo.swapOut.min,
                                         ),
                                     ),
                                 })}
