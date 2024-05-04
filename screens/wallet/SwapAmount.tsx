@@ -28,7 +28,6 @@ import {SwapType} from '../../types/enums';
 
 import {
     ReverseSwapPairInfo,
-    receiveOnchain,
     fetchReverseSwapFees,
     maxReverseSwapAmount,
 } from '@breeztech/react-native-breez-sdk';
@@ -54,8 +53,13 @@ const SwapAmount = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {fiatRate, getWalletData, currentWalletID, appFiatCurrency} =
-        useContext(AppStorageContext);
+    const {
+        fiatRate,
+        getWalletData,
+        currentWalletID,
+        appFiatCurrency,
+        swapInfo,
+    } = useContext(AppStorageContext);
     const {t} = useTranslation('wallet');
 
     const wallet = getWalletData(currentWalletID);
@@ -71,16 +75,15 @@ const SwapAmount = ({route}: Props) => {
     const [loadingFeeText, setFeeLoadingText] = useState('');
     const [showMinText, setShowMinText] = useState<boolean>(false);
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
-    const [bottomText, setBottomText] = useState<string>(
-        isSwapOut ? t('get_swap_fees') : t('get_limits'),
-    );
     const [swapFees, setSwapFees] = useState<ReverseSwapPairInfo>();
-    const [minimumSwapAmount, setMinimumSwapAmount] = useState<BigNumber>(
-        new BigNumber(isSwapOut ? balance.multipliedBy(0.1) : 0),
+
+    const minimumSwapAmount = new BigNumber(
+        isSwapOut ? swapInfo.swapOut.min : swapInfo.swapIn.min,
     );
-    const [maximumSwapAmount, setMaximumSwapAmount] = useState<BigNumber>(
-        new BigNumber(isSwapOut ? balance : 0),
+    const maximumSwapAmount = new BigNumber(
+        isSwapOut ? swapInfo.swapOut.max : swapInfo.swapIn.max,
     );
+
     const [satsAmount, setSatsAmount] = useState<DisplayUnit>({
         value: new BigNumber(0),
         symbol: 'sats',
@@ -106,11 +109,6 @@ const SwapAmount = ({route}: Props) => {
 
     const handleSwapRoute = async () => {
         if (isSwapOut) {
-            if (!swapFees?.totalEstimatedFees) {
-                getFeeInfo(true);
-                return;
-            }
-
             let maxSwapAmount;
 
             if (isMax) {
@@ -127,11 +125,6 @@ const SwapAmount = ({route}: Props) => {
                 }),
             );
         } else {
-            if (maximumSwapAmount.isZero()) {
-                handleFetchLimits();
-                return;
-            }
-
             navigation.dispatch(
                 CommonActions.navigate('SwapIn', {
                     lnBalance: route.params.lnBalance,
@@ -377,34 +370,9 @@ const SwapAmount = ({route}: Props) => {
         );
     };
 
-    const handleFetchLimits = async () => {
-        const swapInfo = await receiveOnchain({});
-
-        setMinimumSwapAmount(new BigNumber(swapInfo.minAllowedDeposit));
-        setMaximumSwapAmount(new BigNumber(swapInfo.maxAllowedDeposit));
-
-        if (!isSwapOut) {
-            setBottomText(t('continue'));
-        }
-    };
-
-    const getFeeInfo = async (set?: boolean) => {
+    const handleFetchSwapFees = async () => {
         setLoading(true);
 
-        if (set) {
-            await handleFetchSwapFees();
-            setLoading(false);
-        } else {
-            const _feeInfo = await fetchReverseSwapFees({
-                sendAmountSat: balance.toNumber(),
-            });
-
-            setMinimumSwapAmount(new BigNumber(_feeInfo.min));
-            setLoading(false);
-        }
-    };
-
-    const handleFetchSwapFees = async () => {
         try {
             setFeeLoadingText('Fetching fee...');
 
@@ -482,31 +450,10 @@ const SwapAmount = ({route}: Props) => {
     };
 
     useEffect(() => {
-        // Load fees and onchain limits
-        // TODO: show loading if for onchain
-        if (!isSwapOut) {
-            handleFetchLimits();
-        } else {
-            getFeeInfo();
+        if (isSwapOut) {
+            handleFetchSwapFees();
         }
     }, []);
-
-    useEffect(() => {
-        if (!minimumSwapAmount.isZero()) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('continue'),
-                text2: t('swap_amount_too_low'),
-                visibilityTime: 2000,
-                onHide: () => {
-                    setShowMinText(true);
-                },
-            });
-        } else {
-            setShowMinText(false);
-        }
-    }, [minimumSwapAmount]);
 
     return (
         <SafeAreaView
