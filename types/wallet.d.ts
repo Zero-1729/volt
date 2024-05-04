@@ -186,3 +186,13 @@ export type TLnManualPayloadType = {
     description: string;
     amount?: number;
 };
+
+export type TMempoolInfo = {
+    mempoolCongested: boolean;
+    mempoolHighFeeEnv: boolean;
+    economyFee: number;
+    fastestFee: number;
+    minimumFee: number;
+    hourFee: number;
+    halfHourFee: number;
+};
