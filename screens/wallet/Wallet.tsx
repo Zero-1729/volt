@@ -547,7 +547,11 @@ const Wallet = ({route}: Props) => {
                                 <View
                                     style={[
                                         tailwind('absolute w-5/6'),
-                                        styles.bottomConverter,
+                                        {
+                                            bottom: hideTotalBalance
+                                                ? 98 + 24
+                                                : 98,
+                                        },
                                     ]}>
                                     <View
                                         style={[
@@ -567,16 +571,35 @@ const Wallet = ({route}: Props) => {
                                                 ]}>
                                                 Lightning
                                             </Text>
-                                            <Balance
-                                                disabled={true}
-                                                fontColor={'white'}
-                                                balance={
-                                                    walletData.balance.lightning
-                                                }
-                                                balanceFontSize={'text-lg'}
-                                                disableFiat={false}
-                                                loading={loadingBalance}
-                                            />
+
+                                            {hideTotalBalance ? (
+                                                <View
+                                                    style={[
+                                                        styles.emptyBalance,
+                                                        tailwind('rounded-sm'),
+                                                        {
+                                                            height: 20,
+                                                            width: 98,
+                                                            opacity:
+                                                                loadingBalance
+                                                                    ? 0.35
+                                                                    : 0.6,
+                                                        },
+                                                    ]}
+                                                />
+                                            ) : (
+                                                <Balance
+                                                    disabled={true}
+                                                    fontColor={'white'}
+                                                    balance={
+                                                        walletData.balance
+                                                            .lightning
+                                                    }
+                                                    balanceFontSize={'text-lg'}
+                                                    disableFiat={false}
+                                                    loading={loadingBalance}
+                                                />
+                                            )}
                                         </View>
                                     </View>
 
@@ -635,16 +658,34 @@ const Wallet = ({route}: Props) => {
                                                 On-chain
                                             </Text>
 
-                                            <Balance
-                                                disabled={true}
-                                                fontColor={'white'}
-                                                balance={
-                                                    walletData.balance.onchain
-                                                }
-                                                balanceFontSize={'text-lg'}
-                                                disableFiat={false}
-                                                loading={loadingBalance}
-                                            />
+                                            {hideTotalBalance ? (
+                                                <View
+                                                    style={[
+                                                        styles.emptyBalance,
+                                                        tailwind('rounded-sm'),
+                                                        {
+                                                            height: 20,
+                                                            width: 98,
+                                                            opacity:
+                                                                loadingBalance
+                                                                    ? 0.35
+                                                                    : 0.6,
+                                                        },
+                                                    ]}
+                                                />
+                                            ) : (
+                                                <Balance
+                                                    disabled={true}
+                                                    fontColor={'white'}
+                                                    balance={
+                                                        walletData.balance
+                                                            .onchain
+                                                    }
+                                                    balanceFontSize={'text-lg'}
+                                                    disableFiat={false}
+                                                    loading={loadingBalance}
+                                                />
+                                            )}
                                         </View>
                                     </View>
                                 </View>
@@ -869,8 +910,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
     },
-    bottomConverter: {
-        bottom: 98,
+    emptyBalance: {
+        backgroundColor: 'darkgrey',
     },
     divider: {
         height: 1,
