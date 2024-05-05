@@ -162,10 +162,6 @@ export const WALLET_NAME_LENGTH = 15;
 // Default wallet type
 export const DEFAULT_WALLET_TYPE = 'unified';
 
-// Balance minimums for inwallet swaps (sats)
-export const LIGHTNING_SWAP_BALANCE_MIN = 50000; // Boltz
-export const ONCHAIN_SWAP_BALANCE_MIN = 21000; // Boltz
-
 export const electrumServerList = [
     // Blockstream
     {
