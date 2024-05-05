@@ -18,7 +18,13 @@ import VText from '../../components/text';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {
+    ReverseSwapPairInfo,
+    SwapInfo,
+    fetchReverseSwapFees,
+    nodeInfo,
+    receiveOnchain,
+} from '@breeztech/react-native-breez-sdk';
 
 import BDK from 'bdk-rn';
 
@@ -65,6 +71,11 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
 import {SwapType} from '../../types/enums';
 
+type swapLimits = {
+    min: number;
+    max: number;
+};
+
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
 const Wallet = ({route}: Props) => {
@@ -76,6 +87,8 @@ const Wallet = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
+    const [swapOut, setSwapOut] = useState<swapLimits>({} as swapLimits);
+    const [swapIn, setSwapIn] = useState<swapLimits>({} as swapLimits);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
@@ -237,6 +250,10 @@ const Wallet = ({route}: Props) => {
                 screen: 'SwapAmount',
                 params: {
                     swapType: swapType,
+                    swapMin:
+                        swapType === SwapType.SwapIn ? swapIn.min : swapOut.min,
+                    swapMax:
+                        swapType === SwapType.SwapIn ? swapIn.max : swapOut.max,
                 },
             }),
         );
@@ -371,6 +388,32 @@ const Wallet = ({route}: Props) => {
         walletData,
     ]);
 
+    const getLNSwapInfo = async () => {
+        fetchReverseSwapFees({sendAmountSat: 150000})
+            .then((c: ReverseSwapPairInfo) => {
+                setSwapOut({
+                    min: c.min,
+                    max: c.max,
+                });
+            })
+            .catch((e: any) => {
+                console.log('[Breez swapOut] error: ', e.message);
+            });
+    };
+
+    const getOnchainSwapInfo = async () => {
+        receiveOnchain({})
+            .then((d: SwapInfo) => {
+                setSwapIn({
+                    min: d.minAllowedDeposit,
+                    max: d.maxAllowedDeposit,
+                });
+            })
+            .catch((e: any) => {
+                console.log('[Breez swapIn] error: ', e.message);
+            });
+    };
+
     // Check if wallet balance is empty
     const isWalletBroke = (balance: TBalance) => {
         return new BigNumber(0).eq(balance.onchain.plus(balance.lightning));
@@ -380,6 +423,9 @@ const Wallet = ({route}: Props) => {
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
     useEffect(() => {
+        getLNSwapInfo();
+        getOnchainSwapInfo();
+
         // Kill all loading effects
         () => {
             setRefreshing(false);
@@ -892,6 +938,10 @@ const Wallet = ({route}: Props) => {
                                     triggerSwap={handleSwap}
                                     onSelectSwap={idx => {
                                         setOpenSwap(idx);
+                                    }}
+                                    swapInfo={{
+                                        swapIn: swapIn,
+                                        swapOut: swapOut,
                                     }}
                                 />
                             </View>
