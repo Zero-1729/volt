@@ -53,13 +53,8 @@ const SwapAmount = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {
-        fiatRate,
-        getWalletData,
-        currentWalletID,
-        appFiatCurrency,
-        swapInfo,
-    } = useContext(AppStorageContext);
+    const {fiatRate, getWalletData, currentWalletID, appFiatCurrency} =
+        useContext(AppStorageContext);
     const {t} = useTranslation('wallet');
 
     const wallet = getWalletData(currentWalletID);
@@ -77,12 +72,8 @@ const SwapAmount = ({route}: Props) => {
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
     const [swapFees, setSwapFees] = useState<ReverseSwapPairInfo>();
 
-    const minimumSwapAmount = new BigNumber(
-        isSwapOut ? swapInfo.swapOut.min : swapInfo.swapIn.min,
-    );
-    const maximumSwapAmount = new BigNumber(
-        isSwapOut ? swapInfo.swapOut.max : swapInfo.swapIn.max,
-    );
+    const minimumSwapAmount = new BigNumber(route.params.swapMin);
+    const maximumSwapAmount = new BigNumber(route.params.swapMax);
 
     const [satsAmount, setSatsAmount] = useState<DisplayUnit>({
         value: new BigNumber(0),
@@ -119,7 +110,9 @@ const SwapAmount = ({route}: Props) => {
                 CommonActions.navigate('SwapOut', {
                     lnBalance: route.params.lnBalance,
                     onchainBalance: route.params.onchainBalance,
-                    satsAmount: maxSwapAmount ? maxSwapAmount : satsAmount,
+                    satsAmount: maxSwapAmount
+                        ? maxSwapAmount
+                        : satsAmount.value,
                     fees: swapFees,
                     maxed: isMax,
                 }),
@@ -388,8 +381,10 @@ const SwapAmount = ({route}: Props) => {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
-                    text1: t('continue'),
-                    text2: t('swap_amount_too_low'),
+                    text1: capitalizeFirst(t('continue')),
+                    text2: t('balance_below_min', {
+                        swap_min: formatSats(minimumSwapAmount),
+                    }),
                     visibilityTime: 1750,
                 });
 
