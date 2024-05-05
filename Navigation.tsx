@@ -249,7 +249,6 @@ export type WalletParamList = {
     FeeSelection: {
         invoiceData: TInvoiceData;
         wallet: TMiniWallet;
-        source: string;
     };
     Send: {
         feeRate: number;
@@ -282,7 +281,6 @@ export type WalletParamList = {
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
-        source: string;
         isLightning?: boolean;
         isLnManual?: boolean;
         lnManualPayload?: TLnManualPayloadType;
@@ -384,12 +382,10 @@ const WalletRoot = () => {
             {/* TODO: Fix issue routing to 'Send' screen from Wallet as modal, route changed but reverted after few seconds */}
             <WalletStack.Screen name="Send" component={Send} />
             <WalletStack.Screen name="SendLN" component={SendLN} />
+            <WalletStack.Screen name="SendAmount" component={SendAmount} />
+            <WalletStack.Screen name="FeeSelection" component={FeeSelection} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
-                <WalletStack.Screen
-                    name="FeeSelection"
-                    component={FeeSelection}
-                />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
@@ -412,9 +408,7 @@ const WalletRoot = () => {
                     name="RequestAmount"
                     component={RequestAmount}
                 />
-                <WalletStack.Screen name="SendAmount" component={SendAmount} />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
-
                 <WalletStack.Screen name="SwapAmount" component={SwapAmount} />
                 <WalletStack.Screen name="SwapOut" component={SwapOut} />
             </WalletStack.Group>
