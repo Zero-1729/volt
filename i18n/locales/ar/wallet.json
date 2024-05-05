@@ -123,8 +123,7 @@
     "ln_description_text": "أدخل وصفًا (تسعون حرفًا كحد أقصى)",
     "keep_receive_open": "اترك هذه الصفحة مفتوحة حتى يتم دفع الفاتورة",
     "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة",
-    "balance_below_min": "الرصيد أقل من {{swap_min}} هو الحد الأدنى"
-    "ln_insufficient_funds": "عدم كفاية الأموال لدفع الفاتورة",
+    "balance_below_min": "الرصيد أقل من {{swap_min}} هو الحد الأدنى",
     "manual": "يدوي",
     "manual_message": "أدخل عنوان Lightning أو معرف العقدة",
     "manual_placeholder": "أدخل عنوان Lightning.",
@@ -134,6 +133,8 @@
     "descriptor_backup_message": "لحماية أموالك، قم بعمل نسخة احتياطية من واصف محفظتك. ليست كل المحافظ تدعم هذا حتى الآن.",
     "xprv_backup_message": "لحماية أموالك، قم بعمل نسخة احتياطية من مفتاحك الخاص الممتد.",
     "lock_screen_message": "أدخل رمز PIN الخاص بك",
-    "not_ln_address": "العنوان ليس عنوان Lightning."
+    "not_ln_address": "العنوان ليس عنوان Lightning.",
+    "minimum_amount": "الحد الأدنى للمبلغ",
+    "get_swap_fees": "حساب الرسوم",
     "mempool_congested": "Mempool مزدحم حاليًا."
 }

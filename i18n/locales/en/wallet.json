@@ -124,8 +124,7 @@
     "ln_description_text": "Enter a description (90 chars max)",
     "keep_receive_open": "Keep this page open until invoice is paid",
     "ln_insufficient_funds": "Insufficient funds to pay invoice",
-    "balance_below_min": "Balance below {{swap_min}} sats minimum"
-    "ln_insufficient_funds": "Insufficient funds to pay invoice",
+    "balance_below_min": "Balance below {{swap_min}} sats minimum",
     "manual": "Manual",
     "manual_message": "Enter a Lightning Address or Node ID",
     "paying_ln_address": "Paying Lightning Address",
@@ -135,6 +134,8 @@
     "descriptor_backup_message": "To protect your funds, back up your wallet descriptor. Not all wallets support this yet.",
     "xprv_backup_message": "To protect your funds, back up your extended private key.",
     "lock_screen_message": "Enter your PIN code",
-    "not_ln_address": "Not a Lightning Address."
+    "not_ln_address": "Not a Lightning Address.",
+    "minimum_amount": "Min amount",
+    "get_swap_fees": "Calculate Fees",
     "mempool_congested": "The Mempool is currently congested."
 }
