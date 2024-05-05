@@ -131,25 +131,29 @@ const Swap = (props: SwapProps) => {
                             {t('swap_in_message')}
                         </VText>
 
-                        <View
-                            style={[
-                                tailwind('w-full items-center flex-row mt-2'),
-                            ]}>
-                            <InfoIcon fill={ColorScheme.SVG.GrayFill} />
-                            <VText
+                        {props.onchainBalance.lt(props.swapInfo.swapIn.min) && (
+                            <View
                                 style={[
-                                    tailwind('text-sm ml-2'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
-                                {t('balance_below_min', {
-                                    swap_min: formatSats(
-                                        new BigNumber(
-                                            props.swapInfo.swapIn.min,
-                                        ),
+                                    tailwind(
+                                        'w-full items-center flex-row mt-2',
                                     ),
-                                })}
-                            </VText>
-                        </View>
+                                ]}>
+                                <InfoIcon fill={ColorScheme.SVG.GrayFill} />
+                                <VText
+                                    style={[
+                                        tailwind('text-sm ml-2'),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {t('balance_below_min', {
+                                        swap_min: formatSats(
+                                            new BigNumber(
+                                                props.swapInfo.swapIn.min,
+                                            ),
+                                        ),
+                                    })}
+                                </VText>
+                            </View>
+                        )}
                     </PlainButton>
 
                     {/* Swap Out */}
@@ -210,25 +214,31 @@ const Swap = (props: SwapProps) => {
                             {t('swap_out_message')}
                         </VText>
 
-                        <View
-                            style={[
-                                tailwind('w-full items-center flex-row mt-2'),
-                            ]}>
-                            <InfoIcon fill={ColorScheme.SVG.GrayFill} />
-                            <VText
+                        {props.lightningBalance.lt(
+                            props.swapInfo.swapOut.min,
+                        ) && (
+                            <View
                                 style={[
-                                    tailwind('text-sm ml-2'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
-                                {t('balance_below_min', {
-                                    swap_min: formatSats(
-                                        new BigNumber(
-                                            props.swapInfo.swapOut.min,
-                                        ),
+                                    tailwind(
+                                        'w-full items-center flex-row mt-2',
                                     ),
-                                })}
-                            </VText>
-                        </View>
+                                ]}>
+                                <InfoIcon fill={ColorScheme.SVG.GrayFill} />
+                                <VText
+                                    style={[
+                                        tailwind('text-sm ml-2'),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {t('balance_below_min', {
+                                        swap_min: formatSats(
+                                            new BigNumber(
+                                                props.swapInfo.swapOut.min,
+                                            ),
+                                        ),
+                                    })}
+                                </VText>
+                            </View>
+                        )}
                     </PlainButton>
 
                     <View
