@@ -117,7 +117,6 @@ const InputPanel = (): ReactElement => {
                 invoiceData: {},
                 wallet: minWallet,
                 isLightning: true,
-                source: 'conservative',
                 isLnManual: true,
                 lnManualPayload: {
                     amount: 0,

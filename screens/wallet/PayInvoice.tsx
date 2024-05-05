@@ -275,7 +275,6 @@ const PayInvoice = ({route}: Props) => {
                         params: {
                             invoiceData: decodedInvoice,
                             wallet: wallet,
-                            source: 'liberal',
                         },
                     }),
                 );
@@ -287,7 +286,6 @@ const PayInvoice = ({route}: Props) => {
                             invoiceData: decodedInvoice,
                             wallet: wallet,
                             isLightning: isLightning,
-                            source: 'liberal',
                         },
                     }),
                 );

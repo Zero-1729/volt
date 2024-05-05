@@ -9,7 +9,7 @@ import {
     StackActions,
 } from '@react-navigation/native';
 
-import {SafeAreaView, Edges} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
@@ -29,8 +29,6 @@ import Close from '../../assets/svg/x-24.svg';
 import bottomOffset from '../../constants/NativeWindowMetrics';
 
 import {DUST_LIMIT} from '../../modules/wallet-defaults';
-
-import {getScreenEdges} from '../../modules/screen';
 
 import {useTranslation} from 'react-i18next';
 
@@ -61,11 +59,6 @@ const SendAmount = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
-
-    // We need to make adjustments to the screen based on the source caller.
-    // conservative - from the wallet view
-    // liberal - from home screen
-    const edges: Edges = getScreenEdges(route.params.source);
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -242,7 +235,7 @@ const SendAmount = ({route}: Props) => {
 
     return (
         <SafeAreaView
-            edges={edges}
+            edges={['top', 'right', 'left', 'bottom']}
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
