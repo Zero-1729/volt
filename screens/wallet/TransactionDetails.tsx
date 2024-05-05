@@ -82,7 +82,10 @@ const TransactionDetailsView = ({route}: Props) => {
 
     const buttonText = isAdvancedMode ? t('view_on_mempool') : t('see_more');
 
-    const displayFeeBump = !route.params.tx.confirmed && route.params.tx.rbf;
+    const displayFeeBump =
+        !route.params.tx.confirmed &&
+        route.params.tx.rbf &&
+        !route.params.tx.received;
 
     const openBumpFee = () => {
         if (openBump !== 1) {
