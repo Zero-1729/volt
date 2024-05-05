@@ -38,7 +38,6 @@ import {
     TAddress,
     TElectrumServerURLs,
     TMempoolInfo,
-    TSwapInfo,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -77,7 +76,6 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
-    swapInfo: TSwapInfo;
     breezEvent: BreezEvent;
     appLanguage: TLanguage;
     appFiatCurrency: TCurrency;
@@ -99,7 +97,6 @@ type defaultContextType = {
     isBiometricsActive: boolean;
     mempoolInfo: TMempoolInfo;
     pinAttempts: number; // maxes out at 10, reset when correct pin entered
-    setSwapInfo: (data: TSwapInfo) => void;
     setBreezEvent: (event: BreezEvent) => void;
     setMempoolInfo: (data: TMempoolInfo) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
@@ -143,7 +140,6 @@ type defaultContextType = {
 const defaultContext: defaultContextType = {
     loadLock: false,
     onboarding: true,
-    swapInfo: {} as TSwapInfo,
     breezEvent: {} as BreezEvent,
     mempoolInfo: {} as TMempoolInfo,
     appLanguage: {
@@ -182,7 +178,6 @@ const defaultContext: defaultContextType = {
     isPINActive: false,
     isBiometricsActive: false,
     pinAttempts: 0,
-    setSwapInfo: () => {},
     setBreezEvent: () => {},
     setMempoolInfo: () => {},
     setAppLanguage: () => {},
@@ -224,7 +219,6 @@ export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
-    const [swapInfo, _setSwapInfo] = useState(defaultContext.swapInfo);
     const [breezEvent, _setBreezEvent] = useState(defaultContext.breezEvent);
     const [mempoolInfo, _setMempoolInfo] = useState(defaultContext.mempoolInfo);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
@@ -267,8 +261,6 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('loadLock');
     const {getItem: _getOnboarding, setItem: _updateOnboarding} =
         useAsyncStorage('onboarding');
-    const {getItem: _getSwapInfo, setItem: _updateSwapInfo} =
-        useAsyncStorage('swapInfo');
     const {getItem: _getBreezEvent, setItem: _updateBreezEvent} =
         useAsyncStorage('breezEvent');
     const {getItem: _getMempoolInfo, setItem: _updateMempoolInfo} =
@@ -333,30 +325,6 @@ export const AppStorageProvider = ({children}: Props) => {
             }
         },
         [_setPINAttempts, _updatePINAttempts],
-    );
-
-    const _loadSwapInfo = async () => {
-        const si = await _getSwapInfo();
-
-        if (si !== null) {
-            _setSwapInfo(JSON.parse(si));
-        }
-    };
-
-    const setSwapInfo = useCallback(
-        (info: TSwapInfo) => {
-            try {
-                _setSwapInfo(info);
-                _updateSwapInfo(JSON.stringify(info));
-            } catch (e) {
-                console.error(
-                    `[AsyncStorage] (SwapInfo setting) Error loading data: ${e}`,
-                );
-
-                throw new Error('Unable to set swap info');
-            }
-        },
-        [_setSwapInfo, _updateSwapInfo],
     );
 
     const _loadBiometricsActive = async () => {
@@ -1429,10 +1397,6 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
-        _loadSwapInfo();
-    }, []);
-
-    useEffect(() => {
         _loadBiometricsActive();
     }, []);
 
@@ -1512,8 +1476,6 @@ export const AppStorageProvider = ({children}: Props) => {
     return (
         <AppStorageContext.Provider
             value={{
-                swapInfo,
-                setSwapInfo,
                 pinAttempts,
                 setPINAttempts,
                 isBiometricsActive,
