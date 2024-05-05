@@ -258,6 +258,9 @@ export type WalletParamList = {
         swapType: SwapType;
         lnBalance: number;
         onchainBalance: number;
+        swapMin: number;
+        swapMax: number;
+    };
     };
     SwapOut: {
         lnBalance: number;
