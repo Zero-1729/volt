@@ -196,14 +196,3 @@ export type TMempoolInfo = {
     hourFee: number;
     halfHourFee: number;
 };
-
-export type TSwapInfo = {
-    swapOut: {
-        min: number;
-        max: number;
-    };
-    swapIn: {
-        min: number;
-        max: number;
-    };
-};
