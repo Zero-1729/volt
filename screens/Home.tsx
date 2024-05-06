@@ -649,6 +649,8 @@ const Home = ({route}: Props) => {
                                     ),
                                 ]}>
                                 <FlatList
+                                    maxToRenderPerBatch={50}
+                                    updateCellsBatchingPeriod={2500}
                                     refreshing={refreshing}
                                     onRefresh={jointSync}
                                     scrollEnabled={true}

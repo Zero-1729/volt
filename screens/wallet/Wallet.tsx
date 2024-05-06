@@ -851,6 +851,8 @@ const Wallet = ({route}: Props) => {
                                 tailwind('w-full h-full items-center pb-10'),
                             ]}>
                             <FlatList
+                                maxToRenderPerBatch={50}
+                                updateCellsBatchingPeriod={2500}
                                 refreshing={refreshing}
                                 onRefresh={jointSync}
                                 scrollEnabled={true}
