@@ -136,5 +136,6 @@
     "not_ln_address": "العنوان ليس عنوان Lightning.",
     "minimum_amount": "الحد الأدنى للمبلغ",
     "get_swap_fees": "حساب الرسوم",
-    "mempool_congested": "Mempool مزدحم حاليًا."
+    "mempool_congested": "Mempool مزدحم حاليًا.",
+    "mempool_high_fee": "رسوم Onchain مرتفعة جدًا حاليًا."
 }

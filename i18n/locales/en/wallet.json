@@ -137,5 +137,6 @@
     "not_ln_address": "Not a Lightning Address.",
     "minimum_amount": "Min amount",
     "get_swap_fees": "Calculate Fees",
-    "mempool_congested": "The Mempool is currently congested."
+    "mempool_congested": "The Mempool is currently congested.",
+    "mempool_high_fee": "Onchain fees currently too high."
 }
