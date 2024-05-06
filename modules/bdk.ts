@@ -554,7 +554,7 @@ export const psbtFromInvoice = async (
         try {
             const _uPsbt = await constructPSBT(
                 invoiceData.options?.amount?.toString() as string,
-                invoiceData.address,
+                invoiceData.address.trim(),
                 Number(feeRate),
                 maxBalance.eq(Number(invoiceData.options?.amount)),
                 _wallet as TComboWallet,
