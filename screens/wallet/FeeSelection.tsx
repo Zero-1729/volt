@@ -74,6 +74,8 @@ const FeeSelection = ({route}: Props) => {
         mempoolInfo,
         currentWalletID,
         getWalletData,
+        isAdvancedMode,
+    } = useContext(AppStorageContext);
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
     const [selectedFeeRateType, setSelectedFeeRateType] = useState<string>();
     const [psbtVSize, setPsbtVSize] = useState<number>(1);
@@ -112,13 +114,15 @@ const FeeSelection = ({route}: Props) => {
             new BigNumber(route.params.wallet.balanceOnchain),
             electrumServerURL,
             (err: any) => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: e('tx_fail_creation_error'),
-                    visibilityTime: 1750,
-                });
+                if (isAdvancedMode) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: e('tx_fail_creation_error'),
+                        visibilityTime: 1750,
+                    });
+                }
 
                 console.log(
                     '[Fee Selection] Failed to create tx: ',
