@@ -512,6 +512,7 @@ export const canSendToInvoice = (
             : prefixTip
     ).toLowerCase();
     const invoicePrefixInfo = prefixInfo[prefixStub];
+    const walletP2tr = miniWallet.type === 'unified' ? 'p2tr' : miniWallet.type;
 
     switch (invoicePrefixInfo?.type) {
         case 'p2pkh':
@@ -521,7 +522,7 @@ export const canSendToInvoice = (
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'shp2wpkh' ||
                     miniWallet.type === 'wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
         case 'shp2wpkh':
             // Can send to shp2wpkh if wallet is wpkh, shp2wpkh, or p2tr
@@ -529,7 +530,7 @@ export const canSendToInvoice = (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
         case 'wpkh':
             // Can send to wpkh if wallet is shp2wpkh, wpkh, or p2tr
@@ -537,18 +538,15 @@ export const canSendToInvoice = (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'shp2wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
         case 'p2tr':
             // Can send to p2tr if wallet is unified, p2tr or wpkh
-            const walletP2tr =
-                miniWallet.type === 'unified' ? 'p2tr' : invoicePrefixInfo.type;
-
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
-                (walletP2tr === invoicePrefixInfo.type ||
+                (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
     }
 
