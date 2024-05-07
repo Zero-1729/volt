@@ -19,11 +19,11 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
 import {
-    ReverseSwapPairInfo,
     SwapInfo,
-    fetchReverseSwapFees,
     nodeInfo,
     receiveOnchain,
+    onchainPaymentLimits,
+    OnchainPaymentLimitsResponse,
 } from '@breeztech/react-native-breez-sdk';
 
 import BDK from 'bdk-rn';
@@ -389,11 +389,11 @@ const Wallet = ({route}: Props) => {
     ]);
 
     const getLNSwapInfo = async () => {
-        fetchReverseSwapFees({sendAmountSat: 150000})
-            .then((c: ReverseSwapPairInfo) => {
+        onchainPaymentLimits()
+            .then((c: OnchainPaymentLimitsResponse) => {
                 setSwapOut({
-                    min: c.min,
-                    max: c.max,
+                    min: c.minSat,
+                    max: c.maxSat,
                 });
             })
             .catch((e: any) => {
