@@ -71,7 +71,7 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
 import {SwapType} from '../../types/enums';
 
-type swapLimits = {
+type TSwapInfo = {
     min: number;
     max: number;
 };
@@ -87,8 +87,8 @@ const Wallet = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-    const [swapOut, setSwapOut] = useState<swapLimits>({} as swapLimits);
-    const [swapIn, setSwapIn] = useState<swapLimits>({} as swapLimits);
+    const [swapOut, setSwapOut] = useState<TSwapInfo>({} as TSwapInfo);
+    const [swapIn, setSwapIn] = useState<TSwapInfo>({} as TSwapInfo);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
