@@ -74,6 +74,7 @@ import {SwapType} from '../../types/enums';
 type TSwapInfo = {
     min: number;
     max: number;
+    address?: string; // For onchain receiving swap address
 };
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
@@ -407,6 +408,7 @@ const Wallet = ({route}: Props) => {
                 setSwapIn({
                     min: d.minAllowedDeposit,
                     max: d.maxAllowedDeposit,
+                    address: d.bitcoinAddress,
                 });
             })
             .catch((e: any) => {
