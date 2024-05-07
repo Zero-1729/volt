@@ -98,7 +98,7 @@ export type TTransaction = Payment & {
     value: number; // Transaction value in sats
     received: number; // Transaction received value in sats
     sent: number; // Transaction sent value in sats
-    timestamp: Date; // Transaction date
+    timestamp: number; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
     inputs?: TUTXO[]; // Transaction inputs
     outputs?: TUTXO[]; // Transaction outputs
