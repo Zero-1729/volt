@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState, useEffect, ReactElement} from 'react';
+import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -28,7 +27,6 @@ import {SwapType} from '../../types/enums';
 
 import {
     ReverseSwapPairInfo,
-    fetchReverseSwapFees,
     maxReverseSwapAmount,
 } from '@breeztech/react-native-breez-sdk';
 
@@ -65,10 +63,8 @@ const SwapAmount = ({route}: Props) => {
     );
     const isSwapOut = route.params.swapType === SwapType.SwapOut;
 
-    const [loading, setLoading] = useState(true);
     const [amount, setAmount] = useState<string>('');
     const [loadingFeeText, setFeeLoadingText] = useState('');
-    const [showMinText, setShowMinText] = useState<boolean>(false);
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
     const [swapFees, setSwapFees] = useState<ReverseSwapPairInfo>();
 
@@ -171,11 +167,6 @@ const SwapAmount = ({route}: Props) => {
             bottomUnit.name === 'sats'
                 ? maximumSwapAmount.lt(value)
                 : fiatEqv.gt(maxSwapFiatAmount);
-
-        // clear swap
-        if (swapFees?.totalEstimatedFees) {
-            setSwapFees({} as ReverseSwapPairInfo);
-        }
 
         // clear loading text
         if (loadingFeeText) {
@@ -317,30 +308,6 @@ const SwapAmount = ({route}: Props) => {
         );
     };
 
-    const displayFees = (fontSize: string) => {
-        const bottomUnitSats = bottomUnit?.name === 'sats';
-        const rawFeeSats = new BigNumber(
-            swapFees?.totalEstimatedFees as number,
-        );
-        const feeAmount = normalizeFiat(rawFeeSats, fiatRate.rate);
-
-        return bottomUnitSats ? (
-            <DisplaySatsAmount
-                textColor={ColorScheme.Text.DescText}
-                amount={rawFeeSats}
-                fontSize={fontSize}
-                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
-            />
-        ) : (
-            <DisplayFiatAmount
-                textColor={ColorScheme.Text.DescText}
-                amount={feeAmount}
-                fontSize={fontSize}
-                isApprox={topUnit?.name !== 'sats' && amount.length > 0}
-            />
-        );
-    };
-
     const displayMinimum = (fontSize: string) => {
         const bottomUnitSats = bottomUnit?.name === 'sats';
         const rawMin = new BigNumber(minimumSwapAmount);
@@ -362,93 +329,6 @@ const SwapAmount = ({route}: Props) => {
             />
         );
     };
-
-    const handleFetchSwapFees = async () => {
-        setLoading(true);
-
-        try {
-            setFeeLoadingText('Fetching fee...');
-
-            const fees = await fetchReverseSwapFees({
-                sendAmountSat: satsAmount.value.toNumber(),
-            });
-
-            setSwapFees(fees);
-            setBottomText(t('continue'));
-            setFeeLoadingText('');
-        } catch (e: any) {
-            if (e.message.includes('too low')) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('continue')),
-                    text2: t('balance_below_min', {
-                        swap_min: formatSats(minimumSwapAmount),
-                    }),
-                    visibilityTime: 1750,
-                });
-
-                setFeeLoadingText('');
-            } else {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('continue'),
-                    text2: e.message,
-                    visibilityTime: 2000,
-                });
-
-                setFeeLoadingText('');
-            }
-        }
-    };
-
-    const displayFeeText = (fontSize: string): ReactElement => {
-        if (loadingFeeText.length !== 0) {
-            return (
-                <View
-                    style={[
-                        tailwind('items-center justify-center flex-row mt-6'),
-                    ]}>
-                    <Text
-                        style={[
-                            tailwind(`items-center ${fontSize}`),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
-                        {loadingFeeText}
-                    </Text>
-                </View>
-            );
-        }
-
-        if (swapFees?.totalEstimatedFees) {
-            return (
-                <View
-                    style={[
-                        tailwind('items-center justify-center flex-row mt-6'),
-                    ]}>
-                    <Text
-                        style={[
-                            tailwind(`${fontSize} font-bold mr-2`),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
-                        {t('swap_fees')}
-                    </Text>
-                    <View style={[tailwind('items-center')]}>
-                        {displayFees(fontSize)}
-                    </View>
-                </View>
-            );
-        }
-
-        return <></>;
-    };
-
-    useEffect(() => {
-        if (isSwapOut) {
-            handleFetchSwapFees();
-        }
-    }, []);
 
     return (
         <SafeAreaView
@@ -502,18 +382,16 @@ const SwapAmount = ({route}: Props) => {
                 </View>
 
                 {/* Minimum Sats warn */}
-                {showMinText && (
-                    <View style={[tailwind('absolute flex-row'), {top: 120}]}>
-                        <Text
-                            style={[
-                                tailwind('text-sm mr-2'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
-                            {t('minimum_amount')}
-                        </Text>
-                        {displayMinimum('text-sm')}
-                    </View>
-                )}
+                <View style={[tailwind('absolute flex-row'), {top: 120}]}>
+                    <Text
+                        style={[
+                            tailwind('text-sm mr-2'),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {t('minimum_amount')}
+                    </Text>
+                    {displayMinimum('text-sm')}
+                </View>
 
                 {/* Screen for amount */}
                 <View
@@ -555,7 +433,7 @@ const SwapAmount = ({route}: Props) => {
                     </View>
 
                     {/* Set maximum */}
-                    {!loading && balance.gt(minimumSwapAmount) && (
+                    {balance.gt(minimumSwapAmount) && (
                         <View
                             style={[
                                 tailwind('rounded-full px-4 py-1 mt-6'),
@@ -586,8 +464,6 @@ const SwapAmount = ({route}: Props) => {
                     )}
                 </View>
 
-                {isSwapOut && displayFeeText('text-sm')}
-
                 {/* Number pad for input amount */}
                 <AmountNumpad
                     amount={amount}
@@ -606,7 +482,6 @@ const SwapAmount = ({route}: Props) => {
                         disabled={
                             amount === '' ||
                             isBeyondMax ||
-                            loading ||
                             minimumSwapAmount.gt(satsAmount.value)
                         }
                         onPress={handleSwapRoute}>
@@ -616,7 +491,6 @@ const SwapAmount = ({route}: Props) => {
                                     `rounded-full items-center flex-row justify-center px-6 py-3 ${
                                         amount === '' ||
                                         isBeyondMax ||
-                                        loading ||
                                         minimumSwapAmount.gt(satsAmount.value)
                                             ? 'opacity-20'
                                             : ''
@@ -634,7 +508,7 @@ const SwapAmount = ({route}: Props) => {
                                         color: ColorScheme.Text.Alt,
                                     },
                                 ]}>
-                                {bottomText}
+                                {capitalizeFirst(t('continue'))}
                             </Text>
                         </View>
                     </PlainButton>
