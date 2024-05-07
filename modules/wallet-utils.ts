@@ -649,7 +649,11 @@ export const getLNPayments = async (
     let txs: TTransaction[] = [];
 
     for (let i = 0; i < payments.length; i++) {
-        txs.push({...payments[i], isLightning: true} as TTransaction);
+        txs.push({
+            ...payments[i],
+            isLightning: true,
+            timestamp: payments[i].paymentTime,
+        } as TTransaction);
     }
 
     // Return formatted LN payments

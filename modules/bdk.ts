@@ -77,7 +77,7 @@ export const formatTXFromBDK = async (
         confirmed: tx.confirmed,
         confirmations: blockConfirms > 0 ? blockConfirms + 1 : 1,
         block_height: tx.confirmationTime?.height as number,
-        timestamp: timestamp as any,
+        timestamp: timestamp,
         fee: tx.fee as number,
         value: value.toNumber(),
         received: tx.received,
