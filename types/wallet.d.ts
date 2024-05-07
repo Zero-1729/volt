@@ -196,3 +196,12 @@ export type TMempoolInfo = {
     hourFee: number;
     halfHourFee: number;
 };
+
+type TSwapInfo = {
+    min: number;
+    max: number;
+    address?: string; // For onchain receiving swap address
+    lockHeight?: number;
+    channelOpeningFees?: OpeningFeeParams;
+    maxSwapperPayable?: number;
+};
