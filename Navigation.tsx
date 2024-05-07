@@ -36,6 +36,7 @@ import {
     connect,
     BreezEventVariant,
     ReverseSwapPairInfo,
+    ConnectRequest,
 } from '@breeztech/react-native-breez-sdk';
 import {getXPub256} from './modules/wallet-utils';
 
@@ -649,6 +650,8 @@ const RootNavigator = (): ReactElement => {
             return;
         }
 
+        let restore_only = wallet.payments.length > 0 ? true : false;
+
         // Get node info
         try {
             const info = await nodeInfo();
@@ -770,9 +773,15 @@ const RootNavigator = (): ReactElement => {
         const xpub256 = getXPub256(wallet.xpub);
         config.workingDir = config.workingDir + `/volt/${xpub256}`;
 
+        const connectionRequest: ConnectRequest = {
+            config,
+            seed,
+            restoreOnly: restore_only,
+        };
+
         try {
             // Connect to the Breez SDK make it ready for use
-            BreezSub.current = await connect(config, seed, onBreezEvent);
+            BreezSub.current = await connect(connectionRequest, onBreezEvent);
 
             Toast.show({
                 topOffset: 54,
