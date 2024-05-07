@@ -607,7 +607,7 @@ const SwapAmount = ({route}: Props) => {
                             amount === '' ||
                             isBeyondMax ||
                             loading ||
-                            balance.lt(minimumSwapAmount)
+                            minimumSwapAmount.gt(satsAmount.value)
                         }
                         onPress={handleSwapRoute}>
                         <View
@@ -617,7 +617,7 @@ const SwapAmount = ({route}: Props) => {
                                         amount === '' ||
                                         isBeyondMax ||
                                         loading ||
-                                        balance.lt(minimumSwapAmount)
+                                        minimumSwapAmount.gt(satsAmount.value)
                                             ? 'opacity-20'
                                             : ''
                                     }`,
