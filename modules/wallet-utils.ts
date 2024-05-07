@@ -686,7 +686,7 @@ export const getCountdownStart = (timestamp: number, expiry: number) => {
 
 // Function for syncing and returning new BDK wallet and Breez transactions
 
-const determinLnType = async (
+const determineLnType = async (
     invoice: string,
 ): Promise<{
     type: string;
@@ -757,7 +757,7 @@ export const decodeInvoiceType = async (
         lowercasedInvoice.startsWith('lnurl') ||
         lowercasedInvoice.startsWith('lightning')
     ) {
-        const determinedLnType = await determinLnType(lowercasedInvoice);
+        const determinedLnType = await determineLnType(lowercasedInvoice);
 
         return determinedLnType;
     }
