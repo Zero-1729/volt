@@ -123,6 +123,7 @@ import {
     TInvoiceData,
     TBreezPaymentDetails,
     TLnManualPayloadType,
+    TSwapInfo,
 } from './types/wallet';
 import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
@@ -259,8 +260,7 @@ export type WalletParamList = {
         swapType: SwapType;
         lnBalance: number;
         onchainBalance: number;
-        swapMin: number;
-        swapMax: number;
+        swapMeta: TSwapInfo;
     };
     };
     SwapOut: {

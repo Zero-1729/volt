@@ -61,7 +61,7 @@ import {Balance} from '../../components/balance';
 
 import {UnifiedTransactionListItem} from '../../components/transaction';
 
-import {TBalance, TTransaction} from '../../types/wallet';
+import {TBalance, TTransaction, TSwapInfo} from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -70,12 +70,6 @@ import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
 import {SwapType} from '../../types/enums';
-
-type TSwapInfo = {
-    min: number;
-    max: number;
-    address?: string; // For onchain receiving swap address
-};
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -251,10 +245,7 @@ const Wallet = ({route}: Props) => {
                 screen: 'SwapAmount',
                 params: {
                     swapType: swapType,
-                    swapMin:
-                        swapType === SwapType.SwapIn ? swapIn.min : swapOut.min,
-                    swapMax:
-                        swapType === SwapType.SwapIn ? swapIn.max : swapOut.max,
+                    swapMeta: swapType === SwapType.SwapIn ? swapIn : swapOut,
                 },
             }),
         );
@@ -409,6 +400,9 @@ const Wallet = ({route}: Props) => {
                     min: d.minAllowedDeposit,
                     max: d.maxAllowedDeposit,
                     address: d.bitcoinAddress,
+                    lockHeight: d.lockHeight,
+                    channelOpeningFees: d.channelOpeningFees,
+                    maxSwapperPayable: d.maxSwapperPayable,
                 });
             })
             .catch((e: any) => {
