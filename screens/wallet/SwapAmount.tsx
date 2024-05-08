@@ -396,16 +396,18 @@ const SwapAmount = ({route}: Props) => {
                 </View>
 
                 {/* Minimum Sats warn */}
-                <View style={[tailwind('absolute flex-row'), {top: 120}]}>
-                    <Text
-                        style={[
-                            tailwind('text-sm mr-2'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
-                        {t('minimum_amount')}
-                    </Text>
-                    {displayMinimum('text-sm')}
-                </View>
+                {route.params.swapMeta.min && (
+                    <View style={[tailwind('absolute flex-row'), {top: 120}]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm mr-2'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {t('minimum_amount')}
+                        </Text>
+                        {displayMinimum('text-sm')}
+                    </View>
+                )}
 
                 {/* Screen for amount */}
                 <View
