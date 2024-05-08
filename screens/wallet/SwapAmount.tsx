@@ -2,7 +2,11 @@
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -43,6 +47,7 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast';
+import {getMiniWallet} from '../../modules/wallet-utils';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SwapAmount'>;
 
@@ -95,6 +100,10 @@ const SwapAmount = ({route}: Props) => {
     };
 
     const handleSwapRoute = async () => {
+        const miniWallet = getMiniWallet(wallet);
+
+        navigation.dispatch(StackActions.pop());
+
         if (isSwapOut) {
             let maxSwapAmount;
 
@@ -116,9 +125,14 @@ const SwapAmount = ({route}: Props) => {
         } else {
             navigation.dispatch(
                 CommonActions.navigate('SwapIn', {
-                    lnBalance: route.params.lnBalance,
-                    onchainBalance: route.params.onchainBalance,
-                    satsAmount: satsAmount,
+                    onchainBalance: wallet.balance.onchain.toString(),
+                    invoiceData: {
+                        address: route.params.swapMeta.address,
+                        options: {
+                            amount: satsAmount.value.toString(),
+                        },
+                    },
+                    swapMeta: route.params.swapMeta,
                 }),
             );
         }
