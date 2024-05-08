@@ -76,6 +76,7 @@ import Xpub from './screens/wallet/Xpub';
 
 // Swap screens
 import SwapAmount from './screens/wallet/SwapAmount';
+import SwapIn from './screens/wallet/SwapIn';
 import SwapOut from './screens/wallet/SwapOut';
 
 // Transaction details screen
@@ -262,6 +263,11 @@ export type WalletParamList = {
         onchainBalance: number;
         swapMeta: TSwapInfo;
     };
+    SwapIn: {
+        feeRate?: number;
+        onchainBalance: number;
+        invoiceData: TInvoiceData;
+        swapMeta: TSwapInfo;
     };
     SwapOut: {
         lnBalance: number;
@@ -411,6 +417,7 @@ const WalletRoot = () => {
                 />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
                 <WalletStack.Screen name="SwapAmount" component={SwapAmount} />
+                <WalletStack.Screen name="SwapIn" component={SwapIn} />
                 <WalletStack.Screen name="SwapOut" component={SwapOut} />
             </WalletStack.Group>
         </WalletStack.Navigator>
