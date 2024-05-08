@@ -35,6 +35,7 @@ type SwapProps = {
             max: number;
         };
     };
+    loadingInfo: boolean;
 };
 
 const Swap = (props: SwapProps) => {
@@ -84,7 +85,9 @@ const Swap = (props: SwapProps) => {
                         style={[
                             tailwind(
                                 `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
-                                    onchainBroke ? 'opacity-60' : 'opacity-100'
+                                    onchainBroke || props.loadingInfo
+                                        ? 'opacity-60'
+                                        : 'opacity-100'
                                 }`,
                             ),
                             {
@@ -108,7 +111,7 @@ const Swap = (props: SwapProps) => {
                                 ]}>
                                 {t('swap_in')}
                             </VText>
-                            {selected === SwapType.SwapIn && (
+                            {selected === SwapType.SwapIn && !onchainBroke && (
                                 <CheckIcon
                                     style={[
                                         tailwind(
@@ -167,7 +170,7 @@ const Swap = (props: SwapProps) => {
                         style={[
                             tailwind(
                                 `items-center p-4 w-full border rounded-md ${
-                                    lightningBroke
+                                    lightningBroke || props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
                                 }`,
@@ -191,20 +194,21 @@ const Swap = (props: SwapProps) => {
                                 ]}>
                                 {t('swap_out')}
                             </VText>
-                            {selected === SwapType.SwapOut && (
-                                <CheckIcon
-                                    style={[
-                                        tailwind(
-                                            `${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : 'ml-2'
-                                            }`,
-                                        ),
-                                    ]}
-                                    fill={ColorScheme.Text.Default}
-                                />
-                            )}
+                            {selected === SwapType.SwapOut &&
+                                !lightningBroke && (
+                                    <CheckIcon
+                                        style={[
+                                            tailwind(
+                                                `${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                        ]}
+                                        fill={ColorScheme.Text.Default}
+                                    />
+                                )}
                         </View>
                         <VText
                             style={[
@@ -247,7 +251,10 @@ const Swap = (props: SwapProps) => {
                             {bottom: NativeWindowMetrics.bottom - 16},
                         ]}>
                         <LongBottomButton
-                            disabled={onchainBroke && lightningBroke}
+                            disabled={
+                                (onchainBroke && lightningBroke) ||
+                                props.loadingInfo
+                            }
                             title={capitalizeFirst(t('continue'))}
                             onPress={() => {
                                 props.triggerSwap(selected);
