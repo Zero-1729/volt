@@ -3,11 +3,7 @@
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
-import {
-    useNavigation,
-    CommonActions,
-    StackActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -226,11 +222,7 @@ const SendAmount = ({route}: Props) => {
     };
 
     const handleCloseButton = () => {
-        if (route.params.source === 'liberal') {
-            navigation.dispatch(StackActions.popToTop());
-        } else {
-            navigation.dispatch(CommonActions.goBack());
-        }
+        navigation.dispatch(CommonActions.goBack());
     };
 
     return (
