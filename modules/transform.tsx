@@ -133,7 +133,7 @@ const getLocaleGroupingSeparator = (locale: string) => {
     return (1000).toLocaleString(locale).substring(1, 2);
 };
 
-export const formatLocaleDate = (locale: string, date: Date) => {
+export const formatLocaleDate = (locale: string, date: number) => {
     const d = +date * 1000;
     const isToday = DayJS(date).isSame(DayJS(), 'day');
     const isEnglish = locale === 'en';
