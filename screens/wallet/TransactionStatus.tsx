@@ -10,7 +10,11 @@ import {
 } from 'react-native';
 import React, {useState, useLayoutEffect, useContext, useEffect} from 'react';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
@@ -274,6 +278,10 @@ const TransactionStatus = ({route}: Props) => {
                             ]}>
                             <LongBottomButton
                                 onPress={() => {
+                                    navigation.dispatch(
+                                        StackActions.popToTop(),
+                                    );
+
                                     navigation.dispatch(
                                         CommonActions.navigate('WalletRoot', {
                                             screen: 'WalletView',
