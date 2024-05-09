@@ -103,12 +103,12 @@ const TransactionDetailsView = ({route}: Props) => {
         ? route.params.tx.paymentType === 'received'
         : route.params.tx.type === 'inbound';
 
-    const getTxTimestamp = (time: Date) => {
+    const getTxTimestamp = (time: number) => {
         return formatLocaleDate(i18n.language, time);
     };
 
     const titleDescText = isLNTx
-        ? getTxTimestamp(new Date(route.params.tx.paymentTime))
+        ? getTxTimestamp(route.params.tx.paymentTime)
         : route.params.tx.confirmed
         ? getTxTimestamp(route.params.tx.timestamp)
         : t('pending');
