@@ -59,6 +59,7 @@ import {getPrivateDescriptors} from '../../modules/descriptors';
 import {TComboWallet} from '../../types/wallet';
 import {SingleBDKSend, psbtFromInvoice} from '../../modules/bdk';
 import {PartiallySignedTransaction} from 'bdk-rn';
+import {openChannelFee} from '@breeztech/react-native-breez-sdk';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SwapIn'>;
 type Slide = () => ReactElement;
@@ -80,10 +81,12 @@ const SwapIn = ({route}: Props) => {
     const {t} = useTranslation('wallet');
 
     const [loadingTX, setLoadingTX] = useState<boolean>(false);
+    const [loadingChanFees, setLoadingChanFees] = useState<boolean>(true);
     const [statusMessage, setStatusMessage] = useState<string>();
     const [failedTx, setFailedTx] = useState<boolean>(false);
     const [errMessage, setErrMessage] = useState<string>();
     const [txID, setTxID] = useState<string>();
+    const [channelOpeningFees, setChannelOpeningFees] = useState<number>(0);
 
     const swapInfo = route.params.swapMeta;
     const carouselRef = React.useRef(null);
@@ -91,6 +94,24 @@ const SwapIn = ({route}: Props) => {
 
     const handleCloseButton = () => {
         navigation.dispatch(StackActions.popToTop());
+    };
+
+    const getChannelOpeningFees = async () => {
+        try {
+            const amountMsat =
+                (route.params.invoiceData.options?.amount as number) * 1_000;
+
+            openChannelFee({amountMsat})
+                .then(feeResp => {
+                    setChannelOpeningFees((feeResp.feeMsat as number) / 1_000);
+                    setLoadingChanFees(false);
+                })
+                .catch((e: any) => {
+                    console.log('[SwapIn] Error: ', e.message);
+                });
+        } catch (e: any) {
+            console.log('[SwapIn] Error: ', e.message);
+        }
     };
 
     const sendTx = useCallback(async () => {
@@ -174,6 +195,12 @@ const SwapIn = ({route}: Props) => {
         wallet,
     ]);
 
+    useEffect(() => {
+        // TODO: Ensure tx also created here? so we can display fee in fiat
+        getChannelOpeningFees();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Panels
     // Breakdown of the swap out process
     const breakdownPanel = useCallback((): ReactElement => {
@@ -227,6 +254,27 @@ const SwapIn = ({route}: Props) => {
                         </VText>
                     </View>
 
+                    {/* onchain fee */}
+                    <View
+                        style={[
+                            tailwind('w-full mt-2 justify-start px-4 py-2'),
+                        ]}>
+                        <VText
+                            style={[
+                                tailwind('w-full text-sm font-bold mb-1'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {t('onchain_fee_rate')}
+                        </VText>
+                        <Text
+                            style={
+                                (tailwind('text-sm'),
+                                {color: ColorScheme.Text.DescText})
+                            }>
+                            {mempoolInfo.fastestFee} sats/vbyte
+                        </Text>
+                    </View>
+
                     {/* Amount to swap */}
                     <View
                         style={[
@@ -251,26 +299,51 @@ const SwapIn = ({route}: Props) => {
                         />
                     </View>
 
-                    {/* onchain fee */}
-                    <View
-                        style={[
-                            tailwind('w-full mt-2 justify-start px-4 py-2'),
-                        ]}>
-                        <VText
+                    {/* Amount to swap */}
+                    {loadingChanFees ? (
+                        <View
                             style={[
-                                tailwind('w-full text-sm font-bold mb-1'),
-                                {color: ColorScheme.Text.Default},
+                                tailwind(
+                                    'self-start ml-4 w-5/6 rounded-sm mt-4 mb-4',
+                                ),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                    height: 48,
+                                },
+                            ]}
+                        />
+                    ) : (
+                        <View
+                            style={[
+                                tailwind('w-full mt-2 justify-start px-4 py-2'),
                             ]}>
-                            {t('onchain_fee_rate')}
-                        </VText>
-                        <Text
-                            style={
-                                (tailwind('text-sm'),
-                                {color: ColorScheme.Text.DescText})
-                            }>
-                            {mempoolInfo.fastestFee} sats/vbyte
-                        </Text>
-                    </View>
+                            <VText
+                                style={[
+                                    tailwind('w-full text-sm font-bold mb-1'),
+                                    {
+                                        color: ColorScheme.Text.Default,
+                                    },
+                                ]}>
+                                {t('channel_fee')}
+                            </VText>
+                            {channelOpeningFees ? (
+                                <DisplaySatsAmount
+                                    textColor={ColorScheme.Text.DescText}
+                                    amount={new BigNumber(channelOpeningFees)}
+                                    fontSize={'text-sm'}
+                                />
+                            ) : (
+                                <Text
+                                    style={[
+                                        tailwind('text-sm mt-1 mb-2'),
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    -
+                                </Text>
+                            )}
+                        </View>
+                    )}
                 </View>
 
                 {/* Bottom Button */}
@@ -280,10 +353,10 @@ const SwapIn = ({route}: Props) => {
                         {bottom: NativeWindowMetrics.bottomButtonOffset + 24},
                     ]}>
                     <LongBottomButton
-                        disabled={loadingTX}
+                        disabled={loadingTX || loadingChanFees}
                         onPress={sendTx}
                         backgroundColor={ColorScheme.Background.Inverted}
-                        title={t('swap')}
+                        title={capitalizeFirst(t('swap'))}
                         textColor={ColorScheme.Text.Alt}
                     />
                 </View>
@@ -295,7 +368,8 @@ const SwapIn = ({route}: Props) => {
         fiatRate.rate,
         ColorScheme,
         t,
-        btcAddress,
+        loadingChanFees,
+        channelOpeningFees,
         swapInfo.address,
         mempoolInfo.fastestFee,
         loadingTX,
