@@ -563,7 +563,7 @@ const SwapIn = ({route}: Props) => {
                             tailwind('text-base font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        {capitalizeFirst(t('swap_out'))}
+                        {capitalizeFirst(t('swap_in'))}
                     </Text>
                 </View>
 
