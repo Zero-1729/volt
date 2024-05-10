@@ -88,7 +88,6 @@ const SwapIn = ({route}: Props) => {
     const swapInfo = route.params.swapMeta;
     const carouselRef = React.useRef(null);
     const progressValue = useSharedValue(0);
-    const btcAddress = wallet.address.address;
 
     const handleCloseButton = () => {
         navigation.dispatch(StackActions.popToTop());
@@ -210,24 +209,6 @@ const SwapIn = ({route}: Props) => {
                             borderWidth: 1,
                         },
                     ]}>
-                    {/* Onchain sending (own) address */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {capitalizeFirst(t('from'))}
-                        </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
-                            {btcAddress}
-                        </VText>
-                    </View>
-
                     {/* Onchain receiving address */}
                     <View style={[tailwind('w-full justify-start px-4 py-2')]}>
                         <VText
