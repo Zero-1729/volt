@@ -44,7 +44,6 @@ import {useTranslation} from 'react-i18next';
 import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
 
-import Dot from '../../components/dots';
 import {calculateFiatEquivalent} from '../../modules/transform';
 
 import {capitalizeFirst, formatFiat} from '../../modules/transform';
@@ -597,29 +596,6 @@ const SwapIn = ({route}: Props) => {
                         }}
                         enabled={false}
                     />
-
-                    {!loadingTX && (
-                        <View
-                            style={[
-                                styles.dots,
-                                tailwind('items-center justify-center'),
-                                {
-                                    bottom:
-                                        NativeWindowMetrics.bottomButtonOffset +
-                                        48,
-                                },
-                            ]}
-                            pointerEvents="none">
-                            {panels.map((_slide, index) => (
-                                <Dot
-                                    key={index}
-                                    index={index}
-                                    animValue={progressValue}
-                                    length={panels.length}
-                                />
-                            ))}
-                        </View>
-                    )}
                 </View>
 
                 <Toast config={toastConfig as ToastConfig} />
@@ -633,11 +609,5 @@ export default SwapIn;
 const styles = StyleSheet.create({
     carouselContainer: {
         flex: 1,
-    },
-    dots: {
-        flexDirection: 'row',
-        alignSelf: 'center',
-        width: 26,
-        position: 'absolute',
     },
 });
