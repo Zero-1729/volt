@@ -53,6 +53,8 @@ const Swap = (props: SwapProps) => {
         onchainBroke ? SwapType.SwapOut : SwapType.SwapIn,
     );
 
+    const swapInfoUnavailable = Object.keys(props.swapInfo).length === 0;
+
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
@@ -76,7 +78,7 @@ const Swap = (props: SwapProps) => {
                 <View style={[tailwind('w-full px-2 h-full items-center')]}>
                     {/* Swap In */}
                     <PlainButton
-                        disabled={onchainBroke}
+                        disabled={onchainBroke || swapInfoUnavailable}
                         onPress={() => {
                             if (!onchainBroke) {
                                 setSelected(SwapType.SwapIn);
@@ -85,7 +87,9 @@ const Swap = (props: SwapProps) => {
                         style={[
                             tailwind(
                                 `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
-                                    onchainBroke || props.loadingInfo
+                                    onchainBroke ||
+                                    swapInfoUnavailable ||
+                                    props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
                                 }`,
@@ -161,7 +165,7 @@ const Swap = (props: SwapProps) => {
 
                     {/* Swap Out */}
                     <PlainButton
-                        disabled={lightningBroke}
+                        disabled={lightningBroke || swapInfoUnavailable}
                         onPress={() => {
                             if (!lightningBroke) {
                                 setSelected(SwapType.SwapOut);
@@ -170,7 +174,9 @@ const Swap = (props: SwapProps) => {
                         style={[
                             tailwind(
                                 `items-center p-4 w-full border rounded-md ${
-                                    lightningBroke || props.loadingInfo
+                                    lightningBroke ||
+                                    swapInfoUnavailable ||
+                                    props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
                                 }`,
@@ -253,7 +259,8 @@ const Swap = (props: SwapProps) => {
                         <LongBottomButton
                             disabled={
                                 (onchainBroke && lightningBroke) ||
-                                props.loadingInfo
+                                props.loadingInfo ||
+                                swapInfoUnavailable
                             }
                             title={capitalizeFirst(t('continue'))}
                             onPress={() => {
