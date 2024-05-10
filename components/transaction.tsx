@@ -20,6 +20,8 @@ import Color from '../constants/Color';
 
 import ArrowUp from '../assets/svg/arrow-up-right-24.svg';
 import ArrowDown from '../assets/svg/arrow-down-left-24.svg';
+import SwapIcon from '../assets/svg/arrow-switch-24.svg';
+
 import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
@@ -41,6 +43,14 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
 
     const getTxTimestamp = (time: Date) => {
         return formatLocaleDate(i18n.language, time);
+    };
+
+    const receiveComp = () => {
+        if (props.tx.description === 'Bitcoin Transfer') {
+            return <SwapIcon fill={ColorScheme.SVG.Received} />;
+        } else {
+            return <ArrowDown fill={ColorScheme.SVG.Received} />;
+        }
     };
 
     return (
@@ -91,7 +101,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                         },
                     ]}>
                     {props.tx.paymentType === 'received' ? (
-                        <ArrowDown fill={ColorScheme.SVG.Received} />
+                        receiveComp()
                     ) : (
                         <ArrowUp fill={ColorScheme.SVG.Sent} />
                     )}
