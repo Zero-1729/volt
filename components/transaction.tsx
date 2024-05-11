@@ -41,7 +41,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
     const {i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const getTxTimestamp = (time: Date) => {
+    const getTxTimestamp = (time: number) => {
         return formatLocaleDate(i18n.language, time);
     };
 
@@ -87,7 +87,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                                 tailwind('text-xs'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            {getTxTimestamp(new Date(props.tx.paymentTime))}
+                            {getTxTimestamp(props.tx.paymentTime)}
                         </VText>
                     </View>
                 </View>
@@ -120,7 +120,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
 
     const {isAdvancedMode} = useContext(AppStorageContext);
 
-    const getTxTimestamp = (time: Date) => {
+    const getTxTimestamp = (time: number) => {
         return formatLocaleDate(i18n.language, time);
     };
 
