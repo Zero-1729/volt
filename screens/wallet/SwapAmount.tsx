@@ -47,7 +47,6 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast';
-import {getMiniWallet} from '../../modules/wallet-utils';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SwapAmount'>;
 
@@ -100,8 +99,6 @@ const SwapAmount = ({route}: Props) => {
     };
 
     const handleSwapRoute = async () => {
-        const miniWallet = getMiniWallet(wallet);
-
         navigation.dispatch(StackActions.pop());
 
         if (isSwapOut) {
