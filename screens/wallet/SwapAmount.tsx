@@ -393,7 +393,7 @@ const SwapAmount = ({route}: Props) => {
                 </View>
 
                 {/* Minimum Sats warn */}
-                {route.params.swapMeta.min && (
+                {route.params.swapMeta.min > 0 && (
                     <View style={[tailwind('absolute flex-row'), {top: 120}]}>
                         <Text
                             style={[
