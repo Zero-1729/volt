@@ -49,7 +49,6 @@ import {calculateFiatEquivalent} from '../../modules/transform';
 
 import {capitalizeFirst, formatFiat} from '../../modules/transform';
 import {AppStorageContext} from '../../class/storageContext';
-import {inProgressSwap} from '@breeztech/react-native-breez-sdk';
 
 import Success from '../../assets/svg/check-circle-fill-24.svg';
 import Failed from '../../assets/svg/x-circle-fill-24.svg';
@@ -75,6 +74,7 @@ const SwapIn = ({route}: Props) => {
         fiatRate,
         electrumServerURL,
         mempoolInfo,
+        appFiatCurrency,
     } = useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
 
@@ -88,6 +88,12 @@ const SwapIn = ({route}: Props) => {
     const [errMessage, setErrMessage] = useState<string>();
     const [txID, setTxID] = useState<string>();
     const [channelOpeningFees, setChannelOpeningFees] = useState<number>(0);
+    const [_uPsbt, _setPsbt] = useState<PartiallySignedTransaction>();
+    const [_uPsbtVSize, _setUPVS] = useState<number>();
+
+    // For now, only single sends are supported
+    // Update wallet descriptors to private version
+    const descriptors = getPrivateDescriptors(wallet.privateDescriptor);
 
     const swapInfo = route.params.swapMeta;
     const carouselRef = React.useRef(null);
@@ -117,17 +123,10 @@ const SwapIn = ({route}: Props) => {
         }
     };
 
-    const sendTx = useCallback(async () => {
+    const generatePsbt = async () => {
         setLoadingTX(true);
-        carouselRef.current?.next();
 
-        // For now, only single sends are supported
-        // Update wallet descriptors to private version
-        const descriptors = getPrivateDescriptors(wallet.privateDescriptor);
-
-        setStatusMessage(t('generating_tx'));
-
-        const _uPsbt = (await psbtFromInvoice(
+        psbtFromInvoice(
             descriptors,
             mempoolInfo.fastestFee,
             route.params.invoiceData,
@@ -146,9 +145,34 @@ const SwapIn = ({route}: Props) => {
                 console.log('[Send] Error creating transaction: ', e.message);
                 setFailedTx(true);
             },
-        )) as PartiallySignedTransaction;
+        )
+            .then(async (value: any) => {
+                _setPsbt(value);
+                const vsize = (await value.extractTx()).vsize();
 
-        setLoadingTX(false);
+                _setUPVS(vsize);
+                setLoadingTX(false);
+            })
+            .catch((e: any) => {
+                setLoadingTX(false);
+                console.log('[PSBT] error: ', e.message);
+            });
+    };
+
+    const setPsbtVsize = async () => {
+        const psbt = _uPsbt as PartiallySignedTransaction;
+
+        try {
+            const vsize = await (await psbt.extractTx()).size();
+
+            _setUPVS(vsize);
+        } catch (e: any) {
+            console.log('[Error]: ', e.message);
+        }
+    };
+
+    const sendTx = useCallback(async () => {
+        carouselRef.current?.next();
 
         try {
             let _w = {
@@ -156,9 +180,10 @@ const SwapIn = ({route}: Props) => {
                 externalDescriptor: descriptors.external,
                 internalDescriptor: descriptors.internal,
             };
+
             // We expect a signed PSBT to be passed in
             const {broadcasted, psbt, errorMessage} = await SingleBDKSend(
-                _uPsbt.base64,
+                (_uPsbt as PartiallySignedTransaction).base64,
                 _w as TComboWallet,
                 electrumServerURL,
                 (msg: string) => {
@@ -179,21 +204,11 @@ const SwapIn = ({route}: Props) => {
             setFailedTx(true);
             setErrMessage(e.message);
         }
-
-        inProgressSwap()
-            .then((value: any) => {
-                console.log('In progress (swapIn): ', value);
-                setLoadingTX(false);
-            })
-            .catch((e: any) => {
-                console.log('In progress (swapIn) error: ', e.message);
-                setLoadingTX(false);
-                setErrMessage(e.message);
-            });
     }, [
+        _uPsbt,
+        descriptors.external,
+        descriptors.internal,
         electrumServerURL,
-        mempoolInfo.fastestFee,
-        route.params.invoiceData,
         t,
         wallet,
     ]);
@@ -201,8 +216,16 @@ const SwapIn = ({route}: Props) => {
     useEffect(() => {
         // TODO: Ensure tx also created here? so we can display fee in fiat
         getChannelOpeningFees();
+        generatePsbt();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (_uPsbt !== null) {
+            setPsbtVsize();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [_uPsbt]);
 
     // Panels
     // Breakdown of the swap out process
@@ -400,13 +423,14 @@ const SwapIn = ({route}: Props) => {
         tailwind,
         route.params.invoiceData.options?.amount,
         fiatRate.rate,
-        ColorScheme,
-        t,
+        swapInfo.address,
+        _uPsbt,
+        _uPsbtVSize,
+        mempoolInfo.fastestFee,
         mempoolInfo.mempoolHighFeeEnv,
         loadingChanFees,
         channelOpeningFees,
         CardColor,
-        mempoolInfo.fastestFee,
         loadingTX,
         sendTx,
     ]);
@@ -623,11 +647,6 @@ const SwapIn = ({route}: Props) => {
         (): Slide[] => [breakdownPanel, inflightPanel],
         [breakdownPanel, inflightPanel],
     );
-
-    useEffect(() => {
-        // create transaction and send
-        // sendTx();
-    }, [loadingTX]);
 
     return (
         <SafeAreaView
