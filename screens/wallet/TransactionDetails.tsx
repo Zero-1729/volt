@@ -42,6 +42,7 @@ import Failed from '../../assets/svg/x-circle-fill-24.svg';
 import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
+import SwapIcon from '../../assets/svg/arrow-switch-24.svg';
 
 import {
     capitalizeFirst,
@@ -118,6 +119,8 @@ const TransactionDetailsView = ({route}: Props) => {
     const txFee = new BigNumber(
         isLNTx ? route.params.tx.feeMsat / 1000 : route.params.tx.fee,
     );
+
+    const isSwapInTx = route.params.tx.description === 'Bitcoin Transfer';
 
     const paymentPreimage = route.params.tx.details?.data
         ? (route.params.tx.details?.data as LnPaymentDetails).paymentPreimage
@@ -405,15 +408,40 @@ const TransactionDetailsView = ({route}: Props) => {
                         {isLNTx && (
                             <View
                                 style={[tailwind('items-center mt-6 w-full')]}>
-                                <Text
-                                    ellipsizeMode="middle"
-                                    numberOfLines={2}
-                                    style={[
-                                        tailwind('text-sm w-4/5 text-center'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
-                                    {route.params.tx.description}
-                                </Text>
+                                {isSwapInTx ? (
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'flex-row items-center justify-center',
+                                            ),
+                                        ]}>
+                                        <SwapIcon
+                                            fill={ColorScheme.SVG.GrayFill}
+                                        />
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm ml-2'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .DescText,
+                                                },
+                                            ]}>
+                                            {t('bitcoin_swapin')}
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <Text
+                                        ellipsizeMode="middle"
+                                        numberOfLines={2}
+                                        style={[
+                                            tailwind(
+                                                'text-sm w-4/5 text-center',
+                                            ),
+                                            {color: ColorScheme.Text.DescText},
+                                        ]}>
+                                        {route.params.tx.description}
+                                    </Text>
+                                )}
                             </View>
                         )}
 
