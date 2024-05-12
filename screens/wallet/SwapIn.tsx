@@ -42,12 +42,12 @@ import {LongBottomButton, PlainButton} from '../../components/button';
 
 import Carousel from 'react-native-reanimated-carousel';
 import {useTranslation} from 'react-i18next';
-import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
+import {DisplaySatsAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
 
-import {calculateFiatEquivalent} from '../../modules/transform';
+import {addCommas, i18nNumber, normalizeFiat} from '../../modules/transform';
 
-import {capitalizeFirst, formatFiat} from '../../modules/transform';
+import {capitalizeFirst} from '../../modules/transform';
 import {AppStorageContext} from '../../class/storageContext';
 
 import Success from '../../assets/svg/check-circle-fill-24.svg';
@@ -79,7 +79,8 @@ const SwapIn = ({route}: Props) => {
     const wallet = getWalletData(currentWalletID);
 
     const navigation = useNavigation();
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [loadingTX, setLoadingTX] = useState<boolean>(false);
     const [loadingChanFees, setLoadingChanFees] = useState<boolean>(true);
@@ -232,25 +233,6 @@ const SwapIn = ({route}: Props) => {
     const breakdownPanel = useCallback((): ReactElement => {
         return (
             <View style={[tailwind('w-full h-full items-center')]}>
-                <View
-                    style={[
-                        tailwind('w-5/6 items-center justify-center'),
-                        {marginTop: 98},
-                    ]}>
-                    <DisplayFiatAmount
-                        amount={formatFiat(
-                            calculateFiatEquivalent(
-                                new BigNumber(
-                                    route.params.invoiceData.options
-                                        ?.amount as number,
-                                ).toString(),
-                                fiatRate.rate,
-                            ),
-                        )}
-                        fontSize={'text-2xl'}
-                    />
-                </View>
-
                 {/* Main breakdown */}
                 <View
                     style={[
@@ -260,69 +242,179 @@ const SwapIn = ({route}: Props) => {
                         {
                             borderColor: ColorScheme.Background.Greyed,
                             borderWidth: 1,
+                            marginTop: 128,
                         },
                     ]}>
-                    {/* Onchain receiving address */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
+                    {/* LN amount */}
+                    <View style={[tailwind('w-full px-4 py-2')]}>
                         <VText
                             style={[
                                 tailwind('w-full text-sm font-semibold mb-1'),
-                                {color: ColorScheme.Text.Default},
+                                {
+                                    color: ColorScheme.Text.Default,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
                             ]}>
-                            {capitalizeFirst(t('to'))}
+                            {capitalizeFirst(t('recv_amount'))}
+                        </VText>
+                        <View
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } mt-2`,
+                                ),
+                            ]}>
+                            <DisplaySatsAmount
+                                textColor={ColorScheme.Text.DescText}
+                                amount={
+                                    new BigNumber(
+                                        route.params.invoiceData.options
+                                            ?.amount as number,
+                                    )
+                                }
+                                fontSize={'text-sm'}
+                            />
+                            <View
+                                style={[
+                                    tailwind(
+                                        `rounded-full px-4 py-1 ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`,
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {`${appFiatCurrency.symbol} ${normalizeFiat(
+                                        new BigNumber(
+                                            route.params.invoiceData.options
+                                                ?.amount as number,
+                                        ),
+                                        new BigNumber(fiatRate.rate),
+                                    )}`}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Onchain receiving address */}
+                    <View style={[tailwind('w-full px-4 py-2')]}>
+                        <VText
+                            style={[
+                                tailwind('w-full text-sm font-semibold'),
+                                {
+                                    color: ColorScheme.Text.Default,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
+                            ]}>
+                            {t('onchain_address')}
                         </VText>
                         <VText
                             style={[
-                                tailwind('w-full text-sm'),
-                                {color: ColorScheme.Text.DescText},
+                                tailwind('w-full text-sm mt-2'),
+                                {
+                                    color: ColorScheme.Text.DescText,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
                             ]}>
                             {swapInfo.address}
                         </VText>
                     </View>
 
                     {/* onchain fee */}
-                    <View
-                        style={[
-                            tailwind('w-full mt-2 justify-start px-4 py-2'),
-                        ]}>
+                    <View style={[tailwind('w-full mt-2 px-4 py-2')]}>
                         <VText
                             style={[
                                 tailwind('w-full text-sm font-bold mb-1'),
-                                {color: ColorScheme.Text.Default},
+                                {
+                                    color: ColorScheme.Text.Default,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
                             ]}>
                             {t('onchain_fee_rate')}
                         </VText>
-                        <Text
-                            style={
-                                (tailwind('text-sm'),
-                                {color: ColorScheme.Text.DescText})
-                            }>
-                            {mempoolInfo.fastestFee} sats/vbyte
-                        </Text>
-                    </View>
-
-                    {/* Amount to swap */}
-                    <View
-                        style={[
-                            tailwind('w-full mt-2 justify-start px-4 py-2'),
-                        ]}>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm font-bold mb-1'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {t('swap_amount_sats')}
-                        </VText>
-                        <DisplaySatsAmount
-                            textColor={ColorScheme.Text.DescText}
-                            amount={
-                                new BigNumber(
-                                    route.params.invoiceData.options
-                                        ?.amount as number,
-                                )
-                            }
-                            fontSize={'text-sm'}
-                        />
+                        {_uPsbt && _uPsbtVSize ? (
+                            <View
+                                style={[
+                                    tailwind(
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } mt-2 items-center`,
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {`${addCommas(
+                                        mempoolInfo.fastestFee.toString(),
+                                    )} sats/vB`}
+                                </Text>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `rounded-full px-4 py-1 ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : 'ml-2'
+                                            }`,
+                                        ),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background.Greyed,
+                                        },
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-bold'),
+                                            {
+                                                color: ColorScheme.Text.Default,
+                                            },
+                                        ]}>
+                                        {`~${
+                                            appFiatCurrency.symbol
+                                        } ${normalizeFiat(
+                                            new BigNumber(
+                                                (_uPsbtVSize as number) *
+                                                    mempoolInfo.fastestFee,
+                                            ),
+                                            new BigNumber(fiatRate.rate),
+                                        )}`}
+                                    </Text>
+                                </View>
+                            </View>
+                        ) : (
+                            <View
+                                style={[
+                                    tailwind('mt-2 rounded-sm'),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                        height: 32,
+                                        width: 128,
+                                    },
+                                ]}
+                            />
+                        )}
                     </View>
 
                     {/* Amount to swap */}
@@ -349,21 +441,77 @@ const SwapIn = ({route}: Props) => {
                                     tailwind('w-full text-sm font-bold mb-1'),
                                     {
                                         color: ColorScheme.Text.Default,
+                                        textAlign:
+                                            langDir === 'right'
+                                                ? 'right'
+                                                : 'left',
                                     },
                                 ]}>
                                 {t('channel_fee')}
                             </VText>
-                            {channelOpeningFees ? (
-                                <DisplaySatsAmount
-                                    textColor={ColorScheme.Text.DescText}
-                                    amount={new BigNumber(channelOpeningFees)}
-                                    fontSize={'text-sm'}
-                                />
+                            {channelOpeningFees > 0 ? (
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } mt-2`,
+                                        ),
+                                    ]}>
+                                    <DisplaySatsAmount
+                                        textColor={ColorScheme.Text.DescText}
+                                        amount={
+                                            new BigNumber(channelOpeningFees)
+                                        }
+                                        fontSize={'text-sm'}
+                                    />
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                `rounded-full px-4 py-1 ${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                            {
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
+                                            },
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm font-bold'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            {`${
+                                                appFiatCurrency.symbol
+                                            } ${normalizeFiat(
+                                                new BigNumber(
+                                                    channelOpeningFees,
+                                                ),
+                                                new BigNumber(fiatRate.rate),
+                                            )}`}
+                                        </Text>
+                                    </View>
+                                </View>
                             ) : (
                                 <Text
                                     style={[
                                         tailwind('text-sm mt-1 mb-2'),
-                                        {color: ColorScheme.Text.DescText},
+                                        {
+                                            color: ColorScheme.Text.DescText,
+                                            textAlign:
+                                                langDir === 'right'
+                                                    ? 'right'
+                                                    : 'left',
+                                        },
                                     ]}>
                                     -
                                 </Text>
@@ -421,7 +569,11 @@ const SwapIn = ({route}: Props) => {
         );
     }, [
         tailwind,
+        ColorScheme,
+        langDir,
+        t,
         route.params.invoiceData.options?.amount,
+        appFiatCurrency.symbol,
         fiatRate.rate,
         swapInfo.address,
         _uPsbt,
@@ -508,6 +660,81 @@ const SwapIn = ({route}: Props) => {
                                 </VText>
                             </View>
 
+                            {/* LN amount */}
+                            <View style={[tailwind('w-full px-4 py-2')]}>
+                                <VText
+                                    style={[
+                                        tailwind(
+                                            'w-full text-sm font-semibold mb-1',
+                                        ),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                            textAlign:
+                                                langDir === 'right'
+                                                    ? 'right'
+                                                    : 'left',
+                                        },
+                                    ]}>
+                                    {capitalizeFirst(t('recv_amount'))}
+                                </VText>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } mt-2`,
+                                        ),
+                                    ]}>
+                                    <DisplaySatsAmount
+                                        textColor={ColorScheme.Text.DescText}
+                                        amount={
+                                            new BigNumber(
+                                                route.params.invoiceData.options
+                                                    ?.amount as number,
+                                            )
+                                        }
+                                        fontSize={'text-sm'}
+                                    />
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                `rounded-full px-4 py-1 ${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                            {
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
+                                            },
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm font-bold'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            {`${
+                                                appFiatCurrency.symbol
+                                            } ${normalizeFiat(
+                                                new BigNumber(
+                                                    route.params.invoiceData
+                                                        .options
+                                                        ?.amount as number,
+                                                ),
+                                                new BigNumber(fiatRate.rate),
+                                            )}`}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+
                             {/* Lock Height */}
                             <View
                                 style={[
@@ -534,36 +761,6 @@ const SwapIn = ({route}: Props) => {
                                     {swapInfo.lockHeight}
                                 </VText>
                             </View>
-
-                            {/* Amount to swap */}
-                            <View
-                                style={[
-                                    tailwind(
-                                        'w-full mt-2 justify-start px-4 py-2',
-                                    ),
-                                ]}>
-                                <VText
-                                    style={[
-                                        tailwind(
-                                            'w-full text-sm font-bold mb-1',
-                                        ),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                        },
-                                    ]}>
-                                    {t('onchain_amount_sat')}
-                                </VText>
-                                <DisplaySatsAmount
-                                    textColor={ColorScheme.Text.DescText}
-                                    amount={
-                                        new BigNumber(
-                                            route.params.invoiceData.options
-                                                ?.amount as number,
-                                        )
-                                    }
-                                    fontSize={'text-sm'}
-                                />
-                            </View>
                         </View>
 
                         <View
@@ -575,7 +772,7 @@ const SwapIn = ({route}: Props) => {
                                     tailwind('text-sm text-center ml-2'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {t('swapout_message')}
+                                {t('swapout_message', {n: i18nNumber(6)})}
                             </Text>
                         </View>
 
@@ -637,8 +834,11 @@ const SwapIn = ({route}: Props) => {
         failedTx,
         t,
         txID,
-        swapInfo.lockHeight,
+        langDir,
         route.params.invoiceData.options?.amount,
+        appFiatCurrency.symbol,
+        fiatRate.rate,
+        swapInfo.lockHeight,
         errMessage,
         navigation,
     ]);
