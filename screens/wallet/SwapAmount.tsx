@@ -73,7 +73,7 @@ const SwapAmount = ({route}: Props) => {
     const [swapFees, setSwapFees] = useState<ReverseSwapPairInfo>();
 
     const minimumSwapAmount = new BigNumber(route.params.swapMeta.min);
-    const maximumSwapAmount = new BigNumber(route.params.swapMeta.max);
+    const maximumSwapAmount = new BigNumber(balance);
 
     const [satsAmount, setSatsAmount] = useState<DisplayUnit>({
         value: new BigNumber(0),
