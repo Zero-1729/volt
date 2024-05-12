@@ -11,7 +11,11 @@ import {
     StyleSheet,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 
 import VText from '../../components/text';
 
@@ -24,6 +28,7 @@ import {
     receiveOnchain,
     onchainPaymentLimits,
     OnchainPaymentLimitsResponse,
+    BreezEventVariant,
 } from '@breeztech/react-native-breez-sdk';
 
 import BDK from 'bdk-rn';
@@ -69,7 +74,7 @@ import Swap from './../../components/swap';
 import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
-import {SwapType} from '../../types/enums';
+import {EBreezDetails, SwapType} from '../../types/enums';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -103,6 +108,7 @@ const Wallet = ({route}: Props) => {
         updateWalletAddress,
         electrumServerURL,
         isAdvancedMode,
+        breezEvent,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -432,6 +438,22 @@ const Wallet = ({route}: Props) => {
             setLoadLock(false);
         };
     }, []);
+
+    useEffect(() => {
+        // TODO: replace with some alternative notification trigger flow
+        if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
+            // Route to LN payment status screen
+            navigation.dispatch(StackActions.popToTop());
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: true,
+                    details: breezEvent.details,
+                    detailsType: EBreezDetails.Success,
+                }),
+            );
+            return;
+        }
+    }, [breezEvent]);
 
     useEffect(() => {
         // Attempt to sync balance when reload triggered
