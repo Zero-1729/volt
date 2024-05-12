@@ -137,5 +137,14 @@
     "minimum_amount": "الحد الأدنى للمبلغ",
     "get_swap_fees": "حساب الرسوم",
     "mempool_congested": "Mempool مزدحم حاليًا.",
-    "mempool_high_fee": "رسوم Onchain مرتفعة جدًا حاليًا."
+    "mempool_high_fee": "رسوم Onchain مرتفعة جدًا حاليًا.",
+    "onchain_address": "عنوان Onchain.",
+    "swap_amount_sats": "مبلغ المبادلة",
+    "channel_fee": "رسوم فتح القناة",
+    "onchain_fee_rate": "معدل رسوم Onchain",
+    "lock_height": "قفل ارتفاع الكتلة",
+    "recv_amount": "استلام مبلغ المبادلة",
+    "swapout_message": "بدأت عملية المبادلة، بعد تأكيد {{n}}، سيتم إضافة المبلغ إلى رصيد Lightning الخاص بك",
+    "bitcoin_swapin": "مبادلة Onchain الداخلية",
+    "bitcoin_swapout": "مبادلة Lightning الداخلية"
 }

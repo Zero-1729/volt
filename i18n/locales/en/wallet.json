@@ -138,5 +138,13 @@
     "minimum_amount": "Min amount",
     "get_swap_fees": "Calculate Fees",
     "mempool_congested": "The Mempool is currently congested.",
-    "mempool_high_fee": "Onchain fees currently too high."
+    "mempool_high_fee": "Onchain fees currently too high.",
+    "onchain_address": "Onchain Address",
+    "channel_fee": "Channel Opening Fee",
+    "onchain_fee_rate": "Onchain fee rate",
+    "lock_height": "Block Height Lock",
+    "recv_amount": "Receiving Swap Amount",
+    "swapout_message": "Swap initiated, after {{n}} confirmations, the amount will be added to your Lightning balance",
+    "bitcoin_swapin": "Internal Onchain Swap",
+    "bitcoin_swapout": "Internal LN Swap"
 }
