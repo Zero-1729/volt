@@ -36,6 +36,7 @@ import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import Close from '../../assets/svg/x-24.svg';
+import AlertIcon from '../../assets/svg/alert-16.svg';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
 
@@ -91,6 +92,8 @@ const SwapIn = ({route}: Props) => {
     const swapInfo = route.params.swapMeta;
     const carouselRef = React.useRef(null);
     const progressValue = useSharedValue(0);
+
+    const CardColor = ColorScheme.WalletColors[wallet.type][wallet.network];
 
     const handleCloseButton = () => {
         navigation.dispatch(StackActions.popToTop());
@@ -346,6 +349,37 @@ const SwapIn = ({route}: Props) => {
                     )}
                 </View>
 
+                {/* Display network congestion */}
+                {mempoolInfo.mempoolHighFeeEnv && (
+                    <View
+                        style={[
+                            tailwind(
+                                `mt-4 w-5/6 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center`,
+                            ),
+                        ]}>
+                        <AlertIcon width={16} height={16} fill={CardColor} />
+                        <Text
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'mr-2'
+                                            : 'ml-2 text-center'
+                                    } text-sm`,
+                                ),
+                                {
+                                    color: CardColor,
+                                },
+                            ]}>
+                            {t('mempool_high_fee')}
+                        </Text>
+                    </View>
+                )}
+
                 {/* Bottom Button */}
                 <View
                     style={[
@@ -368,9 +402,10 @@ const SwapIn = ({route}: Props) => {
         fiatRate.rate,
         ColorScheme,
         t,
+        mempoolInfo.mempoolHighFeeEnv,
         loadingChanFees,
         channelOpeningFees,
-        swapInfo.address,
+        CardColor,
         mempoolInfo.fastestFee,
         loadingTX,
         sendTx,
