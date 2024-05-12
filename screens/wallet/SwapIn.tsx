@@ -75,6 +75,7 @@ const SwapIn = ({route}: Props) => {
         electrumServerURL,
         mempoolInfo,
         appFiatCurrency,
+        appLanguage,
     } = useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
 
@@ -772,7 +773,9 @@ const SwapIn = ({route}: Props) => {
                                     tailwind('text-sm text-center ml-2'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {t('swapout_message', {n: i18nNumber(6)})}
+                                {t('swapout_message', {
+                                    n: i18nNumber(6, appLanguage.code),
+                                })}
                             </Text>
                         </View>
 
@@ -837,6 +840,7 @@ const SwapIn = ({route}: Props) => {
         langDir,
         route.params.invoiceData.options?.amount,
         appFiatCurrency.symbol,
+        appLanguage.code,
         fiatRate.rate,
         swapInfo.lockHeight,
         errMessage,
