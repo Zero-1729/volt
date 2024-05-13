@@ -440,15 +440,14 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        // TODO: replace with some alternative notification trigger flow
-        if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
+        if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
             // Route to LN payment status screen
             navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
                     details: breezEvent.details,
-                    detailsType: EBreezDetails.Success,
+                    detailsType: EBreezDetails.Received,
                 }),
             );
             return;
