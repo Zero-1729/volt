@@ -259,8 +259,6 @@ export type WalletParamList = {
     };
     SwapAmount: {
         swapType: SwapType;
-        lnBalance: number;
-        onchainBalance: number;
         swapMeta: TSwapInfo;
     };
     SwapIn: {
@@ -271,9 +269,8 @@ export type WalletParamList = {
     };
     SwapOut: {
         lnBalance: number;
-        onchainBalance: number;
+        swapMeta: TSwapInfo;
         satsAmount: number;
-        fees: ReverseSwapPairInfo;
         maxed: boolean;
     };
     WalletView: {
