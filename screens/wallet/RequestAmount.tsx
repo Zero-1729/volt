@@ -125,6 +125,7 @@ const RequestAmount = () => {
 
     // TODO: remove and make sure only onchain generated in next screen
     const hideContinueButton =
+        (isLightning && !feeMessage) ||
         satsAmount.value.isZero() ||
         (satsAmount.value.gte(maxReceivableAmount) &&
             !maxReceivableAmount.isZero() &&
