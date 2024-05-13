@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useEffect, useState} from 'react';
@@ -70,6 +71,7 @@ const RequestAmount = () => {
         new BigNumber(0),
     );
     const [lnInvoiceDesc, setLNInvoiceDesc] = useState<string>('');
+    const [feeMessage, setFeeMessage] = useState<string>('');
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
         value: new BigNumber(0),
@@ -89,6 +91,31 @@ const RequestAmount = () => {
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
     const setMaxReceivableAmount = async () => {
+        const nodeState = await nodeInfo();
+        const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
+        const inboundLiquiditySat =
+            inboundLiquidityMsat !== null ? inboundLiquidityMsat / 1_000 : 0;
+
+        const openChannelFeeResponse = await openChannelFee({});
+
+        const openingFees = openChannelFeeResponse.feeParams;
+        const feePercentage = (openingFees.proportional * 100) / 1_000_000;
+        const minFeeSat = openingFees.minMsat / 1_000;
+
+        if (inboundLiquiditySat === 0) {
+            setFeeMessage(
+                t('ln_fee_message', {pct: feePercentage, mfs: minFeeSat}),
+            );
+        } else {
+            setFeeMessage(
+                t('ln_fee_message_ext', {
+                    pct: feePercentage,
+                    mfs: minFeeSat,
+                    ils: inboundLiquiditySat.toFixed(0),
+                }),
+            );
+        }
+
         updateMaxReceivableAmount(
             new BigNumber((await nodeInfo()).maxReceivableMsat / 1_000),
         );
@@ -418,27 +445,6 @@ const RequestAmount = () => {
                             </VTextSingle>
                         </View>
                     )}
-
-                    {isLightning &&
-                        satsAmount.value.gte(maxReceivableAmount) && (
-                            <View style={[tailwind('mt-4')]}>
-                                <VText
-                                    style={[
-                                        tailwind('text-sm text-center'),
-                                        {
-                                            color: ColorScheme.Text.GrayText,
-                                        },
-                                    ]}>
-                                    {capitalizeFirst(t('note')) +
-                                        ': ' +
-                                        t('max_receivable_lightning', {
-                                            sats: formatSats(
-                                                maxReceivableAmount,
-                                            ),
-                                        })}
-                                </VText>
-                            </View>
-                        )}
                 </View>
 
                 {/* Screen for amount */}
@@ -467,6 +473,38 @@ const RequestAmount = () => {
                         </PlainButton>
                     </View>
                 </View>
+
+                {isLightning && feeMessage && (
+                    <View
+                        style={[
+                            tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
+                            {backgroundColor: ColorScheme.Background.Greyed},
+                        ]}>
+                        {satsAmount.value.gte(maxReceivableAmount) ? (
+                            <VText
+                                style={[
+                                    tailwind('text-sm text-center'),
+                                    {
+                                        color: ColorScheme.Text.GrayText,
+                                    },
+                                ]}>
+                                {t('max_receivable_lightning', {
+                                    sats: formatSats(maxReceivableAmount),
+                                })}
+                            </VText>
+                        ) : (
+                            <VText
+                                style={[
+                                    tailwind('text-sm text-center'),
+                                    {
+                                        color: ColorScheme.Text.GrayText,
+                                    },
+                                ]}>
+                                {feeMessage}
+                            </VText>
+                        )}
+                    </View>
+                )}
 
                 {/* Number pad for input amount */}
                 <AmountNumpad
