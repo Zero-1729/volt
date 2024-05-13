@@ -54,6 +54,7 @@ const Swap = (props: SwapProps) => {
     );
 
     const swapInfoUnavailable = Object.keys(props.swapInfo).length === 0;
+    const swapOutLow = props.swapInfo.swapOut.min === 0;
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -165,7 +166,9 @@ const Swap = (props: SwapProps) => {
 
                     {/* Swap Out */}
                     <PlainButton
-                        disabled={lightningBroke || swapInfoUnavailable}
+                        disabled={
+                            lightningBroke || swapInfoUnavailable || swapOutLow
+                        }
                         onPress={() => {
                             if (!lightningBroke) {
                                 setSelected(SwapType.SwapOut);
@@ -176,6 +179,7 @@ const Swap = (props: SwapProps) => {
                                 `items-center p-4 w-full border rounded-md ${
                                     lightningBroke ||
                                     swapInfoUnavailable ||
+                                    swapOutLow ||
                                     props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
