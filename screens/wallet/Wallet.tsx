@@ -337,7 +337,7 @@ const Wallet = ({route}: Props) => {
                 );
 
                 // update wallet address
-                updateWalletAddress(currentWalletID, address);
+                updateWalletAddress(walletData.index, address);
 
                 // We make this update in case of pending txs
                 // and because we already have this data from the balance update BDK call
