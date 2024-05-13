@@ -89,7 +89,8 @@ const Wallet = ({route}: Props) => {
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
     const [swapOut, setSwapOut] = useState<TSwapInfo>({} as TSwapInfo);
     const [swapIn, setSwapIn] = useState<TSwapInfo>({} as TSwapInfo);
-    const [loadingSwapInfo, setLoadingSwapInfo] = useState<boolean>(true);
+    const [loadingSwapOutInfo, setLoadingSwapOutInfo] = useState<boolean>(true);
+    const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
@@ -394,10 +395,11 @@ const Wallet = ({route}: Props) => {
                     min: c.minSat,
                     max: c.maxSat,
                 });
-                setLoadingSwapInfo(false);
+                setLoadingSwapOutInfo(false);
             })
             .catch((e: any) => {
                 console.log('[Breez swapOut] error: ', e.message);
+                setLoadingSwapOutInfo(false);
             });
     };
 
@@ -412,10 +414,11 @@ const Wallet = ({route}: Props) => {
                     channelOpeningFees: d.channelOpeningFees,
                     maxSwapperPayable: d.maxSwapperPayable,
                 });
-                setLoadingSwapInfo(false);
+                setLoadingSwapInInfo(false);
             })
             .catch((e: any) => {
                 console.log('[Breez swapIn] error: ', e.message);
+                setLoadingSwapInInfo(false);
             });
     };
 
@@ -438,6 +441,15 @@ const Wallet = ({route}: Props) => {
             setLoadLock(false);
         };
     }, []);
+
+    useEffect(() => {
+        // Re-check swap info
+        setLoadingSwapOutInfo(true);
+        setLoadingSwapInInfo(true);
+
+        getLNSwapInfo();
+        getOnchainSwapInfo();
+    }, [walletBalance]);
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
@@ -965,7 +977,9 @@ const Wallet = ({route}: Props) => {
                                         swapIn: swapIn,
                                         swapOut: swapOut,
                                     }}
-                                    loadingInfo={loadingSwapInfo}
+                                    loadingInfo={
+                                        loadingSwapOutInfo && loadingSwapInInfo
+                                    }
                                 />
                             </View>
                         )}
