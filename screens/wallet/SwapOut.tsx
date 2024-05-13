@@ -17,7 +17,11 @@ import {
 } from 'react-native';
 import VText from '../../components/text';
 
-import {useNavigation, StackActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    StackActions,
+    CommonActions,
+} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NativeDims from '../../constants/NativeWindowMetrics';
@@ -33,23 +37,29 @@ import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import Close from '../../assets/svg/x-24.svg';
+import AlertIcon from '../../assets/svg/alert-16.svg';
+import Success from '../../assets/svg/check-circle-fill-24.svg';
+import Failed from '../../assets/svg/x-circle-fill-24.svg';
 
 import {LongBottomButton, PlainButton} from '../../components/button';
 
 import Carousel from 'react-native-reanimated-carousel';
 import {useTranslation} from 'react-i18next';
-import {DisplayFiatAmount, DisplaySatsAmount} from '../../components/balance';
+import {DisplaySatsAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
 
-import Dot from '../../components/dots';
-import {calculateFiatEquivalent} from '../../modules/transform';
+import {i18nNumber, normalizeFiat} from '../../modules/transform';
 
-import {capitalizeFirst, formatFiat} from '../../modules/transform';
+import {capitalizeFirst} from '../../modules/transform';
 import {AppStorageContext} from '../../class/storageContext';
-import {ReverseSwapInfo, sendOnchain} from '@breeztech/react-native-breez-sdk';
-
-import {TMempoolFeeRates} from '../../types/wallet';
-import {getFeeRates} from '../../modules/mempool';
+import {
+    prepareOnchainPayment,
+    SwapAmountType,
+    payOnchain,
+    ReverseSwapInfo,
+    PrepareOnchainPaymentResponse,
+    PayOnchainResponse,
+} from '@breeztech/react-native-breez-sdk';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast';
@@ -58,185 +68,396 @@ type Props = NativeStackScreenProps<WalletParamList, 'SwapOut'>;
 type Slide = () => ReactElement;
 
 const SwapOut = ({route}: Props) => {
-    // TODO: add case to handle max swap "maxReverseSwapAmount"
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {getWalletData, currentWalletID, fiatRate} =
-        useContext(AppStorageContext);
+    const {
+        getWalletData,
+        currentWalletID,
+        fiatRate,
+        mempoolInfo,
+        appFiatCurrency,
+        appLanguage,
+        updateWalletAddress,
+    } = useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
 
     const navigation = useNavigation();
-    const {t} = useTranslation('wallet');
-    const {t: e} = useTranslation('errors');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const [swapLoading, setSwapLoading] = useState(false);
-    const [swapInfo, setSwapInfo] = useState({} as ReverseSwapInfo);
-    const [satsPerVB, setSatsPerVB] = useState(0);
+    const [loadingTX, setLoadingTX] = useState<boolean>(false);
+    const [fees, setFees] = useState<boolean>(true);
+    const [statusMessage, setStatusMessage] = useState<string>();
+    const [failedTx, setFailedTx] = useState<boolean>(false);
+    const [errMessage, setErrMessage] = useState<string>();
+    const [rvsSwapInfo, setRvsSwapInfo] = useState<ReverseSwapInfo>();
+    const [prepSwap, setPrepSwap] = useState<PrepareOnchainPaymentResponse>();
+    const [btcAddress, setBtcAddress] = useState<string>();
 
+    // For now, only single sends are supported
+    // Update wallet descriptors to private version
+    const swapInfo = route.params.swapMeta;
     const carouselRef = React.useRef(null);
-
     const progressValue = useSharedValue(0);
 
-    const amount = new BigNumber(route.params.satsAmount);
-    const btcAddress = wallet.address.address;
+    const CardColor = ColorScheme.WalletColors[wallet.type][wallet.network];
 
     const handleCloseButton = () => {
         navigation.dispatch(StackActions.popToTop());
     };
 
+    const getFeeInfo = async () => {
+        const satPerVbyte = mempoolInfo.fastestFee;
+
+        setStatusMessage('generating_fees');
+        setFees(true);
+
+        prepareOnchainPayment({
+            amountSat: route.params.satsAmount,
+            amountType: SwapAmountType.SEND,
+            claimTxFeerate: satPerVbyte,
+        })
+            .then((value: PrepareOnchainPaymentResponse) => {
+                console.log('prep: ', value);
+                setStatusMessage('found_fees');
+                setFees(false);
+                setPrepSwap(value);
+            })
+            .catch((e: any) => {
+                console.log('[SwapOut] Error: ', e.message);
+                setErrMessage(e.message);
+                setFailedTx(false);
+            });
+    };
+
+    const grabAndSetAddress = async () => {
+        const _addressObj = wallet.generateNewAddress();
+        setBtcAddress(_addressObj.address);
+        updateWalletAddress(_addressObj.index, _addressObj);
+    };
+
+    const execSwap = async () => {
+        const _onchainRecipientAddress = wallet.address.address;
+        const _prepSwap = prepSwap as PrepareOnchainPaymentResponse;
+
+        setStatusMessage('executing_swap');
+        setLoadingTX(true);
+
+        payOnchain({
+            recipientAddress: _onchainRecipientAddress,
+            prepareRes: _prepSwap,
+        })
+            .then((value: PayOnchainResponse) => {
+                const reverseSwapInfo = value.reverseSwapInfo;
+                setRvsSwapInfo(reverseSwapInfo);
+                setLoadingTX(false);
+
+                console.log('reverse swap info: ', reverseSwapInfo);
+            })
+            .catch((e: any) => {
+                console.error('[SwapOut] error: ', e.message);
+                setErrMessage(e.message);
+                setFailedTx(true);
+            });
+
+        // claimPubkey: string;
+        // lockupTxid?: string;
+        // claimTxid?: string;
+    };
+
+    const sendTx = useCallback(async () => {
+        carouselRef.current?.next();
+
+        try {
+            execSwap();
+        } catch (e: any) {
+            setFailedTx(true);
+            setErrMessage(e.message);
+        }
+    }, []);
+
+    useEffect(() => {
+        grabAndSetAddress();
+        getFeeInfo();
+    }, []);
+
     // Panels
     // Breakdown of the swap out process
     const breakdownPanel = useCallback((): ReactElement => {
-        const initSwap = async (): Promise<void> => {
-            setSwapLoading(true);
-
-            try {
-                const _info = await sendOnchain({
-                    amountSat: amount.toNumber(),
-                    onchainRecipientAddress: btcAddress,
-                    pairHash: route.params.fees.feesHash,
-                    satPerVbyte: satsPerVB,
-                });
-
-                setSwapInfo(_info.reverseSwapInfo);
-
-                setSwapLoading(false);
-
-                carouselRef.current?.next();
-            } catch (error: any) {
-                // Show toast
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('feerate'),
-                    text2: error.message,
-                    visibilityTime: 2000,
-                });
-
-                setSwapLoading(false);
-            }
-        };
-
         return (
-            <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
-                <View style={[tailwind('w-5/6 items-center justify-center')]}>
-                    <Text style={[tailwind('text-lg font-semibold mb-2')]}>
-                        {t('swap_amount')}
-                    </Text>
-                    <DisplayFiatAmount
-                        amount={formatFiat(
-                            calculateFiatEquivalent(
-                                amount.toString(),
-                                fiatRate.rate,
-                            ),
-                        )}
-                        fontSize={'text-2xl'}
-                    />
-                </View>
-
+            <View style={[tailwind('w-full h-full items-center')]}>
                 {/* Main breakdown */}
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 mt-12 items-center justify-center flex rounded-md py-2',
+                            'w-5/6 mt-6 items-center justify-center flex rounded-md py-2',
                         ),
                         {
                             borderColor: ColorScheme.Background.Greyed,
                             borderWidth: 1,
+                            marginTop: 128,
                         },
                     ]}>
-                    {/* Onchain address */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
+                    {/* Onchain amount */}
+                    <View style={[tailwind('w-full px-4 py-2')]}>
                         <VText
                             style={[
                                 tailwind('w-full text-sm font-semibold mb-1'),
+                                {
+                                    color: ColorScheme.Text.Default,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
+                            ]}>
+                            {capitalizeFirst(t('amount'))}
+                        </VText>
+                        <View
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } mt-2`,
+                                ),
+                            ]}>
+                            <DisplaySatsAmount
+                                textColor={ColorScheme.Text.DescText}
+                                amount={
+                                    new BigNumber(
+                                        prepSwap?.senderAmountSat as number,
+                                    )
+                                }
+                                fontSize={'text-sm'}
+                            />
+                            <View
+                                style={[
+                                    tailwind(
+                                        `rounded-full px-4 py-1 ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`,
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {`${appFiatCurrency.symbol} ${normalizeFiat(
+                                        new BigNumber(
+                                            prepSwap?.senderAmountSat as number,
+                                        ),
+                                        new BigNumber(fiatRate.rate),
+                                    )}`}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Onchain receiving address */}
+                    <View style={[tailwind('w-full px-4 py-2')]}>
+                        <VText
+                            style={[
+                                tailwind('w-full text-sm font-semibold'),
+                                {
+                                    color: ColorScheme.Text.Default,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
                             ]}>
                             {t('onchain_address')}
                         </VText>
                         <VText
                             style={[
-                                tailwind('w-full text-sm'),
-                                {color: ColorScheme.Text.DescText},
+                                tailwind('w-full text-sm mt-2'),
+                                {
+                                    color: ColorScheme.Text.DescText,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
                             ]}>
                             {btcAddress}
                         </VText>
                     </View>
 
-                    {/* Amount to swap */}
-                    <View
-                        style={[
-                            tailwind('w-full mt-2 justify-start px-4 py-2'),
-                        ]}>
+                    {/* Onchain amount */}
+                    <View style={[tailwind('w-full px-4 py-2')]}>
                         <VText
-                            style={[tailwind('w-full text-sm font-bold mb-1')]}>
-                            {t('swap_amount_sats')}
+                            style={[
+                                tailwind('w-full text-sm font-semibold mb-1'),
+                                {
+                                    color: ColorScheme.Text.Default,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
+                            ]}>
+                            {capitalizeFirst(t('recv_amount'))}
                         </VText>
-                        <DisplaySatsAmount
-                            textColor={ColorScheme.Text.DescText}
-                            amount={amount}
-                            fontSize={'text-sm'}
-                        />
-                    </View>
-
-                    {/* Channel Fee */}
-                    <View
-                        style={[
-                            tailwind('w-full mt-2 justify-start px-4 py-2'),
-                        ]}>
-                        <VText
-                            style={[tailwind('w-full text-sm font-bold mb-1')]}>
-                            {t('channel_fee')}
-                        </VText>
-                        <DisplaySatsAmount
-                            textColor={ColorScheme.Text.DescText}
-                            amount={
-                                new BigNumber(
-                                    route.params.fees
-                                        .totalEstimatedFees as number,
-                                )
-                            }
-                            fontSize={'text-sm'}
-                        />
+                        <View
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } mt-2`,
+                                ),
+                            ]}>
+                            <DisplaySatsAmount
+                                textColor={ColorScheme.Text.DescText}
+                                amount={
+                                    new BigNumber(
+                                        prepSwap?.recipientAmountSat as number,
+                                    )
+                                }
+                                fontSize={'text-sm'}
+                            />
+                            <View
+                                style={[
+                                    tailwind(
+                                        `rounded-full px-4 py-1 ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`,
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {`${appFiatCurrency.symbol} ${normalizeFiat(
+                                        new BigNumber(
+                                            prepSwap?.recipientAmountSat as number,
+                                        ),
+                                        new BigNumber(fiatRate.rate),
+                                    )}`}
+                                </Text>
+                            </View>
+                        </View>
                     </View>
 
                     {/* onchain fee */}
-                    <View
-                        style={[
-                            tailwind('w-full mt-2 justify-start px-4 py-2'),
-                        ]}>
+                    <View style={[tailwind('w-full mt-2 px-4 py-2')]}>
                         <VText
-                            style={[tailwind('w-full text-sm font-bold mb-1')]}>
+                            style={[
+                                tailwind('w-full text-sm font-bold mb-1'),
+                                {
+                                    color: ColorScheme.Text.Default,
+                                    textAlign:
+                                        langDir === 'right' ? 'right' : 'left',
+                                },
+                            ]}>
                             {t('onchain_fee_rate')}
                         </VText>
-                        <Text
-                            style={
-                                (tailwind('text-sm'),
-                                {color: ColorScheme.Text.DescText})
-                            }>
-                            {satsPerVB} sats/vbyte
-                        </Text>
+                        {prepSwap ? (
+                            <View
+                                style={[
+                                    tailwind(
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } mt-2 items-center`,
+                                    ),
+                                ]}>
+                                <Text
+                                    style={[
+                                        {color: ColorScheme.Text.DescText},
+                                    ]}>
+                                    {prepSwap.totalFees}
+                                </Text>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `rounded-full px-4 py-1 ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : 'ml-2'
+                                            }`,
+                                        ),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background.Greyed,
+                                        },
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-bold'),
+                                            {
+                                                color: ColorScheme.Text.Default,
+                                            },
+                                        ]}>
+                                        {`${
+                                            appFiatCurrency.symbol
+                                        } ${normalizeFiat(
+                                            new BigNumber(prepSwap.totalFees),
+                                            new BigNumber(fiatRate.rate),
+                                        )}`}
+                                    </Text>
+                                </View>
+                            </View>
+                        ) : (
+                            <View
+                                style={[
+                                    tailwind('mt-2 rounded-sm'),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                        height: 32,
+                                        width: 128,
+                                    },
+                                ]}
+                            />
+                        )}
                     </View>
+
+                    {/* Amount to swap */}
                 </View>
 
-                {swapLoading && (
+                {/* Display network congestion */}
+                {mempoolInfo.mempoolHighFeeEnv && (
                     <View
                         style={[
-                            tailwind('absolute'),
-                            {bottom: NativeWindowMetrics.bottom + 116},
+                            tailwind(
+                                `mt-4 w-5/6 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center`,
+                            ),
                         ]}>
-                        <ActivityIndicator
-                            color={ColorScheme.Text.Default}
-                            size="small"
-                        />
-
+                        <AlertIcon width={16} height={16} fill={CardColor} />
                         <Text
                             style={[
-                                tailwind('text-sm mt-2'),
-                                {color: ColorScheme.Text.DescText},
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'mr-2'
+                                            : 'ml-2 text-center'
+                                    } text-sm`,
+                                ),
+                                {
+                                    color: CardColor,
+                                },
                             ]}>
-                            {t('creating_swap...')}
+                            {t('mempool_high_fee')}
                         </Text>
                     </View>
                 )}
@@ -245,13 +466,13 @@ const SwapOut = ({route}: Props) => {
                 <View
                     style={[
                         tailwind('absolute items-center w-full'),
-                        {bottom: NativeWindowMetrics.bottom},
+                        {bottom: NativeWindowMetrics.bottomButtonOffset + 24},
                     ]}>
                     <LongBottomButton
-                        disabled={swapLoading}
-                        onPress={initSwap}
+                        disabled={loadingTX || fees}
+                        onPress={sendTx}
                         backgroundColor={ColorScheme.Background.Inverted}
-                        title={t('swap')}
+                        title={capitalizeFirst(t('swap'))}
                         textColor={ColorScheme.Text.Alt}
                     />
                 </View>
@@ -259,203 +480,277 @@ const SwapOut = ({route}: Props) => {
         );
     }, [
         tailwind,
+        ColorScheme,
+        langDir,
         t,
-        amount,
+        appFiatCurrency.symbol,
         fiatRate.rate,
-        btcAddress,
-        route.params.fees.totalEstimatedFees,
-        route.params.fees.feesHash,
-        satsPerVB,
-        swapLoading,
+        swapInfo.address,
+        mempoolInfo.fastestFee,
+        mempoolInfo.mempoolHighFeeEnv,
+        CardColor,
+        loadingTX,
+        sendTx,
     ]);
 
     // Swapping Progress
     const inflightPanel = useCallback((): ReactElement => {
         return (
-            <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
-                <View style={[tailwind('text-center')]}>
-                    {/* <FlatList data={listOfSwaps} renderItem={undefined} /> */}
-                </View>
-
-                {/* Main breakdown */}
-                <View
-                    style={[
-                        tailwind(
-                            'w-5/6 mt-12 items-center justify-center flex rounded-md py-2',
-                        ),
-                        {
-                            borderColor: ColorScheme.Background.Greyed,
-                            borderWidth: 1,
-                        },
-                    ]}>
-                    <Text
-                        style={[
-                            tailwind('text-lg font-semibold mt-4 mb-6'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        {t('swap_details')}
-                    </Text>
-                    {/* ID */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
-                            ]}>
-                            {t('id')}
-                        </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
-                            {swapInfo.id}
-                        </VText>
-                    </View>
-
-                    {/* Status */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
-                            ]}>
-                            {t('status')}
-                        </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
-                            {swapInfo.status}
-                        </VText>
-                    </View>
-
-                    {/* Amount to swap */}
+            <View style={[tailwind('w-full h-full items-center')]}>
+                {loadingTX && (
                     <View
                         style={[
-                            tailwind('w-full mt-2 justify-start px-4 py-2'),
+                            tailwind(
+                                'items-center justify-center h-full w-full',
+                            ),
+                            {marginTop: -48},
                         ]}>
-                        <VText
-                            style={[tailwind('w-full text-sm font-bold mb-1')]}>
-                            {t('onchain_amount_sat')}
-                        </VText>
-                        <DisplaySatsAmount
-                            textColor={ColorScheme.Text.DescText}
-                            amount={new BigNumber(swapInfo.onchainAmountSat)}
-                            fontSize={'text-sm'}
+                        <ActivityIndicator
+                            color={ColorScheme.Text.Default}
+                            size="small"
                         />
-                    </View>
-
-                    {/* lockupTxid */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
-                        <VText
+                        <Text
                             style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
-                            ]}>
-                            {t('lockup_tx_id')}
-                        </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm'),
+                                tailwind('text-sm mt-2'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            {swapInfo.lockupTxid}
-                        </VText>
+                            {statusMessage}
+                        </Text>
                     </View>
+                )}
 
-                    {/* claimTxid */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
-                        <VText
+                {!failedTx && !loadingTX && (
+                    <>
+                        <View style={[{marginTop: 128}]}>
+                            <Success
+                                height={128}
+                                width={128}
+                                fill={ColorScheme.SVG.Default}
+                            />
+                        </View>
+
+                        <View
                             style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
+                                tailwind(
+                                    'w-5/6 mt-6 items-center justify-center flex rounded-md py-2',
+                                ),
+                                {
+                                    borderColor: ColorScheme.Background.Greyed,
+                                    borderWidth: 1,
+                                },
                             ]}>
-                            {t('claim_tx_id')}
-                        </VText>
-                        <VText
+                            {/* TXID */}
+                            <View
+                                style={[
+                                    tailwind('w-full justify-start px-4 py-2'),
+                                ]}>
+                                <VText
+                                    style={[
+                                        tailwind(
+                                            'w-full text-sm font-semibold mb-1',
+                                        ),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {capitalizeFirst(t('tx_id'))}
+                                </VText>
+                                <VText
+                                    style={[
+                                        tailwind('w-full text-sm'),
+                                        {
+                                            color: ColorScheme.Text.DescText,
+                                        },
+                                    ]}>
+                                    {rvsSwapInfo?.id}
+                                </VText>
+                            </View>
+
+                            {/* LN amount */}
+                            <View style={[tailwind('w-full px-4 py-2')]}>
+                                <VText
+                                    style={[
+                                        tailwind(
+                                            'w-full text-sm font-semibold mb-1',
+                                        ),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                            textAlign:
+                                                langDir === 'right'
+                                                    ? 'right'
+                                                    : 'left',
+                                        },
+                                    ]}>
+                                    {capitalizeFirst(t('recv_amount'))}
+                                </VText>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } mt-2`,
+                                        ),
+                                    ]}>
+                                    <DisplaySatsAmount
+                                        textColor={ColorScheme.Text.DescText}
+                                        amount={
+                                            new BigNumber(
+                                                rvsSwapInfo?.onchainAmountSat as number,
+                                            )
+                                        }
+                                        fontSize={'text-sm'}
+                                    />
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                `rounded-full px-4 py-1 ${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                            {
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
+                                            },
+                                        ]}>
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm font-bold'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            {`${
+                                                appFiatCurrency.symbol
+                                            } ${normalizeFiat(
+                                                new BigNumber(
+                                                    rvsSwapInfo?.onchainAmountSat as number,
+                                                ),
+                                                new BigNumber(fiatRate.rate),
+                                            )}`}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+
+                            {/* Status */}
+                            <View
+                                style={[
+                                    tailwind('w-full justify-start px-4 py-2'),
+                                ]}>
+                                <VText
+                                    style={[
+                                        tailwind(
+                                            'w-full text-sm font-semibold mb-1',
+                                        ),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {t('status')}
+                                </VText>
+                                <VText
+                                    style={[
+                                        tailwind('w-full text-sm'),
+                                        {
+                                            color: ColorScheme.Text.DescText,
+                                        },
+                                    ]}>
+                                    {rvsSwapInfo?.status}
+                                </VText>
+                            </View>
+                        </View>
+
+                        <View
                             style={[
-                                tailwind('w-full text-sm'),
-                                {color: ColorScheme.Text.DescText},
+                                tailwind('items-center w-5/6 mt-4 flex-row'),
                             ]}>
-                            {swapInfo.claimTxid}
-                        </VText>
+                            <Text
+                                style={[
+                                    tailwind('text-sm text-center ml-2'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('swapout_message', {
+                                    n: i18nNumber(6, appLanguage.code),
+                                })}
+                            </Text>
+                        </View>
+
+                        <View
+                            style={[
+                                tailwind('absolute items-center w-full'),
+                                {
+                                    bottom:
+                                        NativeWindowMetrics.bottomButtonOffset +
+                                        24,
+                                },
+                            ]}>
+                            <LongBottomButton
+                                disabled={loadingTX}
+                                onPress={() => {
+                                    navigation.dispatch(
+                                        CommonActions.navigate('WalletRoot', {
+                                            screen: 'WalletView',
+                                            params: {
+                                                reload: true,
+                                            },
+                                        }),
+                                    );
+                                }}
+                                backgroundColor={
+                                    ColorScheme.Background.Inverted
+                                }
+                                title={capitalizeFirst(t('done'))}
+                                textColor={ColorScheme.Text.Alt}
+                            />
+                        </View>
+                    </>
+                )}
+
+                {failedTx && !loadingTX && (
+                    <View style={[tailwind('items-center'), {marginTop: 128}]}>
+                        <Failed
+                            width={128}
+                            height={128}
+                            fill={ColorScheme.SVG.Default}
+                        />
+
+                        <Text
+                            style={[
+                                tailwind('mt-4 text-center text-sm'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {errMessage}
+                        </Text>
                     </View>
-
-                    {/* claimPubkey */}
-                    <View style={[tailwind('w-full justify-start px-4 py-2')]}>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
-                            ]}>
-                            {t('claimPubKey')}
-                        </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
-                            {swapInfo.claimPubkey}
-                        </VText>
-                    </View>
-                </View>
-
-                {/* Swap details */}
-                <View style={[tailwind('items-center mt-6')]}>
-                    <ActivityIndicator
-                        color={ColorScheme.Text.Default}
-                        size="small"
-                    />
-                    <Text
-                        style={[
-                            tailwind('text-lg font-semibold mt-2'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
-                        {t('swapping...')}
-                    </Text>
-                </View>
+                )}
             </View>
         );
-    }, []);
+    }, [
+        tailwind,
+        loadingTX,
+        ColorScheme,
+        statusMessage,
+        failedTx,
+        t,
+        langDir,
+        appFiatCurrency.symbol,
+        appLanguage.code,
+        fiatRate.rate,
+        swapInfo.lockHeight,
+        errMessage,
+        navigation,
+    ]);
 
     const panels = useMemo(
         (): Slide[] => [breakdownPanel, inflightPanel],
         [breakdownPanel, inflightPanel],
     );
-
-    const getOnchainFeerate = async () => {
-        try {
-            let rates: TMempoolFeeRates;
-
-            try {
-                const fetchedRates = await getFeeRates(wallet.network);
-
-                rates = fetchedRates as TMempoolFeeRates;
-
-                setSatsPerVB(rates.fastestFee);
-            } catch (err: any) {
-                // Error assumed to be 503; mempool unavailable due to sync
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('feerate'),
-                    text2: e('failed_fee_rate_fetch'),
-                    visibilityTime: 1750,
-                });
-            }
-        } catch (error: any) {
-            // Show toast
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('feerate'),
-                text2: error.message,
-                visibilityTime: 2000,
-            });
-        }
-    };
-
-    useEffect(() => {
-        getOnchainFeerate();
-    }, []);
 
     return (
         <SafeAreaView
@@ -481,7 +776,7 @@ const SwapOut = ({route}: Props) => {
                             tailwind('text-base font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        {capitalizeFirst(t('swap_out'))}
+                        {capitalizeFirst(t('swap_in'))}
                     </Text>
                 </View>
 
@@ -489,9 +784,7 @@ const SwapOut = ({route}: Props) => {
                 <View
                     style={[
                         styles.carouselContainer,
-                        tailwind(
-                            'h-full w-full items-center justify-end absolute bottom-0',
-                        ),
+                        tailwind('h-full w-full items-center'),
                         {zIndex: -9},
                     ]}>
                     <Carousel
@@ -516,23 +809,6 @@ const SwapOut = ({route}: Props) => {
                         }}
                         enabled={false}
                     />
-
-                    <View
-                        style={[
-                            styles.dots,
-                            tailwind('items-center justify-center'),
-                            {bottom: NativeDims.bottom + 12},
-                        ]}
-                        pointerEvents="none">
-                        {panels.map((_slide, index) => (
-                            <Dot
-                                key={index}
-                                index={index}
-                                animValue={progressValue}
-                                length={panels.length}
-                            />
-                        ))}
-                    </View>
                 </View>
 
                 <Toast config={toastConfig as ToastConfig} />
