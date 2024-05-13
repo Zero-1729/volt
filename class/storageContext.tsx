@@ -115,7 +115,7 @@ type defaultContextType = {
     updateWalletPayments: (id: string, payments: TTransaction[]) => void;
     updateWalletUTXOs: (id: string, utxo: TUtxo[]) => void;
     updateWalletBalance: (id: string, balance: TBalance) => void;
-    updateWalletAddress: (id: string, address: TAddress) => void;
+    updateWalletAddress: (index: number, address: TAddress) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
@@ -966,14 +966,12 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletAddress = useCallback(
-        async (id: string, address: TAddress) => {
-            const index = wallets.findIndex(wallet => wallet.id === id);
-
+        async (index: number, address: TAddress) => {
             // Get the current wallet
             // Update the address in the current wallet
             const tmp = [...wallets];
-            tmp[index].address = address;
-            tmp[index].index += address.index;
+            tmp[0].address = address;
+            tmp[0].index = index;
 
             // Update wallets list
             _setWallets(tmp);
