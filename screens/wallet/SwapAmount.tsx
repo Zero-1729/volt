@@ -30,11 +30,6 @@ import {DisplayUnit} from '../../types/wallet';
 import {SwapType} from '../../types/enums';
 
 import {
-    ReverseSwapPairInfo,
-    maxReverseSwapAmount,
-} from '@breeztech/react-native-breez-sdk';
-
-import {
     DisplayFiatAmount,
     DisplaySatsAmount,
     DisplayBTCAmount,
@@ -70,7 +65,6 @@ const SwapAmount = ({route}: Props) => {
     const [amount, setAmount] = useState<string>('');
     const [loadingFeeText, setFeeLoadingText] = useState('');
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
-    const [swapFees, setSwapFees] = useState<ReverseSwapPairInfo>();
 
     const minimumSwapAmount = new BigNumber(route.params.swapMeta.min);
     const maximumSwapAmount = new BigNumber(balance);
@@ -105,17 +99,16 @@ const SwapAmount = ({route}: Props) => {
             let maxSwapAmount;
 
             if (isMax) {
-                maxSwapAmount = (await maxReverseSwapAmount()).totalSat;
+                maxSwapAmount = balance.eq(satsAmount.value);
             }
 
             navigation.dispatch(
                 CommonActions.navigate('SwapOut', {
-                    lnBalance: route.params.lnBalance,
-                    onchainBalance: route.params.onchainBalance,
+                    lnBalance: wallet.balance.lightning.toNumber(),
+                    swapMeta: route.params.swapMeta,
                     satsAmount: maxSwapAmount
                         ? maxSwapAmount
-                        : satsAmount.value,
-                    fees: swapFees,
+                        : satsAmount.value.toNumber(),
                     maxed: isMax,
                 }),
             );
@@ -211,10 +204,6 @@ const SwapAmount = ({route}: Props) => {
         setFiatAmount(
             bottomUnit.name !== 'sats' ? new BigNumber(value || 0) : fiatEqv,
         );
-
-        if (value === '') {
-            setSwapFees({} as ReverseSwapPairInfo);
-        }
     };
 
     const calculateSatsEquivalent = (value: string): string => {
