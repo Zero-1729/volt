@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {
     useMemo,
@@ -48,7 +47,7 @@ import {useTranslation} from 'react-i18next';
 import {DisplaySatsAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
 
-import {i18nNumber, normalizeFiat} from '../../modules/transform';
+import {normalizeFiat} from '../../modules/transform';
 
 import {capitalizeFirst} from '../../modules/transform';
 import {AppStorageContext} from '../../class/storageContext';
@@ -77,7 +76,6 @@ const SwapOut = ({route}: Props) => {
         fiatRate,
         mempoolInfo,
         appFiatCurrency,
-        appLanguage,
         updateWalletAddress,
     } = useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
@@ -97,7 +95,6 @@ const SwapOut = ({route}: Props) => {
 
     // For now, only single sends are supported
     // Update wallet descriptors to private version
-    const swapInfo = route.params.swapMeta;
     const carouselRef = React.useRef(null);
     const progressValue = useSharedValue(0);
 
@@ -119,7 +116,6 @@ const SwapOut = ({route}: Props) => {
             claimTxFeerate: satPerVbyte,
         })
             .then((value: PrepareOnchainPaymentResponse) => {
-                console.log('prep: ', value);
                 setStatusMessage('found_fees');
                 setFees(false);
                 setPrepSwap(value);
@@ -132,7 +128,7 @@ const SwapOut = ({route}: Props) => {
     };
 
     const grabAndSetAddress = async () => {
-        const _addressObj = wallet.generateNewAddress();
+        const _addressObj = await wallet.generateNewAddress();
         setBtcAddress(_addressObj.address);
         updateWalletAddress(_addressObj.index, _addressObj);
     };
@@ -152,18 +148,12 @@ const SwapOut = ({route}: Props) => {
                 const reverseSwapInfo = value.reverseSwapInfo;
                 setRvsSwapInfo(reverseSwapInfo);
                 setLoadingTX(false);
-
-                console.log('reverse swap info: ', reverseSwapInfo);
             })
             .catch((e: any) => {
                 console.error('[SwapOut] error: ', e.message);
                 setErrMessage(e.message);
                 setFailedTx(true);
             });
-
-        // claimPubkey: string;
-        // lockupTxid?: string;
-        // claimTxid?: string;
     };
 
     const sendTx = useCallback(async () => {
@@ -175,11 +165,13 @@ const SwapOut = ({route}: Props) => {
             setFailedTx(true);
             setErrMessage(e.message);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         grabAndSetAddress();
         getFeeInfo();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Panels
@@ -212,55 +204,71 @@ const SwapOut = ({route}: Props) => {
                             ]}>
                             {capitalizeFirst(t('amount'))}
                         </VText>
-                        <View
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } mt-2`,
-                                ),
-                            ]}>
-                            <DisplaySatsAmount
-                                textColor={ColorScheme.Text.DescText}
-                                amount={
-                                    new BigNumber(
-                                        prepSwap?.senderAmountSat as number,
-                                    )
-                                }
-                                fontSize={'text-sm'}
-                            />
+                        {prepSwap ? (
                             <View
                                 style={[
                                     tailwind(
-                                        `rounded-full px-4 py-1 ${
+                                        `${
                                             langDir === 'right'
-                                                ? 'mr-2'
-                                                : 'ml-2'
-                                        }`,
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } mt-2`,
                                     ),
+                                ]}>
+                                <DisplaySatsAmount
+                                    textColor={ColorScheme.Text.DescText}
+                                    amount={
+                                        new BigNumber(
+                                            prepSwap?.senderAmountSat as number,
+                                        )
+                                    }
+                                    fontSize={'text-sm'}
+                                />
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `rounded-full px-4 py-1 ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : 'ml-2'
+                                            }`,
+                                        ),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background.Greyed,
+                                        },
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-bold'),
+                                            {
+                                                color: ColorScheme.Text.Default,
+                                            },
+                                        ]}>
+                                        {`${
+                                            appFiatCurrency.symbol
+                                        } ${normalizeFiat(
+                                            new BigNumber(
+                                                prepSwap?.senderAmountSat as number,
+                                            ),
+                                            new BigNumber(fiatRate.rate),
+                                        )}`}
+                                    </Text>
+                                </View>
+                            </View>
+                        ) : (
+                            <View
+                                style={[
+                                    tailwind('mt-2 rounded-sm'),
                                     {
                                         backgroundColor:
                                             ColorScheme.Background.Greyed,
+                                        height: 32,
+                                        width: 128,
                                     },
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm font-bold'),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                        },
-                                    ]}>
-                                    {`${appFiatCurrency.symbol} ${normalizeFiat(
-                                        new BigNumber(
-                                            prepSwap?.senderAmountSat as number,
-                                        ),
-                                        new BigNumber(fiatRate.rate),
-                                    )}`}
-                                </Text>
-                            </View>
-                        </View>
+                                ]}
+                            />
+                        )}
                     </View>
 
                     {/* Onchain receiving address */}
@@ -276,17 +284,34 @@ const SwapOut = ({route}: Props) => {
                             ]}>
                             {t('onchain_address')}
                         </VText>
-                        <VText
-                            style={[
-                                tailwind('w-full text-sm mt-2'),
-                                {
-                                    color: ColorScheme.Text.DescText,
-                                    textAlign:
-                                        langDir === 'right' ? 'right' : 'left',
-                                },
-                            ]}>
-                            {btcAddress}
-                        </VText>
+                        {prepSwap ? (
+                            <VText
+                                style={[
+                                    tailwind(
+                                        'w-full text-sm mt-2 font-semibold',
+                                    ),
+                                    {
+                                        color: ColorScheme.Text.DescText,
+                                        textAlign:
+                                            langDir === 'right'
+                                                ? 'right'
+                                                : 'left',
+                                    },
+                                ]}>
+                                {btcAddress}
+                            </VText>
+                        ) : (
+                            <View
+                                style={[
+                                    tailwind('mt-2 rounded-sm w-full'),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                        height: 32,
+                                    },
+                                ]}
+                            />
+                        )}
                     </View>
 
                     {/* Onchain amount */}
@@ -302,58 +327,74 @@ const SwapOut = ({route}: Props) => {
                             ]}>
                             {capitalizeFirst(t('recv_amount'))}
                         </VText>
-                        <View
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } mt-2`,
-                                ),
-                            ]}>
-                            <DisplaySatsAmount
-                                textColor={ColorScheme.Text.DescText}
-                                amount={
-                                    new BigNumber(
-                                        prepSwap?.recipientAmountSat as number,
-                                    )
-                                }
-                                fontSize={'text-sm'}
-                            />
+                        {prepSwap ? (
                             <View
                                 style={[
                                     tailwind(
-                                        `rounded-full px-4 py-1 ${
+                                        `${
                                             langDir === 'right'
-                                                ? 'mr-2'
-                                                : 'ml-2'
-                                        }`,
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } mt-2`,
                                     ),
+                                ]}>
+                                <DisplaySatsAmount
+                                    textColor={ColorScheme.Text.DescText}
+                                    amount={
+                                        new BigNumber(
+                                            prepSwap?.recipientAmountSat as number,
+                                        )
+                                    }
+                                    fontSize={'text-sm'}
+                                />
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `rounded-full px-4 py-1 ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : 'ml-2'
+                                            }`,
+                                        ),
+                                        {
+                                            backgroundColor:
+                                                ColorScheme.Background.Greyed,
+                                        },
+                                    ]}>
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-bold'),
+                                            {
+                                                color: ColorScheme.Text.Default,
+                                            },
+                                        ]}>
+                                        {`${
+                                            appFiatCurrency.symbol
+                                        } ${normalizeFiat(
+                                            new BigNumber(
+                                                prepSwap?.recipientAmountSat as number,
+                                            ),
+                                            new BigNumber(fiatRate.rate),
+                                        )}`}
+                                    </Text>
+                                </View>
+                            </View>
+                        ) : (
+                            <View
+                                style={[
+                                    tailwind('mt-2 rounded-sm'),
                                     {
                                         backgroundColor:
                                             ColorScheme.Background.Greyed,
+                                        height: 32,
+                                        width: 128,
                                     },
-                                ]}>
-                                <Text
-                                    style={[
-                                        tailwind('text-sm font-bold'),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                        },
-                                    ]}>
-                                    {`${appFiatCurrency.symbol} ${normalizeFiat(
-                                        new BigNumber(
-                                            prepSwap?.recipientAmountSat as number,
-                                        ),
-                                        new BigNumber(fiatRate.rate),
-                                    )}`}
-                                </Text>
-                            </View>
-                        </View>
+                                ]}
+                            />
+                        )}
                     </View>
 
-                    {/* onchain fee */}
+                    {/* total fee */}
                     <View style={[tailwind('w-full mt-2 px-4 py-2')]}>
                         <VText
                             style={[
@@ -364,7 +405,7 @@ const SwapOut = ({route}: Props) => {
                                         langDir === 'right' ? 'right' : 'left',
                                 },
                             ]}>
-                            {t('onchain_fee_rate')}
+                            {t('total_swapout_fees')}
                         </VText>
                         {prepSwap ? (
                             <View
@@ -377,12 +418,11 @@ const SwapOut = ({route}: Props) => {
                                         } mt-2 items-center`,
                                     ),
                                 ]}>
-                                <Text
-                                    style={[
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
-                                    {prepSwap.totalFees}
-                                </Text>
+                                <DisplaySatsAmount
+                                    textColor={ColorScheme.Text.DescText}
+                                    amount={new BigNumber(prepSwap.totalFees)}
+                                    fontSize={'text-sm'}
+                                />
                                 <View
                                     style={[
                                         tailwind(
@@ -427,8 +467,6 @@ const SwapOut = ({route}: Props) => {
                             />
                         )}
                     </View>
-
-                    {/* Amount to swap */}
                 </View>
 
                 {/* Display network congestion */}
@@ -483,13 +521,14 @@ const SwapOut = ({route}: Props) => {
         ColorScheme,
         langDir,
         t,
+        prepSwap,
         appFiatCurrency.symbol,
         fiatRate.rate,
-        swapInfo.address,
-        mempoolInfo.fastestFee,
+        btcAddress,
         mempoolInfo.mempoolHighFeeEnv,
         CardColor,
         loadingTX,
+        fees,
         sendTx,
     ]);
 
@@ -566,7 +605,7 @@ const SwapOut = ({route}: Props) => {
                                 </VText>
                             </View>
 
-                            {/* LN amount */}
+                            {/* Onchain amount */}
                             <View style={[tailwind('w-full px-4 py-2')]}>
                                 <VText
                                     style={[
@@ -668,21 +707,6 @@ const SwapOut = ({route}: Props) => {
 
                         <View
                             style={[
-                                tailwind('items-center w-5/6 mt-4 flex-row'),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm text-center ml-2'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {t('swapout_message', {
-                                    n: i18nNumber(6, appLanguage.code),
-                                })}
-                            </Text>
-                        </View>
-
-                        <View
-                            style={[
                                 tailwind('absolute items-center w-full'),
                                 {
                                     bottom:
@@ -738,11 +762,12 @@ const SwapOut = ({route}: Props) => {
         statusMessage,
         failedTx,
         t,
+        rvsSwapInfo?.id,
+        rvsSwapInfo?.onchainAmountSat,
+        rvsSwapInfo?.status,
         langDir,
         appFiatCurrency.symbol,
-        appLanguage.code,
         fiatRate.rate,
-        swapInfo.lockHeight,
         errMessage,
         navigation,
     ]);
