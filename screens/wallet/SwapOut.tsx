@@ -57,7 +57,6 @@ import {
     payOnchain,
     ReverseSwapInfo,
     PrepareOnchainPaymentResponse,
-    PayOnchainResponse,
 } from '@breeztech/react-native-breez-sdk';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
@@ -106,8 +105,6 @@ const SwapOut = ({route}: Props) => {
 
     const getFeeInfo = async () => {
         const satPerVbyte = mempoolInfo.fastestFee;
-
-        setStatusMessage('generating_fees');
         setFees(true);
 
         prepareOnchainPayment({
@@ -116,7 +113,6 @@ const SwapOut = ({route}: Props) => {
             claimTxFeerate: satPerVbyte,
         })
             .then((value: PrepareOnchainPaymentResponse) => {
-                setStatusMessage('found_fees');
                 setFees(false);
                 setPrepSwap(value);
             })
@@ -133,40 +129,29 @@ const SwapOut = ({route}: Props) => {
         updateWalletAddress(_addressObj.index, _addressObj);
     };
 
-    const execSwap = async () => {
-        const _onchainRecipientAddress = wallet.address.address;
-        const _prepSwap = prepSwap as PrepareOnchainPaymentResponse;
-
-        setStatusMessage('executing_swap');
-        setLoadingTX(true);
-
-        payOnchain({
-            recipientAddress: _onchainRecipientAddress,
-            prepareRes: _prepSwap,
-        })
-            .then((value: PayOnchainResponse) => {
-                const reverseSwapInfo = value.reverseSwapInfo;
-                setRvsSwapInfo(reverseSwapInfo);
-                setLoadingTX(false);
-            })
-            .catch((e: any) => {
-                console.error('[SwapOut] error: ', e.message);
-                setErrMessage(e.message);
-                setFailedTx(true);
-            });
-    };
-
     const sendTx = useCallback(async () => {
         carouselRef.current?.next();
 
         try {
-            execSwap();
+            setStatusMessage(t('executing_swapout'));
+            setLoadingTX(true);
+
+            const onchainResp = await payOnchain({
+                recipientAddress: wallet.address.address,
+                prepareRes: prepSwap as PrepareOnchainPaymentResponse,
+            });
+
+            const reverseSwapInfo = onchainResp.reverseSwapInfo;
+            setRvsSwapInfo(reverseSwapInfo);
+            setLoadingTX(false);
         } catch (e: any) {
-            setFailedTx(true);
+            console.error('[SwapOut] error: ', e.message);
             setErrMessage(e.message);
+            setLoadingTX(false);
+            setFailedTx(true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [prepSwap, wallet.address.address]);
 
     useEffect(() => {
         grabAndSetAddress();
