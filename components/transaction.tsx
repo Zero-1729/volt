@@ -25,6 +25,10 @@ import SwapIcon from '../assets/svg/arrow-switch-24.svg';
 import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
+import {
+    SWAP_IN_LN_DESCRIPTION,
+    SWAP_OUT_LN_DESCRIPTION,
+} from '../modules/wallet-defaults';
 
 export const UnifiedTransactionListItem = (props: TxListItemProps) => {
     if (props.tx.isLightning) {
@@ -46,7 +50,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
     };
 
     const receiveComp = () => {
-        if (props.tx.description === 'Bitcoin Transfer') {
+        if (props.tx.description === SWAP_IN_LN_DESCRIPTION) {
             return <SwapIcon fill={ColorScheme.SVG.Received} />;
         } else {
             return <ArrowDown fill={ColorScheme.SVG.Received} />;

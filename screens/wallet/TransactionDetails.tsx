@@ -54,6 +54,7 @@ import {getScreenEdges} from '../../modules/screen';
 import BigNumber from 'bignumber.js';
 
 import {nodeInfo, LnPaymentDetails} from '@breeztech/react-native-breez-sdk';
+import { SWAP_IN_LN_DESCRIPTION, SWAP_OUT_LN_DESCRIPTION } from '../../modules/wallet-defaults';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
@@ -120,7 +121,7 @@ const TransactionDetailsView = ({route}: Props) => {
         isLNTx ? route.params.tx.feeMsat / 1000 : route.params.tx.fee,
     );
 
-    const isSwapInTx = route.params.tx.description === 'Bitcoin Transfer';
+    const isSwapInTx = route.params.tx.description === SWAP_IN_LN_DESCRIPTION;
 
     const paymentPreimage = route.params.tx.details?.data
         ? (route.params.tx.details?.data as LnPaymentDetails).paymentPreimage
