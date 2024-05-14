@@ -1056,7 +1056,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
         // TODO: not working for LN unified wallet
         // Generate new initial receive address
-        const newAddress = newWallet.generateNewAddress();
+        const newAddress = await newWallet.generateNewAddress();
 
         // Update temporary wallet address
         newWallet.setAddress(newAddress);
