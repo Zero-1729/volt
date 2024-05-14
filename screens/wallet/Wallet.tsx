@@ -91,6 +91,8 @@ const Wallet = ({route}: Props) => {
     const [swapIn, setSwapIn] = useState<TSwapInfo>({} as TSwapInfo);
     const [loadingSwapOutInfo, setLoadingSwapOutInfo] = useState<boolean>(true);
     const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
+    const [updatedLNBalance, setUpdatedLNBalance] = useState<boolean>(false);
+    const [updatedOnchainBalance, setUpdatedOBalance] = useState<boolean>(false);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
@@ -165,9 +167,11 @@ const Wallet = ({route}: Props) => {
         walletData.type !== 'unified'
             ? walletData.balance.onchain
             : walletData.balance.onchain.plus(walletData.balance.lightning);
+    const isLNWallet = walletData.type === 'unified';
 
     const getBalance = async () => {
         try {
+            const LNB = walletData.balance.lightning;
             const nodeState = await nodeInfo();
             const balanceLn = nodeState.channelsBalanceMsat;
 
@@ -176,6 +180,10 @@ const Wallet = ({route}: Props) => {
                 onchain: new BigNumber(0),
                 lightning: new BigNumber(balanceLn / 1000),
             });
+
+            if (!LNB.isEqualTo(balanceLn / 1000)) {
+                setUpdatedLNBalance(true);
+            }
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
@@ -238,7 +246,7 @@ const Wallet = ({route}: Props) => {
         refreshWallet();
 
         // Also call Breez if LN wallet
-        if (walletData.type === 'unified') {
+        if (isLNWallet) {
             await getBalance();
             await fetchPayments();
         }
@@ -323,6 +331,10 @@ const Wallet = ({route}: Props) => {
                 walletData.balance.onchain,
             );
 
+            if (updated && isLNWallet) {
+                setUpdatedOBalance(true);
+            }
+
             // update wallet balance
             updateWalletBalance(currentWalletID, {
                 onchain: balance,
@@ -389,6 +401,8 @@ const Wallet = ({route}: Props) => {
     ]);
 
     const getLNSwapInfo = async () => {
+        // TODO: report error in toast
+        // TODO: replace with call to Boltz to get when LN Balance below min
         onchainPaymentLimits()
             .then((c: OnchainPaymentLimitsResponse) => {
                 setSwapOut({
@@ -396,14 +410,17 @@ const Wallet = ({route}: Props) => {
                     max: c.maxSat,
                 });
                 setLoadingSwapOutInfo(false);
+                setUpdatedLNBalance(false);
             })
             .catch((e: any) => {
                 console.log('[Breez swapOut] error: ', e.message);
                 setLoadingSwapOutInfo(false);
+                setUpdatedLNBalance(false);
             });
     };
 
     const getOnchainSwapInfo = async () => {
+        // TODO: report error in toast
         receiveOnchain({})
             .then((d: SwapInfo) => {
                 setSwapIn({
@@ -415,10 +432,12 @@ const Wallet = ({route}: Props) => {
                     maxSwapperPayable: d.maxSwapperPayable,
                 });
                 setLoadingSwapInInfo(false);
+                setUpdatedOBalance(false);
             })
             .catch((e: any) => {
                 console.log('[Breez swapIn] error: ', e.message);
                 setLoadingSwapInInfo(false);
+                setUpdatedOBalance(false);
             });
     };
 
@@ -431,8 +450,10 @@ const Wallet = ({route}: Props) => {
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
     useEffect(() => {
-        getLNSwapInfo();
-        getOnchainSwapInfo();
+        if (isLNWallet) {
+            getLNSwapInfo();
+            getOnchainSwapInfo();
+        }
 
         // Kill all loading effects
         () => {
@@ -443,16 +464,22 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
+        if (updatedOnchainBalance && isLNWallet) {
+            setLoadingSwapInInfo(true);
+            getOnchainSwapInfo();
+        }
         // Re-check swap info
-        setLoadingSwapOutInfo(true);
-        setLoadingSwapInInfo(true);
-
-        getLNSwapInfo();
-        getOnchainSwapInfo();
-    }, [walletBalance]);
+    }, [updatedOnchainBalance]);
 
     useEffect(() => {
-        if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
+        if (updatedLNBalance && isLNWallet) {
+            setLoadingSwapOutInfo(true);
+            getLNSwapInfo();
+        }
+    }, [updatedLNBalance]);
+
+    useEffect(() => {
+        if (breezEvent.type === BreezEventVariant.INVOICE_PAID && isLNWallet) {
             // Route to LN payment status screen
             navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
