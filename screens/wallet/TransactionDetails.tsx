@@ -122,6 +122,7 @@ const TransactionDetailsView = ({route}: Props) => {
     );
 
     const isSwapInTx = route.params.tx.description === SWAP_IN_LN_DESCRIPTION;
+    const isSwapOutTx = route.params.tx.description === SWAP_OUT_LN_DESCRIPTION;
 
     const paymentPreimage = route.params.tx.details?.data
         ? (route.params.tx.details?.data as LnPaymentDetails).paymentPreimage
@@ -232,8 +233,15 @@ const TransactionDetailsView = ({route}: Props) => {
             ? ''
             : capitalizeFirst(t('unconfirmed'));
 
+    const onchainStatusMessage =
+        route.params.tx.status === 'pending'
+            ? t('pending_conf')
+            : t(route.params.tx.status);
+
     const confirmationInfo = isLNTx
-        ? t(route.params.tx.status)
+        ? isSwapOutTx
+            ? capitalizeFirst(t(route.params.tx.status))
+            : onchainStatusMessage
         : route.params.tx.confirmed
         ? `${
               route.params.tx.confirmations === 1
@@ -409,7 +417,7 @@ const TransactionDetailsView = ({route}: Props) => {
                         {isLNTx && (
                             <View
                                 style={[tailwind('items-center mt-6 w-full')]}>
-                                {isSwapInTx ? (
+                                {isSwapInTx || isSwapOutTx ? (
                                     <View
                                         style={[
                                             tailwind(
@@ -427,7 +435,9 @@ const TransactionDetailsView = ({route}: Props) => {
                                                         .DescText,
                                                 },
                                             ]}>
-                                            {t('bitcoin_swapin')}
+                                            {isSwapInTx
+                                                ? t('bitcoin_swapin')
+                                                : t('ln_swapout')}
                                         </Text>
                                     </View>
                                 ) : (
