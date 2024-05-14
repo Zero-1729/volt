@@ -57,6 +57,14 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
         }
     };
 
+    const sendComp = () => {
+        if (props.tx.description === SWAP_OUT_LN_DESCRIPTION) {
+            return <SwapIcon fill={ColorScheme.SVG.Sent} />;
+        } else {
+            return <ArrowUp fill={ColorScheme.SVG.Sent} />;
+        }
+    };
+
     return (
         <PlainButton
             onPress={() => {
@@ -104,11 +112,9 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                             backgroundColor: ColorScheme.Background.Secondary,
                         },
                     ]}>
-                    {props.tx.paymentType === 'received' ? (
-                        receiveComp()
-                    ) : (
-                        <ArrowUp fill={ColorScheme.SVG.Sent} />
-                    )}
+                    {props.tx.paymentType === 'received'
+                        ? receiveComp()
+                        : sendComp()}
                 </View>
             </View>
         </PlainButton>
