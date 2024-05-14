@@ -191,3 +191,7 @@ export const electrumServerList = [
 ];
 
 export const MAX_PIN_ATTEMPTS = 10;
+
+// Lightning SwapIn and SwapOut tx comments
+export const SWAP_OUT_LN_DESCRIPTION = 'Send to BTC address';
+export const SWAP_IN_LN_DESCRIPTION = 'Bitcoin Transfer';
