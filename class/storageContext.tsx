@@ -37,6 +37,7 @@ import {
     TBaseWalletArgs,
     TAddress,
     TElectrumServerURLs,
+    TMempoolInfo,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -94,8 +95,10 @@ type defaultContextType = {
     electrumServerURL: TElectrumServerURLs;
     isPINActive: boolean;
     isBiometricsActive: boolean;
+    mempoolInfo: TMempoolInfo;
     pinAttempts: number; // maxes out at 10, reset when correct pin entered
     setBreezEvent: (event: BreezEvent) => void;
+    setMempoolInfo: (data: TMempoolInfo) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
     updateFiatRate: (fiatObj: TFiatRate) => void;
@@ -112,7 +115,7 @@ type defaultContextType = {
     updateWalletPayments: (id: string, payments: TTransaction[]) => void;
     updateWalletUTXOs: (id: string, utxo: TUtxo[]) => void;
     updateWalletBalance: (id: string, balance: TBalance) => void;
-    updateWalletAddress: (id: string, address: TAddress) => void;
+    updateWalletAddress: (index: number, address: TAddress) => void;
     renameWallet: (id: string, newName: string) => void;
     deleteWallet: (id: string) => void;
     restoreWallet: (
@@ -138,6 +141,7 @@ const defaultContext: defaultContextType = {
     loadLock: false,
     onboarding: true,
     breezEvent: {} as BreezEvent,
+    mempoolInfo: {} as TMempoolInfo,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -175,6 +179,7 @@ const defaultContext: defaultContextType = {
     isBiometricsActive: false,
     pinAttempts: 0,
     setBreezEvent: () => {},
+    setMempoolInfo: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -215,6 +220,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
     const [breezEvent, _setBreezEvent] = useState(defaultContext.breezEvent);
+    const [mempoolInfo, _setMempoolInfo] = useState(defaultContext.mempoolInfo);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -257,6 +263,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('onboarding');
     const {getItem: _getBreezEvent, setItem: _updateBreezEvent} =
         useAsyncStorage('breezEvent');
+    const {getItem: _getMempoolInfo, setItem: _updateMempoolInfo} =
+        useAsyncStorage('mempoolInfo');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -439,6 +447,30 @@ export const AppStorageProvider = ({children}: Props) => {
 
         if (be !== null) {
             _setBreezEvent(JSON.parse(be));
+        }
+    };
+
+    const setMempoolInfo = useCallback(async (data: TMempoolInfo) => {
+        if (data === ({} as TMempoolInfo)) {
+            await _setMempoolInfo({} as TMempoolInfo);
+            await _updateMempoolInfo(JSON.stringify({}));
+        }
+
+        try {
+            await _setMempoolInfo(data);
+            await _updateMempoolInfo(JSON.stringify(data));
+        } catch (e) {
+            console.error(
+                `[AsyncStorage] (Mempool Info) Error loading data: ${e}`,
+            );
+            throw new Error('Error setting mempool info data');
+        }
+    }, []);
+
+    const _loadMempoolInfo = async () => {
+        const mi = await _getMempoolInfo();
+        if (mi !== null) {
+            _setMempoolInfo(JSON.parse(mi));
         }
     };
 
@@ -934,14 +966,12 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const updateWalletAddress = useCallback(
-        async (id: string, address: TAddress) => {
-            const index = wallets.findIndex(wallet => wallet.id === id);
-
+        async (index: number, address: TAddress) => {
             // Get the current wallet
             // Update the address in the current wallet
             const tmp = [...wallets];
-            tmp[index].address = address;
-            tmp[index].index += address.index;
+            tmp[0].address = address;
+            tmp[0].index = index;
 
             // Update wallets list
             _setWallets(tmp);
@@ -1026,7 +1056,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
         // TODO: not working for LN unified wallet
         // Generate new initial receive address
-        const newAddress = newWallet.generateNewAddress();
+        const newAddress = await newWallet.generateNewAddress();
 
         // Update temporary wallet address
         newWallet.setAddress(newAddress);
@@ -1385,6 +1415,10 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
+        _loadMempoolInfo();
+    }, []);
+
+    useEffect(() => {
         _loadAppLanguage();
     }, []);
 
@@ -1454,7 +1488,9 @@ export const AppStorageProvider = ({children}: Props) => {
                 electrumServerURL,
                 setElectrumServerURL,
                 breezEvent,
+                mempoolInfo,
                 setBreezEvent,
+                setMempoolInfo,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,

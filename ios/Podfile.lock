@@ -2,12 +2,12 @@ PODS:
   - bdk-rn (0.29.0):
     - React
   - boost (1.83.0)
-  - breez_sdk (0.3.9):
-    - BreezSDK (= 0.3.9)
+  - breez_sdk (0.4.0):
+    - BreezSDK (= 0.4.0)
     - React-Core
-  - breez_sdkFFI (0.3.9)
-  - BreezSDK (0.3.9):
-    - breez_sdkFFI (= 0.3.9)
+  - breez_sdkFFI (0.4.0)
+  - BreezSDK (0.4.0):
+    - breez_sdkFFI (= 0.4.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.73.7)
@@ -1478,9 +1478,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   bdk-rn: 0b3d1975bad08b2b511fa3fb85249735d626afc6
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
-  breez_sdk: 2ca6cae60a7a64153860609586636294aec9c0a1
-  breez_sdkFFI: a3e6468a66bf14641207a0af9d15e288c873be47
-  BreezSDK: 54eed1bd79343a088fe5c4d33a41a91b65367a54
+  breez_sdk: aea12c34c179219bd98cb8a522c4dd5933a01d45
+  breez_sdkFFI: 93311f8a55b81164546ae2766d18a2fb1c251629
+  BreezSDK: a8e72a9b5104f0eeed24120520a1ac453e0ef3a7
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
   FBLazyVector: 9f533d5a4c75ca77c8ed774aced1a91a0701781e

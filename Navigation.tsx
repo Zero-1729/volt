@@ -35,6 +35,8 @@ import {
     EnvironmentType,
     connect,
     BreezEventVariant,
+    ReverseSwapPairInfo,
+    ConnectRequest,
 } from '@breeztech/react-native-breez-sdk';
 import {getXPub256} from './modules/wallet-utils';
 
@@ -72,6 +74,12 @@ import SendAmount from './screens/wallet/SendAmount';
 import SendLN from './screens/wallet/SendLN';
 import Xpub from './screens/wallet/Xpub';
 
+// Swap screens
+import SwapAmount from './screens/wallet/SwapAmount';
+import SwapIn from './screens/wallet/SwapIn';
+import SwapOut from './screens/wallet/SwapOut';
+
+// Transaction details screen
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
 import LNTransactionStatus from './screens/wallet/LNTransactionStatus';
@@ -116,9 +124,10 @@ import {
     TInvoiceData,
     TBreezPaymentDetails,
     TLnManualPayloadType,
+    TSwapInfo,
 } from './types/wallet';
+import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
-import {ENet, EBreezDetails} from './types/enums';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
 // Make sure this is updated to match all screen routes below
@@ -240,7 +249,6 @@ export type WalletParamList = {
     FeeSelection: {
         invoiceData: TInvoiceData;
         wallet: TMiniWallet;
-        source: string;
     };
     Send: {
         feeRate: number;
@@ -248,6 +256,22 @@ export type WalletParamList = {
         invoiceData: TInvoiceData;
         wallet?: TMiniWallet;
         bolt11?: LnInvoice;
+    };
+    SwapAmount: {
+        swapType: SwapType;
+        swapMeta: TSwapInfo;
+    };
+    SwapIn: {
+        feeRate?: number;
+        onchainBalance: number;
+        invoiceData: TInvoiceData;
+        swapMeta: TSwapInfo;
+    };
+    SwapOut: {
+        lnBalance: number;
+        swapMeta: TSwapInfo;
+        satsAmount: number;
+        maxed: boolean;
     };
     WalletView: {
         reload: boolean;
@@ -261,7 +285,6 @@ export type WalletParamList = {
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
-        source: string;
         isLightning?: boolean;
         isLnManual?: boolean;
         lnManualPayload?: TLnManualPayloadType;
@@ -363,12 +386,10 @@ const WalletRoot = () => {
             {/* TODO: Fix issue routing to 'Send' screen from Wallet as modal, route changed but reverted after few seconds */}
             <WalletStack.Screen name="Send" component={Send} />
             <WalletStack.Screen name="SendLN" component={SendLN} />
+            <WalletStack.Screen name="SendAmount" component={SendAmount} />
+            <WalletStack.Screen name="FeeSelection" component={FeeSelection} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
-                <WalletStack.Screen
-                    name="FeeSelection"
-                    component={FeeSelection}
-                />
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
                 <WalletStack.Screen
                     name="AddressOwnership"
@@ -391,8 +412,10 @@ const WalletRoot = () => {
                     name="RequestAmount"
                     component={RequestAmount}
                 />
-                <WalletStack.Screen name="SendAmount" component={SendAmount} />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
+                <WalletStack.Screen name="SwapAmount" component={SwapAmount} />
+                <WalletStack.Screen name="SwapIn" component={SwapIn} />
+                <WalletStack.Screen name="SwapOut" component={SwapOut} />
             </WalletStack.Group>
         </WalletStack.Navigator>
     );
@@ -459,7 +482,9 @@ const RootNavigator = (): ReactElement => {
         getWalletData,
         currentWalletID,
         isWalletInitialized,
+        mempoolInfo,
         setBreezEvent,
+        setMempoolInfo,
     } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
@@ -468,6 +493,9 @@ const RootNavigator = (): ReactElement => {
 
     const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
+    const mempoolRef = useRef(
+        new WebSocket('wss://mempool.space/api/v1/ws'),
+    ).current;
 
     const {t} = useTranslation('wallet');
 
@@ -572,12 +600,61 @@ const RootNavigator = (): ReactElement => {
         setTriggerClipboardCheck(false);
     }, [triggerClipboardCheck]);
 
+    // Fetch and set Swap Info here
+    const initMempoolSock = async () => {
+        mempoolRef.onopen = () => {
+            console.log('[Mempool] Connected');
+
+            mempoolRef.send(
+                JSON.stringify({
+                    action: 'want',
+                    data: ['stats'],
+                }),
+            );
+        };
+
+        mempoolRef.onmessage = (e: any) => {
+            const _mempoolInfo = JSON.parse(e.data.toString()).mempoolInfo;
+            const _fees = JSON.parse(e.data.toString()).fees;
+
+            const mempoolUsage = _mempoolInfo?.usage;
+            const mempoolMax = _mempoolInfo?.maxmempool;
+            const feeEnv = _fees?.fastestFee
+                ? _fees?.fastestFee
+                : mempoolInfo.fastestFee;
+
+            setMempoolInfo({
+                mempoolCongested: mempoolUsage / mempoolMax >= 2.5,
+                mempoolHighFeeEnv: feeEnv >= 150,
+                economyFee: _fees?.economyFee
+                    ? _fees?.economyFee
+                    : mempoolInfo.economyFee,
+                fastestFee: _fees?.fastestFee
+                    ? _fees?.fastestFee
+                    : mempoolInfo.fastestFee,
+                minimumFee: _fees?.minimumFee
+                    ? _fees?.minimumFee
+                    : mempoolInfo.minimumFee,
+                hourFee: _fees?.hourFee ? _fees?.hourFee : mempoolInfo.hourFee,
+                halfHourFee: _fees?.halfHourFee
+                    ? _fees?.halfHourFee
+                    : mempoolInfo.halfHourFee,
+            });
+        };
+
+        mempoolRef.onerror = (e: any) => {
+            console.log('[Mempool] (error)', e.error);
+        };
+    };
+
     // Breez startup
     const initNode = async () => {
         // No point putting in any effort if mnemonic missing
         if (wallet?.mnemonic.length === 0) {
             return;
         }
+
+        let restore_only = wallet.payments.length > 0 ? true : false;
 
         // Get node info
         try {
@@ -700,9 +777,15 @@ const RootNavigator = (): ReactElement => {
         const xpub256 = getXPub256(wallet.xpub);
         config.workingDir = config.workingDir + `/volt/${xpub256}`;
 
+        const connectionRequest: ConnectRequest = {
+            config,
+            seed,
+            restoreOnly: restore_only,
+        };
+
         try {
             // Connect to the Breez SDK make it ready for use
-            BreezSub.current = await connect(config, seed, onBreezEvent);
+            BreezSub.current = await connect(connectionRequest, onBreezEvent);
 
             Toast.show({
                 topOffset: 54,
@@ -740,6 +823,7 @@ const RootNavigator = (): ReactElement => {
         if (renderCount <= 2 && !onboardingState.current) {
             // Call on trigger for Lock comp
             setTriggerClipboardCheck(true);
+            initMempoolSock();
         }
 
         const appStateSub = AppState.addEventListener(
@@ -776,6 +860,7 @@ const RootNavigator = (): ReactElement => {
             // Kill subscription
             BreezSub?.current?.remove();
             appStateSub?.remove();
+            mempoolRef.close();
         };
     }, []);
 

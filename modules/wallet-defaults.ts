@@ -162,10 +162,6 @@ export const WALLET_NAME_LENGTH = 15;
 // Default wallet type
 export const DEFAULT_WALLET_TYPE = 'unified';
 
-// Balance minimums for inwallet swaps (sats)
-export const LIGHTNING_SWAP_BALANCE_MIN = 1000;
-export const ONCHAIN_SWAP_BALANCE_MIN = 10000;
-
 export const electrumServerList = [
     // Blockstream
     {
@@ -195,3 +191,7 @@ export const electrumServerList = [
 ];
 
 export const MAX_PIN_ATTEMPTS = 10;
+
+// Lightning SwapIn and SwapOut tx comments
+export const SWAP_OUT_LN_DESCRIPTION = 'Send to BTC address';
+export const SWAP_IN_LN_DESCRIPTION = 'Bitcoin Transfer';

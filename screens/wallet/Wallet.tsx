@@ -11,14 +11,25 @@ import {
     StyleSheet,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 
 import VText from '../../components/text';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {
+    SwapInfo,
+    nodeInfo,
+    receiveOnchain,
+    onchainPaymentLimits,
+    OnchainPaymentLimitsResponse,
+    BreezEventVariant,
+} from '@breeztech/react-native-breez-sdk';
 
 import BDK from 'bdk-rn';
 
@@ -55,7 +66,7 @@ import {Balance} from '../../components/balance';
 
 import {UnifiedTransactionListItem} from '../../components/transaction';
 
-import {TBalance, TTransaction} from '../../types/wallet';
+import {TBalance, TTransaction, TSwapInfo} from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -63,6 +74,7 @@ import Swap from './../../components/swap';
 import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
+import {EBreezDetails, SwapType} from '../../types/enums';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -75,6 +87,12 @@ const Wallet = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
+    const [swapOut, setSwapOut] = useState<TSwapInfo>({} as TSwapInfo);
+    const [swapIn, setSwapIn] = useState<TSwapInfo>({} as TSwapInfo);
+    const [loadingSwapOutInfo, setLoadingSwapOutInfo] = useState<boolean>(true);
+    const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
+    const [updatedLNBalance, setUpdatedLNBalance] = useState<boolean>(false);
+    const [updatedOnchainBalance, setUpdatedOBalance] = useState<boolean>(false);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data
@@ -93,6 +111,7 @@ const Wallet = ({route}: Props) => {
         updateWalletAddress,
         electrumServerURL,
         isAdvancedMode,
+        breezEvent,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -148,9 +167,11 @@ const Wallet = ({route}: Props) => {
         walletData.type !== 'unified'
             ? walletData.balance.onchain
             : walletData.balance.onchain.plus(walletData.balance.lightning);
+    const isLNWallet = walletData.type === 'unified';
 
     const getBalance = async () => {
         try {
+            const LNB = walletData.balance.lightning;
             const nodeState = await nodeInfo();
             const balanceLn = nodeState.channelsBalanceMsat;
 
@@ -159,6 +180,10 @@ const Wallet = ({route}: Props) => {
                 onchain: new BigNumber(0),
                 lightning: new BigNumber(balanceLn / 1000),
             });
+
+            if (!LNB.isEqualTo(balanceLn / 1000)) {
+                setUpdatedLNBalance(true);
+            }
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
@@ -221,18 +246,25 @@ const Wallet = ({route}: Props) => {
         refreshWallet();
 
         // Also call Breez if LN wallet
-        if (walletData.type === 'unified') {
+        if (isLNWallet) {
             await getBalance();
             await fetchPayments();
         }
     };
 
-    const handleSwap = async (swapType: string) => {
-        if (swapType === 'swap_in') {
-            console.log('[Swap] Init Swap In');
-        } else {
-            console.log('[Swap] Init Swap Out');
-        }
+    const handleSwap = async (swapType: SwapType) => {
+        // Close the modal
+        bottomSwapRef.current?.close();
+
+        navigation.dispatch(
+            CommonActions.navigate('WalletRoot', {
+                screen: 'SwapAmount',
+                params: {
+                    swapType: swapType,
+                    swapMeta: swapType === SwapType.SwapIn ? swapIn : swapOut,
+                },
+            }),
+        );
     };
 
     const navigateScanScreen = () => {
@@ -299,6 +331,10 @@ const Wallet = ({route}: Props) => {
                 walletData.balance.onchain,
             );
 
+            if (updated && isLNWallet) {
+                setUpdatedOBalance(true);
+            }
+
             // update wallet balance
             updateWalletBalance(currentWalletID, {
                 onchain: balance,
@@ -314,7 +350,7 @@ const Wallet = ({route}: Props) => {
                 );
 
                 // update wallet address
-                updateWalletAddress(currentWalletID, address);
+                updateWalletAddress(walletData.index, address);
 
                 // We make this update in case of pending txs
                 // and because we already have this data from the balance update BDK call
@@ -364,6 +400,47 @@ const Wallet = ({route}: Props) => {
         walletData,
     ]);
 
+    const getLNSwapInfo = async () => {
+        // TODO: report error in toast
+        // TODO: replace with call to Boltz to get when LN Balance below min
+        onchainPaymentLimits()
+            .then((c: OnchainPaymentLimitsResponse) => {
+                setSwapOut({
+                    min: c.minSat,
+                    max: c.maxSat,
+                });
+                setLoadingSwapOutInfo(false);
+                setUpdatedLNBalance(false);
+            })
+            .catch((e: any) => {
+                console.log('[Breez swapOut] error: ', e.message);
+                setLoadingSwapOutInfo(false);
+                setUpdatedLNBalance(false);
+            });
+    };
+
+    const getOnchainSwapInfo = async () => {
+        // TODO: report error in toast
+        receiveOnchain({})
+            .then((d: SwapInfo) => {
+                setSwapIn({
+                    min: d.minAllowedDeposit,
+                    max: d.maxAllowedDeposit,
+                    address: d.bitcoinAddress,
+                    lockHeight: d.lockHeight,
+                    channelOpeningFees: d.channelOpeningFees,
+                    maxSwapperPayable: d.maxSwapperPayable,
+                });
+                setLoadingSwapInInfo(false);
+                setUpdatedOBalance(false);
+            })
+            .catch((e: any) => {
+                console.log('[Breez swapIn] error: ', e.message);
+                setLoadingSwapInInfo(false);
+                setUpdatedOBalance(false);
+            });
+    };
+
     // Check if wallet balance is empty
     const isWalletBroke = (balance: TBalance) => {
         return new BigNumber(0).eq(balance.onchain.plus(balance.lightning));
@@ -373,6 +450,11 @@ const Wallet = ({route}: Props) => {
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
     useEffect(() => {
+        if (isLNWallet) {
+            getLNSwapInfo();
+            getOnchainSwapInfo();
+        }
+
         // Kill all loading effects
         () => {
             setRefreshing(false);
@@ -380,6 +462,36 @@ const Wallet = ({route}: Props) => {
             setLoadLock(false);
         };
     }, []);
+
+    useEffect(() => {
+        if (updatedOnchainBalance && isLNWallet) {
+            setLoadingSwapInInfo(true);
+            getOnchainSwapInfo();
+        }
+        // Re-check swap info
+    }, [updatedOnchainBalance]);
+
+    useEffect(() => {
+        if (updatedLNBalance && isLNWallet) {
+            setLoadingSwapOutInfo(true);
+            getLNSwapInfo();
+        }
+    }, [updatedLNBalance]);
+
+    useEffect(() => {
+        if (breezEvent.type === BreezEventVariant.INVOICE_PAID && isLNWallet) {
+            // Route to LN payment status screen
+            navigation.dispatch(StackActions.popToTop());
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: true,
+                    details: breezEvent.details,
+                    detailsType: EBreezDetails.Received,
+                }),
+            );
+            return;
+        }
+    }, [breezEvent]);
 
     useEffect(() => {
         // Attempt to sync balance when reload triggered
@@ -798,6 +910,8 @@ const Wallet = ({route}: Props) => {
                                 tailwind('w-full h-full items-center pb-10'),
                             ]}>
                             <FlatList
+                                maxToRenderPerBatch={50}
+                                updateCellsBatchingPeriod={2500}
                                 refreshing={refreshing}
                                 onRefresh={jointSync}
                                 scrollEnabled={true}
@@ -886,6 +1000,13 @@ const Wallet = ({route}: Props) => {
                                     onSelectSwap={idx => {
                                         setOpenSwap(idx);
                                     }}
+                                    swapInfo={{
+                                        swapIn: swapIn,
+                                        swapOut: swapOut,
+                                    }}
+                                    loadingInfo={
+                                        loadingSwapOutInfo && loadingSwapInInfo
+                                    }
                                 />
                             </View>
                         )}

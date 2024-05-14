@@ -14,15 +14,12 @@ import {
 } from './../../types/wallet';
 import {ENet} from './../../types/enums';
 
-import {
-    getAddressPath,
-    generateAddressFromMnemonic,
-    generateAddressFromXKey,
-} from '../../modules/wallet-utils';
+import {getAddressPath} from '../../modules/wallet-utils';
 
 import {WalletPaths, GAP_LIMIT} from '../../modules/wallet-defaults';
 
 import {parseDescriptor} from '../../modules/descriptors';
+import {createBDKWallet, generateBDKAddress} from '../../modules/bdk';
 
 export class BaseWallet {
     // Use static method to create wallet from JSON
@@ -164,46 +161,32 @@ export class BaseWallet {
         this.masterFingerprint = args.fingerprint ? args.fingerprint : ''; // Wallet master fingerprint
     }
 
-    generateNewAddress(index?: number): TAddress {
+    async generateNewAddress(index?: number): Promise<TAddress> {
+        const addressPath = getAddressPath(
+            this.index,
+            false,
+            this.network,
+            this.type,
+        );
+
+        const idx = index ? index : this.index;
+
         try {
-            let idx = index ? index : this.index;
-            let address!: string;
+            const _w = await createBDKWallet(this);
 
-            const addressPath = getAddressPath(
-                this.index,
-                false,
-                this.network,
-                this.type,
-            );
+            const _addressObj = await generateBDKAddress(_w, idx, false);
 
-            // Generate address using either mnemonic or xpub
-            if (this.mnemonic.length > 0) {
-                address = generateAddressFromMnemonic(
-                    addressPath,
-                    this.network,
-                    this.type,
-                    this.mnemonic,
-                );
-            } else {
-                address = generateAddressFromXKey(
-                    addressPath,
-                    this.network,
-                    this.type,
-                    this.xpub ? this.xpub : this.xprv,
-                );
-            }
-
-            // Bump address index
-            this.index = index ? index : this.index + 1;
+            // Bump index
+            this.index += 1;
 
             return {
-                address: address,
+                address: _addressObj.asString,
                 path: addressPath,
                 change: false,
-                index: idx,
+                index: _addressObj.index,
                 memo: '',
             };
-        } catch (e) {
+        } catch (e: any) {
             throw e;
         }
     }

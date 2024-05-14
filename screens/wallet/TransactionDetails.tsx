@@ -42,6 +42,7 @@ import Failed from '../../assets/svg/x-circle-fill-24.svg';
 import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
+import SwapIcon from '../../assets/svg/arrow-switch-24.svg';
 
 import {
     capitalizeFirst,
@@ -53,6 +54,7 @@ import {getScreenEdges} from '../../modules/screen';
 import BigNumber from 'bignumber.js';
 
 import {nodeInfo, LnPaymentDetails} from '@breeztech/react-native-breez-sdk';
+import { SWAP_IN_LN_DESCRIPTION, SWAP_OUT_LN_DESCRIPTION } from '../../modules/wallet-defaults';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
@@ -82,7 +84,10 @@ const TransactionDetailsView = ({route}: Props) => {
 
     const buttonText = isAdvancedMode ? t('view_on_mempool') : t('see_more');
 
-    const displayFeeBump = !route.params.tx.confirmed && route.params.tx.rbf;
+    const displayFeeBump =
+        !route.params.tx.confirmed &&
+        route.params.tx.rbf &&
+        !route.params.tx.received;
 
     const openBumpFee = () => {
         if (openBump !== 1) {
@@ -100,12 +105,12 @@ const TransactionDetailsView = ({route}: Props) => {
         ? route.params.tx.paymentType === 'received'
         : route.params.tx.type === 'inbound';
 
-    const getTxTimestamp = (time: Date) => {
+    const getTxTimestamp = (time: number) => {
         return formatLocaleDate(i18n.language, time);
     };
 
     const titleDescText = isLNTx
-        ? getTxTimestamp(new Date(route.params.tx.paymentTime))
+        ? getTxTimestamp(route.params.tx.paymentTime)
         : route.params.tx.confirmed
         ? getTxTimestamp(route.params.tx.timestamp)
         : t('pending');
@@ -115,6 +120,9 @@ const TransactionDetailsView = ({route}: Props) => {
     const txFee = new BigNumber(
         isLNTx ? route.params.tx.feeMsat / 1000 : route.params.tx.fee,
     );
+
+    const isSwapInTx = route.params.tx.description === SWAP_IN_LN_DESCRIPTION;
+    const isSwapOutTx = route.params.tx.description === SWAP_OUT_LN_DESCRIPTION;
 
     const paymentPreimage = route.params.tx.details?.data
         ? (route.params.tx.details?.data as LnPaymentDetails).paymentPreimage
@@ -225,8 +233,15 @@ const TransactionDetailsView = ({route}: Props) => {
             ? ''
             : capitalizeFirst(t('unconfirmed'));
 
+    const onchainStatusMessage =
+        route.params.tx.status === 'pending'
+            ? t('pending_conf')
+            : t(route.params.tx.status);
+
     const confirmationInfo = isLNTx
-        ? t(route.params.tx.status)
+        ? isSwapOutTx
+            ? capitalizeFirst(t(route.params.tx.status))
+            : onchainStatusMessage
         : route.params.tx.confirmed
         ? `${
               route.params.tx.confirmations === 1
@@ -402,15 +417,42 @@ const TransactionDetailsView = ({route}: Props) => {
                         {isLNTx && (
                             <View
                                 style={[tailwind('items-center mt-6 w-full')]}>
-                                <Text
-                                    ellipsizeMode="middle"
-                                    numberOfLines={2}
-                                    style={[
-                                        tailwind('text-sm w-4/5 text-center'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
-                                    {route.params.tx.description}
-                                </Text>
+                                {isSwapInTx || isSwapOutTx ? (
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'flex-row items-center justify-center',
+                                            ),
+                                        ]}>
+                                        <SwapIcon
+                                            fill={ColorScheme.SVG.GrayFill}
+                                        />
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm ml-2'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .DescText,
+                                                },
+                                            ]}>
+                                            {isSwapInTx
+                                                ? t('bitcoin_swapin')
+                                                : t('ln_swapout')}
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <Text
+                                        ellipsizeMode="middle"
+                                        numberOfLines={2}
+                                        style={[
+                                            tailwind(
+                                                'text-sm w-4/5 text-center',
+                                            ),
+                                            {color: ColorScheme.Text.DescText},
+                                        ]}>
+                                        {route.params.tx.description}
+                                    </Text>
+                                )}
                             </View>
                         )}
 

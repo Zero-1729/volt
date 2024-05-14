@@ -22,7 +22,7 @@ import {
 } from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AppStorageContext} from '../../class/storageContext';
-import {SafeAreaView, Edges} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {WalletParamList} from '../../Navigation';
 
 import BigNumber from 'bignumber.js';
@@ -48,8 +48,10 @@ import Close from '../../assets/svg/x-24.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {getPrivateDescriptors} from '../../modules/descriptors';
 import {psbtFromInvoice} from '../../modules/bdk';
-import {getScreenEdges} from '../../modules/screen';
 import Toast from 'react-native-toast-message';
+
+import Info from '../../assets/svg/info-16.svg';
+import AlertIcon from '../../assets/svg/alert-16.svg';
 
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
@@ -65,13 +67,15 @@ const FeeSelection = ({route}: Props) => {
 
     const isAndroid = Platform.OS === 'android';
 
-    // We need to make adjustments to the screen based on the source caller.
-    // conservative - from the wallet view
-    // liberal - from home screen
-    const edges: Edges = getScreenEdges(route.params.source);
-
-    const {fiatRate, appFiatCurrency, electrumServerURL} =
-        useContext(AppStorageContext);
+    const {
+        fiatRate,
+        appFiatCurrency,
+        electrumServerURL,
+        mempoolInfo,
+        currentWalletID,
+        getWalletData,
+        isAdvancedMode,
+    } = useContext(AppStorageContext);
     const [selectedFeeRate, setSelectedFeeRate] = useState<number>(1);
     const [selectedFeeRateType, setSelectedFeeRateType] = useState<string>();
     const [psbtVSize, setPsbtVSize] = useState<number>(1);
@@ -83,6 +87,11 @@ const FeeSelection = ({route}: Props) => {
         economyFee: 1,
         minimumFee: 1,
     });
+
+    const walletData = getWalletData(currentWalletID);
+
+    const CardColor =
+        ColorScheme.WalletColors[walletData.type][walletData.network];
 
     const isFeeTooHigh = (fee: number, isMaxAmount: boolean) => {
         const amount = Number(route.params.invoiceData.options?.amount);
@@ -105,13 +114,15 @@ const FeeSelection = ({route}: Props) => {
             new BigNumber(route.params.wallet.balanceOnchain),
             electrumServerURL,
             (err: any) => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: e('tx_fail_creation_error'),
-                    visibilityTime: 1750,
-                });
+                if (isAdvancedMode) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: e('tx_fail_creation_error'),
+                        visibilityTime: 1750,
+                    });
+                }
 
                 console.log(
                     '[Fee Selection] Failed to create tx: ',
@@ -257,7 +268,7 @@ const FeeSelection = ({route}: Props) => {
 
     return (
         <SafeAreaView
-            edges={edges}
+            edges={['top', 'left', 'bottom', 'right']}
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
@@ -687,8 +698,6 @@ const FeeSelection = ({route}: Props) => {
                     </PlainButton>
                 </View>
 
-                {/* TODO: calculate/determine if in high-fee or congested mempool environment and display warn message here */}
-
                 {/* Loading psbt text */}
                 {loadingData && (
                     <View
@@ -710,6 +719,73 @@ const FeeSelection = ({route}: Props) => {
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
                             {t('fee_loading_message')}
+                        </Text>
+                    </View>
+                )}
+
+                {/* Show message if in high-fee or congested mempool environment and display warn message here */}
+                {!loadingData && mempoolInfo.mempoolCongested && (
+                    <View
+                        style={[
+                            tailwind(
+                                `absolute w-5/6 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center`,
+                            ),
+                            {bottom: NativeWindowMetrics.bottom + 110},
+                        ]}>
+                        <Info
+                            width={16}
+                            height={16}
+                            fill={ColorScheme.SVG.GrayFill}
+                        />
+                        <Text
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'mr-2'
+                                            : 'ml-2 text-center'
+                                    } text-sm`,
+                                ),
+                                {
+                                    color: ColorScheme.Text.DescText,
+                                },
+                            ]}>
+                            {t('mempool_congested')}
+                        </Text>
+                    </View>
+                )}
+
+                {!loadingData && mempoolInfo.mempoolHighFeeEnv && (
+                    <View
+                        style={[
+                            tailwind(
+                                `absolute w-5/6 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center`,
+                            ),
+                            {bottom: NativeWindowMetrics.bottom + 146},
+                        ]}>
+                        <AlertIcon width={16} height={16} fill={CardColor} />
+                        <Text
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'mr-2'
+                                            : 'ml-2 text-center'
+                                    } text-sm`,
+                                ),
+                                {
+                                    color: CardColor,
+                                },
+                            ]}>
+                            {t('mempool_high_fee')}
                         </Text>
                     </View>
                 )}

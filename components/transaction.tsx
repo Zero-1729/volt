@@ -20,9 +20,15 @@ import Color from '../constants/Color';
 
 import ArrowUp from '../assets/svg/arrow-up-right-24.svg';
 import ArrowDown from '../assets/svg/arrow-down-left-24.svg';
+import SwapIcon from '../assets/svg/arrow-switch-24.svg';
+
 import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
+import {
+    SWAP_IN_LN_DESCRIPTION,
+    SWAP_OUT_LN_DESCRIPTION,
+} from '../modules/wallet-defaults';
 
 export const UnifiedTransactionListItem = (props: TxListItemProps) => {
     if (props.tx.isLightning) {
@@ -39,8 +45,24 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
     const {i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const getTxTimestamp = (time: Date) => {
+    const getTxTimestamp = (time: number) => {
         return formatLocaleDate(i18n.language, time);
+    };
+
+    const receiveComp = () => {
+        if (props.tx.description === SWAP_IN_LN_DESCRIPTION) {
+            return <SwapIcon fill={ColorScheme.SVG.Received} />;
+        } else {
+            return <ArrowDown fill={ColorScheme.SVG.Received} />;
+        }
+    };
+
+    const sendComp = () => {
+        if (props.tx.description === SWAP_OUT_LN_DESCRIPTION) {
+            return <SwapIcon fill={ColorScheme.SVG.Sent} />;
+        } else {
+            return <ArrowUp fill={ColorScheme.SVG.Sent} />;
+        }
     };
 
     return (
@@ -77,7 +99,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                                 tailwind('text-xs'),
                                 {color: ColorScheme.Text.GrayedText},
                             ]}>
-                            {getTxTimestamp(new Date(props.tx.paymentTime))}
+                            {getTxTimestamp(props.tx.paymentTime)}
                         </VText>
                     </View>
                 </View>
@@ -90,11 +112,9 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                             backgroundColor: ColorScheme.Background.Secondary,
                         },
                     ]}>
-                    {props.tx.paymentType === 'received' ? (
-                        <ArrowDown fill={ColorScheme.SVG.Received} />
-                    ) : (
-                        <ArrowUp fill={ColorScheme.SVG.Sent} />
-                    )}
+                    {props.tx.paymentType === 'received'
+                        ? receiveComp()
+                        : sendComp()}
                 </View>
             </View>
         </PlainButton>
@@ -110,7 +130,7 @@ export const TransactionListItem = (props: TxListItemProps) => {
 
     const {isAdvancedMode} = useContext(AppStorageContext);
 
-    const getTxTimestamp = (time: Date) => {
+    const getTxTimestamp = (time: number) => {
         return formatLocaleDate(i18n.language, time);
     };
 

@@ -15,3 +15,8 @@ export const enum EBreezDetails {
     Received = 'received',
     Failed = 'failed',
 }
+
+export const enum SwapType {
+    SwapIn = 'swap_in',
+    SwapOut = 'swap_out',
+}

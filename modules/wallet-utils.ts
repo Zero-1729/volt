@@ -512,6 +512,7 @@ export const canSendToInvoice = (
             : prefixTip
     ).toLowerCase();
     const invoicePrefixInfo = prefixInfo[prefixStub];
+    const walletP2tr = miniWallet.type === 'unified' ? 'p2tr' : miniWallet.type;
 
     switch (invoicePrefixInfo?.type) {
         case 'p2pkh':
@@ -521,7 +522,7 @@ export const canSendToInvoice = (
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'shp2wpkh' ||
                     miniWallet.type === 'wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
         case 'shp2wpkh':
             // Can send to shp2wpkh if wallet is wpkh, shp2wpkh, or p2tr
@@ -529,7 +530,7 @@ export const canSendToInvoice = (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
         case 'wpkh':
             // Can send to wpkh if wallet is shp2wpkh, wpkh, or p2tr
@@ -537,15 +538,15 @@ export const canSendToInvoice = (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'shp2wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
         case 'p2tr':
-            // Can send to p2tr if wallet is p2tr or wpkh
+            // Can send to p2tr if wallet is unified, p2tr or wpkh
             return (
                 miniWallet.network === invoicePrefixInfo.network &&
                 (miniWallet.type === invoicePrefixInfo.type ||
                     miniWallet.type === 'wpkh' ||
-                    miniWallet.type === 'p2tr')
+                    walletP2tr === 'p2tr')
             );
     }
 
@@ -648,7 +649,11 @@ export const getLNPayments = async (
     let txs: TTransaction[] = [];
 
     for (let i = 0; i < payments.length; i++) {
-        txs.push({...payments[i], isLightning: true} as TTransaction);
+        txs.push({
+            ...payments[i],
+            isLightning: true,
+            timestamp: payments[i].paymentTime,
+        } as TTransaction);
     }
 
     // Return formatted LN payments
@@ -681,7 +686,7 @@ export const getCountdownStart = (timestamp: number, expiry: number) => {
 
 // Function for syncing and returning new BDK wallet and Breez transactions
 
-const determinLnType = async (
+const determineLnType = async (
     invoice: string,
 ): Promise<{
     type: string;
@@ -752,7 +757,7 @@ export const decodeInvoiceType = async (
         lowercasedInvoice.startsWith('lnurl') ||
         lowercasedInvoice.startsWith('lightning')
     ) {
-        const determinedLnType = await determinLnType(lowercasedInvoice);
+        const determinedLnType = await determineLnType(lowercasedInvoice);
 
         return determinedLnType;
     }

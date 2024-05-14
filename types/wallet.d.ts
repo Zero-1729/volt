@@ -98,7 +98,7 @@ export type TTransaction = Payment & {
     value: number; // Transaction value in sats
     received: number; // Transaction received value in sats
     sent: number; // Transaction sent value in sats
-    timestamp: Date; // Transaction date
+    timestamp: number; // Transaction date
     type: string; // Transaction type, 'outbound' or 'inbound'
     inputs?: TUTXO[]; // Transaction inputs
     outputs?: TUTXO[]; // Transaction outputs
@@ -174,9 +174,34 @@ export type TBreezDetails = {
     failed: PaymentFailedData;
 };
 
+export type DisplayUnit = {
+    value: BigNumber;
+    symbol: string;
+    name: string;
+};
+
 export type TLnManualPayloadType = {
     kind: string;
     text: string;
     description: string;
     amount?: number;
+};
+
+export type TMempoolInfo = {
+    mempoolCongested: boolean;
+    mempoolHighFeeEnv: boolean;
+    economyFee: number;
+    fastestFee: number;
+    minimumFee: number;
+    hourFee: number;
+    halfHourFee: number;
+};
+
+type TSwapInfo = {
+    min: number;
+    max: number;
+    address?: string; // For onchain receiving swap address
+    lockHeight?: number;
+    channelOpeningFees?: OpeningFeeParams;
+    maxSwapperPayable?: number;
 };

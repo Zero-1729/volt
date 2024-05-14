@@ -1,9 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-// TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+    useNavigation,
+    CommonActions,
+    StackActions,
+} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -11,59 +14,66 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
 import {useTailwind} from 'tailwind-rn';
-
-import BigNumber from 'bignumber.js';
-
 import Color from '../../constants/Color';
-
-import {AppStorageContext} from '../../class/storageContext';
-
-import Toast from 'react-native-toast-message';
-
 import Close from '../../assets/svg/x-24.svg';
-
-import bottomOffset from '../../constants/NativeWindowMetrics';
-
-import {DUST_LIMIT} from '../../modules/wallet-defaults';
-
-import {useTranslation} from 'react-i18next';
 
 import {
     capitalizeFirst,
     formatFiat,
     normalizeFiat,
     SATS_TO_BTC_RATE,
-    calculateFiatEquivalent,
 } from '../../modules/transform';
-
-import {useNetInfo} from '@react-native-community/netinfo';
-import {checkNetworkIsReachable} from '../../modules/wallet-utils';
-import {DisplayUnit} from '../../types/wallet';
 
 import {PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
+import {DisplayUnit} from '../../types/wallet';
+import {SwapType} from '../../types/enums';
+
 import {
     DisplayFiatAmount,
     DisplaySatsAmount,
     DisplayBTCAmount,
 } from '../../components/balance';
 
-type Props = NativeStackScreenProps<WalletParamList, 'SendAmount'>;
+import BigNumber from 'bignumber.js';
+import {AppStorageContext} from '../../class/storageContext';
+import {useTranslation} from 'react-i18next';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
-const SendAmount = ({route}: Props) => {
+import Toast, {ToastConfig} from 'react-native-toast-message';
+import {toastConfig} from '../../components/toast';
+
+type Props = NativeStackScreenProps<WalletParamList, 'SwapAmount'>;
+
+const SwapAmount = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
-
     const navigation = useNavigation();
 
+    const {fiatRate, getWalletData, currentWalletID, appFiatCurrency} =
+        useContext(AppStorageContext);
     const {t} = useTranslation('wallet');
-    const {t: e} = useTranslation('errors');
 
-    const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
-
-    const networkState = useNetInfo();
+    const wallet = getWalletData(currentWalletID);
+    const balance = new BigNumber(
+        route.params.swapType === SwapType.SwapOut
+            ? wallet.balance.lightning
+            : wallet.balance.onchain,
+    );
+    const isSwapOut = route.params.swapType === SwapType.SwapOut;
 
     const [amount, setAmount] = useState<string>('');
+    const [loadingFeeText, setFeeLoadingText] = useState('');
+    const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
+
+    const minimumSwapAmount = new BigNumber(route.params.swapMeta.min);
+    const maximumSwapAmount = new BigNumber(balance);
+
+    const [satsAmount, setSatsAmount] = useState<DisplayUnit>({
+        value: new BigNumber(0),
+        symbol: 'sats',
+        name: 'sats',
+    });
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
         value: new BigNumber(0),
         symbol: 'sats',
@@ -74,28 +84,52 @@ const SendAmount = ({route}: Props) => {
         symbol: appFiatCurrency.symbol,
         name: appFiatCurrency.short,
     });
-    const [satsAmount, setSatsAmount] = useState<DisplayUnit>({
-        value: new BigNumber(0),
-        symbol: 'sats',
-        name: 'sats',
-    });
-    const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
-    const walletBalance = new BigNumber(
-        route.params.isLightning
-            ? route.params.wallet.balanceLightning
-            : route.params.wallet.balanceOnchain,
-    );
+    const isMax = amount === balance.toString();
+    const isBeyondMax = satsAmount.value.gt(maximumSwapAmount);
 
-    const isMax = amount === walletBalance.toString();
-    const isAmountEmpty = Number(amount) === 0;
-    const isLNManual = route.params.isLnManual;
+    const handleCloseButton = () => {
+        navigation.dispatch(CommonActions.goBack());
+    };
 
-    const isOverBalance = new BigNumber(satsAmount.value).gt(walletBalance);
-    const isBelowDust = new BigNumber(satsAmount.value).lt(DUST_LIMIT);
+    const handleSwapRoute = async () => {
+        navigation.dispatch(StackActions.pop());
+
+        if (isSwapOut) {
+            let maxSwapAmount;
+
+            if (isMax) {
+                maxSwapAmount = balance.eq(satsAmount.value);
+            }
+
+            navigation.dispatch(
+                CommonActions.navigate('SwapOut', {
+                    lnBalance: wallet.balance.lightning.toNumber(),
+                    swapMeta: route.params.swapMeta,
+                    satsAmount: maxSwapAmount
+                        ? maxSwapAmount
+                        : satsAmount.value.toNumber(),
+                    maxed: isMax,
+                }),
+            );
+        } else {
+            navigation.dispatch(
+                CommonActions.navigate('SwapIn', {
+                    onchainBalance: wallet.balance.onchain.toString(),
+                    invoiceData: {
+                        address: route.params.swapMeta.address,
+                        options: {
+                            amount: satsAmount.value.toString(),
+                        },
+                    },
+                    swapMeta: route.params.swapMeta,
+                }),
+            );
+        }
+    };
 
     const triggerMax = () => {
-        const maxSats = walletBalance.toString();
+        const maxSats = balance.toString();
 
         setAmount(maxSats);
 
@@ -105,7 +139,7 @@ const SendAmount = ({route}: Props) => {
             name: 'sats',
         });
 
-        setFiatAmount(calculateFiatEquivalent(maxSats, fiatRate.rate));
+        setFiatAmount(calculateFiatEquivalent(maxSats));
     };
 
     const updateAmount = (value: string) => {
@@ -113,6 +147,46 @@ const SendAmount = ({route}: Props) => {
         // We reset instead of preserve previous top unit value
         // because we assume the user changes unit to get a new value
         // in the new bottom unit and not to preserve the previous value
+
+        // The fiat equivalent (fiat if fiat and sats to fiat if sats)
+        const fiatEqv =
+            bottomUnit.name !== 'sats'
+                ? new BigNumber(value)
+                : new BigNumber(calculateFiatEquivalent(value));
+        // The sats equivalent (sats if sats and fiat to sats if fiat)
+        const satsEqv =
+            bottomUnit.name === 'sats'
+                ? new BigNumber(value)
+                : new BigNumber(calculateSatsEquivalent(value));
+        const maxSwapFiatAmount = calculateFiatEquivalent(
+            maximumSwapAmount.toString(),
+        );
+
+        const isMaxing =
+            bottomUnit.name === 'sats'
+                ? satsEqv.isEqualTo(maximumSwapAmount)
+                : fiatEqv.isEqualTo(maxSwapFiatAmount);
+
+        const isLarger =
+            bottomUnit.name === 'sats'
+                ? maximumSwapAmount.lt(value)
+                : fiatEqv.gt(maxSwapFiatAmount);
+
+        // clear loading text
+        if (loadingFeeText) {
+            setFeeLoadingText('');
+        }
+
+        // If maximum manually entered, auto set to max
+        if (isMaxing) {
+            triggerMax();
+            return;
+        }
+
+        // If new input about to be larger, stop input
+        if (isLarger) {
+            return;
+        }
 
         // I.e. if the previous bottom was $20, and the user swaps to sats
         // we assume the user wants to set a different value in sats
@@ -122,15 +196,13 @@ const SendAmount = ({route}: Props) => {
             value:
                 bottomUnit.name === 'sats'
                     ? new BigNumber(value || 0)
-                    : new BigNumber(calculateSatsEquivalent(value)),
+                    : satsEqv,
             symbol: 'sats',
             name: 'sats',
         });
 
         setFiatAmount(
-            bottomUnit.name !== 'sats'
-                ? new BigNumber(value || 0)
-                : calculateFiatEquivalent(value, fiatRate.rate),
+            bottomUnit.name !== 'sats' ? new BigNumber(value || 0) : fiatEqv,
         );
     };
 
@@ -145,6 +217,21 @@ const SendAmount = ({route}: Props) => {
         }
 
         return '0';
+    };
+
+    const calculateFiatEquivalent = (value: string): BigNumber => {
+        if (value.length > 0) {
+            const satoshis = new BigNumber(value);
+
+            return new BigNumber(
+                satoshis
+                    .multipliedBy(0.00000001)
+                    .multipliedBy(fiatRate.rate)
+                    .toFixed(2),
+            );
+        }
+
+        return new BigNumber(0);
     };
 
     const swapPolarity = () => {
@@ -203,8 +290,8 @@ const SendAmount = ({route}: Props) => {
 
     const displayBalance = (fontSize: string) => {
         const bottomUnitSats = bottomUnit?.name === 'sats';
-        const rawBalance = walletBalance; // sats
-        const fiatBalance = normalizeFiat(rawBalance, fiatRate.rate);
+        const rawBalance = balance; // sats
+        const fBalance = normalizeFiat(rawBalance, fiatRate.rate);
 
         return bottomUnitSats ? (
             <DisplaySatsAmount
@@ -214,44 +301,99 @@ const SendAmount = ({route}: Props) => {
             />
         ) : (
             <DisplayFiatAmount
-                amount={fiatBalance}
+                amount={fBalance}
                 fontSize={fontSize}
                 isApprox={topUnit?.name !== 'sats' && amount.length > 0}
             />
         );
     };
 
-    const handleCloseButton = () => {
-        navigation.dispatch(CommonActions.goBack());
+    const displayMinimum = (fontSize: string) => {
+        const bottomUnitSats = bottomUnit?.name === 'sats';
+        const rawMin = new BigNumber(minimumSwapAmount);
+        const minAmount = normalizeFiat(rawMin, fiatRate.rate);
+
+        return bottomUnitSats ? (
+            <DisplaySatsAmount
+                textColor={ColorScheme.Text.DescText}
+                amount={rawMin}
+                fontSize={fontSize}
+                isApprox={bottomUnit.name !== 'sats' && amount.length > 0}
+            />
+        ) : (
+            <DisplayFiatAmount
+                textColor={ColorScheme.Text.DescText}
+                amount={minAmount}
+                fontSize={fontSize}
+                isApprox={topUnit?.name !== 'sats' && amount.length > 0}
+            />
+        );
     };
 
     return (
         <SafeAreaView
-            edges={['top', 'right', 'left', 'bottom']}
+            edges={['left', 'right', 'bottom']}
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
                 style={[tailwind('w-full h-full items-center justify-center')]}>
+                {/* Screen header */}
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 items-center justify-center flex-row absolute top-6 flex',
+                            'absolute top-6 z-10 w-full flex-row items-center justify-center',
                         ),
                     ]}>
                     <PlainButton
-                        style={[tailwind('absolute left-0 z-10')]}
-                        onPress={handleCloseButton}>
-                        <Close fill={ColorScheme.SVG.Default} width={32} />
+                        onPress={handleCloseButton}
+                        style={[tailwind('absolute z-10 left-6')]}>
+                        <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                     <Text
                         style={[
-                            tailwind('text-sm text-center w-full font-bold'),
+                            tailwind('text-base font-bold'),
                             {color: ColorScheme.Text.Default},
                         ]}>
-                        {capitalizeFirst(t('send'))}
+                        {capitalizeFirst(t('continue'))}
                     </Text>
                 </View>
+
+                <View
+                    style={[
+                        tailwind(
+                            'absolute items-center justify-center flex-row rounded-md py-1 px-4',
+                        ),
+                        {
+                            top: 72,
+                            backgroundColor: ColorScheme.Background.Greyed,
+                        },
+                    ]}>
+                    <Text
+                        style={[
+                            tailwind('text-base font-bold mr-2'),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {t('balance')}
+                    </Text>
+                    <View style={[tailwind('items-center')]}>
+                        {displayBalance('text-base')}
+                    </View>
+                </View>
+
+                {/* Minimum Sats warn */}
+                {route.params.swapMeta.min > 0 && (
+                    <View style={[tailwind('absolute flex-row'), {top: 120}]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm mr-2'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {t('minimum_amount')}
+                        </Text>
+                        {displayMinimum('text-sm')}
+                    </View>
+                )}
 
                 {/* Screen for amount */}
                 <View
@@ -293,7 +435,7 @@ const SendAmount = ({route}: Props) => {
                     </View>
 
                     {/* Set maximum */}
-                    {!isMax && (
+                    {balance.gt(minimumSwapAmount) && (
                         <View
                             style={[
                                 tailwind('rounded-full px-4 py-1 mt-6'),
@@ -309,20 +451,16 @@ const SendAmount = ({route}: Props) => {
                                     ),
                                 ]}
                                 disabled={
-                                    walletBalance.toString() ===
-                                    satsAmount.value.toString()
+                                    balance.toString() === satsAmount.toString()
                                 }
                                 onPress={triggerMax}>
                                 <Text
                                     style={[
-                                        tailwind('text-sm font-bold mr-2'),
+                                        tailwind('text-sm font-bold'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {t('use_max')}
+                                    {capitalizeFirst(t('max'))}
                                 </Text>
-                                <View style={[tailwind('justify-center')]}>
-                                    {displayBalance('text-sm')}
-                                </View>
                             </PlainButton>
                         </View>
                     )}
@@ -333,86 +471,29 @@ const SendAmount = ({route}: Props) => {
                     amount={amount}
                     onAmountChange={updateAmount}
                     isSats={bottomUnit.name === 'sats'}
-                    maxAmount={walletBalance.toString()}
+                    maxAmount={balance.toString()}
                 />
 
                 {/* Continue button */}
                 <View
                     style={[
                         tailwind('absolute'),
-                        {bottom: bottomOffset.bottom},
+                        {bottom: NativeWindowMetrics.bottom},
                     ]}>
                     <PlainButton
-                        disabled={amount === '' || isOverBalance}
-                        onPress={() => {
-                            if (isBelowDust && !route.params.isLightning) {
-                                Toast.show({
-                                    topOffset: 54,
-                                    type: 'Liberal',
-                                    text1: e('dust_limit_title'),
-                                    text2: `${e(
-                                        'dust_limit_message',
-                                    )} ${DUST_LIMIT} ${t('satoshi')}.`,
-                                    visibilityTime: 1750,
-                                });
-                                return;
-                            }
-
-                            if (
-                                checkNetworkIsReachable(networkState) &&
-                                isLNManual
-                            ) {
-                                navigation.dispatch(
-                                    CommonActions.navigate('WalletRoot', {
-                                        screen: 'SendLN',
-                                        params: {
-                                            lnManualPayload: {
-                                                amount: satsAmount.value.toString(),
-                                                kind: route.params
-                                                    .lnManualPayload?.kind,
-                                                text: route.params
-                                                    .lnManualPayload?.text,
-                                                description:
-                                                    route.params.lnManualPayload
-                                                        ?.description,
-                                            },
-                                        },
-                                    }),
-                                );
-                                return;
-                            }
-
-                            if (checkNetworkIsReachable(networkState)) {
-                                navigation.dispatch(
-                                    CommonActions.navigate('WalletRoot', {
-                                        screen: 'FeeSelection',
-                                        params: {
-                                            invoiceData: {
-                                                ...route.params.invoiceData,
-                                                options: {
-                                                    amount: satsAmount.value.toString(),
-                                                },
-                                            },
-                                            wallet: route.params.wallet,
-                                        },
-                                    }),
-                                );
-                            } else {
-                                Toast.show({
-                                    topOffset: 54,
-                                    type: 'Liberal',
-                                    text1: e('no_internet_title'),
-                                    text2: e('no_internet_message'),
-                                    visibilityTime: 1750,
-                                });
-                                return;
-                            }
-                        }}>
+                        disabled={
+                            amount === '' ||
+                            isBeyondMax ||
+                            minimumSwapAmount.gt(satsAmount.value)
+                        }
+                        onPress={handleSwapRoute}>
                         <View
                             style={[
                                 tailwind(
                                     `rounded-full items-center flex-row justify-center px-6 py-3 ${
-                                        isAmountEmpty || isOverBalance
+                                        amount === '' ||
+                                        isBeyondMax ||
+                                        minimumSwapAmount.gt(satsAmount.value)
                                             ? 'opacity-20'
                                             : ''
                                     }`,
@@ -434,9 +515,11 @@ const SendAmount = ({route}: Props) => {
                         </View>
                     </PlainButton>
                 </View>
+
+                <Toast config={toastConfig as ToastConfig} />
             </View>
         </SafeAreaView>
     );
 };
 
-export default SendAmount;
+export default SwapAmount;

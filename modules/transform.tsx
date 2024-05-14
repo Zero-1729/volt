@@ -133,7 +133,7 @@ const getLocaleGroupingSeparator = (locale: string) => {
     return (1000).toLocaleString(locale).substring(1, 2);
 };
 
-export const formatLocaleDate = (locale: string, date: Date) => {
+export const formatLocaleDate = (locale: string, date: number) => {
     const d = +date * 1000;
     const isToday = DayJS(date).isSame(DayJS(), 'day');
     const isEnglish = locale === 'en';
@@ -157,4 +157,19 @@ export const displayNumberedSeed = (seed: string) => {
 // Return language translated number
 export const i18nNumber = (num: number, locale: string) => {
     return num.toLocaleString(locale);
+};
+
+export const calculateFiatEquivalent = (
+    value: string,
+    rate: BigNumber,
+): BigNumber => {
+    if (value.length > 0) {
+        const satoshis = new BigNumber(value);
+
+        return new BigNumber(
+            satoshis.multipliedBy(0.00000001).multipliedBy(rate).toFixed(2),
+        );
+    }
+
+    return new BigNumber(0);
 };

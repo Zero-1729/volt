@@ -58,6 +58,7 @@ import {
     addCommas,
     capitalizeFirst,
     formatFiat,
+    normalizeFiat,
     SATS_TO_BTC_RATE,
 } from '../../modules/transform';
 
@@ -67,6 +68,7 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Close from '../../assets/svg/x-24.svg';
+import Info from '../../assets/svg/info-16.svg';
 
 import {
     DisplayFiatAmount,
@@ -96,14 +98,23 @@ const Receive = ({route}: Props) => {
 
     const navigation = useNavigation();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const {currentWalletID, getWalletData, isAdvancedMode, breezEvent} =
-        useContext(AppStorageContext);
+    const {
+        currentWalletID,
+        getWalletData,
+        isAdvancedMode,
+        breezEvent,
+        mempoolInfo,
+        appFiatCurrency,
+        fiatRate,
+    } = useContext(AppStorageContext);
     const walletData = getWalletData(currentWalletID);
     const isLNWallet = walletData.type === 'unified';
 
     const progressValue = useSharedValue(0);
+    const [feeMessage, setFeeMessage] = useState<string>('');
     const [loadingInvoice, setLoadingInvoice] = useState(
         walletData.type === 'unified',
     );
@@ -167,7 +178,24 @@ const Receive = ({route}: Props) => {
                 description: ln_desc,
             });
 
+            const openingFee = receivePaymentResp.openingFeeMsat
+                ? receivePaymentResp.openingFeeMsat / 1_000
+                : 0;
+
             setLNInvoice(receivePaymentResp.lnInvoice);
+
+            if (openingFee > 0) {
+                setFeeMessage(
+                    t('ln_fee_amount_message', {
+                        sats: openingFee,
+                        currency: appFiatCurrency.symbol,
+                        fiat: normalizeFiat(
+                            new BigNumber(openingFee),
+                            fiatRate.rate,
+                        ),
+                    }),
+                );
+            }
 
             setLoadingInvoice(false);
         } catch (error: any) {
@@ -246,6 +274,15 @@ const Receive = ({route}: Props) => {
         [state.bitcoinValue],
     );
 
+    // const getFees = () => {
+    //     const openingFeeMsat = receivePaymentResponse.openingFeeMsat;
+    //     const openingFeeSat =
+    //         openingFeeMsat != null ? openingFeeMsat / 1000 : 0;
+    //     console.log(
+    //         `A setup fee of ${openingFeeSat} sats is applied to this invoice.`,
+    //     );
+    // };
+
     // Copy data to clipboard
     const copyDescToClipboard = (invoice: string) => {
         // Copy backup material to Clipboard
@@ -276,7 +313,11 @@ const Receive = ({route}: Props) => {
         return (
             <View
                 style={[
-                    tailwind('items-center justify-center h-full w-full mt-6'),
+                    tailwind(
+                        `items-center justify-center h-full w-full ${
+                            mempoolInfo.mempoolCongested ? 'mt-10' : 'mt-6'
+                        }`,
+                    ),
                 ]}>
                 {isAmountInvoice && (
                     <View
@@ -328,10 +369,45 @@ const Receive = ({route}: Props) => {
                     />
                 </View>
 
+                {/* Message on congestion */}
+                {mempoolInfo?.mempoolCongested && (
+                    <View
+                        style={[
+                            tailwind(
+                                `mt-4 w-5/6 ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center`,
+                            ),
+                        ]}>
+                        <Info
+                            width={16}
+                            height={16}
+                            fill={ColorScheme.SVG.GrayFill}
+                        />
+                        <Text
+                            style={[
+                                tailwind(
+                                    `${
+                                        langDir === 'right'
+                                            ? 'mr-2'
+                                            : 'ml-2 text-center'
+                                    } text-sm`,
+                                ),
+                                {
+                                    color: ColorScheme.Text.DescText,
+                                },
+                            ]}>
+                            {t('mempool_congested')}
+                        </Text>
+                    </View>
+                )}
+
                 {/* Bitcoin address info */}
                 <View
                     style={[
-                        tailwind('p-4 mt-4 w-4/5 rounded'),
+                        tailwind('p-4 mt-4 w-4/5 rounded mb-4'),
                         {backgroundColor: ColorScheme.Background.Greyed},
                     ]}>
                     <PlainButton
@@ -347,8 +423,39 @@ const Receive = ({route}: Props) => {
                 </View>
 
                 {/* Bottom buttons */}
+                <View
+                    style={[
+                        tailwind(
+                            `items-center ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            }`,
+                        ),
+                    ]}>
+                    {/* Enter receive amount */}
+                    <PlainButton
+                        style={[
+                            tailwind(
+                                `mb-4 ${langDir === 'right' ? 'ml-6' : 'mr-6'}`,
+                            ),
+                        ]}
+                        onPress={() => {
+                            navigation.dispatch(
+                                CommonActions.navigate({
+                                    name: 'RequestAmount',
+                                }),
+                            );
+                        }}>
+                        <Text
+                            style={[
+                                tailwind('font-bold text-center'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {t('edit_amount')}
+                        </Text>
+                    </PlainButton>
 
-                <View style={[tailwind('items-center mt-6')]}>
                     {/* Share Button */}
                     <PlainButton
                         style={[tailwind('mb-6')]}
@@ -381,25 +488,6 @@ const Receive = ({route}: Props) => {
                             <ShareIcon fill={ColorScheme.SVG.Inverted} />
                         </View>
                     </PlainButton>
-
-                    {/* Enter receive amount */}
-                    <PlainButton
-                        style={[tailwind('mb-4')]}
-                        onPress={() => {
-                            navigation.dispatch(
-                                CommonActions.navigate({
-                                    name: 'RequestAmount',
-                                }),
-                            );
-                        }}>
-                        <Text
-                            style={[
-                                tailwind('font-bold text-center'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {t('edit_amount')}
-                        </Text>
-                    </PlainButton>
                 </View>
             </View>
         );
@@ -423,18 +511,10 @@ const Receive = ({route}: Props) => {
         return (
             <View
                 style={[
-                    tailwind('items-center justify-center h-full w-full mt-6'),
+                    tailwind('items-center justify-center h-full w-full mt-12'),
                 ]}>
                 {!loadingInvoice && (
                     <>
-                        <Text
-                            style={[
-                                tailwind('text-base mb-4 font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {capitalizeFirst(t('lightning'))}
-                        </Text>
-
                         <View
                             style={[
                                 tailwind('items-center w-4/5 mb-4 flex-row'),
@@ -498,7 +578,7 @@ const Receive = ({route}: Props) => {
                 {!loadingInvoice && (
                     <View
                         style={[
-                            tailwind('p-4 mt-4 w-4/5 rounded'),
+                            tailwind('p-4 mt-4 w-4/5 rounded mb-4'),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
                         <PlainButton
@@ -514,9 +594,54 @@ const Receive = ({route}: Props) => {
                     </View>
                 )}
 
+                {/* ln_fee_amount_message */}
+                {!loadingInvoice && feeMessage && (
+                    <Text
+                        style={[
+                            tailwind('text-sm text-center mb-6 w-5/6'),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {feeMessage}
+                    </Text>
+                )}
+
                 {/* Bottom buttons */}
                 {!loadingInvoice && (
-                    <View style={[tailwind('items-center mt-6')]}>
+                    <View
+                        style={[
+                            tailwind(
+                                `items-center ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                }`,
+                            ),
+                        ]}>
+                        {/* Enter receive amount */}
+                        <PlainButton
+                            style={[
+                                tailwind(
+                                    `mb-4 ${
+                                        langDir === 'right' ? 'ml-6' : 'mr-6'
+                                    }`,
+                                ),
+                            ]}
+                            onPress={() => {
+                                navigation.dispatch(
+                                    CommonActions.navigate({
+                                        name: 'RequestAmount',
+                                    }),
+                                );
+                            }}>
+                            <Text
+                                style={[
+                                    tailwind('font-bold text-center'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('edit_amount')}
+                            </Text>
+                        </PlainButton>
+
                         {/* Share Button */}
                         <PlainButton
                             style={[tailwind('mb-6')]}
@@ -548,25 +673,6 @@ const Receive = ({route}: Props) => {
                                 </Text>
                                 <ShareIcon fill={ColorScheme.SVG.Inverted} />
                             </View>
-                        </PlainButton>
-
-                        {/* Enter receive amount */}
-                        <PlainButton
-                            style={[tailwind('mb-4')]}
-                            onPress={() => {
-                                navigation.dispatch(
-                                    CommonActions.navigate({
-                                        name: 'RequestAmount',
-                                    }),
-                                );
-                            }}>
-                            <Text
-                                style={[
-                                    tailwind('font-bold text-center'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {t('edit_amount')}
-                            </Text>
                         </PlainButton>
                     </View>
                 )}
