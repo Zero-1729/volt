@@ -53,7 +53,7 @@
     "master_fingerprint": "Master Fingerprint",
     "derivation_path": "Derivation Path",
     "summary": "Summary",
-    "pending": "Pending confirmation",
+    "pending_conf": "Pending confirmation",
     "enabled": "Enabled",
     "see_more": "See more",
     "view_on_mempool": "View on Mempool.space",
@@ -146,5 +146,16 @@
     "recv_amount": "Receiving Swap Amount",
     "swapout_message": "Swap initiated, after {{n}} confirmations, the amount will be added to your Lightning balance",
     "bitcoin_swapin": "Internal Onchain Swap",
-    "bitcoin_swapout": "Internal LN Swap"
+    "bitcoin_swapout": "Internal LN Swap",
+    "ln_fee_message": "A setup fee of {{pct}}% with a minimum of {{mfs}} sats will be applied.",
+    "ln_fee_message_ext": "A setup fee of {{pct}}% with a minimum of {{mfs}} sats will be applied for receiving more than {{ils}} sats.",
+    "ln_fee_amount_message": "A setup fee of {{sats}} sats ({{currency}}{{fiat}}) will be deducted from the amount.",
+    "total_swapout_fees": "Total Fees",
+    "executing_swapout": "Executing Swap",
+    "ln_swapout": "Internal Lightning Swap",
+    "initial": "Initiated Swap",
+    "inProgress": "Swap Inflight",
+    "cancelled": "Swap Cancelled",
+    "completedSeen": "Sent Onchain Transaction",
+    "completedConfirmed": "Completed Swap"
 }

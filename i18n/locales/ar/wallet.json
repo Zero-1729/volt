@@ -51,7 +51,7 @@
     "master_fingerprint": "بصمة الماستر",
     "derivation_path": "مسار الاشتقاق",
     "summary": "ملخص",
-    "pending": "في انتظار التأكيد",
+    "pending_conf": "في انتظار التأكيد",
     "enabled": "ممكّن",
     "see_more": "شاهد المزيد",
     "view_on_mempool": "عرض على Mempool",
@@ -146,5 +146,16 @@
     "recv_amount": "استلام مبلغ المبادلة",
     "swapout_message": "بدأت عملية المبادلة، بعد تأكيد {{n}}، سيتم إضافة المبلغ إلى رصيد Lightning الخاص بك",
     "bitcoin_swapin": "مبادلة Onchain الداخلية",
-    "bitcoin_swapout": "مبادلة Lightning الداخلية"
+    "bitcoin_swapout": "مبادلة Lightning الداخلية",
+    "ln_fee_message": "سيتم تطبيق رسوم الإعداد بنسبة {{pct}}% بحد أدنى {{mfs}} أيام.",
+    "ln_fee_message_ext": "سيتم تطبيق رسوم إعداد قدرها {{pct}}% بحد أدنى {{mfs}} يوم لتلقي أكثر من {{ils}} يوم.",
+    "ln_fee_amount_message": "سيتم خصم رسوم الإعداد البالغة {{sats}} sats ({{currency}}{{fiat}}) من المبلغ.",
+    "total_swapout_fees": "الرسوم الكلية",
+    "executing_swapout": "تنفيذ المبادلة",
+    "ln_swapout": "مبادلة البرق الداخلية",
+    "initial": "مبادلة بدأت",
+    "inProgress": "مبادلة على متن الطائرة",
+    "cancelled": "تم إلغاء المبادلة",
+    "completedSeen": "معاملة Onchain المرسلة",
+    "completedConfirmed": "مبادلة مكتملة"
 }
