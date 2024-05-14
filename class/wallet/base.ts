@@ -176,6 +176,9 @@ export class BaseWallet {
 
             const _addressObj = await generateBDKAddress(_w, idx, false);
 
+            // Bump index
+            this.index += 1;
+
             return {
                 address: _addressObj.asString,
                 path: addressPath,
