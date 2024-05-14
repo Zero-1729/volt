@@ -235,6 +235,11 @@
 			"marginLeft": 16
 		}
 	},
+	"ml-6": {
+		"style": {
+			"marginLeft": 24
+		}
+	},
 	"mr-1": {
 		"style": {
 			"marginRight": 4
@@ -253,6 +258,11 @@
 	"mr-4": {
 		"style": {
 			"marginRight": 16
+		}
+	},
+	"mr-6": {
+		"style": {
+			"marginRight": 24
 		}
 	},
 	"mt-0": {

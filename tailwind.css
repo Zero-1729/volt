@@ -185,6 +185,10 @@
   margin-left: 1rem
 }
 
+.ml-6 {
+  margin-left: 1.5rem
+}
+
 .mr-1 {
   margin-right: 0.25rem
 }
@@ -199,6 +203,10 @@
 
 .mr-4 {
   margin-right: 1rem
+}
+
+.mr-6 {
+  margin-right: 1.5rem
 }
 
 .mt-0 {
