@@ -685,7 +685,7 @@ const SwapOut = ({route}: Props) => {
                                             color: ColorScheme.Text.DescText,
                                         },
                                     ]}>
-                                    {rvsSwapInfo?.status}
+                                    {t(rvsSwapInfo?.status)}
                                 </VText>
                             </View>
                         </View>
