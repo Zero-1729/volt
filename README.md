@@ -3,16 +3,17 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 ![](https://camo.githubusercontent.com/bb4c8c469821e7b1e3f2998bf0c183f700a6597106e2c28c0e62f44b2f53e710/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d3233323332332e7376673f7374796c653d666c61742d737175617265)
 
-A Modern descriptor based Sovereign Bitcoin Wallet
+A Modern descriptor-based Financial Freedom Bitcoin Wallet
 
 > What are descriptors? [Read more](https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md).
 
 # Features
 
 - Descriptor-based HD wallet (wpkh(), pkh(), sh(wpkh()), tr())
-- Watch Only (public descriptor / extended public key)
+- Watch Only support
 - Partially Signed Bitcoin Transactions (PSBTs) and Fee Bumping (RBF)
-- Multi-wallet support
+- Lightning Network support
+- Internal Wallet Lightning Swaps (Onchain<>Lighting)
 - Multi-lingual (en, ar)
 
 #### Supported BIPs
@@ -27,6 +28,11 @@ A Modern descriptor based Sovereign Bitcoin Wallet
 - [BIP86](https://github.com/bitcoin/bips/blob/master/bip-0086.mediawiki) Derivation scheme for PTR based accounts
 - [BIP173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki) Base32 address format for native v0-16 witness outputs
 - [BIP174](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki) Partially Signed Bitcoin Transactions
+
+#### Supported Bitcoin Tech
+
+- Breez SDK
+- Bitcoin Development Kit (BDK)
 
 # Translation
 
