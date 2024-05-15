@@ -94,6 +94,14 @@ const SendAmount = ({route}: Props) => {
     const isOverBalance = new BigNumber(satsAmount.value).gt(walletBalance);
     const isBelowDust = new BigNumber(satsAmount.value).lt(DUST_LIMIT);
 
+    const handleMax = () => {
+        if (!isMax) {
+            triggerMax();
+        } else {
+            updateAmount('');
+        }
+    };
+
     const triggerMax = () => {
         const maxSats = walletBalance.toString();
 
@@ -312,13 +320,15 @@ const SendAmount = ({route}: Props) => {
                                     walletBalance.toString() ===
                                     satsAmount.value.toString()
                                 }
-                                onPress={triggerMax}>
+                                onPress={handleMax}>
                                 <Text
                                     style={[
                                         tailwind('text-sm font-bold mr-2'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {t('use_max')}
+                                    {isMax
+                                        ? capitalizeFirst(t('clear'))
+                                        : t('use_max')}
                                 </Text>
                                 <View style={[tailwind('justify-center')]}>
                                     {displayBalance('text-sm')}

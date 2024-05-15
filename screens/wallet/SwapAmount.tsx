@@ -128,6 +128,14 @@ const SwapAmount = ({route}: Props) => {
         }
     };
 
+    const handleMax = () => {
+        if (!isMax) {
+            triggerMax();
+        } else {
+            updateAmount('');
+        }
+    };
+
     const triggerMax = () => {
         const maxSats = balance.toString();
 
@@ -453,13 +461,13 @@ const SwapAmount = ({route}: Props) => {
                                 disabled={
                                     balance.toString() === satsAmount.toString()
                                 }
-                                onPress={triggerMax}>
+                                onPress={handleMax}>
                                 <Text
                                     style={[
                                         tailwind('text-sm font-bold'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {capitalizeFirst(t('max'))}
+                                    {isMax ? capitalizeFirst(t('clear')) : capitalizeFirst(t('max'))}
                                 </Text>
                             </PlainButton>
                         </View>
