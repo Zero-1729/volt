@@ -7,12 +7,14 @@ A Modern descriptor-based Financial Freedom Bitcoin Wallet
 
 > What are descriptors? [Read more](https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md).
 
+<img src="./assets/volt-wallet.png" height=512>
+
 # Features
 
-- Descriptor-based HD wallet (wpkh(), pkh(), sh(wpkh()), tr())
+- Descriptor-based HD wallet (`wpkh(KEY)`, `pkh(KEY)`, `sh(wpkh(KEY))`, `tr(KEY)`)
 - Watch Only support
 - Partially Signed Bitcoin Transactions (PSBTs) and Fee Bumping (RBF)
-- Lightning Network support
+- Lightning Network support (BOLT11 & LNURL)
 - Internal Wallet Lightning Swaps (Onchain<>Lighting)
 - Multi-lingual (en, ar)
 
@@ -31,8 +33,8 @@ A Modern descriptor-based Financial Freedom Bitcoin Wallet
 
 #### Supported Bitcoin Tech
 
-- Breez SDK
-- Bitcoin Development Kit (BDK)
+- [Breez SDK](https://github.com/breez/breez-sdk)
+- [Bitcoin Development Kit (BDK)](https://github.com/bitcoindevkit)
 
 # Translation
 
