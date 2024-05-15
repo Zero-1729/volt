@@ -376,8 +376,8 @@ const Receive = ({route}: Props) => {
                                 <View
                                     style={{
                                         position: 'absolute',
-                                        top: 126,
-                                        left: 124,
+                                        top: NativeDims.height / 7.725,
+                                        left: NativeDims.width / 3.425,
                                     }}>
                                     <BTCQR width={54} height={54} />
                                 </View>
@@ -611,8 +611,8 @@ const Receive = ({route}: Props) => {
                                             ),
                                             {
                                                 position: 'absolute',
-                                                top: 130,
-                                                left: 130,
+                                                top: NativeDims.height / 6.215,
+                                                left: NativeDims.width / 2.925,
                                                 backgroundColor: 'black',
                                                 height: 54,
                                                 width: 54,
