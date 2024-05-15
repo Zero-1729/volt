@@ -69,6 +69,10 @@ import {AppStorageContext} from '../../class/storageContext';
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Close from '../../assets/svg/x-24.svg';
 import Info from '../../assets/svg/info-16.svg';
+import NFCIcon from '../../assets/svg/nfc.svg';
+
+import BTCQR from '../../assets/svg/btc-qr.svg';
+import LNQR from '../../assets/svg/ln.svg';
 
 import {
     DisplayFiatAmount,
@@ -76,7 +80,8 @@ import {
     DisplayBTCAmount,
 } from '../../components/balance';
 
-import ShareIcon from '../../assets/svg/share-android-24.svg';
+import ShareIcon from '../../assets/svg/share-android-16.svg';
+import EditIcon from '../../assets/svg/pencil-16.svg';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -366,6 +371,18 @@ const Receive = ({route}: Props) => {
                         color={ColorScheme.Background.Default}
                         isPiecesGlued={true}
                         pieceBorderRadius={4}
+                        children={(): ReactElement => {
+                            return (
+                                <View
+                                    style={{
+                                        position: 'absolute',
+                                        top: 126,
+                                        left: 124,
+                                    }}>
+                                    <BTCQR width={54} height={54} />
+                                </View>
+                            );
+                        }}
                     />
                 </View>
 
@@ -437,8 +454,13 @@ const Receive = ({route}: Props) => {
                     <PlainButton
                         style={[
                             tailwind(
-                                `mb-4 ${langDir === 'right' ? 'ml-6' : 'mr-6'}`,
+                                `${
+                                    langDir === 'right' ? 'ml-4' : 'mr-4'
+                                } rounded-full items-center flex-row justify-center px-4 py-2`,
                             ),
+                            {
+                                backgroundColor: ColorScheme.Background.Greyed,
+                            },
                         ]}
                         onPress={() => {
                             navigation.dispatch(
@@ -447,18 +469,23 @@ const Receive = ({route}: Props) => {
                                 }),
                             );
                         }}>
+                        <EditIcon
+                            style={[tailwind('mr-2')]}
+                            fill={ColorScheme.SVG.Default}
+                            width={16}
+                            height={16}
+                        />
                         <Text
                             style={[
-                                tailwind('font-bold text-center'),
+                                tailwind('font-bold text-center text-sm'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {t('edit_amount')}
+                            {capitalizeFirst(t('edit'))}
                         </Text>
                     </PlainButton>
 
                     {/* Share Button */}
                     <PlainButton
-                        style={[tailwind('mb-6')]}
                         onPress={() => {
                             Share.share({
                                 message: BTCInvoice,
@@ -469,23 +496,28 @@ const Receive = ({route}: Props) => {
                         <View
                             style={[
                                 tailwind(
-                                    'rounded-full items-center flex-row justify-center px-6 py-3',
+                                    'rounded-full items-center flex-row justify-center px-4 py-2',
                                 ),
                                 {
                                     backgroundColor:
-                                        ColorScheme.Background.Inverted,
+                                        ColorScheme.Background.Greyed,
                                 },
                             ]}>
+                            <ShareIcon
+                                style={[tailwind('mr-2')]}
+                                fill={ColorScheme.SVG.Default}
+                                width={16}
+                                height={16}
+                            />
                             <Text
                                 style={[
-                                    tailwind('text-sm mr-2 font-bold'),
+                                    tailwind('text-sm font-bold'),
                                     {
-                                        color: ColorScheme.Text.Alt,
+                                        color: ColorScheme.Text.Default,
                                     },
                                 ]}>
                                 {capitalizeFirst(t('share'))}
                             </Text>
-                            <ShareIcon fill={ColorScheme.SVG.Inverted} />
                         </View>
                     </PlainButton>
                 </View>
@@ -570,6 +602,30 @@ const Receive = ({route}: Props) => {
                             color={ColorScheme.Background.Default}
                             isPiecesGlued={true}
                             pieceBorderRadius={2}
+                            children={(): ReactElement => {
+                                return (
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'rounded-full justify-center items-center',
+                                            ),
+                                            {
+                                                position: 'absolute',
+                                                top: 130,
+                                                left: 130,
+                                                backgroundColor: 'black',
+                                                height: 54,
+                                                width: 54,
+                                            },
+                                        ]}>
+                                        <LNQR
+                                            width={32}
+                                            height={32}
+                                            fill={ColorScheme.SVG.Default}
+                                        />
+                                    </View>
+                                );
+                            }}
                         />
                     </View>
                 )}
@@ -610,7 +666,7 @@ const Receive = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                `items-center ${
+                                `items-center w-5/6 justify-around ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
@@ -621,10 +677,12 @@ const Receive = ({route}: Props) => {
                         <PlainButton
                             style={[
                                 tailwind(
-                                    `mb-4 ${
-                                        langDir === 'right' ? 'ml-6' : 'mr-6'
-                                    }`,
+                                    'rounded-full items-center flex-row justify-center px-4 py-2',
                                 ),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                },
                             ]}
                             onPress={() => {
                                 navigation.dispatch(
@@ -633,18 +691,23 @@ const Receive = ({route}: Props) => {
                                     }),
                                 );
                             }}>
+                            <EditIcon
+                                style={[tailwind('mr-2')]}
+                                fill={ColorScheme.SVG.Default}
+                                width={16}
+                                height={16}
+                            />
                             <Text
                                 style={[
-                                    tailwind('font-bold text-center'),
+                                    tailwind('font-bold text-center text-sm'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
-                                {t('edit_amount')}
+                                {capitalizeFirst(t('edit'))}
                             </Text>
                         </PlainButton>
 
                         {/* Share Button */}
                         <PlainButton
-                            style={[tailwind('mb-6')]}
                             onPress={() => {
                                 Share.share({
                                     message: LNInvoice?.bolt11 as string,
@@ -655,23 +718,58 @@ const Receive = ({route}: Props) => {
                             <View
                                 style={[
                                     tailwind(
-                                        'rounded-full items-center flex-row justify-center px-6 py-3',
+                                        'rounded-full items-center flex-row justify-center px-4 py-2',
                                     ),
                                     {
                                         backgroundColor:
-                                            ColorScheme.Background.Inverted,
+                                            ColorScheme.Background.Greyed,
                                     },
                                 ]}>
+                                <ShareIcon
+                                    style={[tailwind('mr-2')]}
+                                    fill={ColorScheme.SVG.Default}
+                                    width={16}
+                                    height={16}
+                                />
                                 <Text
                                     style={[
-                                        tailwind('text-sm mr-2 font-bold'),
+                                        tailwind('text-sm font-bold'),
                                         {
-                                            color: ColorScheme.Text.Alt,
+                                            color: ColorScheme.Text.Default,
                                         },
                                     ]}>
                                     {capitalizeFirst(t('share'))}
                                 </Text>
-                                <ShareIcon fill={ColorScheme.SVG.Inverted} />
+                            </View>
+                        </PlainButton>
+
+                        {/* NFC Button */}
+                        <PlainButton onPress={() => {}}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'rounded-full items-center flex-row justify-center px-4 py-2',
+                                    ),
+                                    {
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <NFCIcon
+                                    style={[tailwind('mr-1')]}
+                                    fill={ColorScheme.SVG.Default}
+                                    width={18}
+                                    height={18}
+                                />
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {'NFC'}
+                                </Text>
                             </View>
                         </PlainButton>
                     </View>
