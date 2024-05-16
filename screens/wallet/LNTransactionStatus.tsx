@@ -302,6 +302,8 @@ const LNTransactionStatus = ({route}: Props) => {
                         ]}>
                         <LongBottomButton
                             onPress={() => {
+                                setBreezEvent({} as BreezEvent);
+
                                 navigation.dispatch(
                                     CommonActions.navigate('WalletRoot', {
                                         screen: 'WalletView',
