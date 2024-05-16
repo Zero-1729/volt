@@ -31,6 +31,7 @@ import {
     checkInvoiceAndWallet,
     isValidAddress,
     decodeInvoiceType,
+    isLNAddress,
 } from '../modules/wallet-utils';
 
 import {Camera, CameraType} from 'react-native-camera-kit';
