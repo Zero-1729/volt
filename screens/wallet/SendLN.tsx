@@ -25,10 +25,8 @@ import {
 import {
     BreezEventVariant,
     InputTypeVariant,
-    TlvEntry,
     parseInput,
     payLnurl,
-    sendSpontaneousPayment,
 } from '@breeztech/react-native-breez-sdk';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -53,7 +51,7 @@ import Close from '../../assets/svg/x-24.svg';
 import {TextSingleInput} from '../../components/input';
 import VText from '../../components/text';
 
-import {getMiniWallet} from '../../modules/wallet-utils';
+import {getMiniWallet, isLNAddress} from '../../modules/wallet-utils';
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {EBreezDetails} from '../../types/enums';
 import {toastConfig} from '../../components/toast';
@@ -67,7 +65,7 @@ import PINPass from '../../components/pinpass';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SendLN'>;
 
-const InputPanel = (): ReactElement => {
+const InputPanel = (props: {address: string}): ReactElement => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
@@ -75,7 +73,9 @@ const InputPanel = (): ReactElement => {
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const [inputText, setInputText] = useState<string>('');
+    const [inputText, setInputText] = useState<string>(
+        props.address ? props.address : '',
+    );
     const [descriptionText, setDescriptionText] = useState<string>('');
 
     const {getWalletData, currentWalletID, appLanguage} =
@@ -120,35 +120,12 @@ const InputPanel = (): ReactElement => {
                 isLnManual: true,
                 lnManualPayload: {
                     amount: 0,
-                    kind: isLNAddress(inputText) ? 'address' : 'Node_ID',
+                    kind: 'address',
                     text: inputText,
                     description: descriptionText,
                 },
             }),
         );
-    };
-
-    const isLNAddress = (address: string): boolean => {
-        const splitted = address.split('@');
-
-        if (splitted.length !== 2) {
-            return false;
-        }
-
-        const isNonEmpty = !!splitted[0].trim() && !!splitted[1].trim();
-
-        const mailRegExp = new RegExp(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        );
-
-        return isNonEmpty && mailRegExp.test(address);
-    };
-
-    const isNodeID = (text: string): boolean => {
-        // create regex for lightning network public node ID
-        const nodeIDRegExp = new RegExp(/^[0-9a-fA-F]{66}$/);
-
-        return text.length === 66 && nodeIDRegExp.test(text);
     };
 
     return (
@@ -180,11 +157,12 @@ const InputPanel = (): ReactElement => {
                         value={inputText}
                         onChangeText={mutateText}
                         refs={mainInputRef}
+                        disabled={!!props.address}
                     />
                 </View>
             </View>
 
-            {(isLNAddress(inputText) || isNodeID(inputText)) && (
+            {isLNAddress(inputText) && (
                 <View style={[tailwind('w-5/6 items-center mt-12')]}>
                     <VText
                         style={[
@@ -249,7 +227,7 @@ const InputPanel = (): ReactElement => {
             )}
 
             <LongBottomButton
-                disabled={!(isLNAddress(inputText) || isNodeID(inputText))}
+                disabled={!isLNAddress(inputText)}
                 onPress={handleAmount}
                 title={capitalizeFirst(t('continue'))}
                 textColor={ColorScheme.Text.Alt}
@@ -357,9 +335,7 @@ const SummaryPanel = (props: {
                                     tailwind('text-sm'),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                {props.kind === 'address'
-                                    ? t('lightning_address')
-                                    : t('node_id')}
+                                {t('lightning_address')}
                             </Text>
                             <Text
                                 numberOfLines={2}
@@ -412,9 +388,7 @@ const SummaryPanel = (props: {
                                     tailwind('text-sm mr-2'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                {props.kind === 'address'
-                                    ? t('paying_ln_address')
-                                    : t('paying_node_id')}
+                                {t('paying_ln_address')}
                             </Text>
                             <ActivityIndicator />
                         </View>
@@ -525,22 +499,12 @@ const SendLN = ({route}: Props) => {
     const handlePayment = async () => {
         setLoadingPay(true);
 
-        // Make payment
-        if (manualKind === 'address') {
-            // Make payment to address
-            payLNAddress(
-                manualText as string,
-                manualAmount as number,
-                manualDescription,
-            );
-        } else {
-            // Make payment to Node ID
-            payNodeID(
-                manualText as string,
-                manualAmount as number,
-                manualDescription as string,
-            );
-        }
+        // Make payment to address
+        payLNAddress(
+            manualText as string,
+            manualAmount as number,
+            manualDescription,
+        );
     };
 
     const payLNAddress = async (
@@ -601,38 +565,6 @@ const SendLN = ({route}: Props) => {
         }
     };
 
-    const stringToBytes = (text: string) => {
-        const encoder = new TextEncoder();
-
-        return Array.from(encoder.encode(text));
-    };
-
-    const payNodeID = async (
-        nodeID: string,
-        amount: number,
-        description: string,
-    ) => {
-        // Make payment to Node ID
-        const amountMsat = amount * 1_000;
-        const bytesValue = stringToBytes(description);
-
-        try {
-            const extraTlvs: TlvEntry[] = [
-                {fieldNumber: 34349334, value: bytesValue},
-            ];
-
-            await sendSpontaneousPayment({
-                nodeId: nodeID,
-                amountMsat,
-                extraTlvs,
-            });
-
-            setLoadingPay(false);
-        } catch (err: any) {
-            setLoadingPay(false);
-        }
-    };
-
     return (
         <SafeAreaView
             edges={['top', 'left', 'right', 'bottom']}
@@ -663,7 +595,16 @@ const SendLN = ({route}: Props) => {
                         </Text>
                     </View>
 
-                    {!route.params?.lnManualPayload && <InputPanel />}
+                    {(!route.params?.lnManualPayload ||
+                        (route.params.lnManualPayload?.amount === 0 &&
+                            route.params.lnManualPayload.kind ===
+                                'address')) && (
+                        <InputPanel
+                            address={
+                                route.params.lnManualPayload?.text as string
+                            }
+                        />
+                    )}
 
                     {route.params?.lnManualPayload && (
                         <SummaryPanel
