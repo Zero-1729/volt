@@ -35,7 +35,6 @@ import {
     EnvironmentType,
     connect,
     BreezEventVariant,
-    ReverseSwapPairInfo,
     ConnectRequest,
 } from '@breeztech/react-native-breez-sdk';
 import {getXPub256} from './modules/wallet-utils';
@@ -383,7 +382,6 @@ const WalletRoot = () => {
             />
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
-            {/* TODO: Fix issue routing to 'Send' screen from Wallet as modal, route changed but reverted after few seconds */}
             <WalletStack.Screen name="Send" component={Send} />
             <WalletStack.Screen name="SendLN" component={SendLN} />
             <WalletStack.Screen name="SendAmount" component={SendAmount} />
