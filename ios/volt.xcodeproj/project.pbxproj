@@ -41,6 +41,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = volt/main.m; sourceTree = "<group>"; };
 		47C222279E5D22F915437A68 /* Pods-volt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.debug.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.debug.xcconfig"; sourceTree = "<group>"; };
 		5B9771D32EB80181BA612A45 /* libPods-volt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C38A06E2BF5A22000734AFC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = volt/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6C563C7D2875187B002067CA /* Roboto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Roboto.ttf; path = ../assets/fonts/Roboto.ttf; sourceTree = "<group>"; };
 		6C563C7E2875187B002067CA /* Satoshi Symbol.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Satoshi Symbol.ttf"; path = "../assets/fonts/Satoshi Symbol.ttf"; sourceTree = "<group>"; };
 		6C563C7F2875187B002067CA /* Roboto Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto Medium.ttf"; path = "../assets/fonts/Roboto Medium.ttf"; sourceTree = "<group>"; };
@@ -98,6 +99,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				6C38A06E2BF5A22000734AFC /* PrivacyInfo.xcprivacy */,
 			);
 			name = volt;
 			sourceTree = "<group>";
@@ -598,10 +600,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -669,10 +668,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
