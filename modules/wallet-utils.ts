@@ -1,7 +1,6 @@
 import * as bip39 from 'bip39';
 import * as b58 from 'bs58';
 import * as b58c from 'bs58check';
-import * as bitcoin from 'bitcoinjs-lib';
 
 import {BIP32Factory, BIP32Interface} from 'bip32';
 import ecc from '@bitcoinerlab/secp256k1';
@@ -13,7 +12,6 @@ const bip32 = BIP32Factory(ecc);
 
 import {
     listPayments,
-    parseInput,
     InputTypeVariant,
 } from '@breeztech/react-native-breez-sdk';
 
@@ -274,7 +272,7 @@ export const generateRootFromXKey = (
     const prefix = getExtendedKeyPrefix(xkey);
     let key = xkey;
 
-    // We must normalize the xpub for bitcoinjs-lib
+    // We must normalize the xpub for BDK
     if (prefix === EBackupMaterial.Xpub) {
         key = normalizeExtKey(xkey, 'pub');
     }
@@ -314,94 +312,6 @@ export const generateRootFromMnemonic = (
     const root = bip32.fromSeed(seed, BJSNetworks[net]);
 
     return root.derivePath(path);
-};
-
-export const generateAddressFromXKey = (
-    addressPath: string,
-    net: string,
-    type: string,
-    xkey: string,
-): string => {
-    // XPub | Xprv -> Xpub, includes address path (coin/account/chain/change/index)
-    const pubKeyRoot = generateRootFromXKey(xkey, net, addressPath);
-
-    const address = _generateAddress(net, type, pubKeyRoot);
-
-    return address;
-};
-
-export const generateAddressFromMnemonic = (
-    addressPath: string,
-    net: string,
-    type: string,
-    mnemonic: string,
-): string => {
-    const pubKey = generateRootFromMnemonic(mnemonic, addressPath, net);
-
-    const address = _generateAddress(net, type, pubKey);
-
-    return address;
-};
-
-const _generateAddress = (
-    net: string,
-    type: string,
-    root: BIP32Interface,
-): string => {
-    let address = '';
-
-    const network = BJSNetworks[net];
-
-    // Assumed root includes full derivation path (i.e. m/84'/1'/0'/0/0)
-    let keyPair = root;
-
-    switch (type) {
-        case 'p2pkh':
-            const P2PKData = bitcoin.payments.p2pkh({
-                pubkey: keyPair.publicKey,
-                network,
-            });
-
-            address = P2PKData.address;
-            break;
-
-        case 'shp2wpkh':
-            const P2SHData = bitcoin.payments.p2sh({
-                redeem: bitcoin.payments.p2wpkh({
-                    pubkey: keyPair.publicKey,
-                    network,
-                }),
-                network,
-            });
-
-            address = P2SHData.address;
-            break;
-        case 'wpkh':
-            const P2WPKHData = bitcoin.payments.p2wpkh({
-                pubkey: keyPair.publicKey,
-                network,
-            });
-
-            address = P2WPKHData.address;
-            break;
-        case 'unified':
-        case 'p2tr':
-            // Initialize ecc library
-            bitcoin.initEccLib(ecc);
-
-            // drop the DER header byte to get internal pubkey
-            const internalPubKey = keyPair.publicKey.subarray(1, 33);
-
-            const P2TRData = bitcoin.payments.p2tr({
-                internalPubkey: internalPubKey,
-                network: network,
-            });
-
-            address = P2TRData.address;
-            break;
-    }
-
-    return address;
 };
 
 export const getMetaFromMnemonic = (
@@ -469,7 +379,7 @@ const _getParentFingerprintHex = (xkey: string): string => {
 export const normalizeExtKey = (xkey: string, key_type: string) => {
     const network = extendedKeyInfo[_getPrefix(xkey)[0]].network;
 
-    // Bitcoinjs-lib & BDK only support tpub/prv and xpub/prv prefixes
+    // BDK only support tpub/prv and xpub/prv prefixes
     // Convert exotic prefixes to tpub/prv or xpub/prv
     if (['u', 'v', 'y', 'z'].includes(xkey[0])) {
         const convertedKey = convertXKey(
