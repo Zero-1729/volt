@@ -47,7 +47,7 @@ import {
 } from '../modules/bdk';
 
 import Dots from '../assets/svg/kebab-horizontal-24.svg';
-import Add from '../assets/svg/plus-32.svg';
+import Bell from '../assets/svg/bell-fill-24.svg';
 
 import Box from '../assets/svg/inbox-24.svg';
 
@@ -520,24 +520,20 @@ const Home = ({route}: Props) => {
                         />
                     </PlainButton>
 
-                    {wallets.length > 0 && walletMode === 'multi' && (
+                    <PlainButton onPress={() => {}}>
                         <View
-                            style={tailwind(
-                                'flex-row justify-between items-center -mr-1',
-                            )}>
-                            <PlainButton
-                                onPress={() =>
-                                    navigation.dispatch(
-                                        CommonActions.navigate('AddWalletRoot'),
-                                    )
-                                }>
-                                <Add
-                                    width={30}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </PlainButton>
+                            style={[
+                                tailwind(
+                                    'flex-row justify-between items-center -mr-1',
+                                ),
+                            ]}>
+                            <Bell
+                                fill={ColorScheme.Background.Inverted}
+                                width={24}
+                                height={24}
+                            />
                         </View>
-                    )}
+                    </PlainButton>
                 </View>
 
                 <View style={[tailwind('w-full h-full justify-around mt-2')]}>
