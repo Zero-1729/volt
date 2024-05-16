@@ -217,7 +217,7 @@ const Scan = ({route}: Props) => {
         [updateScannerMessage],
     );
 
-    const processQR = useCallback(
+    const processAndRoute = useCallback(
         async (decodedQRState: {
             decodedInvoice: any;
             isOnchain: boolean | null;
@@ -479,10 +479,10 @@ const Scan = ({route}: Props) => {
                 setQRData(qrData);
 
                 const handledInvoice = await handleInvoice(qrData);
-                await processQR(handledInvoice);
+                await processAndRoute(handledInvoice);
             }
         },
-        [_qrData, handleInvoice, processQR, scanLock],
+        [_qrData, handleInvoice, processAndRoute, scanLock],
     );
 
     const closeScreen = () => {
@@ -497,70 +497,7 @@ const Scan = ({route}: Props) => {
         const clipboardData = await Clipboard.getString();
 
         const invoiceState = await handleInvoice(clipboardData);
-
-        if (!invoiceState.error) {
-            // To highlight the successful scan, we'll trigger a success haptic
-            RNHapticFeedback.trigger(
-                'notificationSuccess',
-                RNHapticFeedbackOptions,
-            );
-
-            // Lightning handling
-            if (!invoiceState.isOnchain) {
-                // call on breez to attempt to pay and route screen
-                const parsedBolt11Invoice = invoiceState.decodedInvoice;
-                const bolt11Msat = parsedBolt11Invoice.amountMsat;
-
-                if (!bolt11Msat) {
-                    updateScannerMessage(e('missing_bolt11_invoice_amount'));
-                    return;
-                }
-
-                // Navigate to send screen to handle LN payment
-                runOnJS(navigation.dispatch)(
-                    CommonActions.navigate('WalletRoot', {
-                        screen: 'Send',
-                        params: {
-                            wallet: route.params.wallet,
-                            feeRate: 0,
-                            dummyPsbtVsize: 0,
-                            invoiceData: null,
-                            bolt11: parsedBolt11Invoice,
-                        },
-                    }),
-                );
-            } else {
-                // BTC handling
-                if (invoiceState.decodedInvoice.options.amount) {
-                    // Update amount to sats
-                    invoiceState.decodedInvoice.options.amount =
-                        convertBTCtoSats(
-                            invoiceState.decodedInvoice.options.amount,
-                        );
-
-                    runOnJS(navigation.dispatch)(
-                        CommonActions.navigate('WalletRoot', {
-                            screen: 'FeeSelection',
-                            params: {
-                                invoiceData: invoiceState.decodedInvoice,
-                                wallet: route.params.wallet,
-                            },
-                        }),
-                    );
-                } else {
-                    runOnJS(navigation.dispatch)(
-                        CommonActions.navigate('WalletRoot', {
-                            screen: 'SendAmount',
-                            params: {
-                                invoiceData: invoiceState.decodedInvoice,
-                                wallet: route.params.wallet,
-                                isLightning: false,
-                            },
-                        }),
-                    );
-                }
-            }
-        }
+        await processAndRoute(invoiceState);
     };
 
     const dynamicHeading =
