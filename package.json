@@ -62,7 +62,6 @@
     "bip66": "^1.1.5",
     "bip68": "^1.0.4",
     "bip69": "^2.1.4",
-    "bitcoinjs-lib": "^6.1.5",
     "bitcoinjs-message": "^2.2.0",
     "bs58": "^5.0.0",
     "coinselect": "^3.1.12",
