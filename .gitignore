@@ -10,7 +10,7 @@ data/git-branch-data.json
 
 # Xcode
 #
-ios/.xcode*
+**/.xcode*
 build/
 *.pbxuser
 !default.pbxuser
@@ -76,5 +76,13 @@ coverage/**
 *.jsbundle
 
 # CocoaPods
-ios/Pods/
-ios/.xcode.env
+**/Pods/
+**/.xcode.env
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
