@@ -83,7 +83,7 @@
     "process": "^0.11.10",
     "react": "18.2.0",
     "react-i18next": "^14.0.1",
-    "react-native": "^0.73.8",
+    "react-native": "^0.74.1",
     "react-native-biometrics": "^3.0.1",
     "react-native-bouncy-checkbox": "^3.0.7",
     "react-native-camera-kit": "^13.0.0",
@@ -125,10 +125,10 @@
     "@babel/core": "^7.24.3",
     "@babel/preset-env": "^7.24.3",
     "@babel/runtime": "^7.24.1",
-    "@react-native/babel-preset": "^0.73.21",
-    "@react-native/eslint-config": "^0.73.2",
-    "@react-native/metro-config": "^0.73.5",
-    "@react-native/typescript-config": "^0.73.1",
+    "@react-native/babel-preset": "^0.74.83",
+    "@react-native/eslint-config": "^0.74.83",
+    "@react-native/metro-config": "^0.74.83",
+    "@react-native/typescript-config": "^0.74.83",
     "@types/bs58check": "^2.1.0",
     "@types/jest": "^29.2.1",
     "@types/react": "^18.2.6",
@@ -167,7 +167,7 @@
     "Camera",
     "LocationWhenInUse"
   ],
-  "packageManager": "yarn@3.4.1",
+  "packageManager": "yarn@4.2.2",
   "resolutions": {
     "browserify-sign": "4.2.2"
   }
