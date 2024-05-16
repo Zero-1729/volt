@@ -682,9 +682,21 @@ export const getCountdownStart = (timestamp: number, expiry: number) => {
     return Math.floor(timestamp + expiry - +new Date() / 1_000);
 };
 
-// Function for syncing and returning new BDK wallet balance and Breez balance
+export const isLNAddress = (address: string): boolean => {
+    const splitted = address.split('@');
 
-// Function for syncing and returning new BDK wallet and Breez transactions
+    if (splitted.length !== 2) {
+        return false;
+    }
+
+    const isNonEmpty = !!splitted[0].trim() && !!splitted[1].trim();
+
+    const mailRegExp = new RegExp(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    );
+
+    return isNonEmpty && mailRegExp.test(address);
+};
 
 const determineLnType = async (
     rawInvoice: string,
