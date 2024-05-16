@@ -618,11 +618,7 @@ const Receive = ({route}: Props) => {
                                                 width: 54,
                                             },
                                         ]}>
-                                        <LNQR
-                                            width={32}
-                                            height={32}
-                                            fill={ColorScheme.SVG.Default}
-                                        />
+                                        <LNQR width={32} height={32} />
                                     </View>
                                 );
                             }}
