@@ -687,17 +687,39 @@ export const getCountdownStart = (timestamp: number, expiry: number) => {
 // Function for syncing and returning new BDK wallet and Breez transactions
 
 const determineLnType = async (
-    invoice: string,
+    rawInvoice: string,
 ): Promise<{
     type: string;
     invoice: string;
     invalid: boolean;
     spec: string;
 }> => {
-    const specType = await parseInput(invoice);
+    let specType;
     let spec = '';
 
-    switch (specType.type) {
+    // Strip out Lightning link, if any
+    const invoice = rawInvoice.startsWith('lightning:')
+        ? rawInvoice.substring(10)
+        : rawInvoice;
+
+    // TODO: get a more static way to determine LNURL, than using BreezSDK's parseInput
+    switch (invoice.substring(0, 4)) {
+        // BOLT11
+        case 'lnbc':
+            specType = InputTypeVariant.BOLT11;
+            break;
+        // LNURL (Withdraw)
+        case 'lnurl':
+            specType = InputTypeVariant.LN_URL_WITHDRAW;
+            break;
+    }
+
+    // LNURL (Pay)
+    if (isLNAddress(invoice)) {
+        specType = InputTypeVariant.LN_URL_PAY;
+    }
+
+    switch (specType) {
         case InputTypeVariant.BOLT11:
             spec = 'bolt11';
             break;
@@ -755,10 +777,10 @@ export const decodeInvoiceType = async (
     if (
         lowercasedInvoice.startsWith('lnbc') ||
         lowercasedInvoice.startsWith('lnurl') ||
-        lowercasedInvoice.startsWith('lightning')
+        lowercasedInvoice.startsWith('lightning') ||
+        isLNAddress(lowercasedInvoice)
     ) {
         const determinedLnType = await determineLnType(lowercasedInvoice);
-
         return determinedLnType;
     }
 
