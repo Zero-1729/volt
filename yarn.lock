@@ -12019,9 +12019,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:^0.73.5":
-  version: 0.73.7
-  resolution: "react-native@npm:0.73.7"
+"react-native@npm:^0.73.8":
+  version: 0.73.8
+  resolution: "react-native@npm:0.73.8"
   dependencies:
     "@jest/create-cache-key-function": ^29.6.3
     "@react-native-community/cli": 12.3.6
@@ -12065,7 +12065,7 @@ __metadata:
     react: 18.2.0
   bin:
     react-native: cli.js
-  checksum: e5813946db0594f870c890f3ed7168d2c8bdd2cd13ce9f901ab21072df709e817b534d00d1d8e9039d52cebda20e223ca45fa7e13cf59185c39357edfa9258d1
+  checksum: e6701ffed6c23f04f8a7336a3011b205ff05c069e5febfcd2b8026ca2b3633fb5716b0a024a0a81390a04f025fa16eb9068131b0851c669784a5dd0c9bc99fd7
   languageName: node
   linkType: hard
 
@@ -14193,7 +14193,7 @@ __metadata:
     process: ^0.11.10
     react: 18.2.0
     react-i18next: ^14.0.1
-    react-native: ^0.73.5
+    react-native: ^0.73.8
     react-native-biometrics: ^3.0.1
     react-native-bouncy-checkbox: ^3.0.7
     react-native-camera-kit: ^13.0.0

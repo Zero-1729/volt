@@ -83,7 +83,7 @@
     "process": "^0.11.10",
     "react": "18.2.0",
     "react-i18next": "^14.0.1",
-    "react-native": "^0.73.5",
+    "react-native": "^0.73.8",
     "react-native-biometrics": "^3.0.1",
     "react-native-bouncy-checkbox": "^3.0.7",
     "react-native-camera-kit": "^13.0.0",
