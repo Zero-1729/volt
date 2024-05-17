@@ -135,6 +135,7 @@ export type TDescriptor = string;
 export type TBaseWalletArgs = {
     name: string;
     type: string;
+    restored: boolean;
     derivationPath?: string;
     mnemonic?: string;
     xprv?: string;
