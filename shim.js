@@ -1,4 +1,7 @@
-require('crypto');
+// Fix issue with React Native and Buffer
+if (typeof Buffer === 'undefined') {
+    global.Buffer = require('buffer').Buffer;
+}
 
 // Polyfill TextEncoder/TextDecoder including TextEncoder().encodeInto
 // https://github.com/anonyco/FastestSmallestTextEncoderDecoder
