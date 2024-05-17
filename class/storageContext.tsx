@@ -84,7 +84,6 @@ type defaultContextType = {
     fiatRate: TFiatRate;
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
-    walletMode: string;
     isAdvancedMode: boolean;
     defaultToTestnet: boolean;
     walletsIndex: number;
@@ -106,7 +105,6 @@ type defaultContextType = {
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     setDefaultToTestnet: (defaultToTestnet: boolean) => void;
     setWalletInit: (initialized: boolean) => void;
-    setWalletModeType: (mode: string) => void;
     updateAppUnit: (unit: TUnit) => void;
     updateWalletTransactions: (
         id: string,
@@ -167,7 +165,6 @@ const defaultContext: defaultContextType = {
     isDevMode: false,
     hideTotalBalance: false,
     isWalletInitialized: false,
-    walletMode: 'single',
     isAdvancedMode: false,
     defaultToTestnet: false, // Default to Taproot LN on Mainnet
     electrumServerURL: {
@@ -195,7 +192,6 @@ const defaultContext: defaultContextType = {
     updateWalletBalance: () => {},
     updateWalletAddress: () => {},
     setWalletInit: () => {},
-    setWalletModeType: () => {},
     renameWallet: () => {},
     deleteWallet: () => {},
     resetAppData: () => {},
@@ -234,7 +230,6 @@ export const AppStorageProvider = ({children}: Props) => {
     const [isWalletInitialized, _setWalletInitialized] = useState(
         defaultContext.isWalletInitialized,
     );
-    const [walletMode, _setWalletMode] = useState(defaultContext.walletMode);
     const [walletsIndex, _setWalletsIndex] = useState<number>(0);
     const [wallets, _setWallets] = useState<TWalletType[]>(
         defaultContext.wallets,
@@ -279,8 +274,6 @@ export const AppStorageProvider = ({children}: Props) => {
     } = useAsyncStorage('hideTotalBalance');
     const {getItem: _getWalletInitialized, setItem: _updateWalletInitialized} =
         useAsyncStorage('isWalletInitialized');
-    const {getItem: _getWalletMode, setItem: _updateWalletMode} =
-        useAsyncStorage('walletMode');
     const {getItem: _getWalletsIndex, setItem: _updateWalletsIndex} =
         useAsyncStorage('walletsIndex');
     const {getItem: _getWallets, setItem: _updateWallets} =
@@ -602,27 +595,6 @@ export const AppStorageProvider = ({children}: Props) => {
             console.error(
                 `[AsyncStorage] (Wallet initialized setting) Error loading data: ${e}`,
             );
-        }
-    };
-
-    const setWalletModeType = async (mode: string) => {
-        try {
-            _setWalletMode(mode);
-            _updateWalletMode(JSON.stringify(mode));
-        } catch (e) {
-            console.error(
-                `[AsyncStorage] (Wallet mode setting) Error loading data: ${e}`,
-            );
-        }
-    };
-
-    const _loadWalletMode = async () => {
-        const mode = await _getWalletMode();
-
-        // Only update setting if a value already exists
-        // ...otherwise, use default
-        if (mode !== null) {
-            _setWalletMode(JSON.parse(mode));
         }
     };
 
@@ -1371,7 +1343,6 @@ export const AppStorageProvider = ({children}: Props) => {
             await updateAppUnit(defaultContext.appUnit);
             await setTotalBalanceHidden(false);
             await _setWalletInit(false);
-            await setWalletModeType('single');
             await setWallets([]);
             await setCurrentWalletID('');
             await setIsAdvancedMode(false);
@@ -1439,10 +1410,6 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
-        _loadWalletMode();
-    }, []);
-
-    useEffect(() => {
         _loadIsAdvancedMode();
     }, []);
 
@@ -1501,7 +1468,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 hideTotalBalance,
                 setTotalBalanceHidden,
                 isWalletInitialized,
-                walletMode,
                 resetAppData,
                 isDevMode,
                 wallets,
@@ -1513,7 +1479,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 defaultToTestnet,
                 setOnboarding,
                 setWalletInit,
-                setWalletModeType,
                 setIsAdvancedMode,
                 setDefaultToTestnet,
                 getWalletData,
