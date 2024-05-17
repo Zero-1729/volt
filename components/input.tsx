@@ -546,10 +546,6 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
     };
 
     const safelyDelete = (text: string) => {
-        if (props.pin === text) {
-            return '';
-        }
-
         return text.slice(0, -1);
     };
 
