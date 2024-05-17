@@ -45,7 +45,7 @@ import {
 } from '../types/props';
 
 import Folder from './../assets/svg/file-directory-fill-24.svg';
-import LeftArrow from '../assets/svg/chevron-left-24.svg';
+import Delete from '../assets/svg/delete.svg';
 import {AppStorageContext} from '../class/storageContext';
 
 type CapsuleInputProps = {
@@ -523,7 +523,7 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
                     onLongPress={() => {
                         props.onAmountChange('');
                     }}>
-                    <LeftArrow fill={ColorScheme.SVG.Default} />
+                    <Delete fill={ColorScheme.SVG.Default} />
                 </Pressable>
             </View>
         </View>
@@ -750,7 +750,7 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     onLongPress={() => {
                         props.onPinChange('');
                     }}>
-                    <LeftArrow fill={ColorScheme.SVG.Default} />
+                    <Delete fill={ColorScheme.SVG.Default} />
                 </Pressable>
             </View>
         </View>
