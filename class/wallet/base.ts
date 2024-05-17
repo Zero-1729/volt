@@ -33,10 +33,12 @@ export class BaseWallet {
             xpub: obj.xpub,
             mnemonic: obj.mnemonic,
             network: obj.network as ENet,
+            restored: obj.restored,
         });
 
         wallet.id = obj.id;
         wallet.index = obj.index as number;
+        wallet.restored = obj.restored;
 
         wallet.gap_limit = obj.gap_limit;
 
@@ -68,6 +70,7 @@ export class BaseWallet {
 
     id: string;
     name: string;
+    restored: boolean;
 
     index: number;
 
@@ -111,8 +114,8 @@ export class BaseWallet {
     constructor(args: TBaseWalletArgs) {
         this.id = this._generateID(); // Unique wallet ID
         this.name = args.name; // Wallet name
-
         this.index = 0; // Wallet address index
+        this.restored = args.restored; // Whether wallet is restored
 
         this.type = args.type; // Can have 'segwit native', 'segwit', 'legacy', etc. wallets
 
@@ -153,7 +156,6 @@ export class BaseWallet {
 
         this.xprv = args.xprv ? args.xprv : '';
         this.xpub = args.xpub ? args.xpub : '';
-
         this.mnemonic = args.mnemonic ? args.mnemonic : '';
 
         this.isWatchOnly = false; // Whether wallet is watch only
