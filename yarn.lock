@@ -11184,13 +11184,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-secure-key-store@npm:^2.0.10":
-  version: 2.0.10
-  resolution: "react-native-secure-key-store@npm:2.0.10"
-  checksum: 10/63c7d23928d9b309d8c440b5bcf026502668d1036d194e9ed77c08e215e67dc5b1312e64f7debb2cf3b0d93dacaa7c0289eeaa3d224a7c90214d959d87398fdc
-  languageName: node
-  linkType: hard
-
 "react-native-share@npm:^10.1.0":
   version: 10.2.1
   resolution: "react-native-share@npm:10.2.1"
@@ -13479,7 +13472,6 @@ __metadata:
     react-native-reanimated-carousel: "npm:^3.5.1"
     react-native-safe-area-context: "npm:^4.9.0"
     react-native-screens: "npm:^3.29.0"
-    react-native-secure-key-store: "npm:^2.0.10"
     react-native-share: "npm:^10.1.0"
     react-native-skeleton-loaders: "npm:^1.5.0"
     react-native-svg: "npm:^15.1.0"

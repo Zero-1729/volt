@@ -109,7 +109,6 @@
     "react-native-reanimated-carousel": "^3.5.1",
     "react-native-safe-area-context": "^4.9.0",
     "react-native-screens": "^3.29.0",
-    "react-native-secure-key-store": "^2.0.10",
     "react-native-share": "^10.1.0",
     "react-native-skeleton-loaders": "^1.5.0",
     "react-native-svg": "^15.1.0",
