@@ -73,7 +73,7 @@ const PayInvoice = ({route}: Props) => {
     const [expiryEpoch, setExpiryEpoch] = useState<number>();
     const [isExpired, setIsExpired] = useState(false);
 
-    const {wallets, hideTotalBalance, getWalletData, walletsIndex, walletMode} =
+    const {wallets, hideTotalBalance, getWalletData, walletsIndex} =
         useContext(AppStorageContext);
 
     const networkState = useNetInfo();
@@ -480,18 +480,12 @@ const PayInvoice = ({route}: Props) => {
                     <View
                         style={[tailwind('self-center'), {height: cardHeight}]}>
                         <Carousel
-                            enabled={
-                                walletMode === 'multi' && wallets.length > 1
-                            }
+                            enabled={wallets.length > 1}
                             vertical={true}
                             autoPlay={false}
                             width={AppScreenWidth * 0.9}
                             height={cardHeight}
-                            data={
-                                walletMode === 'single'
-                                    ? [wallets[walletsIndex]]
-                                    : [...wallets]
-                            }
+                            data={[wallets[walletsIndex]]}
                             renderItem={renderCard}
                             pagingEnabled={true}
                             mode={'vertical-stack'}

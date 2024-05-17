@@ -114,7 +114,6 @@ const Home = ({route}: Props) => {
         electrumServerURL,
         walletsIndex,
         updateWalletsIndex,
-        walletMode,
         isAdvancedMode,
     } = useContext(AppStorageContext);
 
@@ -129,7 +128,6 @@ const Home = ({route}: Props) => {
 
     // Locked wallet for single wallet mode
     const singleWallet = [wallets[walletsIndex]];
-    const walletModeIndex = walletMode === 'multi' ? walletsIndex : 0;
 
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
@@ -591,19 +589,12 @@ const Home = ({route}: Props) => {
                         {wallets.length > 0 && (
                             <View style={[styles.CardContainer]}>
                                 <Carousel
-                                    enabled={
-                                        walletMode === 'multi' &&
-                                        wallets.length > 1
-                                    }
+                                    enabled={wallets.length > 1}
                                     vertical={true}
                                     autoPlay={false}
                                     width={AppScreenWidth * 0.92}
                                     height={styles.CardContainer.height}
-                                    data={
-                                        walletMode === 'multi'
-                                            ? [...wallets]
-                                            : singleWallet
-                                    }
+                                    data={singleWallet}
                                     renderItem={renderCard}
                                     pagingEnabled={true}
                                     mode={'vertical-stack'}
@@ -614,7 +605,7 @@ const Home = ({route}: Props) => {
                                     onScrollEnd={index => {
                                         updateWalletsIndex(index);
                                     }}
-                                    defaultIndex={walletModeIndex}
+                                    defaultIndex={0}
                                 />
                             </View>
                         )}

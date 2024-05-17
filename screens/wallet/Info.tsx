@@ -11,7 +11,7 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {PlainButton} from '../../components/button';
 import {TextSingleInput} from '../../components/input';
-import {DeletionAlert, actionAlert} from '../../components/alert';
+import {DeletionAlert} from '../../components/alert';
 
 import {useTranslation} from 'react-i18next';
 
@@ -62,9 +62,6 @@ const Info = () => {
         getWalletData,
         renameWallet,
         deleteWallet,
-        wallets,
-        walletMode,
-        setWalletModeType,
         isBiometricsActive,
     } = useContext(AppStorageContext);
 
@@ -189,22 +186,6 @@ const Info = () => {
                 text2: t('wait_for_wallet_to_load_error'),
                 visibilityTime: 1750,
             });
-            return;
-        }
-
-        // Check if other wallets exist and in single mode
-        // warn user about 'n' other wallets
-        if (walletMode === 'single' && wallets.length > 1) {
-            actionAlert(
-                capitalizeFirst(t('notice')),
-                e('multi_wallets_exist_error', {n: wallets.length - 1}),
-                capitalizeFirst(t('yes')),
-                capitalizeFirst(t('cancel')),
-                () => {
-                    // enable multi mode here
-                    setWalletModeType('multi');
-                },
-            );
             return;
         }
 
