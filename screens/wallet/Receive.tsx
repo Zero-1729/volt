@@ -374,11 +374,7 @@ const Receive = ({route}: Props) => {
                         children={(): ReactElement => {
                             return (
                                 <View
-                                    style={{
-                                        position: 'absolute',
-                                        top: NativeDims.height / 7.725,
-                                        left: NativeDims.width / 3.425,
-                                    }}>
+                                    style={styles.qrLogoContainer}>
                                     <BTCQR width={54} height={54} />
                                 </View>
                             );
@@ -605,20 +601,14 @@ const Receive = ({route}: Props) => {
                             children={(): ReactElement => {
                                 return (
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'rounded-full justify-center items-center',
-                                            ),
-                                            {
-                                                position: 'absolute',
-                                                top: NativeDims.height / 6.215,
-                                                left: NativeDims.width / 2.925,
+                                        style={styles.qrLogoContainer}>
+                                            <View style={[tailwind('rounded-full items-center justify-center'), {
                                                 backgroundColor: 'black',
                                                 height: 54,
-                                                width: 54,
-                                            },
-                                        ]}>
-                                        <LNQR width={32} height={32} />
+                                                width: 54
+                                            }]}>
+                                                <LNQR width={32} height={32} />
+                                            </View>
                                     </View>
                                 );
                             }}
@@ -907,4 +897,10 @@ const styles = StyleSheet.create({
         width: 26,
         position: 'absolute',
     },
+    qrLogoContainer: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
 });
