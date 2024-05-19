@@ -524,15 +524,15 @@ const SendLN = ({route}: Props) => {
                 const canComment = input.data.commentAllowed;
 
                 // Note: min spendable is in Msat
-                const minAmountSats = input.data.minSendable / 1_000;
+                const maxAmountSats = input.data.maxSendable / 1_000;
                 const amountMSats = amtSats * 1_000;
 
-                if (amtSats < minAmountSats) {
+                if (amtSats > maxAmountSats) {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
                         text1: 'LNURL Pay Error',
-                        text2: t('amount_below_min_spendable'),
+                        text2: t('amount_above_min_spendable'),
                         visibilityTime: 1750,
                     });
                 }

@@ -57,20 +57,9 @@ const BoltNFC = (props: BoltNFCProps) => {
 
                 if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
                     setStatusMessage('Processing Withdrawal...');
-                    const minAmount = input.data.minWithdrawable; // in sats
                     const maxAmount = input.data.maxWithdrawable; // in sats
 
-                    // Check if below or above limits
-                    if (_amountMsat / 1_000 < minAmount) {
-                        setStatusMessage(
-                            `Invoice amount ${
-                                _amountMsat / 1_000
-                            } sats is less than ${minAmount} sats min amount`,
-                        );
-                        setLoading(false);
-                        return;
-                    }
-
+                    // Check if above limit
                     if (_amountMsat / 1_000 > maxAmount) {
                         setStatusMessage(
                             `Invoice amount ${
