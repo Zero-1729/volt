@@ -1728,7 +1728,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@breeztech/react-native-breez-sdk@npm:^0.4.0":
+"@breeztech/react-native-breez-sdk@npm:^0.4.1":
   version: 0.4.1
   resolution: "@breeztech/react-native-breez-sdk@npm:0.4.1"
   peerDependencies:
@@ -9082,7 +9082,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.14.2, lodash@npm:^4.17.21, lodash@npm:^4.17.5":
+"lodash@npm:^4.17.21, lodash@npm:^4.17.5":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: 10/c08619c038846ea6ac754abd6dd29d2568aa705feb69339e836dfa8d8b09abbb2f859371e86863eda41848221f9af43714491467b5b0299122431e202bb0c532
@@ -11061,15 +11061,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-camera-kit@npm:^13.0.0":
-  version: 13.0.0
-  resolution: "react-native-camera-kit@npm:13.0.0"
-  dependencies:
-    lodash: "npm:^4.14.2"
+"react-native-camera-kit@npm:^v14.0.0-beta14":
+  version: 14.0.0-beta9
+  resolution: "react-native-camera-kit@npm:14.0.0-beta9"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/0bbff1ff67e0add4ef79e69a387a08791a8824a30cd241aa34f2955ec2a89f2bcc50767812d657e4c3fe2d65693ce99ac7d622520fee3d81dc2e14cb0e97bfe7
+  checksum: 10/4cbba23a05ac87196e57dbe969d8400c778161e796780164b6c2bd1e3a1788dba11b7b0bf78d486b75c414961d4d154bd2696f06369ad87ea30cda12332c18bb
   languageName: node
   linkType: hard
 
@@ -11166,16 +11164,6 @@ __metadata:
   peerDependencies:
     react-native: ">=0.60.0"
   checksum: 10/70036be2123d0caf6ab475deb0f2ca46e422d7233e69b81d247e582f2972e34e0eba8da25adce09de6b30111482bab4dc71c47e43463ecff8707e06fca1a3037
-  languageName: node
-  linkType: hard
-
-"react-native-image-picker@npm:^7.1.2":
-  version: 7.1.2
-  resolution: "react-native-image-picker@npm:7.1.2"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10/8c3ab5b5fb7c1e55af20b7c98b1074c417136a3c8f30b80459a5ccadc7173a59e464fe2c38b21f624515b59f25e212602443a54f04c7facf6f626b3a220d9596
   languageName: node
   linkType: hard
 
@@ -11324,7 +11312,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:^3.10.1":
+"react-native-reanimated@npm:^3.11.0":
   version: 3.11.0
   resolution: "react-native-reanimated@npm:3.11.0"
   dependencies:
@@ -13597,7 +13585,7 @@ __metadata:
     "@babel/runtime": "npm:^7.24.1"
     "@bitcoinerlab/descriptors": "npm:^2.1.0"
     "@bitcoinerlab/secp256k1": "npm:^1.1.0"
-    "@breeztech/react-native-breez-sdk": "npm:^0.4.0"
+    "@breeztech/react-native-breez-sdk": "npm:^0.4.1"
     "@craftzdog/react-native-buffer": "npm:^6.0.5"
     "@formatjs/intl-datetimeformat": "npm:^6.12.2"
     "@formatjs/intl-getcanonicallocales": "npm:^2.3.0"
@@ -13670,7 +13658,7 @@ __metadata:
     react-native: "npm:^0.74.1"
     react-native-biometrics: "npm:^3.0.1"
     react-native-bouncy-checkbox: "npm:^3.0.7"
-    react-native-camera-kit: "npm:^13.0.0"
+    react-native-camera-kit: "npm:^v14.0.0-beta14"
     react-native-default-preference: "npm:^1.4.4"
     react-native-device-info: "npm:^10.13.1"
     react-native-document-picker: "npm:^9.1.1"
@@ -13679,7 +13667,6 @@ __metadata:
     react-native-fs: "npm:^2.20.0"
     react-native-gesture-handler: "npm:^2.15.0"
     react-native-haptic-feedback: "npm:^2.2.0"
-    react-native-image-picker: "npm:^7.1.2"
     react-native-keychain: "npm:^8.2.0"
     react-native-localize: "npm:^3.0.6"
     react-native-modal: "npm:^13.0.1"
@@ -13693,7 +13680,7 @@ __metadata:
     react-native-qrcode-styled: "npm:^0.3.1"
     react-native-quick-base64: "npm:^2.0.8"
     react-native-quick-crypto: "npm:^0.7.0-rc.6"
-    react-native-reanimated: "npm:^3.10.1"
+    react-native-reanimated: "npm:^3.11.0"
     react-native-reanimated-carousel: "npm:^3.5.1"
     react-native-safe-area-context: "npm:^4.9.0"
     react-native-screens: "npm:^3.29.0"
