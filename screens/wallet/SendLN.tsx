@@ -608,7 +608,7 @@ const SendLN = ({route}: Props) => {
                                 'address')) && (
                         <InputPanel
                             address={
-                                route.params.lnManualPayload?.text as string
+                                route.params?.lnManualPayload?.text as string
                             }
                         />
                     )}
