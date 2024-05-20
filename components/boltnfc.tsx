@@ -50,21 +50,22 @@ const BoltNFC = (props: BoltNFCProps) => {
     const handleWithdraw = useCallback(
         async (lnurl: string) => {
             try {
-                setStatusMessage('Retrieving LNURL Data...');
+                setStatusMessage(t('retrieving_lnurl_data'));
 
                 const _amountMsat = props.amountMsat;
                 const input = await parseInput(lnurl);
 
                 if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-                    setStatusMessage('Processing Withdrawal...');
+                    setStatusMessage(t('processing_lnurl_withdraw'));
                     const maxAmount = input.data.maxWithdrawable; // in sats
 
                     // Check if above limit
                     if (_amountMsat / 1_000 > maxAmount) {
                         setStatusMessage(
-                            `Invoice amount ${
-                                _amountMsat / 1_000
-                            } sats is more than ${maxAmount} sats max amount`,
+                            t('above_lnurl_withdraw_limit', {
+                                amount: _amountMsat / 1_000,
+                                maxAmount: maxAmount,
+                            }),
                         );
                         setLoading(false);
                         return;
@@ -82,10 +83,12 @@ const BoltNFC = (props: BoltNFCProps) => {
                         lnUrlWithdrawResult.type ===
                         LnUrlWithdrawResultVariant.OK
                     ) {
-                        setStatusMessage('Withdrawal successful!');
+                        setStatusMessage(t('lnurl_withdrawal_success'));
                     } else {
                         setStatusMessage(
-                            `Withdrawal failed: ${lnUrlWithdrawResult.data.reason}`,
+                            t('lnurl_withdrawal_failed', {
+                                reason: lnUrlWithdrawResult.data.reason,
+                            }),
                         );
                         setLoading(false);
                     }
@@ -94,7 +97,7 @@ const BoltNFC = (props: BoltNFCProps) => {
                 setStatusMessage(`Error: ${error.message}`);
             }
         },
-        [props.amountMsat],
+        [props.amountMsat, t],
     );
 
     const readNFC = useCallback(async () => {
@@ -117,47 +120,47 @@ const BoltNFC = (props: BoltNFCProps) => {
         const enabled = await NFCManager.isEnabled();
 
         if (!supported) {
-            setStatusMessage('NFC is not supported');
+            setStatusMessage(t('nfc_unsupported'));
             setLoading(false);
             return;
         }
 
         if (!enabled) {
-            setStatusMessage('NFC is not enabled');
+            setStatusMessage(t('nfc_disabled'));
             setLoading(false);
             return;
         }
 
         try {
-            setStatusMessage('Hold your NFC Tag near your device...');
+            setStatusMessage(t('nfc_read_message'));
             // register for the NFC tag with NDEF in it
             await NFCManager.requestTechnology(NfcTech.Ndef);
             // the resolved tag object will contain `ndefMessage` property
             const tag = await NFCManager.getTag();
 
             if (tag !== null) {
-                setStatusMessage('Processing NFC Tag...');
+                setStatusMessage(t('processing_nfc_tag'));
                 const tagData = extractNFCTagData(tag);
 
                 if (!tagData.lnurl) {
-                    setStatusMessage('No LNURL found in NFC Tag');
+                    setStatusMessage(t('no_lnurl_data_found'));
                     setLoading(false);
                     return;
                 }
 
                 handleWithdraw(tagData.lnurl);
             } else {
-                setStatusMessage('No NFC Tag found');
+                setStatusMessage(t('no_nfc_tag_found'));
                 setLoading(false);
             }
         } catch (error: any) {
-            setStatusMessage(`Error reading NFC Tag: ${error.message}`);
+            setStatusMessage(t('nfc_tag_error', {error: error.message}));
             setLoading(false);
         } finally {
             // stop the nfc scanning
             NFCManager.cancelTechnologyRequest();
         }
-    }, [handleWithdraw, loading]);
+    }, [handleWithdraw, loading, t]);
 
     return (
         <BottomModal

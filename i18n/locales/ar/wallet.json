@@ -156,5 +156,21 @@
     "inProgress": "مبادلة على متن الطائرة",
     "cancelled": "تم إلغاء المبادلة",
     "completedSeen": "معاملة Onchain المرسلة",
-    "completedConfirmed": "مبادلة مكتملة"
+    "completedConfirmed": "مبادلة مكتملة",
+    "check_ln_address_limits": "جارٍ التحقق من حدود عنوان Lightning...",
+    "parsing_ln_address": "جارٍ التحقق من صحة عنوان Lightning...",
+    "read_nfc": "قراءة علامة NFC",
+    "amount_above_max_spendable": "المبلغ أعلى من الحد الأقصى القابل للإرسال",
+    "nfc_unsupported": "NFC غير مدعوم",
+    "nfc_disabled": "لم يتم تمكين NFC",
+    "nfc_read_message": "ضع علامة NFC بالقرب من جهازك...",
+    "processing_nfc_tag": "جارٍ معالجة علامة NFC...",
+    "no_lnurl_found": "لم يتم العثور على LNURL في علامة NFC",
+    "no_nfc_tag_found": "لم يتم العثور على علامة NFC",
+    "nfc_tag_error": "خطأ في قراءة علامة NFC: {{error}}",
+    "retrieving_lnurl_data": "جارٍ استرداد بيانات LNURL...",
+    "processing_lnurl_withdraw": "معالجة السحب...",
+    "above_lnurl_withdraw_limit": "مبلغ الفاتورة {{amount}} يزيد عن {{maxAmount}} الحد الأقصى للمبلغ",
+    "lnurl_withdrawal_success": "تم السحب بنجاح!",
+    "lnurl_withdrawal_failed": "فشل السحب: {{reason}}"
 }

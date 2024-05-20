@@ -156,5 +156,21 @@
     "inProgress": "Swap Inflight",
     "cancelled": "Swap Cancelled",
     "completedSeen": "Sent Onchain Transaction",
-    "completedConfirmed": "Completed Swap"
+    "completedConfirmed": "Completed Swap",
+    "check_ln_address_limits": "Checking Lightning Address limits...",
+    "parsing_ln_address": "Checking if Lightning Address is valid...",
+    "read_nfc": "Read NFC Tag",
+    "amount_above_max_spendable": "Amount above maximum sendable",
+    "nfc_unsupported": "NFC is not supported",
+    "nfc_disabled": "NFC is not enabled",
+    "nfc_read_message": "Hold your NFC Tag near your device...",
+    "processing_nfc_tag": "Processing NFC Tag...",
+    "no_lnurl_found": "No LNURL found in NFC Tag",
+    "no_nfc_tag_found": "No NFC Tag found",
+    "nfc_tag_error": "Error reading NFC Tag: {{error}}",
+    "retrieving_lnurl_data": "Retrieving LNURL Data...",
+    "processing_lnurl_withdraw": "Processing Withdrawal...",
+    "above_lnurl_withdraw_limit": "Invoice amount {{amount}} sats is more than {{maxAmount}} sats max amount",
+    "lnurl_withdrawal_success": "Withdrawal successful!",
+    "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}"
 }
