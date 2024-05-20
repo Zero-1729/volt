@@ -197,7 +197,11 @@ const defaultContext: defaultContextType = {
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
-        return new BaseWallet({name: 'test wallet', type: 'p2tr'});
+        return new BaseWallet({
+            name: 'test wallet',
+            type: 'p2tr',
+            restored: false,
+        });
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
     setOnboarding: () => {},
@@ -1129,6 +1133,7 @@ export const AppStorageProvider = ({children}: Props) => {
             const walletArgs = {
                 name: 'Restored Wallet',
                 type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
+                restored: true,
                 mnemonic:
                     backupMaterialType === 'mnemonic' ? backupMaterial : '',
                 descriptor:
@@ -1278,6 +1283,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1287,6 +1293,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1296,6 +1303,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1305,6 +1313,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1314,6 +1323,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
                 }
