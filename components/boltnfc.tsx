@@ -163,9 +163,7 @@ const BoltNFC = (props: BoltNFCProps) => {
             snapPoints={snapPoints}
             ref={props.boltNFCRef}
             onUpdate={idx => {
-                if (idx !== -1) {
-                    readNFC();
-                } else {
+                if (idx === -1) {
                     NFCManager.cancelTechnologyRequest();
                 }
 
