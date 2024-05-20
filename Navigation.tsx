@@ -641,7 +641,7 @@ const RootNavigator = (): ReactElement => {
         };
 
         mempoolRef.onerror = (e: any) => {
-            console.log('[Mempool] (error)', e.error);
+            console.log('[Mempool] (error)', e.message);
         };
     };
 
