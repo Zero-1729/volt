@@ -296,7 +296,6 @@ const Scan = ({route}: Props) => {
                     }
 
                     if (isLNA) {
-                        // Possible LNURL
                         // Assumed an LN Address
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('WalletRoot', {
