@@ -22,7 +22,7 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import Close from '../../assets/svg/x-24.svg';
 
-import bottomOffset from '../../constants/NativeWindowMetrics';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 
@@ -522,7 +522,7 @@ const RequestAmount = () => {
                                 hideContinueButton ? 'opacity-40' : ''
                             }`,
                         ),
-                        {bottom: bottomOffset.bottom},
+                        {bottom: NativeWindowMetrics.bottom},
                     ]}>
                     <PlainButton
                         disabled={hideContinueButton}
