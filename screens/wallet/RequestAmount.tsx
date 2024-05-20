@@ -475,13 +475,14 @@ const RequestAmount = () => {
                     </View>
                 </View>
 
-                {isLightning && feeMessage && (
+                {isLightning && (
                     <View
                         style={[
                             tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
-                        {satsAmount.value.gte(maxReceivableAmount) ? (
+                        {satsAmount.value.gte(maxReceivableAmount) &&
+                        feeMessage ? (
                             <VText
                                 style={[
                                     tailwind('text-sm text-center'),
