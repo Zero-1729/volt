@@ -1269,7 +1269,7 @@ PODS:
     - React-logger (= 0.74.1)
     - React-perflogger (= 0.74.1)
     - React-utils (= 0.74.1)
-  - ReactNativeCameraKit (13.0.0):
+  - ReactNativeCameraKit (14.0.0-beta14):
     - React-Core
   - RNCAsyncStorage (1.23.1):
     - React-Core
@@ -1690,7 +1690,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: e2152ed146b6a35c07386fc2ac4827b27e6aad12
   React-utils: 3285151c9d1e3a28a9586571fc81d521678c196d
   ReactCommon: f42444e384d82ab89184aed5d6f3142748b54768
-  ReactNativeCameraKit: 9d46a5d7dd544ca64aa9c03c150d2348faf437eb
+  ReactNativeCameraKit: ca94991532dc39ea65e67a3f97513c6563a1ecf5
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNCClipboard: 0a720adef5ec193aa0e3de24c3977222c7e52a37
   RNCPushNotificationIOS: 64218f3c776c03d7408284a819b2abfda1834bc8
