@@ -107,7 +107,7 @@ const SwapIn = ({route}: Props) => {
         navigation.dispatch(StackActions.popToTop());
     };
 
-    const getChannelOpeningFees = async () => {
+    const getChannelOpeningFees = useCallback(async () => {
         try {
             const amountMsat =
                 (route.params.invoiceData.options?.amount as number) * 1_000;
@@ -123,9 +123,9 @@ const SwapIn = ({route}: Props) => {
         } catch (e: any) {
             console.log('[SwapIn] Error: ', e.message);
         }
-    };
+    }, [route.params.invoiceData.options?.amount]);
 
-    const generatePsbt = async () => {
+    const generatePsbt = useCallback(async () => {
         setLoadingTX(true);
 
         psbtFromInvoice(
@@ -159,9 +159,16 @@ const SwapIn = ({route}: Props) => {
                 setLoadingTX(false);
                 console.log('[PSBT] error: ', e.message);
             });
-    };
+    }, [
+        descriptors,
+        electrumServerURL,
+        mempoolInfo.fastestFee,
+        route.params.invoiceData,
+        t,
+        wallet,
+    ]);
 
-    const setPsbtVsize = async () => {
+    const setPsbtVsize = useCallback(async () => {
         const psbt = _uPsbt as PartiallySignedTransaction;
 
         try {
@@ -171,7 +178,7 @@ const SwapIn = ({route}: Props) => {
         } catch (e: any) {
             console.log('[Error]: ', e.message);
         }
-    };
+    }, [_uPsbt]);
 
     const sendTx = useCallback(async () => {
         carouselRef.current?.next();

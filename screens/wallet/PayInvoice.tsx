@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext, useEffect, useCallback} from 'react';
 import {
     Text,
     View,
@@ -101,12 +101,12 @@ const PayInvoice = ({route}: Props) => {
         ? decodedInvoice.options?.message
         : bolt11?.description;
 
-    const decodeInvoice = (invoice: string) => {
+    const decodeInvoice = useCallback((invoice: string) => {
         // Only handling Bolt11 Lightning invoices
         return decodeURI.decode(invoice) as TInvoiceData;
-    };
+    }, []);
 
-    const decodeBolt11 = async (invoice: string) => {
+    const decodeBolt11 = useCallback(async (invoice: string) => {
         const decodedBolt11 = await parseInvoice(invoice);
         setBolt11(decodedBolt11);
         setIsLightning(true);
@@ -124,9 +124,9 @@ const PayInvoice = ({route}: Props) => {
                 decodedBolt11.expiry as number,
             ),
         );
-    };
+    }, []);
 
-    const handleInvoiceType = async (invoice: string) => {
+    const handleInvoiceType = useCallback(async (invoice: string) => {
         const invoiceType = await decodeInvoiceType(invoice);
 
         if (
@@ -197,13 +197,13 @@ const PayInvoice = ({route}: Props) => {
 
             navigation.dispatch(CommonActions.navigate('HomeScreen'));
         }
-    };
+    }, []);
 
     useEffect(() => {
         handleInvoiceType(route.params?.invoice);
     }, []);
 
-    const handleRoute = () => {
+    const handleRoute = useCallback(() => {
         const wallet = getMiniWallet(getWalletData(walletId));
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
 
@@ -291,7 +291,7 @@ const PayInvoice = ({route}: Props) => {
                 );
             }
         }
-    };
+    }, []);
 
     const renderCard = ({item}: {item: BaseWallet}) => {
         return (

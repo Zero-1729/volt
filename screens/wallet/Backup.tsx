@@ -122,7 +122,7 @@ const Backup = () => {
     );
 
     // Write public descriptor file to device
-    const writeDescriptorToFile = async () => {
+    const writeDescriptorToFile = useCallback(async () => {
         let pathData =
             RNFS.TemporaryDirectoryPath +
             `/${walletData.name}-wallet_descriptor_backup.txt`;
@@ -163,7 +163,7 @@ const Backup = () => {
                 '[Backup Descriptor to file] not yet implemented on Android',
             );
         }
-    };
+    }, [getQRData, t, walletData.name]);
 
     // Copy data to clipboard
     const copyToClipboard = useCallback(
