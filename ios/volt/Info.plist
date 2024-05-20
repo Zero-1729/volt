@@ -61,6 +61,13 @@
 	<string>${PRODUCT_NAME} needs access to the camera to scan QR Codes</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NFCReaderUsageDescription</key>
+	<string>We need to use NFC for LNURL</string>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>D2760000850100</string>
+		<string>D2760000850101</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto Medium.ttf</string>

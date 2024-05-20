@@ -994,6 +994,8 @@ PODS:
     - Yoga
   - react-native-netinfo (11.3.2):
     - React-Core
+  - react-native-nfc-manager (3.14.14):
+    - React-Core
   - react-native-quick-base64 (2.1.2):
     - DoubleConversion
     - glog
@@ -1404,6 +1406,7 @@ DEPENDENCIES:
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-nfc-manager (from `../node_modules/react-native-nfc-manager`)
   - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-quick-crypto (from `../node_modules/react-native-quick-crypto`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -1533,6 +1536,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-picker"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
+  react-native-nfc-manager:
+    :path: "../node_modules/react-native-nfc-manager"
   react-native-quick-base64:
     :path: "../node_modules/react-native-quick-base64"
   react-native-quick-crypto:
@@ -1664,6 +1669,7 @@ SPEC CHECKSUMS:
   react-native-document-picker: 2b3efb60622b7be891b8d0e0e5424632150e0c94
   react-native-image-picker: c3afe5472ef870d98a4b28415fc0b928161ee5f7
   react-native-netinfo: 076df4f9b07f6670acf4ce9a75aac8d34c2e2ccc
+  react-native-nfc-manager: ead2cd1d1eaab139cc8b2dc5fbfe575eaa45efc4
   react-native-quick-base64: a74c4b2607b9de016877a8edb776b6ac59785809
   react-native-quick-crypto: b3f15e088ac30779de165ab45e5ace167e6a23a4
   react-native-safe-area-context: dcab599c527c2d7de2d76507a523d20a0b83823d
