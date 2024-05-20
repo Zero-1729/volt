@@ -1,6 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import React, {
     useContext,
     useState,
@@ -71,8 +69,8 @@ import Close from '../../assets/svg/x-24.svg';
 import Info from '../../assets/svg/info-16.svg';
 import NFCIcon from '../../assets/svg/nfc.svg';
 
-import BTCQR from '../../assets/svg/btc-qr.svg';
-import LNQR from '../../assets/svg/ln.svg';
+import BTCIcon from '../../assets/svg/btc-symbol.svg';
+import LNIcon from '../../assets/svg/ln.svg';
 
 import {
     DisplayFiatAmount,
@@ -88,9 +86,12 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {PlainButton} from '../../components/button';
 
 import NativeDims from '../../constants/NativeWindowMetrics';
-import {useSharedValue} from 'react-native-reanimated';
+import {runOnJS, useSharedValue} from 'react-native-reanimated';
 
 import Dot from '../../components/dots';
+
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import BoltNFC from '../../components/boltnfc';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
@@ -124,6 +125,17 @@ const Receive = ({route}: Props) => {
         walletData.type === 'unified',
     );
     const [LNInvoice, setLNInvoice] = useState<LnInvoice>();
+
+    const bottomNFCRef = useRef<BottomSheetModal>(null);
+    const [openBoltNFC, setOpenBoltNFC] = useState(-1);
+
+    const openNFCModal = useCallback(() => {
+        if (openBoltNFC !== 1) {
+            bottomNFCRef.current?.present();
+        } else {
+            bottomNFCRef.current?.close();
+        }
+    }, [openBoltNFC]);
 
     const initialState = {
         // Amount in sats
@@ -165,7 +177,7 @@ const Receive = ({route}: Props) => {
         }
     }, [route.params]);
 
-    const displayLNInvoice = async () => {
+    const displayLNInvoice = useCallback(async () => {
         const mSats =
             (state.bitcoinValue > 0 ? state.bitcoinValue : route.params.sats) *
             1_000;
@@ -187,7 +199,7 @@ const Receive = ({route}: Props) => {
                 ? receivePaymentResp.openingFeeMsat / 1_000
                 : 0;
 
-            setLNInvoice(receivePaymentResp.lnInvoice);
+            runOnJS(setLNInvoice)(receivePaymentResp.lnInvoice);
 
             if (openingFee > 0) {
                 setFeeMessage(
@@ -221,7 +233,15 @@ const Receive = ({route}: Props) => {
                 }),
             );
         }
-    };
+    }, [
+        state.bitcoinValue,
+        route.params.sats,
+        route.params.lnDescription,
+        t,
+        appFiatCurrency.symbol,
+        fiatRate.rate,
+        navigation,
+    ]);
 
     useEffect(() => {
         // Get invoice details
@@ -229,7 +249,7 @@ const Receive = ({route}: Props) => {
         if (walletData.type === 'unified') {
             displayLNInvoice();
         }
-    }, []);
+    }, [displayLNInvoice, walletData.type]);
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
@@ -257,53 +277,52 @@ const Receive = ({route}: Props) => {
             );
             return;
         }
-    }, [breezEvent]);
+    }, [breezEvent, navigation]);
 
     // Format as Bitcoin URI
-    const getFormattedAddress = (address: string) => {
-        let amount = state.bitcoinValue;
+    const getFormattedAddress = useCallback(
+        (address: string) => {
+            let amount = state.bitcoinValue;
 
-        if (amount.gt(0)) {
-            // If amount is greater than 0, return a bitcoin payment request URI
-            return `bitcoin:${address}?amount=${amount.div(SATS_TO_BTC_RATE)}`;
-        }
+            if (amount.gt(0)) {
+                // If amount is greater than 0, return a bitcoin payment request URI
+                return `bitcoin:${address}?amount=${amount.div(
+                    SATS_TO_BTC_RATE,
+                )}`;
+            }
 
-        // If amount is 0, return a plain address
-        // return a formatted bitcoin address to include the bitcoin payment request URI
-        return `bitcoin:${address}`;
-    };
+            // If amount is 0, return a plain address
+            // return a formatted bitcoin address to include the bitcoin payment request URI
+            return `bitcoin:${address}`;
+        },
+        [state.bitcoinValue],
+    );
 
     // Set bitcoin invoice URI
     const BTCInvoice = useMemo(
         () => getFormattedAddress(walletData.address.address),
-        [state.bitcoinValue],
+        [getFormattedAddress, walletData.address.address],
     );
 
-    // const getFees = () => {
-    //     const openingFeeMsat = receivePaymentResponse.openingFeeMsat;
-    //     const openingFeeSat =
-    //         openingFeeMsat != null ? openingFeeMsat / 1000 : 0;
-    //     console.log(
-    //         `A setup fee of ${openingFeeSat} sats is applied to this invoice.`,
-    //     );
-    // };
-
     // Copy data to clipboard
-    const copyDescToClipboard = (invoice: string) => {
-        // Copy backup material to Clipboard
-        // Temporarily set copied message
-        // and revert after a few seconds
-        Clipboard.setString(invoice);
+    const copyDescToClipboard = useCallback(
+        (invoice: string) => {
+            // Copy backup material to Clipboard
+            // Temporarily set copied message
+            // and revert after a few seconds
+            Clipboard.setString(invoice);
 
-        Toast.show({
-            topOffset: 60,
-            type: 'Liberal',
-            text1: capitalizeFirst(t('clipboard')),
-            text2: capitalizeFirst(t('copied_to_clipboard')),
-            visibilityTime: 1000,
-            position: 'top',
-        });
-    };
+            Toast.show({
+                topOffset: 60,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('clipboard')),
+                text2: capitalizeFirst(t('copied_to_clipboard')),
+                visibilityTime: 1000,
+                position: 'top',
+            });
+        },
+        [t],
+    );
 
     const isAmountInvoice =
         (!isLNWallet && !state.bitcoinValue.isZero()) || isLNWallet;
@@ -374,8 +393,23 @@ const Receive = ({route}: Props) => {
                         children={(): ReactElement => {
                             return (
                                 <View
-                                    style={styles.qrLogoContainer}>
-                                    <BTCQR width={54} height={54} />
+                                    style={[
+                                        tailwind('w-full h-full'),
+                                        styles.qrLogoContainer,
+                                    ]}>
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'rounded-full items-center justify-center',
+                                            ),
+                                            {
+                                                backgroundColor: 'black',
+                                                height: 54,
+                                                width: 54,
+                                            },
+                                        ]}>
+                                        <BTCIcon width={32} height={32} />
+                                    </View>
                                 </View>
                             );
                         }}
@@ -520,15 +554,24 @@ const Receive = ({route}: Props) => {
             </View>
         );
     }, [
-        ColorScheme,
-        BTCInvoice,
-        state,
-        t,
         tailwind,
-        route.params.amount,
+        mempoolInfo.mempoolCongested,
         isAmountInvoice,
-        styles,
-        Toast,
+        state.bitcoinValue,
+        state.fiatValue,
+        route.params.amount,
+        ColorScheme.Background.QRBorder,
+        ColorScheme.Background.Default,
+        ColorScheme.Background.Greyed,
+        ColorScheme.SVG.GrayFill,
+        ColorScheme.SVG.Default,
+        ColorScheme.Text.DescText,
+        ColorScheme.Text.Default,
+        BTCInvoice,
+        langDir,
+        t,
+        copyDescToClipboard,
+        navigation,
     ]);
 
     const lnPanel = useCallback((): ReactElement => {
@@ -545,7 +588,9 @@ const Receive = ({route}: Props) => {
                     <>
                         <View
                             style={[
-                                tailwind('items-center w-4/5 mb-4 flex-row'),
+                                tailwind(
+                                    'items-center justify-center w-4/5 mb-4 flex-row',
+                                ),
                             ]}>
                             <ActivityIndicator />
                             <VText
@@ -601,14 +646,23 @@ const Receive = ({route}: Props) => {
                             children={(): ReactElement => {
                                 return (
                                     <View
-                                        style={styles.qrLogoContainer}>
-                                            <View style={[tailwind('rounded-full items-center justify-center'), {
-                                                backgroundColor: 'black',
-                                                height: 54,
-                                                width: 54
-                                            }]}>
-                                                <LNQR width={32} height={32} />
-                                            </View>
+                                        style={[
+                                            tailwind('w-full h-full'),
+                                            styles.qrLogoContainer,
+                                        ]}>
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'rounded-full items-center justify-center',
+                                                ),
+                                                {
+                                                    backgroundColor: 'black',
+                                                    height: 54,
+                                                    width: 54,
+                                                },
+                                            ]}>
+                                            <LNIcon width={32} height={32} />
+                                        </View>
                                     </View>
                                 );
                             }}
@@ -730,39 +784,58 @@ const Receive = ({route}: Props) => {
                         </PlainButton>
 
                         {/* NFC Button */}
-                        <PlainButton onPress={() => {}}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'rounded-full items-center flex-row justify-center px-4 py-2',
-                                    ),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                    },
-                                ]}>
-                                <NFCIcon
-                                    style={[tailwind('mr-1')]}
-                                    fill={ColorScheme.SVG.Default}
-                                    width={18}
-                                    height={18}
-                                />
-                                <Text
+                        {Platform.OS === 'android' && (
+                            <PlainButton onPress={openNFCModal}>
+                                <View
                                     style={[
-                                        tailwind('text-sm font-bold'),
+                                        tailwind(
+                                            'rounded-full items-center flex-row justify-center px-4 py-2',
+                                        ),
                                         {
-                                            color: ColorScheme.Text.Default,
+                                            backgroundColor:
+                                                ColorScheme.Background.Greyed,
                                         },
                                     ]}>
-                                    {'NFC'}
-                                </Text>
-                            </View>
-                        </PlainButton>
+                                    <NFCIcon
+                                        style={[tailwind('mr-1')]}
+                                        fill={ColorScheme.SVG.Default}
+                                        width={18}
+                                        height={18}
+                                    />
+                                    <Text
+                                        style={[
+                                            tailwind('text-sm font-bold'),
+                                            {
+                                                color: ColorScheme.Text.Default,
+                                            },
+                                        ]}>
+                                        {'NFC'}
+                                    </Text>
+                                </View>
+                            </PlainButton>
+                        )}
                     </View>
                 )}
             </View>
         );
-    }, [ColorScheme, tailwind, LNInvoice, loadingInvoice, t, styles, Toast]);
+    }, [
+        tailwind,
+        loadingInvoice,
+        ColorScheme.Text.DescText,
+        ColorScheme.Text.Default,
+        ColorScheme.Background.QRBorder,
+        ColorScheme.Background.Default,
+        ColorScheme.Background.Greyed,
+        ColorScheme.SVG.Default,
+        t,
+        isAdvancedMode,
+        LNInvoice?.bolt11,
+        feeMessage,
+        langDir,
+        openNFCModal,
+        copyDescToClipboard,
+        navigation,
+    ]);
 
     const panels = useMemo(
         (): Slide[] => [lnPanel, onchainPanel],
@@ -775,107 +848,129 @@ const Receive = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View
-                style={[
-                    tailwind('w-full h-full items-center justify-center'),
-                    {backgroundColor: ColorScheme.Background.Default},
-                ]}>
+            <BottomSheetModalProvider>
                 <View
                     style={[
-                        tailwind(
-                            'w-5/6 justify-center items-center absolute top-6 flex',
-                        ),
+                        tailwind('w-full h-full items-center justify-center'),
+                        {backgroundColor: ColorScheme.Background.Default},
                     ]}>
-                    <PlainButton
-                        style={[tailwind('absolute left-0 z-10')]}
-                        onPress={() => {
-                            navigation.dispatch(StackActions.popToTop());
-                        }}>
-                        <Close fill={ColorScheme.SVG.Default} />
-                    </PlainButton>
-
-                    <Text
+                    <View
                         style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
+                            tailwind(
+                                'w-5/6 justify-center items-center absolute top-6 flex',
+                            ),
                         ]}>
-                        {t('bitcoin_invoice')}
-                    </Text>
+                        <PlainButton
+                            style={[tailwind('absolute left-0 z-10')]}
+                            onPress={() => {
+                                navigation.dispatch(StackActions.popToTop());
+                            }}>
+                            <Close fill={ColorScheme.SVG.Default} />
+                        </PlainButton>
 
-                    {/* Invoice Timeout */}
-                    {LNInvoice?.expiry && (
-                        <View style={[tailwind('absolute right-0')]}>
-                            <ExpiryTimer expiryDate={LNInvoice?.expiry} />
+                        <Text
+                            style={[
+                                tailwind('text-lg font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {t('bitcoin_invoice')}
+                        </Text>
+
+                        {/* Invoice Timeout */}
+                        {LNInvoice?.expiry && (
+                            <View style={[tailwind('absolute right-0')]}>
+                                <ExpiryTimer expiryDate={LNInvoice?.expiry} />
+                            </View>
+                        )}
+                    </View>
+
+                    {isLNWallet && (
+                        <View
+                            style={[
+                                styles.carouselContainer,
+                                tailwind(
+                                    'h-full w-full items-center justify-end absolute bottom-0',
+                                ),
+                                {zIndex: -9},
+                            ]}>
+                            <Carousel
+                                ref={carouselRef}
+                                style={[tailwind('items-center')]}
+                                data={panels}
+                                width={NativeDims.width}
+                                // Adjust height for iOS
+                                // to account for top stack height
+                                height={
+                                    Platform.OS === 'ios'
+                                        ? NativeDims.height -
+                                          NativeDims.navBottom * 3.2
+                                        : NativeDims.height -
+                                          NativeDims.navBottom * 2.4
+                                }
+                                loop={false}
+                                panGestureHandlerProps={{
+                                    activeOffsetX: [-10, 10],
+                                }}
+                                testID="ReceiveSlider"
+                                renderItem={({index}): ReactElement => {
+                                    const Slide = panels[index];
+                                    return <Slide key={index} />;
+                                }}
+                                onProgressChange={(
+                                    _,
+                                    absoluteProgress,
+                                ): void => {
+                                    progressValue.value = absoluteProgress;
+                                }}
+                            />
+
+                            <View
+                                style={[
+                                    styles.dots,
+                                    {bottom: NativeDims.bottom},
+                                ]}
+                                pointerEvents="none">
+                                {panels.map((_slide, index) => (
+                                    <Dot
+                                        key={index}
+                                        index={index}
+                                        animValue={progressValue}
+                                        length={panels.length}
+                                    />
+                                ))}
+                            </View>
                         </View>
                     )}
+
+                    {!isLNWallet && (
+                        <View
+                            style={[
+                                styles.carouselContainer,
+                                tailwind(
+                                    'h-full w-full items-center justify-end absolute bottom-0',
+                                ),
+                                {zIndex: -9},
+                            ]}>
+                            {onchainPanel()}
+                        </View>
+                    )}
+
+                    <Toast config={toastConfig as ToastConfig} />
                 </View>
 
-                {isLNWallet && (
-                    <View
-                        style={[
-                            styles.carouselContainer,
-                            tailwind(
-                                'h-full w-full items-center justify-end absolute bottom-0',
-                            ),
-                            {zIndex: -9},
-                        ]}>
-                        <Carousel
-                            ref={carouselRef}
-                            style={[tailwind('items-center')]}
-                            data={panels}
-                            width={NativeDims.width}
-                            // Adjust height for iOS
-                            // to account for top stack height
-                            height={
-                                Platform.OS === 'ios'
-                                    ? NativeDims.height -
-                                      NativeDims.navBottom * 3.2
-                                    : NativeDims.height
-                            }
-                            loop={false}
-                            panGestureHandlerProps={{
-                                activeOffsetX: [-10, 10],
-                            }}
-                            testID="ReceiveSlider"
-                            renderItem={({index}): ReactElement => {
-                                const Slide = panels[index];
-                                return <Slide key={index} />;
-                            }}
-                            onProgressChange={(_, absoluteProgress): void => {
-                                progressValue.value = absoluteProgress;
-                            }}
-                        />
-
-                        <View
-                            style={[styles.dots, {bottom: NativeDims.bottom}]}
-                            pointerEvents="none">
-                            {panels.map((_slide, index) => (
-                                <Dot
-                                    key={index}
-                                    index={index}
-                                    animValue={progressValue}
-                                    length={panels.length}
-                                />
-                            ))}
-                        </View>
-                    </View>
+                {Platform.OS === 'android' && LNInvoice?.amountMsat && (
+                    <BoltNFC
+                        boltNFCRef={bottomNFCRef}
+                        onSelectNFC={setOpenBoltNFC}
+                        index={openBoltNFC}
+                        amountMsat={LNInvoice?.amountMsat as number}
+                        fiat={normalizeFiat(
+                            new BigNumber(route.params.sats),
+                            fiatRate.rate,
+                        )}
+                    />
                 )}
-
-                {!isLNWallet && (
-                    <View
-                        style={[
-                            styles.carouselContainer,
-                            tailwind(
-                                'h-full w-full items-center justify-end absolute bottom-0',
-                            ),
-                            {zIndex: -9},
-                        ]}>
-                        {onchainPanel()}
-                    </View>
-                )}
-
-                <Toast config={toastConfig as ToastConfig} />
-            </View>
+            </BottomSheetModalProvider>
         </SafeAreaView>
     );
 };
@@ -898,9 +993,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
     },
     qrLogoContainer: {
-        width: '100%',
-        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-    }
+    },
 });
