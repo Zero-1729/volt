@@ -86,7 +86,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {PlainButton} from '../../components/button';
 
 import NativeDims from '../../constants/NativeWindowMetrics';
-import {useSharedValue} from 'react-native-reanimated';
+import {runOnJS, useSharedValue} from 'react-native-reanimated';
 
 import Dot from '../../components/dots';
 
@@ -199,7 +199,7 @@ const Receive = ({route}: Props) => {
                 ? receivePaymentResp.openingFeeMsat / 1_000
                 : 0;
 
-            setLNInvoice(receivePaymentResp.lnInvoice);
+            runOnJS(setLNInvoice)(receivePaymentResp.lnInvoice);
 
             if (openingFee > 0) {
                 setFeeMessage(
