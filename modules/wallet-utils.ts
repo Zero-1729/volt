@@ -624,20 +624,31 @@ const determineLnType = async (
         ? rawInvoice.substring(10)
         : rawInvoice;
 
-    // TODO: get a more static way to determine LNURL, than using BreezSDK's parseInput
-    switch (invoice.substring(0, 4)) {
-        // BOLT11
-        case 'lnbc':
-            specType = InputTypeVariant.BOLT11;
-            break;
-        // LNURL (Withdraw)
-        case 'lnurl':
-            specType = InputTypeVariant.LN_URL_WITHDRAW;
-            break;
+    // BOLT11
+    // lnbc1pwr7u7...
+    if (invoice.startsWith('lnbc')) {
+        specType = InputTypeVariant.BOLT11;
+    }
+
+    // LNURL (Withdraw)
+    /**
+     *  lnurlw://domain.com/lnurl-withdraw?key=val
+     */
+    if (invoice.startsWith('lnurlw://')) {
+        specType = InputTypeVariant.LN_URL_WITHDRAW;
     }
 
     // LNURL (Pay)
-    if (isLNAddress(invoice)) {
+    /*
+     *   LN Address: [name]@[domain]
+     *   lnurlp://domain.com/lnurl-pay?key=val
+     *   lnurl1dp68gurn8ghj7ct5mr...
+     */
+    if (
+        isLNAddress(invoice) ||
+        invoice.startsWith('lnurlp://') ||
+        invoice.startsWith('lnurl1')
+    ) {
         specType = InputTypeVariant.LN_URL_PAY;
     }
 
