@@ -87,6 +87,7 @@ const BoltNFC = (props: BoltNFCProps) => {
                         setStatusMessage(
                             `Withdrawal failed: ${lnUrlWithdrawResult.data.reason}`,
                         );
+                        setLoading(false);
                     }
                 }
             } catch (error: any) {
