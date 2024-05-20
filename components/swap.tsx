@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {View, useColorScheme} from 'react-native';
+import {Platform, View, useColorScheme} from 'react-native';
 
 import VText from './text';
 
@@ -41,6 +41,9 @@ type SwapProps = {
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['46'], []);
+    const bottomOffset =
+        NativeWindowMetrics.bottom - (Platform.OS === 'ios' ? 16 : 72);
+
     const onchainBroke =
         props.onchainBalance.isLessThan(props.swapInfo.swapIn.min) ||
         props.onchainBalance.isZero();
@@ -71,7 +74,7 @@ const Swap = (props: SwapProps) => {
             backdrop={true}>
             <View
                 style={[
-                    tailwind('w-full h-full items-center relative'),
+                    tailwind('w-full h-full relative'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
@@ -258,7 +261,7 @@ const Swap = (props: SwapProps) => {
                     <View
                         style={[
                             tailwind('w-full absolute items-center'),
-                            {bottom: NativeWindowMetrics.bottom - 16},
+                            {bottom: bottomOffset},
                         ]}>
                         <LongBottomButton
                             disabled={
