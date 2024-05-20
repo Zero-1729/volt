@@ -244,6 +244,7 @@ const SummaryPanel = (props: {
     description: string | undefined;
     loadingPay: boolean;
     authAndPay: () => void;
+    statusMsg: string;
 }): ReactElement => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
@@ -388,7 +389,7 @@ const SummaryPanel = (props: {
                                     tailwind('text-sm mr-2'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                {t('paying_ln_address')}
+                                {props.statusMsg}
                             </Text>
                             <ActivityIndicator />
                         </View>
@@ -414,6 +415,7 @@ const SendLN = ({route}: Props) => {
 
     const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
+    const [statusMessage, setStatusMessage] = useState('');
 
     const {t} = useTranslation('wallet');
 
@@ -513,6 +515,7 @@ const SendLN = ({route}: Props) => {
         comment?: string,
     ) => {
         try {
+            setStatusMessage(t('parsing_ln_address'));
             const input = await parseInput(lnurlPayURL);
 
             if (input.type === InputTypeVariant.LN_URL_ERROR) {
@@ -527,15 +530,19 @@ const SendLN = ({route}: Props) => {
                 const maxAmountSats = input.data.maxSendable / 1_000;
                 const amountMSats = amtSats * 1_000;
 
+                setStatusMessage(t('check_ln_address_limits'));
+
                 if (amtSats > maxAmountSats) {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
                         text1: 'LNURL Pay Error',
-                        text2: t('amount_above_min_spendable'),
+                        text2: t('amount_above_max_spendable'),
                         visibilityTime: 1750,
                     });
                 }
+
+                setStatusMessage(t('paying_ln_address'));
 
                 await payLnurl({
                     data: input.data,
@@ -614,6 +621,7 @@ const SendLN = ({route}: Props) => {
                             kind={manualKind}
                             text={manualText}
                             description={manualDescription}
+                            statusMsg={statusMessage}
                         />
                     )}
                 </View>
