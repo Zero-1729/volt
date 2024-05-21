@@ -266,7 +266,7 @@ const Scan = ({route}: Props) => {
                     const LNinvoice = decodedQRState.decodedInvoice;
 
                     const isBolt11 = !!LNinvoice?.bolt11;
-                    const isLNA = isLNAddress(LNinvoice);
+                    const isLNA = !isBolt11 ? isLNAddress(LNinvoice) : false;
 
                     if (isBolt11) {
                         // If LN Invoice
