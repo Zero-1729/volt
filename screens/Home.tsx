@@ -6,7 +6,6 @@ import {
     Platform,
     useColorScheme,
     View,
-    FlatList,
     Dimensions,
     StyleSheet,
 } from 'react-native';
@@ -14,7 +13,6 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
-import Carousel from 'react-native-reanimated-carousel';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../Navigation';
@@ -46,7 +44,7 @@ import {
     syncBdkWallet,
 } from '../modules/bdk';
 
-import Dots from '../assets/svg/kebab-horizontal-24.svg';
+import Dots from '../assets/svg/gear-24.svg';
 import Bell from '../assets/svg/bell-fill-24.svg';
 
 import Box from '../assets/svg/inbox-24.svg';
@@ -56,7 +54,6 @@ import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/shared';
-import {UnifiedTransactionListItem} from '../components/transaction';
 
 import {BaseWallet} from '../class/wallet/base';
 import {TBalance, TTransaction} from '../types/wallet';
@@ -64,6 +61,9 @@ import {TBalance, TTransaction} from '../types/wallet';
 import {FiatBalance} from '../components/balance';
 
 import {fetchFiatRate} from '../modules/currency';
+
+import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
+import ArrowRight from '../assets/svg/chevron-right-24.svg';
 
 import {
     getUniqueTXs,
@@ -73,14 +73,17 @@ import {
 import {capitalizeFirst} from '../modules/transform';
 
 import {ENet} from '../types/enums';
+import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
 const Home = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
+    const navigation = useNavigation();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -91,11 +94,7 @@ const Home = ({route}: Props) => {
     };
 
     const svgGrayFill = ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA';
-
     const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
-
-    const navigation = useNavigation();
-
     const networkState = useNetInfo();
 
     const {
@@ -112,8 +111,6 @@ const Home = ({route}: Props) => {
         updateWalletBalance,
         isWalletInitialized,
         electrumServerURL,
-        walletsIndex,
-        updateWalletsIndex,
         isAdvancedMode,
     } = useContext(AppStorageContext);
 
@@ -125,9 +122,6 @@ const Home = ({route}: Props) => {
     const wallet = getWalletData(currentWalletID);
 
     const AppScreenWidth = Dimensions.get('window').width;
-
-    // Locked wallet for single wallet mode
-    const singleWallet = [wallets[walletsIndex]];
 
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
@@ -151,7 +145,7 @@ const Home = ({route}: Props) => {
     );
 
     // List out all transactions across all wallets
-    const extractAllTransactions = (): TTransaction[] => {
+    const extractAllTransactions = useCallback(() => {
         let transactions: TTransaction[] = [];
 
         // Filter and show only transactions from current wallet
@@ -164,14 +158,20 @@ const Home = ({route}: Props) => {
         const txs =
             wallets.length > 0 ? getUniqueTXs(transactions) : transactions;
 
-        // Sort by timestamp
-        return txs.sort((a: TTransaction, b: TTransaction) => {
+        // Filter the txs below based on whether their timestamp is from today or not
+        const filtered = txs.filter((a: TTransaction) => {
+            const today = new Date();
+            const date = new Date(a.timestamp * 1_000);
+
             return (
-                +(b?.isLightning ? b.paymentTime : b.timestamp) -
-                +(a?.isLightning ? a.paymentTime : a.timestamp)
+                date.getDate() === today.getDate() &&
+                date.getMonth() === today.getMonth() &&
+                date.getFullYear() === today.getFullYear()
             );
         });
-    };
+
+        return {allCount: txs.length, filtered: filtered};
+    }, []);
 
     const initWallet = useCallback(async () => {
         const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
@@ -451,41 +451,6 @@ const Home = ({route}: Props) => {
         }
     }, [route.params?.restoreMeta]);
 
-    const renderCard = ({item}: {item: BaseWallet}) => {
-        return (
-            <View style={[tailwind('w-full absolute')]}>
-                {/* Avoid gesture handler triggering click event */}
-                <WalletCard
-                    // This is for onchain behaviour only
-                    maxedCard={
-                        wallet.type !== 'unified' &&
-                        item.balance.onchain.isZero() &&
-                        item.transactions.length > 0
-                    }
-                    // Combine the balances
-                    balance={item.balance.lightning.plus(item.balance.onchain)}
-                    network={item.network}
-                    isWatchOnly={item.isWatchOnly}
-                    label={item.name}
-                    walletType={item.type}
-                    loading={loadingBalance}
-                    hideBalance={hideTotalBalance}
-                    unit={item.units}
-                    navCallback={() => {
-                        // Set the current wallet ID
-                        setCurrentWalletID(item.id);
-
-                        navigation.dispatch(
-                            CommonActions.navigate('WalletRoot', {
-                                screen: 'WalletView',
-                            }),
-                        );
-                    }}
-                />
-            </View>
-        );
-    };
-
     return (
         <SafeAreaView
             style={[
@@ -538,13 +503,13 @@ const Home = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                `w-5/6 self-center items-center justify-between ${
-                                    !(wallets.length > 0) ? 'mb-4' : ''
-                                }`,
+                                'w-5/6 self-center items-center justify-between',
                             ),
                         ]}>
                         <View
-                            style={tailwind('justify-around mt-2 w-full mb-3')}>
+                            style={tailwind(
+                                'justify-around items-center w-full mb-6',
+                            )}>
                             {wallets.length > 0 && (
                                 <>
                                     <VText
@@ -555,7 +520,7 @@ const Home = ({route}: Props) => {
                                             {color: ColorScheme.Text.Default},
                                             Font.RobotoText,
                                         ]}>
-                                        {t('total_balance')}
+                                        {t('balance')}
                                     </VText>
 
                                     {!hideTotalBalance ? (
@@ -585,129 +550,160 @@ const Home = ({route}: Props) => {
                             )}
                         </View>
 
-                        {/** Carousel for 'BaseCard */}
-                        {wallets.length > 0 && (
-                            <View style={[styles.CardContainer]}>
-                                <Carousel
-                                    enabled={wallets.length > 1}
-                                    vertical={true}
-                                    autoPlay={false}
-                                    width={AppScreenWidth * 0.92}
-                                    height={styles.CardContainer.height}
-                                    data={singleWallet}
-                                    renderItem={renderCard}
-                                    pagingEnabled={true}
-                                    mode={'vertical-stack'}
-                                    modeConfig={{
-                                        snapDirection: 'left',
-                                        stackInterval: 8,
-                                    }}
-                                    onScrollEnd={index => {
-                                        updateWalletsIndex(index);
-                                    }}
-                                    defaultIndex={0}
-                                />
-                            </View>
-                        )}
+                        {/** Wallet Card */}
+                        <View
+                            style={[
+                                tailwind('w-full'),
+                                {
+                                    height: styles.CardContainer.height,
+                                    width: AppScreenWidth * 0.92,
+                                },
+                            ]}>
+                            <WalletCard
+                                // This is for onchain behaviour only
+                                maxedCard={
+                                    wallet.type !== 'unified' &&
+                                    wallet.balance.onchain.isZero() &&
+                                    wallet.transactions.length > 0
+                                }
+                                // Combine the balances
+                                balance={wallet.balance.lightning.plus(
+                                    wallet.balance.onchain,
+                                )}
+                                network={wallet.network}
+                                isWatchOnly={wallet.isWatchOnly}
+                                label={wallet.name}
+                                walletType={wallet.type}
+                                loading={loadingBalance}
+                                hideBalance={hideTotalBalance}
+                                unit={wallet.units}
+                                navCallback={() => {
+                                    // Set the current wallet ID
+                                    setCurrentWalletID(wallet.id);
+
+                                    navigation.dispatch(
+                                        CommonActions.navigate('WalletRoot', {
+                                            screen: 'WalletView',
+                                        }),
+                                    );
+                                }}
+                            />
+                        </View>
                     </View>
 
-                    <View
-                        style={[
-                            tailwind(
-                                `w-full ${
-                                    wallets.length > 0 ? 'h-3/5' : 'h-4/6'
-                                } mt-4`,
-                            ),
-                        ]}>
-                        <VText
+                    <View style={[tailwind('w-full h-1/2 items-center')]}>
+                        <PlainButton
+                            onPress={() => {}}
                             style={[
-                                tailwind('w-5/6 font-medium self-center'),
-                                DarkGrayText,
-                                Font.RobotoText,
+                                tailwind(
+                                    `rounded-md py-4 px-4 w-5/6 ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }`,
+                                ),
+                                {
+                                    marginTop:
+                                        -(NativeWindowMetrics.height * 0.05) +
+                                        16,
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                },
                             ]}>
-                            {capitalizeFirst(t('latest_transactions_text'))}
-                        </VText>
-
-                        {wallets.length > 0 && (
+                            <View style={[tailwind('flex')]}>
+                                <VText
+                                    style={[
+                                        tailwind('text-base font-bold mb-1'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {t('backup_mnemonic')}
+                                </VText>
+                                <VText
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {t('backup_mnemonic_text')}
+                                </VText>
+                            </View>
                             <View
                                 style={[
                                     tailwind(
-                                        'w-full h-full items-center pb-20',
+                                        'absolute h-full self-center justify-center',
                                     ),
+                                    {
+                                        right: langDir === 'left' ? 12 : 'auto',
+                                        left: langDir === 'right' ? 12 : 'auto',
+                                    },
                                 ]}>
-                                <FlatList
-                                    maxToRenderPerBatch={50}
-                                    updateCellsBatchingPeriod={2500}
-                                    refreshing={refreshing}
-                                    onRefresh={jointSync}
-                                    scrollEnabled={true}
-                                    style={tailwind('w-full')}
-                                    contentContainerStyle={[
-                                        tailwind(
-                                            `${
-                                                extractAllTransactions()
-                                                    .length > 0
-                                                    ? 'w-11/12 self-center'
-                                                    : 'w-full h-full'
-                                            } items-center`,
-                                        ),
-                                    ]}
-                                    data={extractAllTransactions()}
-                                    renderItem={item => {
-                                        return (
-                                            <UnifiedTransactionListItem
-                                                callback={() => {
-                                                    navigation.dispatch(
-                                                        CommonActions.navigate(
-                                                            'WalletRoot',
-                                                            {
-                                                                screen: 'TransactionDetails',
-                                                                params: {
-                                                                    tx: {
-                                                                        ...item.item,
-                                                                    },
-                                                                    source: 'liberal',
-                                                                    walletId:
-                                                                        currentWalletID,
-                                                                },
-                                                            },
-                                                        ),
-                                                    );
-                                                }}
-                                                tx={item.item}
-                                            />
-                                        );
-                                    }}
-                                    keyExtractor={item =>
-                                        item.id ? item.id : item.txid
-                                    }
-                                    initialNumToRender={25}
-                                    contentInsetAdjustmentBehavior="automatic"
-                                    ListEmptyComponent={
-                                        <View
-                                            style={[
-                                                tailwind(
-                                                    'w-5/6 h-5/6 items-center justify-center -mt-12',
-                                                ),
-                                            ]}>
-                                            <Box
-                                                width={32}
-                                                fill={svgGrayFill}
-                                                style={tailwind('mb-4')}
-                                            />
-                                            <VText
-                                                style={[
-                                                    tailwind(
-                                                        'w-5/6 text-center',
-                                                    ),
-                                                    DarkGreyText,
-                                                    Font.RobotoText,
-                                                ]}>
-                                                {t('no_transactions_text')}
-                                            </VText>
-                                        </View>
-                                    }
+                                <View
+                                    style={[tailwind('h-full justify-center')]}>
+                                    <ArrowRight
+                                        fill={ColorScheme.SVG.Default}
+                                        height={20}
+                                        width={20}
+                                    />
+                                </View>
+                            </View>
+                        </PlainButton>
+
+                        {extractAllTransactions().allCount > 0 ? (
+                            <PlainButton
+                                onPress={() => {
+                                    console.log('txs');
+                                }}
+                                style={[
+                                    tailwind(
+                                        'w-5/6 absolute flex-row items-center justify-center',
+                                    ),
+                                    {
+                                        bottom:
+                                            NativeWindowMetrics.bottomButtonOffset +
+                                            32,
+                                    },
+                                ]}>
+                                <ArrowUpIcon
+                                    style={[tailwind('mr-2')]}
+                                    width={24}
+                                    height={24}
+                                    fill={ColorScheme.SVG.GrayFill}
                                 />
+                                <VText style={[DarkGrayText, Font.RobotoText]}>
+                                    {extractAllTransactions().filtered
+                                        .length === 0
+                                        ? t('no_transactions_today')
+                                        : extractAllTransactions().filtered
+                                              .length === 1
+                                        ? t('transaction_today')
+                                        : t('transactions_today', {
+                                              count: extractAllTransactions()
+                                                  .filtered.length,
+                                          })}
+                                </VText>
+                            </PlainButton>
+                        ) : (
+                            <View
+                                style={[
+                                    tailwind('w-5/6 items-center'),
+                                    {
+                                        marginTop: -(
+                                            NativeWindowMetrics.height * 0.15
+                                        ),
+                                    },
+                                ]}>
+                                <Box
+                                    width={32}
+                                    fill={svgGrayFill}
+                                    style={tailwind('mb-4')}
+                                />
+                                <VText
+                                    style={[
+                                        tailwind('w-5/6 text-center'),
+                                        DarkGreyText,
+                                        Font.RobotoText,
+                                    ]}>
+                                    {t('no_transactions_text')}
+                                </VText>
                             </View>
                         )}
                     </View>
