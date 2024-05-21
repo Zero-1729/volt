@@ -718,7 +718,11 @@ const Receive = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                `items-center w-5/6 justify-around ${
+                                `items-center ${
+                                    Platform.OS === 'ios'
+                                        ? 'w-1/2 justify-between'
+                                        : 'w-5/6 justify-around'
+                                } ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
