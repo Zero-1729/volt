@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import {TFiatRate} from '../types/wallet';
+import {TRateObject} from '../types/wallet';
 
 const sourcesAPI = {
     coingecko: {
@@ -14,14 +14,14 @@ export const sourceNames = {
 
 const APIFetcher = {
     // Default source is coingecko given currency ticker support
-    coingecko: async (ticker: string): Promise<BigNumber> => {
+    coingecko: async (ticker: string): Promise<TRateObject> => {
         const {url} = sourcesAPI.coingecko;
 
         let returnedJSON;
 
         try {
             const response = await fetch(
-                `${url}?ids=bitcoin&vs_currencies=${ticker}`,
+                `${url}?ids=bitcoin&vs_currencies=${ticker}&include_24hr_change=true&include_last_updated_at=true`,
                 {
                     method: 'GET',
                     headers: {
@@ -40,9 +40,17 @@ const APIFetcher = {
         }
 
         try {
-            const rate = returnedJSON?.bitcoin[ticker];
+            const rate = new BigNumber(returnedJSON?.bitcoin[ticker]);
+            const dailyChange = new BigNumber(
+                returnedJSON?.bitcoin[`${ticker}_24h_change`],
+            );
+            const lastUpdated = returnedJSON?.bitcoin.last_updated_at;
 
-            return new BigNumber(rate);
+            return {
+                rate: rate,
+                dailyChange: dailyChange,
+                lastUpdated: lastUpdated,
+            };
         } catch (e: any) {
             const detailed_error =
                 returnedJSON?.status.error_message.split('.')[0];
@@ -56,7 +64,7 @@ const APIFetcher = {
 };
 
 // Make single fire call to CoinGecko
-const fetchPrice = async (ticker: string): Promise<BigNumber> => {
+const fetchPrice = async (ticker: string): Promise<TRateObject> => {
     const response = await APIFetcher.coingecko(ticker.toLowerCase());
 
     // return fetched rate
@@ -65,16 +73,17 @@ const fetchPrice = async (ticker: string): Promise<BigNumber> => {
 
 export const fetchFiatRate = async (
     ticker: string,
-    fiatRate: TFiatRate,
-    onSuccess: (rate: BigNumber) => void,
+    fiatRate: TRateObject,
+    onSuccess: (rateObj: TRateObject) => void,
     violate = false,
 ) => {
     const {lastUpdated} = fiatRate;
+    const dateTime = new Date(lastUpdated * 1000);
 
     // Same as Date.getTime()
     const currentTimestamp = +new Date();
 
-    if (currentTimestamp - lastUpdated.getTime() <= 5 * 1000) {
+    if (currentTimestamp - dateTime.getTime() <= 5 * 1000) {
         // Debounce
         console.info(
             '[FiatRate] Not updating fiat rate, last updated less than 5 seconds ago',
@@ -84,10 +93,7 @@ export const fetchFiatRate = async (
         return false;
     }
 
-    if (
-        currentTimestamp - lastUpdated.getTime() <= 30 * 60 * 1000 &&
-        !violate
-    ) {
+    if (currentTimestamp - dateTime.getTime() <= 30 * 60 * 1000 && !violate) {
         // Avoid updating too frequently
         console.info(
             '[FiatRate] Not updating fiat rate, last updated less than 30 minutes ago',
@@ -99,10 +105,10 @@ export const fetchFiatRate = async (
 
     try {
         // Grab data from remote source, i.e., CoinGecko
-        const rate = await fetchPrice(ticker);
+        const rateObj = await fetchPrice(ticker);
 
         // Trigger callback from RN component to update storage context
-        await onSuccess(rate);
+        await onSuccess(rateObj);
 
         // Return true to indicate success
         // i.e. rate fetched
