@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
-import {Text, View, useColorScheme, StyleSheet} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
