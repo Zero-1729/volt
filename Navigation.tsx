@@ -83,8 +83,6 @@ import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
 import LNTransactionStatus from './screens/wallet/LNTransactionStatus';
 
-import Apps from './screens/Apps';
-
 // QR Code Scan screen
 import Scan from './screens/Scan';
 
@@ -167,7 +165,6 @@ export type InitStackParamList = {
     WalletRoot: undefined;
     SettingsRoot: undefined;
     ScanRoot: undefined;
-    Apps: undefined;
     LNTransactionStatus: {
         status: boolean;
         details: TBreezPaymentDetails;
@@ -899,7 +896,6 @@ const RootNavigator = (): ReactElement => {
                         component={Mnemonic}
                     />
                 </InitScreenStack.Group>
-                <InitScreenStack.Screen name="Apps" component={Apps} />
             </InitScreenStack.Navigator>
 
             {!isAuth && <LockScreen onSuccess={handleAuthSuccess} />}
