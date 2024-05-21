@@ -143,7 +143,7 @@ const Home = ({route}: Props) => {
     );
 
     // List out all transactions across all wallets
-    const extractAllTransactions = useCallback(() => {
+    const extractAllTransactions = () => {
         let transactions: TTransaction[] = [];
 
         // Filter and show only transactions from current wallet
@@ -169,7 +169,7 @@ const Home = ({route}: Props) => {
         });
 
         return {allCount: txs.length, filtered: filtered};
-    }, []);
+    };
 
     const initWallet = useCallback(async () => {
         const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
