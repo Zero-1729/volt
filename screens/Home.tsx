@@ -384,10 +384,9 @@ const Home = ({route}: Props) => {
     };
 
     const triggerBackupFlow = () => {
-        // TODO: make sure to add if backed up flag in storage context
         navigation.dispatch(
-            CommonActions.navigate('WalletRoot', {
-                screen: 'Mnemonic',
+            CommonActions.navigate({
+                name: 'Mnemonic',
             }),
         );
     };
