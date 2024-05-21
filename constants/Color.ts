@@ -33,6 +33,8 @@ const Color = (currentTheme: ColorThemeType) => {
             QRBorder: isDarkMode ? 'white' : '#E5E5E5',
             Correct: isDarkMode ? '#34C571' : '#34C571',
             Wrong: isDarkMode ? '#EB5757' : '#EB5757',
+            Fade0: isDarkMode ? 'transparent' : '#FFFFFF00',
+            Fade1: isDarkMode ? 'black' : 'white',
         },
         HeadingBar: isDarkMode ? '#1b1b1b' : '#F3F3F3',
         Text: {
