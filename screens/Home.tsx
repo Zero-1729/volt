@@ -45,7 +45,7 @@ import {
     syncBdkWallet,
 } from '../modules/bdk';
 
-import Dots from '../assets/svg/gear-24.svg';
+import Gear from '../assets/svg/gear-24.svg';
 import Bell from '../assets/svg/bell-fill-24.svg';
 import Box from '../assets/svg/inbox-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
@@ -507,6 +507,15 @@ const Home = ({route}: Props) => {
                         ),
                         {marginTop: topPlatformOffset},
                     ]}>
+                    <PlainButton onPress={() => {}}>
+                        <Bell
+                            fill={ColorScheme.Background.Inverted}
+                            width={24}
+                            height={24}
+                            style={tailwind('-ml-1')}
+                        />
+                    </PlainButton>
+
                     <PlainButton
                         onPress={() =>
                             navigation.dispatch(
@@ -515,25 +524,13 @@ const Home = ({route}: Props) => {
                                 }),
                             )
                         }>
-                        <Dots
-                            width={32}
-                            fill={ColorScheme.SVG.Default}
-                            style={tailwind('-ml-1')}
-                        />
-                    </PlainButton>
-
-                    <PlainButton onPress={() => {}}>
                         <View
                             style={[
                                 tailwind(
                                     'flex-row justify-between items-center -mr-1',
                                 ),
                             ]}>
-                            <Bell
-                                fill={ColorScheme.Background.Inverted}
-                                width={24}
-                                height={24}
-                            />
+                            <Gear width={32} fill={ColorScheme.SVG.Default} />
                         </View>
                     </PlainButton>
                 </View>
