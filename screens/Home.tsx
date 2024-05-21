@@ -658,9 +658,7 @@ const Home = ({route}: Props) => {
 
                         {extractAllTransactions().allCount > 0 ? (
                             <PlainButton
-                                onPress={() => {
-                                    console.log('txs');
-                                }}
+                                onPress={() => {}}
                                 style={[
                                     tailwind(
                                         'w-5/6 absolute flex-row items-center justify-center',

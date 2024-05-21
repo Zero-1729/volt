@@ -92,7 +92,8 @@ const Wallet = ({route}: Props) => {
     const [loadingSwapOutInfo, setLoadingSwapOutInfo] = useState<boolean>(true);
     const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
     const [updatedLNBalance, setUpdatedLNBalance] = useState<boolean>(false);
-    const [updatedOnchainBalance, setUpdatedOBalance] = useState<boolean>(false);
+    const [updatedOnchainBalance, setUpdatedOBalance] =
+        useState<boolean>(false);
     const networkState = useNetInfo();
 
     // Get current wallet ID and wallet data

@@ -208,7 +208,8 @@ const Swap = (props: SwapProps) => {
                                 {t('swap_out')}
                             </VText>
                             {selected === SwapType.SwapOut &&
-                                !lightningBroke && (
+                                !lightningBroke &&
+                                !swapOutLow && (
                                     <CheckIcon
                                         style={[
                                             tailwind(
