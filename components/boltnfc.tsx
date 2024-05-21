@@ -189,7 +189,7 @@ const BoltNFC = (props: BoltNFCProps) => {
                                 tailwind('text-lg font-semibold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {t('Bolt NFC')}
+                            {t('bolt_nfc')}
                         </Text>
                     </View>
 
