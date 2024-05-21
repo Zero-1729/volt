@@ -64,13 +64,6 @@ export type TBalance = {
     lightning: BigNumber;
 };
 
-// Wallet balance fiat rate
-export type TFiatRate = {
-    rate: BigNumber;
-    lastUpdated: Date;
-    source: string;
-};
-
 // UTXO Type
 export type TUtxo = LocalUtxo & {
     txid: string; // Transaction ID
@@ -205,4 +198,11 @@ type TSwapInfo = {
     lockHeight?: number;
     channelOpeningFees?: OpeningFeeParams;
     maxSwapperPayable?: number;
+};
+
+// Wallet fiat rate
+export type TRateObject = {
+    rate: BigNumber;
+    dailyChange: BigNumber;
+    lastUpdated: number; // UNIX Timestamp
 };
