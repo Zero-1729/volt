@@ -637,7 +637,7 @@ const Wallet = ({route}: Props) => {
                                     ]}>
                                     {!checkNetworkIsReachable(networkState)
                                         ? t('offline_balance')
-                                        : t('current_balance')}
+                                        : t('balance')}
                                 </Text>
                                 <Balance
                                     fontColor={'white'}
