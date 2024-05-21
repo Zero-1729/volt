@@ -324,6 +324,18 @@ const Receive = ({route}: Props) => {
         [t],
     );
 
+    const displayExpiry = useCallback(() => {
+        if (LNInvoice) {
+            return (
+                <View style={[tailwind('absolute right-0')]}>
+                    <ExpiryTimer expiryDate={LNInvoice?.expiry} />
+                </View>
+            );
+        }
+
+        return <></>;
+    }, [LNInvoice, tailwind]);
+
     const isAmountInvoice =
         (!isLNWallet && !state.bitcoinValue.isZero()) || isLNWallet;
 
@@ -877,11 +889,7 @@ const Receive = ({route}: Props) => {
                         </Text>
 
                         {/* Invoice Timeout */}
-                        {LNInvoice?.expiry && (
-                            <View style={[tailwind('absolute right-0')]}>
-                                <ExpiryTimer expiryDate={LNInvoice?.expiry} />
-                            </View>
-                        )}
+                        {displayExpiry()}
                     </View>
 
                     {isLNWallet && (

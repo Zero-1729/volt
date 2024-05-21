@@ -6,7 +6,6 @@ import {
     View,
     useColorScheme,
     Platform,
-    Dimensions,
     StyleSheet,
     StatusBar,
 } from 'react-native';
@@ -94,6 +93,18 @@ const PayInvoice = ({route}: Props) => {
     const messageText = !isLightning
         ? decodedInvoice.options?.message
         : bolt11?.description;
+
+    const displayExpiry = useCallback(() => {
+        if (isLightning && expiryEpoch) {
+            return (
+                <View style={[tailwind('absolute right-0 justify-center')]}>
+                    <ExpiryTimer expiryDate={expiryEpoch} />
+                </View>
+            );
+        }
+
+        return <></>;
+    }, []);
 
     const decodeInvoice = useCallback((invoice: string) => {
         // Only handling Bolt11 Lightning invoices
@@ -318,14 +329,7 @@ const PayInvoice = ({route}: Props) => {
                         ]}>
                         {t('pay_invoice_title')}
                     </Text>
-                    {isLightning && expiryEpoch && (
-                        <View
-                            style={[
-                                tailwind('absolute right-0 justify-center'),
-                            ]}>
-                            <ExpiryTimer expiryDate={expiryEpoch} />
-                        </View>
-                    )}
+                    {displayExpiry()}
                 </View>
 
                 {/*Display the invoice data */}
