@@ -633,7 +633,7 @@ const Wallet = ({route}: Props) => {
                                 <Text
                                     style={[
                                         tailwind(
-                                            'text-sm text-white opacity-60',
+                                            'text-sm text-white opacity-60 mb-1',
                                         ),
                                     ]}>
                                     {!checkNetworkIsReachable(networkState)
@@ -650,6 +650,11 @@ const Wallet = ({route}: Props) => {
                                     balanceFontSize={'text-3xl'}
                                     disableFiat={false}
                                     loading={loadingBalance}
+                                    hideColor={
+                                        ColorScheme.WalletColors[
+                                            walletData.type
+                                        ].accent
+                                    }
                                 />
                             </View>
                         </View>
@@ -692,7 +697,6 @@ const Wallet = ({route}: Props) => {
                                             {hideTotalBalance ? (
                                                 <View
                                                     style={[
-                                                        styles.emptyBalance,
                                                         tailwind('rounded-sm'),
                                                         {
                                                             height: 20,
@@ -701,6 +705,12 @@ const Wallet = ({route}: Props) => {
                                                                 loadingBalance
                                                                     ? 0.35
                                                                     : 0.6,
+                                                            backgroundColor:
+                                                                ColorScheme
+                                                                    .WalletColors[
+                                                                    walletData
+                                                                        .type
+                                                                ].accent,
                                                         },
                                                     ]}
                                                 />
@@ -715,6 +725,12 @@ const Wallet = ({route}: Props) => {
                                                     balanceFontSize={'text-lg'}
                                                     disableFiat={false}
                                                     loading={loadingBalance}
+                                                    hideColor={
+                                                        ColorScheme
+                                                            .WalletColors[
+                                                            walletData.type
+                                                        ].accent
+                                                    }
                                                 />
                                             )}
                                         </View>
@@ -782,7 +798,6 @@ const Wallet = ({route}: Props) => {
                                             {hideTotalBalance ? (
                                                 <View
                                                     style={[
-                                                        styles.emptyBalance,
                                                         tailwind('rounded-sm'),
                                                         {
                                                             height: 20,
@@ -791,6 +806,12 @@ const Wallet = ({route}: Props) => {
                                                                 loadingBalance
                                                                     ? 0.35
                                                                     : 0.6,
+                                                            backgroundColor:
+                                                                ColorScheme
+                                                                    .WalletColors[
+                                                                    walletData
+                                                                        .type
+                                                                ].accent,
                                                         },
                                                     ]}
                                                 />
@@ -805,6 +826,12 @@ const Wallet = ({route}: Props) => {
                                                     balanceFontSize={'text-lg'}
                                                     disableFiat={false}
                                                     loading={loadingBalance}
+                                                    hideColor={
+                                                        ColorScheme
+                                                            .WalletColors[
+                                                            walletData.type
+                                                        ].accent
+                                                    }
                                                 />
                                             )}
                                         </View>
