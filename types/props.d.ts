@@ -84,6 +84,7 @@ export type BalanceProps = BaseProps & {
     loading: boolean;
     disableFiat: boolean; // false by default
     disabled?: boolean;
+    hideColor: string;
 };
 
 export type FiatBalanceProps = BaseProps & {
