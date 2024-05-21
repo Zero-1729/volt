@@ -19,7 +19,6 @@ import {InitStackParamList} from '../../Navigation';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
-import Carousel from 'react-native-reanimated-carousel';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -46,7 +45,6 @@ import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
 import {WalletCard} from '../../components/shared';
-import {BaseWallet} from '../../class/wallet/base';
 import {TInvoiceData} from '../../types/wallet';
 import {useNetInfo} from '@react-native-community/netinfo';
 
@@ -73,17 +71,13 @@ const PayInvoice = ({route}: Props) => {
     const [expiryEpoch, setExpiryEpoch] = useState<number>();
     const [isExpired, setIsExpired] = useState(false);
 
-    const {wallets, hideTotalBalance, getWalletData, walletsIndex} =
+    const {hideTotalBalance, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
+    const wallet = getWalletData(currentWalletID);
 
     const networkState = useNetInfo();
 
-    const [walletId, updateWalletId] = useState(wallets[walletsIndex].id);
-
     const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
-
-    const AppScreenWidth = Dimensions.get('window').width;
-
     const cardHeight = 220;
 
     const sats = decodedInvoice.options?.amount
@@ -293,29 +287,6 @@ const PayInvoice = ({route}: Props) => {
         }
     }, []);
 
-    const renderCard = ({item}: {item: BaseWallet}) => {
-        return (
-            <View style={[tailwind('w-full absolute')]}>
-                <WalletCard
-                    loading={false}
-                    maxedCard={
-                        item.balance.lightning
-                            .plus(item.balance.onchain)
-                            .isZero() && item.transactions.length > 0
-                    }
-                    balance={item.balance.lightning.plus(item.balance.onchain)}
-                    network={item.network}
-                    isWatchOnly={item.isWatchOnly}
-                    label={item.name}
-                    walletType={item.type}
-                    hideBalance={hideTotalBalance}
-                    unit={item.units}
-                    navCallback={() => {}}
-                />
-            </View>
-        );
-    };
-
     const invoiceOptionsEmpty = decodedInvoice.options
         ? Object.keys(decodedInvoice.options).length === 0
         : true;
@@ -387,7 +358,7 @@ const PayInvoice = ({route}: Props) => {
                             <FiatBalance
                                 balance={amount}
                                 loading={false}
-                                balanceFontSize={'text-4xl'}
+                                balanceFontSize={'text-3xl'}
                                 fontColor={ColorScheme.Text.Default}
                                 ignoreHideBalance={true}
                             />
@@ -475,28 +446,34 @@ const PayInvoice = ({route}: Props) => {
                     )}
                 </View>
 
-                <View style={[tailwind('w-5/6 justify-center mt-2')]}>
-                    {/** Carousel for 'BaseCard */}
+                <View
+                    style={[
+                        tailwind('w-full items-center justify-center mt-4'),
+                    ]}>
                     <View
-                        style={[tailwind('self-center'), {height: cardHeight}]}>
-                        <Carousel
-                            enabled={wallets.length > 1}
-                            vertical={true}
-                            autoPlay={false}
-                            width={AppScreenWidth * 0.9}
-                            height={cardHeight}
-                            data={[wallets[walletsIndex]]}
-                            renderItem={renderCard}
-                            pagingEnabled={true}
-                            mode={'vertical-stack'}
-                            modeConfig={{
-                                snapDirection: 'left',
-                                stackInterval: 8,
-                            }}
-                            onScrollEnd={index => {
-                                updateWalletId(wallets[index].id);
-                            }}
-                            defaultIndex={0}
+                        style={[
+                            {
+                                height: cardHeight,
+                                width: NativeWindowMetrics.width * 0.94,
+                            },
+                        ]}>
+                        <WalletCard
+                            loading={false}
+                            maxedCard={
+                                wallet.balance.lightning
+                                    .plus(wallet.balance.onchain)
+                                    .isZero() && wallet.transactions.length > 0
+                            }
+                            balance={wallet.balance.lightning.plus(
+                                wallet.balance.onchain,
+                            )}
+                            network={wallet.network}
+                            isWatchOnly={wallet.isWatchOnly}
+                            label={wallet.name}
+                            walletType={wallet.type}
+                            hideBalance={hideTotalBalance}
+                            unit={wallet.units}
+                            navCallback={() => {}}
                         />
                     </View>
                 </View>
