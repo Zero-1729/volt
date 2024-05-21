@@ -35,7 +35,7 @@
     "invalid_btc_address_error": "عنوان بيتكوين غير صالح",
     "lightning_not_support": "فاتورة Lightning غير مدعومة",
     "multi_wallets_exist_error": "لديك {{n, number}} محفظة إضافية. تمكين وضع المحفظة المتعددة لرؤيتهم؟",
-    "new_channel_open_warn": "سيتم خصم {{n, number}} سات من مبلغ الاستقبال لفتح قناة جديدة",
+    "new_channel_open_warn": "سيتم خصم {{n, number}} سات ({{fiat}}) من مبلغ الاستقبال لفتح قناة جديدة",
     "missing_bolt11_invoice_amount": "المبلغ مفقود في فاتورة Bolt11",
     "tx_fail_creation_erorr": "فشل في إنشاء المعاملة",
     "ln_description_length": "يجب أن يكون الوصف أقل من تسعين حرفًا"
