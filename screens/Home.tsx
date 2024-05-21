@@ -60,7 +60,7 @@ import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/shared';
 
 import {BaseWallet} from '../class/wallet/base';
-import {TBalance, TTransaction} from '../types/wallet';
+import {TBalance, TRateObject, TTransaction} from '../types/wallet';
 
 import {FiatBalance} from '../components/balance';
 
@@ -208,11 +208,12 @@ const Home = ({route}: Props) => {
                     await fetchFiatRate(
                         ticker,
                         fiatRate,
-                        (rate: BigNumber) => {
+                        (rateObj: TRateObject) => {
                             updateFiatRate({
                                 ...fiatRate,
-                                rate: rate,
-                                lastUpdated: new Date(),
+                                rate: rateObj.rate,
+                                lastUpdated: rateObj.lastUpdated,
+                                dailyChange: rateObj.dailyChange,
                             });
                         },
                         violate,
@@ -245,12 +246,13 @@ const Home = ({route}: Props) => {
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
             fiatRate,
-            (rate: BigNumber) => {
+            (rateObj: TRateObject) => {
                 // Then fetch fiat rate
                 updateFiatRate({
                     ...fiatRate,
-                    rate: rate,
-                    lastUpdated: new Date(),
+                    rate: rateObj.rate,
+                    lastUpdated: rateObj.lastUpdated,
+                    dailyChange: rateObj.dailyChange,
                 });
             },
         );

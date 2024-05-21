@@ -66,7 +66,12 @@ import {Balance} from '../../components/balance';
 
 import {UnifiedTransactionListItem} from '../../components/transaction';
 
-import {TBalance, TTransaction, TSwapInfo} from '../../types/wallet';
+import {
+    TBalance,
+    TTransaction,
+    TSwapInfo,
+    TRateObject,
+} from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -306,12 +311,13 @@ const Wallet = ({route}: Props) => {
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
             fiatRate,
-            (rate: BigNumber) => {
+            (rateObj: TRateObject) => {
                 // Then fetch fiat rate
                 updateFiatRate({
                     ...fiatRate,
-                    rate: rate,
-                    lastUpdated: new Date(),
+                    rate: rateObj.rate,
+                    lastUpdated: rateObj.lastUpdated,
+                    dailyChange: rateObj.dailyChange,
                 });
             },
         );
