@@ -199,6 +199,7 @@ const BoltNFC = (props: BoltNFCProps) => {
                                 'w-5/6 px-4 py-4 rounded-md mt-6 items-center justify-center',
                             ),
                             {
+                                backgroundColor: ColorScheme.Background.Greyed,
                                 height: NativeWindowMetrics.height * 0.4 - 32,
                             },
                         ]}>
