@@ -31,6 +31,7 @@ import Box from '../../assets/svg/inbox-24.svg';
 import CloseIcon from '../../assets/svg/x-24.svg';
 import {capitalizeFirst} from '../../modules/transform';
 import {PlainButton} from '../../components/button';
+import {LinearGradient} from 'react-native-linear-gradient';
 
 enum ETransactionKind {
     ALL = 'all',
@@ -104,25 +105,23 @@ const TransactionList = () => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View style={[tailwind('h-full items-center justify-center')]}>
+                <View style={[tailwind('h-full items-center')]}>
                     <View
                         style={[
-                            tailwind(
-                                'flex rounded-md absolute font-bold text-center w-full top-6 px-4',
-                            ),
+                            tailwind('flex rounded-md w-full'),
                             {backgroundColor: ColorScheme.Background.Default},
                         ]}>
                         <View
                             style={[
                                 tailwind(
-                                    'flex-row items-center justify-center mb-8',
+                                    'flex-row w-full items-center justify-center mt-6 mb-6 relative',
                                 ),
                             ]}>
                             <PlainButton
                                 onPress={() => {
                                     navigation.dispatch(CommonActions.goBack());
                                 }}
-                                style={[tailwind('absolute left-0')]}>
+                                style={[tailwind('absolute left-6')]}>
                                 <CloseIcon
                                     width={32}
                                     fill={ColorScheme.SVG.Default}
@@ -302,13 +301,7 @@ const TransactionList = () => {
                     {/* Transactions */}
                     <View
                         style={[
-                            tailwind(
-                                'w-full justify-center px-4 items-center absolute',
-                            ),
-                            {
-                                height: NativeWindowMetrics.height * 0.9 - 148,
-                                bottom: 0,
-                            },
+                            tailwind('w-full justify-center px-4 items-center'),
                         ]}>
                         <FlatList
                             maxToRenderPerBatch={50}
@@ -370,6 +363,22 @@ const TransactionList = () => {
                     </View>
                 </View>
             </View>
+            <LinearGradient
+                colors={[
+                    ColorScheme.Background.Fade0,
+                    ColorScheme.Background.Fade1,
+                ]}
+                style={[
+                    tailwind('w-full'),
+                    {
+                        flex: 1,
+                        position: 'absolute',
+                        bottom: 0,
+                        height: 40,
+                        zIndex: 999,
+                    },
+                ]}
+            />
         </SafeAreaView>
     );
 };
