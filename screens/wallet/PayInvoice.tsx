@@ -338,7 +338,7 @@ const PayInvoice = ({route}: Props) => {
                         tailwind(
                             `${
                                 invoiceOptionsEmpty ? 'w-5/6 p-2' : 'w-5/6 p-6'
-                            } items-center flex justify-between rounded mt-4`,
+                            } items-center flex justify-between rounded mt-6`,
                         ),
                     ]}>
                     {decodedInvoice.options?.label && (
