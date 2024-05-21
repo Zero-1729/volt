@@ -63,8 +63,6 @@ import {FiatBalance} from '../components/balance';
 import {fetchFiatRate} from '../modules/currency';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
-import ArrowRight from '../assets/svg/chevron-right-24.svg';
-import ArrowLeft from '../assets/svg/chevron-left-24.svg';
 
 import {
     getUniqueTXs,
@@ -83,8 +81,7 @@ const Home = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
 
-    const {t, i18n} = useTranslation('wallet');
-    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+    const {t} = useTranslation('wallet');
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -596,13 +593,7 @@ const Home = ({route}: Props) => {
                         <PlainButton
                             onPress={() => {}}
                             style={[
-                                tailwind(
-                                    `rounded-md py-4 px-4 w-5/6 ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    }`,
-                                ),
+                                tailwind('rounded-md py-4 px-4 w-5/6'),
                                 {
                                     marginTop:
                                         -(NativeWindowMetrics.height * 0.05) +
@@ -611,49 +602,20 @@ const Home = ({route}: Props) => {
                                         ColorScheme.Background.Greyed,
                                 },
                             ]}>
-                            <View style={[tailwind('flex')]}>
-                                <VText
-                                    style={[
-                                        tailwind('text-base font-bold mb-1'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
-                                    {t('backup_mnemonic')}
-                                </VText>
-                                <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
-                                    {t('backup_mnemonic_text')}
-                                </VText>
-                            </View>
-                            <View
+                            <VText
                                 style={[
-                                    tailwind(
-                                        'absolute h-full self-center justify-center',
-                                    ),
-                                    {
-                                        right: langDir === 'left' ? 12 : 'auto',
-                                        left: langDir === 'right' ? 12 : 'auto',
-                                    },
+                                    tailwind('text-base font-bold mb-1'),
+                                    {color: ColorScheme.Text.Default},
                                 ]}>
-                                <View
-                                    style={[tailwind('h-full justify-center')]}>
-                                    {langDir === 'left' ? (
-                                        <ArrowRight
-                                            fill={ColorScheme.SVG.Default}
-                                            height={20}
-                                            width={20}
-                                        />
-                                    ) : (
-                                        <ArrowLeft
-                                            fill={ColorScheme.SVG.Default}
-                                            width={20}
-                                            height={20}
-                                        />
-                                    )}
-                                </View>
-                            </View>
+                                {t('backup_mnemonic')}
+                            </VText>
+                            <VText
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {t('backup_mnemonic_text')}
+                            </VText>
                         </PlainButton>
 
                         {extractAllTransactions().allCount > 0 ? (
@@ -669,13 +631,22 @@ const Home = ({route}: Props) => {
                                             32,
                                     },
                                 ]}>
-                                <ArrowUpIcon
-                                    style={[tailwind('mr-2')]}
-                                    width={24}
-                                    height={24}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                                <VText style={[DarkGrayText, Font.RobotoText]}>
+                                {extractAllTransactions().filtered.length ===
+                                0 ? (
+                                    <Box
+                                        width={16}
+                                        fill={svgGrayFill}
+                                        style={tailwind('mr-2')}
+                                    />
+                                ) : (
+                                    <ArrowUpIcon
+                                        width={24}
+                                        height={24}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                        style={[tailwind('mr-2')]}
+                                    />
+                                )}
+                                <VText style={[DarkGrayText]}>
                                     {extractAllTransactions().filtered
                                         .length === 0
                                         ? t('no_transactions_today')
