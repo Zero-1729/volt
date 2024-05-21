@@ -205,12 +205,12 @@ export const Balance = (props: BalanceProps) => {
                 /* Empty view to keep the card height consistent  */
                 <View
                     style={[
-                        styles.emptyCard,
                         tailwind(
                             'rounded-sm flex-row self-center rounded w-full h-12',
                         ),
                         {
-                            opacity: props.loading ? 0.15 : 0.3,
+                            opacity: props.loading ? 0.15 : 0.4,
+                            backgroundColor: props.hideColor,
                         },
                     ]}
                 />
@@ -442,9 +442,3 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    emptyCard: {
-        backgroundColor: 'darkgrey',
-    },
-});
