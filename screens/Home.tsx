@@ -46,8 +46,11 @@ import {
 
 import Dots from '../assets/svg/gear-24.svg';
 import Bell from '../assets/svg/bell-fill-24.svg';
-
 import Box from '../assets/svg/inbox-24.svg';
+import BoltIcon from '../assets/svg/bolt-mono.svg';
+import ScanIcon from '../assets/svg/scan.svg';
+import ZapIcon from '../assets/svg/zap.svg';
+import BackupIcon from '../assets/svg/backup.svg';
 
 import Color from '../constants/Color';
 import Font from '../constants/Font';
@@ -68,6 +71,7 @@ import {
     getUniqueTXs,
     checkNetworkIsReachable,
     getLNPayments,
+    getMiniWallet,
 } from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
@@ -383,13 +387,35 @@ const Home = ({route}: Props) => {
         }
     };
 
-    const triggerBackupFlow = () => {
+    const gotToZap = useCallback(() => {
+        navigation.dispatch(
+            CommonActions.navigate('WalletRoot', {
+                screen: 'SendLN',
+            }),
+        );
+    }, []);
+
+    const goToScan = useCallback(() => {
+        const miniWallet = getMiniWallet(wallet);
+
+        navigation.dispatch(
+            CommonActions.navigate('ScanRoot', {
+                screen: 'Scan',
+                params: {
+                    screen: 'home',
+                    wallet: miniWallet,
+                },
+            }),
+        );
+    }, []);
+
+    const triggerBackupFlow = useCallback(() => {
         navigation.dispatch(
             CommonActions.navigate({
                 name: 'Mnemonic',
             }),
         );
-    };
+    }, []);
 
     // Fetch the fiat rate on currency change
     useEffect(() => {
@@ -587,29 +613,133 @@ const Home = ({route}: Props) => {
                         />
                     </View>
 
-                    <PlainButton
-                        onPress={triggerBackupFlow}
-                        style={[
-                            tailwind('rounded-md py-4 px-4 w-5/6'),
-                            {
-                                backgroundColor: ColorScheme.Background.Greyed,
-                            },
-                        ]}>
-                        <VText
+                    {/* Quick Actions */}
+                    <View style={[tailwind('flex-row w-5/6 justify-around')]}>
+                        <PlainButton
+                            onPress={() => {}}
                             style={[
-                                tailwind('text-base font-bold mb-1'),
-                                {color: ColorScheme.Text.Default},
+                                tailwind('flex justify-center items-center'),
                             ]}>
-                            {t('backup_mnemonic')}
-                        </VText>
-                        <VText
+                            <View
+                                style={[
+                                    tailwind(
+                                        'rounded-full items-center justify-center mb-2',
+                                    ),
+                                    {
+                                        height: 54,
+                                        width: 54,
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <BoltIcon
+                                    width={30}
+                                    height={30}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </View>
+                            <VText
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('bolt_nfc')}
+                            </VText>
+                        </PlainButton>
+
+                        <PlainButton
+                            onPress={goToScan}
                             style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.DescText},
+                                tailwind('flex justify-center items-center'),
                             ]}>
-                            {t('backup_mnemonic_text')}
-                        </VText>
-                    </PlainButton>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'rounded-full items-center justify-center mb-2',
+                                    ),
+                                    {
+                                        height: 54,
+                                        width: 54,
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <ScanIcon
+                                    width={24}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </View>
+                            <VText
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {capitalizeFirst(t('scan'))}
+                            </VText>
+                        </PlainButton>
+
+                        <PlainButton
+                            onPress={gotToZap}
+                            style={[
+                                tailwind('flex justify-center items-center'),
+                            ]}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'rounded-full items-center justify-center mb-2',
+                                    ),
+                                    {
+                                        height: 54,
+                                        width: 54,
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <ZapIcon
+                                    width={20}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </View>
+                            <VText
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {capitalizeFirst(t('zap'))}
+                            </VText>
+                        </PlainButton>
+
+                        <PlainButton
+                            onPress={triggerBackupFlow}
+                            style={[
+                                tailwind('flex justify-center items-center'),
+                            ]}>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'rounded-full items-center justify-center mb-2',
+                                    ),
+                                    {
+                                        height: 54,
+                                        width: 54,
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    },
+                                ]}>
+                                <BackupIcon
+                                    width={20}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </View>
+                            <VText
+                                style={[
+                                    tailwind('text-sm'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {capitalizeFirst(t('backup'))}
+                            </VText>
+                        </PlainButton>
+                    </View>
 
                     {extractAllTransactions().allCount > 0 ? (
                         <PlainButton
@@ -638,7 +768,7 @@ const Home = ({route}: Props) => {
                                     style={[tailwind('mr-2')]}
                                 />
                             )}
-                            <VText style={[DarkGrayText]}>
+                            <VText style={[tailwind('text-sm'), DarkGrayText]}>
                                 {extractAllTransactions().filtered.length === 0
                                     ? t('no_transactions_today')
                                     : extractAllTransactions().filtered
@@ -674,9 +804,8 @@ const Home = ({route}: Props) => {
                             />
                             <VText
                                 style={[
-                                    tailwind('w-5/6 text-center'),
+                                    tailwind('w-5/6 text-sm text-center'),
                                     DarkGreyText,
-                                    Font.RobotoText,
                                 ]}>
                                 {t('no_transactions_text')}
                             </VText>
