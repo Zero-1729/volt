@@ -64,6 +64,7 @@ import {fetchFiatRate} from '../modules/currency';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 import ArrowRight from '../assets/svg/chevron-right-24.svg';
+import ArrowLeft from '../assets/svg/chevron-left-24.svg';
 
 import {
     getUniqueTXs,
@@ -638,11 +639,19 @@ const Home = ({route}: Props) => {
                                 ]}>
                                 <View
                                     style={[tailwind('h-full justify-center')]}>
-                                    <ArrowRight
-                                        fill={ColorScheme.SVG.Default}
-                                        height={20}
-                                        width={20}
-                                    />
+                                    {langDir === 'left' ? (
+                                        <ArrowRight
+                                            fill={ColorScheme.SVG.Default}
+                                            height={20}
+                                            width={20}
+                                        />
+                                    ) : (
+                                        <ArrowLeft
+                                            fill={ColorScheme.SVG.Default}
+                                            width={20}
+                                            height={20}
+                                        />
+                                    )}
                                 </View>
                             </View>
                         </PlainButton>
