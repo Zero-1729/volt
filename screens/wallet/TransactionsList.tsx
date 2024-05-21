@@ -141,24 +141,30 @@ const TransactionList = () => {
                         <View
                             style={[
                                 tailwind(
-                                    'flex-row justify-between rounded-full self-center px-2 py-2',
+                                    'flex-row justify-between self-center',
                                 ),
                                 {
+                                    paddingVertical: 5,
+                                    paddingHorizontal: 5,
+                                    borderRadius: 4,
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                     width: NativeWindowMetrics.width * 0.9,
                                 },
                             ]}>
                             <PlainButton
+                                style={tailwind('w-1/4')}
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.ALL);
                                 }}>
                                 <View
                                     style={[
                                         tailwind(
-                                            'flex-row items-center rounded-full justify-center px-4 py-1',
+                                            'flex-row items-center justify-center',
                                         ),
                                         {
+                                            borderRadius: 4,
+                                            paddingVertical: 2,
                                             backgroundColor:
                                                 filteredKind === 'all'
                                                     ? ColorScheme.Background
@@ -168,7 +174,7 @@ const TransactionList = () => {
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind('text-base'),
+                                            tailwind('text-sm'),
                                             {
                                                 color:
                                                     filteredKind === 'all'
@@ -184,15 +190,17 @@ const TransactionList = () => {
                             </PlainButton>
 
                             <PlainButton
+                                style={tailwind('w-1/4')}
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.RECEIVED);
                                 }}>
                                 <View
                                     style={[
                                         tailwind(
-                                            'flex-row items-center rounded-full justify-center px-4 py-1',
+                                            'flex-row items-center rounded-md justify-center',
                                         ),
                                         {
+                                            paddingVertical: 2,
                                             backgroundColor:
                                                 filteredKind === 'received'
                                                     ? ColorScheme.Background
@@ -202,7 +210,7 @@ const TransactionList = () => {
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind('text-base'),
+                                            tailwind('text-sm'),
                                             {
                                                 color:
                                                     filteredKind === 'received'
@@ -218,15 +226,17 @@ const TransactionList = () => {
                             </PlainButton>
 
                             <PlainButton
+                                style={tailwind('w-1/4')}
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.SENT);
                                 }}>
                                 <View
                                     style={[
                                         tailwind(
-                                            'flex-row items-center rounded-full justify-center px-4 py-1',
+                                            'flex-row items-center rounded-md justify-center',
                                         ),
                                         {
+                                            paddingVertical: 2,
                                             backgroundColor:
                                                 filteredKind === 'sent'
                                                     ? ColorScheme.Background
@@ -236,7 +246,7 @@ const TransactionList = () => {
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind('text-base'),
+                                            tailwind('text-sm'),
                                             {
                                                 color:
                                                     filteredKind === 'sent'
@@ -252,15 +262,17 @@ const TransactionList = () => {
                             </PlainButton>
 
                             <PlainButton
+                                style={tailwind('w-1/4')}
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.SWAPs);
                                 }}>
                                 <View
                                     style={[
                                         tailwind(
-                                            'flex-row items-center rounded-full justify-center px-4 py-1',
+                                            'flex-row items-center rounded-md justify-center',
                                         ),
                                         {
+                                            paddingVertical: 2,
                                             backgroundColor:
                                                 filteredKind === 'swaps'
                                                     ? ColorScheme.Background
@@ -270,7 +282,7 @@ const TransactionList = () => {
                                     ]}>
                                     <Text
                                         style={[
-                                            tailwind('text-base'),
+                                            tailwind('text-sm'),
                                             {
                                                 color:
                                                     filteredKind === 'swaps'
@@ -320,19 +332,7 @@ const TransactionList = () => {
                             renderItem={item => {
                                 return (
                                     <UnifiedTransactionListItem
-                                        callback={() => {
-                                            navigation.dispatch(
-                                                CommonActions.navigate({
-                                                    name: 'TransactionDetails',
-                                                    params: {
-                                                        tx: {...item.item},
-                                                        source: 'conservative',
-                                                        walletId:
-                                                            currentWalletID,
-                                                    },
-                                                }),
-                                            );
-                                        }}
+                                        callback={() => {}}
                                         tx={item.item}
                                     />
                                 );
