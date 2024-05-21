@@ -388,6 +388,10 @@ const Home = ({route}: Props) => {
         }
     };
 
+    const gotToTransactions = useCallback(() => {
+        navigation.dispatch(CommonActions.navigate('TransactionList'));
+    }, []);
+
     const gotToZap = useCallback(() => {
         navigation.dispatch(
             CommonActions.navigate('WalletRoot', {
@@ -744,7 +748,7 @@ const Home = ({route}: Props) => {
 
                     {extractAllTransactions().allCount > 0 ? (
                         <PlainButton
-                            onPress={() => {}}
+                            onPress={gotToTransactions}
                             style={[
                                 tailwind(
                                     'w-5/6 absolute flex-row items-center justify-center',
