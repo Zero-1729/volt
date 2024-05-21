@@ -209,7 +209,7 @@ const PayInvoice = ({route}: Props) => {
     }, []);
 
     const handleRoute = useCallback(() => {
-        const wallet = getMiniWallet(getWalletData(walletId));
+        const _wallet = getMiniWallet(wallet);
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
 
         // Check network connection first
@@ -230,7 +230,7 @@ const PayInvoice = ({route}: Props) => {
                 CommonActions.navigate('WalletRoot', {
                     screen: 'Send',
                     params: {
-                        wallet: wallet,
+                        wallet: _wallet,
                         feeRate: 0,
                         dummyPsbtVsize: 0,
                         invoiceData: null,
@@ -244,7 +244,7 @@ const PayInvoice = ({route}: Props) => {
 
         // Check wallet and invoice
         if (
-            checkInvoiceAndWallet(wallet, decodedInvoice, (msg: string) => {
+            checkInvoiceAndWallet(_wallet, decodedInvoice, (msg: string) => {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
