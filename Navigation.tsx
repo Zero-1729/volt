@@ -173,6 +173,7 @@ export type InitStackParamList = {
         details: TBreezPaymentDetails;
         detailsType: EBreezDetails;
     };
+    Mnemonic: undefined;
 };
 
 // Settings Param List for screens
@@ -232,9 +233,6 @@ export type AddWalletParamList = {
         onboarding: boolean;
     };
     CreateActions: undefined;
-    Mnemonic: {
-        onboarding: boolean;
-    };
 };
 
 // Root Param List for screens
@@ -424,7 +422,6 @@ export const AddWalletRoot = () => {
     return (
         <AddWalletStack.Navigator screenOptions={{headerShown: false}}>
             <AddWalletStack.Screen name="Add" component={Add} />
-            <AddWalletStack.Screen name="Mnemonic" component={Mnemonic} />
             <AddWalletStack.Screen
                 name="RestoreActions"
                 component={RestoreActions}
@@ -896,6 +893,10 @@ const RootNavigator = (): ReactElement => {
                     <InitScreenStack.Screen
                         name="ScanRoot"
                         component={ScanRoot}
+                    />
+                    <InitScreenStack.Screen
+                        name="Mnemonic"
+                        component={Mnemonic}
                     />
                 </InitScreenStack.Group>
                 <InitScreenStack.Screen name="Apps" component={Apps} />
