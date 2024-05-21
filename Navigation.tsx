@@ -51,6 +51,7 @@ import {actionAlert} from './components/alert';
 
 import Home from './screens/Home';
 import PayInvoice from './screens/wallet/PayInvoice';
+import TransactionList from './screens/wallet/TransactionsList';
 
 // Biometrics Screen
 import LockScreen from './components/lock';
@@ -165,6 +166,7 @@ export type InitStackParamList = {
     WalletRoot: undefined;
     SettingsRoot: undefined;
     ScanRoot: undefined;
+    TransactionList: undefined;
     LNTransactionStatus: {
         status: boolean;
         details: TBreezPaymentDetails;
@@ -894,6 +896,10 @@ const RootNavigator = (): ReactElement => {
                     <InitScreenStack.Screen
                         name="Mnemonic"
                         component={Mnemonic}
+                    />
+                    <InitScreenStack.Screen
+                        name="TransactionList"
+                        component={TransactionList}
                     />
                 </InitScreenStack.Group>
             </InitScreenStack.Navigator>
