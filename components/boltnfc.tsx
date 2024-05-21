@@ -26,8 +26,7 @@ import {
 import NFCManager, {NfcTech} from 'react-native-nfc-manager';
 import {extractNFCTagData} from '../modules/nfc';
 
-import BoltIcon from '../assets/svg/bolt-icon-dark.svg';
-import BoltIconLight from '../assets/svg/bolt-icon-light.svg';
+import BoltIcon from '../assets/svg/bolt-mono.svg';
 import {DisplayFiatAmount} from './balance';
 
 type BoltNFCProps = {
@@ -200,7 +199,6 @@ const BoltNFC = (props: BoltNFCProps) => {
                                 'w-5/6 px-4 py-4 rounded-md mt-6 items-center justify-center',
                             ),
                             {
-                                backgroundColor: ColorScheme.Background.Greyed,
                                 height: NativeWindowMetrics.height * 0.4 - 32,
                             },
                         ]}>
@@ -219,11 +217,11 @@ const BoltNFC = (props: BoltNFCProps) => {
                         </View>
 
                         <View style={[tailwind('mt-2')]}>
-                            {useColorScheme() === 'dark' ? (
-                                <BoltIcon height={98} width={98} />
-                            ) : (
-                                <BoltIconLight height={98} width={98} />
-                            )}
+                            <BoltIcon
+                                height={98}
+                                width={98}
+                                fill={ColorScheme.SVG.Default}
+                            />
                         </View>
 
                         {statusMessage && (
