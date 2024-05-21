@@ -13,7 +13,9 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useTranslation} from 'react-i18next';
 
-import {displayNumberedSeed, capitalizeFirst} from '../../modules/transform';
+import {capitalizeFirst} from '../../modules/transform';
+
+import {MnemonicDisplayCapsule} from '../../components/shared';
 
 import Color from '../../constants/Color';
 
@@ -30,6 +32,8 @@ const Mnemonic = () => {
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
 
+    const mnemonic = walletData.mnemonic.split(' ');
+
     const returnToHome = useCallback(() => {
         const noWallets = !isWalletInitialized;
 
@@ -40,29 +44,6 @@ const Mnemonic = () => {
 
         navigation.dispatch(StackActions.popToTop());
     }, [isWalletInitialized, navigation, setWalletInit]);
-
-        // iterate over seed words and create a styled component for each
-        displayNumberedSeed(walletData.mnemonic).forEach((word, index) => {
-            components.push(
-                <View style={[tailwind('m-1 rounded-sm')]} key={index}>
-                    <Text
-                        style={[
-                            tailwind('text-base font-bold px-2 py-1 '),
-                            {
-                                color: ColorScheme.Text.GrayedText,
-                                backgroundColor:
-                                    ColorScheme.Background.Secondary,
-                            },
-                        ]}
-                        textBreakStrategy={'simple'}>
-                        {word}
-                    </Text>
-                </View>,
-            );
-        });
-
-        return components;
-    };
 
     return (
         <SafeAreaView
@@ -99,7 +80,7 @@ const Mnemonic = () => {
                 </Text>
 
                 {/* Mnemonic instruction and note on backing up */}
-                <View style={[tailwind('w-5/6 mt-12')]}>
+                <View style={[tailwind('w-5/6 mt-10')]}>
                     <Text
                         style={
                             (tailwind('text-sm'),
@@ -122,10 +103,40 @@ const Mnemonic = () => {
                 </View>
 
                 {/* Show Mnemonic phrases */}
-                <View style={[tailwind('w-5/6 mt-12 grow')]}>
+                <View
+                    style={[
+                        tailwind(
+                            'w-5/6 flex-row justify-center items-center mt-8 mb-6',
+                        ),
+                    ]}>
+                    {/* col 0 */}
                     <View
-                        style={[tailwind('flex-row flex-wrap justify-center')]}>
-                        {displayMnemonic()}
+                        style={[
+                            tailwind('items-center justify-center mr-4'),
+                            styles.capsuleContainer,
+                        ]}>
+                        {mnemonic.slice(0, 6).map((word, index) => (
+                            <MnemonicDisplayCapsule
+                                key={index}
+                                word={word}
+                                index={index}
+                            />
+                        ))}
+                    </View>
+
+                    {/* col 1 */}
+                    <View
+                        style={[
+                            tailwind('items-center justify-center'),
+                            styles.capsuleContainer,
+                        ]}>
+                        {mnemonic.slice(6, 12).map((word, index) => (
+                            <MnemonicDisplayCapsule
+                                key={index + 6}
+                                word={word}
+                                index={index + 6}
+                            />
+                        ))}
                     </View>
                 </View>
 
@@ -143,3 +154,9 @@ const Mnemonic = () => {
 };
 
 export default Mnemonic;
+
+const styles = StyleSheet.create({
+    capsuleContainer: {
+        width: '46%',
+    },
+});
