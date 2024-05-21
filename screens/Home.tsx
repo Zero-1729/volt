@@ -383,6 +383,15 @@ const Home = ({route}: Props) => {
         }
     };
 
+    const triggerBackupFlow = () => {
+        // TODO: make sure to add if backed up flag in storage context
+        navigation.dispatch(
+            CommonActions.navigate('WalletRoot', {
+                screen: 'Mnemonic',
+            }),
+        );
+    };
+
     // Fetch the fiat rate on currency change
     useEffect(() => {
         // Avoid fiat rate update call when offline
@@ -497,194 +506,183 @@ const Home = ({route}: Props) => {
                     </PlainButton>
                 </View>
 
-                <View style={[tailwind('w-full h-full justify-around mt-2')]}>
+                <View style={[tailwind('w-full h-full mt-2 items-center')]}>
                     <View
-                        style={[
-                            tailwind(
-                                'w-5/6 self-center items-center justify-between',
-                            ),
-                        ]}>
-                        <View
-                            style={tailwind(
-                                'justify-around items-center w-full mb-6',
-                            )}>
-                            {wallets.length > 0 && (
-                                <>
-                                    <VText
+                        style={tailwind(
+                            'justify-around items-center w-full mb-6',
+                        )}>
+                        {wallets.length > 0 && (
+                            <>
+                                <VText
+                                    style={[
+                                        tailwind('text-base font-medium mb-1'),
+                                        {color: ColorScheme.Text.Default},
+                                        Font.RobotoText,
+                                    ]}>
+                                    {t('balance')}
+                                </VText>
+
+                                {!hideTotalBalance ? (
+                                    <FiatBalance
+                                        balance={totalBalance.onchain
+                                            .plus(totalBalance.lightning)
+                                            .toNumber()}
+                                        loading={loadingBalance}
+                                        balanceFontSize={'text-3xl'}
+                                        fontColor={ColorScheme.Text.Default}
+                                    />
+                                ) : (
+                                    <View
                                         style={[
                                             tailwind(
-                                                'text-base font-medium mb-1',
+                                                'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row',
                                             ),
-                                            {color: ColorScheme.Text.Default},
-                                            Font.RobotoText,
-                                        ]}>
-                                        {t('balance')}
-                                    </VText>
-
-                                    {!hideTotalBalance ? (
-                                        <FiatBalance
-                                            balance={totalBalance.onchain
-                                                .plus(totalBalance.lightning)
-                                                .toNumber()}
-                                            loading={loadingBalance}
-                                            balanceFontSize={'text-3xl'}
-                                            fontColor={ColorScheme.Text.Default}
-                                        />
-                                    ) : (
-                                        <View
-                                            style={[
-                                                tailwind(
-                                                    'rounded-sm w-full mt-1 opacity-80 h-8 flex-row',
-                                                ),
-                                                {
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Greyed,
-                                                },
-                                            ]}
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </View>
-
-                        {/** Wallet Card */}
-                        <View
-                            style={[
-                                tailwind('w-full'),
-                                {
-                                    height: styles.CardContainer.height,
-                                    width: AppScreenWidth * 0.92,
-                                },
-                            ]}>
-                            <WalletCard
-                                // This is for onchain behaviour only
-                                maxedCard={
-                                    wallet.type !== 'unified' &&
-                                    wallet.balance.onchain.isZero() &&
-                                    wallet.transactions.length > 0
-                                }
-                                // Combine the balances
-                                balance={wallet.balance.lightning.plus(
-                                    wallet.balance.onchain,
+                                            {
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
+                                            },
+                                        ]}
+                                    />
                                 )}
-                                network={wallet.network}
-                                isWatchOnly={wallet.isWatchOnly}
-                                label={wallet.name}
-                                walletType={wallet.type}
-                                loading={loadingBalance}
-                                hideBalance={hideTotalBalance}
-                                unit={wallet.units}
-                                navCallback={() => {
-                                    // Set the current wallet ID
-                                    setCurrentWalletID(wallet.id);
-
-                                    navigation.dispatch(
-                                        CommonActions.navigate('WalletRoot', {
-                                            screen: 'WalletView',
-                                        }),
-                                    );
-                                }}
-                            />
-                        </View>
+                            </>
+                        )}
                     </View>
 
-                    <View style={[tailwind('w-full h-1/2 items-center')]}>
+                    {/** Wallet Card */}
+                    <View
+                        style={[
+                            {
+                                height: styles.CardContainer.height,
+                                width: AppScreenWidth * 0.92,
+                            },
+                        ]}>
+                        <WalletCard
+                            // This is for onchain behaviour only
+                            maxedCard={
+                                wallet.type !== 'unified' &&
+                                wallet.balance.onchain.isZero() &&
+                                wallet.transactions.length > 0
+                            }
+                            // Combine the balances
+                            balance={wallet.balance.lightning.plus(
+                                wallet.balance.onchain,
+                            )}
+                            network={wallet.network}
+                            isWatchOnly={wallet.isWatchOnly}
+                            label={wallet.name}
+                            walletType={wallet.type}
+                            loading={loadingBalance}
+                            hideBalance={hideTotalBalance}
+                            unit={wallet.units}
+                            navCallback={() => {
+                                // Set the current wallet ID
+                                setCurrentWalletID(wallet.id);
+
+                                navigation.dispatch(
+                                    CommonActions.navigate('WalletRoot', {
+                                        screen: 'WalletView',
+                                    }),
+                                );
+                            }}
+                        />
+                    </View>
+
+                    <PlainButton
+                        onPress={triggerBackupFlow}
+                        style={[
+                            tailwind('rounded-md py-4 px-4 w-5/6'),
+                            {
+                                backgroundColor: ColorScheme.Background.Greyed,
+                            },
+                        ]}>
+                        <VText
+                            style={[
+                                tailwind('text-base font-bold mb-1'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {t('backup_mnemonic')}
+                        </VText>
+                        <VText
+                            style={[
+                                tailwind('text-sm'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {t('backup_mnemonic_text')}
+                        </VText>
+                    </PlainButton>
+
+                    {extractAllTransactions().allCount > 0 ? (
                         <PlainButton
                             onPress={() => {}}
                             style={[
-                                tailwind('rounded-md py-4 px-4 w-5/6'),
+                                tailwind(
+                                    'w-5/6 absolute flex-row items-center justify-center',
+                                ),
                                 {
-                                    marginTop:
-                                        -(NativeWindowMetrics.height * 0.05) +
-                                        16,
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
+                                    bottom:
+                                        NativeWindowMetrics.bottomButtonOffset +
+                                        32,
                                 },
                             ]}>
-                            <VText
-                                style={[
-                                    tailwind('text-base font-bold mb-1'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {t('backup_mnemonic')}
-                            </VText>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
-                                {t('backup_mnemonic_text')}
-                            </VText>
-                        </PlainButton>
-
-                        {extractAllTransactions().allCount > 0 ? (
-                            <PlainButton
-                                onPress={() => {}}
-                                style={[
-                                    tailwind(
-                                        'w-5/6 absolute flex-row items-center justify-center',
-                                    ),
-                                    {
-                                        bottom:
-                                            NativeWindowMetrics.bottomButtonOffset +
-                                            32,
-                                    },
-                                ]}>
-                                {extractAllTransactions().filtered.length ===
-                                0 ? (
-                                    <Box
-                                        width={16}
-                                        fill={svgGrayFill}
-                                        style={tailwind('mr-2')}
-                                    />
-                                ) : (
-                                    <ArrowUpIcon
-                                        width={24}
-                                        height={24}
-                                        fill={ColorScheme.SVG.GrayFill}
-                                        style={[tailwind('mr-2')]}
-                                    />
-                                )}
-                                <VText style={[DarkGrayText]}>
-                                    {extractAllTransactions().filtered
-                                        .length === 0
-                                        ? t('no_transactions_today')
-                                        : extractAllTransactions().filtered
-                                              .length === 1
-                                        ? t('transaction_today')
-                                        : t('transactions_today', {
-                                              count: extractAllTransactions()
-                                                  .filtered.length,
-                                          })}
-                                </VText>
-                            </PlainButton>
-                        ) : (
-                            <View
-                                style={[
-                                    tailwind('w-5/6 items-center'),
-                                    {
-                                        marginTop: -(
-                                            NativeWindowMetrics.height * 0.15
-                                        ),
-                                    },
-                                ]}>
+                            {extractAllTransactions().filtered.length === 0 ? (
                                 <Box
-                                    width={32}
+                                    width={16}
                                     fill={svgGrayFill}
-                                    style={tailwind('mb-4')}
+                                    style={tailwind('mr-2')}
                                 />
-                                <VText
-                                    style={[
-                                        tailwind('w-5/6 text-center'),
-                                        DarkGreyText,
-                                        Font.RobotoText,
-                                    ]}>
-                                    {t('no_transactions_text')}
-                                </VText>
-                            </View>
-                        )}
-                    </View>
+                            ) : (
+                                <ArrowUpIcon
+                                    width={24}
+                                    height={24}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                    style={[tailwind('mr-2')]}
+                                />
+                            )}
+                            <VText style={[DarkGrayText]}>
+                                {extractAllTransactions().filtered.length === 0
+                                    ? t('no_transactions_today')
+                                    : extractAllTransactions().filtered
+                                          .length === 1
+                                    ? t('transaction_today')
+                                    : t('transactions_today', {
+                                          count: extractAllTransactions()
+                                              .filtered.length,
+                                      })}
+                            </VText>
+
+                            {loadingBalance && (
+                                <ActivityIndicator
+                                    color={ColorScheme.Background.Greyed}
+                                    style={tailwind('ml-2')}
+                                />
+                            )}
+                        </PlainButton>
+                    ) : (
+                        <View
+                            style={[
+                                tailwind('w-5/6 items-center'),
+                                {
+                                    marginTop: -(
+                                        NativeWindowMetrics.height * 0.15
+                                    ),
+                                },
+                            ]}>
+                            <Box
+                                width={32}
+                                fill={svgGrayFill}
+                                style={tailwind('mb-4')}
+                            />
+                            <VText
+                                style={[
+                                    tailwind('w-5/6 text-center'),
+                                    DarkGreyText,
+                                    Font.RobotoText,
+                                ]}>
+                                {t('no_transactions_text')}
+                            </VText>
+                        </View>
+                    )}
                 </View>
             </View>
         </SafeAreaView>
