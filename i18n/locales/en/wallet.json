@@ -166,6 +166,7 @@
     "amount_above_max_spendable": "Amount above maximum sendable",
     "nfc_unsupported": "NFC is not supported",
     "nfc_disabled": "NFC is not enabled",
+    "bolt_nfc": "Bolt NFC",
     "nfc_read_message": "Hold your NFC Tag near your device...",
     "processing_nfc_tag": "Processing NFC Tag...",
     "no_lnurl_found": "No LNURL found in NFC Tag",

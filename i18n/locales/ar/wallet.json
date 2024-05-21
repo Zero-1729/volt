@@ -166,6 +166,7 @@
     "amount_above_max_spendable": "المبلغ أعلى من الحد الأقصى القابل للإرسال",
     "nfc_unsupported": "NFC غير مدعوم",
     "nfc_disabled": "لم يتم تمكين NFC",
+    "bolt_nfc": "Bolt NFC",
     "nfc_read_message": "ضع علامة NFC بالقرب من جهازك...",
     "processing_nfc_tag": "جارٍ معالجة علامة NFC...",
     "no_lnurl_found": "لم يتم العثور على LNURL في علامة NFC",
