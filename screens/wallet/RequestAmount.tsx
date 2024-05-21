@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useEffect, useState} from 'react';
@@ -33,6 +32,7 @@ import {
     capitalizeFirst,
     formatFiat,
     formatSats,
+    normalizeFiat,
 } from '../../modules/transform';
 import {openChannelFee, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
@@ -71,7 +71,6 @@ const RequestAmount = () => {
         new BigNumber(0),
     );
     const [lnInvoiceDesc, setLNInvoiceDesc] = useState<string>('');
-    const [feeMessage, setFeeMessage] = useState<string>('');
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
         value: new BigNumber(0),
@@ -92,32 +91,9 @@ const RequestAmount = () => {
 
     const setMaxReceivableAmount = async () => {
         const nodeState = await nodeInfo();
-        const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
-        const inboundLiquiditySat =
-            inboundLiquidityMsat !== null ? inboundLiquidityMsat / 1_000 : 0;
-
-        const openChannelFeeResponse = await openChannelFee({});
-
-        const openingFees = openChannelFeeResponse.feeParams;
-        const feePercentage = (openingFees.proportional * 100) / 1_000_000;
-        const minFeeSat = openingFees.minMsat / 1_000;
-
-        if (inboundLiquiditySat === 0) {
-            setFeeMessage(
-                t('ln_fee_message', {pct: feePercentage, mfs: minFeeSat}),
-            );
-        } else {
-            setFeeMessage(
-                t('ln_fee_message_ext', {
-                    pct: feePercentage,
-                    mfs: minFeeSat,
-                    ils: inboundLiquiditySat.toFixed(0),
-                }),
-            );
-        }
 
         updateMaxReceivableAmount(
-            new BigNumber((await nodeInfo()).maxReceivableMsat / 1_000),
+            new BigNumber(nodeState.maxReceivableMsat / 1_000),
         );
     };
 
@@ -125,7 +101,7 @@ const RequestAmount = () => {
 
     // TODO: remove and make sure only onchain generated in next screen
     const hideContinueButton =
-        (isLightning && !feeMessage) ||
+        (isLightning && !maxReceivableAmount.isZero) ||
         satsAmount.value.isZero() ||
         (satsAmount.value.gte(maxReceivableAmount) &&
             !maxReceivableAmount.isZero() &&
@@ -318,6 +294,10 @@ const RequestAmount = () => {
                     capitalizeFirst(t('channel_opening')),
                     e('new_channel_open_warn', {
                         n: feeSats,
+                        fiat: `${appFiatCurrency.symbol} ${normalizeFiat(
+                            new BigNumber(feeSats),
+                            fiatRate.rate,
+                        )}`,
                     }),
                     t('ok'),
                     capitalizeFirst(t('cancel')),
@@ -475,14 +455,17 @@ const RequestAmount = () => {
                     </View>
                 </View>
 
-                {isLightning && (
-                    <View
-                        style={[
-                            tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        {satsAmount.value.gte(maxReceivableAmount) &&
-                        feeMessage ? (
+                {isLightning &&
+                    satsAmount.value.gte(maxReceivableAmount) &&
+                    !maxReceivableAmount.isZero() && (
+                        <View
+                            style={[
+                                tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                },
+                            ]}>
                             <VText
                                 style={[
                                     tailwind('text-sm text-center'),
@@ -494,19 +477,8 @@ const RequestAmount = () => {
                                     sats: formatSats(maxReceivableAmount),
                                 })}
                             </VText>
-                        ) : (
-                            <VText
-                                style={[
-                                    tailwind('text-sm text-center'),
-                                    {
-                                        color: ColorScheme.Text.GrayText,
-                                    },
-                                ]}>
-                                {feeMessage}
-                            </VText>
-                        )}
-                    </View>
-                )}
+                        </View>
+                    )}
 
                 {/* Number pad for input amount */}
                 <AmountNumpad
