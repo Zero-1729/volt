@@ -745,76 +745,43 @@ const Home = ({route}: Props) => {
                         </PlainButton>
                     </View>
 
-                    {extractAllTransactions().allCount > 0 ? (
-                        <PlainButton
-                            onPress={gotToTransactions}
-                            style={[
-                                tailwind(
-                                    'w-5/6 absolute flex-row items-center justify-center',
-                                ),
-                                {
-                                    bottom:
-                                        NativeWindowMetrics.bottomButtonOffset +
-                                        32,
-                                },
-                            ]}>
-                            {extractAllTransactions().filtered.length === 0 ? (
-                                <Box
-                                    width={16}
-                                    fill={svgGrayFill}
-                                    style={tailwind('mr-2')}
-                                />
-                            ) : (
-                                <ArrowUpIcon
-                                    width={24}
-                                    height={24}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                    style={[tailwind('mr-2')]}
-                                />
-                            )}
-                            <VText style={[tailwind('text-sm'), DarkGrayText]}>
-                                {extractAllTransactions().filtered.length === 0
-                                    ? t('no_transactions_today')
-                                    : extractAllTransactions().filtered
-                                          .length === 1
-                                    ? t('transaction_today')
-                                    : t('transactions_today', {
-                                          count: extractAllTransactions()
-                                              .filtered.length,
-                                      })}
-                            </VText>
-
-                            {loadingBalance && (
-                                <ActivityIndicator
-                                    color={ColorScheme.Background.Greyed}
-                                    style={tailwind('ml-2')}
-                                />
-                            )}
-                        </PlainButton>
-                    ) : (
-                        <View
-                            style={[
-                                tailwind('w-5/6 items-center'),
-                                {
-                                    marginTop: -(
-                                        NativeWindowMetrics.height * 0.15
-                                    ),
-                                },
-                            ]}>
-                            <Box
-                                width={32}
-                                fill={svgGrayFill}
-                                style={tailwind('mb-4')}
+                    <PlainButton
+                        onPress={gotToTransactions}
+                        style={[
+                            tailwind(
+                                'w-5/6 absolute flex-row items-center justify-center',
+                            ),
+                            {
+                                bottom:
+                                    NativeWindowMetrics.bottomButtonOffset + 32,
+                            },
+                        ]}>
+                        {extractAllTransactions().filtered.length !== 0 && (
+                            <ArrowUpIcon
+                                width={24}
+                                height={24}
+                                fill={ColorScheme.SVG.GrayFill}
+                                style={[tailwind('mr-2')]}
                             />
-                            <VText
-                                style={[
-                                    tailwind('w-5/6 text-sm text-center'),
-                                    DarkGreyText,
-                                ]}>
-                                {t('no_transactions_text')}
-                            </VText>
-                        </View>
-                    )}
+                        )}
+                        <VText style={[tailwind('text-sm'), DarkGrayText]}>
+                            {extractAllTransactions().filtered.length === 0
+                                ? t('no_transactions_today')
+                                : extractAllTransactions().filtered.length === 1
+                                ? t('transaction_today')
+                                : t('transactions_today', {
+                                      count: extractAllTransactions().filtered
+                                          .length,
+                                  })}
+                        </VText>
+
+                        {loadingBalance && (
+                            <ActivityIndicator
+                                color={ColorScheme.Background.Greyed}
+                                style={tailwind('ml-2')}
+                            />
+                        )}
+                    </PlainButton>
                 </View>
             </View>
         </SafeAreaView>
