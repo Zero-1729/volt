@@ -637,6 +637,7 @@ const Home = ({route}: Props) => {
                                     },
                                 ]}>
                                 <BoltIcon
+                                    style={[{marginTop: 3}]}
                                     width={30}
                                     height={30}
                                     fill={ColorScheme.SVG.Default}
