@@ -116,18 +116,24 @@ const Receive = ({route}: Props) => {
         appFiatCurrency,
         fiatRate,
     } = useContext(AppStorageContext);
-    const walletData = getWalletData(currentWalletID);
-    const isLNWallet = walletData.type === 'unified';
 
-    const progressValue = useSharedValue(0);
+    const walletData = useMemo(() => {
+        return getWalletData(currentWalletID);
+    }, [currentWalletID, getWalletData]);
+
+    const isLNWallet = useMemo(() => {
+        return walletData.type === 'unified';
+    }, [walletData]);
+
+    const [LNInvoice, setLNInvoice] = useState<LnInvoice>();
     const [feeMessage, setFeeMessage] = useState<string>('');
     const [loadingInvoice, setLoadingInvoice] = useState(
         walletData.type === 'unified',
     );
-    const [LNInvoice, setLNInvoice] = useState<LnInvoice>();
 
     const bottomNFCRef = useRef<BottomSheetModal>(null);
     const [openBoltNFC, setOpenBoltNFC] = useState(-1);
+    const progressValue = useSharedValue(0);
 
     const openNFCModal = useCallback(() => {
         if (openBoltNFC !== 1) {
@@ -161,6 +167,82 @@ const Receive = ({route}: Props) => {
     };
 
     const [state, dispatch] = useReducer(reducer, initialState);
+
+    // Format as Bitcoin URI
+    const getFormattedAddress = useCallback(
+        (address: string) => {
+            let amount = state.bitcoinValue;
+
+            if (amount.gt(0)) {
+                // If amount is greater than 0, return a bitcoin payment request URI
+                return `bitcoin:${address}?amount=${amount.div(
+                    SATS_TO_BTC_RATE,
+                )}`;
+            }
+
+            // If amount is 0, return a plain address
+            // return a formatted bitcoin address to include the bitcoin payment request URI
+            return `bitcoin:${address}`;
+        },
+        [state.bitcoinValue],
+    );
+
+    // Copy data to clipboard
+    const copyDescToClipboard = useCallback(
+        (invoice: string) => {
+            // Copy backup material to Clipboard
+            // Temporarily set copied message
+            // and revert after a few seconds
+            Clipboard.setString(invoice);
+
+            Toast.show({
+                topOffset: 60,
+                type: 'Liberal',
+                text1: capitalizeFirst(t('clipboard')),
+                text2: capitalizeFirst(t('copied_to_clipboard')),
+                visibilityTime: 1000,
+                position: 'top',
+            });
+        },
+        [t],
+    );
+
+    const congestedMempool = useMemo(() => {
+        return mempoolInfo.mempoolCongested;
+    }, [mempoolInfo.mempoolCongested]);
+
+    const bolt11Invoice = useMemo(() => {
+        return LNInvoice?.bolt11;
+    }, [LNInvoice]);
+    const bolt11AmountMsat = useMemo(() => {
+        return LNInvoice?.amountMsat;
+    }, [LNInvoice]);
+
+    const displayExpiry = useMemo(() => {
+        if (LNInvoice) {
+            return (
+                <View style={[tailwind('absolute right-0')]}>
+                    <ExpiryTimer expiryDate={LNInvoice.expiry} />
+                </View>
+            );
+        }
+
+        return <></>;
+    }, [LNInvoice, tailwind]);
+
+    const isAmountInvoice = useMemo(() => {
+        return (!isLNWallet && !state.bitcoinValue.isZero()) || isLNWallet;
+    }, [isLNWallet, state.bitcoinValue]);
+
+    // Set bitcoin invoice URI
+    const BTCInvoice = useMemo(
+        () => getFormattedAddress(walletData.address.address),
+        [getFormattedAddress, walletData.address.address],
+    );
+
+    const BTCAddress = useMemo(() => {
+        return walletData.address.address;
+    }, [walletData.address.address]);
 
     useEffect(() => {
         // Update the request amount if it is passed in as a parameter
@@ -279,71 +361,11 @@ const Receive = ({route}: Props) => {
         }
     }, [breezEvent, navigation]);
 
-    // Format as Bitcoin URI
-    const getFormattedAddress = useCallback(
-        (address: string) => {
-            let amount = state.bitcoinValue;
-
-            if (amount.gt(0)) {
-                // If amount is greater than 0, return a bitcoin payment request URI
-                return `bitcoin:${address}?amount=${amount.div(
-                    SATS_TO_BTC_RATE,
-                )}`;
-            }
-
-            // If amount is 0, return a plain address
-            // return a formatted bitcoin address to include the bitcoin payment request URI
-            return `bitcoin:${address}`;
-        },
-        [state.bitcoinValue],
-    );
-
-    // Set bitcoin invoice URI
-    const BTCInvoice = useMemo(
-        () => getFormattedAddress(walletData.address.address),
-        [getFormattedAddress, walletData.address.address],
-    );
-
-    // Copy data to clipboard
-    const copyDescToClipboard = useCallback(
-        (invoice: string) => {
-            // Copy backup material to Clipboard
-            // Temporarily set copied message
-            // and revert after a few seconds
-            Clipboard.setString(invoice);
-
-            Toast.show({
-                topOffset: 60,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('clipboard')),
-                text2: capitalizeFirst(t('copied_to_clipboard')),
-                visibilityTime: 1000,
-                position: 'top',
-            });
-        },
-        [t],
-    );
-
-    const displayExpiry = useCallback(() => {
-        if (LNInvoice) {
-            return (
-                <View style={[tailwind('absolute right-0')]}>
-                    <ExpiryTimer expiryDate={LNInvoice?.expiry} />
-                </View>
-            );
-        }
-
-        return <></>;
-    }, [LNInvoice, tailwind]);
-
-    const isAmountInvoice =
-        (!isLNWallet && !state.bitcoinValue.isZero()) || isLNWallet;
-
     const carouselRef = useRef<ICarouselInstance>(null);
 
     const onchainPanel = useCallback((): ReactElement => {
         const copyToClip = () => {
-            copyDescToClipboard(BTCInvoice);
+            copyDescToClipboard(BTCAddress);
         };
 
         return (
@@ -351,7 +373,7 @@ const Receive = ({route}: Props) => {
                 style={[
                     tailwind(
                         `items-center justify-center h-full w-full ${
-                            mempoolInfo.mempoolCongested ? 'mt-10' : 'mt-6'
+                            congestedMempool ? 'mt-8' : 'mt-6'
                         }`,
                     ),
                 ]}>
@@ -389,8 +411,11 @@ const Receive = ({route}: Props) => {
                 <View
                     style={[
                         styles.qrCodeContainer,
-                        tailwind('rounded'),
-                        {borderColor: ColorScheme.Background.QRBorder},
+                        tailwind('rounded p-2'),
+                        {
+                            borderColor: ColorScheme.Background.QRBorder,
+                            backgroundColor: 'white',
+                        },
                     ]}>
                     <QRCodeStyled
                         style={{
@@ -429,7 +454,7 @@ const Receive = ({route}: Props) => {
                 </View>
 
                 {/* Message on congestion */}
-                {mempoolInfo?.mempoolCongested && (
+                {congestedMempool && (
                     <View
                         style={[
                             tailwind(
@@ -476,7 +501,7 @@ const Receive = ({route}: Props) => {
                             ellipsizeMode="middle"
                             numberOfLines={1}
                             style={[{color: ColorScheme.Text.Default}]}>
-                            {BTCInvoice}
+                            {BTCAddress}
                         </Text>
                     </PlainButton>
                 </View>
@@ -567,7 +592,7 @@ const Receive = ({route}: Props) => {
         );
     }, [
         tailwind,
-        mempoolInfo.mempoolCongested,
+        congestedMempool,
         isAmountInvoice,
         state.bitcoinValue,
         state.fiatValue,
@@ -582,13 +607,14 @@ const Receive = ({route}: Props) => {
         BTCInvoice,
         langDir,
         t,
+        BTCAddress,
         copyDescToClipboard,
         navigation,
     ]);
 
     const lnPanel = useCallback((): ReactElement => {
         const copyToClip = () => {
-            copyDescToClipboard(LNInvoice?.bolt11 as string);
+            copyDescToClipboard(bolt11Invoice as string);
         };
 
         return (
@@ -640,18 +666,19 @@ const Receive = ({route}: Props) => {
                     <View
                         style={[
                             styles.qrCodeContainer,
-                            tailwind('rounded'),
+                            tailwind('rounded p-2'),
                             {
                                 borderColor: ColorScheme.Background.QRBorder,
+                                backgroundColor: 'white',
                             },
                         ]}>
                         <QRCodeStyled
                             style={{
                                 backgroundColor: 'white',
                             }}
-                            data={LNInvoice?.bolt11}
+                            data={bolt11Invoice}
                             padding={4}
-                            pieceSize={4}
+                            pieceSize={3.75}
                             color={ColorScheme.Background.Default}
                             isPiecesGlued={true}
                             pieceBorderRadius={2}
@@ -696,7 +723,7 @@ const Receive = ({route}: Props) => {
                                 ellipsizeMode="middle"
                                 numberOfLines={1}
                                 style={[{color: ColorScheme.Text.Default}]}>
-                                {LNInvoice?.bolt11}
+                                {bolt11Invoice}
                             </Text>
                         </PlainButton>
                     </View>
@@ -766,9 +793,9 @@ const Receive = ({route}: Props) => {
                         <PlainButton
                             onPress={() => {
                                 Share.share({
-                                    message: LNInvoice?.bolt11 as string,
+                                    message: bolt11Invoice as string,
                                     title: 'Share Address',
-                                    url: LNInvoice?.bolt11 as string,
+                                    url: bolt11Invoice as string,
                                 });
                             }}>
                             <View
@@ -845,7 +872,7 @@ const Receive = ({route}: Props) => {
         ColorScheme.SVG.Default,
         t,
         isAdvancedMode,
-        LNInvoice?.bolt11,
+        bolt11Invoice,
         feeMessage,
         langDir,
         openNFCModal,
@@ -893,7 +920,7 @@ const Receive = ({route}: Props) => {
                         </Text>
 
                         {/* Invoice Timeout */}
-                        {displayExpiry()}
+                        {displayExpiry}
                     </View>
 
                     {isLNWallet && (
@@ -970,12 +997,12 @@ const Receive = ({route}: Props) => {
                     <Toast config={toastConfig as ToastConfig} />
                 </View>
 
-                {Platform.OS === 'android' && LNInvoice?.amountMsat && (
+                {Platform.OS === 'android' && bolt11AmountMsat && (
                     <BoltNFC
                         boltNFCRef={bottomNFCRef}
                         onSelectNFC={setOpenBoltNFC}
                         index={openBoltNFC}
-                        amountMsat={LNInvoice?.amountMsat as number}
+                        amountMsat={bolt11AmountMsat as number}
                         fiat={normalizeFiat(
                             new BigNumber(route.params.sats),
                             fiatRate.rate,
