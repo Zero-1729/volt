@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useContext, useEffect, useCallback} from 'react';
+import React, {
+    useState,
+    useContext,
+    useEffect,
+    useCallback,
+    useMemo,
+} from 'react';
 import {
     Text,
     View,
@@ -94,17 +100,17 @@ const PayInvoice = ({route}: Props) => {
         ? decodedInvoice.options?.message
         : bolt11?.description;
 
-    const displayExpiry = useCallback(() => {
-        if (isLightning && expiryEpoch) {
-            return (
-                <View style={[tailwind('absolute right-0 justify-center')]}>
-                    <ExpiryTimer expiryDate={expiryEpoch} />
-                </View>
-            );
+    const displayExpiry = useMemo(() => {
+        if (!(expiryEpoch && isLightning)) {
+            return <></>;
         }
 
-        return <></>;
-    }, []);
+        return (
+            <View style={[tailwind('absolute right-0 justify-center')]}>
+                <ExpiryTimer expiryDate={expiryEpoch} />
+            </View>
+        );
+    }, [expiryEpoch, isLightning]);
 
     const decodeInvoice = useCallback((invoice: string) => {
         // Only handling Bolt11 Lightning invoices
@@ -302,8 +308,6 @@ const PayInvoice = ({route}: Props) => {
         ? Object.keys(decodedInvoice.options).length === 0
         : true;
 
-    // TODO: find a way to close any modals open, e.g. Scan screen open
-
     return (
         <SafeAreaView
             style={[
@@ -329,7 +333,7 @@ const PayInvoice = ({route}: Props) => {
                         ]}>
                         {t('pay_invoice_title')}
                     </Text>
-                    {displayExpiry()}
+                    {displayExpiry}
                 </View>
 
                 {/*Display the invoice data */}
