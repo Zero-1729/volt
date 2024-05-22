@@ -208,7 +208,7 @@ const Currency = () => {
                                     fiatRate.rate.toString(),
                                 )} ${appFiatCurrency.short} ${t('price_on')} `}
                                 <VText style={[tailwind('flex font-bold')]}>
-                                    {fiatRate.source}
+                                    {'CoinGecko'}
                                 </VText>
                             </VText>
                         </View>
