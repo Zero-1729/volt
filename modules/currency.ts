@@ -78,12 +78,11 @@ export const fetchFiatRate = async (
     violate = false,
 ) => {
     const {lastUpdated} = fiatRate;
-    const dateTime = new Date(lastUpdated * 1000);
 
     // Same as Date.getTime()
     const currentTimestamp = +new Date();
 
-    if (currentTimestamp - dateTime.getTime() <= 5 * 1000) {
+    if (currentTimestamp - lastUpdated <= 5 * 1000) {
         // Debounce
         console.info(
             '[FiatRate] Not updating fiat rate, last updated less than 5 seconds ago',
@@ -93,7 +92,7 @@ export const fetchFiatRate = async (
         return false;
     }
 
-    if (currentTimestamp - dateTime.getTime() <= 30 * 60 * 1000 && !violate) {
+    if (currentTimestamp - lastUpdated <= 30 * 60 * 1000 && !violate) {
         // Avoid updating too frequently
         console.info(
             '[FiatRate] Not updating fiat rate, last updated less than 30 minutes ago',
