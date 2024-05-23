@@ -33,6 +33,9 @@ const Color = (currentTheme: ColorThemeType) => {
             QRBorder: isDarkMode ? 'white' : '#E5E5E5',
             Correct: isDarkMode ? '#34C571' : '#34C571',
             Wrong: isDarkMode ? '#EB5757' : '#EB5757',
+            QuickActionsButton: isDarkMode
+                ? 'rgba(200, 200, 200, 0.15)'
+                : 'rgba(200, 200, 200, 0.3)',
             Fade0: isDarkMode ? 'transparent' : '#FFFFFF00',
             Fade1: isDarkMode ? 'black' : 'white',
         },
