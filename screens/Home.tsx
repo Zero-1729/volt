@@ -47,7 +47,6 @@ import {
 
 import Gear from '../assets/svg/gear-24.svg';
 import Bell from '../assets/svg/bell-fill-24.svg';
-import Box from '../assets/svg/inbox-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
 import ScanIcon from '../assets/svg/scan.svg';
 import ZapIcon from '../assets/svg/zap.svg';
@@ -91,12 +90,6 @@ const Home = ({route}: Props) => {
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
     };
-
-    const DarkGreyText = {
-        color: ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA',
-    };
-
-    const svgGrayFill = ColorScheme.isDarkMode ? '#4b4b4b' : '#DADADA';
     const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
     const networkState = useNetInfo();
 
@@ -633,7 +626,8 @@ const Home = ({route}: Props) => {
                                         height: 54,
                                         width: 54,
                                         backgroundColor:
-                                            ColorScheme.Background.Greyed,
+                                            ColorScheme.Background
+                                                .QuickActionsButton,
                                     },
                                 ]}>
                                 <BoltIcon
@@ -666,7 +660,8 @@ const Home = ({route}: Props) => {
                                         height: 54,
                                         width: 54,
                                         backgroundColor:
-                                            ColorScheme.Background.Greyed,
+                                            ColorScheme.Background
+                                                .QuickActionsButton,
                                     },
                                 ]}>
                                 <ScanIcon
@@ -697,7 +692,8 @@ const Home = ({route}: Props) => {
                                         height: 54,
                                         width: 54,
                                         backgroundColor:
-                                            ColorScheme.Background.Greyed,
+                                            ColorScheme.Background
+                                                .QuickActionsButton,
                                     },
                                 ]}>
                                 <ZapIcon
@@ -728,7 +724,8 @@ const Home = ({route}: Props) => {
                                         height: 54,
                                         width: 54,
                                         backgroundColor:
-                                            ColorScheme.Background.Greyed,
+                                            ColorScheme.Background
+                                                .QuickActionsButton,
                                     },
                                 ]}>
                                 <BackupIcon
