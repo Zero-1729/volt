@@ -100,6 +100,7 @@ const Wallet = ({route}: Props) => {
     const [updatedOnchainBalance, setUpdatedOBalance] =
         useState<boolean>(false);
     const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     // Get current wallet ID and wallet data
     const {
@@ -229,11 +230,7 @@ const Wallet = ({route}: Props) => {
     const jointSync = async () => {
         // Avoid duplicate loading and
         // only attempt load if connected to network
-        if (
-            refreshing ||
-            loadingBalance ||
-            !checkNetworkIsReachable(networkState)
-        ) {
+        if (refreshing || loadingBalance || !isNetOn) {
             return;
         }
 
@@ -454,7 +451,7 @@ const Wallet = ({route}: Props) => {
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
     const routeToReceive = () => {
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             navigation.dispatch(
                 CommonActions.navigate({
                     name: 'Receive',
@@ -491,7 +488,7 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             return;
         }
 
@@ -503,7 +500,7 @@ const Wallet = ({route}: Props) => {
     }, [updatedOnchainBalance]);
 
     useEffect(() => {
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             return;
         }
 
@@ -670,7 +667,7 @@ const Wallet = ({route}: Props) => {
                                             'text-sm text-white opacity-60 mb-1',
                                         ),
                                     ]}>
-                                    {!checkNetworkIsReachable(networkState)
+                                    {!isNetOn
                                         ? t('offline_balance')
                                         : t('balance')}
                                 </Text>
@@ -1059,6 +1056,7 @@ const Wallet = ({route}: Props) => {
                                         swapIn: swapIn,
                                         swapOut: swapOut,
                                     }}
+                                    isOnline={isNetOn}
                                     loadingInfo={
                                         loadingSwapOutInfo && loadingSwapInInfo
                                     }
