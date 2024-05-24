@@ -868,6 +868,11 @@ const RootNavigator = (): ReactElement => {
         };
     }, []);
 
+    useEffect(() => {
+        initNode();
+        initMempoolSock();
+    }, [isNetOn]);
+
     return (
         <NavigationContainer
             ref={navigationRef}
