@@ -48,10 +48,16 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
 import Close from '../../assets/svg/x-24.svg';
+import InfoIcon from '../../assets/svg/info-16.svg';
+
 import {TextSingleInput} from '../../components/input';
 import VText from '../../components/text';
 
-import {getMiniWallet, isLNAddress} from '../../modules/wallet-utils';
+import {
+    checkNetworkIsReachable,
+    getMiniWallet,
+    isLNAddress,
+} from '../../modules/wallet-utils';
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {EBreezDetails} from '../../types/enums';
 import {toastConfig} from '../../components/toast';
@@ -62,6 +68,7 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {biometricAuth} from '../../modules/shared';
 
 import PINPass from '../../components/pinpass';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SendLN'>;
 
@@ -81,6 +88,9 @@ const InputPanel = (props: {address: string}): ReactElement => {
     const {getWalletData, currentWalletID, appLanguage} =
         useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
+
+    const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const mainInputRef = useRef(null);
 
@@ -162,7 +172,7 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             </View>
 
-            {isLNAddress(inputText) && (
+            {isLNAddress(inputText) && isNetOn && (
                 <View style={[tailwind('w-5/6 items-center mt-12')]}>
                     <VText
                         style={[
@@ -226,8 +236,34 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             )}
 
+            {isLNAddress(inputText) && !isNetOn && (
+                <View
+                    style={[
+                        tailwind(
+                            `mt-6 items-center ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            }`,
+                        ),
+                    ]}>
+                    <InfoIcon width={16} fill={ColorScheme.SVG.GrayFill} />
+                    <VText
+                        style={[
+                            tailwind(
+                                `text-sm ${
+                                    langDir === 'right' ? 'mr-2' : 'ml-2'
+                                }`,
+                            ),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {t('no_internet_cannot_zap')}
+                    </VText>
+                </View>
+            )}
+
             <LongBottomButton
-                disabled={!isLNAddress(inputText)}
+                disabled={!isLNAddress(inputText) || !isNetOn}
                 onPress={handleAmount}
                 title={capitalizeFirst(t('continue'))}
                 textColor={ColorScheme.Text.Alt}
