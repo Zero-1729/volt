@@ -35,6 +35,7 @@ type SwapProps = {
             max: number;
         };
     };
+    isOnline: boolean;
     loadingInfo: boolean;
 };
 
@@ -82,7 +83,11 @@ const Swap = (props: SwapProps) => {
                 <View style={[tailwind('w-full px-2 h-full items-center')]}>
                     {/* Swap In */}
                     <PlainButton
-                        disabled={onchainBroke || swapInfoUnavailable}
+                        disabled={
+                            onchainBroke ||
+                            swapInfoUnavailable ||
+                            !props.isOnline
+                        }
                         onPress={() => {
                             if (!onchainBroke) {
                                 setSelected(SwapType.SwapIn);
@@ -93,6 +98,7 @@ const Swap = (props: SwapProps) => {
                                 `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
                                     onchainBroke ||
                                     swapInfoUnavailable ||
+                                    !props.isOnline ||
                                     props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
@@ -119,20 +125,22 @@ const Swap = (props: SwapProps) => {
                                 ]}>
                                 {t('swap_in')}
                             </VText>
-                            {selected === SwapType.SwapIn && !onchainBroke && (
-                                <CheckIcon
-                                    style={[
-                                        tailwind(
-                                            `${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : 'ml-2'
-                                            }`,
-                                        ),
-                                    ]}
-                                    fill={ColorScheme.Text.Default}
-                                />
-                            )}
+                            {selected === SwapType.SwapIn &&
+                                props.isOnline &&
+                                !onchainBroke && (
+                                    <CheckIcon
+                                        style={[
+                                            tailwind(
+                                                `${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                        ]}
+                                        fill={ColorScheme.Text.Default}
+                                    />
+                                )}
                         </View>
                         <VText
                             style={[
@@ -170,10 +178,13 @@ const Swap = (props: SwapProps) => {
                     {/* Swap Out */}
                     <PlainButton
                         disabled={
-                            lightningBroke || swapInfoUnavailable || swapOutLow
+                            lightningBroke ||
+                            swapInfoUnavailable ||
+                            swapOutLow ||
+                            !props.isOnline
                         }
                         onPress={() => {
-                            if (!lightningBroke) {
+                            if (!lightningBroke && props.isOnline) {
                                 setSelected(SwapType.SwapOut);
                             }
                         }}
@@ -183,6 +194,7 @@ const Swap = (props: SwapProps) => {
                                     lightningBroke ||
                                     swapInfoUnavailable ||
                                     swapOutLow ||
+                                    !props.isOnline ||
                                     props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
@@ -209,6 +221,7 @@ const Swap = (props: SwapProps) => {
                             </VText>
                             {selected === SwapType.SwapOut &&
                                 !lightningBroke &&
+                                props.isOnline &&
                                 !swapOutLow && (
                                     <CheckIcon
                                         style={[
@@ -259,6 +272,37 @@ const Swap = (props: SwapProps) => {
                         )}
                     </PlainButton>
 
+                    {!props.isOnline && (
+                        <View
+                            style={[
+                                tailwind(
+                                    `mt-4 items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }`,
+                                ),
+                            ]}>
+                            <InfoIcon
+                                width={16}
+                                fill={ColorScheme.SVG.GrayFill}
+                            />
+                            <VText
+                                style={[
+                                    tailwind(
+                                        `text-sm ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`,
+                                    ),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {t('no_internet_cannot_swap')}
+                            </VText>
+                        </View>
+                    )}
+
                     <View
                         style={[
                             tailwind('w-full absolute items-center'),
@@ -268,7 +312,8 @@ const Swap = (props: SwapProps) => {
                             disabled={
                                 (onchainBroke && lightningBroke) ||
                                 props.loadingInfo ||
-                                swapInfoUnavailable
+                                swapInfoUnavailable ||
+                                !props.isOnline
                             }
                             title={capitalizeFirst(t('continue'))}
                             onPress={() => {
