@@ -474,7 +474,7 @@ const Wallet = ({route}: Props) => {
     };
 
     useEffect(() => {
-        if (isLNWallet) {
+        if (isLNWallet && isNetOn) {
             getLNSwapInfo();
             getOnchainSwapInfo();
         }
@@ -488,11 +488,7 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        if (!isNetOn) {
-            return;
-        }
-
-        if (updatedOnchainBalance && isLNWallet) {
+        if (updatedOnchainBalance && isLNWallet && isNetOn) {
             setLoadingSwapInInfo(true);
             getOnchainSwapInfo();
         }
@@ -500,11 +496,7 @@ const Wallet = ({route}: Props) => {
     }, [updatedOnchainBalance]);
 
     useEffect(() => {
-        if (!isNetOn) {
-            return;
-        }
-
-        if (updatedLNBalance && isLNWallet) {
+        if (updatedLNBalance && isLNWallet && isNetOn) {
             setLoadingSwapOutInfo(true);
             getLNSwapInfo();
         }
