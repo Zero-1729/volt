@@ -342,7 +342,7 @@ const RequestAmount = () => {
 
     return (
         <SafeAreaView
-            edges={['bottom', 'right', 'left']}
+            edges={['top', 'bottom', 'right', 'left']}
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>

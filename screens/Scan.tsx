@@ -545,7 +545,7 @@ const Scan = ({route}: Props) => {
     return (
         <SafeAreaView
             style={[styles.flexed, tailwind('bg-black')]}
-            edges={['bottom', 'left', 'right']}>
+            edges={['top', 'bottom', 'left', 'right']}>
             {grantedPermission === Status.AUTHORIZED && (
                 <View
                     style={[
