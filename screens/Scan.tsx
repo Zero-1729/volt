@@ -8,11 +8,7 @@ import {
     Linking,
     Platform,
 } from 'react-native';
-import {
-    CommonActions,
-    StackActions,
-    useNavigation,
-} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
@@ -248,12 +244,6 @@ const Scan = ({route}: Props) => {
                         decodedQRState.decodedInvoice.options.amount =
                             convertBTCtoSats(amount);
 
-                        if (route.params.screen === 'home') {
-                            runOnJS(navigation.dispatch)(
-                                StackActions.popToTop(),
-                            );
-                        }
-
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('WalletRoot', {
                                 screen: 'FeeSelection',
@@ -265,12 +255,6 @@ const Scan = ({route}: Props) => {
                         );
                     } else {
                         // Route to SendAmount screen
-                        if (route.params.screen === 'home') {
-                            runOnJS(navigation.dispatch)(
-                                StackActions.popToTop(),
-                            );
-                        }
-
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('WalletRoot', {
                                 screen: 'SendAmount',
@@ -301,12 +285,6 @@ const Scan = ({route}: Props) => {
                         }
 
                         // Navigate to send screen to handle LN payment
-                        if (route.params.screen === 'home') {
-                            runOnJS(navigation.dispatch)(
-                                StackActions.popToTop(),
-                            );
-                        }
-
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('WalletRoot', {
                                 screen: 'Send',
@@ -323,12 +301,6 @@ const Scan = ({route}: Props) => {
 
                     if (isLNA) {
                         // Assumed an LN Address
-                        if (route.params.screen === 'home') {
-                            runOnJS(navigation.dispatch)(
-                                StackActions.popToTop(),
-                            );
-                        }
-
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('WalletRoot', {
                                 screen: 'SendLN',
@@ -350,14 +322,7 @@ const Scan = ({route}: Props) => {
                 }
             }
         },
-        [
-            e,
-            navigation.dispatch,
-            route.params.screen,
-            route.params.wallet,
-            t,
-            updateScannerMessage,
-        ],
+        [e, navigation.dispatch, route.params.wallet, t, updateScannerMessage],
     );
 
     const handleInvoice = useCallback(
