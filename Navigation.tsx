@@ -130,7 +130,6 @@ import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
-    'Scan',
     'FeeSelection',
     'WalletBackup',
     'AddressOwnership',
@@ -867,6 +866,7 @@ const RootNavigator = (): ReactElement => {
                 screenOptions={{headerShown: false}}
                 initialRouteName={'HomeScreen'}>
                 <InitScreenStack.Screen name="HomeScreen" component={Home} />
+                <InitScreenStack.Screen name="ScanRoot" component={ScanRoot} />
                 <InitScreenStack.Screen
                     name="LNTransactionStatus"
                     component={LNTransactionStatus}
@@ -889,10 +889,6 @@ const RootNavigator = (): ReactElement => {
                     component={SettingsRoot}
                 />
                 <InitScreenStack.Group screenOptions={{presentation: 'modal'}}>
-                    <InitScreenStack.Screen
-                        name="ScanRoot"
-                        component={ScanRoot}
-                    />
                     <InitScreenStack.Screen
                         name="Mnemonic"
                         component={Mnemonic}
