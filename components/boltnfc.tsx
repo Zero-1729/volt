@@ -83,6 +83,7 @@ const BoltNFC = (props: BoltNFCProps) => {
                         LnUrlWithdrawResultVariant.OK
                     ) {
                         setStatusMessage(t('lnurl_withdrawal_success'));
+                        setLoading(false);
                     } else {
                         setStatusMessage(
                             t('lnurl_withdrawal_failed', {
@@ -94,6 +95,7 @@ const BoltNFC = (props: BoltNFCProps) => {
                 }
             } catch (error: any) {
                 setStatusMessage(`Error: ${error.message}`);
+                setLoading(false);
             }
         },
         [props.amountMsat, t],
@@ -158,6 +160,7 @@ const BoltNFC = (props: BoltNFCProps) => {
         } finally {
             // stop the nfc scanning
             NFCManager.cancelTechnologyRequest();
+            setLoading(false);
         }
     }, [handleWithdraw, loading, t]);
 
