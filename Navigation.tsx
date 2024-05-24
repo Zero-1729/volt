@@ -136,9 +136,6 @@ const modalRoutes = [
     'TransactionDetails',
     'TransactionStatus',
     'TransactionExported',
-    'SendAmount',
-    'Receive',
-    'RequestAmount',
     'WalletXpub',
     // 'addWalletRoot', Screen not necessary as before wallet created
     'License',
@@ -382,6 +379,11 @@ const WalletRoot = () => {
             <WalletStack.Screen name="SendLN" component={SendLN} />
             <WalletStack.Screen name="SendAmount" component={SendAmount} />
             <WalletStack.Screen name="FeeSelection" component={FeeSelection} />
+            <WalletStack.Screen name="Receive" component={Receive} />
+            <WalletStack.Screen
+                name="RequestAmount"
+                component={RequestAmount}
+            />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
@@ -400,11 +402,6 @@ const WalletRoot = () => {
                 <WalletStack.Screen
                     name="TransactionExported"
                     component={TransactionExported}
-                />
-                <WalletStack.Screen name="Receive" component={Receive} />
-                <WalletStack.Screen
-                    name="RequestAmount"
-                    component={RequestAmount}
                 />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
                 <WalletStack.Screen name="SwapAmount" component={SwapAmount} />
