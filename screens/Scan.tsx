@@ -619,10 +619,23 @@ const Scan = ({route}: Props) => {
                             <PlainButton
                                 onPress={() => setFlashOn(!flashOn)}
                                 style={[
+                                    tailwind('absolute'),
                                     styles.torchContainer,
-                                    tailwind('p-3 absolute rounded-full'),
                                 ]}>
-                                <TorchIcon fill={'white'} />
+                                <View
+                                    style={[
+                                        tailwind('rounded-full p-3'),
+                                        // eslint-disable-next-line react-native/no-inline-styles
+                                        {
+                                            backgroundColor: !flashOn
+                                                ? '#00000080'
+                                                : '#FFFFFFFF',
+                                        },
+                                    ]}>
+                                    <TorchIcon
+                                        fill={!flashOn ? 'white' : 'black'}
+                                    />
+                                </View>
                             </PlainButton>
                         </View>
                     </View>
@@ -670,7 +683,6 @@ const styles = StyleSheet.create({
         height: 320,
     },
     torchContainer: {
-        backgroundColor: '#00000080',
         top: 12,
         right: 12,
     },
