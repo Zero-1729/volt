@@ -92,6 +92,8 @@ import Dot from '../../components/dots';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import BoltNFC from '../../components/boltnfc';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
@@ -130,6 +132,9 @@ const Receive = ({route}: Props) => {
     const [loadingInvoice, setLoadingInvoice] = useState(
         walletData.type === 'unified',
     );
+
+    const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const bottomNFCRef = useRef<BottomSheetModal>(null);
     const [openBoltNFC, setOpenBoltNFC] = useState(-1);
@@ -231,8 +236,13 @@ const Receive = ({route}: Props) => {
     }, [LNInvoice, tailwind]);
 
     const isAmountInvoice = useMemo(() => {
-        return (!isLNWallet && !state.bitcoinValue.isZero()) || isLNWallet;
-    }, [isLNWallet, state.bitcoinValue]);
+        // Show if is a LN wallet & online
+        // or not LN but has BTC onchain amount set
+        return (
+            (!isLNWallet && !state.bitcoinValue.isZero()) ||
+            (isLNWallet && isNetOn)
+        );
+    }, [isLNWallet, state.bitcoinValue, isNetOn]);
 
     // Set bitcoin invoice URI
     const BTCInvoice = useMemo(
@@ -328,10 +338,10 @@ const Receive = ({route}: Props) => {
     useEffect(() => {
         // Get invoice details
         // Note: hide amount details
-        if (walletData.type === 'unified') {
+        if (walletData.type === 'unified' && isNetOn) {
             displayLNInvoice();
         }
-    }, [displayLNInvoice, walletData.type]);
+    }, [displayLNInvoice, isNetOn, walletData.type]);
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
@@ -454,7 +464,7 @@ const Receive = ({route}: Props) => {
                 </View>
 
                 {/* Message on congestion */}
-                {congestedMempool && (
+                {congestedMempool && isNetOn && (
                     <View
                         style={[
                             tailwind(
@@ -607,6 +617,7 @@ const Receive = ({route}: Props) => {
         BTCInvoice,
         langDir,
         t,
+        isNetOn,
         BTCAddress,
         copyDescToClipboard,
         navigation,
@@ -880,10 +891,9 @@ const Receive = ({route}: Props) => {
         navigation,
     ]);
 
-    const panels = useMemo(
-        (): Slide[] => [lnPanel, onchainPanel],
-        [onchainPanel, lnPanel],
-    );
+    const panels = useMemo((): Slide[] => {
+        return isNetOn ? [lnPanel, onchainPanel] : [onchainPanel];
+    }, [isNetOn, lnPanel, onchainPanel]);
 
     return (
         <SafeAreaView
@@ -963,21 +973,23 @@ const Receive = ({route}: Props) => {
                                 }}
                             />
 
-                            <View
-                                style={[
-                                    styles.dots,
-                                    {bottom: NativeDims.bottom},
-                                ]}
-                                pointerEvents="none">
-                                {panels.map((_slide, index) => (
-                                    <Dot
-                                        key={index}
-                                        index={index}
-                                        animValue={progressValue}
-                                        length={panels.length}
-                                    />
-                                ))}
-                            </View>
+                            {isNetOn && (
+                                <View
+                                    style={[
+                                        styles.dots,
+                                        {bottom: NativeDims.bottom},
+                                    ]}
+                                    pointerEvents="none">
+                                    {panels.map((_slide, index) => (
+                                        <Dot
+                                            key={index}
+                                            index={index}
+                                            animValue={progressValue}
+                                            length={panels.length}
+                                        />
+                                    ))}
+                                </View>
+                            )}
                         </View>
                     )}
 
