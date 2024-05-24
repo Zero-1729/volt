@@ -37,7 +37,7 @@ import {
     BreezEventVariant,
     ConnectRequest,
 } from '@breeztech/react-native-breez-sdk';
-import {getXPub256} from './modules/wallet-utils';
+import {checkNetworkIsReachable, getXPub256} from './modules/wallet-utils';
 
 import Color from './constants/Color';
 
@@ -127,6 +127,8 @@ import {
 import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
+
+import {useNetInfo} from '@react-native-community/netinfo';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
@@ -480,6 +482,8 @@ const RootNavigator = (): ReactElement => {
     const onboardingState = useRef(onboarding);
     const wallet = getWalletData(currentWalletID);
     const BreezSub = useRef<any>(null);
+    const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
@@ -488,6 +492,7 @@ const RootNavigator = (): ReactElement => {
     ).current;
 
     const {t} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
 
     const ColorScheme = Color(useColorScheme());
 
@@ -592,6 +597,10 @@ const RootNavigator = (): ReactElement => {
 
     // Fetch and set Swap Info here
     const initMempoolSock = async () => {
+        if (!isNetOn) {
+            return;
+        }
+
         mempoolRef.onopen = () => {
             console.log('[Mempool] Connected');
 
@@ -603,9 +612,9 @@ const RootNavigator = (): ReactElement => {
             );
         };
 
-        mempoolRef.onmessage = (e: any) => {
-            const _mempoolInfo = JSON.parse(e.data.toString()).mempoolInfo;
-            const _fees = JSON.parse(e.data.toString()).fees;
+        mempoolRef.onmessage = (error: any) => {
+            const _mempoolInfo = JSON.parse(error.data.toString()).mempoolInfo;
+            const _fees = JSON.parse(error.data.toString()).fees;
 
             const mempoolUsage = _mempoolInfo?.usage;
             const mempoolMax = _mempoolInfo?.maxmempool;
@@ -632,8 +641,8 @@ const RootNavigator = (): ReactElement => {
             });
         };
 
-        mempoolRef.onerror = (e: any) => {
-            console.log('[Mempool] (error)', e.message);
+        mempoolRef.onerror = (error: any) => {
+            console.log('[Mempool] (error)', error.message);
         };
     };
 
@@ -641,6 +650,11 @@ const RootNavigator = (): ReactElement => {
     const initNode = async () => {
         // No point putting in any effort if mnemonic missing
         if (wallet?.mnemonic.length === 0) {
+            return;
+        }
+
+        // Check network
+        if (!isNetOn) {
             return;
         }
 
