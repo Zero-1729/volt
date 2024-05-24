@@ -107,7 +107,7 @@ export const fetchFiatRate = async (
         const rateObj = await fetchPrice(ticker);
 
         // Trigger callback from RN component to update storage context
-        await onSuccess(rateObj);
+        onSuccess(rateObj);
 
         // Return true to indicate success
         // i.e. rate fetched

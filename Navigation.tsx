@@ -492,7 +492,6 @@ const RootNavigator = (): ReactElement => {
     ).current;
 
     const {t} = useTranslation('wallet');
-    const {t: e} = useTranslation('errors');
 
     const ColorScheme = Color(useColorScheme());
 
