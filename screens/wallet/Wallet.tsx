@@ -227,14 +227,13 @@ const Wallet = ({route}: Props) => {
     };
 
     const jointSync = async () => {
-        // Avoid duplicate loading
-        if (refreshing || loadingBalance) {
-            return;
-        }
-
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
-            setRefreshing(false);
+        // Avoid duplicate loading and
+        // only attempt load if connected to network
+        if (
+            refreshing ||
+            loadingBalance ||
+            !checkNetworkIsReachable(networkState)
+        ) {
             return;
         }
 
@@ -408,7 +407,6 @@ const Wallet = ({route}: Props) => {
     ]);
 
     const getLNSwapInfo = async () => {
-        // TODO: report error in toast
         // TODO: replace with call to Boltz to get when LN Balance below min
         onchainPaymentLimits()
             .then((c: OnchainPaymentLimitsResponse) => {
@@ -419,15 +417,14 @@ const Wallet = ({route}: Props) => {
                 setLoadingSwapOutInfo(false);
                 setUpdatedLNBalance(false);
             })
-            .catch((e: any) => {
-                console.log('[Breez swapOut] error: ', e.message);
+            .catch((error: any) => {
+                console.log('[Breez swapOut] error: ', error.message);
                 setLoadingSwapOutInfo(false);
                 setUpdatedLNBalance(false);
             });
     };
 
     const getOnchainSwapInfo = async () => {
-        // TODO: report error in toast
         receiveOnchain({})
             .then((d: SwapInfo) => {
                 setSwapIn({
@@ -441,8 +438,8 @@ const Wallet = ({route}: Props) => {
                 setLoadingSwapInInfo(false);
                 setUpdatedOBalance(false);
             })
-            .catch((e: any) => {
-                console.log('[Breez swapIn] error: ', e.message);
+            .catch((error: any) => {
+                console.log('[Breez swapIn] error: ', error.message);
                 setLoadingSwapInInfo(false);
                 setUpdatedOBalance(false);
             });
@@ -455,6 +452,29 @@ const Wallet = ({route}: Props) => {
 
     const hideSendButton =
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
+
+    const routeToReceive = () => {
+        if (!checkNetworkIsReachable(networkState)) {
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'Receive',
+                    params: {
+                        sats: '',
+                        fiat: '',
+                        amount: '',
+                        lnDescription: null,
+                    },
+                }),
+            );
+            return;
+        }
+
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'RequestAmount',
+            }),
+        );
+    };
 
     useEffect(() => {
         if (isLNWallet) {
@@ -471,6 +491,10 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
+        if (!checkNetworkIsReachable(networkState)) {
+            return;
+        }
+
         if (updatedOnchainBalance && isLNWallet) {
             setLoadingSwapInInfo(true);
             getOnchainSwapInfo();
@@ -479,6 +503,10 @@ const Wallet = ({route}: Props) => {
     }, [updatedOnchainBalance]);
 
     useEffect(() => {
+        if (!checkNetworkIsReachable(networkState)) {
+            return;
+        }
+
         if (updatedLNBalance && isLNWallet) {
             setLoadingSwapOutInfo(true);
             getLNSwapInfo();
@@ -887,14 +915,7 @@ const Wallet = ({route}: Props) => {
                                         backgroundColor: CardAccent,
                                     },
                                 ]}>
-                                <PlainButton
-                                    onPress={() => {
-                                        navigation.dispatch(
-                                            CommonActions.navigate({
-                                                name: 'RequestAmount',
-                                            }),
-                                        );
-                                    }}>
+                                <PlainButton onPress={routeToReceive}>
                                     <Text
                                         style={[
                                             tailwind(
