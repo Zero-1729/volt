@@ -92,6 +92,7 @@ const Home = ({route}: Props) => {
     };
     const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
     const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const {
         wallets,
@@ -211,13 +212,13 @@ const Home = ({route}: Props) => {
                         },
                         violate,
                     );
-                } catch (e: any) {
+                } catch (error: any) {
                     // Report network error
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
                         text1: capitalizeFirst(t('network')),
-                        text2: e.message,
+                        text2: error.message,
                         visibilityTime: 2000,
                     });
 
@@ -255,7 +256,7 @@ const Home = ({route}: Props) => {
         }
 
         // Check net again, just in case there is a drop mid execution
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             setRefreshing(false);
             setLoadingBalance(false);
             return;
@@ -348,7 +349,7 @@ const Home = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             setRefreshing(false);
             setLoadingBalance(false);
             return;
@@ -365,7 +366,7 @@ const Home = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             setRefreshing(false);
             return;
         }
@@ -421,7 +422,7 @@ const Home = ({route}: Props) => {
     useEffect(() => {
         // Avoid fiat rate update call when offline
         // or when newly loaded screen to avoid dup call
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             return;
         }
 
@@ -434,17 +435,9 @@ const Home = ({route}: Props) => {
     useEffect(() => {
         // Only attempt update when initial fiat rate update call
         // and wallets exists
-        if (wallets.length > 0) {
+        if (isWalletInitialized && !isNetOn && wallet.type !== 'unified') {
             // Avoid fiat rate update call when offline
-            if (!checkNetworkIsReachable(networkState)) {
-                return;
-            }
-
-            // Begin loading
-            setLoadingBalance(true);
-
-            // Single shot call to update fiat rate
-            singleSyncFiatRate(appFiatCurrency.short);
+            jointSync();
         }
 
         () => {
@@ -454,14 +447,8 @@ const Home = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        if (!checkNetworkIsReachable(networkState)) {
-            return;
-        }
-    }, [currentWalletID]);
-
-    useEffect(() => {
         if (route.params?.restoreMeta) {
-            if (route.params?.restoreMeta.load) {
+            if (route.params?.restoreMeta.load && isNetOn) {
                 // set loading
                 setLoadingBalance(true);
 
@@ -538,10 +525,16 @@ const Home = ({route}: Props) => {
                                 <VText
                                     style={[
                                         tailwind('text-base font-medium mb-1'),
-                                        {color: ColorScheme.Text.Default},
+                                        {
+                                            color: isNetOn
+                                                ? ColorScheme.Text.Default
+                                                : ColorScheme.Text.GrayedText,
+                                        },
                                         Font.RobotoText,
                                     ]}>
-                                    {t('balance')}
+                                    {!isNetOn
+                                        ? t('offline_balance')
+                                        : t('balance')}
                                 </VText>
 
                                 {!hideTotalBalance ? (
