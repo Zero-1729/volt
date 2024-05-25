@@ -62,6 +62,7 @@ const ConfirmPIN = ({route}: Props) => {
             // Set pin
             setKeychainItem('pin', tmpPIN);
             setPINActive(true);
+            setTmpPIN('');
 
             if (!route.params.isChangePIN && !isBiometricsActive) {
                 navigation.dispatch(
