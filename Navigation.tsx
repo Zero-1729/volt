@@ -596,7 +596,7 @@ const RootNavigator = (): ReactElement => {
 
     // Fetch and set Swap Info here
     const initMempoolSock = async () => {
-        if (!isNetOn) {
+        if (!checkNetworkIsReachable(networkState)) {
             return;
         }
 
@@ -653,7 +653,7 @@ const RootNavigator = (): ReactElement => {
         }
 
         // Check network
-        if (!isNetOn) {
+        if (!checkNetworkIsReachable(networkState)) {
             return;
         }
 

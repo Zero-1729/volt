@@ -240,9 +240,9 @@ const Receive = ({route}: Props) => {
         // or not LN but has BTC onchain amount set
         return (
             (!isLNWallet && !state.bitcoinValue.isZero()) ||
-            (isLNWallet && isNetOn)
+            (isLNWallet && checkNetworkIsReachable(networkState))
         );
-    }, [isLNWallet, state.bitcoinValue, isNetOn]);
+    }, [isLNWallet, state.bitcoinValue, networkState]);
 
     // Set bitcoin invoice URI
     const BTCInvoice = useMemo(
@@ -338,10 +338,13 @@ const Receive = ({route}: Props) => {
     useEffect(() => {
         // Get invoice details
         // Note: hide amount details
-        if (walletData.type === 'unified' && isNetOn) {
+        if (
+            walletData.type === 'unified' &&
+            checkNetworkIsReachable(networkState)
+        ) {
             displayLNInvoice();
         }
-    }, [displayLNInvoice, isNetOn, walletData.type]);
+    }, [displayLNInvoice, networkState, walletData.type]);
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {

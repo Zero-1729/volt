@@ -256,7 +256,7 @@ const Home = ({route}: Props) => {
         }
 
         // Check net again, just in case there is a drop mid execution
-        if (!isNetOn) {
+        if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
             setLoadingBalance(false);
             return;
@@ -349,7 +349,7 @@ const Home = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!isNetOn) {
+        if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
             setLoadingBalance(false);
             return;
@@ -366,7 +366,7 @@ const Home = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!isNetOn) {
+        if (!checkNetworkIsReachable(networkState)) {
             setRefreshing(false);
             return;
         }
@@ -422,7 +422,7 @@ const Home = ({route}: Props) => {
     useEffect(() => {
         // Avoid fiat rate update call when offline
         // or when newly loaded screen to avoid dup call
-        if (!isNetOn) {
+        if (!checkNetworkIsReachable(networkState)) {
             return;
         }
 
@@ -435,7 +435,11 @@ const Home = ({route}: Props) => {
     useEffect(() => {
         // Only attempt update when initial fiat rate update call
         // and wallets exists
-        if (isWalletInitialized && !isNetOn && wallet.type !== 'unified') {
+        if (
+            isWalletInitialized &&
+            !checkNetworkIsReachable(networkState) &&
+            wallet.type !== 'unified'
+        ) {
             // Avoid fiat rate update call when offline
             jointSync();
         }
@@ -448,7 +452,10 @@ const Home = ({route}: Props) => {
 
     useEffect(() => {
         if (route.params?.restoreMeta) {
-            if (route.params?.restoreMeta.load && isNetOn) {
+            if (
+                route.params?.restoreMeta.load &&
+                checkNetworkIsReachable(networkState)
+            ) {
                 // set loading
                 setLoadingBalance(true);
 
