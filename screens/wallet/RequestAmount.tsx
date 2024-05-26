@@ -52,7 +52,12 @@ import {
 import {actionAlert} from '../../components/alert';
 import {toastConfig} from '../../components/toast';
 
-const RequestAmount = () => {
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {WalletParamList} from '../../Navigation';
+
+type Props = NativeStackScreenProps<WalletParamList, 'RequestAmount'>;
+
+const RequestAmount = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
@@ -275,6 +280,23 @@ const RequestAmount = () => {
     };
 
     const handleRoute = async () => {
+        if (route.params?.boltNFCMode) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'BoltNFC',
+                    params: {
+                        amountMsat: satsAmount.value
+                            .multipliedBy(1_000)
+                            .toNumber(),
+                        description: lnInvoiceDesc,
+                        fromQuickActions: true,
+                    },
+                }),
+            );
+
+            return;
+        }
+
         if (walletType === 'unified') {
             const channelOpenFee = await openChannelFee({
                 amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),

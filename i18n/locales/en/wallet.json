@@ -176,5 +176,6 @@
     "processing_lnurl_withdraw": "Processing Withdrawal...",
     "above_lnurl_withdraw_limit": "Invoice amount {{amount}} sats is more than {{maxAmount}} sats max amount",
     "lnurl_withdrawal_success": "Withdrawal successful!",
-    "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}"
+    "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}",
+    "return_home": "Return Home"
 }

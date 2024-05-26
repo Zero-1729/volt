@@ -118,6 +118,8 @@ const Home = ({route}: Props) => {
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
 
+    const isLightning = wallet.type === 'unified';
+
     const AppScreenWidth = Dimensions.get('window').width;
 
     // add the total balances of the wallets
@@ -388,6 +390,17 @@ const Home = ({route}: Props) => {
         navigation.dispatch(CommonActions.navigate('TransactionList'));
     }, []);
 
+    const navigateToBoltNFC = useCallback(() => {
+        navigation.dispatch(
+            CommonActions.navigate('WalletRoot', {
+                screen: 'RequestAmount',
+                params: {
+                    boltNFCMode: true,
+                },
+            }),
+        );
+    }, []);
+
     const gotToZap = useCallback(() => {
         navigation.dispatch(
             CommonActions.navigate('WalletRoot', {
@@ -612,39 +625,43 @@ const Home = ({route}: Props) => {
 
                     {/* Quick Actions */}
                     <View style={[tailwind('flex-row w-5/6 justify-around')]}>
-                        <PlainButton
-                            onPress={() => {}}
-                            style={[
-                                tailwind('flex justify-center items-center'),
-                            ]}>
-                            <View
+                        {isLightning && (
+                            <PlainButton
+                                onPress={navigateToBoltNFC}
                                 style={[
                                     tailwind(
-                                        'rounded-full items-center justify-center mb-2',
+                                        'flex justify-center items-center',
                                     ),
-                                    {
-                                        height: 54,
-                                        width: 54,
-                                        backgroundColor:
-                                            ColorScheme.Background
-                                                .QuickActionsButton,
-                                    },
                                 ]}>
-                                <BoltIcon
-                                    style={[{marginTop: 3}]}
-                                    width={30}
-                                    height={30}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </View>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {t('bolt_nfc')}
-                            </VText>
-                        </PlainButton>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'rounded-full items-center justify-center mb-2',
+                                        ),
+                                        {
+                                            height: 54,
+                                            width: 54,
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .QuickActionsButton,
+                                        },
+                                    ]}>
+                                    <BoltIcon
+                                        style={[{marginTop: 3}]}
+                                        width={30}
+                                        height={30}
+                                        fill={ColorScheme.SVG.Default}
+                                    />
+                                </View>
+                                <VText
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {t('bolt_nfc')}
+                                </VText>
+                            </PlainButton>
+                        )}
 
                         <PlainButton
                             onPress={goToScan}
@@ -678,37 +695,41 @@ const Home = ({route}: Props) => {
                             </VText>
                         </PlainButton>
 
-                        <PlainButton
-                            onPress={gotToZap}
-                            style={[
-                                tailwind('flex justify-center items-center'),
-                            ]}>
-                            <View
+                        {isLightning && (
+                            <PlainButton
+                                onPress={gotToZap}
                                 style={[
                                     tailwind(
-                                        'rounded-full items-center justify-center mb-2',
+                                        'flex justify-center items-center',
                                     ),
-                                    {
-                                        height: 54,
-                                        width: 54,
-                                        backgroundColor:
-                                            ColorScheme.Background
-                                                .QuickActionsButton,
-                                    },
                                 ]}>
-                                <ZapIcon
-                                    width={20}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </View>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {capitalizeFirst(t('zap'))}
-                            </VText>
-                        </PlainButton>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'rounded-full items-center justify-center mb-2',
+                                        ),
+                                        {
+                                            height: 54,
+                                            width: 54,
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .QuickActionsButton,
+                                        },
+                                    ]}>
+                                    <ZapIcon
+                                        width={20}
+                                        fill={ColorScheme.SVG.Default}
+                                    />
+                                </View>
+                                <VText
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {capitalizeFirst(t('zap'))}
+                                </VText>
+                            </PlainButton>
+                        )}
 
                         <PlainButton
                             onPress={triggerBackupFlow}
