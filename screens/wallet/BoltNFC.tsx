@@ -313,7 +313,7 @@ const BoltNFC = ({route}: Props) => {
                     style={[
                         tailwind(
                             `items-center flex ${
-                                !unsupportedNFC ? 'mt-12' : ''
+                                !unsupportedNFC ? 'mt-12' : '-mt-12'
                             }`,
                         ),
                     ]}>
