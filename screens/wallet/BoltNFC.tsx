@@ -63,6 +63,10 @@ const BoltNFC = ({route}: Props) => {
     const [loading, setLoading] = useState<boolean>();
 
     const unsupportedNFC = statusMessage === t('nfc_unsupported');
+    const isInError =
+        statusMessage.toLowerCase().includes('error') ||
+        statusMessage.toLowerCase().includes('failed') ||
+        statusMessage.toLowerCase().includes('limit');
     const isInactive =
         statusMessage === t('bolt_nfc_parking') || unsupportedNFC;
     // Description for LNURL Withdrawal
@@ -362,7 +366,7 @@ const BoltNFC = ({route}: Props) => {
                 </View>
 
                 {/* Scan button */}
-                {isInactive && (
+                {(isInactive || isInError) && (
                     <PlainButton
                         onPress={readNFC}
                         style={[
