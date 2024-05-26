@@ -1,5 +1,11 @@
 import {Text, View, useColorScheme} from 'react-native';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 
 import {PlainButton} from '../../components/button';
 
@@ -7,6 +13,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {
+    BreezEventVariant,
     InputTypeVariant,
     LnUrlWithdrawResultVariant,
     parseInput,
@@ -29,7 +36,10 @@ import {WalletParamList} from '../../Navigation';
 import {VTextSingle} from '../../components/text';
 import {DisplaySatsAmount, FiatBalance} from '../../components/balance';
 
+import {AppStorageContext} from '../../class/storageContext';
 import BigNumber from 'bignumber.js';
+
+import {EBreezDetails} from '../../types/enums';
 
 type Props = NativeStackScreenProps<WalletParamList, 'BoltNFC'>;
 
@@ -37,6 +47,8 @@ const BoltNFC = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
     const {t} = useTranslation('wallet');
+
+    const {breezEvent} = useContext(AppStorageContext);
 
     const navigation = useNavigation();
     const amountMsat = useMemo(
@@ -229,6 +241,20 @@ const BoltNFC = ({route}: Props) => {
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
+            // Route to LN payment status screen
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: true,
+                    details: breezEvent.details,
+                    detailsType: EBreezDetails.Received,
+                }),
+            );
+            return;
+        }
+    }, [breezEvent, navigation]);
 
     return (
         <SafeAreaView
