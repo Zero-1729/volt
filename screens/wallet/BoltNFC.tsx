@@ -132,14 +132,7 @@ const BoltNFC = ({route}: Props) => {
         }
 
         // Check if NFC is enabled
-        const supported = await NFCManager.isSupported();
         const enabled = await NFCManager.isEnabled();
-
-        if (!supported) {
-            setStatusMessage(t('nfc_unsupported'));
-            setLoading(false);
-            return;
-        }
 
         if (!enabled) {
             setStatusMessage(t('nfc_disabled'));
@@ -183,7 +176,7 @@ const BoltNFC = ({route}: Props) => {
             NFCManager.cancelTechnologyRequest();
             setLoading(false);
         }
-    }, [handleWithdraw, loading, t]);
+    }, [handleWithdraw, loading, navigation, t, unsupportedNFC]);
 
     const checkNFCSupport = async () => {
         const supported = await NFCManager.isSupported();
