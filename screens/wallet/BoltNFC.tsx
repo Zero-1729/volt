@@ -63,7 +63,9 @@ const BoltNFC = ({route}: Props) => {
             ? capitalizeFirst(t('scan'))
             : !unsupportedNFC
             ? capitalizeFirst(t('cancel'))
-            : t('return_home');
+            : route.params.fromQuickActions
+            ? t('return_home')
+            : capitalizeFirst(t('back'));
 
     const handleWithdraw = useCallback(
         async (lnurl: string) => {
@@ -119,7 +121,12 @@ const BoltNFC = ({route}: Props) => {
 
     const readNFC = useCallback(async () => {
         if (unsupportedNFC) {
-            navigation.dispatch(CommonActions.navigate('HomeScreen'));
+            if (route.params.fromQuickActions) {
+                navigation.dispatch(CommonActions.navigate('HomeScreen'));
+            } else {
+                navigation.dispatch(CommonActions.goBack());
+            }
+
             return;
         }
 
@@ -176,7 +183,14 @@ const BoltNFC = ({route}: Props) => {
             NFCManager.cancelTechnologyRequest();
             setLoading(false);
         }
-    }, [handleWithdraw, loading, navigation, t, unsupportedNFC]);
+    }, [
+        handleWithdraw,
+        loading,
+        navigation,
+        route.params.fromQuickActions,
+        t,
+        unsupportedNFC,
+    ]);
 
     const checkNFCSupport = async () => {
         const supported = await NFCManager.isSupported();
