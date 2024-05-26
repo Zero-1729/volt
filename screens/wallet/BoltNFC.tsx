@@ -46,7 +46,7 @@ const BoltNFC = ({route}: Props) => {
     const amountSats = amountMsat.dividedBy(1_000);
 
     const [statusMessage, setStatusMessage] = useState<string>(
-        t('bolt_nfc_parking'),
+        t('check_nfc_supported'),
     );
     const [loading, setLoading] = useState<boolean>();
 
