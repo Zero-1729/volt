@@ -695,37 +695,41 @@ const Home = ({route}: Props) => {
                             </VText>
                         </PlainButton>
 
-                        <PlainButton
-                            onPress={gotToZap}
-                            style={[
-                                tailwind('flex justify-center items-center'),
-                            ]}>
-                            <View
+                        {isLightning && (
+                            <PlainButton
+                                onPress={gotToZap}
                                 style={[
                                     tailwind(
-                                        'rounded-full items-center justify-center mb-2',
+                                        'flex justify-center items-center',
                                     ),
-                                    {
-                                        height: 54,
-                                        width: 54,
-                                        backgroundColor:
-                                            ColorScheme.Background
-                                                .QuickActionsButton,
-                                    },
                                 ]}>
-                                <ZapIcon
-                                    width={20}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </View>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {capitalizeFirst(t('zap'))}
-                            </VText>
-                        </PlainButton>
+                                <View
+                                    style={[
+                                        tailwind(
+                                            'rounded-full items-center justify-center mb-2',
+                                        ),
+                                        {
+                                            height: 54,
+                                            width: 54,
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .QuickActionsButton,
+                                        },
+                                    ]}>
+                                    <ZapIcon
+                                        width={20}
+                                        fill={ColorScheme.SVG.Default}
+                                    />
+                                </View>
+                                <VText
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    {capitalizeFirst(t('zap'))}
+                                </VText>
+                            </PlainButton>
+                        )}
 
                         <PlainButton
                             onPress={triggerBackupFlow}
