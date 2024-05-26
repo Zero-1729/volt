@@ -116,6 +116,11 @@ const BoltNFC = ({route}: Props) => {
     );
 
     const readNFC = useCallback(async () => {
+        if (unsupportedNFC) {
+            navigation.dispatch(CommonActions.navigate('HomeScreen'));
+            return;
+        }
+
         if (loading) {
             // Stop loading
             setLoading(false);
