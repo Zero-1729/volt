@@ -224,12 +224,7 @@ const Wallet = ({route}: Props) => {
 
     const jointSync = async () => {
         // Avoid duplicate loading and
-        // only attempt load if connected to network
-        if (
-            refreshing ||
-            loadingBalance ||
-            !checkNetworkIsReachable(networkState)
-        ) {
+        if (refreshing || loadingBalance) {
             return;
         }
 
