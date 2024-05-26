@@ -1,4 +1,4 @@
-import {Text, View, useColorScheme} from 'react-native';
+import {Linking, Platform, Text, View, useColorScheme} from 'react-native';
 import React, {
     useCallback,
     useContext,
@@ -40,6 +40,7 @@ import {AppStorageContext} from '../../class/storageContext';
 import BigNumber from 'bignumber.js';
 
 import {EBreezDetails} from '../../types/enums';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<WalletParamList, 'BoltNFC'>;
 
@@ -62,6 +63,8 @@ const BoltNFC = ({route}: Props) => {
     );
     const [loading, setLoading] = useState<boolean>();
 
+    const isEnabled = useMemo(async () => await NFCManager.isEnabled(), []);
+
     const unsupportedNFC = statusMessage === t('nfc_unsupported');
     const isInError =
         statusMessage.toLowerCase().includes('error') ||
@@ -82,6 +85,14 @@ const BoltNFC = ({route}: Props) => {
             : route.params.fromQuickActions
             ? t('return_home')
             : capitalizeFirst(t('back'));
+
+    const goToSettings = useCallback(() => {
+        if (Platform.OS === 'android') {
+            NFCManager.goToNfcSetting();
+        } else {
+            Linking.openSettings();
+        }
+    }, []);
 
     const routeHome = useCallback(() => {
         navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -364,6 +375,25 @@ const BoltNFC = ({route}: Props) => {
                         {statusMessage}
                     </Text>
                 </View>
+
+                {/* Settings button */}
+                {!unsupportedNFC && !isEnabled && (
+                    <View
+                        style={[
+                            tailwind('absolute'),
+                            {bottom: NativeWindowMetrics.bottom + 80},
+                        ]}>
+                        <PlainButton onPress={goToSettings}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm font-bold'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('go_to_nfc_settings')}
+                            </Text>
+                        </PlainButton>
+                    </View>
+                )}
 
                 {/* Scan button */}
                 {(isInactive || isInError) && (
