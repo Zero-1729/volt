@@ -289,6 +289,7 @@ const RequestAmount = ({route}: Props) => {
                             .multipliedBy(1_000)
                             .toNumber(),
                         description: lnInvoiceDesc,
+                        fromQuickActions: true,
                     },
                 }),
             );
