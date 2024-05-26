@@ -328,7 +328,7 @@ const BoltNFC = ({route}: Props) => {
                     />
                     <Text
                         style={[
-                            tailwind('text-sm'),
+                            tailwind('text-sm w-5/6'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         {statusMessage}
