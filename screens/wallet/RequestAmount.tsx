@@ -290,6 +290,7 @@ const RequestAmount = ({route}: Props) => {
                             .toNumber(),
                         description: lnInvoiceDesc,
                         fromQuickActions: true,
+                        satsUnit: bottomUnit.name === 'sats',
                     },
                 }),
             );
