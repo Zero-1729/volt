@@ -19,7 +19,7 @@ import Color from '../../constants/Color';
 import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 
-import Close from '../../assets/svg/x-24.svg';
+import Back from '../../assets/svg/arrow-left-24.svg';
 import BoltIcon from '../../assets/svg/bolt-mono.svg';
 
 import {capitalizeFirst, formatSats} from '../../modules/transform';
@@ -228,7 +228,7 @@ const BoltNFC = ({route}: Props) => {
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
-                        <Close fill={ColorScheme.SVG.Default} />
+                        <Back fill={ColorScheme.SVG.Default} />
                     </PlainButton>
 
                     <Text
