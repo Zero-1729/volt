@@ -216,6 +216,8 @@ const BoltNFC = ({route}: Props) => {
             setStatusMessage(t('nfc_unsupported'));
             setLoading(false);
             return;
+        } else {
+            setStatusMessage(t('bolt_nfc_parking'));
         }
     };
 
