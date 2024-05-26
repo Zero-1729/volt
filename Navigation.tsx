@@ -72,6 +72,7 @@ import TransactionExported from './screens/wallet/TransactionExported';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 import SendLN from './screens/wallet/SendLN';
+import BoltNFC from './screens/wallet/BoltNFC';
 import Xpub from './screens/wallet/Xpub';
 
 // Swap screens
@@ -301,6 +302,9 @@ export type WalletParamList = {
         wallet: TMiniWallet;
         network: string;
     };
+    BoltNFC: {
+        amountMsat: number;
+    };
     WalletXpub: undefined;
 };
 
@@ -386,6 +390,7 @@ const WalletRoot = () => {
                 name="RequestAmount"
                 component={RequestAmount}
             />
+            <WalletStack.Screen name="BoltNFC" component={BoltNFC} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
