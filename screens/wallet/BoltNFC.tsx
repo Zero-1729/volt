@@ -55,7 +55,7 @@ const BoltNFC = ({route}: Props) => {
         () => new BigNumber(route.params?.amountMsat),
         [route.params?.amountMsat],
     );
-    const amountSats = amountMsat.dividedBy(1_000);
+    const amountSats = amountMsat.div(1_000);
 
     const [statusMessage, setStatusMessage] = useState<string>(
         t('check_nfc_supported'),
