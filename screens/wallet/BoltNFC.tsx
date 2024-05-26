@@ -237,7 +237,7 @@ const BoltNFC = ({route}: Props) => {
         unsupportedNFC,
     ]);
 
-    const checkNFCSupport = async () => {
+    const checkNFCSupport = useCallback(async () => {
         const supported = await NFCManager.isSupported();
 
         if (!supported) {
@@ -247,7 +247,7 @@ const BoltNFC = ({route}: Props) => {
         } else {
             setStatusMessage(t('bolt_nfc_parking'));
         }
-    };
+    }, [t]);
 
     useEffect(() => {
         checkNFCSupport();
