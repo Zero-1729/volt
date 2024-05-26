@@ -308,6 +308,7 @@ export type WalletParamList = {
         amountMsat: number;
         description: string;
         fromQuickActions: boolean;
+        satsUnit: boolean; // Whether amount was in sats or fiat
     };
     WalletXpub: undefined;
 };
