@@ -179,5 +179,6 @@
     "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}",
     "return_home": "Return Home"
     "return_home": "Return Home",
+    "bolt_nfc_parking": "Scan NFC Tag",
     "check_nfc_supported": "Checking NFC support..."
 }

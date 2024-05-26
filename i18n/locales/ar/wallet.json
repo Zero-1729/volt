@@ -179,5 +179,6 @@
     "lnurl_withdrawal_failed": "فشل السحب: {{reason}}",
     "return_home": "العودة إلى المنزل"
     "return_home": "العودة إلى المنزل",
+    "bolt_nfc_parking": "مسح علامة NFC",
     "check_nfc_supported": "جارٍ التحقق من دعم NFC..."
 }
