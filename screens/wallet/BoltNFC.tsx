@@ -61,7 +61,9 @@ const BoltNFC = ({route}: Props) => {
     const buttonText =
         statusMessage === t('bolt_nfc_parking')
             ? capitalizeFirst(t('scan'))
-            : capitalizeFirst(t('cancel'));
+            : !unsupportedNFC
+            ? capitalizeFirst(t('cancel'))
+            : t('return_home');
 
     const handleWithdraw = useCallback(
         async (lnurl: string) => {
@@ -310,27 +312,22 @@ const BoltNFC = ({route}: Props) => {
                 </View>
 
                 {/* Scan button */}
-                {!unsupportedNFC && (
-                    <PlainButton
-                        onPress={readNFC}
+                <PlainButton
+                    onPress={readNFC}
+                    style={[
+                        tailwind('absolute bottom-6 px-8 py-3 rounded-full'),
+                        {
+                            backgroundColor: ColorScheme.Background.Inverted,
+                        },
+                    ]}>
+                    <Text
                         style={[
-                            tailwind(
-                                'absolute bottom-6 px-8 py-3 rounded-full',
-                            ),
-                            {
-                                backgroundColor:
-                                    ColorScheme.Background.Inverted,
-                            },
+                            tailwind('font-bold'),
+                            {color: ColorScheme.Text.Alt},
                         ]}>
-                        <Text
-                            style={[
-                                tailwind('font-bold'),
-                                {color: ColorScheme.Text.Alt},
-                            ]}>
-                            {buttonText}
-                        </Text>
-                    </PlainButton>
-                )}
+                        {buttonText}
+                    </Text>
+                </PlainButton>
             </View>
         </SafeAreaView>
     );
