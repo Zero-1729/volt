@@ -304,6 +304,7 @@ export type WalletParamList = {
     };
     BoltNFC: {
         amountMsat: number;
+        description: string;
     };
     WalletXpub: undefined;
 };
