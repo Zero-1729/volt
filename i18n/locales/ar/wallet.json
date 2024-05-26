@@ -177,7 +177,9 @@
     "above_lnurl_withdraw_limit": "مبلغ الفاتورة {{amount}} يزيد عن {{maxAmount}} الحد الأقصى للمبلغ",
     "lnurl_withdrawal_success": "تم السحب بنجاح!",
     "lnurl_withdrawal_failed": "فشل السحب: {{reason}}",
-    "return_home": "العودة إلى المنزل"
+    "no_internet_cannot_swap": "لا يمكن تبديلها أثناء الاتصال بالإنترنت ، والاتصال بالإنترنت.",
+    "no_internet_cannot_zap": "لا يمكن Zap أثناء الاتصال بالإنترنت ، قم بالاتصال بالإنترنت.",
+    "no_internet_withdrawal": "لا يمكن الانسحاب أثناء الاتصال بالإنترنت ، والاتصال بالإنترنت.",
     "return_home": "العودة إلى المنزل",
     "bolt_nfc_parking": "مسح علامة NFC",
     "check_nfc_supported": "جارٍ التحقق من دعم NFC...",

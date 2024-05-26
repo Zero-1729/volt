@@ -177,7 +177,9 @@
     "above_lnurl_withdraw_limit": "Invoice amount {{amount}} sats is more than {{maxAmount}} sats max amount",
     "lnurl_withdrawal_success": "Withdrawal successful!",
     "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}",
-    "return_home": "Return Home"
+    "no_internet_cannot_swap": "Cannot swap while offline, connect to the Internet.",
+    "no_internet_cannot_zap": "Cannot zap while offline, connect to the Internet.",
+    "no_internet_withdrawal": "Cannot withdraw while offline, connect to the Internet.",
     "return_home": "Return Home",
     "bolt_nfc_parking": "Scan NFC Tag",
     "check_nfc_supported": "Checking NFC support...",
