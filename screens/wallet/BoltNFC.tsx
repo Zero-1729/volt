@@ -26,7 +26,9 @@ import {capitalizeFirst} from '../../modules/transform';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
+import {VTextSingle} from '../../components/text';
 import {DisplaySatsAmount, FiatBalance} from '../../components/balance';
+
 import BigNumber from 'bignumber.js';
 
 type Props = NativeStackScreenProps<WalletParamList, 'BoltNFC'>;
@@ -51,6 +53,10 @@ const BoltNFC = ({route}: Props) => {
     const unsupportedNFC = statusMessage === t('nfc_unsupported');
     const isInactive =
         statusMessage === t('bolt_nfc_parking') || unsupportedNFC;
+    // Description for LNURL Withdrawal
+    const description = route.params?.description
+        ? route.params.description
+        : `Volt ${amountSats} sats Withdrawal`;
 
     const buttonText =
         statusMessage === t('bolt_nfc_parking')
@@ -83,7 +89,7 @@ const BoltNFC = ({route}: Props) => {
                     const lnUrlWithdrawResult = await withdrawLnurl({
                         data: input.data,
                         amountMsat: amountSats.toNumber(),
-                        description: `Volt ${amountSats} sats Withdrawal`,
+                        description: description,
                     });
 
                     if (
@@ -106,7 +112,7 @@ const BoltNFC = ({route}: Props) => {
                 setLoading(false);
             }
         },
-        [amountSats, t],
+        [amountSats, description, t],
     );
 
     const readNFC = useCallback(async () => {
@@ -230,34 +236,56 @@ const BoltNFC = ({route}: Props) => {
 
                     {/* Amount summary */}
                     {!unsupportedNFC && amountMsat && (
-                        <View style={[tailwind('items-center mt-12')]}>
-                            <Text
-                                style={[
-                                    tailwind('text-base mb-1'),
-                                    {
-                                        color: ColorScheme.Text.GrayedText,
-                                    },
-                                ]}>
-                                {capitalizeFirst(t('amount'))}
-                            </Text>
-                            <FiatBalance
-                                balance={amountSats.toNumber()}
-                                loading={false}
-                                balanceFontSize={'text-4xl'}
-                                fontColor={ColorScheme.Text.Default}
-                                ignoreHideBalance={true}
-                            />
-                            <DisplaySatsAmount
-                                amount={amountSats}
-                                fontSize={'text-sm'}
-                                textColor={ColorScheme.Text.DescText}
-                            />
-                        </View>
+                        <>
+                            <View style={[tailwind('items-center mt-12')]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-base mb-1'),
+                                        {
+                                            color: ColorScheme.Text.GrayedText,
+                                        },
+                                    ]}>
+                                    {capitalizeFirst(t('amount'))}
+                                </Text>
+                                <FiatBalance
+                                    balance={amountSats.toNumber()}
+                                    loading={false}
+                                    balanceFontSize={'text-4xl'}
+                                    fontColor={ColorScheme.Text.Default}
+                                    ignoreHideBalance={true}
+                                />
+                                <DisplaySatsAmount
+                                    amount={amountSats}
+                                    fontSize={'text-sm'}
+                                    textColor={ColorScheme.Text.DescText}
+                                />
+                            </View>
+
+                            <View
+                                style={[tailwind('w-full items-center mt-6')]}>
+                                <VTextSingle
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {
+                                            color: ColorScheme.Text.DescText,
+                                        },
+                                    ]}>
+                                    {description}
+                                </VTextSingle>
+                            </View>
+                        </>
                     )}
                 </View>
 
                 {/* Bolt Icon and status message */}
-                <View style={[tailwind('items-center flex')]}>
+                <View
+                    style={[
+                        tailwind(
+                            `items-center flex ${
+                                !unsupportedNFC ? 'mt-12' : ''
+                            }`,
+                        ),
+                    ]}>
                     <BoltIcon
                         fill={
                             isInactive
