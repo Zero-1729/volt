@@ -129,7 +129,7 @@ const BoltNFC = ({route}: Props) => {
 
                     const lnUrlWithdrawResult = await withdrawLnurl({
                         data: input.data,
-                        amountMsat: amountSats.toNumber(),
+                        amountMsat: amountMsat.toNumber(),
                         description: description,
                     });
 
@@ -153,7 +153,7 @@ const BoltNFC = ({route}: Props) => {
                 setLoading(false);
             }
         },
-        [amountSats, description, t],
+        [amountMsat, amountSats, description, t],
     );
 
     const readNFC = useCallback(async () => {
