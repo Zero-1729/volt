@@ -22,7 +22,7 @@ import {useTranslation} from 'react-i18next';
 import Close from '../../assets/svg/x-24.svg';
 import BoltIcon from '../../assets/svg/bolt-mono.svg';
 
-import {capitalizeFirst} from '../../modules/transform';
+import {capitalizeFirst, formatSats} from '../../modules/transform';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
@@ -56,7 +56,7 @@ const BoltNFC = ({route}: Props) => {
     // Description for LNURL Withdrawal
     const description = route.params?.description
         ? route.params.description
-        : `Volt ${amountSats} sats Withdrawal`;
+        : `Volt ${formatSats(amountSats)} sats Withdrawal`;
 
     const buttonText =
         statusMessage === t('bolt_nfc_parking')
