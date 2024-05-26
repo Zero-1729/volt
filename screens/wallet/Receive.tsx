@@ -90,8 +90,6 @@ import {runOnJS, useSharedValue} from 'react-native-reanimated';
 
 import Dot from '../../components/dots';
 
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import BoltNFC from '../../components/boltnfc';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 import {useNetInfo} from '@react-native-community/netinfo';
 
@@ -136,17 +134,7 @@ const Receive = ({route}: Props) => {
     const networkState = useNetInfo();
     const isNetOn = checkNetworkIsReachable(networkState);
 
-    const bottomNFCRef = useRef<BottomSheetModal>(null);
-    const [openBoltNFC, setOpenBoltNFC] = useState(-1);
     const progressValue = useSharedValue(0);
-
-    const openNFCModal = useCallback(() => {
-        if (openBoltNFC !== 1) {
-            bottomNFCRef.current?.present();
-        } else {
-            bottomNFCRef.current?.close();
-        }
-    }, [openBoltNFC]);
 
     const initialState = {
         // Amount in sats
@@ -253,6 +241,21 @@ const Receive = ({route}: Props) => {
     const BTCAddress = useMemo(() => {
         return walletData.address.address;
     }, [walletData.address.address]);
+
+    const routeToBoltNFC = useCallback(() => {
+        if (bolt11AmountMsat) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'BoltNFC',
+                    params: {
+                        amountMsat: bolt11AmountMsat,
+                        description: route.params.lnDescription,
+                        fromQuickActions: false,
+                    },
+                }),
+            );
+        }
+    }, [bolt11AmountMsat, navigation, route.params.lnDescription]);
 
     useEffect(() => {
         // Update the request amount if it is passed in as a parameter
@@ -842,7 +845,7 @@ const Receive = ({route}: Props) => {
 
                         {/* NFC Button */}
                         {Platform.OS === 'android' && (
-                            <PlainButton onPress={openNFCModal}>
+                            <PlainButton onPress={routeToBoltNFC}>
                                 <View
                                     style={[
                                         tailwind(
@@ -889,7 +892,7 @@ const Receive = ({route}: Props) => {
         bolt11Invoice,
         feeMessage,
         langDir,
-        openNFCModal,
+        routeToBoltNFC,
         copyDescToClipboard,
         navigation,
     ]);
@@ -904,127 +907,109 @@ const Receive = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <BottomSheetModalProvider>
+            <View
+                style={[
+                    tailwind('w-full h-full items-center justify-center'),
+                    {backgroundColor: ColorScheme.Background.Default},
+                ]}>
                 <View
                     style={[
-                        tailwind('w-full h-full items-center justify-center'),
-                        {backgroundColor: ColorScheme.Background.Default},
+                        tailwind(
+                            'w-5/6 justify-center items-center absolute top-6 flex',
+                        ),
                     ]}>
-                    <View
+                    <PlainButton
+                        style={[tailwind('absolute left-0 z-10')]}
+                        onPress={() => {
+                            navigation.dispatch(StackActions.popToTop());
+                        }}>
+                        <Close fill={ColorScheme.SVG.Default} />
+                    </PlainButton>
+
+                    <Text
                         style={[
-                            tailwind(
-                                'w-5/6 justify-center items-center absolute top-6 flex',
-                            ),
+                            tailwind('text-lg font-bold'),
+                            {color: ColorScheme.Text.Default},
                         ]}>
-                        <PlainButton
-                            style={[tailwind('absolute left-0 z-10')]}
-                            onPress={() => {
-                                navigation.dispatch(StackActions.popToTop());
-                            }}>
-                            <Close fill={ColorScheme.SVG.Default} />
-                        </PlainButton>
+                        {t('bitcoin_invoice')}
+                    </Text>
 
-                        <Text
-                            style={[
-                                tailwind('text-lg font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {t('bitcoin_invoice')}
-                        </Text>
-
-                        {/* Invoice Timeout */}
-                        {displayExpiry}
-                    </View>
-
-                    {isLNWallet && (
-                        <View
-                            style={[
-                                styles.carouselContainer,
-                                tailwind(
-                                    'h-full w-full items-center justify-end absolute bottom-0',
-                                ),
-                                {zIndex: -9},
-                            ]}>
-                            <Carousel
-                                ref={carouselRef}
-                                style={[tailwind('items-center')]}
-                                data={panels}
-                                width={NativeDims.width}
-                                // Adjust height for iOS
-                                // to account for top stack height
-                                height={
-                                    Platform.OS === 'ios'
-                                        ? NativeDims.height -
-                                          NativeDims.navBottom * 3.2
-                                        : NativeDims.height -
-                                          NativeDims.navBottom * 2.4
-                                }
-                                loop={false}
-                                panGestureHandlerProps={{
-                                    activeOffsetX: [-10, 10],
-                                }}
-                                testID="ReceiveSlider"
-                                renderItem={({index}): ReactElement => {
-                                    const Slide = panels[index];
-                                    return <Slide key={index} />;
-                                }}
-                                onProgressChange={(
-                                    _,
-                                    absoluteProgress,
-                                ): void => {
-                                    progressValue.value = absoluteProgress;
-                                }}
-                            />
-
-                            {isNetOn && (
-                                <View
-                                    style={[
-                                        styles.dots,
-                                        {bottom: NativeDims.bottom},
-                                    ]}
-                                    pointerEvents="none">
-                                    {panels.map((_slide, index) => (
-                                        <Dot
-                                            key={index}
-                                            index={index}
-                                            animValue={progressValue}
-                                            length={panels.length}
-                                        />
-                                    ))}
-                                </View>
-                            )}
-                        </View>
-                    )}
-
-                    {!isLNWallet && (
-                        <View
-                            style={[
-                                styles.carouselContainer,
-                                tailwind(
-                                    'h-full w-full items-center justify-end absolute bottom-0',
-                                ),
-                                {zIndex: -9},
-                            ]}>
-                            {onchainPanel()}
-                        </View>
-                    )}
-
-                    <Toast config={toastConfig as ToastConfig} />
+                    {/* Invoice Timeout */}
+                    {displayExpiry}
                 </View>
 
-                {Platform.OS === 'android' && bolt11AmountMsat && (
-                    <BoltNFC
-                        boltNFCRef={bottomNFCRef}
-                        onSelectNFC={setOpenBoltNFC}
-                        index={openBoltNFC}
-                        amountMsat={bolt11AmountMsat as number}
-                        fiat={normalizeFiat(
-                            new BigNumber(route.params.sats),
-                            fiatRate.rate,
+                {isLNWallet && (
+                    <View
+                        style={[
+                            styles.carouselContainer,
+                            tailwind(
+                                'h-full w-full items-center justify-end absolute bottom-0',
+                            ),
+                            {zIndex: -9},
+                        ]}>
+                        <Carousel
+                            ref={carouselRef}
+                            style={[tailwind('items-center')]}
+                            data={panels}
+                            width={NativeDims.width}
+                            // Adjust height for iOS
+                            // to account for top stack height
+                            height={
+                                Platform.OS === 'ios'
+                                    ? NativeDims.height -
+                                      NativeDims.navBottom * 3.2
+                                    : NativeDims.height -
+                                      NativeDims.navBottom * 2.4
+                            }
+                            loop={false}
+                            panGestureHandlerProps={{
+                                activeOffsetX: [-10, 10],
+                            }}
+                            testID="ReceiveSlider"
+                            renderItem={({index}): ReactElement => {
+                                const Slide = panels[index];
+                                return <Slide key={index} />;
+                            }}
+                            onProgressChange={(_, absoluteProgress): void => {
+                                progressValue.value = absoluteProgress;
+                            }}
+                        />
+
+                        {isNetOn && (
+                            <View
+                                style={[
+                                    styles.dots,
+                                    {bottom: NativeDims.bottom},
+                                ]}
+                                pointerEvents="none">
+                                {panels.map((_slide, index) => (
+                                    <Dot
+                                        key={index}
+                                        index={index}
+                                        animValue={progressValue}
+                                        length={panels.length}
+                                    />
+                                ))}
+                            </View>
                         )}
-                    />
+                    </View>
                 )}
-            </BottomSheetModalProvider>
+
+                {!isLNWallet && (
+                    <View
+                        style={[
+                            styles.carouselContainer,
+                            tailwind(
+                                'h-full w-full items-center justify-end absolute bottom-0',
+                            ),
+                            {zIndex: -9},
+                        ]}>
+                        {onchainPanel()}
+                    </View>
+                )}
+
+                <Toast config={toastConfig as ToastConfig} />
+            </View>
         </SafeAreaView>
     );
 };
