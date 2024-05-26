@@ -266,7 +266,7 @@ const BoltNFC = ({route}: Props) => {
                     </Text>
 
                     {/* Amount summary */}
-                    {!unsupportedNFC && amountMsat && (
+                    {!unsupportedNFC && isInactive && (
                         <>
                             <View style={[tailwind('items-center mt-12')]}>
                                 <Text
@@ -336,22 +336,27 @@ const BoltNFC = ({route}: Props) => {
                 </View>
 
                 {/* Scan button */}
-                <PlainButton
-                    onPress={readNFC}
-                    style={[
-                        tailwind('absolute bottom-6 px-8 py-3 rounded-full'),
-                        {
-                            backgroundColor: ColorScheme.Background.Inverted,
-                        },
-                    ]}>
-                    <Text
+                {isInactive && (
+                    <PlainButton
+                        onPress={readNFC}
                         style={[
-                            tailwind('font-bold'),
-                            {color: ColorScheme.Text.Alt},
+                            tailwind(
+                                'absolute bottom-6 px-8 py-3 rounded-full',
+                            ),
+                            {
+                                backgroundColor:
+                                    ColorScheme.Background.Inverted,
+                            },
                         ]}>
-                        {buttonText}
-                    </Text>
-                </PlainButton>
+                        <Text
+                            style={[
+                                tailwind('font-bold'),
+                                {color: ColorScheme.Text.Alt},
+                            ]}>
+                            {buttonText}
+                        </Text>
+                    </PlainButton>
+                )}
             </View>
         </SafeAreaView>
     );
