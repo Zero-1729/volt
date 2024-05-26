@@ -1,4 +1,4 @@
-import {Linking, Platform, Text, View, useColorScheme} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 import React, {
     useCallback,
     useContext,
@@ -40,6 +40,8 @@ import {AppStorageContext} from '../../class/storageContext';
 import BigNumber from 'bignumber.js';
 
 import {EBreezDetails} from '../../types/enums';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<WalletParamList, 'BoltNFC'>;
@@ -62,8 +64,8 @@ const BoltNFC = ({route}: Props) => {
         t('check_nfc_supported'),
     );
     const [loading, setLoading] = useState<boolean>();
-
-    const isEnabled = useMemo(async () => await NFCManager.isEnabled(), []);
+    const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const unsupportedNFC = statusMessage === t('nfc_unsupported');
     const isInError =
@@ -85,14 +87,6 @@ const BoltNFC = ({route}: Props) => {
             : route.params.fromQuickActions
             ? t('return_home')
             : capitalizeFirst(t('back'));
-
-    const goToSettings = useCallback(() => {
-        if (Platform.OS === 'android') {
-            NFCManager.goToNfcSetting();
-        } else {
-            Linking.openSettings();
-        }
-    }, []);
 
     const routeHome = useCallback(() => {
         navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -163,6 +157,12 @@ const BoltNFC = ({route}: Props) => {
     );
 
     const readNFC = useCallback(async () => {
+        if (checkNetworkIsReachable(networkState)) {
+            return;
+        }
+
+        const isEnabled = await NFCManager.isEnabled();
+
         if (unsupportedNFC) {
             if (route.params.fromQuickActions) {
                 routeHome();
@@ -229,6 +229,7 @@ const BoltNFC = ({route}: Props) => {
     }, [
         handleWithdraw,
         loading,
+        networkState,
         route.params.fromQuickActions,
         routeBack,
         routeHome,
@@ -405,22 +406,19 @@ const BoltNFC = ({route}: Props) => {
                     </Text>
                 </View>
 
-                {/* Settings button */}
-                {!unsupportedNFC && !isEnabled && (
+                {!isNetOn && (
                     <View
                         style={[
-                            tailwind('absolute'),
+                            tailwind('absolute items-center w-5/6'),
                             {bottom: NativeWindowMetrics.bottom + 80},
                         ]}>
-                        <PlainButton onPress={goToSettings}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {t('go_to_nfc_settings')}
-                            </Text>
-                        </PlainButton>
+                        <Text
+                            style={[
+                                tailwind('text-sm text-center w-5/6'),
+                                {color: ColorScheme.Text.DescText},
+                            ]}>
+                            {t('no_internet_withdrawal')}
+                        </Text>
                     </View>
                 )}
 
