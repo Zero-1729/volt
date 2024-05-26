@@ -277,7 +277,7 @@ export type WalletParamList = {
         wallet: TMiniWallet;
     };
     RequestAmount: {
-        boltNFCMode?: boolean;
+        boltNFCMode?: boolean; // from BoltNFC Quick Action
     };
     SendAmount: {
         invoiceData: any;
@@ -307,6 +307,7 @@ export type WalletParamList = {
     BoltNFC: {
         amountMsat: number;
         description: string;
+        fromQuickActions: boolean;
     };
     WalletXpub: undefined;
 };
