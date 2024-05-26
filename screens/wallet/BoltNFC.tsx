@@ -1,4 +1,4 @@
-import {Text, View, useColorScheme} from 'react-native';
+import {Linking, Platform, Text, View, useColorScheme} from 'react-native';
 import React, {
     useCallback,
     useContext,
@@ -7,7 +7,7 @@ import React, {
     useState,
 } from 'react';
 
-import {PlainButton} from '../../components/button';
+import {LongBottomButton, PlainButton} from '../../components/button';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {CommonActions, useNavigation} from '@react-navigation/native';
@@ -72,21 +72,26 @@ const BoltNFC = ({route}: Props) => {
         statusMessage.toLowerCase().includes('error') ||
         statusMessage.toLowerCase().includes('failed') ||
         statusMessage.toLowerCase().includes('limit');
-    const isInactive =
-        statusMessage === t('bolt_nfc_parking') || unsupportedNFC;
     // Description for LNURL Withdrawal
     const description = route.params?.description
         ? route.params.description
         : `Volt ${formatSats(amountSats)} sats Withdrawal`;
+    const isDisabledNFC = statusMessage === t('nfc_disabled');
 
-    const buttonText =
-        statusMessage === t('bolt_nfc_parking')
-            ? capitalizeFirst(t('scan'))
-            : !unsupportedNFC
-            ? capitalizeFirst(t('cancel'))
-            : route.params.fromQuickActions
-            ? t('return_home')
-            : capitalizeFirst(t('back'));
+    const buttonText = useMemo(() => {
+        if (
+            statusMessage === t('bolt_nfc_parking') ||
+            statusMessage.startsWith('Error')
+        ) {
+            return capitalizeFirst(t('scan'));
+        } else if (loading) {
+            return capitalizeFirst(t('cancel'));
+        } else if (route.params.fromQuickActions) {
+            return t('return_home');
+        } else {
+            return capitalizeFirst(t('back'));
+        }
+    }, [loading, route.params.fromQuickActions, statusMessage, t]);
 
     const routeHome = useCallback(() => {
         navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -96,13 +101,26 @@ const BoltNFC = ({route}: Props) => {
         navigation.dispatch(CommonActions.goBack());
     }, [navigation]);
 
+    const handleSettings = useCallback(() => {
+        if (Platform.OS === 'android') {
+            NFCManager.goToNfcSetting().then((set: boolean) => {
+                if (set) {
+                    setStatusMessage(t('bolt_nfc_parking'));
+                }
+            });
+        } else {
+            Linking.openSettings();
+            setStatusMessage(t('bolt_nfc_parking'));
+        }
+    }, [t]);
+
     const handleBack = useCallback(() => {
-        if (unsupportedNFC) {
+        if (unsupportedNFC || statusMessage === t('nfc_disabled') || !isNetOn) {
             routeHome();
         } else {
             routeBack();
         }
-    }, [routeBack, routeHome, unsupportedNFC]);
+    }, [isNetOn, routeBack, routeHome, statusMessage, t, unsupportedNFC]);
 
     const handleWithdraw = useCallback(
         async (lnurl: string) => {
@@ -156,15 +174,38 @@ const BoltNFC = ({route}: Props) => {
         [amountMsat, amountSats, description, t],
     );
 
+    const cancelScanRequest = useCallback(() => {
+        setLoading(false);
+        setStatusMessage(t('bolt_nfc_parking'));
+        NFCManager.cancelTechnologyRequest();
+    }, [t]);
+
     const readNFC = useCallback(async () => {
-        if (checkNetworkIsReachable(networkState)) {
+        // Cancel scan
+        if (loading) {
+            cancelScanRequest();
             return;
         }
 
-        const isEnabled = await NFCManager.isEnabled();
+        // Check if network is reachable
+        if (!checkNetworkIsReachable(networkState)) {
+            return;
+        }
 
+        // Check if NFC is disabled
+        // Then move to settings
+        if (isDisabledNFC) {
+            handleSettings();
+            return;
+        }
+
+        // Check if NFC is enabled
+        const enabled = await NFCManager.isEnabled();
+
+        // Check if NFC is unsupported
+        // Then move to home or back
         if (unsupportedNFC) {
-            if (route.params.fromQuickActions) {
+            if (route.params.fromQuickActions || isInError) {
                 routeHome();
             } else {
                 routeBack();
@@ -172,17 +213,6 @@ const BoltNFC = ({route}: Props) => {
 
             return;
         }
-
-        if (loading) {
-            // Stop loading
-            setLoading(false);
-            setStatusMessage('');
-            NFCManager.cancelTechnologyRequest();
-            return;
-        }
-
-        // Check if NFC is enabled
-        const enabled = await NFCManager.isEnabled();
 
         if (!enabled) {
             setStatusMessage(t('nfc_disabled'));
@@ -223,11 +253,14 @@ const BoltNFC = ({route}: Props) => {
             setLoading(false);
         } finally {
             // stop the nfc scanning
-            NFCManager.cancelTechnologyRequest();
-            setLoading(false);
+            cancelScanRequest();
         }
     }, [
+        cancelScanRequest,
+        handleSettings,
         handleWithdraw,
+        isDisabledNFC,
+        isInError,
         loading,
         networkState,
         route.params.fromQuickActions,
@@ -253,7 +286,7 @@ const BoltNFC = ({route}: Props) => {
         checkNFCSupport();
 
         return () => {
-            NFCManager.cancelTechnologyRequest();
+            cancelScanRequest();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -390,7 +423,7 @@ const BoltNFC = ({route}: Props) => {
                     ]}>
                     <BoltIcon
                         fill={
-                            isInactive
+                            !loading || unsupportedNFC
                                 ? ColorScheme.SVG.GrayFill
                                 : ColorScheme.SVG.Default
                         }
@@ -406,11 +439,12 @@ const BoltNFC = ({route}: Props) => {
                     </Text>
                 </View>
 
+                {/*  No Internet message*/}
                 {!isNetOn && (
                     <View
                         style={[
                             tailwind('absolute items-center w-5/6'),
-                            {bottom: NativeWindowMetrics.bottom + 80},
+                            {bottom: NativeWindowMetrics.bottom + 116},
                         ]}>
                         <Text
                             style={[
@@ -423,27 +457,13 @@ const BoltNFC = ({route}: Props) => {
                 )}
 
                 {/* Scan button */}
-                {(isInactive || isInError) && (
-                    <PlainButton
-                        onPress={readNFC}
-                        style={[
-                            tailwind(
-                                'absolute bottom-6 px-8 py-3 rounded-full',
-                            ),
-                            {
-                                backgroundColor:
-                                    ColorScheme.Background.Inverted,
-                            },
-                        ]}>
-                        <Text
-                            style={[
-                                tailwind('font-bold'),
-                                {color: ColorScheme.Text.Alt},
-                            ]}>
-                            {buttonText}
-                        </Text>
-                    </PlainButton>
-                )}
+                <LongBottomButton
+                    disabled={!isNetOn || unsupportedNFC}
+                    onPress={readNFC}
+                    backgroundColor={ColorScheme.Background.Inverted}
+                    title={isDisabledNFC ? t('go_to_nfc_settings') : buttonText}
+                    textColor={ColorScheme.Text.Alt}
+                />
             </View>
         </SafeAreaView>
     );
