@@ -276,7 +276,9 @@ export type WalletParamList = {
     AddressOwnership: {
         wallet: TMiniWallet;
     };
-    RequestAmount: undefined;
+    RequestAmount: {
+        boltNFCMode?: boolean;
+    };
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
