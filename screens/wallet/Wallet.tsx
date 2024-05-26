@@ -9,6 +9,7 @@ import {
     FlatList,
     StatusBar,
     StyleSheet,
+    BackHandler,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -471,17 +472,39 @@ const Wallet = ({route}: Props) => {
         );
     };
 
+    const handleBackPress = useCallback(() => {
+        if (route.params?.reload) {
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'HomeScreen',
+                }),
+            );
+            return true;
+        } else {
+            navigation.dispatch(CommonActions.goBack());
+            return true;
+        }
+    }, []);
+
     useEffect(() => {
         if (isLNWallet && checkNetworkIsReachable(networkState)) {
             getLNSwapInfo();
             getOnchainSwapInfo();
         }
 
+        // Handle back behavior
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            handleBackPress,
+        );
+
         // Kill all loading effects
         () => {
             setRefreshing(false);
             setLoadingBalance(false);
             setLoadLock(false);
+
+            backHandler.remove();
         };
     }, []);
 
