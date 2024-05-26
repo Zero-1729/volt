@@ -292,7 +292,7 @@ const BoltNFC = ({route}: Props) => {
                     </Text>
 
                     {/* Amount summary */}
-                    {!unsupportedNFC && isInactive && (
+                    {!unsupportedNFC && (
                         <>
                             <View style={[tailwind('items-center mt-12')]}>
                                 <Text
