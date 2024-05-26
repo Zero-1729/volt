@@ -530,10 +530,13 @@ const RootNavigator = (): ReactElement => {
             clipboardMessage = t('read_clipboard_bitcoin_text');
         }
 
+        // Only check if clippy content exists, supported invoice type, & not in BoltNFC screen (scan trigger)
+        const currentRoute = navigationRef.current?.getCurrentRoute();
         // If clipboard has contents, display dialog
         if (
             clipboardResult.hasContents &&
-            clipboardResult.invoiceType !== 'unsupported'
+            clipboardResult.invoiceType !== 'unsupported' &&
+            currentRoute?.name !== 'BoltNFC'
         ) {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
@@ -584,8 +587,10 @@ const RootNavigator = (): ReactElement => {
     const checkDeepLinkAndClipboard = async (): Promise<void> => {
         // Check deep link
         const url = await Linking.getInitialURL();
+        const currentRoute = navigationRef.current?.getCurrentRoute();
 
-        if (url) {
+        // only check if url exists & not in BoltNFC screen (scan trigger)
+        if (url && currentRoute?.name !== 'BoltNFC') {
             rootNavigation.navigate('PayInvoice', {invoice: url});
             return;
         }
