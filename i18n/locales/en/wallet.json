@@ -178,4 +178,6 @@
     "lnurl_withdrawal_success": "Withdrawal successful!",
     "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}",
     "return_home": "Return Home"
+    "return_home": "Return Home",
+    "check_nfc_supported": "Checking NFC support..."
 }
