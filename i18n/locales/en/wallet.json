@@ -180,5 +180,6 @@
     "return_home": "Return Home"
     "return_home": "Return Home",
     "bolt_nfc_parking": "Scan NFC Tag",
-    "check_nfc_supported": "Checking NFC support..."
+    "check_nfc_supported": "Checking NFC support...",
+    "go_to_nfc_settings": "Open Settings"
 }

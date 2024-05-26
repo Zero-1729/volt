@@ -180,5 +180,6 @@
     "return_home": "العودة إلى المنزل"
     "return_home": "العودة إلى المنزل",
     "bolt_nfc_parking": "مسح علامة NFC",
-    "check_nfc_supported": "جارٍ التحقق من دعم NFC..."
+    "check_nfc_supported": "جارٍ التحقق من دعم NFC...",
+    "go_to_nfc_settings": "أفتح الإعدادات"
 }
