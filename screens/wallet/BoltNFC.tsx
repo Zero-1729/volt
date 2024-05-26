@@ -319,18 +319,47 @@ const BoltNFC = ({route}: Props) => {
                                     ]}>
                                     {capitalizeFirst(t('amount'))}
                                 </Text>
-                                <FiatBalance
-                                    balance={amountSats.toNumber()}
-                                    loading={false}
-                                    balanceFontSize={'text-4xl'}
-                                    fontColor={ColorScheme.Text.Default}
-                                    ignoreHideBalance={true}
-                                />
-                                <DisplaySatsAmount
-                                    amount={amountSats}
-                                    fontSize={'text-sm'}
-                                    textColor={ColorScheme.Text.DescText}
-                                />
+
+                                <View
+                                    style={[
+                                        tailwind('flex items-center'),
+                                        // eslint-disable-next-line react-native/no-inline-styles
+                                        {
+                                            flexDirection: route.params
+                                                ?.satsUnit
+                                                ? 'column-reverse'
+                                                : 'column',
+                                        },
+                                    ]}>
+                                    <FiatBalance
+                                        balance={amountSats.toNumber()}
+                                        loading={false}
+                                        balanceFontSize={
+                                            route.params?.satsUnit
+                                                ? 'text-base'
+                                                : 'text-4xl'
+                                        }
+                                        fontColor={
+                                            route.params?.satsUnit
+                                                ? ColorScheme.Text.DescText
+                                                : ColorScheme.Text.Default
+                                        }
+                                        ignoreHideBalance={true}
+                                    />
+                                    <DisplaySatsAmount
+                                        amount={amountSats}
+                                        fontSize={
+                                            route.params?.satsUnit
+                                                ? 'text-3xl'
+                                                : 'text-sm'
+                                        }
+                                        textColor={
+                                            route.params?.satsUnit
+                                                ? ColorScheme.Text.Default
+                                                : ColorScheme.Text.DescText
+                                        }
+                                    />
+                                </View>
                             </View>
 
                             <View
