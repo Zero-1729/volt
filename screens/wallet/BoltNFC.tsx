@@ -67,6 +67,22 @@ const BoltNFC = ({route}: Props) => {
             ? t('return_home')
             : capitalizeFirst(t('back'));
 
+    const routeHome = useCallback(() => {
+        navigation.dispatch(CommonActions.navigate('HomeScreen'));
+    }, [navigation]);
+
+    const routeBack = useCallback(() => {
+        navigation.dispatch(CommonActions.goBack());
+    }, [navigation]);
+
+    const handleBack = useCallback(() => {
+        if (unsupportedNFC) {
+            routeHome();
+        } else {
+            routeBack();
+        }
+    }, [routeBack, routeHome, unsupportedNFC]);
+
     const handleWithdraw = useCallback(
         async (lnurl: string) => {
             try {
@@ -122,9 +138,9 @@ const BoltNFC = ({route}: Props) => {
     const readNFC = useCallback(async () => {
         if (unsupportedNFC) {
             if (route.params.fromQuickActions) {
-                navigation.dispatch(CommonActions.navigate('HomeScreen'));
+                routeHome();
             } else {
-                navigation.dispatch(CommonActions.goBack());
+                routeBack();
             }
 
             return;
@@ -186,8 +202,9 @@ const BoltNFC = ({route}: Props) => {
     }, [
         handleWithdraw,
         loading,
-        navigation,
         route.params.fromQuickActions,
+        routeBack,
+        routeHome,
         t,
         unsupportedNFC,
     ]);
@@ -234,9 +251,7 @@ const BoltNFC = ({route}: Props) => {
                     ]}>
                     <PlainButton
                         style={[tailwind('absolute left-0 top-0 z-10')]}
-                        onPress={() => {
-                            navigation.dispatch(CommonActions.goBack());
-                        }}>
+                        onPress={handleBack}>
                         <Back fill={ColorScheme.SVG.Default} />
                     </PlainButton>
 
