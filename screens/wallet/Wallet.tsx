@@ -30,7 +30,7 @@ import BDK from 'bdk-rn';
 
 import BigNumber from 'bignumber.js';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTranslation} from 'react-i18next';
 
@@ -229,6 +229,11 @@ const Wallet = ({route}: Props) => {
             return;
         }
 
+        const _netInfo = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netInfo)) {
+            return;
+        }
+
         // Lock load to avoid deleting wallet while loading
         setLoadLock(true);
 
@@ -402,6 +407,11 @@ const Wallet = ({route}: Props) => {
     ]);
 
     const getLNSwapInfo = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+        if (checkNetworkIsReachable(_netInfo)) {
+            return;
+        }
+
         onchainPaymentLimits()
             .then((c: OnchainPaymentLimitsResponse) => {
                 if (c.minSat !== 0) {
@@ -442,6 +452,11 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     const getOnchainSwapInfo = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+        if (checkNetworkIsReachable(_netInfo)) {
+            return;
+        }
+
         receiveOnchain({})
             .then((d: SwapInfo) => {
                 setSwapIn({
@@ -470,8 +485,10 @@ const Wallet = ({route}: Props) => {
     const hideSendButton =
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
-    const routeToReceive = () => {
-        if (!isNetOn) {
+    const routeToReceive = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+
+        if (!checkNetworkIsReachable(_netInfo)) {
             navigation.dispatch(
                 CommonActions.navigate({
                     name: 'Receive',
@@ -491,7 +508,7 @@ const Wallet = ({route}: Props) => {
                 name: 'RequestAmount',
             }),
         );
-    };
+    }, [navigation]);
 
     const handleBackPress = useCallback(() => {
         if (route.params?.reload) {

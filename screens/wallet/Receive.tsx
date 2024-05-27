@@ -91,7 +91,7 @@ import {runOnJS, useSharedValue} from 'react-native-reanimated';
 import Dot from '../../components/dots';
 
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
@@ -228,9 +228,9 @@ const Receive = ({route}: Props) => {
         // or not LN but has BTC onchain amount set
         return (
             (!isLNWallet && !state.bitcoinValue.isZero()) ||
-            (isLNWallet && checkNetworkIsReachable(networkState))
+            (isLNWallet && isNetOn)
         );
-    }, [isLNWallet, state.bitcoinValue, networkState]);
+    }, [isLNWallet, state.bitcoinValue, isNetOn]);
 
     // Set bitcoin invoice URI
     const BTCInvoice = useMemo(
@@ -338,16 +338,21 @@ const Receive = ({route}: Props) => {
         navigation,
     ]);
 
-    useEffect(() => {
+    const processLNInvoice = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
         // Get invoice details
         // Note: hide amount details
         if (
             walletData.type === 'unified' &&
-            checkNetworkIsReachable(networkState)
+            checkNetworkIsReachable(_netInfo)
         ) {
             displayLNInvoice();
         }
-    }, [displayLNInvoice, networkState, walletData.type]);
+    }, [displayLNInvoice, walletData.type]);
+
+    useEffect(() => {
+        processLNInvoice();
+    }, [displayLNInvoice, processLNInvoice, walletData.type]);
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {

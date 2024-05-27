@@ -472,13 +472,9 @@ export const doesWalletExist = (
 };
 
 export const checkNetworkIsReachable = (networkState: NetInfoState) => {
-    if (networkState.isInternetReachable === null) {
-        return networkState.isConnected === null
-            ? false
-            : networkState.isConnected;
-    } else {
-        return networkState.isInternetReachable;
-    }
+    return networkState.isInternetReachable !== null
+        ? networkState.isInternetReachable
+        : false;
 };
 
 // Function to check and report invoice and wallet error for payment

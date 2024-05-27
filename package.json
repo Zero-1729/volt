@@ -44,7 +44,7 @@
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-clipboard/clipboard": "^1.13.2",
     "@react-native-community/cli": "^13.6.1",
-    "@react-native-community/netinfo": "^11.3.1",
+    "@react-native-community/netinfo": "^11.3.2",
     "@react-native-community/push-notification-ios": "^1.11.0",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.10",

@@ -129,7 +129,7 @@ import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo from '@react-native-community/netinfo';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
@@ -492,8 +492,6 @@ const RootNavigator = (): ReactElement => {
     const onboardingState = useRef(onboarding);
     const wallet = getWalletData(currentWalletID);
     const BreezSub = useRef<any>(null);
-    const networkState = useNetInfo();
-    const isNetOn = checkNetworkIsReachable(networkState);
 
     const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
@@ -611,7 +609,9 @@ const RootNavigator = (): ReactElement => {
 
     // Fetch and set Swap Info here
     const initMempoolSock = async () => {
-        if (!checkNetworkIsReachable(networkState)) {
+        // Check network
+        const _netState = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netState)) {
             return;
         }
 
@@ -652,11 +652,25 @@ const RootNavigator = (): ReactElement => {
                 halfHourFee: _fees?.halfHourFee
                     ? _fees?.halfHourFee
                     : mempoolInfo.halfHourFee,
+                connected: true,
             });
         };
 
         mempoolRef.onerror = (error: any) => {
             console.log('[Mempool] (error)', error.message);
+
+            if (error.message.includes('not connected')) {
+                setMempoolInfo({
+                    mempoolCongested: mempoolInfo.mempoolCongested,
+                    mempoolHighFeeEnv: mempoolInfo.mempoolHighFeeEnv,
+                    economyFee: mempoolInfo.economyFee,
+                    fastestFee: mempoolInfo.fastestFee,
+                    minimumFee: mempoolInfo.minimumFee,
+                    hourFee: mempoolInfo.hourFee,
+                    halfHourFee: mempoolInfo.halfHourFee,
+                    connected: true,
+                });
+            }
         };
     };
 
@@ -668,7 +682,8 @@ const RootNavigator = (): ReactElement => {
         }
 
         // Check network
-        if (!checkNetworkIsReachable(networkState)) {
+        const _netState = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netState)) {
             return;
         }
 
@@ -804,14 +819,6 @@ const RootNavigator = (): ReactElement => {
         try {
             // Connect to the Breez SDK make it ready for use
             BreezSub.current = await connect(connectionRequest, onBreezEvent);
-
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('Breez SDK'),
-                text2: t('breez_connected'),
-                visibilityTime: 1750,
-            });
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
@@ -874,18 +881,26 @@ const RootNavigator = (): ReactElement => {
             initNode();
         }
 
+        // Net event listener
+        // Subscribe
+        const NetInfoSub = netInfo.addEventListener(state => {
+            // fetch and set mempool info
+            // and Breez SDK connection
+
+            if (checkNetworkIsReachable(state)) {
+                initNode();
+                initMempoolSock();
+            }
+        });
+
         return () => {
             // Kill subscription
             BreezSub?.current?.remove();
             appStateSub?.remove();
             mempoolRef.close();
+            NetInfoSub();
         };
     }, []);
-
-    useEffect(() => {
-        initNode();
-        initMempoolSock();
-    }, [isNetOn]);
 
     return (
         <NavigationContainer

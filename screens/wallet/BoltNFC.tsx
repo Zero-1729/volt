@@ -40,7 +40,7 @@ import {AppStorageContext} from '../../class/storageContext';
 import BigNumber from 'bignumber.js';
 
 import {EBreezDetails} from '../../types/enums';
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
@@ -194,11 +194,6 @@ const BoltNFC = ({route}: Props) => {
             return;
         }
 
-        // Check if network is reachable
-        if (!checkNetworkIsReachable(networkState)) {
-            return;
-        }
-
         // Check if NFC is disabled
         // Then move to settings
         if (isDisabledNFC) {
@@ -224,6 +219,12 @@ const BoltNFC = ({route}: Props) => {
         if (!enabled) {
             setStatusMessage(t('nfc_disabled'));
             setLoading(false);
+            return;
+        }
+
+        // Check if network is reachable
+        const _netInfo = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netInfo)) {
             return;
         }
 
@@ -266,7 +267,6 @@ const BoltNFC = ({route}: Props) => {
         isDisabledNFC,
         isInError,
         loading,
-        networkState,
         route.params.fromQuickActions,
         routeBack,
         routeHome,

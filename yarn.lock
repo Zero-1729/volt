@@ -2770,7 +2770,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/netinfo@npm:^11.3.1":
+"@react-native-community/netinfo@npm:^11.3.2":
   version: 11.3.2
   resolution: "@react-native-community/netinfo@npm:11.3.2"
   peerDependencies:
@@ -11061,13 +11061,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-camera-kit@npm:14.0.0-beta15":
-  version: 14.0.0-beta15
-  resolution: "react-native-camera-kit@npm:14.0.0-beta15"
+"react-native-camera-kit@npm:^14.0.0-beta15":
+  version: 14.0.0-beta9
+  resolution: "react-native-camera-kit@npm:14.0.0-beta9"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/1c9e437f3c7d6efab5a5cf12532764ba03b1768c38f9d2dabcbd1e9740fbeb5e6c036d49004dce21adcd57bac73d8864c3eefe5ee3335998f01b9e206f835a92
+  checksum: 10/4cbba23a05ac87196e57dbe969d8400c778161e796780164b6c2bd1e3a1788dba11b7b0bf78d486b75c414961d4d154bd2696f06369ad87ea30cda12332c18bb
   languageName: node
   linkType: hard
 
@@ -13608,7 +13608,7 @@ __metadata:
     "@react-native-async-storage/async-storage": "npm:^1.23.1"
     "@react-native-clipboard/clipboard": "npm:^1.13.2"
     "@react-native-community/cli": "npm:^13.6.1"
-    "@react-native-community/netinfo": "npm:^11.3.1"
+    "@react-native-community/netinfo": "npm:^11.3.2"
     "@react-native-community/push-notification-ios": "npm:^1.11.0"
     "@react-native/babel-preset": "npm:^0.74.83"
     "@react-native/eslint-config": "npm:^0.74.83"
@@ -13668,7 +13668,7 @@ __metadata:
     react-native: "npm:^0.74.1"
     react-native-biometrics: "npm:^3.0.1"
     react-native-bouncy-checkbox: "npm:^3.0.7"
-    react-native-camera-kit: "npm:14.0.0-beta15"
+    react-native-camera-kit: "npm:^14.0.0-beta15"
     react-native-default-preference: "npm:^1.4.4"
     react-native-device-info: "npm:^10.13.1"
     react-native-document-picker: "npm:^9.1.1"

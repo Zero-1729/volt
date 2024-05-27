@@ -29,7 +29,7 @@ import {useTranslation} from 'react-i18next';
 import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -258,7 +258,8 @@ const Home = ({route}: Props) => {
         }
 
         // Check net again, just in case there is a drop mid execution
-        if (!checkNetworkIsReachable(networkState)) {
+        const _netInfo = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netInfo)) {
             setRefreshing(false);
             setLoadingBalance(false);
             return;
@@ -351,7 +352,8 @@ const Home = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
+        const _netInfo = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netInfo)) {
             setRefreshing(false);
             setLoadingBalance(false);
             return;
@@ -368,7 +370,7 @@ const Home = ({route}: Props) => {
         }
 
         // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!checkNetworkIsReachable(_netInfo)) {
             setRefreshing(false);
             return;
         }
@@ -431,43 +433,41 @@ const Home = ({route}: Props) => {
         );
     }, []);
 
-    // Fetch the fiat rate on currency change
-    useEffect(() => {
+    const fiatRateFetchRehydrate = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
         // Avoid fiat rate update call when offline
         // or when newly loaded screen to avoid dup call
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!checkNetworkIsReachable(_netInfo)) {
             return;
         }
 
         // Only call on each change to fiat currency in settings
         setLoadingBalance(true);
         singleSyncFiatRate(appFiatCurrency.short, true);
-    }, [appFiatCurrency]);
+    }, []);
 
-    // Fetch the fiat rate on initial load
-    useEffect(() => {
+    const initWalletSync = useCallback(async () => {
         // Only attempt update when initial fiat rate update call
         // and wallets exists
+        const _netInfo = await netInfo.fetch();
+
         if (
             isWalletInitialized &&
-            !checkNetworkIsReachable(networkState) &&
+            !checkNetworkIsReachable(_netInfo) &&
             wallet.type !== 'unified'
         ) {
             // Avoid fiat rate update call when offline
             jointSync();
         }
-
-        () => {
-            setRefreshing(false);
-            setLoadingBalance(false);
-        };
     }, []);
 
-    useEffect(() => {
+    const handleWalletRestore = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+
         if (route.params?.restoreMeta) {
             if (
                 route.params?.restoreMeta.load &&
-                checkNetworkIsReachable(networkState)
+                checkNetworkIsReachable(_netInfo)
             ) {
                 // set loading
                 setLoadingBalance(true);
@@ -488,6 +488,25 @@ const Home = ({route}: Props) => {
             // Vibrate to let user know the action was successful
             RNHapticFeedback.trigger('impactLight', RNHapticFeedbackOptions);
         }
+    }, []);
+
+    // Fetch the fiat rate on currency change
+    useEffect(() => {
+        fiatRateFetchRehydrate();
+    }, [appFiatCurrency]);
+
+    // Fetch the fiat rate on initial load
+    useEffect(() => {
+        initWalletSync();
+
+        () => {
+            setRefreshing(false);
+            setLoadingBalance(false);
+        };
+    }, []);
+
+    useEffect(() => {
+        handleWalletRestore();
     }, [route.params?.restoreMeta]);
 
     return (
