@@ -26,8 +26,8 @@ const boltzExchangeLimitsFetch = async (): Promise<TBoltzSwapInfo> => {
         const min = Number(returnedJSON?.BTC.BTC.limits.minimal);
 
         return {
-            minLimit: max,
-            maxLimit: min,
+            minLimit: min,
+            maxLimit: max,
         };
     } catch (e: any) {
         const detailed_error = returnedJSON?.status.error_message.split('.')[0];
