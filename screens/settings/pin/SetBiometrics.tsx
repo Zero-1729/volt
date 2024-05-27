@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Linking, Text, View, useColorScheme} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 import React, {useContext} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
@@ -39,6 +39,7 @@ const SetBiometrics = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('settings');
+    const {t: e} = useTranslation('errors');
 
     const {setBiometricsActive, isWalletInitialized} =
         useContext(AppStorageContext);
@@ -66,16 +67,8 @@ const SetBiometrics = ({route}: Props) => {
             const {available, biometryType, error} =
                 await RNBiometrics.isSensorAvailable();
 
-            if (error) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Biometrics'),
-                    text2: t('biometrics_error'),
-                    visibilityTime: 1750,
-                });
-
-                setDoneErrorText(t('biometrics_error'));
+            if (error && !available) {
+                setDoneErrorText(e('biometrics_error'));
                 return;
             }
 
@@ -141,6 +134,12 @@ const SetBiometrics = ({route}: Props) => {
     };
 
     const handleDone = () => {
+        if (doneErrorText) {
+            setDoneErrorText('');
+            skipAlong();
+            return;
+        }
+
         if (doneSetup) {
             handleRoute();
             return;
@@ -157,10 +156,6 @@ const SetBiometrics = ({route}: Props) => {
         } else {
             navigation.dispatch(CommonActions.navigate({name: 'DonePIN'}));
         }
-    };
-
-    const openSettings = () => {
-        Linking.openSettings();
     };
 
     return (
@@ -231,6 +226,8 @@ const SetBiometrics = ({route}: Props) => {
                             ]}>
                             {doneSetup
                                 ? t('setup_bio_done_desc')
+                                : doneErrorText
+                                ? doneErrorText
                                 : t('setup_bio_desc')}
                         </Text>
                     </View>
@@ -256,23 +253,13 @@ const SetBiometrics = ({route}: Props) => {
                             </PlainButton>
                         )}
 
-                        {doneErrorText.length > 0 && (
-                            <PlainButton onPress={openSettings}>
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-base text-center font-bold mb-6',
-                                        ),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
-                                    {capitalizeFirst(t('open_settings'))}
-                                </Text>
-                            </PlainButton>
-                        )}
-
                         <LongButton
                             title={capitalizeFirst(
-                                doneSetup ? t('done') : t('enable'),
+                                doneSetup
+                                    ? doneErrorText
+                                        ? capitalizeFirst(t('skip'))
+                                        : t('done')
+                                    : t('enable'),
                             )}
                             textColor={ColorScheme.Text.Alt}
                             backgroundColor={ColorScheme.Background.Inverted}
