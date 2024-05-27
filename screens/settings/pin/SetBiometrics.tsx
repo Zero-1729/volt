@@ -187,7 +187,7 @@ const SetBiometrics = ({route}: Props) => {
                             />
                         )}
 
-                        {!(doneSetup && doneErrorText) && (
+                        {!doneSetup && !doneErrorText && (
                             <View
                                 style={[
                                     {
@@ -249,7 +249,7 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('absolute w-5/6'),
                             {bottom: NativeWindowMetrics.bottomButtonOffset},
                         ]}>
-                        {!doneSetup && doneErrorText.length === 0 && (
+                        {!doneSetup && !doneErrorText && (
                             <PlainButton onPress={skipAlong}>
                                 <Text
                                     style={[
