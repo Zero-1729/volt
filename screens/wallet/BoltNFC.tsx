@@ -83,12 +83,22 @@ const BoltNFC = ({route}: Props) => {
             return t('return_home');
         }
 
+        if (isDisabledNFC) {
+            return t('go_to_nfc_settings');
+        }
+
         if (loading) {
             return capitalizeFirst(t('cancel'));
         }
 
         return capitalizeFirst(t('scan'));
-    }, [loading, route.params.fromQuickActions, t, unsupportedNFC]);
+    }, [
+        isDisabledNFC,
+        loading,
+        route.params.fromQuickActions,
+        t,
+        unsupportedNFC,
+    ]);
 
     const routeHome = useCallback(() => {
         navigation.dispatch(CommonActions.navigate('HomeScreen'));
