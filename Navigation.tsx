@@ -129,7 +129,7 @@ import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo from '@react-native-community/netinfo';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
@@ -492,8 +492,6 @@ const RootNavigator = (): ReactElement => {
     const onboardingState = useRef(onboarding);
     const wallet = getWalletData(currentWalletID);
     const BreezSub = useRef<any>(null);
-    const networkState = useNetInfo();
-    const isNetOn = checkNetworkIsReachable(networkState);
 
     const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
@@ -611,7 +609,9 @@ const RootNavigator = (): ReactElement => {
 
     // Fetch and set Swap Info here
     const initMempoolSock = async () => {
-        if (!checkNetworkIsReachable(networkState)) {
+        // Check network
+        const _netState = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netState)) {
             return;
         }
 
@@ -668,7 +668,8 @@ const RootNavigator = (): ReactElement => {
         }
 
         // Check network
-        if (!checkNetworkIsReachable(networkState)) {
+        const _netState = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netState)) {
             return;
         }
 
@@ -874,18 +875,26 @@ const RootNavigator = (): ReactElement => {
             initNode();
         }
 
+        // Net event listener
+        // Subscribe
+        const NetInfoSub = netInfo.addEventListener(state => {
+            // fetch and set mempool info
+            // and Breez SDK connection
+
+            if (checkNetworkIsReachable(state)) {
+                initNode();
+                initMempoolSock();
+            }
+        });
+
         return () => {
             // Kill subscription
             BreezSub?.current?.remove();
             appStateSub?.remove();
             mempoolRef.close();
+            NetInfoSub();
         };
     }, []);
-
-    useEffect(() => {
-        initNode();
-        initMempoolSock();
-    }, [isNetOn]);
 
     return (
         <NavigationContainer
