@@ -216,19 +216,17 @@ const SetBiometrics = ({route}: Props) => {
                             />
                         )}
 
-                        {!doneErrorText && (
-                            <Text
-                                style={[
-                                    tailwind(
-                                        'text-xl font-bold text-white mb-2',
-                                    ),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {doneSetup
-                                    ? t('setup_bio_success')
-                                    : t('setup_bio')}
-                            </Text>
-                        )}
+                        <Text
+                            style={[
+                                tailwind('text-xl font-bold text-white mb-2'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {doneSetup
+                                ? t('setup_bio_success')
+                                : doneErrorText
+                                ? t('cannot_setup_bio')
+                                : t('setup_bio')}
+                        </Text>
 
                         <Text
                             style={[
