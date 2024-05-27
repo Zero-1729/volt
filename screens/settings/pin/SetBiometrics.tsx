@@ -141,7 +141,6 @@ const SetBiometrics = ({route}: Props) => {
 
     const handleDone = () => {
         if (doneErrorText) {
-            setDoneErrorText('');
             skipAlong();
             return;
         }
