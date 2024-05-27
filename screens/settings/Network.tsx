@@ -57,7 +57,7 @@ const Network = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {electrumServerURL, setElectrumServerURL} =
+    const {electrumServerURL, setElectrumServerURL, mempoolInfo} =
         useContext(AppStorageContext);
 
     const [url, setURL] = useState('');
@@ -265,9 +265,10 @@ const Network = () => {
                                             }`,
                                         ),
                                         {
-                                            backgroundColor: isNetOn
-                                                ? 'lightgreen'
-                                                : '#ff4e4a',
+                                            backgroundColor:
+                                                isNetOn && mempoolInfo.connected
+                                                    ? 'lightgreen'
+                                                    : '#ff4e4a',
                                         },
                                     ]}>
                                     <VText
@@ -276,12 +277,14 @@ const Network = () => {
                                                 'text-xs font-bold p-1 px-4',
                                             ),
                                             {
-                                                color: isNetOn
-                                                    ? 'darkgreen'
-                                                    : 'black',
+                                                color:
+                                                    isNetOn &&
+                                                    mempoolInfo.connected
+                                                        ? 'darkgreen'
+                                                        : 'black',
                                             },
                                         ]}>
-                                        {isNetOn
+                                        {isNetOn && mempoolInfo.connected
                                             ? capitalizeFirst(t('connected'))
                                             : capitalizeFirst(
                                                   t('disconnected'),
