@@ -46,6 +46,12 @@ const SetBiometrics = ({route}: Props) => {
     const [doneSetup, setDoneSetup] = React.useState<boolean>(false);
     const [doneErrorText, setDoneErrorText] = React.useState<string>('');
 
+    const bottomText = doneErrorText
+        ? capitalizeFirst(t('skip'))
+        : doneSetup
+        ? t('done')
+        : t('enable');
+
     const handleRoute = () => {
         if (isWalletInitialized) {
             // Route back to PIN manager
@@ -173,13 +179,15 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('items-center w-5/6'),
                             {marginTop: -64},
                         ]}>
-                        {doneSetup && doneErrorText.length === 0 ? (
+                        {doneSetup && (
                             <Success
                                 fill={ColorScheme.SVG.Default}
                                 width={200}
                                 height={200}
                             />
-                        ) : (
+                        )}
+
+                        {!(doneSetup && doneErrorText) && (
                             <View
                                 style={[
                                     {
@@ -201,7 +209,7 @@ const SetBiometrics = ({route}: Props) => {
                             </View>
                         )}
 
-                        {doneErrorText.length > 0 && (
+                        {doneErrorText && (
                             <Failed
                                 fill={ColorScheme.Background.Default}
                                 width={200}
@@ -209,15 +217,19 @@ const SetBiometrics = ({route}: Props) => {
                             />
                         )}
 
-                        <Text
-                            style={[
-                                tailwind('text-xl font-bold text-white mb-2'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {doneSetup
-                                ? t('setup_bio_success')
-                                : t('setup_bio')}
-                        </Text>
+                        {!doneErrorText && (
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-xl font-bold text-white mb-2',
+                                    ),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {doneSetup
+                                    ? t('setup_bio_success')
+                                    : t('setup_bio')}
+                            </Text>
+                        )}
 
                         <Text
                             style={[
@@ -254,13 +266,7 @@ const SetBiometrics = ({route}: Props) => {
                         )}
 
                         <LongButton
-                            title={capitalizeFirst(
-                                doneSetup
-                                    ? doneErrorText
-                                        ? capitalizeFirst(t('skip'))
-                                        : t('done')
-                                    : t('enable'),
-                            )}
+                            title={bottomText}
                             textColor={ColorScheme.Text.Alt}
                             backgroundColor={ColorScheme.Background.Inverted}
                             onPress={handleDone}
