@@ -79,19 +79,16 @@ const BoltNFC = ({route}: Props) => {
     const isDisabledNFC = statusMessage === t('nfc_disabled');
 
     const buttonText = useMemo(() => {
-        if (
-            statusMessage === t('bolt_nfc_parking') ||
-            statusMessage.startsWith('Error')
-        ) {
-            return capitalizeFirst(t('scan'));
-        } else if (loading) {
-            return capitalizeFirst(t('cancel'));
-        } else if (route.params.fromQuickActions) {
+        if (unsupportedNFC && route.params.fromQuickActions) {
             return t('return_home');
-        } else {
-            return capitalizeFirst(t('back'));
         }
-    }, [loading, route.params.fromQuickActions, statusMessage, t]);
+
+        if (loading) {
+            return capitalizeFirst(t('cancel'));
+        }
+
+        return capitalizeFirst(t('scan'));
+    }, [loading, route.params.fromQuickActions, t, unsupportedNFC]);
 
     const routeHome = useCallback(() => {
         navigation.dispatch(CommonActions.navigate('HomeScreen'));
