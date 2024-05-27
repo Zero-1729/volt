@@ -248,9 +248,6 @@ const BoltNFC = ({route}: Props) => {
         } catch (error: any) {
             setStatusMessage(t('nfc_tag_error', {error: error.message}));
             setLoading(false);
-        } finally {
-            // stop the nfc scanning
-            cancelScanRequest();
         }
     }, [
         cancelScanRequest,
