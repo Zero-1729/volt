@@ -49,8 +49,8 @@ const SetBiometrics = ({route}: Props) => {
     const bottomText = doneErrorText
         ? capitalizeFirst(t('skip'))
         : doneSetup
-        ? t('done')
-        : t('enable');
+        ? capitalizeFirst(t('done'))
+        : capitalizeFirst(t('enable'));
 
     const handleRoute = () => {
         if (isWalletInitialized) {
