@@ -415,14 +415,14 @@ const Wallet = ({route}: Props) => {
                 } else {
                     try {
                         console.log(
-                            '[Boltz] Fallback to Fetch LN limits from Boltz',
+                            '[Boltz SwapOut] Fallback to Fetch limits from Boltz',
                         );
 
                         fetchBoltzSwapInfo((respObj: TBoltzSwapInfo) => {
                             if (respObj.minLimit !== 0) {
                                 setSwapOut({
-                                    min: c.minSat,
-                                    max: c.maxSat,
+                                    min: respObj.minLimit,
+                                    max: respObj.maxLimit,
                                 });
 
                                 setUpdatedLNBalance(false);
@@ -430,7 +430,7 @@ const Wallet = ({route}: Props) => {
                             }
                         });
                     } catch (error: any) {
-                        console.log('[Boltz] Error: ', error.message);
+                        console.log('[Boltz SwapOut] Error: ', error.message);
                     }
                 }
             })
@@ -471,7 +471,7 @@ const Wallet = ({route}: Props) => {
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
     const routeToReceive = () => {
-        if (!checkNetworkIsReachable(networkState)) {
+        if (!isNetOn) {
             navigation.dispatch(
                 CommonActions.navigate({
                     name: 'Receive',
@@ -508,7 +508,7 @@ const Wallet = ({route}: Props) => {
     }, [navigation, route.params?.reload]);
 
     useEffect(() => {
-        if (isLNWallet && checkNetworkIsReachable(networkState)) {
+        if (isLNWallet) {
             getLNSwapInfo();
             getOnchainSwapInfo();
         }
@@ -531,11 +531,7 @@ const Wallet = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        if (
-            updatedOnchainBalance &&
-            isLNWallet &&
-            checkNetworkIsReachable(networkState)
-        ) {
+        if (updatedOnchainBalance && isLNWallet) {
             setLoadingSwapInInfo(true);
             getOnchainSwapInfo();
         }
@@ -544,11 +540,7 @@ const Wallet = ({route}: Props) => {
     }, [updatedOnchainBalance]);
 
     useEffect(() => {
-        if (
-            updatedLNBalance &&
-            isLNWallet &&
-            checkNetworkIsReachable(networkState)
-        ) {
+        if (updatedLNBalance && isLNWallet) {
             setLoadingSwapOutInfo(true);
             getLNSwapInfo();
         }
