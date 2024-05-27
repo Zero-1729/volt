@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import {StyleSheet, View, useColorScheme} from 'react-native';
 
@@ -34,6 +34,7 @@ import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
 import {useNetInfo} from '@react-native-community/netinfo';
+import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 import {capitalizeFirst} from '../../modules/transform';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
@@ -51,6 +52,7 @@ const Network = () => {
 
     const netInfo = useNetInfo();
     const isNetOn = checkNetworkIsReachable(netInfo);
+    const [breezConnected, setBreezConnected] = useState(isNetOn);
 
     const HeadingBar = {
         height: 2,
@@ -86,6 +88,15 @@ const Network = () => {
         return valueWithSingleWhitespace;
     };
 
+    const checkBreezServices = useCallback(async () => {
+        try {
+            await nodeInfo();
+            setBreezConnected(true);
+        } catch (error: any) {
+            setBreezConnected(false);
+        }
+    }, []);
+
     // Attempt to periodically connect to Electrum server
     useEffect(() => {
         const intervalCheck = setInterval(() => {
@@ -102,10 +113,16 @@ const Network = () => {
             );
         }, 1000 * 15);
 
+        checkBreezServices();
+
         return () => {
             clearInterval(intervalCheck);
         };
     }, []);
+
+    useEffect(() => {
+        checkBreezServices();
+    }, [isNetOn]);
 
     return (
         <SafeAreaView>
@@ -192,9 +209,10 @@ const Network = () => {
                                             }`,
                                         ),
                                         {
-                                            backgroundColor: isNetOn
-                                                ? 'lightgreen'
-                                                : '#ff4e4a',
+                                            backgroundColor:
+                                                isNetOn && breezConnected
+                                                    ? 'lightgreen'
+                                                    : '#ff4e4a',
                                         },
                                     ]}>
                                     <VText
@@ -203,12 +221,13 @@ const Network = () => {
                                                 'text-xs font-bold p-1 px-4',
                                             ),
                                             {
-                                                color: isNetOn
-                                                    ? 'darkgreen'
-                                                    : 'black',
+                                                color:
+                                                    isNetOn && breezConnected
+                                                        ? 'darkgreen'
+                                                        : 'black',
                                             },
                                         ]}>
-                                        {isNetOn
+                                        {isNetOn && breezConnected
                                             ? capitalizeFirst(t('connected'))
                                             : capitalizeFirst(
                                                   t('disconnected'),
