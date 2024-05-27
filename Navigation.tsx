@@ -805,14 +805,6 @@ const RootNavigator = (): ReactElement => {
         try {
             // Connect to the Breez SDK make it ready for use
             BreezSub.current = await connect(connectionRequest, onBreezEvent);
-
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('Breez SDK'),
-                text2: t('breez_connected'),
-                visibilityTime: 1750,
-            });
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
