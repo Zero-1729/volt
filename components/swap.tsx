@@ -58,7 +58,7 @@ const Swap = (props: SwapProps) => {
     );
 
     const swapInfoUnavailable = Object.keys(props.swapInfo).length === 0;
-    const swapOutLow = props.swapInfo.swapOut.min === 0;
+    const swapOutLoading = swapInfoUnavailable || !props.swapInfo.swapOut.min;
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -84,12 +84,10 @@ const Swap = (props: SwapProps) => {
                     {/* Swap In */}
                     <PlainButton
                         disabled={
-                            onchainBroke ||
-                            swapInfoUnavailable ||
-                            !props.isOnline
+                            onchainBroke || swapOutLoading || !props.isOnline
                         }
                         onPress={() => {
-                            if (!onchainBroke) {
+                            if (!onchainBroke && !swapOutLoading) {
                                 setSelected(SwapType.SwapIn);
                             }
                         }}
@@ -97,7 +95,7 @@ const Swap = (props: SwapProps) => {
                             tailwind(
                                 `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
                                     onchainBroke ||
-                                    swapInfoUnavailable ||
+                                    swapOutLoading ||
                                     !props.isOnline ||
                                     props.loadingInfo
                                         ? 'opacity-60'
@@ -126,6 +124,7 @@ const Swap = (props: SwapProps) => {
                                 {t('swap_in')}
                             </VText>
                             {selected === SwapType.SwapIn &&
+                                !swapOutLoading &&
                                 props.isOnline &&
                                 !onchainBroke && (
                                     <CheckIcon
@@ -178,13 +177,10 @@ const Swap = (props: SwapProps) => {
                     {/* Swap Out */}
                     <PlainButton
                         disabled={
-                            lightningBroke ||
-                            swapInfoUnavailable ||
-                            swapOutLow ||
-                            !props.isOnline
+                            lightningBroke || swapOutLoading || !props.isOnline
                         }
                         onPress={() => {
-                            if (!lightningBroke && props.isOnline) {
+                            if (!lightningBroke || !swapOutLoading) {
                                 setSelected(SwapType.SwapOut);
                             }
                         }}
@@ -192,8 +188,7 @@ const Swap = (props: SwapProps) => {
                             tailwind(
                                 `items-center p-4 w-full border rounded-md ${
                                     lightningBroke ||
-                                    swapInfoUnavailable ||
-                                    swapOutLow ||
+                                    swapOutLoading ||
                                     !props.isOnline ||
                                     props.loadingInfo
                                         ? 'opacity-60'
@@ -221,8 +216,8 @@ const Swap = (props: SwapProps) => {
                             </VText>
                             {selected === SwapType.SwapOut &&
                                 !lightningBroke &&
-                                props.isOnline &&
-                                !swapOutLow && (
+                                !swapOutLoading &&
+                                props.isOnline && (
                                     <CheckIcon
                                         style={[
                                             tailwind(
@@ -272,7 +267,7 @@ const Swap = (props: SwapProps) => {
                         )}
                     </PlainButton>
 
-                    {!props.isOnline && (
+                    {(!props.isOnline || swapOutLoading) && (
                         <View
                             style={[
                                 tailwind(
@@ -298,7 +293,9 @@ const Swap = (props: SwapProps) => {
                                     ),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                {t('no_internet_cannot_swap')}
+                                {!props.isOnline
+                                    ? t('no_internet_cannot_swap')
+                                    : t('loading_swap_info')}
                             </VText>
                         </View>
                     )}
@@ -312,7 +309,7 @@ const Swap = (props: SwapProps) => {
                             disabled={
                                 (onchainBroke && lightningBroke) ||
                                 props.loadingInfo ||
-                                swapInfoUnavailable ||
+                                swapOutLoading ||
                                 !props.isOnline
                             }
                             title={capitalizeFirst(t('continue'))}

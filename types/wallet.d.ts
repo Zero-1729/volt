@@ -206,3 +206,9 @@ export type TRateObject = {
     dailyChange: BigNumber;
     lastUpdated: number; // UNIX Timestamp
 };
+
+// Boltz Exchange ReverseSwap Type
+export type TBoltzSwapInfo = {
+    maxLimit: number;
+    minLimit: number;
+};
