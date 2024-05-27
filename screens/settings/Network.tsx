@@ -97,15 +97,19 @@ const Network = () => {
         }
     }, []);
 
+    const testElectrumService = useCallback(async () => {
+        getBlockHeight(
+            electrumServerURL.bitcoin,
+            (args: {status: boolean; blockHeight: number}) => {
+                setStatus(args.status);
+            },
+        );
+    }, []);
+
     // Attempt to periodically connect to Electrum server
     useEffect(() => {
         const intervalCheck = setInterval(() => {
-            getBlockHeight(
-                electrumServerURL.bitcoin,
-                (args: {status: boolean; blockHeight: number}) => {
-                    setStatus(args.status);
-                },
-            );
+            testElectrumService();
         }, 1000 * 15);
 
         checkBreezServices();
@@ -117,6 +121,7 @@ const Network = () => {
 
     useEffect(() => {
         checkBreezServices();
+        testElectrumService();
     }, [isNetOn]);
 
     return (
