@@ -652,11 +652,25 @@ const RootNavigator = (): ReactElement => {
                 halfHourFee: _fees?.halfHourFee
                     ? _fees?.halfHourFee
                     : mempoolInfo.halfHourFee,
+                connected: true,
             });
         };
 
         mempoolRef.onerror = (error: any) => {
             console.log('[Mempool] (error)', error.message);
+
+            if (error.message.includes('not connected')) {
+                setMempoolInfo({
+                    mempoolCongested: mempoolInfo.mempoolCongested,
+                    mempoolHighFeeEnv: mempoolInfo.mempoolHighFeeEnv,
+                    economyFee: mempoolInfo.economyFee,
+                    fastestFee: mempoolInfo.fastestFee,
+                    minimumFee: mempoolInfo.minimumFee,
+                    hourFee: mempoolInfo.hourFee,
+                    halfHourFee: mempoolInfo.halfHourFee,
+                    connected: true,
+                });
+            }
         };
     };
 
