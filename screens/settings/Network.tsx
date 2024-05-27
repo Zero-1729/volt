@@ -103,11 +103,6 @@ const Network = () => {
             getBlockHeight(
                 electrumServerURL.bitcoin,
                 (args: {status: boolean; blockHeight: number}) => {
-                    console.log(
-                        `[Electrum Server] Status: ${
-                            args.status ? 'Connected' : 'Disconnected'
-                        }`,
-                    );
                     setStatus(args.status);
                 },
             );
