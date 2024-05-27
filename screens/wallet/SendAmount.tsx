@@ -62,6 +62,7 @@ const SendAmount = ({route}: Props) => {
     const {fiatRate, appFiatCurrency} = useContext(AppStorageContext);
 
     const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
@@ -368,10 +369,7 @@ const SendAmount = ({route}: Props) => {
                                 return;
                             }
 
-                            if (
-                                checkNetworkIsReachable(networkState) &&
-                                isLNManual
-                            ) {
+                            if (isNetOn && isLNManual) {
                                 navigation.dispatch(
                                     CommonActions.navigate('WalletRoot', {
                                         screen: 'SendLN',
@@ -392,7 +390,7 @@ const SendAmount = ({route}: Props) => {
                                 return;
                             }
 
-                            if (checkNetworkIsReachable(networkState)) {
+                            if (isNetOn) {
                                 navigation.dispatch(
                                     CommonActions.navigate('WalletRoot', {
                                         screen: 'FeeSelection',
