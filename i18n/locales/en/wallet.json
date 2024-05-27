@@ -185,5 +185,6 @@
     "check_nfc_supported": "Checking NFC support...",
     "go_to_nfc_settings": "Open Settings",
     "add_wallet_advanced_mode": "Enable advanced mode",
-    "add_wallet_advanced_mode_desc": "For experienced Bitcoin wallet users who want to access advanced features"
+    "add_wallet_advanced_mode_desc": "For experienced Bitcoin wallet users who want to access advanced features",
+    "loading_swap_info": "Loading swap limit information..."
 }

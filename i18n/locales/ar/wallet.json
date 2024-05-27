@@ -185,5 +185,6 @@
     "check_nfc_supported": "جارٍ التحقق من دعم NFC...",
     "go_to_nfc_settings": "أفتح الإعدادات",
     "add_wallet_advanced_mode": "تمكين الوضع المتقدم",
-    "add_wallet_advanced_mode_desc": "لمستخدمي محفظة Bitcoin ذوي الخبرة الذين يرغبون في الوصول إلى الميزات المتقدمة"
+    "add_wallet_advanced_mode_desc": "لمستخدمي محفظة Bitcoin ذوي الخبرة الذين يرغبون في الوصول إلى الميزات المتقدمة",
+    "loading_swap_info": "جارٍ تحميل معلومات حد المبادلة..."
 }
