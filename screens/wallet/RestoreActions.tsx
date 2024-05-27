@@ -449,7 +449,7 @@ const ImportAction = ({route}: Props) => {
                     />
 
                     {/* Wallet Network */}
-                    {isMnemonic(importText.trim()) && (
+                    {isMnemonic(importText.trim()) && isAdvancedMode && (
                         <View style={[tailwind('mt-8 flex-row')]}>
                             <Text
                                 style={[
