@@ -285,7 +285,9 @@ const RequestAmount = ({route}: Props) => {
                 CommonActions.navigate('WalletRoot', {
                     screen: 'BoltNFC',
                     params: {
-                        amountMsat: satsAmount.value.div(1_000).toNumber(),
+                        amountMsat: satsAmount.value
+                            .multipliedBy(1_000)
+                            .toNumber(),
                         description: lnInvoiceDesc,
                         fromQuickActions: true,
                         satsUnit: bottomUnit.name === 'sats',
