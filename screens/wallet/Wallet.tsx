@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
 
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
@@ -67,9 +66,11 @@ import {
     TTransaction,
     TSwapInfo,
     TRateObject,
+    TBoltzSwapInfo,
 } from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
+import {fetchBoltzSwapInfo} from '../../modules/boltz';
 
 import Swap from './../../components/swap';
 import Send from './../../components/send';
@@ -134,7 +135,7 @@ const Wallet = ({route}: Props) => {
         const w = await createBDKWallet(walletData);
 
         return w;
-    }, []);
+    }, [walletData]);
 
     const bottomSwapRef = React.useRef<BottomSheetModal>(null);
     const bottomSendRef = React.useRef<BottomSheetModal>(null);
@@ -294,7 +295,7 @@ const Wallet = ({route}: Props) => {
         const w = bdkWallet ? bdkWallet : await initWallet();
 
         return await syncBDKWallet(w, walletData.network, electrumServerURL);
-    }, []);
+    }, [bdkWallet, electrumServerURL, initWallet, walletData.network]);
 
     // Fetch fiat rate
     const fetchFiat = async () => {
@@ -385,37 +386,62 @@ const Wallet = ({route}: Props) => {
             setBdkWallet(w);
         }
     }, [
-        appFiatCurrency.short,
+        bdkWallet,
         currentWalletID,
-        fiatRate,
+        electrumServerURL,
+        isLNWallet,
         loadingBalance,
-        networkState,
-        refreshing,
-        updateFiatRate,
+        setLoadLock,
+        syncWallet,
+        t,
+        updateWalletAddress,
         updateWalletBalance,
         updateWalletTransactions,
+        updateWalletUTXOs,
         walletData,
     ]);
 
-    const getLNSwapInfo = async () => {
-        // TODO: replace with call to Boltz to get when LN Balance below min
+    const getLNSwapInfo = useCallback(async () => {
         onchainPaymentLimits()
             .then((c: OnchainPaymentLimitsResponse) => {
-                setSwapOut({
-                    min: c.minSat,
-                    max: c.maxSat,
-                });
-                setLoadingSwapOutInfo(false);
-                setUpdatedLNBalance(false);
+                if (c.minSat !== 0) {
+                    setSwapOut({
+                        min: c.minSat,
+                        max: c.maxSat,
+                    });
+
+                    setUpdatedLNBalance(false);
+                    setLoadingSwapOutInfo(false);
+                } else {
+                    try {
+                        console.log(
+                            '[Boltz] Fallback to Fetch LN limits from Boltz',
+                        );
+
+                        fetchBoltzSwapInfo((respObj: TBoltzSwapInfo) => {
+                            if (respObj.minLimit !== 0) {
+                                setSwapOut({
+                                    min: c.minSat,
+                                    max: c.maxSat,
+                                });
+
+                                setUpdatedLNBalance(false);
+                                setLoadingSwapOutInfo(false);
+                            }
+                        });
+                    } catch (error: any) {
+                        console.log('[Boltz] Error: ', error.message);
+                    }
+                }
             })
             .catch((error: any) => {
                 console.log('[Breez swapOut] error: ', error.message);
                 setLoadingSwapOutInfo(false);
                 setUpdatedLNBalance(false);
             });
-    };
+    }, []);
 
-    const getOnchainSwapInfo = async () => {
+    const getOnchainSwapInfo = useCallback(async () => {
         receiveOnchain({})
             .then((d: SwapInfo) => {
                 setSwapIn({
@@ -434,7 +460,7 @@ const Wallet = ({route}: Props) => {
                 setLoadingSwapInInfo(false);
                 setUpdatedOBalance(false);
             });
-    };
+    }, []);
 
     // Check if wallet balance is empty
     const isWalletBroke = (balance: TBalance) => {
@@ -479,7 +505,7 @@ const Wallet = ({route}: Props) => {
             navigation.dispatch(CommonActions.goBack());
             return true;
         }
-    }, []);
+    }, [navigation, route.params?.reload]);
 
     useEffect(() => {
         if (isLNWallet && checkNetworkIsReachable(networkState)) {
@@ -501,6 +527,7 @@ const Wallet = ({route}: Props) => {
 
             backHandler.remove();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -513,6 +540,7 @@ const Wallet = ({route}: Props) => {
             getOnchainSwapInfo();
         }
         // Re-check swap info
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updatedOnchainBalance]);
 
     useEffect(() => {
@@ -524,6 +552,7 @@ const Wallet = ({route}: Props) => {
             setLoadingSwapOutInfo(true);
             getLNSwapInfo();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updatedLNBalance]);
 
     useEffect(() => {
@@ -532,6 +561,7 @@ const Wallet = ({route}: Props) => {
         if (route.params?.reload) {
             jointSync();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route.params?.reload]);
 
     // Receive Wallet ID and fetch wallet data to display
