@@ -189,6 +189,7 @@ export type TMempoolInfo = {
     minimumFee: number;
     hourFee: number;
     halfHourFee: number;
+    connected: boolean;
 };
 
 type TSwapInfo = {
