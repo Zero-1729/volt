@@ -24,8 +24,6 @@ import {TextSingleInput} from '../../components/input';
 
 import {useTailwind} from 'tailwind-rn';
 
-import Checkbox from 'react-native-bouncy-checkbox';
-
 import {AppStorageContext} from '../../class/storageContext';
 
 import {PlainButton} from '../../components/button';
@@ -35,7 +33,10 @@ import Back from './../../assets/svg/arrow-left-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
+import {useNetInfo} from '@react-native-community/netinfo';
+
 import {capitalizeFirst} from '../../modules/transform';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 const Network = () => {
     const navigation = useNavigation();
@@ -45,19 +46,19 @@ const Network = () => {
     const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
+    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    const netInfo = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(netInfo);
 
     const HeadingBar = {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {
-        electrumServerURL,
-        setElectrumServerURL,
-        defaultToTestnet,
-        setDefaultToTestnet,
-    } = useContext(AppStorageContext);
+    const {electrumServerURL, setElectrumServerURL} =
+        useContext(AppStorageContext);
 
     const [url, setURL] = useState('');
     const [status, setStatus] = useState(true);
@@ -91,7 +92,11 @@ const Network = () => {
             getBlockHeight(
                 electrumServerURL.bitcoin,
                 (args: {status: boolean; blockHeight: number}) => {
-                    console.log('[electrum] status: ', args.status);
+                    console.log(
+                        `[Electrum Server] Status: ${
+                            args.status ? 'Connected' : 'Disconnected'
+                        }`,
+                    );
                     setStatus(args.status);
                 },
             );
@@ -149,10 +154,158 @@ const Network = () => {
                         <View style={[tailwind('w-full'), HeadingBar]} />
                     </View>
 
-                    {/* Set Custom Electrum server */}
+                    {/* Breez */}
                     <View
                         style={tailwind(
-                            'justify-center w-full items-center flex-row mt-8 mb-2',
+                            'justify-center w-full items-center flex-row mt-8 mb-8',
+                        )}>
+                        <View style={tailwind('w-5/6')}>
+                            <View
+                                style={tailwind(
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center mb-4`,
+                                )}>
+                                <VText
+                                    style={[
+                                        tailwind(
+                                            `text-sm font-medium ${
+                                                langDir === 'right'
+                                                    ? ''
+                                                    : 'mr-4'
+                                            }`,
+                                        ),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    Breez SDK
+                                </VText>
+
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `rounded-full ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : ''
+                                            }`,
+                                        ),
+                                        {
+                                            backgroundColor: isNetOn
+                                                ? 'lightgreen'
+                                                : '#ff4e4a',
+                                        },
+                                    ]}>
+                                    <VText
+                                        style={[
+                                            tailwind(
+                                                'text-xs font-bold p-1 px-4',
+                                            ),
+                                            {
+                                                color: isNetOn
+                                                    ? 'darkgreen'
+                                                    : 'black',
+                                            },
+                                        ]}>
+                                        {isNetOn
+                                            ? capitalizeFirst(t('connected'))
+                                            : capitalizeFirst(
+                                                  t('disconnected'),
+                                              )}
+                                    </VText>
+                                </View>
+                            </View>
+
+                            <VText
+                                style={[
+                                    tailwind('text-xs'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {t('breez_sdk_info')}
+                            </VText>
+                        </View>
+                    </View>
+
+                    {/* Mempool */}
+                    <View
+                        style={tailwind(
+                            'justify-center w-full items-center flex-row mb-8',
+                        )}>
+                        <View style={tailwind('w-5/6')}>
+                            <View
+                                style={tailwind(
+                                    `w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center mb-4`,
+                                )}>
+                                <VText
+                                    style={[
+                                        tailwind(
+                                            `text-sm font-medium ${
+                                                langDir === 'right'
+                                                    ? ''
+                                                    : 'mr-4'
+                                            }`,
+                                        ),
+                                        {color: ColorScheme.Text.Default},
+                                    ]}>
+                                    Mempool.space
+                                </VText>
+
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `rounded-full ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : ''
+                                            }`,
+                                        ),
+                                        {
+                                            backgroundColor: isNetOn
+                                                ? 'lightgreen'
+                                                : '#ff4e4a',
+                                        },
+                                    ]}>
+                                    <VText
+                                        style={[
+                                            tailwind(
+                                                'text-xs font-bold p-1 px-4',
+                                            ),
+                                            {
+                                                color: isNetOn
+                                                    ? 'darkgreen'
+                                                    : 'black',
+                                            },
+                                        ]}>
+                                        {isNetOn
+                                            ? capitalizeFirst(t('connected'))
+                                            : capitalizeFirst(
+                                                  t('disconnected'),
+                                              )}
+                                    </VText>
+                                </View>
+                            </View>
+
+                            <VText
+                                style={[
+                                    tailwind('text-xs'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {t('mempool_connection_info')}
+                            </VText>
+                        </View>
+                    </View>
+
+                    <View style={[tailwind('w-full mb-8'), HeadingBar]} />
+
+                    {/* Electrum server */}
+                    <View
+                        style={tailwind(
+                            'justify-center w-full items-center flex-row mb-2',
                         )}>
                         <View style={tailwind('w-5/6')}>
                             <View
@@ -187,9 +340,10 @@ const Network = () => {
                                             }`,
                                         ),
                                         {
-                                            backgroundColor: status
-                                                ? 'lightgreen'
-                                                : '#ff4e4a',
+                                            backgroundColor:
+                                                isNetOn && status
+                                                    ? 'lightgreen'
+                                                    : '#ff4e4a',
                                         },
                                     ]}>
                                     <VText
@@ -198,12 +352,13 @@ const Network = () => {
                                                 'text-xs font-bold p-1 px-4',
                                             ),
                                             {
-                                                color: status
-                                                    ? 'darkgreen'
-                                                    : 'black',
+                                                color:
+                                                    isNetOn && status
+                                                        ? 'darkgreen'
+                                                        : 'black',
                                             },
                                         ]}>
-                                        {status
+                                        {isNetOn && status
                                             ? capitalizeFirst(t('connected'))
                                             : capitalizeFirst(
                                                   t('disconnected'),
@@ -215,7 +370,7 @@ const Network = () => {
                             <VText
                                 style={[
                                     tailwind('text-sm mb-2 italic'),
-                                    {color: ColorScheme.Text.GrayText},
+                                    {color: ColorScheme.Text.DescText},
                                 ]}>
                                 {`${electrumServerURL.bitcoin}`}
                             </VText>
@@ -321,78 +476,12 @@ const Network = () => {
                                     {capitalizeFirst(t('warning'))}
                                     {':'}
                                 </VText>{' '}
-                                {t('default_testnet_warn')}
+                                {e('default_testnet_warn')}
                             </VText>
                         </View>
                     </View>
 
-                    {/* Toggle advanced mode */}
-                    <View
-                        style={tailwind(
-                            'justify-center w-full items-center flex-row mt-10 mb-10',
-                        )}>
-                        <View style={tailwind('w-5/6')}>
-                            <View
-                                style={tailwind(
-                                    `w-full ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } items-center mb-2`,
-                                )}>
-                                <VText
-                                    style={[
-                                        tailwind('text-sm font-medium'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
-                                    {t('default_testnet')}
-                                </VText>
-                                <Checkbox
-                                    fillColor={
-                                        ColorScheme.Background.CheckBoxFilled
-                                    }
-                                    unfillColor={
-                                        ColorScheme.Background.CheckBoxUnfilled
-                                    }
-                                    size={18}
-                                    isChecked={defaultToTestnet}
-                                    iconStyle={{
-                                        borderWidth: 1,
-                                        borderRadius: 2,
-                                    }}
-                                    innerIconStyle={{
-                                        borderWidth: 1,
-                                        borderColor:
-                                            ColorScheme.Background
-                                                .CheckBoxOutline,
-                                        borderRadius: 2,
-                                    }}
-                                    style={[
-                                        tailwind('flex-row absolute -right-4'),
-                                    ]}
-                                    onPress={() => {
-                                        RNHapticFeedback.trigger(
-                                            'rigid',
-                                            RNHapticFeedbackOptions,
-                                        );
-
-                                        setDefaultToTestnet(!defaultToTestnet);
-                                    }}
-                                    disableBuiltInState={true}
-                                />
-                            </View>
-
-                            <View style={tailwind('w-full')}>
-                                <VText
-                                    style={[
-                                        tailwind('text-xs'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
-                                    {t('default_testnet_description')}
-                                </VText>
-                            </View>
-                        </View>
-                    </View>
+                    {/* <View style={[tailwind(' mt-8 mb-8 w-full'), HeadingBar]} /> */}
                 </View>
             </View>
         </SafeAreaView>
