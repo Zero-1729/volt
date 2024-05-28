@@ -877,6 +877,11 @@ const RootNavigator = (): ReactElement => {
             },
         );
 
+        // Init LN services
+        // Call mempool
+        initNode();
+        initMempoolSock();
+
         // Net event listener
         // Subscribe
         const NetInfoSub = netInfo.addEventListener(state => {
