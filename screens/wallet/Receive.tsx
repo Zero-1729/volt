@@ -326,6 +326,19 @@ const Receive = ({route}: Props) => {
         navigation,
     ]);
 
+    const closeScreen = useCallback(() => {
+        // Note: we route back to wallet view as edit is what gets us back to amount
+        // and back here
+        navigation.dispatch(
+            CommonActions.navigate('WalletRoot', {
+                screen: 'WalletView',
+                params: {
+                    reload: false,
+                },
+            }),
+        );
+    }, [navigation]);
+
     const processLNInvoice = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
         // Get invoice details
@@ -912,9 +925,7 @@ const Receive = ({route}: Props) => {
                     ]}>
                     <PlainButton
                         style={[tailwind('absolute left-0 z-10')]}
-                        onPress={() => {
-                            navigation.dispatch(CommonActions.goBack());
-                        }}>
+                        onPress={closeScreen}>
                         <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
 
