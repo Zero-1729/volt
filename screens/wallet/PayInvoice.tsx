@@ -54,7 +54,11 @@ import {TInvoiceData} from '../../types/wallet';
 import {useNetInfo} from '@react-native-community/netinfo';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
-import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
+import {
+    LnInvoice,
+    nodeInfo,
+    parseInvoice,
+} from '@breeztech/react-native-breez-sdk';
 import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'PayInvoice'>;
@@ -64,12 +68,15 @@ const PayInvoice = ({route}: Props) => {
 
     const tailwind = useTailwind();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const navigation = useNavigation();
     const [bolt11, setBolt11] = useState<LnInvoice>();
     const [isLightning, setIsLightning] = useState(false);
+    const [paymentToSelf, setPaymentToSelf] = useState(true);
+    const [paySelfMessage, setPaySelfMessage] = useState('');
     const [decodedInvoice, setDecodedInvoice] = useState<TInvoiceData>(
         {} as TInvoiceData,
     );
@@ -115,6 +122,17 @@ const PayInvoice = ({route}: Props) => {
     const decodeInvoice = useCallback((invoice: string) => {
         // Only handling Bolt11 Lightning invoices
         return decodeURI.decode(invoice) as TInvoiceData;
+    }, []);
+
+    const checkIfSelf = useCallback(async (payeePubkey: string) => {
+        const _nodeID = await nodeInfo();
+
+        // Check if bolt11 is self
+        if (payeePubkey !== _nodeID.id) {
+            setPaymentToSelf(false);
+        } else {
+            setPaySelfMessage(t('payment_to_self_detected'));
+        }
     }, []);
 
     const decodeBolt11 = useCallback(async (invoice: string) => {
@@ -210,10 +228,6 @@ const PayInvoice = ({route}: Props) => {
         }
     }, []);
 
-    useEffect(() => {
-        handleInvoiceType(route.params?.invoice);
-    }, []);
-
     const handleRoute = useCallback(() => {
         const _wallet = getMiniWallet(wallet);
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
@@ -302,6 +316,16 @@ const PayInvoice = ({route}: Props) => {
                 );
             }
         }
+    }, []);
+
+    useEffect(() => {
+        if (bolt11) {
+            checkIfSelf(bolt11?.payeePubkey);
+        }
+    }, [bolt11]);
+
+    useEffect(() => {
+        handleInvoiceType(route.params?.invoice);
     }, []);
 
     const invoiceOptionsEmpty = decodedInvoice.options
@@ -484,6 +508,29 @@ const PayInvoice = ({route}: Props) => {
                             navCallback={() => {}}
                         />
                     </View>
+
+                    {paySelfMessage && (
+                        <View
+                            style={[
+                                tailwind(
+                                    `mt-2 w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center justify-center`,
+                                ),
+                            ]}>
+                            <VText
+                                style={[
+                                    tailwind('text-sm text-center w-5/6'),
+                                    {
+                                        color: ColorScheme.Text.DescText,
+                                    },
+                                ]}>
+                                {paySelfMessage}
+                            </VText>
+                        </View>
+                    )}
                 </View>
 
                 <View
@@ -510,7 +557,7 @@ const PayInvoice = ({route}: Props) => {
                 </View>
 
                 <LongBottomButton
-                    disabled={isExpired}
+                    disabled={isExpired || paymentToSelf}
                     title={'Pay Invoice'}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}

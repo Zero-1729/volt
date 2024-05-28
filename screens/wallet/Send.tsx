@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useContext, useEffect, useRef} from 'react';
+import React, {
+    useState,
+    useContext,
+    useEffect,
+    useRef,
+    useCallback,
+} from 'react';
 import {
     StyleSheet,
     Text,
@@ -52,6 +58,7 @@ import {useTranslation} from 'react-i18next';
 import {
     sendPayment,
     BreezEventVariant,
+    nodeInfo,
 } from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from '../../types/enums';
 import ExpiryTimer from '../../components/expiry';
@@ -125,6 +132,9 @@ const SendView = ({route}: Props) => {
             ? (route.params.bolt11?.amountMsat as number) / 1_000
             : route.params.invoiceData?.options?.amount || 0,
     );
+
+    const [paymentToSelf, setPaymentToSelf] = useState(true);
+    const [paySelfMessage, setPaySelfMessage] = useState('');
 
     const bottomExportRef = useRef<BottomSheetModal>(null);
     const bottomPINPassRef = useRef<BottomSheetModal>(null);
@@ -354,14 +364,29 @@ const SendView = ({route}: Props) => {
         }
     };
 
-    useEffect(() => {
-        // Create Psbt if onchain
-        if (!route.params.bolt11) {
-            loadUPsbt();
+    const checkIfSelf = useCallback(async () => {
+        const _bolt11 = route.params.bolt11;
+        const _nodeID = await nodeInfo();
+
+        // Check if bolt11 is self
+        if (_bolt11?.payeePubkey !== _nodeID.id) {
+            setPaymentToSelf(false);
+        } else {
+            setPaySelfMessage(t('payment_to_self_detected'));
         }
     }, []);
 
     useEffect(() => {
+        // Create Psbt if onchain
+        if (!route.params.bolt11) {
+            loadUPsbt();
+        } else {
+            checkIfSelf();
+        }
+    }, []);
+
+    useEffect(() => {
+        // TODO: make sure it closes all pop up screen / test and check
         if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
             // Route to LN payment status screen
             navigation.dispatch(StackActions.popToTop());
@@ -680,28 +705,57 @@ const SendView = ({route}: Props) => {
                     </View>
 
                     {((isLightning && loading) ||
-                        (!isLightning && loadingPsbt)) && (
+                        (!isLightning && loadingPsbt)) &&
+                        !paySelfMessage && (
+                            <View
+                                style={[
+                                    tailwind('absolute'),
+                                    {
+                                        bottom:
+                                            NativeWindowMetrics.bottomButtonOffset +
+                                            76,
+                                    },
+                                ]}>
+                                <ActivityIndicator
+                                    style={[tailwind('mb-4')]}
+                                    size={'small'}
+                                    color={ColorScheme.Text.Default}
+                                />
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {loadingMessage}
+                                </Text>
+                            </View>
+                        )}
+
+                    {paySelfMessage && (
                         <View
                             style={[
-                                tailwind('absolute'),
+                                tailwind(
+                                    `mt-6 w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center justify-center absolute`,
+                                ),
                                 {
                                     bottom:
                                         NativeWindowMetrics.bottomButtonOffset +
                                         76,
                                 },
                             ]}>
-                            <ActivityIndicator
-                                style={[tailwind('mb-4')]}
-                                size={'small'}
-                                color={ColorScheme.Text.Default}
-                            />
-                            <Text
+                            <VText
                                 style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.GrayedText},
+                                    tailwind('text-sm text-center w-5/6'),
+                                    {
+                                        color: ColorScheme.Text.DescText,
+                                    },
                                 ]}>
-                                {loadingMessage}
-                            </Text>
+                                {paySelfMessage}
+                            </VText>
                         </View>
                     )}
 
@@ -709,7 +763,8 @@ const SendView = ({route}: Props) => {
                         disabled={
                             loading ||
                             (!isLightning && loadingPsbt) ||
-                            isExpired
+                            isExpired ||
+                            paymentToSelf
                         }
                         onPress={authAndPay}
                         title={capitalizeFirst(t('send'))}
