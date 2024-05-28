@@ -505,7 +505,10 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
-                        props.onAmountChange(safelyConcat(props.amount, '0'));
+                        // Disable adding a leading zeros if amount is empty and in sats unit
+                        const text =
+                            props.isSats && props.amount === '' ? '' : '0';
+                        props.onAmountChange(safelyConcat(props.amount, text));
                     }}>
                     <Text
                         style={[
