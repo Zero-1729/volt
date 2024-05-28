@@ -107,10 +107,10 @@ const RequestAmount = ({route}: Props) => {
 
     const isLightning = walletType === 'unified';
 
-    // TODO: remove and make sure only onchain generated in next screen
+    const shouldSkip = satsAmount.value.isZero();
+
     const hideContinueButton =
         (isLightning && !maxReceivableAmount.isZero) ||
-        satsAmount.value.isZero() ||
         (satsAmount.value.gte(maxReceivableAmount) &&
             !maxReceivableAmount.isZero() &&
             walletType === 'unified');
@@ -323,60 +323,56 @@ const RequestAmount = ({route}: Props) => {
                 return;
             }
 
-            const channelOpenFee = await openChannelFee({
-                amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
-            });
+            if (!shouldSkip) {
+                const channelOpenFee = await openChannelFee({
+                    amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
+                });
 
-            const info = await nodeInfo();
-            const beyondMaxLiquidity = satsAmount.value.gte(
-                info.inboundLiquidityMsats / 1_000,
-            );
-
-            const feeSats = (channelOpenFee.feeMsat as number) / 1_000;
-
-            // Warn user that amount will trigger a new channel open
-            // In cases were first tx or if larger than channel liquidity
-            if (beyondMaxLiquidity && feeSats > 0) {
-                actionAlert(
-                    capitalizeFirst(t('channel_opening')),
-                    e('new_channel_open_warn', {
-                        n: feeSats,
-                        fiat: `${appFiatCurrency.symbol} ${normalizeFiat(
-                            new BigNumber(feeSats),
-                            fiatRate.rate,
-                        )}`,
-                    }),
-                    t('ok'),
-                    capitalizeFirst(t('cancel')),
-                    () => {
-                        navigation.dispatch(
-                            CommonActions.navigate({
-                                name: 'Receive',
-                                params: {
-                                    sats: satsAmount.value.toString(),
-                                    fiat: fiatAmount.toString(),
-                                    amount: amount,
-                                    lnDescription: lnInvoiceDesc,
-                                },
-                            }),
-                        );
-                    },
+                const info = await nodeInfo();
+                const beyondMaxLiquidity = satsAmount.value.gte(
+                    info.inboundLiquidityMsats / 1_000,
                 );
+
+                const feeSats = (channelOpenFee.feeMsat as number) / 1_000;
+
+                // Warn user that amount will trigger a new channel open
+                // In cases were first tx or if larger than channel liquidity
+                if (beyondMaxLiquidity && feeSats > 0) {
+                    actionAlert(
+                        capitalizeFirst(t('channel_opening')),
+                        e('new_channel_open_warn', {
+                            n: feeSats,
+                            fiat: `${appFiatCurrency.symbol} ${normalizeFiat(
+                                new BigNumber(feeSats),
+                                fiatRate.rate,
+                            )}`,
+                        }),
+                        t('ok'),
+                        capitalizeFirst(t('cancel')),
+                        () => {
+                            navigation.dispatch(
+                                CommonActions.navigate({
+                                    name: 'Receive',
+                                    params: {
+                                        sats: satsAmount.value.toString(),
+                                        fiat: fiatAmount.toString(),
+                                        amount: amount,
+                                        lnDescription: lnInvoiceDesc,
+                                    },
+                                }),
+                            );
+                        },
+                    );
+                }
             } else {
                 routeToOnchainReceive();
+                return;
             }
         }
 
         routeToOnchainReceive();
         return;
     };
-
-    // If we are in LN we shouldn't attempt to show skip since we are forcing
-    // user to add an amount before generating an invoice
-    const skipText =
-        walletType === 'unified'
-            ? capitalizeFirst(t('continue'))
-            : capitalizeFirst(t('skip'));
 
     return (
         <SafeAreaView
@@ -555,8 +551,8 @@ const RequestAmount = ({route}: Props) => {
                                         color: ColorScheme.Text.Alt,
                                     },
                                 ]}>
-                                {satsAmount.value.isZero()
-                                    ? skipText
+                                {shouldSkip
+                                    ? capitalizeFirst(t('skip'))
                                     : capitalizeFirst(t('continue'))}
                             </Text>
                         </View>
