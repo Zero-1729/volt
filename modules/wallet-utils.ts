@@ -725,3 +725,53 @@ export const getXPub256 = (xpub: string): string => {
 
     return _singleSha256(decoded).toString('hex');
 };
+
+// Check if weak and return true if it is
+// Otherwise, return false + feedback
+export const checkPINStrength = (pin: string) => {
+    // Check if pin repeated
+    const repeated = new RegExp(/(.)\1{3,}/).test(pin);
+
+    // Check if pin is repeated
+    if (repeated) {
+        return {
+            isWeak: true,
+            feedback: 'repeated',
+        };
+    }
+
+    const commonPins = [
+        '0123',
+        '3210',
+        '1234',
+        '4321',
+        '6969',
+        '9876',
+        '8765',
+        '5432',
+        '2580',
+        '0852',
+        '1112',
+        '1212',
+        '1236',
+        '1999',
+        '1998',
+        '2000',
+        '2001',
+        '1313',
+    ];
+
+    // Check if pin is a common pin
+    if (commonPins.includes(pin)) {
+        return {
+            isWeak: true,
+            feedback: 'common',
+        };
+    }
+
+    // Assumed strong enough if not repeated or common
+    return {
+        isWeak: false,
+        feedback: '',
+    };
+};
