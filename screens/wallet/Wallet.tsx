@@ -141,6 +141,7 @@ const Wallet = ({route}: Props) => {
     const bottomSendRef = React.useRef<BottomSheetModal>(null);
     const [openSwap, setOpenSwap] = useState(-1);
     const [openSend, setOpenSend] = useState(-1);
+    const [swapOutRetryCount, setSwapRetryCount] = useState(0);
 
     const openSwapModal = () => {
         if (openSwap !== 1) {
@@ -472,10 +473,20 @@ const Wallet = ({route}: Props) => {
             })
             .catch((error: any) => {
                 console.log('[Breez swapIn] error: ', error.message);
+
+                if (
+                    error.message.includes('ConnectionReset') &&
+                    checkNetworkIsReachable(_netInfo) &&
+                    swapOutRetryCount <= 2
+                ) {
+                    getOnchainSwapInfo();
+                }
+
+                setSwapRetryCount(0);
                 setLoadingSwapInInfo(false);
                 setUpdatedOBalance(false);
             });
-    }, []);
+    }, [swapOutRetryCount]);
 
     // Check if wallet balance is empty
     const isWalletBroke = (balance: TBalance) => {
