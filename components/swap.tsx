@@ -41,7 +41,7 @@ type SwapProps = {
 
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
-    const snapPoints = useMemo(() => ['46'], []);
+    const snapPoints = useMemo(() => ['50'], []);
     const bottomOffset =
         NativeWindowMetrics.bottom - (Platform.OS === 'ios' ? 16 : 72);
 
