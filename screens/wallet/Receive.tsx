@@ -222,8 +222,11 @@ const Receive = ({route}: Props) => {
     const isAmountInvoice = useMemo(() => {
         // Show if is a LN wallet & online
         // or has BTC onchain amount set
-        return !state.bitcoinValue.isZero() || (isLNWallet && isNetOn);
-    }, [isLNWallet, state.bitcoinValue, isNetOn]);
+        return (
+            !state.bitcoinValue.isZero() ||
+            (isLNWallet && isNetOn && route.params.amount)
+        );
+    }, [state.bitcoinValue, isLNWallet, isNetOn, route.params.amount]);
 
     // Set bitcoin invoice URI
     const BTCInvoice = useMemo(
@@ -304,14 +307,6 @@ const Receive = ({route}: Props) => {
 
             setLoadingInvoice(false);
         } catch (error: any) {
-            Toast.show({
-                topOffset: 60,
-                type: 'Liberal',
-                text1: t('error'),
-                text2: error.message,
-                visibilityTime: 2000,
-            });
-
             navigation.dispatch(
                 CommonActions.navigate('WalletRoot', {
                     screen: 'WalletView',
@@ -337,11 +332,12 @@ const Receive = ({route}: Props) => {
         // Note: hide amount details
         if (
             walletData.type === 'unified' &&
-            checkNetworkIsReachable(_netInfo)
+            checkNetworkIsReachable(_netInfo) &&
+            route.params.amount
         ) {
             displayLNInvoice();
         }
-    }, [displayLNInvoice, walletData.type]);
+    }, [displayLNInvoice, route.params.amount, walletData.type]);
 
     useEffect(() => {
         processLNInvoice();
@@ -934,7 +930,7 @@ const Receive = ({route}: Props) => {
                     {displayExpiry}
                 </View>
 
-                {isLNWallet && (
+                {isLNWallet && route.params.amount && (
                     <View
                         style={[
                             styles.carouselContainer,
@@ -991,7 +987,7 @@ const Receive = ({route}: Props) => {
                     </View>
                 )}
 
-                {!isLNWallet && (
+                {(!isLNWallet || !route.params.amount) && (
                     <View
                         style={[
                             styles.carouselContainer,
