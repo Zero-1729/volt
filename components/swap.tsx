@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {View, useColorScheme} from 'react-native';
+import {Platform, View, useColorScheme} from 'react-native';
 
 import VText from './text';
 
@@ -35,12 +35,16 @@ type SwapProps = {
             max: number;
         };
     };
+    isOnline: boolean;
     loadingInfo: boolean;
 };
 
 const Swap = (props: SwapProps) => {
     const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['46'], []);
+    const bottomOffset =
+        NativeWindowMetrics.bottom - (Platform.OS === 'ios' ? 16 : 72);
+
     const onchainBroke =
         props.onchainBalance.isLessThan(props.swapInfo.swapIn.min) ||
         props.onchainBalance.isZero();
@@ -54,7 +58,7 @@ const Swap = (props: SwapProps) => {
     );
 
     const swapInfoUnavailable = Object.keys(props.swapInfo).length === 0;
-    const swapOutLow = props.swapInfo.swapOut.min === 0;
+    const swapOutLoading = swapInfoUnavailable || !props.swapInfo.swapOut.min;
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -71,7 +75,7 @@ const Swap = (props: SwapProps) => {
             backdrop={true}>
             <View
                 style={[
-                    tailwind('w-full h-full items-center relative'),
+                    tailwind('w-full h-full relative'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
@@ -79,9 +83,11 @@ const Swap = (props: SwapProps) => {
                 <View style={[tailwind('w-full px-2 h-full items-center')]}>
                     {/* Swap In */}
                     <PlainButton
-                        disabled={onchainBroke || swapInfoUnavailable}
+                        disabled={
+                            onchainBroke || swapOutLoading || !props.isOnline
+                        }
                         onPress={() => {
-                            if (!onchainBroke) {
+                            if (!onchainBroke && !swapOutLoading) {
                                 setSelected(SwapType.SwapIn);
                             }
                         }}
@@ -89,7 +95,8 @@ const Swap = (props: SwapProps) => {
                             tailwind(
                                 `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
                                     onchainBroke ||
-                                    swapInfoUnavailable ||
+                                    swapOutLoading ||
+                                    !props.isOnline ||
                                     props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
@@ -116,20 +123,23 @@ const Swap = (props: SwapProps) => {
                                 ]}>
                                 {t('swap_in')}
                             </VText>
-                            {selected === SwapType.SwapIn && !onchainBroke && (
-                                <CheckIcon
-                                    style={[
-                                        tailwind(
-                                            `${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : 'ml-2'
-                                            }`,
-                                        ),
-                                    ]}
-                                    fill={ColorScheme.Text.Default}
-                                />
-                            )}
+                            {selected === SwapType.SwapIn &&
+                                !swapOutLoading &&
+                                props.isOnline &&
+                                !onchainBroke && (
+                                    <CheckIcon
+                                        style={[
+                                            tailwind(
+                                                `${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                        ]}
+                                        fill={ColorScheme.Text.Default}
+                                    />
+                                )}
                         </View>
                         <VText
                             style={[
@@ -167,10 +177,10 @@ const Swap = (props: SwapProps) => {
                     {/* Swap Out */}
                     <PlainButton
                         disabled={
-                            lightningBroke || swapInfoUnavailable || swapOutLow
+                            lightningBroke || swapOutLoading || !props.isOnline
                         }
                         onPress={() => {
-                            if (!lightningBroke) {
+                            if (!lightningBroke || !swapOutLoading) {
                                 setSelected(SwapType.SwapOut);
                             }
                         }}
@@ -178,8 +188,8 @@ const Swap = (props: SwapProps) => {
                             tailwind(
                                 `items-center p-4 w-full border rounded-md ${
                                     lightningBroke ||
-                                    swapInfoUnavailable ||
-                                    swapOutLow ||
+                                    swapOutLoading ||
+                                    !props.isOnline ||
                                     props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
@@ -205,7 +215,9 @@ const Swap = (props: SwapProps) => {
                                 {t('swap_out')}
                             </VText>
                             {selected === SwapType.SwapOut &&
-                                !lightningBroke && (
+                                !lightningBroke &&
+                                !swapOutLoading &&
+                                props.isOnline && (
                                     <CheckIcon
                                         style={[
                                             tailwind(
@@ -255,16 +267,50 @@ const Swap = (props: SwapProps) => {
                         )}
                     </PlainButton>
 
+                    {(!props.isOnline || swapOutLoading) && (
+                        <View
+                            style={[
+                                tailwind(
+                                    `mt-4 items-center ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }`,
+                                ),
+                            ]}>
+                            <InfoIcon
+                                width={16}
+                                fill={ColorScheme.SVG.GrayFill}
+                            />
+                            <VText
+                                style={[
+                                    tailwind(
+                                        `text-sm ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`,
+                                    ),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {!props.isOnline
+                                    ? t('no_internet_cannot_swap')
+                                    : t('loading_swap_info')}
+                            </VText>
+                        </View>
+                    )}
+
                     <View
                         style={[
                             tailwind('w-full absolute items-center'),
-                            {bottom: NativeWindowMetrics.bottom - 16},
+                            {bottom: bottomOffset},
                         ]}>
                         <LongBottomButton
                             disabled={
                                 (onchainBroke && lightningBroke) ||
                                 props.loadingInfo ||
-                                swapInfoUnavailable
+                                swapOutLoading ||
+                                !props.isOnline
                             }
                             title={capitalizeFirst(t('continue'))}
                             onPress={() => {

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext} from 'react';
-import {Text, View, useColorScheme, StyleSheet} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -205,12 +205,12 @@ export const Balance = (props: BalanceProps) => {
                 /* Empty view to keep the card height consistent  */
                 <View
                     style={[
-                        styles.emptyCard,
                         tailwind(
                             'rounded-sm flex-row self-center rounded w-full h-12',
                         ),
                         {
-                            opacity: props.loading ? 0.15 : 0.3,
+                            opacity: props.loading ? 0.15 : 0.4,
+                            backgroundColor: props.hideColor,
                         },
                     ]}
                 />
@@ -442,9 +442,3 @@ export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    emptyCard: {
-        backgroundColor: 'darkgrey',
-    },
-});

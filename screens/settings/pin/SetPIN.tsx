@@ -20,10 +20,13 @@ import {PinNumpad} from '../../../components/input';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SettingsParamList} from '../../../Navigation';
 
+import {checkPINStrength} from '../../../modules/wallet-utils';
+
 type Props = NativeStackScreenProps<SettingsParamList, 'SetPIN'>;
 
 const SetPIN = ({route}: Props) => {
     const [tmpPIN, setTmpPIN] = useState<string>('');
+    const [feedbackMessage, setFeedbackMessage] = useState<string>('');
 
     const navigation = useNavigation();
     const tailwind = useTailwind();
@@ -54,8 +57,17 @@ const SetPIN = ({route}: Props) => {
 
     useEffect(() => {
         if (tmpPIN.length === 4) {
+            const strengthResp = checkPINStrength(tmpPIN.trim());
+
+            if (strengthResp.isWeak) {
+                setTmpPIN('');
+                setFeedbackMessage(strengthResp.feedback);
+                return;
+            }
+
             setTmpPIN('');
             moveToConfirm(tmpPIN);
+            setFeedbackMessage('');
         }
     }, [tmpPIN]);
 
@@ -82,7 +94,9 @@ const SetPIN = ({route}: Props) => {
                                 tailwind('text-base text-center mb-6'),
                                 {color: ColorScheme.Text.DescText},
                             ]}>
-                            {t('choose_4_digit_pin_desc')}
+                            {feedbackMessage
+                                ? t(`pin_${feedbackMessage}_message`)
+                                : t('choose_4_digit_pin_desc')}
                         </Text>
 
                         <View

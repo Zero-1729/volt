@@ -11,13 +11,13 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		69F159A1093FC5D517680473 /* libPods-volt-voltTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB2DD27D72C5F9B6BCB1FB2C /* libPods-volt-voltTests.a */; };
 		6C563C802875187B002067CA /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C563C7D2875187B002067CA /* Roboto.ttf */; };
 		6C563C812875187B002067CA /* Satoshi Symbol.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C563C7E2875187B002067CA /* Satoshi Symbol.ttf */; };
 		6C563C822875187B002067CA /* Roboto Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C563C7F2875187B002067CA /* Roboto Medium.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		B0B3DF861AAFA236D4CABBC9 /* libPods-volt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B9771D32EB80181BA612A45 /* libPods-volt.a */; };
-		F0CF3E8138B94521FBF88329 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 4693A47F1324D78D411643D6 /* PrivacyInfo.xcprivacy */; };
+		8CCAB6749D05D2A1113C0BA1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5500A8DD59E4E32A43387270 /* PrivacyInfo.xcprivacy */; };
+		D5D2F12CFF1E773215747DED /* libPods-volt-voltTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C816C4370DFDB2FB6F0EA3E2 /* libPods-volt-voltTests.a */; };
+		DC2768DE048291F5BED85C72 /* libPods-volt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F721EBDB3DAE0BD23E0A221B /* libPods-volt.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,19 +40,19 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = volt/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = volt/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = volt/main.m; sourceTree = "<group>"; };
-		4693A47F1324D78D411643D6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = volt/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		47C222279E5D22F915437A68 /* Pods-volt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.debug.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.debug.xcconfig"; sourceTree = "<group>"; };
-		5B9771D32EB80181BA612A45 /* libPods-volt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		415B01DD523D22E0B2CF4D69 /* Pods-volt-voltTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt-voltTests.release.xcconfig"; path = "Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests.release.xcconfig"; sourceTree = "<group>"; };
+		5500A8DD59E4E32A43387270 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = volt/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6C38A06E2BF5A22000734AFC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = volt/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6C563C7D2875187B002067CA /* Roboto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Roboto.ttf; path = ../assets/fonts/Roboto.ttf; sourceTree = "<group>"; };
 		6C563C7E2875187B002067CA /* Satoshi Symbol.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Satoshi Symbol.ttf"; path = "../assets/fonts/Satoshi Symbol.ttf"; sourceTree = "<group>"; };
 		6C563C7F2875187B002067CA /* Roboto Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto Medium.ttf"; path = "../assets/fonts/Roboto Medium.ttf"; sourceTree = "<group>"; };
-		710DE59BCE5759042D8D7137 /* Pods-volt-voltTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt-voltTests.release.xcconfig"; path = "Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = volt/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		AF44B9DA09CF3A591755865A /* Pods-volt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.release.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.release.xcconfig"; sourceTree = "<group>"; };
+		84F6AC3F46CF170E12151A19 /* Pods-volt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.debug.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.debug.xcconfig"; sourceTree = "<group>"; };
+		9958EBB043A240A913C112B3 /* Pods-volt-voltTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt-voltTests.debug.xcconfig"; path = "Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests.debug.xcconfig"; sourceTree = "<group>"; };
+		C27A85717ED33FD58D11A261 /* Pods-volt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.release.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.release.xcconfig"; sourceTree = "<group>"; };
+		C816C4370DFDB2FB6F0EA3E2 /* libPods-volt-voltTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt-voltTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FB2DD27D72C5F9B6BCB1FB2C /* libPods-volt-voltTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt-voltTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FFACD72D9E95B525633A95D3 /* Pods-volt-voltTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt-voltTests.debug.xcconfig"; path = "Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests.debug.xcconfig"; sourceTree = "<group>"; };
+		F721EBDB3DAE0BD23E0A221B /* libPods-volt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				69F159A1093FC5D517680473 /* libPods-volt-voltTests.a in Frameworks */,
+				D5D2F12CFF1E773215747DED /* libPods-volt-voltTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,7 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B0B3DF861AAFA236D4CABBC9 /* libPods-volt.a in Frameworks */,
+				DC2768DE048291F5BED85C72 /* libPods-volt.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,7 +102,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				6C38A06E2BF5A22000734AFC /* PrivacyInfo.xcprivacy */,
-				4693A47F1324D78D411643D6 /* PrivacyInfo.xcprivacy */,
+				5500A8DD59E4E32A43387270 /* PrivacyInfo.xcprivacy */,
 			);
 			name = volt;
 			sourceTree = "<group>";
@@ -111,8 +111,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5B9771D32EB80181BA612A45 /* libPods-volt.a */,
-				FB2DD27D72C5F9B6BCB1FB2C /* libPods-volt-voltTests.a */,
+				F721EBDB3DAE0BD23E0A221B /* libPods-volt.a */,
+				C816C4370DFDB2FB6F0EA3E2 /* libPods-volt-voltTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -154,10 +154,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				47C222279E5D22F915437A68 /* Pods-volt.debug.xcconfig */,
-				AF44B9DA09CF3A591755865A /* Pods-volt.release.xcconfig */,
-				FFACD72D9E95B525633A95D3 /* Pods-volt-voltTests.debug.xcconfig */,
-				710DE59BCE5759042D8D7137 /* Pods-volt-voltTests.release.xcconfig */,
+				84F6AC3F46CF170E12151A19 /* Pods-volt.debug.xcconfig */,
+				C27A85717ED33FD58D11A261 /* Pods-volt.release.xcconfig */,
+				9958EBB043A240A913C112B3 /* Pods-volt-voltTests.debug.xcconfig */,
+				415B01DD523D22E0B2CF4D69 /* Pods-volt-voltTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -169,12 +169,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "voltTests" */;
 			buildPhases = (
-				7E65A3A0EDF02DE2E6A8A333 /* [CP] Check Pods Manifest.lock */,
+				31AA8BDEDB52921D2C66F234 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				B8D812E535F0368B2734DDE9 /* [CP] Embed Pods Frameworks */,
-				2B3A27C286C2DE7879365D5F /* [CP] Copy Pods Resources */,
+				8848928422477F677F3DAB60 /* [CP] Embed Pods Frameworks */,
+				44C1F53D8623259ED23C9742 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -190,13 +190,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "volt" */;
 			buildPhases = (
-				771DE966F1FD2B0EDB333B9A /* [CP] Check Pods Manifest.lock */,
+				18B8376D8CC1864444E9BD05 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				CD76F7C772FD1D6C98FC50D1 /* [CP] Embed Pods Frameworks */,
-				0647BFDAC6F24A00FA8BA516 /* [CP] Copy Pods Resources */,
+				975AB6BE415CACFFF1D23652 /* [CP] Embed Pods Frameworks */,
+				B0FF0EA204E657E835A6E285 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -260,7 +260,7 @@
 				6C563C822875187B002067CA /* Roboto Medium.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F0CF3E8138B94521FBF88329 /* PrivacyInfo.xcprivacy in Resources */,
+				8CCAB6749D05D2A1113C0BA1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,41 +281,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		0647BFDAC6F24A00FA8BA516 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2B3A27C286C2DE7879365D5F /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		771DE966F1FD2B0EDB333B9A /* [CP] Check Pods Manifest.lock */ = {
+		18B8376D8CC1864444E9BD05 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -337,7 +303,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7E65A3A0EDF02DE2E6A8A333 /* [CP] Check Pods Manifest.lock */ = {
+		31AA8BDEDB52921D2C66F234 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -359,7 +325,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B8D812E535F0368B2734DDE9 /* [CP] Embed Pods Frameworks */ = {
+		44C1F53D8623259ED23C9742 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8848928422477F677F3DAB60 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -376,7 +359,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CD76F7C772FD1D6C98FC50D1 /* [CP] Embed Pods Frameworks */ = {
+		975AB6BE415CACFFF1D23652 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -391,6 +374,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B0FF0EA204E657E835A6E285 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -426,7 +426,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FFACD72D9E95B525633A95D3 /* Pods-volt-voltTests.debug.xcconfig */;
+			baseConfigurationReference = 9958EBB043A240A913C112B3 /* Pods-volt-voltTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = D843NQ66DN;
@@ -454,7 +454,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 710DE59BCE5759042D8D7137 /* Pods-volt-voltTests.release.xcconfig */;
+			baseConfigurationReference = 415B01DD523D22E0B2CF4D69 /* Pods-volt-voltTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -479,7 +479,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 47C222279E5D22F915437A68 /* Pods-volt.debug.xcconfig */;
+			baseConfigurationReference = 84F6AC3F46CF170E12151A19 /* Pods-volt.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -509,7 +509,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AF44B9DA09CF3A591755865A /* Pods-volt.release.xcconfig */;
+			baseConfigurationReference = C27A85717ED33FD58D11A261 /* Pods-volt.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

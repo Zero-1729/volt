@@ -99,11 +99,11 @@ const SwapOut = ({route}: Props) => {
 
     const CardColor = ColorScheme.WalletColors[wallet.type][wallet.network];
 
-    const handleCloseButton = () => {
+    const handleCloseButton = useCallback(() => {
         navigation.dispatch(StackActions.popToTop());
-    };
+    }, [navigation]);
 
-    const getFeeInfo = async () => {
+    const getFeeInfo = useCallback(async () => {
         const satPerVbyte = mempoolInfo.fastestFee;
         setFees(true);
 
@@ -121,13 +121,13 @@ const SwapOut = ({route}: Props) => {
                 setErrMessage(e.message);
                 setFailedTx(false);
             });
-    };
+    }, [mempoolInfo.fastestFee, route.params.satsAmount]);
 
-    const grabAndSetAddress = async () => {
+    const grabAndSetAddress = useCallback(async () => {
         const _addressObj = await wallet.generateNewAddress();
         setBtcAddress(_addressObj.address);
         updateWalletAddress(_addressObj.index, _addressObj);
-    };
+    }, [updateWalletAddress, wallet]);
 
     const sendTx = useCallback(async () => {
         carouselRef.current?.next();

@@ -1,12 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useContext, useEffect} from 'react';
+import React, {
+    useState,
+    useContext,
+    useEffect,
+    useCallback,
+    useMemo,
+} from 'react';
 import {
     Text,
     View,
     useColorScheme,
     Platform,
-    Dimensions,
     StyleSheet,
     StatusBar,
 } from 'react-native';
@@ -19,11 +23,13 @@ import {InitStackParamList} from '../../Navigation';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
-import Carousel from 'react-native-reanimated-carousel';
 
 import {AppStorageContext} from '../../class/storageContext';
 
 import {useTranslation} from 'react-i18next';
+
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import decodeURI from 'bip21';
 import {
@@ -46,9 +52,7 @@ import {LongBottomButton, PlainButton} from '../../components/button';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
 import {WalletCard} from '../../components/shared';
-import {BaseWallet} from '../../class/wallet/base';
 import {TInvoiceData} from '../../types/wallet';
-import {useNetInfo} from '@react-native-community/netinfo';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
@@ -72,18 +76,13 @@ const PayInvoice = ({route}: Props) => {
     );
     const [expiryEpoch, setExpiryEpoch] = useState<number>();
     const [isExpired, setIsExpired] = useState(false);
+    const isNetOn = useNetInfo();
 
-    const {wallets, hideTotalBalance, getWalletData, walletsIndex} =
+    const {hideTotalBalance, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
-
-    const networkState = useNetInfo();
-
-    const [walletId, updateWalletId] = useState(wallets[walletsIndex].id);
+    const wallet = getWalletData(currentWalletID);
 
     const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
-
-    const AppScreenWidth = Dimensions.get('window').width;
-
     const cardHeight = 220;
 
     const sats = decodedInvoice.options?.amount
@@ -101,12 +100,24 @@ const PayInvoice = ({route}: Props) => {
         ? decodedInvoice.options?.message
         : bolt11?.description;
 
-    const decodeInvoice = (invoice: string) => {
+    const displayExpiry = useMemo(() => {
+        if (!(expiryEpoch && isLightning)) {
+            return <></>;
+        }
+
+        return (
+            <View style={[tailwind('absolute right-0 justify-center')]}>
+                <ExpiryTimer expiryDate={expiryEpoch} />
+            </View>
+        );
+    }, [expiryEpoch, isLightning, tailwind]);
+
+    const decodeInvoice = useCallback((invoice: string) => {
         // Only handling Bolt11 Lightning invoices
         return decodeURI.decode(invoice) as TInvoiceData;
-    };
+    }, []);
 
-    const decodeBolt11 = async (invoice: string) => {
+    const decodeBolt11 = useCallback(async (invoice: string) => {
         const decodedBolt11 = await parseInvoice(invoice);
         setBolt11(decodedBolt11);
         setIsLightning(true);
@@ -124,91 +135,95 @@ const PayInvoice = ({route}: Props) => {
                 decodedBolt11.expiry as number,
             ),
         );
-    };
+    }, []);
 
-    const handleInvoiceType = async (invoice: string) => {
-        const invoiceType = await decodeInvoiceType(invoice);
+    const handleInvoiceType = useCallback(
+        async (invoice: string) => {
+            const invoiceType = await decodeInvoiceType(invoice);
 
-        if (
-            invoiceType.type === 'lightning' ||
-            invoiceType.type === 'bitcoin' ||
-            invoiceType.type === 'unified'
-        ) {
-            let invoiceBolt11!: string;
-            let btcInvoice!: string;
+            if (
+                invoiceType.type === 'lightning' ||
+                invoiceType.type === 'bitcoin' ||
+                invoiceType.type === 'unified'
+            ) {
+                let invoiceBolt11!: string;
+                let btcInvoice!: string;
 
-            // Handle unified BIP21 QR
-            if (invoiceType.type === 'unified') {
-                const embededBolt11 = invoiceType.invoice?.split('&lightning=');
+                // Handle unified BIP21 QR
+                if (invoiceType.type === 'unified') {
+                    const embededBolt11 =
+                        invoiceType.invoice?.split('&lightning=');
 
-                if (embededBolt11.length > 1) {
-                    invoiceBolt11 =
-                        invoiceType.invoice?.split('&lightning=').pop() ?? '';
-                } else {
-                    btcInvoice =
-                        invoiceType.invoice
-                            ?.split('&lightning=')[0]
-                            .toLowerCase() ?? '';
+                    if (embededBolt11.length > 1) {
+                        invoiceBolt11 =
+                            invoiceType.invoice?.split('&lightning=').pop() ??
+                            '';
+                    } else {
+                        btcInvoice =
+                            invoiceType.invoice
+                                ?.split('&lightning=')[0]
+                                .toLowerCase() ?? '';
+                    }
                 }
-            }
 
-            // Handle Bolt11 Invoice
-            if (
-                (invoiceType.type === 'lightning' &&
-                    invoiceType.spec === 'bolt11') ||
-                invoiceBolt11
-            ) {
-                decodeBolt11(
-                    invoiceBolt11 ? invoiceBolt11 : route.params?.invoice,
+                // Handle Bolt11 Invoice
+                if (
+                    (invoiceType.type === 'lightning' &&
+                        invoiceType.spec === 'bolt11') ||
+                    invoiceBolt11
+                ) {
+                    decodeBolt11(
+                        invoiceBolt11 ? invoiceBolt11 : route.params?.invoice,
+                    );
+                    return;
+                }
+
+                // If LN report we aren't supporting it yet
+                if (
+                    !(invoiceType?.spec === 'bolt11') &&
+                    invoiceType.type === 'lightning'
+                ) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: e('unsupported_invoice_type'),
+                        visibilityTime: 1750,
+                    });
+
+                    navigation.dispatch(CommonActions.navigate('HomeScreen'));
+
+                    return;
+                }
+
+                // handle bitcoin BIP21 invoice
+                setDecodedInvoice(
+                    decodeInvoice(
+                        btcInvoice ? btcInvoice : route.params?.invoice,
+                    ),
                 );
-                return;
-            }
-
-            // If LN report we aren't supporting it yet
-            if (
-                !(invoiceType?.spec === 'bolt11') &&
-                invoiceType.type === 'lightning'
-            ) {
+            } else {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
-                    text2: e('unsupported_invoice_type'),
+                    text2: e('invalid_invoice_error'),
                     visibilityTime: 1750,
                 });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
-
-                return;
             }
+        },
+        [decodeBolt11, decodeInvoice, e, navigation, route.params?.invoice, t],
+    );
 
-            // handle bitcoin BIP21 invoice
-            setDecodedInvoice(
-                decodeInvoice(btcInvoice ? btcInvoice : route.params?.invoice),
-            );
-        } else {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: e('invalid_invoice_error'),
-                visibilityTime: 1750,
-            });
-
-            navigation.dispatch(CommonActions.navigate('HomeScreen'));
-        }
-    };
-
-    useEffect(() => {
-        handleInvoiceType(route.params?.invoice);
-    }, []);
-
-    const handleRoute = () => {
-        const wallet = getMiniWallet(getWalletData(walletId));
+    const handleRoute = useCallback(async () => {
+        const _wallet = getMiniWallet(wallet);
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
 
         // Check network connection first
-        if (!networkState?.isInternetReachable) {
+        const _netInfo = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netInfo)) {
             Toast.show({
                 topOffset: 54,
                 type: 'Liberal',
@@ -225,7 +240,7 @@ const PayInvoice = ({route}: Props) => {
                 CommonActions.navigate('WalletRoot', {
                     screen: 'Send',
                     params: {
-                        wallet: wallet,
+                        wallet: _wallet,
                         feeRate: 0,
                         dummyPsbtVsize: 0,
                         invoiceData: null,
@@ -239,7 +254,7 @@ const PayInvoice = ({route}: Props) => {
 
         // Check wallet and invoice
         if (
-            checkInvoiceAndWallet(wallet, decodedInvoice, (msg: string) => {
+            checkInvoiceAndWallet(_wallet, decodedInvoice, (msg: string) => {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
@@ -274,7 +289,7 @@ const PayInvoice = ({route}: Props) => {
                         screen: 'FeeSelection',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: wallet,
+                            wallet: _wallet,
                         },
                     }),
                 );
@@ -284,43 +299,23 @@ const PayInvoice = ({route}: Props) => {
                         screen: 'SendAmount',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: wallet,
+                            wallet: _wallet,
                             isLightning: isLightning,
                         },
                     }),
                 );
             }
         }
-    };
+    }, [bolt11, decodedInvoice, e, isLightning, navigation, t, wallet]);
 
-    const renderCard = ({item}: {item: BaseWallet}) => {
-        return (
-            <View style={[tailwind('w-full absolute')]}>
-                <WalletCard
-                    loading={false}
-                    maxedCard={
-                        item.balance.lightning
-                            .plus(item.balance.onchain)
-                            .isZero() && item.transactions.length > 0
-                    }
-                    balance={item.balance.lightning.plus(item.balance.onchain)}
-                    network={item.network}
-                    isWatchOnly={item.isWatchOnly}
-                    label={item.name}
-                    walletType={item.type}
-                    hideBalance={hideTotalBalance}
-                    unit={item.units}
-                    navCallback={() => {}}
-                />
-            </View>
-        );
-    };
+    useEffect(() => {
+        handleInvoiceType(route.params.invoice);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const invoiceOptionsEmpty = decodedInvoice.options
         ? Object.keys(decodedInvoice.options).length === 0
         : true;
-
-    // TODO: find a way to close any modals open, e.g. Scan screen open
 
     return (
         <SafeAreaView
@@ -347,14 +342,7 @@ const PayInvoice = ({route}: Props) => {
                         ]}>
                         {t('pay_invoice_title')}
                     </Text>
-                    {isLightning && expiryEpoch && (
-                        <View
-                            style={[
-                                tailwind('absolute right-0 justify-center'),
-                            ]}>
-                            <ExpiryTimer expiryDate={expiryEpoch} />
-                        </View>
-                    )}
+                    {displayExpiry}
                 </View>
 
                 {/*Display the invoice data */}
@@ -363,7 +351,7 @@ const PayInvoice = ({route}: Props) => {
                         tailwind(
                             `${
                                 invoiceOptionsEmpty ? 'w-5/6 p-2' : 'w-5/6 p-6'
-                            } items-center flex justify-between rounded mt-4`,
+                            } items-center flex justify-between rounded mt-6`,
                         ),
                     ]}>
                     {decodedInvoice.options?.label && (
@@ -387,7 +375,7 @@ const PayInvoice = ({route}: Props) => {
                             <FiatBalance
                                 balance={amount}
                                 loading={false}
-                                balanceFontSize={'text-4xl'}
+                                balanceFontSize={'text-3xl'}
                                 fontColor={ColorScheme.Text.Default}
                                 ignoreHideBalance={true}
                             />
@@ -475,28 +463,34 @@ const PayInvoice = ({route}: Props) => {
                     )}
                 </View>
 
-                <View style={[tailwind('w-5/6 justify-center mt-2')]}>
-                    {/** Carousel for 'BaseCard */}
+                <View
+                    style={[
+                        tailwind('w-full items-center justify-center mt-4'),
+                    ]}>
                     <View
-                        style={[tailwind('self-center'), {height: cardHeight}]}>
-                        <Carousel
-                            enabled={wallets.length > 1}
-                            vertical={true}
-                            autoPlay={false}
-                            width={AppScreenWidth * 0.9}
-                            height={cardHeight}
-                            data={[wallets[walletsIndex]]}
-                            renderItem={renderCard}
-                            pagingEnabled={true}
-                            mode={'vertical-stack'}
-                            modeConfig={{
-                                snapDirection: 'left',
-                                stackInterval: 8,
-                            }}
-                            onScrollEnd={index => {
-                                updateWalletId(wallets[index].id);
-                            }}
-                            defaultIndex={0}
+                        style={[
+                            {
+                                height: cardHeight,
+                                width: NativeWindowMetrics.width * 0.94,
+                            },
+                        ]}>
+                        <WalletCard
+                            loading={false}
+                            maxedCard={
+                                wallet.balance.lightning
+                                    .plus(wallet.balance.onchain)
+                                    .isZero() && wallet.transactions.length > 0
+                            }
+                            balance={wallet.balance.lightning.plus(
+                                wallet.balance.onchain,
+                            )}
+                            network={wallet.network}
+                            isWatchOnly={wallet.isWatchOnly}
+                            label={wallet.name}
+                            walletType={wallet.type}
+                            hideBalance={hideTotalBalance}
+                            unit={wallet.units}
+                            navCallback={() => {}}
                         />
                     </View>
                 </View>
@@ -525,7 +519,11 @@ const PayInvoice = ({route}: Props) => {
                 </View>
 
                 <LongBottomButton
-                    disabled={isExpired}
+                    disabled={
+                        isExpired ||
+                        !isNetOn ||
+                        (!bolt11 && Object.keys(decodedInvoice).length === 0)
+                    }
                     title={'Pay Invoice'}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}

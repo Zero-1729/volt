@@ -64,13 +64,6 @@ export type TBalance = {
     lightning: BigNumber;
 };
 
-// Wallet balance fiat rate
-export type TFiatRate = {
-    rate: BigNumber;
-    lastUpdated: Date;
-    source: string;
-};
-
 // UTXO Type
 export type TUtxo = LocalUtxo & {
     txid: string; // Transaction ID
@@ -135,6 +128,7 @@ export type TDescriptor = string;
 export type TBaseWalletArgs = {
     name: string;
     type: string;
+    restored: boolean;
     derivationPath?: string;
     mnemonic?: string;
     xprv?: string;
@@ -195,6 +189,7 @@ export type TMempoolInfo = {
     minimumFee: number;
     hourFee: number;
     halfHourFee: number;
+    connected: boolean;
 };
 
 type TSwapInfo = {
@@ -204,4 +199,17 @@ type TSwapInfo = {
     lockHeight?: number;
     channelOpeningFees?: OpeningFeeParams;
     maxSwapperPayable?: number;
+};
+
+// Wallet fiat rate
+export type TRateObject = {
+    rate: BigNumber;
+    dailyChange: BigNumber;
+    lastUpdated: number; // UNIX Timestamp
+};
+
+// Boltz Exchange ReverseSwap Type
+export type TBoltzSwapInfo = {
+    maxLimit: number;
+    minLimit: number;
 };

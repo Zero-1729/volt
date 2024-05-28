@@ -17,7 +17,7 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -57,9 +57,6 @@ const AddressOwnership = ({route}: Props) => {
     const navigation = useNavigation();
 
     const {electrumServerURL} = useContext(AppStorageContext);
-
-    const networkState = useNetInfo();
-
     const addressInputRef = useRef<TextInput>(null);
 
     const handleButtonCheck = () => {
@@ -73,7 +70,9 @@ const AddressOwnership = ({route}: Props) => {
     };
 
     const checkAddressOwnership = async () => {
-        if (!checkNetworkIsReachable(networkState)) {
+        const _netInfo = await netInfo.fetch();
+
+        if (!checkNetworkIsReachable(_netInfo)) {
             errorAlert(
                 capitalizeFirst(t('network')),
                 e('no_internet_message'),

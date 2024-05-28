@@ -37,7 +37,7 @@ import {
     BreezEventVariant,
     ConnectRequest,
 } from '@breeztech/react-native-breez-sdk';
-import {getXPub256} from './modules/wallet-utils';
+import {checkNetworkIsReachable, getXPub256} from './modules/wallet-utils';
 
 import Color from './constants/Color';
 
@@ -51,6 +51,7 @@ import {actionAlert} from './components/alert';
 
 import Home from './screens/Home';
 import PayInvoice from './screens/wallet/PayInvoice';
+import TransactionList from './screens/wallet/TransactionsList';
 
 // Biometrics Screen
 import LockScreen from './components/lock';
@@ -71,6 +72,7 @@ import TransactionExported from './screens/wallet/TransactionExported';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 import SendLN from './screens/wallet/SendLN';
+import BoltNFC from './screens/wallet/BoltNFC';
 import Xpub from './screens/wallet/Xpub';
 
 // Swap screens
@@ -82,8 +84,6 @@ import SwapOut from './screens/wallet/SwapOut';
 import TransactionDetails from './screens/wallet/TransactionDetails';
 import TransactionStatus from './screens/wallet/TransactionStatus';
 import LNTransactionStatus from './screens/wallet/LNTransactionStatus';
-
-import Apps from './screens/Apps';
 
 // QR Code Scan screen
 import Scan from './screens/Scan';
@@ -129,18 +129,15 @@ import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
 import {LnInvoice} from '@breeztech/react-native-breez-sdk';
 
+import netInfo from '@react-native-community/netinfo';
+
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
-    'Scan',
-    'FeeSelection',
     'WalletBackup',
     'AddressOwnership',
     'TransactionDetails',
     'TransactionStatus',
     'TransactionExported',
-    'SendAmount',
-    'Receive',
-    'RequestAmount',
     'WalletXpub',
     // 'addWalletRoot', Screen not necessary as before wallet created
     'License',
@@ -167,12 +164,13 @@ export type InitStackParamList = {
     WalletRoot: undefined;
     SettingsRoot: undefined;
     ScanRoot: undefined;
-    Apps: undefined;
+    TransactionList: undefined;
     LNTransactionStatus: {
         status: boolean;
         details: TBreezPaymentDetails;
         detailsType: EBreezDetails;
     };
+    Mnemonic: undefined;
 };
 
 // Settings Param List for screens
@@ -232,9 +230,6 @@ export type AddWalletParamList = {
         onboarding: boolean;
     };
     CreateActions: undefined;
-    Mnemonic: {
-        onboarding: boolean;
-    };
 };
 
 // Root Param List for screens
@@ -280,7 +275,9 @@ export type WalletParamList = {
     AddressOwnership: {
         wallet: TMiniWallet;
     };
-    RequestAmount: undefined;
+    RequestAmount: {
+        boltNFCMode?: boolean; // from BoltNFC Quick Action
+    };
     SendAmount: {
         invoiceData: any;
         wallet: TMiniWallet;
@@ -305,6 +302,12 @@ export type WalletParamList = {
         unsignedPsbt: string;
         wallet: TMiniWallet;
         network: string;
+    };
+    BoltNFC: {
+        amountMsat: number;
+        description: string;
+        fromQuickActions: boolean;
+        satsUnit: boolean; // Whether amount was in sats or fiat
     };
     WalletXpub: undefined;
 };
@@ -386,6 +389,12 @@ const WalletRoot = () => {
             <WalletStack.Screen name="SendLN" component={SendLN} />
             <WalletStack.Screen name="SendAmount" component={SendAmount} />
             <WalletStack.Screen name="FeeSelection" component={FeeSelection} />
+            <WalletStack.Screen name="Receive" component={Receive} />
+            <WalletStack.Screen
+                name="RequestAmount"
+                component={RequestAmount}
+            />
+            <WalletStack.Screen name="BoltNFC" component={BoltNFC} />
 
             <WalletStack.Group screenOptions={{presentation: 'modal'}}>
                 <WalletStack.Screen name="WalletBackup" component={Backup} />
@@ -405,11 +414,6 @@ const WalletRoot = () => {
                     name="TransactionExported"
                     component={TransactionExported}
                 />
-                <WalletStack.Screen name="Receive" component={Receive} />
-                <WalletStack.Screen
-                    name="RequestAmount"
-                    component={RequestAmount}
-                />
                 <WalletStack.Screen name="WalletXpub" component={Xpub} />
                 <WalletStack.Screen name="SwapAmount" component={SwapAmount} />
                 <WalletStack.Screen name="SwapIn" component={SwapIn} />
@@ -424,7 +428,6 @@ export const AddWalletRoot = () => {
     return (
         <AddWalletStack.Navigator screenOptions={{headerShown: false}}>
             <AddWalletStack.Screen name="Add" component={Add} />
-            <AddWalletStack.Screen name="Mnemonic" component={Mnemonic} />
             <AddWalletStack.Screen
                 name="RestoreActions"
                 component={RestoreActions}
@@ -524,10 +527,13 @@ const RootNavigator = (): ReactElement => {
             clipboardMessage = t('read_clipboard_bitcoin_text');
         }
 
+        // Only check if clippy content exists, supported invoice type, & not in BoltNFC screen (scan trigger)
+        const currentRoute = navigationRef.current?.getCurrentRoute();
         // If clipboard has contents, display dialog
         if (
             clipboardResult.hasContents &&
-            clipboardResult.invoiceType !== 'unsupported'
+            clipboardResult.invoiceType !== 'unsupported' &&
+            currentRoute?.name !== 'BoltNFC'
         ) {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
@@ -578,8 +584,10 @@ const RootNavigator = (): ReactElement => {
     const checkDeepLinkAndClipboard = async (): Promise<void> => {
         // Check deep link
         const url = await Linking.getInitialURL();
+        const currentRoute = navigationRef.current?.getCurrentRoute();
 
-        if (url) {
+        // only check if url exists & not in BoltNFC screen (scan trigger)
+        if (url && currentRoute?.name !== 'BoltNFC') {
             rootNavigation.navigate('PayInvoice', {invoice: url});
             return;
         }
@@ -600,8 +608,19 @@ const RootNavigator = (): ReactElement => {
 
     // Fetch and set Swap Info here
     const initMempoolSock = async () => {
+        // Check network
+        const _netState = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netState)) {
+            return;
+        }
+
+        if (mempoolInfo.connected) {
+            console.log('[Mempool] WebSocket already connected');
+            return;
+        }
+
         mempoolRef.onopen = () => {
-            console.log('[Mempool] Connected');
+            console.log('[Mempool] WebSocket connected');
 
             mempoolRef.send(
                 JSON.stringify({
@@ -611,9 +630,9 @@ const RootNavigator = (): ReactElement => {
             );
         };
 
-        mempoolRef.onmessage = (e: any) => {
-            const _mempoolInfo = JSON.parse(e.data.toString()).mempoolInfo;
-            const _fees = JSON.parse(e.data.toString()).fees;
+        mempoolRef.onmessage = (error: any) => {
+            const _mempoolInfo = JSON.parse(error.data.toString()).mempoolInfo;
+            const _fees = JSON.parse(error.data.toString()).fees;
 
             const mempoolUsage = _mempoolInfo?.usage;
             const mempoolMax = _mempoolInfo?.maxmempool;
@@ -637,18 +656,43 @@ const RootNavigator = (): ReactElement => {
                 halfHourFee: _fees?.halfHourFee
                     ? _fees?.halfHourFee
                     : mempoolInfo.halfHourFee,
+                connected: true,
             });
         };
 
-        mempoolRef.onerror = (e: any) => {
-            console.log('[Mempool] (error)', e.error);
+        mempoolRef.onerror = (error: any) => {
+            console.log('[Mempool] (error)', error.message);
+
+            if (error.message.includes('not connected')) {
+                setMempoolInfo({
+                    mempoolCongested: mempoolInfo.mempoolCongested,
+                    mempoolHighFeeEnv: mempoolInfo.mempoolHighFeeEnv,
+                    economyFee: mempoolInfo.economyFee,
+                    fastestFee: mempoolInfo.fastestFee,
+                    minimumFee: mempoolInfo.minimumFee,
+                    hourFee: mempoolInfo.hourFee,
+                    halfHourFee: mempoolInfo.halfHourFee,
+                    connected: true,
+                });
+            }
         };
     };
 
     // Breez startup
     const initNode = async () => {
+        // Init LN connection
         // No point putting in any effort if mnemonic missing
-        if (wallet?.mnemonic.length === 0) {
+        if (
+            wallet?.mnemonic.length === 0 &&
+            isWalletInitialized &&
+            wallet.type === 'unified'
+        ) {
+            return;
+        }
+
+        // Check network
+        const _netState = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netState)) {
             return;
         }
 
@@ -657,17 +701,8 @@ const RootNavigator = (): ReactElement => {
         // Get node info
         try {
             const info = await nodeInfo();
-
             if (info?.id) {
-                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Breez SDK'),
-                        text2: t('Node already initialized'),
-                        visibilityTime: 1750,
-                    });
-                }
+                console.log('[Breez SDK] Services already connected');
                 return;
             }
         } catch (error: any) {
@@ -718,8 +753,7 @@ const RootNavigator = (): ReactElement => {
             }
 
             if (event.type === BreezEventVariant.BACKUP_FAILED) {
-                console.log('[Breez SDK] Backup failed');
-                console.log('[Breez SDK] Event details: ', event.details);
+                console.log('[Breez SDK] Backup Failed: ', event.details);
 
                 Toast.show({
                     topOffset: 54,
@@ -731,24 +765,24 @@ const RootNavigator = (): ReactElement => {
             }
 
             if (event.type === BreezEventVariant.INVOICE_PAID) {
-                console.log('[Breez SDK] Invoice paid');
-                console.log('[Breez SDK] Payment details: ', event.details);
+                console.log(
+                    '[Breez SDK] Invoice Paid (Received Payment): ',
+                    event.details,
+                );
 
                 // Handle navigation to LNTransactionStatus in Wallet Receive screen
                 setBreezEvent(event);
             }
 
             if (event.type === BreezEventVariant.PAYMENT_FAILED) {
-                console.log('[Breez SDK] Payment failed');
-                console.log('[Breez SDK] Event details: ', event.details);
+                console.log('[Breez SDK] Payment Failed: ', event.details);
 
                 // Handle navigation to LNTransactionStatus in Wallet Receive & Send screen
                 setBreezEvent(event);
             }
 
             if (event.type === BreezEventVariant.PAYMENT_SUCCEED) {
-                console.log('[Breez SDK] Payment sent');
-                console.log('[Breez SDK] Event details: ', event.details);
+                console.log('[Breez SDK] Payment Sent: ', event.details);
 
                 // Handle navigation to LNTransactionStatus in Wallet Send screen
                 setBreezEvent(event);
@@ -784,14 +818,7 @@ const RootNavigator = (): ReactElement => {
         try {
             // Connect to the Breez SDK make it ready for use
             BreezSub.current = await connect(connectionRequest, onBreezEvent);
-
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('Breez SDK'),
-                text2: t('breez_connected'),
-                visibilityTime: 1750,
-            });
+            console.log('[Breez SDK] Connected to services');
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
@@ -821,7 +848,6 @@ const RootNavigator = (): ReactElement => {
         if (renderCount <= 2 && !onboardingState.current) {
             // Call on trigger for Lock comp
             setTriggerClipboardCheck(true);
-            initMempoolSock();
         }
 
         const appStateSub = AppState.addEventListener(
@@ -849,16 +875,31 @@ const RootNavigator = (): ReactElement => {
             },
         );
 
-        // Init LN connection
-        if (isWalletInitialized && wallet.type === 'unified') {
-            initNode();
-        }
+        // Init LN services
+        // Call mempool
+        initNode();
+        initMempoolSock();
+
+        // Net event listener
+        // Subscribe
+        const NetInfoSub = netInfo.addEventListener(state => {
+            // fetch and set mempool info
+            // and Breez SDK connection
+            if (checkNetworkIsReachable(state)) {
+                console.log(
+                    '[NetInfo] Attempt to (Re)connect to Breez & Mempool',
+                );
+                initNode();
+                initMempoolSock();
+            }
+        });
 
         return () => {
             // Kill subscription
             BreezSub?.current?.remove();
             appStateSub?.remove();
             mempoolRef.close();
+            NetInfoSub();
         };
     }, []);
 
@@ -871,6 +912,7 @@ const RootNavigator = (): ReactElement => {
                 screenOptions={{headerShown: false}}
                 initialRouteName={'HomeScreen'}>
                 <InitScreenStack.Screen name="HomeScreen" component={Home} />
+                <InitScreenStack.Screen name="ScanRoot" component={ScanRoot} />
                 <InitScreenStack.Screen
                     name="LNTransactionStatus"
                     component={LNTransactionStatus}
@@ -894,11 +936,14 @@ const RootNavigator = (): ReactElement => {
                 />
                 <InitScreenStack.Group screenOptions={{presentation: 'modal'}}>
                     <InitScreenStack.Screen
-                        name="ScanRoot"
-                        component={ScanRoot}
+                        name="Mnemonic"
+                        component={Mnemonic}
+                    />
+                    <InitScreenStack.Screen
+                        name="TransactionList"
+                        component={TransactionList}
                     />
                 </InitScreenStack.Group>
-                <InitScreenStack.Screen name="Apps" component={Apps} />
             </InitScreenStack.Navigator>
 
             {!isAuth && <LockScreen onSuccess={handleAuthSuccess} />}

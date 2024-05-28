@@ -472,13 +472,9 @@ export const doesWalletExist = (
 };
 
 export const checkNetworkIsReachable = (networkState: NetInfoState) => {
-    if (networkState.isInternetReachable === null) {
-        return networkState.isConnected === null
-            ? false
-            : networkState.isConnected;
-    } else {
-        return networkState.isInternetReachable;
-    }
+    return networkState.isInternetReachable !== null
+        ? networkState.isInternetReachable
+        : false;
 };
 
 // Function to check and report invoice and wallet error for payment
@@ -624,20 +620,31 @@ const determineLnType = async (
         ? rawInvoice.substring(10)
         : rawInvoice;
 
-    // TODO: get a more static way to determine LNURL, than using BreezSDK's parseInput
-    switch (invoice.substring(0, 4)) {
-        // BOLT11
-        case 'lnbc':
-            specType = InputTypeVariant.BOLT11;
-            break;
-        // LNURL (Withdraw)
-        case 'lnurl':
-            specType = InputTypeVariant.LN_URL_WITHDRAW;
-            break;
+    // BOLT11
+    // lnbc1pwr7u7...
+    if (invoice.startsWith('lnbc')) {
+        specType = InputTypeVariant.BOLT11;
+    }
+
+    // LNURL (Withdraw)
+    /**
+     *  lnurlw://domain.com/lnurl-withdraw?key=val
+     */
+    if (invoice.startsWith('lnurlw://')) {
+        specType = InputTypeVariant.LN_URL_WITHDRAW;
     }
 
     // LNURL (Pay)
-    if (isLNAddress(invoice)) {
+    /*
+     *   LN Address: [name]@[domain]
+     *   lnurlp://domain.com/lnurl-pay?key=val
+     *   lnurl1dp68gurn8ghj7ct5mr...
+     */
+    if (
+        isLNAddress(invoice) ||
+        invoice.startsWith('lnurlp://') ||
+        invoice.startsWith('lnurl1')
+    ) {
         specType = InputTypeVariant.LN_URL_PAY;
     }
 
@@ -717,4 +724,54 @@ export const getXPub256 = (xpub: string): string => {
     const decoded = _deserializeExtendedKey(xpub);
 
     return _singleSha256(decoded).toString('hex');
+};
+
+// Check if weak and return true if it is
+// Otherwise, return false + feedback
+export const checkPINStrength = (pin: string) => {
+    // Check if pin repeated
+    const repeated = new RegExp(/(.)\1{3,}/).test(pin);
+
+    // Check if pin is repeated
+    if (repeated) {
+        return {
+            isWeak: true,
+            feedback: 'repeated',
+        };
+    }
+
+    const commonPins = [
+        '0123',
+        '3210',
+        '1234',
+        '4321',
+        '6969',
+        '9876',
+        '8765',
+        '5432',
+        '2580',
+        '0852',
+        '1112',
+        '1212',
+        '1236',
+        '1999',
+        '1998',
+        '2000',
+        '2001',
+        '1313',
+    ];
+
+    // Check if pin is a common pin
+    if (commonPins.includes(pin)) {
+        return {
+            isWeak: true,
+            feedback: 'common',
+        };
+    }
+
+    // Assumed strong enough if not repeated or common
+    return {
+        isWeak: false,
+        feedback: '',
+    };
 };

@@ -35,11 +35,11 @@ const Done = ({route}: Props) => {
     const {t} = useTranslation('settings');
 
     const titleText =
-        route.params?.isChangePIN || route.params.isPINReset
+        route.params?.isChangePIN || route.params?.isPINReset
             ? t('done_pin_change')
             : t('done_pin_setup');
     const titleDesc =
-        route.params?.isChangePIN || route.params.isPINReset
+        route.params?.isChangePIN || route.params?.isPINReset
             ? t('done_pin_change_message')
             : t('done_pin_setup_message');
 

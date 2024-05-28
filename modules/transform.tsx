@@ -145,15 +145,6 @@ export const formatLocaleDate = (locale: string, date: number) => {
         : DayJS(d).locale(locale).format('LLL');
 };
 
-// Format a string of Mnemonic phrases into
-// a numbered string of phrases
-export const displayNumberedSeed = (seed: string) => {
-    const words = seed.split(' ');
-
-    // Return an array of numbered Mnemonic phrases
-    return words.map((word, i) => `${i + 1}. ${word}`);
-};
-
 // Return language translated number
 export const i18nNumber = (num: number, locale: string) => {
     return num.toLocaleString(locale);

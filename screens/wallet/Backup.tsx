@@ -19,7 +19,6 @@ import {useNavigation, CommonActions} from '@react-navigation/core';
 
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Checkbox from 'react-native-bouncy-checkbox';
-import {runOnJS} from 'react-native-reanimated';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -46,16 +45,15 @@ import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 import CloseIcon from '../../assets/svg/x-24.svg';
 import ShareIcon from '../../assets/svg/share-24.svg';
 
-import {EBackupMaterial} from '../../types/enums';
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast';
 
 import {capitalizeFirst} from '../../modules/transform';
-import {useSharedValue} from 'react-native-reanimated';
 
 import RNBiometrics from '../../modules/biometrics';
 
 import {MnemonicDisplayCapsule, GenericSwitch} from '../../components/shared';
+import Animated from 'react-native-reanimated';
 
 type Slide = () => ReactElement;
 
@@ -68,12 +66,14 @@ const Backup = () => {
         useContext(AppStorageContext);
 
     const carouselRef = useRef<ICarouselInstance>(null);
-    const progressValue = useSharedValue(0);
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const walletData = getWalletData(currentWalletID);
+    const walletData = useMemo(() => {
+        return getWalletData(currentWalletID);
+    }, [getWalletData, currentWalletID]);
+
     const walletType = WalletTypeDetails[walletData.type];
     const walletTypeName =
         walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
@@ -82,52 +82,31 @@ const Backup = () => {
 
     const [showPrivateDescriptor, setShowPrivateDescriptor] = useState(false);
     const [switchEnabled, setSwitchEnabled] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-    const getQRData = useCallback(
-        (material: string) => {
-            // Only show mnemonic if mnemonic available and toggled
-            if (
-                material === EBackupMaterial.Mnemonic &&
-                walletData.mnemonic !== ''
-            ) {
-                return walletData.mnemonic;
-            }
+    const mnemonicData = walletData.mnemonic !== '' ? walletData.mnemonic : '';
+    const xprvData = walletData.xprv !== '' ? walletData.xprv : '';
 
-            // Shows descriptor if available or toggled
-            if (
-                walletData.externalDescriptor ||
-                material === EBackupMaterial.Descriptor
-            ) {
-                return showPrivateDescriptor
-                    ? walletData.privateDescriptor
-                    : walletData.externalDescriptor;
-            }
-
-            return walletData.externalDescriptor;
-        },
-        [walletData, showPrivateDescriptor],
-    );
+    const descriptorData = useMemo(() => {
+        return showPrivateDescriptor
+            ? walletData.privateDescriptor
+            : walletData.externalDescriptor;
+    }, [
+        showPrivateDescriptor,
+        walletData.privateDescriptor,
+        walletData.externalDescriptor,
+    ]);
 
     // Could be either mnemonic or xprv if available
-    const baseBackupTitle =
-        walletData.mnemonic !== '' ? 'Mnemonic' : 'Extended Key';
-
-    // Key material currently stored in wallet
-    const [currentBackup, setCurrentBackup] = useState<string>(
-        EBackupMaterial.Mnemonic,
-    );
-
-    const [descriptorData, setupDescriptorData] = useState<string>(
-        getQRData(EBackupMaterial.Descriptor),
-    );
+    const baseBackupTitle = mnemonicData ? 'Mnemonic' : 'Extended Key';
 
     // Write public descriptor file to device
-    const writeDescriptorToFile = async () => {
+    const writeDescriptorToFile = useCallback(async () => {
         let pathData =
             RNFS.TemporaryDirectoryPath +
             `/${walletData.name}-wallet_descriptor_backup.txt`;
 
-        const fileBackupData = getQRData(EBackupMaterial.Descriptor);
+        const fileBackupData = descriptorData;
 
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(e => {
@@ -163,7 +142,7 @@ const Backup = () => {
                 '[Backup Descriptor to file] not yet implemented on Android',
             );
         }
-    };
+    }, [descriptorData, t, walletData.name]);
 
     // Copy data to clipboard
     const copyToClipboard = useCallback(
@@ -188,11 +167,8 @@ const Backup = () => {
     const warning = t('backup_clarification');
 
     const mainPanel = useCallback((): ReactElement => {
-        const mnemonics = walletData.mnemonic.split(' ');
-        const baseBackup =
-            walletData.mnemonic !== ''
-                ? getQRData(EBackupMaterial.Mnemonic)
-                : getQRData(EBackupMaterial.Xprv);
+        const mnemonics = mnemonicData.split(' ');
+        const baseBackup = mnemonicData ? mnemonicData : xprvData;
 
         const toggleSwitch = () => {
             if (switchEnabled) {
@@ -209,12 +185,12 @@ const Backup = () => {
             <View
                 style={[
                     tailwind('items-center justify-center h-full w-full'),
-                    switchEnabled || walletData.mnemonic === ''
+                    switchEnabled || !mnemonicData
                         ? styles.minMarginContainer
                         : styles.largeMarginContainer,
                 ]}>
                 {/* Show mnemonic & QR code version or Xprv QR code */}
-                {switchEnabled || walletData.mnemonic === '' ? (
+                {switchEnabled || !mnemonicData ? (
                     <View
                         style={[
                             tailwind('rounded self-center mb-4'),
@@ -275,7 +251,7 @@ const Backup = () => {
                     </View>
                 )}
 
-                {walletData.mnemonic !== '' && (
+                {mnemonicData && (
                     <View
                         style={[
                             tailwind(
@@ -329,20 +305,25 @@ const Backup = () => {
             </View>
         );
     }, [
-        walletData.mnemonic,
+        mnemonicData,
+        xprvData,
         tailwind,
-        CardColor,
-        ColorScheme,
-        baseBackupTitle,
         switchEnabled,
+        ColorScheme.Background.QRBorder,
+        ColorScheme.Background.Default,
+        ColorScheme.Background.Greyed,
+        ColorScheme.Text.Default,
+        ColorScheme.Text.GrayedText,
+        ColorScheme.Text.DescText,
         t,
+        CardColor,
+        baseBackupTitle,
         warning,
-        getQRData,
     ]);
 
     const descriptorPanel = useCallback((): ReactElement => {
         const copyDescriptor = () => {
-            copyToClipboard(getQRData(EBackupMaterial.Descriptor));
+            copyToClipboard(descriptorData);
         };
 
         const togglePrivateDescriptor = () => {
@@ -353,8 +334,6 @@ const Backup = () => {
                 );
 
                 setShowPrivateDescriptor(false);
-
-                setupDescriptorData(walletData.externalDescriptor);
             } else {
                 if (isBiometricsActive) {
                     RNBiometrics.simplePrompt({
@@ -365,9 +344,6 @@ const Backup = () => {
                         .then(({success}) => {
                             if (success) {
                                 setShowPrivateDescriptor(true);
-                                setupDescriptorData(
-                                    walletData.privateDescriptor,
-                                );
                             }
                         })
                         .catch((error: any) => {
@@ -381,7 +357,6 @@ const Backup = () => {
                         });
                 } else {
                     setShowPrivateDescriptor(true);
-                    setupDescriptorData(walletData.privateDescriptor);
                 }
             }
         };
@@ -534,14 +509,11 @@ const Backup = () => {
         ColorScheme,
         descriptorData,
         walletData.isWatchOnly,
-        walletData.externalDescriptor,
-        walletData.privateDescriptor,
         langDir,
         showPrivateDescriptor,
         t,
         warning,
         copyToClipboard,
-        getQRData,
         isBiometricsActive,
     ]);
 
@@ -556,12 +528,13 @@ const Backup = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={tailwind('w-5/6 h-full justify-center')}>
+            <Animated.View style={[tailwind('w-full h-full items-center')]}>
+                <Animated.View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}
-                    <View style={[tailwind('absolute top-6  w-full left-0')]}>
+                    <Animated.View
+                        style={[tailwind('absolute top-6  w-full left-0')]}>
                         {/* Allow exporting public descriptor to file */}
-                        {currentBackup === EBackupMaterial.Descriptor &&
+                        {currentIndex === 1 &&
                             Platform.OS === 'ios' &&
                             !showPrivateDescriptor && (
                                 <PlainButton
@@ -575,9 +548,9 @@ const Backup = () => {
                                     />
                                 </PlainButton>
                             )}
-                    </View>
+                    </Animated.View>
 
-                    <View style={[tailwind('absolute top-6 right-0')]}>
+                    <Animated.View style={[tailwind('absolute top-6 right-0')]}>
                         <PlainButton
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
@@ -587,10 +560,10 @@ const Backup = () => {
                                 fill={ColorScheme.SVG.Default}
                             />
                         </PlainButton>
-                    </View>
+                    </Animated.View>
 
                     {/* Display wallet name */}
-                    <View
+                    <Animated.View
                         style={tailwind(
                             'absolute top-16 justify-center w-full',
                         )}>
@@ -618,40 +591,40 @@ const Backup = () => {
                         </Text>
 
                         {/* Display wallet seed selector */}
-                        <View
+                        <Animated.View
                             style={[
                                 tailwind(
-                                    'flex-row self-center items-center justify-center rounded-full p-2 px-6 mb-4 bg-blue-800',
+                                    'flex-row self-center items-center justify-center rounded-full p-2 px-6 mb-4',
                                 ),
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                 },
                             ]}>
-                            {/* Display the single backup material if restored non-mnemonic */}
-                            {/* Display the backup material selector if restored mnemonic */}
                             <PlainButton
                                 style={[tailwind('mr-4')]}
                                 onPress={() => {
-                                    carouselRef.current?.prev();
-                                    runOnJS(setCurrentBackup)(
-                                        EBackupMaterial.Mnemonic,
-                                    );
+                                    if (
+                                        carouselRef.current &&
+                                        currentIndex !== 0
+                                    ) {
+                                        carouselRef.current.scrollTo({
+                                            index: 0,
+                                        });
+                                    }
                                 }}>
                                 <Text
                                     style={[
                                         tailwind(
                                             `text-sm ${
-                                                currentBackup ===
-                                                EBackupMaterial.Mnemonic
+                                                currentIndex === 0
                                                     ? 'font-bold'
                                                     : ''
                                             }`,
                                         ),
                                         {
                                             color:
-                                                currentBackup ===
-                                                EBackupMaterial.Mnemonic
+                                                currentIndex === 0
                                                     ? ColorScheme.Text.Default
                                                     : ColorScheme.Text
                                                           .GrayedText,
@@ -671,25 +644,27 @@ const Backup = () => {
                             />
                             <PlainButton
                                 onPress={() => {
-                                    carouselRef.current?.next();
-                                    runOnJS(setCurrentBackup)(
-                                        EBackupMaterial.Descriptor,
-                                    );
+                                    if (
+                                        carouselRef.current &&
+                                        currentIndex !== 1
+                                    ) {
+                                        carouselRef.current.scrollTo({
+                                            index: 1,
+                                        });
+                                    }
                                 }}>
                                 <Text
                                     style={[
                                         tailwind(
                                             `text-sm ${
-                                                currentBackup ===
-                                                EBackupMaterial.Descriptor
+                                                currentIndex === 1
                                                     ? 'font-bold'
                                                     : ''
                                             }`,
                                         ),
                                         {
                                             color:
-                                                currentBackup ===
-                                                EBackupMaterial.Descriptor
+                                                currentIndex === 1
                                                     ? ColorScheme.Text.Default
                                                     : ColorScheme.Text
                                                           .GrayedText,
@@ -698,11 +673,11 @@ const Backup = () => {
                                     Descriptor
                                 </Text>
                             </PlainButton>
-                        </View>
-                    </View>
+                        </Animated.View>
+                    </Animated.View>
 
                     {/* Main Carousel */}
-                    <View
+                    <Animated.View
                         style={[
                             styles.carouselContainer,
                             tailwind('h-full w-full'),
@@ -716,7 +691,7 @@ const Backup = () => {
                                 ),
                             ]}
                             data={panels}
-                            enabled={false}
+                            enabled={true}
                             width={NativeDims.width}
                             // Adjust height for iOS
                             // to account for top stack height
@@ -726,29 +701,22 @@ const Backup = () => {
                                       NativeDims.navBottom * 3.2
                                     : NativeDims.height
                             }
-                            defaultIndex={
-                                currentBackup === EBackupMaterial.Descriptor
-                                    ? 1
-                                    : 0
-                            }
                             loop={false}
-                            panGestureHandlerProps={{
-                                activeOffsetX: [-10, 10],
-                            }}
-                            testID="ReceiveSlider"
                             renderItem={({index}): ReactElement => {
                                 const Slide = panels[index];
                                 return <Slide key={index} />;
                             }}
-                            onProgressChange={(_, absoluteProgress): void => {
-                                progressValue.value = absoluteProgress;
+                            onProgressChange={(_, absProg) => {
+                                const cI = Math.round(absProg) % 2;
+                                setCurrentIndex(cI);
                             }}
+                            snapEnabled={true}
                         />
-                    </View>
-                </View>
+                    </Animated.View>
+                </Animated.View>
 
                 <Toast config={toastConfig as ToastConfig} />
-            </View>
+            </Animated.View>
         </SafeAreaView>
     );
 };

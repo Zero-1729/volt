@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useContext, useEffect, useRef} from 'react';
+import React, {
+    useState,
+    useContext,
+    useEffect,
+    useRef,
+    useCallback,
+} from 'react';
 import {
     StyleSheet,
     Text,
@@ -22,18 +28,18 @@ import {AppStorageContext} from '../../class/storageContext';
 import {capitalizeFirst, normalizeFiat} from '../../modules/transform';
 import BigNumber from 'bignumber.js';
 
-import {psbtFromInvoice} from './../../modules/bdk';
+import {
+    createBDKWallet,
+    psbtFromInvoice,
+    syncBdkWallet,
+} from './../../modules/bdk';
 import {getPrivateDescriptors} from './../../modules/descriptors';
 import {TComboWallet} from '../../types/wallet';
 
 import ExportPsbt from '../../components/psbt';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
-import {
-    useNavigation,
-    StackActions,
-    CommonActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -46,23 +52,30 @@ import ShareIcon from '../../assets/svg/share-24.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
-import {PartiallySignedTransaction} from 'bdk-rn';
+import {Address, PartiallySignedTransaction} from 'bdk-rn';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {useTranslation} from 'react-i18next';
 import {
     sendPayment,
     BreezEventVariant,
+    nodeInfo,
 } from '@breeztech/react-native-breez-sdk';
-import {EBreezDetails} from '../../types/enums';
+import {EBreezDetails, ENet} from '../../types/enums';
 import ExpiryTimer from '../../components/expiry';
 
 import Toast from 'react-native-toast-message';
 
-import {isInvoiceExpired, getCountdownStart} from '../../modules/wallet-utils';
+import {
+    isInvoiceExpired,
+    getCountdownStart,
+    checkNetworkIsReachable,
+} from '../../modules/wallet-utils';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {biometricAuth} from '../../modules/shared';
 import PINPass from '../../components/pinpass';
+
+import netInfo from '@react-native-community/netinfo';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -125,6 +138,10 @@ const SendView = ({route}: Props) => {
             ? (route.params.bolt11?.amountMsat as number) / 1_000
             : route.params.invoiceData?.options?.amount || 0,
     );
+
+    const [paymentToSelf, setPaymentToSelf] = useState(true);
+    const [paySelfMessage, setPaySelfMessage] = useState('');
+    const [alreadyPaidInvoice, setAlreadyPaidInvoice] = useState(false);
 
     const bottomExportRef = useRef<BottomSheetModal>(null);
     const bottomPINPassRef = useRef<BottomSheetModal>(null);
@@ -233,15 +250,15 @@ const SendView = ({route}: Props) => {
                     visibilityTime: 2000,
                 });
                 setLoading(false);
+                console.log(
+                    '[Send] Error sending payment: ',
+                    result.payment.error,
+                );
             }
         } catch (error: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: error.message,
-                visibilityTime: 2000,
-            });
+            if (error.message === 'Invoice already paid') {
+                setAlreadyPaidInvoice(true);
+            }
             setLoading(false);
         }
     };
@@ -319,6 +336,14 @@ const SendView = ({route}: Props) => {
 
     const loadUPsbt = async () => {
         if (route.params.wallet) {
+            // Check if payment is to self first
+            await checkIfSelfOnchain();
+
+            if (paymentToSelf) {
+                setLoadingPsbt(false);
+                return;
+            }
+
             const descriptors = getPrivateDescriptors(
                 route.params.wallet.privateDescriptor,
             );
@@ -330,7 +355,7 @@ const SendView = ({route}: Props) => {
                 route.params.wallet as TComboWallet,
                 new BigNumber(route.params.wallet.balanceOnchain),
                 electrumServerURL,
-                (e: any) => {
+                (error: any) => {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
@@ -341,7 +366,7 @@ const SendView = ({route}: Props) => {
 
                     console.log(
                         '[Send] Error creating transaction: ',
-                        e.message,
+                        error.message,
                     );
 
                     // Stop loading
@@ -354,17 +379,60 @@ const SendView = ({route}: Props) => {
         }
     };
 
+    const checkIfSelfLN = useCallback(async () => {
+        const _bolt11 = route.params.bolt11;
+        const _nodeID = await nodeInfo();
+
+        // Check if bolt11 is self
+        if (_bolt11?.payeePubkey !== _nodeID.id) {
+            setPaymentToSelf(false);
+        } else {
+            setPaySelfMessage(t('payment_to_self_detected'));
+        }
+    }, []);
+
+    const checkIfSelfOnchain = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+
+        if (!checkNetworkIsReachable(_netInfo)) {
+            return;
+        }
+
+        const wallet = route.params.wallet;
+        const network =
+            wallet?.network === 'testnet' ? ENet.Testnet : ENet.Bitcoin;
+
+        try {
+            let _w = await createBDKWallet(wallet as TComboWallet);
+            _w = await syncBdkWallet(_w, () => {}, network, electrumServerURL);
+
+            const bdkAddr = await new Address().create(
+                route.params.invoiceData.address,
+            );
+            const script = await bdkAddr.scriptPubKey();
+
+            const isOwnedByYou = await _w.isMine(script);
+
+            if (isOwnedByYou) {
+                setPaySelfMessage(t('payment_to_self_detected'));
+            } else {
+                setPaymentToSelf(false);
+            }
+        } catch (error: any) {}
+    }, []);
+
     useEffect(() => {
         // Create Psbt if onchain
         if (!route.params.bolt11) {
             loadUPsbt();
+        } else {
+            checkIfSelfLN();
         }
     }, []);
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
@@ -377,7 +445,6 @@ const SendView = ({route}: Props) => {
 
         if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
@@ -420,7 +487,9 @@ const SendView = ({route}: Props) => {
                         )}
                         <PlainButton
                             onPress={() =>
-                                navigation.dispatch(StackActions.popToTop())
+                                navigation.dispatch(
+                                    CommonActions.navigate('HomeScreen'),
+                                )
                             }
                             style={[tailwind('absolute z-10 left-6')]}>
                             <Close fill={ColorScheme.SVG.Default} />
@@ -680,28 +749,85 @@ const SendView = ({route}: Props) => {
                     </View>
 
                     {((isLightning && loading) ||
-                        (!isLightning && loadingPsbt)) && (
+                        (!isLightning && loadingPsbt)) &&
+                        !paySelfMessage && (
+                            <View
+                                style={[
+                                    tailwind('absolute'),
+                                    {
+                                        bottom:
+                                            NativeWindowMetrics.bottomButtonOffset +
+                                            76,
+                                    },
+                                ]}>
+                                <ActivityIndicator
+                                    style={[tailwind('mb-4')]}
+                                    size={'small'}
+                                    color={ColorScheme.Text.Default}
+                                />
+                                <Text
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {color: ColorScheme.Text.GrayedText},
+                                    ]}>
+                                    {loadingMessage}
+                                </Text>
+                            </View>
+                        )}
+
+                    {isLightning && paySelfMessage && (
                         <View
                             style={[
-                                tailwind('absolute'),
+                                tailwind(
+                                    `mt-6 w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center justify-center absolute`,
+                                ),
                                 {
                                     bottom:
                                         NativeWindowMetrics.bottomButtonOffset +
                                         76,
                                 },
                             ]}>
-                            <ActivityIndicator
-                                style={[tailwind('mb-4')]}
-                                size={'small'}
-                                color={ColorScheme.Text.Default}
-                            />
-                            <Text
+                            <VText
                                 style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.GrayedText},
+                                    tailwind('text-sm text-center w-5/6'),
+                                    {
+                                        color: ColorScheme.Text.DescText,
+                                    },
                                 ]}>
-                                {loadingMessage}
-                            </Text>
+                                {paySelfMessage}
+                            </VText>
+                        </View>
+                    )}
+
+                    {isLightning && alreadyPaidInvoice && (
+                        <View
+                            style={[
+                                tailwind(
+                                    `mt-6 w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center justify-center absolute`,
+                                ),
+                                {
+                                    bottom:
+                                        NativeWindowMetrics.bottomButtonOffset +
+                                        76,
+                                },
+                            ]}>
+                            <VText
+                                style={[
+                                    tailwind('text-sm text-center w-5/6'),
+                                    {
+                                        color: ColorScheme.Text.DescText,
+                                    },
+                                ]}>
+                                {t('already_paid_ln_invoice')}
+                            </VText>
                         </View>
                     )}
 
@@ -709,7 +835,9 @@ const SendView = ({route}: Props) => {
                         disabled={
                             loading ||
                             (!isLightning && loadingPsbt) ||
-                            isExpired
+                            isExpired ||
+                            paymentToSelf ||
+                            alreadyPaidInvoice
                         }
                         onPress={authAndPay}
                         title={capitalizeFirst(t('send'))}

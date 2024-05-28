@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useCallback, useContext} from 'react';
 
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 
@@ -27,6 +27,10 @@ import InfoIcon from './../../assets/svg/info-16.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
+import Checkbox from 'react-native-bouncy-checkbox';
+
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+
 type Props = NativeStackScreenProps<AddWalletParamList, 'Add'>;
 
 const Add = ({route}: Props) => {
@@ -38,7 +42,12 @@ const Add = ({route}: Props) => {
 
     const {t} = useTranslation('wallet');
 
-    const {isAdvancedMode, isWalletInitialized} = useContext(AppStorageContext);
+    const {isAdvancedMode, isWalletInitialized, setIsAdvancedMode} =
+        useContext(AppStorageContext);
+
+    const toggleAdvancedMode = useCallback(() => {
+        setIsAdvancedMode(!isAdvancedMode);
+    }, [isAdvancedMode, setIsAdvancedMode]);
 
     return (
         <SafeAreaView
@@ -180,6 +189,58 @@ const Add = ({route}: Props) => {
                         </View>
                     )}
                 </View>
+
+                <View
+                    style={[
+                        tailwind('absolute w-5/6'),
+                        styles.advancedModeContainer,
+                    ]}>
+                    <PlainButton
+                        onPress={toggleAdvancedMode}
+                        style={[
+                            tailwind('flex-row self-center justify-center'),
+                        ]}>
+                        <Text
+                            style={[
+                                tailwind('text-sm mr-4'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            {t('add_wallet_advanced_mode')}
+                        </Text>
+                        {/* btn */}
+                        <Checkbox
+                            disabled={!isAdvancedMode}
+                            fillColor={ColorScheme.Background.CheckBoxFilled}
+                            unfillColor={
+                                ColorScheme.Background.CheckBoxUnfilled
+                            }
+                            size={18}
+                            isChecked={isAdvancedMode}
+                            iconStyle={{
+                                borderWidth: 1,
+                                borderRadius: 2,
+                            }}
+                            innerIconStyle={{
+                                borderWidth: 1,
+                                borderColor:
+                                    ColorScheme.Background.CheckBoxOutline,
+                                borderRadius: 2,
+                            }}
+                            style={styles.checkBox}
+                            onPress={toggleAdvancedMode}
+                            disableBuiltInState={true}
+                        />
+                    </PlainButton>
+                    <Text
+                        style={[
+                            tailwind(
+                                'text-xs self-center text-center mt-4 w-5/6',
+                            ),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {t('add_wallet_advanced_mode_desc')}
+                    </Text>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -197,5 +258,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.6,
         shadowRadius: 8,
         elevation: 5,
+    },
+    advancedModeContainer: {
+        bottom: NativeWindowMetrics.bottom + 32,
+    },
+    checkBox: {
+        width: 20,
     },
 });

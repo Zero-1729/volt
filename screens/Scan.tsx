@@ -34,11 +34,12 @@ import {
     isLNAddress,
 } from '../modules/wallet-utils';
 
-import {Camera, CameraType} from 'react-native-camera-kit';
+import {Camera, CameraApi} from 'react-native-camera-kit';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
+import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -51,6 +52,8 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst, convertBTCtoSats} from '../modules/transform';
 import {toastConfig} from '../components/toast';
+
+import TorchIcon from '../assets/svg/light-bulb-24.svg';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -138,7 +141,8 @@ const Scan = ({route}: Props) => {
     const [grantedPermission, setGrantedPermission] = useState<Status>(
         Status.UNKNOWN,
     );
-    const cameraRef = React.useRef<Camera>(null);
+    const [flashOn, setFlashOn] = useState<boolean>(false);
+    const cameraRef = React.useRef<CameraApi>(null);
 
     const onError = (error: any) => {
         updateScannerMessage(error.message);
@@ -266,7 +270,7 @@ const Scan = ({route}: Props) => {
                     const LNinvoice = decodedQRState.decodedInvoice;
 
                     const isBolt11 = !!LNinvoice?.bolt11;
-                    const isLNA = isLNAddress(LNinvoice);
+                    const isLNA = !isBolt11 ? isLNAddress(LNinvoice) : false;
 
                     if (isBolt11) {
                         // If LN Invoice
@@ -296,7 +300,6 @@ const Scan = ({route}: Props) => {
                     }
 
                     if (isLNA) {
-                        // Possible LNURL
                         // Assumed an LN Address
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('WalletRoot', {
@@ -507,7 +510,7 @@ const Scan = ({route}: Props) => {
     return (
         <SafeAreaView
             style={[styles.flexed, tailwind('bg-black')]}
-            edges={['bottom', 'left', 'right']}>
+            edges={['top', 'bottom', 'left', 'right']}>
             {grantedPermission === Status.AUTHORIZED && (
                 <View
                     style={[
@@ -519,48 +522,86 @@ const Scan = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                'absolute top-6 z-10 w-full flex-row items-center justify-center',
+                                'absolute top-6 z-10 w-full items-center justify-center',
                             ),
                         ]}>
-                        <PlainButton
-                            onPress={closeScreen}
-                            style={[tailwind('absolute z-10 left-6')]}>
-                            <Close fill={'white'} />
-                        </PlainButton>
-                        {/* Screen header */}
-                        <Text
-                            style={[tailwind('text-sm font-bold text-white')]}>
-                            {dynamicHeading}
-                        </Text>
+                        <View
+                            style={[
+                                tailwind(
+                                    'flex-row mb-6 w-full items-center justify-center',
+                                ),
+                            ]}>
+                            <PlainButton
+                                onPress={closeScreen}
+                                style={[tailwind('absolute z-10 left-6')]}>
+                                <Close fill={'white'} />
+                            </PlainButton>
+                            {/* Screen header */}
+                            <Text
+                                style={[
+                                    tailwind('text-sm font-bold text-white'),
+                                ]}>
+                                {dynamicHeading}
+                            </Text>
+                        </View>
                     </View>
 
-                    {/* Scan midsection */}
+                    {/* Scan Area Container */}
                     <View
                         style={[
-                            tailwind(
-                                'items-center justify-center w-full h-full -mt-8',
-                            ),
+                            styles.camSectionContainer,
+                            tailwind('items-center justify-end relative'),
                         ]}>
-                        <Text style={[tailwind('text-sm mb-4 text-white')]}>
+                        {/* Cam text info */}
+                        <Text
+                            style={[
+                                tailwind('absolute text-sm text-white top-0'),
+                            ]}>
                             {t('scan_message')}
                         </Text>
 
-                        {/* Scan Area */}
+                        {/* Camera View Container */}
                         <View
                             style={[
-                                tailwind('h-2/5 w-4/5 border'),
-                                styles.scanAreaBorder,
+                                styles.camContainer,
+                                tailwind('items-center justify-center'),
                             ]}>
                             <Camera
-                                style={styles.flexed}
+                                style={[
+                                    styles.cameraFlexed,
+                                    StyleSheet.absoluteFillObject,
+                                ]}
                                 onError={onError}
-                                CameraType={CameraType.Back}
                                 ref={cameraRef}
-                                flashMode={'off'} // TODO: Add flash mode
+                                torchMode={flashOn ? 'on' : 'off'}
                                 scanBarcode={true}
                                 focusMode={'on'}
                                 onReadCode={handleQR}
+                                resizeMode={'cover'}
                             />
+
+                            {/* Flash Button */}
+                            <PlainButton
+                                onPress={() => setFlashOn(!flashOn)}
+                                style={[
+                                    tailwind('absolute'),
+                                    styles.torchContainer,
+                                ]}>
+                                <View
+                                    style={[
+                                        tailwind('rounded-full p-3'),
+                                        // eslint-disable-next-line react-native/no-inline-styles
+                                        {
+                                            backgroundColor: !flashOn
+                                                ? '#00000080'
+                                                : '#FFFFFFFF',
+                                        },
+                                    ]}>
+                                    <TorchIcon
+                                        fill={!flashOn ? 'white' : 'black'}
+                                    />
+                                </View>
+                            </PlainButton>
                         </View>
                     </View>
 
@@ -589,12 +630,26 @@ const styles = StyleSheet.create({
     flexed: {
         flex: 1,
     },
-    scanMessage: {
-        top: 90,
-    },
-    scanAreaBorder: {
-        borderWidth: 4,
+    cameraFlexed: {
+        flex: 1,
+        borderWidth: 1,
         borderColor: 'white',
+    },
+    camSectionContainer: {
+        height: 360,
+        width: NativeWindowMetrics.width * 0.95,
+        marginTop: -64,
+    },
+    camContainer: {
+        borderColor: 'white',
+        borderWidth: 2,
+        borderRadius: 2,
+        width: NativeWindowMetrics.width * 0.975,
+        height: 320,
+    },
+    torchContainer: {
+        top: 12,
+        right: 12,
     },
 });
 

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
 import React, {useContext, useEffect, useState} from 'react';
@@ -22,17 +21,21 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import Close from '../../assets/svg/x-24.svg';
 
-import bottomOffset from '../../constants/NativeWindowMetrics';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 
 import BottomArrow from '../../assets/svg/chevron-down-16.svg';
+
+import netInfo from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {
     SATS_TO_BTC_RATE,
     capitalizeFirst,
     formatFiat,
     formatSats,
+    normalizeFiat,
 } from '../../modules/transform';
 import {openChannelFee, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
@@ -52,7 +55,12 @@ import {
 import {actionAlert} from '../../components/alert';
 import {toastConfig} from '../../components/toast';
 
-const RequestAmount = () => {
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {WalletParamList} from '../../Navigation';
+
+type Props = NativeStackScreenProps<WalletParamList, 'RequestAmount'>;
+
+const RequestAmount = ({route}: Props) => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
@@ -71,7 +79,6 @@ const RequestAmount = () => {
         new BigNumber(0),
     );
     const [lnInvoiceDesc, setLNInvoiceDesc] = useState<string>('');
-    const [feeMessage, setFeeMessage] = useState<string>('');
     const [amount, setAmount] = useState<string>('');
     const [topUnit, setTopUnit] = useState<DisplayUnit>({
         value: new BigNumber(0),
@@ -92,32 +99,9 @@ const RequestAmount = () => {
 
     const setMaxReceivableAmount = async () => {
         const nodeState = await nodeInfo();
-        const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
-        const inboundLiquiditySat =
-            inboundLiquidityMsat !== null ? inboundLiquidityMsat / 1_000 : 0;
-
-        const openChannelFeeResponse = await openChannelFee({});
-
-        const openingFees = openChannelFeeResponse.feeParams;
-        const feePercentage = (openingFees.proportional * 100) / 1_000_000;
-        const minFeeSat = openingFees.minMsat / 1_000;
-
-        if (inboundLiquiditySat === 0) {
-            setFeeMessage(
-                t('ln_fee_message', {pct: feePercentage, mfs: minFeeSat}),
-            );
-        } else {
-            setFeeMessage(
-                t('ln_fee_message_ext', {
-                    pct: feePercentage,
-                    mfs: minFeeSat,
-                    ils: inboundLiquiditySat.toFixed(0),
-                }),
-            );
-        }
 
         updateMaxReceivableAmount(
-            new BigNumber((await nodeInfo()).maxReceivableMsat / 1_000),
+            new BigNumber(nodeState.maxReceivableMsat / 1_000),
         );
     };
 
@@ -125,7 +109,7 @@ const RequestAmount = () => {
 
     // TODO: remove and make sure only onchain generated in next screen
     const hideContinueButton =
-        (isLightning && !feeMessage) ||
+        (isLightning && !maxReceivableAmount.isZero) ||
         satsAmount.value.isZero() ||
         (satsAmount.value.gte(maxReceivableAmount) &&
             !maxReceivableAmount.isZero() &&
@@ -298,8 +282,47 @@ const RequestAmount = () => {
         );
     };
 
+    const routeToOnchainReceive = () => {
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'Receive',
+                params: {
+                    sats: satsAmount.value.toString(),
+                    fiat: fiatAmount.toString(),
+                    amount: amount,
+                    lnDescription: lnInvoiceDesc,
+                },
+            }),
+        );
+    };
+
     const handleRoute = async () => {
+        if (route.params?.boltNFCMode) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'BoltNFC',
+                    params: {
+                        amountMsat: satsAmount.value
+                            .multipliedBy(1_000)
+                            .toNumber(),
+                        description: lnInvoiceDesc,
+                        fromQuickActions: true,
+                        satsUnit: bottomUnit.name === 'sats',
+                    },
+                }),
+            );
+
+            return;
+        }
+
         if (walletType === 'unified') {
+            // Network check
+            const _netInfo = await netInfo.fetch();
+            if (!checkNetworkIsReachable(_netInfo)) {
+                routeToOnchainReceive();
+                return;
+            }
+
             const channelOpenFee = await openChannelFee({
                 amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
             });
@@ -318,6 +341,10 @@ const RequestAmount = () => {
                     capitalizeFirst(t('channel_opening')),
                     e('new_channel_open_warn', {
                         n: feeSats,
+                        fiat: `${appFiatCurrency.symbol} ${normalizeFiat(
+                            new BigNumber(feeSats),
+                            fiatRate.rate,
+                        )}`,
                     }),
                     t('ok'),
                     capitalizeFirst(t('cancel')),
@@ -336,20 +363,11 @@ const RequestAmount = () => {
                     },
                 );
             } else {
-                navigation.dispatch(
-                    CommonActions.navigate({
-                        name: 'Receive',
-                        params: {
-                            sats: satsAmount.value.toString(),
-                            fiat: fiatAmount.toString(),
-                            amount: amount,
-                            lnDescription: lnInvoiceDesc,
-                        },
-                    }),
-                );
+                routeToOnchainReceive();
             }
         }
 
+        routeToOnchainReceive();
         return;
     };
 
@@ -362,7 +380,7 @@ const RequestAmount = () => {
 
     return (
         <SafeAreaView
-            edges={['bottom', 'right', 'left']}
+            edges={['top', 'bottom', 'right', 'left']}
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
@@ -475,13 +493,17 @@ const RequestAmount = () => {
                     </View>
                 </View>
 
-                {isLightning && feeMessage && (
-                    <View
-                        style={[
-                            tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        {satsAmount.value.gte(maxReceivableAmount) ? (
+                {isLightning &&
+                    satsAmount.value.gte(maxReceivableAmount) &&
+                    !maxReceivableAmount.isZero() && (
+                        <View
+                            style={[
+                                tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
+                                {
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                },
+                            ]}>
                             <VText
                                 style={[
                                     tailwind('text-sm text-center'),
@@ -493,19 +515,8 @@ const RequestAmount = () => {
                                     sats: formatSats(maxReceivableAmount),
                                 })}
                             </VText>
-                        ) : (
-                            <VText
-                                style={[
-                                    tailwind('text-sm text-center'),
-                                    {
-                                        color: ColorScheme.Text.GrayText,
-                                    },
-                                ]}>
-                                {feeMessage}
-                            </VText>
-                        )}
-                    </View>
-                )}
+                        </View>
+                    )}
 
                 {/* Number pad for input amount */}
                 <AmountNumpad
@@ -522,7 +533,7 @@ const RequestAmount = () => {
                                 hideContinueButton ? 'opacity-40' : ''
                             }`,
                         ),
-                        {bottom: bottomOffset.bottom},
+                        {bottom: NativeWindowMetrics.bottom},
                     ]}>
                     <PlainButton
                         disabled={hideContinueButton}

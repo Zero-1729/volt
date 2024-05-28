@@ -31,13 +31,13 @@ import {
     TWalletType,
     TUnit,
     TBalance,
-    TFiatRate,
     TUtxo,
     TTransaction,
     TBaseWalletArgs,
     TAddress,
     TElectrumServerURLs,
     TMempoolInfo,
+    TRateObject,
 } from '../types/wallet';
 
 import {BaseWallet} from './wallet/base';
@@ -81,7 +81,7 @@ type defaultContextType = {
     appFiatCurrency: TCurrency;
     loadLock: boolean;
     appUnit: TUnit;
-    fiatRate: TFiatRate;
+    fiatRate: TRateObject;
     hideTotalBalance: boolean;
     isWalletInitialized: boolean;
     isAdvancedMode: boolean;
@@ -100,7 +100,7 @@ type defaultContextType = {
     setMempoolInfo: (data: TMempoolInfo) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
-    updateFiatRate: (fiatObj: TFiatRate) => void;
+    updateFiatRate: (fiatObj: TRateObject) => void;
     setTotalBalanceHidden: (hideTotalBalance: boolean) => void;
     setIsAdvancedMode: (isAdvancedMode: boolean) => void;
     setDefaultToTestnet: (defaultToTestnet: boolean) => void;
@@ -197,7 +197,11 @@ const defaultContext: defaultContextType = {
     resetAppData: () => {},
     setCurrentWalletID: () => {},
     getWalletData: () => {
-        return new BaseWallet({name: 'test wallet', type: 'p2tr'});
+        return new BaseWallet({
+            name: 'test wallet',
+            type: 'p2tr',
+            restored: false,
+        });
     }, // Function grabs wallet data through a fetch by index via ids
     setLoadLock: () => {},
     setOnboarding: () => {},
@@ -537,7 +541,7 @@ export const AppStorageProvider = ({children}: Props) => {
     };
 
     const updateFiatRate = useCallback(
-        async (fiat: TFiatRate) => {
+        async (fiat: TRateObject) => {
             try {
                 _setFiatRate(fiat);
                 _updateFiatRate(JSON.stringify(fiat));
@@ -1129,6 +1133,7 @@ export const AppStorageProvider = ({children}: Props) => {
             const walletArgs = {
                 name: 'Restored Wallet',
                 type: walletType, // Allow user to set in advanced mode or guess it from wallet scan
+                restored: true,
                 mnemonic:
                     backupMaterialType === 'mnemonic' ? backupMaterial : '',
                 descriptor:
@@ -1278,6 +1283,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1287,6 +1293,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1296,6 +1303,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1305,6 +1313,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
 
@@ -1314,6 +1323,7 @@ export const AppStorageProvider = ({children}: Props) => {
                             type: type,
                             network: network,
                             mnemonic: mnemonic,
+                            restored: false,
                         });
                         break;
                 }

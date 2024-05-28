@@ -42,28 +42,29 @@ const Intro = () => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View
+                <PlainButton
+                    onPress={() => {
+                        // Route to add PIN screen
+                        navigation.dispatch(
+                            CommonActions.navigate('WelcomePIN'),
+                        );
+                    }}
                     style={[
-                        tailwind('w-5/6 absolute justify-center'),
+                        tailwind(
+                            'absolute justify-center py-2 px-4 rounded-full right-6',
+                        ),
                         {top: marginTopPlatform},
                     ]}>
-                    <PlainButton
-                        onPress={() => {
-                            // Route to add PIN screen
-                            navigation.dispatch(
-                                CommonActions.navigate('WelcomePIN'),
-                            );
-                        }}
-                        style={[tailwind('self-end')]}>
+                    <View style={[tailwind('self-end')]}>
                         <Text
                             style={[
                                 tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Default},
                             ]}>
-                            {t('skip')}
+                            {capitalizeFirst(t('skip'))}
                         </Text>
-                    </PlainButton>
-                </View>
+                    </View>
+                </PlainButton>
 
                 <View style={[tailwind('items-center'), {top: -25}]}>
                     <Volt width={100} height={100} />

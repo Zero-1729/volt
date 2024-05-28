@@ -16,11 +16,7 @@ import React, {
     useEffect,
 } from 'react';
 
-import {
-    useNavigation,
-    StackActions,
-    CommonActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {
     BreezEventVariant,
@@ -48,10 +44,16 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
 import Close from '../../assets/svg/x-24.svg';
+import InfoIcon from '../../assets/svg/info-16.svg';
+
 import {TextSingleInput} from '../../components/input';
 import VText from '../../components/text';
 
-import {getMiniWallet, isLNAddress} from '../../modules/wallet-utils';
+import {
+    checkNetworkIsReachable,
+    getMiniWallet,
+    isLNAddress,
+} from '../../modules/wallet-utils';
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {EBreezDetails} from '../../types/enums';
 import {toastConfig} from '../../components/toast';
@@ -62,6 +64,7 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {biometricAuth} from '../../modules/shared';
 
 import PINPass from '../../components/pinpass';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SendLN'>;
 
@@ -81,6 +84,9 @@ const InputPanel = (props: {address: string}): ReactElement => {
     const {getWalletData, currentWalletID, appLanguage} =
         useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
+
+    const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const mainInputRef = useRef(null);
 
@@ -162,7 +168,7 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             </View>
 
-            {isLNAddress(inputText) && (
+            {isLNAddress(inputText) && isNetOn && (
                 <View style={[tailwind('w-5/6 items-center mt-12')]}>
                     <VText
                         style={[
@@ -226,8 +232,34 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             )}
 
+            {isLNAddress(inputText) && !isNetOn && (
+                <View
+                    style={[
+                        tailwind(
+                            `mt-6 items-center ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            }`,
+                        ),
+                    ]}>
+                    <InfoIcon width={16} fill={ColorScheme.SVG.GrayFill} />
+                    <VText
+                        style={[
+                            tailwind(
+                                `text-sm ${
+                                    langDir === 'right' ? 'mr-2' : 'ml-2'
+                                }`,
+                            ),
+                            {color: ColorScheme.Text.DescText},
+                        ]}>
+                        {t('no_internet_cannot_zap')}
+                    </VText>
+                </View>
+            )}
+
             <LongBottomButton
-                disabled={!isLNAddress(inputText)}
+                disabled={!isLNAddress(inputText) || !isNetOn}
                 onPress={handleAmount}
                 title={capitalizeFirst(t('continue'))}
                 textColor={ColorScheme.Text.Alt}
@@ -244,6 +276,7 @@ const SummaryPanel = (props: {
     description: string | undefined;
     loadingPay: boolean;
     authAndPay: () => void;
+    statusMsg: string;
 }): ReactElement => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
@@ -388,7 +421,7 @@ const SummaryPanel = (props: {
                                     tailwind('text-sm mr-2'),
                                     {color: ColorScheme.Text.GrayedText},
                                 ]}>
-                                {t('paying_ln_address')}
+                                {props.statusMsg}
                             </Text>
                             <ActivityIndicator />
                         </View>
@@ -414,13 +447,13 @@ const SendLN = ({route}: Props) => {
 
     const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
+    const [statusMessage, setStatusMessage] = useState('');
 
     const {t} = useTranslation('wallet');
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
@@ -433,7 +466,6 @@ const SendLN = ({route}: Props) => {
 
         if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
@@ -513,6 +545,7 @@ const SendLN = ({route}: Props) => {
         comment?: string,
     ) => {
         try {
+            setStatusMessage(t('parsing_ln_address'));
             const input = await parseInput(lnurlPayURL);
 
             if (input.type === InputTypeVariant.LN_URL_ERROR) {
@@ -524,18 +557,22 @@ const SendLN = ({route}: Props) => {
                 const canComment = input.data.commentAllowed;
 
                 // Note: min spendable is in Msat
-                const minAmountSats = input.data.minSendable / 1_000;
+                const maxAmountSats = input.data.maxSendable / 1_000;
                 const amountMSats = amtSats * 1_000;
 
-                if (amtSats < minAmountSats) {
+                setStatusMessage(t('check_ln_address_limits'));
+
+                if (amtSats > maxAmountSats) {
                     Toast.show({
                         topOffset: 54,
                         type: 'Liberal',
                         text1: 'LNURL Pay Error',
-                        text2: t('amount_below_min_spendable'),
+                        text2: t('amount_above_max_spendable'),
                         visibilityTime: 1750,
                     });
                 }
+
+                setStatusMessage(t('paying_ln_address'));
 
                 await payLnurl({
                     data: input.data,
@@ -581,7 +618,7 @@ const SendLN = ({route}: Props) => {
                         ]}>
                         <PlainButton
                             onPress={() =>
-                                navigation.dispatch(StackActions.popToTop())
+                                navigation.dispatch(CommonActions.goBack())
                             }
                             style={[tailwind('absolute left-6')]}>
                             <Close fill={ColorScheme.SVG.Default} />
@@ -601,7 +638,7 @@ const SendLN = ({route}: Props) => {
                                 'address')) && (
                         <InputPanel
                             address={
-                                route.params.lnManualPayload?.text as string
+                                route.params?.lnManualPayload?.text as string
                             }
                         />
                     )}
@@ -614,6 +651,7 @@ const SendLN = ({route}: Props) => {
                             kind={manualKind}
                             text={manualText}
                             description={manualDescription}
+                            statusMsg={statusMessage}
                         />
                     )}
                 </View>

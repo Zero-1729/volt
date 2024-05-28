@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {
     useMemo,
@@ -59,6 +58,10 @@ const ResetPINCode = (props: ResetPINProps) => {
 
     const [tmpPIN, setTmpPIN] = useState<string>('');
     const [confirmPIN, setConfirmPIN] = useState<string>('');
+    const [tmpKey, setTmpKey] = useState('');
+    const [isCorrectExtKey, setCorrectExtKey] = useState(false);
+    const [isCorrectMnemonic, setIsCorrectMnemonic] = useState(false);
+
     const carouselRef = useRef<ICarouselInstance>(null);
     const progressValue = useSharedValue(0);
 
@@ -70,27 +73,21 @@ const ResetPINCode = (props: ResetPINProps) => {
     const mnemonicList = walletMnemonic.split(' ');
     const walletXpub = getWalletData(currentWalletID).xpub;
 
-    const [tmpKey, setTmpKey] = useState('');
-
-    const [isCorrectExtKey, setCorrectExtKey] = useState(false);
-
-    const updateKey = (text: string) => {
+    const updateKey = useCallback((text: string) => {
         setTmpKey(text);
-    };
+    }, []);
 
-    const handleExtKeyCorrect = (matches: boolean) => {
+    const handleExtKeyCorrect = useCallback((matches: boolean) => {
         setCorrectExtKey(matches);
-    };
+    }, []);
 
-    const [isCorrectMnemonic, setIsCorrectMnemonic] = useState(false);
-
-    const updatePIN = (pin: string): void => {
+    const updatePIN = useCallback((pin: string): void => {
         setTmpPIN(pin);
-    };
+    }, []);
 
-    const updateConfirmPIN = (pin: string): void => {
+    const updateConfirmPIN = useCallback((pin: string): void => {
         setConfirmPIN(pin);
-    };
+    }, []);
 
     const handleSuccessReset = useCallback(() => {
         props.triggerSuccess();
@@ -131,6 +128,7 @@ const ResetPINCode = (props: ResetPINProps) => {
 
             setConfirmPIN('');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [confirmPIN]);
 
     const welcomePanel = useCallback((): ReactElement => {
@@ -189,7 +187,15 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [ColorScheme, t, tailwind]);
+    }, [
+        ColorScheme.Background.Inverted,
+        ColorScheme.Text.Alt,
+        ColorScheme.Text.Default,
+        ColorScheme.Text.DescText,
+        props.testInfo.isWatchOnly,
+        t,
+        tailwind,
+    ]);
 
     const mnemonicPanel = useCallback((): ReactElement => {
         return (
@@ -271,7 +277,16 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [ColorScheme, t, tailwind, tmpKey, walletXpub]);
+    }, [
+        ColorScheme.Text.Default,
+        ColorScheme.Text.DescText,
+        handleExtKeyCorrect,
+        t,
+        tailwind,
+        tmpKey,
+        updateKey,
+        walletXpub,
+    ]);
 
     const testPanel = props.testInfo.mnemonic ? mnemonicPanel : extKeyPanel;
 
@@ -331,7 +346,15 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [ColorScheme, t, tailwind, tmpPIN]);
+    }, [
+        ColorScheme.Background.Inverted,
+        ColorScheme.Background.Primary,
+        ColorScheme.Text.Default,
+        t,
+        tailwind,
+        tmpPIN,
+        updatePIN,
+    ]);
 
     const confirmPanel = useCallback((): ReactElement => {
         return (
@@ -389,7 +412,15 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [ColorScheme, confirmPIN, t, tailwind]);
+    }, [
+        ColorScheme.Background.Inverted,
+        ColorScheme.Background.Primary,
+        ColorScheme.Text.Default,
+        confirmPIN,
+        t,
+        tailwind,
+        updateConfirmPIN,
+    ]);
 
     const donePanel = useCallback((): ReactElement => {
         return (

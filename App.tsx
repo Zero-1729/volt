@@ -36,11 +36,11 @@ const App = () => {
             return <></>;
         }
 
-        if (isWalletInitialized) {
-            return <RootNavigator />;
+        if (!isWalletInitialized) {
+            return <OnboardingNavigator />;
         }
 
-        return <OnboardingNavigator />;
+        return <RootNavigator />;
     }, [isReady, isWalletInitialized]);
 
     useEffect(() => {

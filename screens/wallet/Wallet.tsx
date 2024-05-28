@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
 
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
@@ -9,13 +8,10 @@ import {
     FlatList,
     StatusBar,
     StyleSheet,
+    BackHandler,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {
-    useNavigation,
-    CommonActions,
-    StackActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import VText from '../../components/text';
 
@@ -28,14 +24,13 @@ import {
     receiveOnchain,
     onchainPaymentLimits,
     OnchainPaymentLimitsResponse,
-    BreezEventVariant,
 } from '@breeztech/react-native-breez-sdk';
 
 import BDK from 'bdk-rn';
 
 import BigNumber from 'bignumber.js';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTranslation} from 'react-i18next';
 
@@ -66,15 +61,22 @@ import {Balance} from '../../components/balance';
 
 import {UnifiedTransactionListItem} from '../../components/transaction';
 
-import {TBalance, TTransaction, TSwapInfo} from '../../types/wallet';
+import {
+    TBalance,
+    TTransaction,
+    TSwapInfo,
+    TRateObject,
+    TBoltzSwapInfo,
+} from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
+import {fetchBoltzSwapInfo} from '../../modules/boltz';
 
 import Swap from './../../components/swap';
 import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
-import {EBreezDetails, SwapType} from '../../types/enums';
+import {SwapType} from '../../types/enums';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -92,8 +94,10 @@ const Wallet = ({route}: Props) => {
     const [loadingSwapOutInfo, setLoadingSwapOutInfo] = useState<boolean>(true);
     const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
     const [updatedLNBalance, setUpdatedLNBalance] = useState<boolean>(false);
-    const [updatedOnchainBalance, setUpdatedOBalance] = useState<boolean>(false);
+    const [updatedOnchainBalance, setUpdatedOBalance] =
+        useState<boolean>(false);
     const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     // Get current wallet ID and wallet data
     const {
@@ -111,7 +115,6 @@ const Wallet = ({route}: Props) => {
         updateWalletAddress,
         electrumServerURL,
         isAdvancedMode,
-        breezEvent,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -132,7 +135,7 @@ const Wallet = ({route}: Props) => {
         const w = await createBDKWallet(walletData);
 
         return w;
-    }, []);
+    }, [walletData]);
 
     const bottomSwapRef = React.useRef<BottomSheetModal>(null);
     const bottomSendRef = React.useRef<BottomSheetModal>(null);
@@ -221,14 +224,13 @@ const Wallet = ({route}: Props) => {
     };
 
     const jointSync = async () => {
-        // Avoid duplicate loading
+        // Avoid duplicate loading and
         if (refreshing || loadingBalance) {
             return;
         }
 
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(networkState)) {
-            setRefreshing(false);
+        const _netInfo = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netInfo)) {
             return;
         }
 
@@ -298,19 +300,20 @@ const Wallet = ({route}: Props) => {
         const w = bdkWallet ? bdkWallet : await initWallet();
 
         return await syncBDKWallet(w, walletData.network, electrumServerURL);
-    }, []);
+    }, [bdkWallet, electrumServerURL, initWallet, walletData.network]);
 
     // Fetch fiat rate
     const fetchFiat = async () => {
         const triggered = await fetchFiatRate(
             appFiatCurrency.short,
             fiatRate,
-            (rate: BigNumber) => {
+            (rateObj: TRateObject) => {
                 // Then fetch fiat rate
                 updateFiatRate({
                     ...fiatRate,
-                    rate: rate,
-                    lastUpdated: new Date(),
+                    rate: rateObj.rate,
+                    lastUpdated: rateObj.lastUpdated,
+                    dailyChange: rateObj.dailyChange,
                 });
             },
         );
@@ -388,39 +391,72 @@ const Wallet = ({route}: Props) => {
             setBdkWallet(w);
         }
     }, [
-        appFiatCurrency.short,
+        bdkWallet,
         currentWalletID,
-        fiatRate,
+        electrumServerURL,
+        isLNWallet,
         loadingBalance,
-        networkState,
-        refreshing,
-        updateFiatRate,
+        setLoadLock,
+        syncWallet,
+        t,
+        updateWalletAddress,
         updateWalletBalance,
         updateWalletTransactions,
+        updateWalletUTXOs,
         walletData,
     ]);
 
-    const getLNSwapInfo = async () => {
-        // TODO: report error in toast
-        // TODO: replace with call to Boltz to get when LN Balance below min
+    const getLNSwapInfo = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+        if (checkNetworkIsReachable(_netInfo)) {
+            return;
+        }
+
         onchainPaymentLimits()
             .then((c: OnchainPaymentLimitsResponse) => {
-                setSwapOut({
-                    min: c.minSat,
-                    max: c.maxSat,
-                });
-                setLoadingSwapOutInfo(false);
-                setUpdatedLNBalance(false);
+                if (c.minSat !== 0) {
+                    setSwapOut({
+                        min: c.minSat,
+                        max: c.maxSat,
+                    });
+
+                    setUpdatedLNBalance(false);
+                    setLoadingSwapOutInfo(false);
+                } else {
+                    try {
+                        console.log(
+                            '[Boltz SwapOut] Fallback to Fetch limits from Boltz',
+                        );
+
+                        fetchBoltzSwapInfo((respObj: TBoltzSwapInfo) => {
+                            if (respObj.minLimit !== 0) {
+                                setSwapOut({
+                                    min: respObj.minLimit,
+                                    max: respObj.maxLimit,
+                                });
+
+                                setUpdatedLNBalance(false);
+                                setLoadingSwapOutInfo(false);
+                            }
+                        });
+                    } catch (error: any) {
+                        console.log('[Boltz SwapOut] Error: ', error.message);
+                    }
+                }
             })
-            .catch((e: any) => {
-                console.log('[Breez swapOut] error: ', e.message);
+            .catch((error: any) => {
+                console.log('[Breez swapOut] error: ', error.message);
                 setLoadingSwapOutInfo(false);
                 setUpdatedLNBalance(false);
             });
-    };
+    }, []);
 
-    const getOnchainSwapInfo = async () => {
-        // TODO: report error in toast
+    const getOnchainSwapInfo = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+        if (checkNetworkIsReachable(_netInfo)) {
+            return;
+        }
+
         receiveOnchain({})
             .then((d: SwapInfo) => {
                 setSwapIn({
@@ -434,12 +470,12 @@ const Wallet = ({route}: Props) => {
                 setLoadingSwapInInfo(false);
                 setUpdatedOBalance(false);
             })
-            .catch((e: any) => {
-                console.log('[Breez swapIn] error: ', e.message);
+            .catch((error: any) => {
+                console.log('[Breez swapIn] error: ', error.message);
                 setLoadingSwapInInfo(false);
                 setUpdatedOBalance(false);
             });
-    };
+    }, []);
 
     // Check if wallet balance is empty
     const isWalletBroke = (balance: TBalance) => {
@@ -449,18 +485,66 @@ const Wallet = ({route}: Props) => {
     const hideSendButton =
         walletData.isWatchOnly || isWalletBroke(walletData.balance);
 
+    const routeToReceive = useCallback(async () => {
+        const _netInfo = await netInfo.fetch();
+
+        if (!checkNetworkIsReachable(_netInfo)) {
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'Receive',
+                    params: {
+                        sats: '',
+                        fiat: '',
+                        amount: '',
+                        lnDescription: null,
+                    },
+                }),
+            );
+            return;
+        }
+
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'RequestAmount',
+            }),
+        );
+    }, [navigation]);
+
+    const handleBackPress = useCallback(() => {
+        if (route.params?.reload) {
+            navigation.dispatch(
+                CommonActions.navigate({
+                    name: 'HomeScreen',
+                }),
+            );
+            return true;
+        } else {
+            navigation.dispatch(CommonActions.goBack());
+            return true;
+        }
+    }, [navigation, route.params?.reload]);
+
     useEffect(() => {
         if (isLNWallet) {
             getLNSwapInfo();
             getOnchainSwapInfo();
         }
 
+        // Handle back behavior
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            handleBackPress,
+        );
+
         // Kill all loading effects
         () => {
             setRefreshing(false);
             setLoadingBalance(false);
             setLoadLock(false);
+
+            backHandler.remove();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -469,6 +553,7 @@ const Wallet = ({route}: Props) => {
             getOnchainSwapInfo();
         }
         // Re-check swap info
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updatedOnchainBalance]);
 
     useEffect(() => {
@@ -476,22 +561,8 @@ const Wallet = ({route}: Props) => {
             setLoadingSwapOutInfo(true);
             getLNSwapInfo();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updatedLNBalance]);
-
-    useEffect(() => {
-        if (breezEvent.type === BreezEventVariant.INVOICE_PAID && isLNWallet) {
-            // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
-            navigation.dispatch(
-                CommonActions.navigate('LNTransactionStatus', {
-                    status: true,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Received,
-                }),
-            );
-            return;
-        }
-    }, [breezEvent]);
 
     useEffect(() => {
         // Attempt to sync balance when reload triggered
@@ -499,6 +570,7 @@ const Wallet = ({route}: Props) => {
         if (route.params?.reload) {
             jointSync();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route.params?.reload]);
 
     // Receive Wallet ID and fetch wallet data to display
@@ -632,12 +704,12 @@ const Wallet = ({route}: Props) => {
                                 <Text
                                     style={[
                                         tailwind(
-                                            'text-sm text-white opacity-60',
+                                            'text-sm text-white opacity-60 mb-1',
                                         ),
                                     ]}>
-                                    {!checkNetworkIsReachable(networkState)
+                                    {!isNetOn
                                         ? t('offline_balance')
-                                        : t('current_balance')}
+                                        : t('balance')}
                                 </Text>
                                 <Balance
                                     fontColor={'white'}
@@ -649,6 +721,11 @@ const Wallet = ({route}: Props) => {
                                     balanceFontSize={'text-3xl'}
                                     disableFiat={false}
                                     loading={loadingBalance}
+                                    hideColor={
+                                        ColorScheme.WalletColors[
+                                            walletData.type
+                                        ].accent
+                                    }
                                 />
                             </View>
                         </View>
@@ -691,7 +768,6 @@ const Wallet = ({route}: Props) => {
                                             {hideTotalBalance ? (
                                                 <View
                                                     style={[
-                                                        styles.emptyBalance,
                                                         tailwind('rounded-sm'),
                                                         {
                                                             height: 20,
@@ -700,6 +776,12 @@ const Wallet = ({route}: Props) => {
                                                                 loadingBalance
                                                                     ? 0.35
                                                                     : 0.6,
+                                                            backgroundColor:
+                                                                ColorScheme
+                                                                    .WalletColors[
+                                                                    walletData
+                                                                        .type
+                                                                ].accent,
                                                         },
                                                     ]}
                                                 />
@@ -714,6 +796,12 @@ const Wallet = ({route}: Props) => {
                                                     balanceFontSize={'text-lg'}
                                                     disableFiat={false}
                                                     loading={loadingBalance}
+                                                    hideColor={
+                                                        ColorScheme
+                                                            .WalletColors[
+                                                            walletData.type
+                                                        ].accent
+                                                    }
                                                 />
                                             )}
                                         </View>
@@ -781,7 +869,6 @@ const Wallet = ({route}: Props) => {
                                             {hideTotalBalance ? (
                                                 <View
                                                     style={[
-                                                        styles.emptyBalance,
                                                         tailwind('rounded-sm'),
                                                         {
                                                             height: 20,
@@ -790,6 +877,12 @@ const Wallet = ({route}: Props) => {
                                                                 loadingBalance
                                                                     ? 0.35
                                                                     : 0.6,
+                                                            backgroundColor:
+                                                                ColorScheme
+                                                                    .WalletColors[
+                                                                    walletData
+                                                                        .type
+                                                                ].accent,
                                                         },
                                                     ]}
                                                 />
@@ -804,6 +897,12 @@ const Wallet = ({route}: Props) => {
                                                     balanceFontSize={'text-lg'}
                                                     disableFiat={false}
                                                     loading={loadingBalance}
+                                                    hideColor={
+                                                        ColorScheme
+                                                            .WalletColors[
+                                                            walletData.type
+                                                        ].accent
+                                                    }
                                                 />
                                             )}
                                         </View>
@@ -853,14 +952,7 @@ const Wallet = ({route}: Props) => {
                                         backgroundColor: CardAccent,
                                     },
                                 ]}>
-                                <PlainButton
-                                    onPress={() => {
-                                        navigation.dispatch(
-                                            CommonActions.navigate({
-                                                name: 'RequestAmount',
-                                            }),
-                                        );
-                                    }}>
+                                <PlainButton onPress={routeToReceive}>
                                     <Text
                                         style={[
                                             tailwind(
@@ -1004,6 +1096,7 @@ const Wallet = ({route}: Props) => {
                                         swapIn: swapIn,
                                         swapOut: swapOut,
                                     }}
+                                    isOnline={isNetOn}
                                     loadingInfo={
                                         loadingSwapOutInfo && loadingSwapInInfo
                                     }

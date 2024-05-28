@@ -489,23 +489,31 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
 
             {/* Row 3 */}
             <View style={[tailwind('w-full flex-row')]}>
+                {/* Disable decimals for sats */}
+                {!props.isSats ? (
+                    <PlainButton
+                        style={[tailwind('w-1/3 items-center justify-center')]}
+                        onPress={() => {
+                            props.onAmountChange(addDecimalPoint(props.amount));
+                        }}>
+                        <Text
+                            style={[
+                                tailwind('text-xl font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            .
+                        </Text>
+                    </PlainButton>
+                ) : (
+                    <View style={[tailwind('w-1/3')]} />
+                )}
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
-                        props.onAmountChange(addDecimalPoint(props.amount));
-                    }}>
-                    <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        .
-                    </Text>
-                </PlainButton>
-                <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
-                    onPress={() => {
-                        props.onAmountChange(safelyConcat(props.amount, '0'));
+                        // Disable adding a leading zeros if amount is empty and in sats unit
+                        const text =
+                            props.isSats && props.amount === '' ? '' : '0';
+                        props.onAmountChange(safelyConcat(props.amount, text));
                     }}>
                     <Text
                         style={[
@@ -546,10 +554,6 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
     };
 
     const safelyDelete = (text: string) => {
-        if (props.pin === text) {
-            return '';
-        }
-
         return text.slice(0, -1);
     };
 

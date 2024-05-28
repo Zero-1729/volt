@@ -54,7 +54,10 @@ import {getScreenEdges} from '../../modules/screen';
 import BigNumber from 'bignumber.js';
 
 import {nodeInfo, LnPaymentDetails} from '@breeztech/react-native-breez-sdk';
-import { SWAP_IN_LN_DESCRIPTION, SWAP_OUT_LN_DESCRIPTION } from '../../modules/wallet-defaults';
+import {
+    SWAP_IN_LN_DESCRIPTION,
+    SWAP_OUT_LN_DESCRIPTION,
+} from '../../modules/wallet-defaults';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 

@@ -33,6 +33,11 @@ const Color = (currentTheme: ColorThemeType) => {
             QRBorder: isDarkMode ? 'white' : '#E5E5E5',
             Correct: isDarkMode ? '#34C571' : '#34C571',
             Wrong: isDarkMode ? '#EB5757' : '#EB5757',
+            QuickActionsButton: isDarkMode
+                ? 'rgba(200, 200, 200, 0.15)'
+                : 'rgba(200, 200, 200, 0.3)',
+            Fade0: isDarkMode ? 'transparent' : '#FFFFFF00',
+            Fade1: isDarkMode ? 'black' : 'white',
         },
         HeadingBar: isDarkMode ? '#1b1b1b' : '#F3F3F3',
         Text: {
@@ -61,9 +66,9 @@ const Color = (currentTheme: ColorThemeType) => {
             }, // Green
             p2tr: {bitcoin: '#004b94', testnet: '#1E90FF', accent: '#002d58'}, // Blue
             unified: {
-                bitcoin: '#E20788',
-                testnet: '#E20788',
-                accent: '#811E58',
+                bitcoin: '#0069FF',
+                testnet: '#2981FF',
+                accent: '#0044A5',
             }, // OFF2024
         },
     };
