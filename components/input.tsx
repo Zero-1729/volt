@@ -489,19 +489,24 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
 
             {/* Row 3 */}
             <View style={[tailwind('w-full flex-row')]}>
-                <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
-                    onPress={() => {
-                        props.onAmountChange(addDecimalPoint(props.amount));
-                    }}>
-                    <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        .
-                    </Text>
-                </PlainButton>
+                {/* Disable decimals for sats */}
+                {!props.isSats ? (
+                    <PlainButton
+                        style={[tailwind('w-1/3 items-center justify-center')]}
+                        onPress={() => {
+                            props.onAmountChange(addDecimalPoint(props.amount));
+                        }}>
+                        <Text
+                            style={[
+                                tailwind('text-xl font-bold'),
+                                {color: ColorScheme.Text.Default},
+                            ]}>
+                            .
+                        </Text>
+                    </PlainButton>
+                ) : (
+                    <View style={[tailwind('w-1/3')]} />
+                )}
                 <PlainButton
                     style={[tailwind('w-1/3 items-center justify-center')]}
                     onPress={() => {
