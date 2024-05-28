@@ -754,8 +754,7 @@ const RootNavigator = (): ReactElement => {
             }
 
             if (event.type === BreezEventVariant.BACKUP_FAILED) {
-                console.log('[Breez SDK] Backup failed');
-                console.log('[Breez SDK] Event details: ', event.details);
+                console.log('[Breez SDK] Backup Failed: ', event.details);
 
                 Toast.show({
                     topOffset: 54,
@@ -767,24 +766,24 @@ const RootNavigator = (): ReactElement => {
             }
 
             if (event.type === BreezEventVariant.INVOICE_PAID) {
-                console.log('[Breez SDK] Invoice paid');
-                console.log('[Breez SDK] Payment details: ', event.details);
+                console.log(
+                    '[Breez SDK] Invoice Paid (Received Payment): ',
+                    event.details,
+                );
 
                 // Handle navigation to LNTransactionStatus in Wallet Receive screen
                 setBreezEvent(event);
             }
 
             if (event.type === BreezEventVariant.PAYMENT_FAILED) {
-                console.log('[Breez SDK] Payment failed');
-                console.log('[Breez SDK] Event details: ', event.details);
+                console.log('[Breez SDK] Payment Failed: ', event.details);
 
                 // Handle navigation to LNTransactionStatus in Wallet Receive & Send screen
                 setBreezEvent(event);
             }
 
             if (event.type === BreezEventVariant.PAYMENT_SUCCEED) {
-                console.log('[Breez SDK] Payment sent');
-                console.log('[Breez SDK] Event details: ', event.details);
+                console.log('[Breez SDK] Payment Sent: ', event.details);
 
                 // Handle navigation to LNTransactionStatus in Wallet Send screen
                 setBreezEvent(event);
