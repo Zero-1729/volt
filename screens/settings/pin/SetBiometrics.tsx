@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Linking, Text, View, useColorScheme} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 import React, {useContext} from 'react';
 
 import {useTailwind} from 'tailwind-rn';
@@ -39,11 +39,18 @@ const SetBiometrics = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('settings');
+    const {t: e} = useTranslation('errors');
 
     const {setBiometricsActive, isWalletInitialized} =
         useContext(AppStorageContext);
     const [doneSetup, setDoneSetup] = React.useState<boolean>(false);
     const [doneErrorText, setDoneErrorText] = React.useState<string>('');
+
+    const bottomText = doneErrorText
+        ? capitalizeFirst(t('skip'))
+        : doneSetup
+        ? capitalizeFirst(t('done'))
+        : capitalizeFirst(t('enable'));
 
     const handleRoute = () => {
         if (isWalletInitialized) {
@@ -66,16 +73,8 @@ const SetBiometrics = ({route}: Props) => {
             const {available, biometryType, error} =
                 await RNBiometrics.isSensorAvailable();
 
-            if (error) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Biometrics'),
-                    text2: t('biometrics_error'),
-                    visibilityTime: 1750,
-                });
-
-                setDoneErrorText(t('biometrics_error'));
+            if (error && !available) {
+                setDoneErrorText(e('biometrics_error'));
                 return;
             }
 
@@ -141,6 +140,11 @@ const SetBiometrics = ({route}: Props) => {
     };
 
     const handleDone = () => {
+        if (doneErrorText) {
+            skipAlong();
+            return;
+        }
+
         if (doneSetup) {
             handleRoute();
             return;
@@ -159,10 +163,6 @@ const SetBiometrics = ({route}: Props) => {
         }
     };
 
-    const openSettings = () => {
-        Linking.openSettings();
-    };
-
     return (
         <SafeAreaView
             style={[
@@ -178,13 +178,15 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('items-center w-5/6'),
                             {marginTop: -64},
                         ]}>
-                        {doneSetup && doneErrorText.length === 0 ? (
+                        {doneSetup && (
                             <Success
                                 fill={ColorScheme.SVG.Default}
                                 width={200}
                                 height={200}
                             />
-                        ) : (
+                        )}
+
+                        {!doneSetup && !doneErrorText && (
                             <View
                                 style={[
                                     {
@@ -206,9 +208,9 @@ const SetBiometrics = ({route}: Props) => {
                             </View>
                         )}
 
-                        {doneErrorText.length > 0 && (
+                        {doneErrorText && (
                             <Failed
-                                fill={ColorScheme.Background.Default}
+                                fill={ColorScheme.SVG.Default}
                                 width={200}
                                 height={200}
                             />
@@ -221,6 +223,8 @@ const SetBiometrics = ({route}: Props) => {
                             ]}>
                             {doneSetup
                                 ? t('setup_bio_success')
+                                : doneErrorText
+                                ? t('cannot_setup_bio')
                                 : t('setup_bio')}
                         </Text>
 
@@ -231,6 +235,8 @@ const SetBiometrics = ({route}: Props) => {
                             ]}>
                             {doneSetup
                                 ? t('setup_bio_done_desc')
+                                : doneErrorText
+                                ? doneErrorText
                                 : t('setup_bio_desc')}
                         </Text>
                     </View>
@@ -240,7 +246,7 @@ const SetBiometrics = ({route}: Props) => {
                             tailwind('absolute w-5/6'),
                             {bottom: NativeWindowMetrics.bottomButtonOffset},
                         ]}>
-                        {!doneSetup && doneErrorText.length === 0 && (
+                        {!doneSetup && !doneErrorText && (
                             <PlainButton onPress={skipAlong}>
                                 <Text
                                     style={[
@@ -256,24 +262,8 @@ const SetBiometrics = ({route}: Props) => {
                             </PlainButton>
                         )}
 
-                        {doneErrorText.length > 0 && (
-                            <PlainButton onPress={openSettings}>
-                                <Text
-                                    style={[
-                                        tailwind(
-                                            'text-base text-center font-bold mb-6',
-                                        ),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
-                                    {capitalizeFirst(t('open_settings'))}
-                                </Text>
-                            </PlainButton>
-                        )}
-
                         <LongButton
-                            title={capitalizeFirst(
-                                doneSetup ? t('done') : t('enable'),
-                            )}
+                            title={bottomText}
                             textColor={ColorScheme.Text.Alt}
                             backgroundColor={ColorScheme.Background.Inverted}
                             onPress={handleDone}

@@ -49,6 +49,7 @@
     "done_pin_setup": "PIN All Set",
     "done_pin_setup_message": "Setup complete, you can now relax knowing your wallet is more secure.",
     "setup_bio": "Setup Biometrics",
+    "cannot_setup_bio": "Unable to setup Biometrics",
     "setup_bio_success": "Biometrics All Set",
     "setup_bio_desc": "Enable Biometrics for added security. This will use your device's fingerprint or face recognition to unlock wallet.",
     "setup_bio_done_desc": "Setup is complete, you can now relax knowing your wallet is even more secure.",

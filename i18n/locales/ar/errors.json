@@ -38,5 +38,6 @@
     "new_channel_open_warn": "سيتم خصم {{n, number}} سات ({{fiat}}) من مبلغ الاستقبال لفتح قناة جديدة",
     "missing_bolt11_invoice_amount": "المبلغ مفقود في فاتورة Bolt11",
     "tx_fail_creation_erorr": "فشل في إنشاء المعاملة",
-    "ln_description_length": "يجب أن يكون الوصف أقل من تسعين حرفًا"
+    "ln_description_length": "يجب أن يكون الوصف أقل من تسعين حرفًا",
+    "biometrics_error": "القياسات الحيوية غير مدعومة"
 }
