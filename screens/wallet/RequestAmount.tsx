@@ -27,6 +27,9 @@ import Toast, {ToastConfig} from 'react-native-toast-message';
 
 import BottomArrow from '../../assets/svg/chevron-down-16.svg';
 
+import netInfo from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
+
 import {
     SATS_TO_BTC_RATE,
     capitalizeFirst,
@@ -279,6 +282,20 @@ const RequestAmount = ({route}: Props) => {
         );
     };
 
+    const routeToOnchainReceive = () => {
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'Receive',
+                params: {
+                    sats: satsAmount.value.toString(),
+                    fiat: fiatAmount.toString(),
+                    amount: amount,
+                    lnDescription: lnInvoiceDesc,
+                },
+            }),
+        );
+    };
+
     const handleRoute = async () => {
         if (route.params?.boltNFCMode) {
             navigation.dispatch(
@@ -299,6 +316,13 @@ const RequestAmount = ({route}: Props) => {
         }
 
         if (walletType === 'unified') {
+            // Network check
+            const _netInfo = await netInfo.fetch();
+            if (!checkNetworkIsReachable(_netInfo)) {
+                routeToOnchainReceive();
+                return;
+            }
+
             const channelOpenFee = await openChannelFee({
                 amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
             });
@@ -339,20 +363,11 @@ const RequestAmount = ({route}: Props) => {
                     },
                 );
             } else {
-                navigation.dispatch(
-                    CommonActions.navigate({
-                        name: 'Receive',
-                        params: {
-                            sats: satsAmount.value.toString(),
-                            fiat: fiatAmount.toString(),
-                            amount: amount,
-                            lnDescription: lnInvoiceDesc,
-                        },
-                    }),
-                );
+                routeToOnchainReceive();
             }
         }
 
+        routeToOnchainReceive();
         return;
     };
 
