@@ -16,11 +16,7 @@ import React, {
     useEffect,
 } from 'react';
 
-import {
-    useNavigation,
-    StackActions,
-    CommonActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {
     BreezEventVariant,
@@ -458,7 +454,6 @@ const SendLN = ({route}: Props) => {
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
@@ -471,7 +466,6 @@ const SendLN = ({route}: Props) => {
 
         if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
@@ -624,7 +618,7 @@ const SendLN = ({route}: Props) => {
                         ]}>
                         <PlainButton
                             onPress={() =>
-                                navigation.dispatch(StackActions.popToTop())
+                                navigation.dispatch(CommonActions.goBack())
                             }
                             style={[tailwind('absolute left-6')]}>
                             <Close fill={ColorScheme.SVG.Default} />

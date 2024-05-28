@@ -133,7 +133,6 @@ import netInfo from '@react-native-community/netinfo';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
-    'FeeSelection',
     'WalletBackup',
     'AddressOwnership',
     'TransactionDetails',

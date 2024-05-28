@@ -15,11 +15,7 @@ import VText from './../../components/text';
 
 import {useTranslation} from 'react-i18next';
 
-import {
-    CommonActions,
-    useNavigation,
-    StackActions,
-} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AppStorageContext} from '../../class/storageContext';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -287,7 +283,7 @@ const FeeSelection = ({route}: Props) => {
                     ]}>
                     <PlainButton
                         onPress={() =>
-                            navigation.dispatch(StackActions.popToTop())
+                            navigation.dispatch(CommonActions.goBack())
                         }
                         style={[tailwind('absolute z-10 left-6')]}>
                         <Close fill={ColorScheme.SVG.Default} />

@@ -21,11 +21,7 @@ import {
 
 import VText from '../../components/text';
 
-import {
-    useNavigation,
-    CommonActions,
-    StackActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {
     receivePayment,
@@ -921,7 +917,7 @@ const Receive = ({route}: Props) => {
                     <PlainButton
                         style={[tailwind('absolute left-0 z-10')]}
                         onPress={() => {
-                            navigation.dispatch(StackActions.popToTop());
+                            navigation.dispatch(CommonActions.goBack());
                         }}>
                         <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>

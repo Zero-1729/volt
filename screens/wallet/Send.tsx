@@ -39,11 +39,7 @@ import {TComboWallet} from '../../types/wallet';
 import ExportPsbt from '../../components/psbt';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
-import {
-    useNavigation,
-    StackActions,
-    CommonActions,
-} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 import {useTailwind} from 'tailwind-rn';
 
@@ -437,7 +433,6 @@ const SendView = ({route}: Props) => {
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
@@ -450,7 +445,6 @@ const SendView = ({route}: Props) => {
 
         if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
