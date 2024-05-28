@@ -158,8 +158,8 @@ const defaultContext: defaultContextType = {
     wallets: [],
     fiatRate: {
         rate: new BigNumber(26000),
-        lastUpdated: new Date(),
-        source: 'CoinGecko',
+        lastUpdated: new Date().getTime(),
+        dailyChange: new BigNumber(0),
     },
     currentWalletID: '',
     isDevMode: false,
@@ -533,8 +533,8 @@ export const AppStorageProvider = ({children}: Props) => {
 
             const rehydratedFiatRate = {
                 rate: new BigNumber(parsedRate.rate),
-                lastUpdated: new Date(parsedRate.lastUpdated),
-                source: 'CoinGecko',
+                lastUpdated: Number(parsedRate.lastUpdated),
+                dailyChange: new BigNumber(parsedRate.dailyChange),
             };
             _setFiatRate(rehydratedFiatRate);
         }
