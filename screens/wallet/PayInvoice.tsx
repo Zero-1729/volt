@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {
     useState,
     useContext,
@@ -29,6 +28,9 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {useTranslation} from 'react-i18next';
 
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
+import {checkNetworkIsReachable} from '../../modules/wallet-utils';
+
 import decodeURI from 'bip21';
 import {
     getMiniWallet,
@@ -51,7 +53,6 @@ import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
 import {WalletCard} from '../../components/shared';
 import {TInvoiceData} from '../../types/wallet';
-import {useNetInfo} from '@react-native-community/netinfo';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
@@ -75,12 +76,11 @@ const PayInvoice = ({route}: Props) => {
     );
     const [expiryEpoch, setExpiryEpoch] = useState<number>();
     const [isExpired, setIsExpired] = useState(false);
+    const isNetOn = useNetInfo();
 
     const {hideTotalBalance, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
-
-    const networkState = useNetInfo();
 
     const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
     const cardHeight = 220;
@@ -110,7 +110,7 @@ const PayInvoice = ({route}: Props) => {
                 <ExpiryTimer expiryDate={expiryEpoch} />
             </View>
         );
-    }, [expiryEpoch, isLightning]);
+    }, [expiryEpoch, isLightning, tailwind]);
 
     const decodeInvoice = useCallback((invoice: string) => {
         // Only handling Bolt11 Lightning invoices
@@ -137,89 +137,93 @@ const PayInvoice = ({route}: Props) => {
         );
     }, []);
 
-    const handleInvoiceType = useCallback(async (invoice: string) => {
-        const invoiceType = await decodeInvoiceType(invoice);
+    const handleInvoiceType = useCallback(
+        async (invoice: string) => {
+            const invoiceType = await decodeInvoiceType(invoice);
 
-        if (
-            invoiceType.type === 'lightning' ||
-            invoiceType.type === 'bitcoin' ||
-            invoiceType.type === 'unified'
-        ) {
-            let invoiceBolt11!: string;
-            let btcInvoice!: string;
+            if (
+                invoiceType.type === 'lightning' ||
+                invoiceType.type === 'bitcoin' ||
+                invoiceType.type === 'unified'
+            ) {
+                let invoiceBolt11!: string;
+                let btcInvoice!: string;
 
-            // Handle unified BIP21 QR
-            if (invoiceType.type === 'unified') {
-                const embededBolt11 = invoiceType.invoice?.split('&lightning=');
+                // Handle unified BIP21 QR
+                if (invoiceType.type === 'unified') {
+                    const embededBolt11 =
+                        invoiceType.invoice?.split('&lightning=');
 
-                if (embededBolt11.length > 1) {
-                    invoiceBolt11 =
-                        invoiceType.invoice?.split('&lightning=').pop() ?? '';
-                } else {
-                    btcInvoice =
-                        invoiceType.invoice
-                            ?.split('&lightning=')[0]
-                            .toLowerCase() ?? '';
+                    if (embededBolt11.length > 1) {
+                        invoiceBolt11 =
+                            invoiceType.invoice?.split('&lightning=').pop() ??
+                            '';
+                    } else {
+                        btcInvoice =
+                            invoiceType.invoice
+                                ?.split('&lightning=')[0]
+                                .toLowerCase() ?? '';
+                    }
                 }
-            }
 
-            // Handle Bolt11 Invoice
-            if (
-                (invoiceType.type === 'lightning' &&
-                    invoiceType.spec === 'bolt11') ||
-                invoiceBolt11
-            ) {
-                decodeBolt11(
-                    invoiceBolt11 ? invoiceBolt11 : route.params?.invoice,
+                // Handle Bolt11 Invoice
+                if (
+                    (invoiceType.type === 'lightning' &&
+                        invoiceType.spec === 'bolt11') ||
+                    invoiceBolt11
+                ) {
+                    decodeBolt11(
+                        invoiceBolt11 ? invoiceBolt11 : route.params?.invoice,
+                    );
+                    return;
+                }
+
+                // If LN report we aren't supporting it yet
+                if (
+                    !(invoiceType?.spec === 'bolt11') &&
+                    invoiceType.type === 'lightning'
+                ) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('error')),
+                        text2: e('unsupported_invoice_type'),
+                        visibilityTime: 1750,
+                    });
+
+                    navigation.dispatch(CommonActions.navigate('HomeScreen'));
+
+                    return;
+                }
+
+                // handle bitcoin BIP21 invoice
+                setDecodedInvoice(
+                    decodeInvoice(
+                        btcInvoice ? btcInvoice : route.params?.invoice,
+                    ),
                 );
-                return;
-            }
-
-            // If LN report we aren't supporting it yet
-            if (
-                !(invoiceType?.spec === 'bolt11') &&
-                invoiceType.type === 'lightning'
-            ) {
+            } else {
                 Toast.show({
                     topOffset: 54,
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
-                    text2: e('unsupported_invoice_type'),
+                    text2: e('invalid_invoice_error'),
                     visibilityTime: 1750,
                 });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
-
-                return;
             }
+        },
+        [decodeBolt11, decodeInvoice, e, navigation, route.params?.invoice, t],
+    );
 
-            // handle bitcoin BIP21 invoice
-            setDecodedInvoice(
-                decodeInvoice(btcInvoice ? btcInvoice : route.params?.invoice),
-            );
-        } else {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: e('invalid_invoice_error'),
-                visibilityTime: 1750,
-            });
-
-            navigation.dispatch(CommonActions.navigate('HomeScreen'));
-        }
-    }, []);
-
-    useEffect(() => {
-        handleInvoiceType(route.params?.invoice);
-    }, []);
-
-    const handleRoute = useCallback(() => {
+    const handleRoute = useCallback(async () => {
         const _wallet = getMiniWallet(wallet);
         const invoiceHasAmount = !!decodedInvoice?.options?.amount;
 
         // Check network connection first
-        if (!networkState?.isInternetReachable) {
+        const _netInfo = await netInfo.fetch();
+        if (!checkNetworkIsReachable(_netInfo)) {
             Toast.show({
                 topOffset: 54,
                 type: 'Liberal',
@@ -285,7 +289,7 @@ const PayInvoice = ({route}: Props) => {
                         screen: 'FeeSelection',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: wallet,
+                            wallet: _wallet,
                         },
                     }),
                 );
@@ -295,13 +299,18 @@ const PayInvoice = ({route}: Props) => {
                         screen: 'SendAmount',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: wallet,
+                            wallet: _wallet,
                             isLightning: isLightning,
                         },
                     }),
                 );
             }
         }
+    }, [bolt11, decodedInvoice, e, isLightning, navigation, t, wallet]);
+
+    useEffect(() => {
+        handleInvoiceType(route.params.invoice);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const invoiceOptionsEmpty = decodedInvoice.options
@@ -510,7 +519,11 @@ const PayInvoice = ({route}: Props) => {
                 </View>
 
                 <LongBottomButton
-                    disabled={isExpired}
+                    disabled={
+                        isExpired ||
+                        !isNetOn ||
+                        (!bolt11 && Object.keys(decodedInvoice).length === 0)
+                    }
                     title={'Pay Invoice'}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}

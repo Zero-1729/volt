@@ -225,11 +225,8 @@ const Receive = ({route}: Props) => {
 
     const isAmountInvoice = useMemo(() => {
         // Show if is a LN wallet & online
-        // or not LN but has BTC onchain amount set
-        return (
-            (!isLNWallet && !state.bitcoinValue.isZero()) ||
-            (isLNWallet && isNetOn)
-        );
+        // or has BTC onchain amount set
+        return !state.bitcoinValue.isZero() || (isLNWallet && isNetOn);
     }, [isLNWallet, state.bitcoinValue, isNetOn]);
 
     // Set bitcoin invoice URI
@@ -357,7 +354,6 @@ const Receive = ({route}: Props) => {
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
@@ -370,7 +366,6 @@ const Receive = ({route}: Props) => {
 
         if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
             // Route to LN payment status screen
-            navigation.dispatch(StackActions.popToTop());
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
