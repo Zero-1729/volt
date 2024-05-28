@@ -145,6 +145,7 @@ const SendView = ({route}: Props) => {
 
     const [paymentToSelf, setPaymentToSelf] = useState(true);
     const [paySelfMessage, setPaySelfMessage] = useState('');
+    const [alreadyPaidInvoice, setAlreadyPaidInvoice] = useState(false);
 
     const bottomExportRef = useRef<BottomSheetModal>(null);
     const bottomPINPassRef = useRef<BottomSheetModal>(null);
@@ -253,15 +254,15 @@ const SendView = ({route}: Props) => {
                     visibilityTime: 2000,
                 });
                 setLoading(false);
+                console.log(
+                    '[Send] Error sending payment: ',
+                    result.payment.error,
+                );
             }
         } catch (error: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: error.message,
-                visibilityTime: 2000,
-            });
+            if (error.message === 'Invoice already paid') {
+                setAlreadyPaidInvoice(true);
+            }
             setLoading(false);
         }
     };
@@ -780,7 +781,7 @@ const SendView = ({route}: Props) => {
                             </View>
                         )}
 
-                    {paySelfMessage && (
+                    {isLightning && paySelfMessage && (
                         <View
                             style={[
                                 tailwind(
@@ -808,12 +809,41 @@ const SendView = ({route}: Props) => {
                         </View>
                     )}
 
+                    {isLightning && alreadyPaidInvoice && (
+                        <View
+                            style={[
+                                tailwind(
+                                    `mt-6 w-full ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } items-center justify-center absolute`,
+                                ),
+                                {
+                                    bottom:
+                                        NativeWindowMetrics.bottomButtonOffset +
+                                        76,
+                                },
+                            ]}>
+                            <VText
+                                style={[
+                                    tailwind('text-sm text-center w-5/6'),
+                                    {
+                                        color: ColorScheme.Text.DescText,
+                                    },
+                                ]}>
+                                {t('already_paid_ln_invoice')}
+                            </VText>
+                        </View>
+                    )}
+
                     <LongBottomButton
                         disabled={
                             loading ||
                             (!isLightning && loadingPsbt) ||
                             isExpired ||
-                            paymentToSelf
+                            paymentToSelf ||
+                            alreadyPaidInvoice
                         }
                         onPress={authAndPay}
                         title={capitalizeFirst(t('send'))}
