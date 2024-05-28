@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useContext, useEffect, useState, useCallback} from 'react';
+import React, {
+    useContext,
+    useEffect,
+    useState,
+    useCallback,
+    useRef,
+} from 'react';
 
 import {
     Platform,
@@ -67,6 +73,11 @@ import {fetchFiatRate} from '../modules/currency';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import PINPass from '../components/pinpass';
+
+import {biometricAuth} from '../modules/shared';
+
 import {
     getUniqueTXs,
     checkNetworkIsReachable,
@@ -109,6 +120,7 @@ const Home = ({route}: Props) => {
         isWalletInitialized,
         electrumServerURL,
         isAdvancedMode,
+        isBiometricsActive,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -121,6 +133,53 @@ const Home = ({route}: Props) => {
     const isLightning = wallet.type === 'unified';
 
     const AppScreenWidth = Dimensions.get('window').width;
+
+    const bottomPINPassRef = useRef<BottomSheetModal>(null);
+    const [pinIdx, setPINIdx] = useState(-1);
+
+    const togglePINPassModal = () => {
+        if (pinIdx !== 1) {
+            bottomPINPassRef.current?.present();
+        } else {
+            bottomPINPassRef.current?.close();
+        }
+    };
+
+    const handlePINSuccess = async () => {
+        triggerBackupFlow();
+        bottomPINPassRef.current?.close();
+    };
+
+    const handleBackupRoute = () => {
+        if (isBiometricsActive) {
+            biometricAuth(
+                success => {
+                    if (success) {
+                        triggerBackupFlow();
+                    }
+                },
+                // prompt response callback
+                () => {
+                    togglePINPassModal();
+                },
+                // prompt error callback
+                error => {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: t('Biometrics'),
+                        text2: error.message,
+                        visibilityTime: 1750,
+                    });
+                },
+            );
+
+            return;
+        }
+
+        // IF no biometrics, just call on PIN modal
+        togglePINPassModal();
+    };
 
     // add the total balances of the wallets
     const totalBalance: TBalance = wallets.reduce(
@@ -514,139 +573,184 @@ const Home = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View
-                style={[
-                    tailwind('h-full items-center justify-start relative'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+            <BottomSheetModalProvider>
                 <View
                     style={[
-                        tailwind(
-                            'w-5/6 h-10 items-center flex-row justify-between',
-                        ),
-                        {marginTop: topPlatformOffset},
+                        tailwind('h-full items-center justify-start relative'),
+                        {backgroundColor: ColorScheme.Background.Primary},
                     ]}>
-                    <PlainButton onPress={() => {}}>
-                        <Bell
-                            fill={ColorScheme.Background.Inverted}
-                            width={24}
-                            height={24}
-                            style={tailwind('-ml-1')}
-                        />
-                    </PlainButton>
+                    <View
+                        style={[
+                            tailwind(
+                                'w-5/6 h-10 items-center flex-row justify-between',
+                            ),
+                            {marginTop: topPlatformOffset},
+                        ]}>
+                        <PlainButton onPress={() => {}}>
+                            <Bell
+                                fill={ColorScheme.Background.Inverted}
+                                width={24}
+                                height={24}
+                                style={tailwind('-ml-1')}
+                            />
+                        </PlainButton>
 
-                    <PlainButton
-                        onPress={() =>
-                            navigation.dispatch(
-                                CommonActions.navigate('SettingsRoot', {
-                                    screen: 'Settings',
-                                }),
-                            )
-                        }>
+                        <PlainButton
+                            onPress={() =>
+                                navigation.dispatch(
+                                    CommonActions.navigate('SettingsRoot', {
+                                        screen: 'Settings',
+                                    }),
+                                )
+                            }>
+                            <View
+                                style={[
+                                    tailwind(
+                                        'flex-row justify-between items-center -mr-1',
+                                    ),
+                                ]}>
+                                <Gear
+                                    width={32}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </View>
+                        </PlainButton>
+                    </View>
+
+                    <View style={[tailwind('w-full h-full mt-2 items-center')]}>
+                        <View
+                            style={tailwind(
+                                'justify-around items-center w-full mb-6',
+                            )}>
+                            {wallets.length > 0 && (
+                                <>
+                                    <VText
+                                        style={[
+                                            tailwind(
+                                                'text-base font-medium mb-1',
+                                            ),
+                                            {
+                                                color: isNetOn
+                                                    ? ColorScheme.Text.Default
+                                                    : ColorScheme.Text
+                                                          .GrayedText,
+                                            },
+                                            Font.RobotoText,
+                                        ]}>
+                                        {!isNetOn
+                                            ? t('offline_balance')
+                                            : t('balance')}
+                                    </VText>
+
+                                    {!hideTotalBalance ? (
+                                        <FiatBalance
+                                            balance={totalBalance.onchain
+                                                .plus(totalBalance.lightning)
+                                                .toNumber()}
+                                            loading={loadingBalance}
+                                            balanceFontSize={'text-3xl'}
+                                            fontColor={ColorScheme.Text.Default}
+                                        />
+                                    ) : (
+                                        <View
+                                            style={[
+                                                tailwind(
+                                                    'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row',
+                                                ),
+                                                {
+                                                    backgroundColor:
+                                                        ColorScheme.Background
+                                                            .Greyed,
+                                                },
+                                            ]}
+                                        />
+                                    )}
+                                </>
+                            )}
+                        </View>
+
+                        {/** Wallet Card */}
                         <View
                             style={[
-                                tailwind(
-                                    'flex-row justify-between items-center -mr-1',
-                                ),
+                                {
+                                    height: styles.CardContainer.height,
+                                    width: AppScreenWidth * 0.92,
+                                },
                             ]}>
-                            <Gear width={32} fill={ColorScheme.SVG.Default} />
+                            <WalletCard
+                                // This is for onchain behaviour only
+                                maxedCard={
+                                    wallet.type !== 'unified' &&
+                                    wallet.balance.onchain.isZero() &&
+                                    wallet.transactions.length > 0
+                                }
+                                // Combine the balances
+                                balance={wallet.balance.lightning.plus(
+                                    wallet.balance.onchain,
+                                )}
+                                network={wallet.network}
+                                isWatchOnly={wallet.isWatchOnly}
+                                label={wallet.name}
+                                walletType={wallet.type}
+                                loading={loadingBalance}
+                                hideBalance={hideTotalBalance}
+                                unit={wallet.units}
+                                navCallback={() => {
+                                    // Set the current wallet ID
+                                    setCurrentWalletID(wallet.id);
+
+                                    navigation.dispatch(
+                                        CommonActions.navigate('WalletRoot', {
+                                            screen: 'WalletView',
+                                        }),
+                                    );
+                                }}
+                            />
                         </View>
-                    </PlainButton>
-                </View>
 
-                <View style={[tailwind('w-full h-full mt-2 items-center')]}>
-                    <View
-                        style={tailwind(
-                            'justify-around items-center w-full mb-6',
-                        )}>
-                        {wallets.length > 0 && (
-                            <>
-                                <VText
+                        {/* Quick Actions */}
+                        <View
+                            style={[tailwind('flex-row w-5/6 justify-around')]}>
+                            {isLightning && (
+                                <PlainButton
+                                    onPress={navigateToBoltNFC}
                                     style={[
-                                        tailwind('text-base font-medium mb-1'),
-                                        {
-                                            color: isNetOn
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.GrayedText,
-                                        },
-                                        Font.RobotoText,
+                                        tailwind(
+                                            'flex justify-center items-center',
+                                        ),
                                     ]}>
-                                    {!isNetOn
-                                        ? t('offline_balance')
-                                        : t('balance')}
-                                </VText>
-
-                                {!hideTotalBalance ? (
-                                    <FiatBalance
-                                        balance={totalBalance.onchain
-                                            .plus(totalBalance.lightning)
-                                            .toNumber()}
-                                        loading={loadingBalance}
-                                        balanceFontSize={'text-3xl'}
-                                        fontColor={ColorScheme.Text.Default}
-                                    />
-                                ) : (
                                     <View
                                         style={[
                                             tailwind(
-                                                'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row',
+                                                'rounded-full items-center justify-center mb-2',
                                             ),
                                             {
+                                                height: 54,
+                                                width: 54,
                                                 backgroundColor:
                                                     ColorScheme.Background
-                                                        .Greyed,
+                                                        .QuickActionsButton,
                                             },
-                                        ]}
-                                    />
-                                )}
-                            </>
-                        )}
-                    </View>
-
-                    {/** Wallet Card */}
-                    <View
-                        style={[
-                            {
-                                height: styles.CardContainer.height,
-                                width: AppScreenWidth * 0.92,
-                            },
-                        ]}>
-                        <WalletCard
-                            // This is for onchain behaviour only
-                            maxedCard={
-                                wallet.type !== 'unified' &&
-                                wallet.balance.onchain.isZero() &&
-                                wallet.transactions.length > 0
-                            }
-                            // Combine the balances
-                            balance={wallet.balance.lightning.plus(
-                                wallet.balance.onchain,
+                                        ]}>
+                                        <BoltIcon
+                                            style={[{marginTop: 3}]}
+                                            width={30}
+                                            height={30}
+                                            fill={ColorScheme.SVG.Default}
+                                        />
+                                    </View>
+                                    <VText
+                                        style={[
+                                            tailwind('text-sm'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        {t('bolt_nfc')}
+                                    </VText>
+                                </PlainButton>
                             )}
-                            network={wallet.network}
-                            isWatchOnly={wallet.isWatchOnly}
-                            label={wallet.name}
-                            walletType={wallet.type}
-                            loading={loadingBalance}
-                            hideBalance={hideTotalBalance}
-                            unit={wallet.units}
-                            navCallback={() => {
-                                // Set the current wallet ID
-                                setCurrentWalletID(wallet.id);
 
-                                navigation.dispatch(
-                                    CommonActions.navigate('WalletRoot', {
-                                        screen: 'WalletView',
-                                    }),
-                                );
-                            }}
-                        />
-                    </View>
-
-                    {/* Quick Actions */}
-                    <View style={[tailwind('flex-row w-5/6 justify-around')]}>
-                        {isLightning && (
                             <PlainButton
-                                onPress={navigateToBoltNFC}
+                                onPress={goToScan}
                                 style={[
                                     tailwind(
                                         'flex justify-center items-center',
@@ -665,10 +769,8 @@ const Home = ({route}: Props) => {
                                                     .QuickActionsButton,
                                         },
                                     ]}>
-                                    <BoltIcon
-                                        style={[{marginTop: 3}]}
-                                        width={30}
-                                        height={30}
+                                    <ScanIcon
+                                        width={24}
                                         fill={ColorScheme.SVG.Default}
                                     />
                                 </View>
@@ -677,46 +779,48 @@ const Home = ({route}: Props) => {
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {t('bolt_nfc')}
+                                    {capitalizeFirst(t('scan'))}
                                 </VText>
                             </PlainButton>
-                        )}
 
-                        <PlainButton
-                            onPress={goToScan}
-                            style={[
-                                tailwind('flex justify-center items-center'),
-                            ]}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'rounded-full items-center justify-center mb-2',
-                                    ),
-                                    {
-                                        height: 54,
-                                        width: 54,
-                                        backgroundColor:
-                                            ColorScheme.Background
-                                                .QuickActionsButton,
-                                    },
-                                ]}>
-                                <ScanIcon
-                                    width={24}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </View>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {capitalizeFirst(t('scan'))}
-                            </VText>
-                        </PlainButton>
+                            {isLightning && (
+                                <PlainButton
+                                    onPress={gotToZap}
+                                    style={[
+                                        tailwind(
+                                            'flex justify-center items-center',
+                                        ),
+                                    ]}>
+                                    <View
+                                        style={[
+                                            tailwind(
+                                                'rounded-full items-center justify-center mb-2',
+                                            ),
+                                            {
+                                                height: 54,
+                                                width: 54,
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .QuickActionsButton,
+                                            },
+                                        ]}>
+                                        <ZapIcon
+                                            width={20}
+                                            fill={ColorScheme.SVG.Default}
+                                        />
+                                    </View>
+                                    <VText
+                                        style={[
+                                            tailwind('text-sm'),
+                                            {color: ColorScheme.Text.Default},
+                                        ]}>
+                                        {capitalizeFirst(t('zap'))}
+                                    </VText>
+                                </PlainButton>
+                            )}
 
-                        {isLightning && (
                             <PlainButton
-                                onPress={gotToZap}
+                                onPress={handleBackupRoute}
                                 style={[
                                     tailwind(
                                         'flex justify-center items-center',
@@ -735,7 +839,7 @@ const Home = ({route}: Props) => {
                                                     .QuickActionsButton,
                                         },
                                     ]}>
-                                    <ZapIcon
+                                    <BackupIcon
                                         width={20}
                                         fill={ColorScheme.SVG.Default}
                                     />
@@ -745,83 +849,60 @@ const Home = ({route}: Props) => {
                                         tailwind('text-sm'),
                                         {color: ColorScheme.Text.Default},
                                     ]}>
-                                    {capitalizeFirst(t('zap'))}
+                                    {capitalizeFirst(t('backup'))}
                                 </VText>
                             </PlainButton>
-                        )}
+                        </View>
 
                         <PlainButton
-                            onPress={triggerBackupFlow}
+                            onPress={gotToTransactions}
                             style={[
-                                tailwind('flex justify-center items-center'),
+                                tailwind(
+                                    'w-5/6 absolute flex-row items-center justify-center',
+                                ),
+                                {
+                                    bottom:
+                                        NativeWindowMetrics.bottomButtonOffset +
+                                        32,
+                                },
                             ]}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        'rounded-full items-center justify-center mb-2',
-                                    ),
-                                    {
-                                        height: 54,
-                                        width: 54,
-                                        backgroundColor:
-                                            ColorScheme.Background
-                                                .QuickActionsButton,
-                                    },
-                                ]}>
-                                <BackupIcon
-                                    width={20}
-                                    fill={ColorScheme.SVG.Default}
+                            {extractAllTransactions().filtered.length !== 0 && (
+                                <ArrowUpIcon
+                                    width={24}
+                                    height={24}
+                                    fill={ColorScheme.SVG.GrayFill}
+                                    style={[tailwind('mr-2')]}
                                 />
-                            </View>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
-                                {capitalizeFirst(t('backup'))}
+                            )}
+                            <VText style={[tailwind('text-sm'), DarkGrayText]}>
+                                {extractAllTransactions().filtered.length === 0
+                                    ? t('no_transactions_today')
+                                    : extractAllTransactions().filtered
+                                          .length === 1
+                                    ? t('transaction_today')
+                                    : t('transactions_today', {
+                                          count: extractAllTransactions()
+                                              .filtered.length,
+                                      })}
                             </VText>
+
+                            {loadingBalance && (
+                                <ActivityIndicator
+                                    color={ColorScheme.Background.Greyed}
+                                    style={tailwind('ml-2')}
+                                />
+                            )}
                         </PlainButton>
                     </View>
-
-                    <PlainButton
-                        onPress={gotToTransactions}
-                        style={[
-                            tailwind(
-                                'w-5/6 absolute flex-row items-center justify-center',
-                            ),
-                            {
-                                bottom:
-                                    NativeWindowMetrics.bottomButtonOffset + 32,
-                            },
-                        ]}>
-                        {extractAllTransactions().filtered.length !== 0 && (
-                            <ArrowUpIcon
-                                width={24}
-                                height={24}
-                                fill={ColorScheme.SVG.GrayFill}
-                                style={[tailwind('mr-2')]}
-                            />
-                        )}
-                        <VText style={[tailwind('text-sm'), DarkGrayText]}>
-                            {extractAllTransactions().filtered.length === 0
-                                ? t('no_transactions_today')
-                                : extractAllTransactions().filtered.length === 1
-                                ? t('transaction_today')
-                                : t('transactions_today', {
-                                      count: extractAllTransactions().filtered
-                                          .length,
-                                  })}
-                        </VText>
-
-                        {loadingBalance && (
-                            <ActivityIndicator
-                                color={ColorScheme.Background.Greyed}
-                                style={tailwind('ml-2')}
-                            />
-                        )}
-                    </PlainButton>
                 </View>
-            </View>
+
+                <PINPass
+                    pinPassRef={bottomPINPassRef}
+                    triggerSuccess={handlePINSuccess}
+                    onSelectPinPass={setPINIdx}
+                    pinMode={false}
+                />
+            </BottomSheetModalProvider>
         </SafeAreaView>
     );
 };
