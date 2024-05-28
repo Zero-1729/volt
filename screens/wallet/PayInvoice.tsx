@@ -299,7 +299,7 @@ const PayInvoice = ({route}: Props) => {
                         screen: 'FeeSelection',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: wallet,
+                            wallet: _wallet,
                         },
                     }),
                 );
@@ -309,7 +309,7 @@ const PayInvoice = ({route}: Props) => {
                         screen: 'SendAmount',
                         params: {
                             invoiceData: decodedInvoice,
-                            wallet: wallet,
+                            wallet: _wallet,
                             isLightning: isLightning,
                         },
                     }),
