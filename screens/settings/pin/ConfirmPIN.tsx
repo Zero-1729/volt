@@ -103,7 +103,7 @@ const ConfirmPIN = ({route}: Props) => {
                     {showBack && (
                         <View
                             style={[
-                                tailwind('w-5/6 absolute top-0'),
+                                tailwind('w-5/6 absolute top-2'),
                                 {zIndex: 9999},
                             ]}>
                             <PlainButton
