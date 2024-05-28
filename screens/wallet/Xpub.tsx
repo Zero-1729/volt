@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useMemo} from 'react';
 
 import {Text, View, useColorScheme, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -44,7 +44,7 @@ const Xpub = () => {
     const {t: e} = useTranslation('errors');
 
     const walletData = getWalletData(currentWalletID);
-    const backupData = walletData.xpub;
+    const backupData = useMemo(() => walletData.xpub, [walletData.xpub]);
 
     const walletType = WalletTypeDetails[walletData.type];
     const walletTypeName =
