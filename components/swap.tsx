@@ -293,7 +293,7 @@ const Swap = (props: SwapProps) => {
                                     ),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                {!props.isOnline
+                                {!(props.isOnline && swapOutLoading)
                                     ? t('no_internet_cannot_swap')
                                     : t('loading_swap_info')}
                             </VText>
