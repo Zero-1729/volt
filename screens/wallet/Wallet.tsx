@@ -820,7 +820,8 @@ const Wallet = ({route}: Props) => {
                                             ]}
                                         />
 
-                                        <View
+                                        <PlainButton
+                                            onPress={openSwapModal}
                                             style={[
                                                 tailwind(
                                                     'rounded-full items-center px-6 py-2',
@@ -829,11 +830,8 @@ const Wallet = ({route}: Props) => {
                                                     backgroundColor: CardAccent,
                                                 },
                                             ]}>
-                                            <PlainButton
-                                                onPress={openSwapModal}>
-                                                <SwapIcon fill={'white'} />
-                                            </PlainButton>
-                                        </View>
+                                            <SwapIcon fill={'white'} />
+                                        </PlainButton>
 
                                         <View
                                             style={[
