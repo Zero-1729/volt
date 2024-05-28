@@ -228,6 +228,11 @@ const BoltNFC = ({route}: Props) => {
             return;
         }
 
+        // Clear old request
+        if (isInError) {
+            cancelScanRequest();
+        }
+
         // Start loading
         setLoading(true);
 
