@@ -93,7 +93,7 @@ const Network = () => {
             await nodeInfo();
             setBreezConnected(true);
         } catch (error: any) {
-            setBreezConnected(false);
+            console.log('[Breez Connection]: ', error.message);
         }
     }, []);
 
