@@ -210,7 +210,7 @@ const SetBiometrics = ({route}: Props) => {
 
                         {doneErrorText && (
                             <Failed
-                                fill={ColorScheme.Background.Default}
+                                fill={ColorScheme.SVG.Default}
                                 width={200}
                                 height={200}
                             />
