@@ -325,6 +325,12 @@ const PayInvoice = ({route}: Props) => {
     }, [bolt11]);
 
     useEffect(() => {
+        if (decodedInvoice) {
+            setPaymentToSelf(false);
+        }
+    }, [decodedInvoice]);
+
+    useEffect(() => {
         handleInvoiceType(route.params?.invoice);
     }, []);
 
