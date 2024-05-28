@@ -408,7 +408,7 @@ const Wallet = ({route}: Props) => {
 
     const getLNSwapInfo = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
-        if (checkNetworkIsReachable(_netInfo)) {
+        if (!checkNetworkIsReachable(_netInfo)) {
             return;
         }
 
@@ -453,7 +453,7 @@ const Wallet = ({route}: Props) => {
 
     const getOnchainSwapInfo = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
-        if (checkNetworkIsReachable(_netInfo)) {
+        if (!checkNetworkIsReachable(_netInfo)) {
             return;
         }
 
