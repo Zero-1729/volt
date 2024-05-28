@@ -43,6 +43,8 @@
     "type_4_digit_pin": "Type PIN",
     "choose_4_digit_pin": "Choose a 4-digit PIN",
     "choose_4_digit_pin_desc": "Enter a PIN that you will remember.\n\nYou can reset your PIN if you forget by entering your mnemonic or Extended Key.",
+    "pin_repeated_message": "PIN contains repeated numbers, please choose a stronger PIN.",
+    "pin_common_message": "PIN is a common number pattern, please choose a stronger PIN.",
     "type_4_digit_pin_desc": "Enter your 4-digit PIN.",
     "retype_pin": "Re-Enter your 4-digit PIN",
     "retype_pin_desc": "Retype your 4-digit PIN to continue setup",
