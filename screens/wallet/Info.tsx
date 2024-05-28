@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useRef, useState} from 'react';
+import React, {useCallback, useContext, useRef, useState} from 'react';
 import {Text, View, TextInput, useColorScheme, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -88,20 +88,25 @@ const Info = () => {
     const [walletFingerprintText, setWalletFingerprintText] =
         useState(walletFingerprint);
     const [walletPathText, setWalletPathText] = useState(walletPath);
+    const [routeName, setRouteName] = useState('');
 
     const bottomPINPassRef = useRef<BottomSheetModal>(null);
     const [pinIdx, setPINIdx] = useState(-1);
 
-    const togglePINPassModal = () => {
+    const togglePINPassModal = useCallback(() => {
         if (pinIdx !== 1) {
             bottomPINPassRef.current?.present();
         } else {
             bottomPINPassRef.current?.close();
         }
-    };
+    }, [pinIdx]);
 
     const handlePINSuccess = async () => {
-        routeToBackup();
+        if (routeName === 'WalletBackup') {
+            routeToBackup();
+        } else if (routeName === 'WalletXpub') {
+            routeToXPub();
+        }
         bottomPINPassRef.current?.close();
     };
 
@@ -113,35 +118,56 @@ const Info = () => {
         );
     };
 
+    const routeToXPub = () => {
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'WalletXpub',
+            }),
+        );
+    };
+
+    const routeWithBioPIN = useCallback(
+        (routeCallback: () => void) => {
+            if (isBiometricsActive) {
+                biometricAuth(
+                    success => {
+                        if (success) {
+                            routeCallback();
+                        }
+                    },
+                    // prompt response callback
+                    () => {
+                        togglePINPassModal();
+                    },
+                    // prompt error callback
+                    error => {
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: t('Biometrics'),
+                            text2: error.message,
+                            visibilityTime: 1750,
+                        });
+                    },
+                );
+
+                return;
+            }
+
+            // IF no biometrics, just call on PIN modal
+            togglePINPassModal();
+        },
+        [isBiometricsActive, t, togglePINPassModal],
+    );
+
+    const handleXPubRoute = () => {
+        setRouteName('WalletXpub');
+        routeWithBioPIN(routeToXPub);
+    };
+
     const handleBackupRoute = () => {
-        if (isBiometricsActive) {
-            biometricAuth(
-                success => {
-                    if (success) {
-                        routeToBackup();
-                    }
-                },
-                // prompt response callback
-                () => {
-                    togglePINPassModal();
-                },
-                // prompt error callback
-                error => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: error.message,
-                        visibilityTime: 1750,
-                    });
-                },
-            );
-
-            return;
-        }
-
-        // IF no biometrics, just call on PIN modal
-        togglePINPassModal();
+        setRouteName('WalletBackup');
+        routeWithBioPIN(routeToBackup);
     };
 
     const CardColor =
@@ -205,7 +231,7 @@ const Info = () => {
             navigation.dispatch(CommonActions.navigate({name: 'HomeScreen'}));
 
             // Delete wallet from store
-            await deleteWallet(currentWalletID);
+            deleteWallet(currentWalletID);
 
             if (walletData.type === 'unified') {
                 // Disconnect from Breez SDK
@@ -477,13 +503,7 @@ const Info = () => {
                     {/* Wallet Xpub */}
                     <PlainButton
                         style={[tailwind('w-5/6 mb-6')]}
-                        onPress={() => {
-                            navigation.dispatch(
-                                CommonActions.navigate({
-                                    name: 'WalletXpub',
-                                }),
-                            );
-                        }}>
+                        onPress={handleXPubRoute}>
                         <View
                             style={[
                                 tailwind(
