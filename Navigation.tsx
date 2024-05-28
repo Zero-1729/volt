@@ -615,8 +615,13 @@ const RootNavigator = (): ReactElement => {
             return;
         }
 
+        if (mempoolInfo.connected) {
+            console.log('[Mempool] WebSocket already connected');
+            return;
+        }
+
         mempoolRef.onopen = () => {
-            console.log('[Mempool] Connected');
+            console.log('[Mempool] WebSocket connected');
 
             mempoolRef.send(
                 JSON.stringify({
@@ -676,8 +681,13 @@ const RootNavigator = (): ReactElement => {
 
     // Breez startup
     const initNode = async () => {
+        // Init LN connection
         // No point putting in any effort if mnemonic missing
-        if (wallet?.mnemonic.length === 0) {
+        if (
+            wallet?.mnemonic.length === 0 &&
+            isWalletInitialized &&
+            wallet.type === 'unified'
+        ) {
             return;
         }
 
@@ -692,17 +702,8 @@ const RootNavigator = (): ReactElement => {
         // Get node info
         try {
             const info = await nodeInfo();
-
             if (info?.id) {
-                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Breez SDK'),
-                        text2: t('Node already initialized'),
-                        visibilityTime: 1750,
-                    });
-                }
+                console.log('[Breez SDK] Services already connected');
                 return;
             }
         } catch (error: any) {
@@ -819,6 +820,7 @@ const RootNavigator = (): ReactElement => {
         try {
             // Connect to the Breez SDK make it ready for use
             BreezSub.current = await connect(connectionRequest, onBreezEvent);
+            console.log('[Breez SDK] Connected to services');
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 Toast.show({
@@ -848,7 +850,6 @@ const RootNavigator = (): ReactElement => {
         if (renderCount <= 2 && !onboardingState.current) {
             // Call on trigger for Lock comp
             setTriggerClipboardCheck(true);
-            initMempoolSock();
         }
 
         const appStateSub = AppState.addEventListener(
@@ -876,18 +877,15 @@ const RootNavigator = (): ReactElement => {
             },
         );
 
-        // Init LN connection
-        if (isWalletInitialized && wallet.type === 'unified') {
-            initNode();
-        }
-
         // Net event listener
         // Subscribe
         const NetInfoSub = netInfo.addEventListener(state => {
             // fetch and set mempool info
             // and Breez SDK connection
-
             if (checkNetworkIsReachable(state)) {
+                console.log(
+                    '[NetInfo] Attempt to (Re)connect to Breez & Mempool',
+                );
                 initNode();
                 initMempoolSock();
             }
