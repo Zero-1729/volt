@@ -187,5 +187,6 @@
     "add_wallet_advanced_mode": "تمكين الوضع المتقدم",
     "add_wallet_advanced_mode_desc": "لمستخدمي محفظة Bitcoin ذوي الخبرة الذين يرغبون في الوصول إلى الميزات المتقدمة",
     "loading_swap_info": "جارٍ تحميل معلومات حد المبادلة...",
-    "payment_to_self_detected": "تم إنشاء هذه الفاتورة من هذه المحفظة، ولا يمكن دفعها بنفسك"
+    "payment_to_self_detected": "تم إنشاء هذه الفاتورة من هذه المحفظة، ولا يمكن دفعها بنفسك",
+    "already_paid_ln_invoice": "لقد تم بالفعل دفع هذه الفاتورة"
 }
