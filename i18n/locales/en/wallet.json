@@ -2,7 +2,7 @@
     "name": "Name",
     "type": "Type",
     "add_wallet_title": "Add Wallet",
-    "add_wallet_description": "Create a new wallet or restor from a backup",
+    "add_wallet_description": "Create a new wallet or restore from a backup",
     "import_title": "Import",
     "import_description": "Restore wallet from seed or other backup material. Select if you want to import an existing wallet",
     "import_button_text": "Restore",
