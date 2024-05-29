@@ -3,7 +3,6 @@ import onboarding from './onboarding.json';
 import settings from './settings.json';
 import wallet from './wallet.json';
 import errors from './errors.json';
-import apps from './apps.json';
 
 export default {
     common,
@@ -11,5 +10,4 @@ export default {
     settings,
     wallet,
     errors,
-    apps,
 };
