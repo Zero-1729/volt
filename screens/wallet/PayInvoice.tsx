@@ -259,7 +259,7 @@ const PayInvoice = ({route}: Props) => {
                     topOffset: 54,
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
-                    text2: msg,
+                    text2: e(msg),
                     visibilityTime: 2000,
                 });
 

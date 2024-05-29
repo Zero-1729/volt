@@ -216,9 +216,9 @@ const Scan = ({route}: Props) => {
 
     const updateToast = useCallback(
         (message: string) => {
-            updateScannerMessage(message);
+            updateScannerMessage(e(message));
         },
-        [updateScannerMessage],
+        [e, updateScannerMessage],
     );
 
     const processAndRoute = useCallback(
