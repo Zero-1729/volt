@@ -504,13 +504,13 @@ export const checkInvoiceAndWallet = (
 
     // Check network
     if (addressNetwork !== wallet.network) {
-        alert(`Cannot pay invoice with a ${wallet.network} wallet`);
+        alert('cannot_pay_invoice_network', {network: wallet.network});
         return false;
     }
 
     // Check balance if zero
     if (balance.isZero()) {
-        alert('Wallet is empty, add funds to wallet');
+        alert('onchain_empty');
         return false;
     }
 
@@ -519,7 +519,7 @@ export const checkInvoiceAndWallet = (
         invoiceHasAmount &&
         invoiceAmount.multipliedBy(100000000).isLessThanOrEqualTo(DUST_LIMIT)
     ) {
-        alert('Invoice amount is below dust limit');
+        alert('below_dust_limit');
         return false;
     }
 
@@ -530,14 +530,14 @@ export const checkInvoiceAndWallet = (
             .multipliedBy(100000000)
             .isGreaterThan(wallet.balanceOnchain)
     ) {
-        alert('Wallet balance insufficient, add funds to wallet');
+        alert('balance_below_invoice');
         return false;
     }
 
     // Check can pay invoice with wallet
     // Check can send to address
     if (!canSendToInvoice(invoice, wallet)) {
-        alert(`Wallet cannot pay to a ${addressTypeName} address`);
+        alert('cannot_pay_address_type', {addressTypeName: addressTypeName});
         return false;
     }
 
