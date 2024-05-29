@@ -39,5 +39,10 @@
     "missing_bolt11_invoice_amount": "المبلغ مفقود في فاتورة Bolt11",
     "tx_fail_creation_erorr": "فشل في إنشاء المعاملة",
     "ln_description_length": "يجب أن يكون الوصف أقل من تسعين حرفًا",
-    "biometrics_error": "القياسات الحيوية غير مدعومة"
+    "biometrics_error": "القياسات الحيوية غير مدعومة",
+    "cannot_pay_invoice_network": "لا يمكن دفع الفاتورة بمحفظة {{network}}.",
+    "onchain_empty": "رصيد Onchain فارغ، قم بإضافة الأموال إلى رصيد Onchain",
+    "below_dust_limit": "مبلغ الفاتورة أقل من حد الغبار",
+    "balance_below_invoice": "رصيد Onchain غير كافي، قم بإضافة أموال إلى رصيد Onchain",
+    "cannot_pay_address_type": "لا تستطيع المحفظة الدفع إلى عنوان {{addressTypeName}}."
 }

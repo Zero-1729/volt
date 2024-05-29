@@ -39,5 +39,10 @@
     "missing_bolt11_invoice_amount": "Missing amount in Bolt11 invoice",
     "tx_fail_creation_erorr": "Failed to create transaction",
     "ln_description_length": "Description must be less than 90 characters",
-    "biometrics_error": "Biometrics not supported"
+    "biometrics_error": "Biometrics not supported",
+    "cannot_pay_invoice_network": "Cannot pay invoice with a {{network}} wallet",
+    "onchain_empty": "Onchain balance is empty, add funds to onchain balance",
+    "below_dust_limit": "Invoice amount is below dust limit",
+    "balance_below_invoice": "Onchain balance insufficient, add funds to onchain balance",
+    "cannot_pay_address_type": "Wallet cannot pay to a {{addressTypeName}} address"
 }
