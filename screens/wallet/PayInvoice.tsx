@@ -260,7 +260,7 @@ const PayInvoice = ({route}: Props) => {
                     type: 'Liberal',
                     text1: capitalizeFirst(t('error')),
                     text2: e(msg),
-                    visibilityTime: 2000,
+                    visibilityTime: 2500,
                 });
 
                 // route home

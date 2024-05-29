@@ -205,7 +205,7 @@ const Scan = ({route}: Props) => {
                 type: 'Liberal',
                 text1: capitalizeFirst(t('scanner')),
                 text2: scannerAlertMsg,
-                visibilityTime: 1750,
+                visibilityTime: 2500,
                 onHide: () => {
                     clearScannerAlert();
                 },
