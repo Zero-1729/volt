@@ -65,11 +65,9 @@ import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/shared';
 
 import {BaseWallet} from '../class/wallet/base';
-import {TBalance, TRateObject, TTransaction} from '../types/wallet';
+import {TBalance, TTransaction} from '../types/wallet';
 
 import {FiatBalance} from '../components/balance';
-
-import {fetchFiatRate} from '../modules/currency';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 
@@ -108,12 +106,10 @@ const Home = ({route}: Props) => {
     const {
         wallets,
         hideTotalBalance,
-        appFiatCurrency,
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
         fiatRate,
-        updateFiatRate,
         updateWalletTransactions,
         updateWalletPayments,
         updateWalletBalance,
@@ -254,67 +250,9 @@ const Home = ({route}: Props) => {
         return w;
     }, []);
 
-    // Fiat fetch
-    const singleSyncFiatRate = useCallback(
-        async (ticker: string, violate: boolean = false) => {
-            // Only proceed if initial load or if user select new currency in settings
-            if (violate) {
-                try {
-                    await fetchFiatRate(
-                        ticker,
-                        fiatRate,
-                        (rateObj: TRateObject) => {
-                            updateFiatRate({
-                                ...fiatRate,
-                                rate: rateObj.rate,
-                                lastUpdated: rateObj.lastUpdated,
-                                dailyChange: rateObj.dailyChange,
-                            });
-                        },
-                        violate,
-                    );
-                } catch (error: any) {
-                    // Report network error
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('network')),
-                        text2: error.message,
-                        visibilityTime: 2000,
-                    });
-
-                    // Kill loading
-                    setLoadingBalance(false);
-                }
-
-                // Kill loading
-                setLoadingBalance(false);
-            }
-        },
-        [],
-    );
-
     // Refresh control
     const refreshWallet = useCallback(async () => {
         const w = await initWallet();
-
-        const triggered = await fetchFiatRate(
-            appFiatCurrency.short,
-            fiatRate,
-            (rateObj: TRateObject) => {
-                // Then fetch fiat rate
-                updateFiatRate({
-                    ...fiatRate,
-                    rate: rateObj.rate,
-                    lastUpdated: rateObj.lastUpdated,
-                    dailyChange: rateObj.dailyChange,
-                });
-            },
-        );
-
-        if (!triggered) {
-            console.info('[Fiat Rate] Did not fetch fiat rate');
-        }
 
         // Check net again, just in case there is a drop mid execution
         const _netInfo = await netInfo.fetch();
@@ -350,13 +288,7 @@ const Home = ({route}: Props) => {
 
         // set bdk wallet
         setBdkWallet(w);
-    }, [
-        setRefreshing,
-        fiatRate,
-        appFiatCurrency,
-        updateFiatRate,
-        networkState,
-    ]);
+    }, [setRefreshing, fiatRate, networkState]);
 
     const getBalance = async () => {
         try {
@@ -434,9 +366,6 @@ const Home = ({route}: Props) => {
             return;
         }
 
-        // fetch fiat rate
-        singleSyncFiatRate(appFiatCurrency.short, true);
-
         // fetch onchain
         refreshWallet();
 
@@ -492,22 +421,7 @@ const Home = ({route}: Props) => {
         );
     }, []);
 
-    const fiatRateFetchRehydrate = useCallback(async () => {
-        const _netInfo = await netInfo.fetch();
-        // Avoid fiat rate update call when offline
-        // or when newly loaded screen to avoid dup call
-        if (!checkNetworkIsReachable(_netInfo)) {
-            return;
-        }
-
-        // Only call on each change to fiat currency in settings
-        setLoadingBalance(true);
-        singleSyncFiatRate(appFiatCurrency.short, true);
-    }, []);
-
     const initWalletSync = useCallback(async () => {
-        // Only attempt update when initial fiat rate update call
-        // and wallets exists
         const _netInfo = await netInfo.fetch();
 
         if (
@@ -515,7 +429,6 @@ const Home = ({route}: Props) => {
             !checkNetworkIsReachable(_netInfo) &&
             wallet.type !== 'unified'
         ) {
-            // Avoid fiat rate update call when offline
             jointSync();
         }
     }, []);
@@ -549,12 +462,7 @@ const Home = ({route}: Props) => {
         }
     }, []);
 
-    // Fetch the fiat rate on currency change
-    useEffect(() => {
-        fiatRateFetchRehydrate();
-    }, [appFiatCurrency]);
-
-    // Fetch the fiat rate on initial load
+    // Sync wallet on initial load
     useEffect(() => {
         initWalletSync();
 

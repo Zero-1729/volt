@@ -55,8 +55,6 @@ import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {fetchFiatRate} from '../../modules/currency';
-
 import {Balance} from '../../components/balance';
 
 import {UnifiedTransactionListItem} from '../../components/transaction';
@@ -65,7 +63,6 @@ import {
     TBalance,
     TTransaction,
     TSwapInfo,
-    TRateObject,
     TBoltzSwapInfo,
 } from '../../types/wallet';
 
@@ -104,9 +101,6 @@ const Wallet = ({route}: Props) => {
         setLoadLock,
         currentWalletID,
         getWalletData,
-        fiatRate,
-        appFiatCurrency,
-        updateFiatRate,
         updateWalletBalance,
         updateWalletTransactions,
         updateWalletPayments,
@@ -242,9 +236,6 @@ const Wallet = ({route}: Props) => {
         setRefreshing(true);
         setLoadingBalance(true);
 
-        // fetch fiat rate
-        fetchFiat();
-
         // fetch onchain
         refreshWallet();
 
@@ -303,27 +294,6 @@ const Wallet = ({route}: Props) => {
         return await syncBDKWallet(w, walletData.network, electrumServerURL);
     }, [bdkWallet, electrumServerURL, initWallet, walletData.network]);
 
-    // Fetch fiat rate
-    const fetchFiat = async () => {
-        const triggered = await fetchFiatRate(
-            appFiatCurrency.short,
-            fiatRate,
-            (rateObj: TRateObject) => {
-                // Then fetch fiat rate
-                updateFiatRate({
-                    ...fiatRate,
-                    rate: rateObj.rate,
-                    lastUpdated: rateObj.lastUpdated,
-                    dailyChange: rateObj.dailyChange,
-                });
-            },
-        );
-
-        if (!triggered) {
-            console.log('[Fiat Rate] Did not fetch fiat rate');
-        }
-    };
-
     // Refresh control
     const refreshWallet = useCallback(async () => {
         const w = await syncWallet();
@@ -381,7 +351,7 @@ const Wallet = ({route}: Props) => {
             }
         }
 
-        // Kill loading if fiat rate fetch not triggered
+        // Kill loading
         setRefreshing(false);
         setLoadingBalance(false);
         setLoadLock(false);
