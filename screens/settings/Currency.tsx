@@ -266,7 +266,7 @@ const Currency = () => {
                                                     .GrayedText,
                                             },
                                         ]}>
-                                        Loading rate...
+                                        {t('loading_rate')}
                                     </VText>
                                 </View>
                             ) : (
