@@ -219,14 +219,4 @@ export const Currencies = [
         locale: 'en_ZA',
         symbol: 'R',
     },
-    {
-        short: 'XAU',
-        locale: 'xau',
-        symbol: 'XAU',
-    },
-    {
-        short: 'XAG',
-        locale: 'xag',
-        symbol: 'XAG',
-    },
 ];
