@@ -79,14 +79,6 @@ const APIFetcher = {
     },
 };
 
-// Make single fire call to CoinGecko
-const fetchPrice = async (ticker: string): Promise<TRateObject> => {
-    const response = await APIFetcher.coingecko(ticker.toLowerCase());
-
-    // return fetched rate
-    return response;
-};
-
 export const fetchFiatRate = async (
     ticker: string,
     fiatRate: TRateObject,
@@ -116,7 +108,7 @@ export const fetchFiatRate = async (
 
     try {
         // Grab data from remote source, i.e., CoinGecko
-        const rateObj = await fetchPrice(ticker);
+        const rateObj = await APIFetcher.coingecko(ticker.toLowerCase());
 
         // Return 'success' true to indicate success
         // i.e. rate fetched
