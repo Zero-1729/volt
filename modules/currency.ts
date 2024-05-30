@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import {TRateObject} from '../types/wallet';
+import {TRateObject, TRateResponse} from '../types/wallet';
 
 const sourcesAPI = {
     coingecko: {
@@ -20,6 +20,7 @@ const APIFetcher = {
         let returnedJSON;
 
         try {
+            // TODO: make call for all supported currencies and update accordingly
             const response = await fetch(
                 `${url}?ids=bitcoin&vs_currencies=${ticker}&include_24hr_change=true&include_last_updated_at=true`,
                 {
@@ -30,11 +31,26 @@ const APIFetcher = {
                 },
             );
 
-            returnedJSON = await response.json();
-        } catch (e: any) {
+            // Grab the raw response here instead, check and parse JSON later
+            const rawResponse = await response.text();
+
+            // Check that it is not an error response
+            if (
+                rawResponse.startsWith('{ error') ||
+                rawResponse.includes('Sorry, not able to access it right now.')
+            ) {
+                throw new Error(
+                    `Error fetching rate for ${ticker.toUpperCase()} from CoinGecko: ${
+                        rawResponse.split(':')[1].split('}')[0]
+                    }`,
+                );
+            }
+
+            returnedJSON = JSON.parse(rawResponse);
+        } catch (error: any) {
             throw new Error(
                 `Error fetching rate for ${ticker.toUpperCase()} from CoinGecko: ${
-                    e.message
+                    error.message
                 }`,
             );
         }
@@ -51,10 +67,10 @@ const APIFetcher = {
                 dailyChange: dailyChange,
                 lastUpdated: lastUpdated,
             };
-        } catch (e: any) {
+        } catch (error: any) {
             const detailed_error =
                 returnedJSON?.status.error_message.split('.')[0];
-            const msg = detailed_error ? detailed_error : e.message;
+            const msg = detailed_error ? detailed_error : error.message;
 
             throw new Error(
                 `Error parsing rate for ${ticker} from CoinGecko: ${msg}`,
@@ -74,45 +90,38 @@ const fetchPrice = async (ticker: string): Promise<TRateObject> => {
 export const fetchFiatRate = async (
     ticker: string,
     fiatRate: TRateObject,
-    onSuccess: (rateObj: TRateObject) => void,
-    violate = false,
-) => {
+): Promise<TRateResponse> => {
     const {lastUpdated} = fiatRate;
 
     // Same as Date.getTime()
     const currentTimestamp = +new Date();
 
+    // Debounce
     if (currentTimestamp - lastUpdated <= 5 * 1000) {
-        // Debounce
-        console.info(
-            '[FiatRate] Not updating fiat rate, last updated less than 5 seconds ago',
-        );
-
-        // Return false to indicate no update
-        return false;
+        return {
+            rate: null,
+            success: false, // Return false to indicate no update
+            error: 'Fiat rate not updated, last updated less than 5 seconds ago',
+        };
     }
 
-    if (currentTimestamp - lastUpdated <= 30 * 60 * 1000 && !violate) {
+    if (currentTimestamp - lastUpdated <= 30 * 60 * 1000) {
         // Avoid updating too frequently
-        console.info(
-            '[FiatRate] Not updating fiat rate, last updated less than 30 minutes ago',
-        );
-
-        // Return false to indicate no update
-        return false;
+        return {
+            rate: null,
+            success: false, // Return false to indicate no update
+            error: 'Fiat rate not updated, last updated less than 30 minutes ago',
+        };
     }
 
     try {
         // Grab data from remote source, i.e., CoinGecko
         const rateObj = await fetchPrice(ticker);
 
-        // Trigger callback from RN component to update storage context
-        onSuccess(rateObj);
-
-        // Return true to indicate success
+        // Return 'success' true to indicate success
         // i.e. rate fetched
-        return true;
-    } catch (e) {
-        throw e;
+        return {rate: rateObj, success: true, error: ''};
+    } catch (error: any) {
+        return {error: error.message, success: false, rate: null};
     }
 };
