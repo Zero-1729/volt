@@ -7,7 +7,7 @@ A Modern descriptor-based Financial Freedom Bitcoin Wallet
 
 > What are descriptors? [Read more](https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md).
 
-<img src="./assets/volt-wallet.png" height=512>
+<img src="./assets/app_showcase.png" width=720>
 
 # Features
 
