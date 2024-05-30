@@ -12,4 +12,5 @@ export type TCurrency = {
     short: string;
     symbol: string;
     locale: string;
+    full_name: string;
 };
