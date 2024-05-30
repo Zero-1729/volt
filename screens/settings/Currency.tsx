@@ -37,6 +37,8 @@ import {Currencies} from '../../constants/Currency';
 
 import {addCommas, capitalizeFirst} from '../../modules/transform';
 import Toast from 'react-native-toast-message';
+import {fetchFiatRate} from '../../modules/currency';
+import {TRateObject, TRateResponse} from '../../types/wallet';
 
 const Currency = () => {
     const navigation = useNavigation();
@@ -50,9 +52,40 @@ const Currency = () => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const {appFiatCurrency, setAppFiatCurrency, fiatRate} =
+    const {appFiatCurrency, setAppFiatCurrency, fiatRate, updateFiatRate} =
         useContext(AppStorageContext);
 
     const networkState = useNetInfo();
+
+    const handleCurrencySwitch = useCallback(
+        async (currency: TCurrency) => {
+            let response: TRateResponse;
+
+            response = await fetchFiatRate(currency.short, fiatRate);
+
+            if (response?.success) {
+                const rateObj = response.rate as TRateObject;
+
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: rateObj.rate,
+                    lastUpdated: rateObj.lastUpdated,
+                    dailyChange: rateObj.dailyChange,
+                });
+                setAppFiatCurrency(currency);
+                RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
+            } else {
+                Toast.show({
+                    topOffset: 54,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('network')),
+                    text2: response.error,
+                    visibilityTime: 2500,
+                });
+            }
+        },
+        [fiatRate, setAppFiatCurrency, t, updateFiatRate],
+    );
 
     const renderItem = ({item, index}: {item: TCurrency; index: number}) => {
         return (
@@ -69,8 +102,7 @@ const Currency = () => {
                         return;
                     }
 
-                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
-                    setAppFiatCurrency(item);
+                    handleCurrencySwitch(item);
                 }}>
                 <View
                     style={[
