@@ -1,6 +1,12 @@
-import React, {useContext} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 
-import {StyleSheet, View, FlatList, useColorScheme} from 'react-native';
+import {
+    StyleSheet,
+    View,
+    FlatList,
+    useColorScheme,
+    ActivityIndicator,
+} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -51,7 +57,8 @@ const Currency = () => {
     const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const {appFiatCurrency, setAppFiatCurrency, fiatRate} =
+    const [loadingRate, setLoadingRate] = useState(false);
+
     const {appFiatCurrency, setAppFiatCurrency, fiatRate, updateFiatRate} =
         useContext(AppStorageContext);
 
@@ -59,6 +66,7 @@ const Currency = () => {
 
     const handleCurrencySwitch = useCallback(
         async (currency: TCurrency) => {
+            setLoadingRate(true);
             let response: TRateResponse;
 
             response = await fetchFiatRate(currency.short, fiatRate);
@@ -74,6 +82,7 @@ const Currency = () => {
                 });
                 setAppFiatCurrency(currency);
                 RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
+                setLoadingRate(false);
             } else {
                 Toast.show({
                     topOffset: 54,
@@ -82,6 +91,7 @@ const Currency = () => {
                     text2: response.error,
                     visibilityTime: 2500,
                 });
+                setLoadingRate(false);
             }
         },
         [fiatRate, setAppFiatCurrency, t, updateFiatRate],
@@ -224,25 +234,59 @@ const Currency = () => {
                                         langDir === 'right' ? 'pr-8' : 'pl-8'
                                     }`,
                                 ),
+                                styles.rateHighlight,
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                 },
                             ]}>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {
-                                        color: ColorScheme.Text.Default,
-                                    },
-                                ]}>
-                                {`${t('price_at')} ${addCommas(
-                                    fiatRate.rate.toString(),
-                                )} ${appFiatCurrency.short} ${t('price_on')} `}
-                                <VText style={[tailwind('flex font-bold')]}>
-                                    {'CoinGecko'}
+                            {loadingRate ? (
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            }`,
+                                        ),
+                                    ]}>
+                                    <ActivityIndicator size={'small'} />
+                                    <VText
+                                        style={[
+                                            tailwind(
+                                                `text-sm ${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
+                                        ]}>
+                                        Loading rate...
+                                    </VText>
+                                </View>
+                            ) : (
+                                <VText
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {`${t('price_at')} ${addCommas(
+                                        fiatRate.rate.toString(),
+                                    )} ${appFiatCurrency.short} ${t(
+                                        'price_on',
+                                    )} `}
+                                    <VText style={[tailwind('flex font-bold')]}>
+                                        {'CoinGecko'}
+                                    </VText>
                                 </VText>
-                            </VText>
+                            )}
                         </View>
                     </View>
 
@@ -274,5 +318,8 @@ const styles = StyleSheet.create({
     },
     flexed: {
         flex: 1,
+    },
+    rateHighlight: {
+        height: 54,
     },
 });
