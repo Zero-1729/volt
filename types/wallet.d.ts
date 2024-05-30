@@ -208,6 +208,12 @@ export type TRateObject = {
     lastUpdated: number; // UNIX Timestamp
 };
 
+export type TRateResponse = {
+    success: boolean;
+    rate: TRateObject | null;
+    error: string;
+};
+
 // Boltz Exchange ReverseSwap Type
 export type TBoltzSwapInfo = {
     maxLimit: number;
