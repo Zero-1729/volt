@@ -34,7 +34,7 @@ import {AppStorageContext} from '../../class/storageContext';
 import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
-import Check from './../../assets/svg/check-circle-24.svg';
+import Check from './../../assets/svg/check-circle-fill-24.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
@@ -113,35 +113,55 @@ const Currency = () => {
                     }
 
                     handleCurrencySwitch(item);
-                }}>
+                }}
+                style={[
+                    tailwind(
+                        `${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        } w-full items-center justify-between px-6 mt-4 mb-6`,
+                    ),
+                    index === 0 ? styles.paddedTop : {},
+                ]}>
                 <View
                     style={[
                         tailwind(
-                            `w-5/6 self-center items-center ${
+                            `items-center ${
                                 langDir === 'right'
                                     ? 'flex-row-reverse'
                                     : 'flex-row'
-                            } justify-between mt-3 mb-6`,
+                            }`,
                         ),
-                        index === 0 ? styles.paddedTop : {},
                     ]}>
                     <VText
                         style={[
                             tailwind('text-sm'),
                             {color: ColorScheme.Text.Default},
+                        ]}>
+                        {item.full_name}
+                    </VText>
+                    {appFiatCurrency.short === item.short && (
+                        <View
+                            style={[
+                                tailwind(
+                                    `${langDir === 'right' ? 'mr-2' : 'ml-2'}`,
+                                ),
+                            ]}>
+                            <Check width={16} fill={ColorScheme.SVG.Default} />
+                        </View>
+                    )}
+                </View>
+                <View
+                    style={[tailwind('items-center justify-center flex-row')]}>
+                    <VText
+                        style={[
+                            tailwind('text-sm'),
+                            {color: ColorScheme.Text.DescText},
                             Font.RobotoText,
                         ]}>
                         {`${item.short} (${item.symbol})`}
                     </VText>
-
-                    <View
-                        style={[
-                            tailwind('flex-row items-center justify-between'),
-                        ]}>
-                        {appFiatCurrency.short === item.short && (
-                            <Check width={16} fill={ColorScheme.SVG.Default} />
-                        )}
-                    </View>
                 </View>
             </PlainButton>
         );
@@ -299,7 +319,11 @@ const Currency = () => {
                         contentInsetAdjustmentBehavior="automatic"
                     />
 
-                    <View style={[tailwind('w-full items-center mt-2')]}>
+                    <View
+                        style={[
+                            tailwind('w-full items-center justify-center'),
+                            styles.bottomMessage,
+                        ]}>
                         <VText style={[{color: ColorScheme.Text.GrayedText}]}>
                             {t('last_updated', {date: fiatRate.lastUpdated})}
                         </VText>
@@ -321,5 +345,8 @@ const styles = StyleSheet.create({
     },
     rateHighlight: {
         height: 54,
+    },
+    bottomMessage: {
+        height: 48,
     },
 });
