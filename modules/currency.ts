@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import {TRateObject, TRateResponse} from '../types/wallet';
+import {TRateObjectResponse, TRateResponse, TRateObject} from '../types/wallet';
 
 const sourcesAPI = {
     coingecko: {
@@ -12,17 +12,64 @@ export const sourceNames = {
     CoinGecko: 'coingecko',
 };
 
+const supported_tickers = [
+    'usd',
+    'aed',
+    'ars',
+    'aud',
+    'bdt',
+    'bhd',
+    'brl',
+    'cad',
+    'chf',
+    'clp',
+    'czk',
+    'cny',
+    'dkk',
+    'eur',
+    'gbp',
+    'hkd',
+    'huf',
+    'idr',
+    'ils',
+    'inr',
+    'jpy',
+    'krw',
+    'kwd',
+    'lkr',
+    'mmk',
+    'mxn',
+    'myr',
+    'ngn',
+    'nok',
+    'nzd',
+    'php',
+    'pkr',
+    'pln',
+    'rub',
+    'sar',
+    'sek',
+    'sgd',
+    'thb',
+    'try',
+    'twd',
+    'uah',
+    'vef',
+    'vnd',
+    'zar',
+];
+
 const APIFetcher = {
     // Default source is coingecko given currency ticker support
-    coingecko: async (ticker: string): Promise<TRateObject> => {
+    coingecko: async (ticker: string): Promise<TRateObjectResponse> => {
         const {url} = sourcesAPI.coingecko;
+        const supported = supported_tickers.join(',');
 
         let returnedJSON;
 
         try {
-            // TODO: make call for all supported currencies and update accordingly
             const response = await fetch(
-                `${url}?ids=bitcoin&vs_currencies=${ticker}&include_24hr_change=true&include_last_updated_at=true`,
+                `${url}?ids=bitcoin&vs_currencies=${supported}&include_24hr_change=true&include_last_updated_at=true`,
                 {
                     method: 'GET',
                     headers: {
