@@ -13,4 +13,6 @@ export type TCurrency = {
     symbol: string;
     locale: string;
     full_name: string;
+    cached_rate?: number;
 };
+
