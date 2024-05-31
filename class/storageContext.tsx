@@ -68,6 +68,11 @@ import {
     validWalletTypes,
 } from '../modules/wallet-defaults';
 
+import rawRates from '../constants/Currency';
+const seedRates = Object.fromEntries(
+    rawRates.map(rateObj => [rateObj.short, rateObj.rate]),
+)
+
 // App context props type
 type Props = PropsWithChildren<{}>;
 
@@ -149,6 +154,8 @@ const defaultContext: defaultContextType = {
         short: 'USD',
         symbol: '$',
         locale: 'en-US',
+        full_name: 'United States Dollar',
+        cached_rate: seedRates.USD,
     },
     appUnit: {
         name: 'sats',
