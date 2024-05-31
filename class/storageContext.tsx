@@ -70,8 +70,8 @@ import {
 
 import rawRates from '../constants/Currency';
 const seedRates = Object.fromEntries(
-    rawRates.map(rateObj => [rateObj.short, rateObj.rate]),
-)
+    rawRates.map(rateObj => [rateObj.short.toLowerCase(), rateObj.rate]),
+);
 
 // App context props type
 type Props = PropsWithChildren<{}>;
