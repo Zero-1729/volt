@@ -20,14 +20,14 @@ import {useTranslation} from 'react-i18next';
 
 import VText from '../../components/text';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {TCurrency} from '../../types/settings';
+import {TCurrency, TRate} from '../../types/settings';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -45,6 +45,7 @@ import {addCommas, capitalizeFirst} from '../../modules/transform';
 import Toast from 'react-native-toast-message';
 import {fetchFiatRate} from '../../modules/currency';
 import {TRateObject, TRateResponse} from '../../types/wallet';
+import BigNumber from 'bignumber.js';
 
 const Currency = () => {
     const navigation = useNavigation();
@@ -54,64 +55,89 @@ const Currency = () => {
     const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
-    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    const fallbackNetworkState = useNetInfo();
 
     const [loadingRate, setLoadingRate] = useState(false);
 
-    const {appFiatCurrency, setAppFiatCurrency, fiatRate, updateFiatRate} =
-        useContext(AppStorageContext);
-
-    const networkState = useNetInfo();
+    const {
+        appFiatCurrency,
+        setAppFiatCurrency,
+        fiatRate,
+        updateFiatRate,
+        setCachedRates,
+        rates,
+    } = useContext(AppStorageContext);
 
     const handleCurrencySwitch = useCallback(
         async (currency: TCurrency) => {
-            setLoadingRate(true);
             let response: TRateResponse;
 
-            response = await fetchFiatRate(currency.short, fiatRate);
+            // Check Internet connection
+            // Only fetch if online
+            const _netInfo = await netInfo.fetch();
+            if (
+                checkNetworkIsReachable(_netInfo) ||
+                checkNetworkIsReachable(fallbackNetworkState)
+            ) {
+                response = await fetchFiatRate(currency.short, fiatRate);
 
-            if (response?.success) {
-                const rateObj = response.rate as TRateObject;
+                if (response?.success) {
+                    const rateObj = response.rate as TRateObject;
 
+                    updateFiatRate({
+                        ...fiatRate,
+                        rate: rateObj.rate,
+                        lastUpdated: rateObj.lastUpdated,
+                        dailyChange: rateObj.dailyChange,
+                    });
+
+                    // Set app fiat currency
+                    setAppFiatCurrency(currency);
+                    // refresh cached rates
+                    setCachedRates(response.rates as TRate);
+
+                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
+                    setLoadingRate(false);
+                } else {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('network')),
+                        text2: response.error,
+                        visibilityTime: 2500,
+                    });
+                    setLoadingRate(false);
+                }
+            } else {
+                // Otherwise
+                // Load cached rate
                 updateFiatRate({
                     ...fiatRate,
-                    rate: rateObj.rate,
-                    lastUpdated: rateObj.lastUpdated,
-                    dailyChange: rateObj.dailyChange,
+                    rate: new BigNumber(rates[currency.short.toLowerCase()]),
+                    lastUpdated: fiatRate.lastUpdated,
                 });
                 setAppFiatCurrency(currency);
-                RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
-                setLoadingRate(false);
-            } else {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('network')),
-                    text2: response.error,
-                    visibilityTime: 2500,
-                });
                 setLoadingRate(false);
             }
         },
-        [fiatRate, setAppFiatCurrency, t, updateFiatRate],
+        [
+            fallbackNetworkState,
+            fiatRate,
+            rates,
+            setAppFiatCurrency,
+            setCachedRates,
+            t,
+            updateFiatRate,
+        ],
     );
 
     const renderItem = ({item, index}: {item: TCurrency; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    if (!checkNetworkIsReachable(networkState)) {
-                        Toast.show({
-                            topOffset: 54,
-                            type: 'Liberal',
-                            text1: capitalizeFirst(t('network')),
-                            text2: e('no_internet_message'),
-                            visibilityTime: 1750,
-                        });
-                        return;
-                    }
-
+                    setLoadingRate(true);
                     handleCurrencySwitch(item);
                 }}
                 style={[
