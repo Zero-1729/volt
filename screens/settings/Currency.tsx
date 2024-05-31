@@ -68,6 +68,7 @@ const Currency = () => {
         updateFiatRate,
         setCachedRates,
         rates,
+        isAdvancedMode,
     } = useContext(AppStorageContext);
 
     const handleCurrencySwitch = useCallback(
@@ -101,13 +102,15 @@ const Currency = () => {
                     RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
                     setLoadingRate(false);
                 } else {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('network')),
-                        text2: response.error,
-                        visibilityTime: 2500,
-                    });
+                    if (isAdvancedMode) {
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: capitalizeFirst(t('network')),
+                            text2: response.error,
+                            visibilityTime: 2500,
+                        });
+                    }
 
                     // If online and hit cool down limit,
                     // update from cache if not refreshed
@@ -135,6 +138,7 @@ const Currency = () => {
         [
             fallbackNetworkState,
             fiatRate,
+            isAdvancedMode,
             rates,
             setAppFiatCurrency,
             setCachedRates,
