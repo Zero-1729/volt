@@ -109,7 +109,6 @@ const Home = ({route}: Props) => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        fiatRate,
         updateWalletTransactions,
         updateWalletPayments,
         updateWalletBalance,
@@ -288,7 +287,7 @@ const Home = ({route}: Props) => {
 
         // set bdk wallet
         setBdkWallet(w);
-    }, [setRefreshing, fiatRate, networkState]);
+    }, [setRefreshing, networkState]);
 
     const getBalance = async () => {
         try {
