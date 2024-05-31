@@ -16,3 +16,8 @@ export type TCurrency = {
     cached_rate?: number;
 };
 
+export type TRate = {
+    [key: string]: number;
+};
+
+export type TCachedRates = TRate;
