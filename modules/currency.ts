@@ -113,6 +113,7 @@ const APIFetcher = {
                 rate: rate,
                 dailyChange: dailyChange,
                 lastUpdated: lastUpdated,
+                rates: returnedJSON?.bitcoin,
             };
         } catch (error: any) {
             const detailed_error =
@@ -141,6 +142,7 @@ export const fetchFiatRate = async (
             rate: null,
             success: false, // Return false to indicate no update
             error: 'Fiat rate not updated, last updated less than 5 seconds ago',
+            rates: null,
         };
     }
 
@@ -150,6 +152,7 @@ export const fetchFiatRate = async (
             rate: null,
             success: false, // Return false to indicate no update
             error: 'Fiat rate not updated, last updated less than 30 minutes ago',
+            rates: null,
         };
     }
 
@@ -159,8 +162,17 @@ export const fetchFiatRate = async (
 
         // Return 'success' true to indicate success
         // i.e. rate fetched
-        return {rate: rateObj, success: true, error: ''};
+        return {
+            rate: {
+                rate: rateObj.rate,
+                lastUpdated: rateObj.lastUpdated,
+                dailyChange: rateObj.dailyChange,
+            },
+            success: true,
+            error: '',
+            rates: rateObj.rates,
+        };
     } catch (error: any) {
-        return {error: error.message, success: false, rate: null};
+        return {error: error.message, success: false, rate: null, rates: null};
     }
 };
