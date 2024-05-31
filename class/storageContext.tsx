@@ -25,7 +25,7 @@ import {
 import {generateMnemonic} from '../modules/bdk';
 import {BreezEvent} from '@breeztech/react-native-breez-sdk';
 
-import {TLanguage, TCurrency} from '../types/settings';
+import {TLanguage, TCurrency, TCachedRates} from '../types/settings';
 import {EBackupMaterial, ENet} from '../types/enums';
 import {
     TWalletType,
@@ -93,6 +93,7 @@ type defaultContextType = {
     defaultToTestnet: boolean;
     walletsIndex: number;
     wallets: TWalletType[];
+    rates: TCachedRates;
     currentWalletID: string;
     isDevMode: boolean;
     onboarding: boolean;
@@ -137,6 +138,7 @@ type defaultContextType = {
     setPINActive: (active: boolean) => void;
     setBiometricsActive: (active: boolean) => void;
     setPINAttempts: (attempts: number) => void;
+    setCachedRates: (rates: TCachedRates) => void;
 };
 
 // Default app context values
@@ -163,6 +165,7 @@ const defaultContext: defaultContextType = {
     },
     walletsIndex: 0,
     wallets: [],
+    rates: seedRates,
     fiatRate: {
         rate: new BigNumber(26000),
         lastUpdated: new Date().getTime(),
@@ -217,6 +220,7 @@ const defaultContext: defaultContextType = {
     setPINActive: () => {},
     setBiometricsActive: () => {},
     setPINAttempts: () => {},
+    setCachedRates: () => {},
 };
 
 // Note: context 'value' will default to 'defaultContext' if no Provider is found
@@ -245,6 +249,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const [wallets, _setWallets] = useState<TWalletType[]>(
         defaultContext.wallets,
     );
+    const [rates, _setRates] = useState<TCachedRates>(defaultContext.rates);
     const [currentWalletID, _setCurrentWalletID] = useState(
         defaultContext.currentWalletID,
     );
@@ -289,6 +294,8 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('walletsIndex');
     const {getItem: _getWallets, setItem: _updateWallets} =
         useAsyncStorage('wallets');
+    const {getItem: _getRates, setItem: _updateRates} =
+        useAsyncStorage('rates');
     const {getItem: _getIsAdvancedMode, setItem: _updateIsAdvancedMode} =
         useAsyncStorage('isAdvancedMode');
     const {getItem: _getDefaultToTestnet, setItem: _updateDefaultToTestnet} =
@@ -776,6 +783,14 @@ export const AppStorageProvider = ({children}: Props) => {
         }
     };
 
+    const _loadRates = async () => {
+        const savedRates = await _getRates();
+
+        if (savedRates !== null) {
+            _setRates(JSON.parse(savedRates));
+        }
+    };
+
     const _loadWallets = async () => {
         const savedWallets = await _getWallets();
 
@@ -833,6 +848,20 @@ export const AppStorageProvider = ({children}: Props) => {
             }
         },
         [_setWallets, _updateWallets],
+    );
+
+    const setCachedRates = useCallback(
+        async (value: TCachedRates) => {
+            try {
+                _setRates(value);
+                _updateRates(JSON.stringify(value));
+            } catch (e) {
+                console.error(
+                    `[AsyncStorage] (Rates setting) Error setting data: ${e}`,
+                );
+            }
+        },
+        [_setRates, _updateRates],
     );
 
     const deleteWallet = useCallback(
@@ -1454,10 +1483,15 @@ export const AppStorageProvider = ({children}: Props) => {
         _loadWalletsIndex();
     }, []);
 
+    useEffect(() => {
+        _loadRates();
+    }, []);
+
     // Return provider
     return (
         <AppStorageContext.Provider
             value={{
+                rates,
                 pinAttempts,
                 setPINAttempts,
                 isBiometricsActive,
@@ -1489,6 +1523,7 @@ export const AppStorageProvider = ({children}: Props) => {
                 isDevMode,
                 wallets,
                 restoreWallet,
+                setCachedRates,
                 addWallet,
                 currentWalletID,
                 setCurrentWalletID,
