@@ -39,7 +39,7 @@ import Check from './../../assets/svg/check-circle-fill-24.svg';
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-import {Currencies} from '../../constants/Currency';
+import Currencies from '../../constants/Currency';
 
 import {addCommas, capitalizeFirst} from '../../modules/transform';
 import Toast from 'react-native-toast-message';
