@@ -108,6 +108,16 @@ const Currency = () => {
                         text2: response.error,
                         visibilityTime: 2500,
                     });
+
+                    // If online and hit cool down limit,
+                    // update from cache if not refreshed
+                    updateFiatRate({
+                        ...fiatRate,
+                        rate: new BigNumber(
+                            rates[currency.short.toLowerCase()],
+                        ),
+                        lastUpdated: fiatRate.lastUpdated,
+                    });
                     setLoadingRate(false);
                 }
             } else {
