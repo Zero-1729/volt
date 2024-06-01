@@ -85,6 +85,7 @@ const SendView = ({route}: Props) => {
     const navigation = useNavigation();
 
     const {t, i18n} = useTranslation('wallet');
+    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const [uPsbt, setUPsbt] = useState<PartiallySignedTransaction>();
@@ -295,19 +296,21 @@ const SendView = ({route}: Props) => {
         const fileExportData = (await uPsbt?.jsonSerialize()) || '';
 
         if (Platform.OS === 'ios') {
-            await RNFS.writeFile(pathData, fileExportData, 'utf8').catch(e => {
-                errorMsg = e.message;
-                status = false;
-            });
+            await RNFS.writeFile(pathData, fileExportData, 'utf8').catch(
+                error => {
+                    errorMsg = error.message;
+                    status = false;
+                },
+            );
 
             await Share.open({
                 url: 'file://' + pathData,
                 type: 'text/plain',
                 title: 'PSBT export',
             })
-                .catch(e => {
-                    if (e.message !== 'User did not share') {
-                        errorMsg = e.message;
+                .catch(error => {
+                    if (error.message !== 'User did not share') {
+                        errorMsg = error.message;
                         status = false;
                     }
                 })
@@ -360,7 +363,7 @@ const SendView = ({route}: Props) => {
                         topOffset: 54,
                         type: 'Liberal',
                         text1: capitalizeFirst(t('error')),
-                        text2: t('tx_fail_creation_error'),
+                        text2: e('tx_fail_creation_error'),
                         visibilityTime: 2000,
                     });
 
