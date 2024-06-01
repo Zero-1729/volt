@@ -112,7 +112,8 @@ const RequestAmount = ({route}: Props) => {
         ? capitalizeFirst(t('continue'))
         : capitalizeFirst(t('skip'));
 
-    const hideContinueButton =
+    const disableContinueButtton =
+        (route.params?.boltNFCMode && satsAmount.value.isZero()) ||
         (isLightning && !maxReceivableAmount.isZero) ||
         (satsAmount.value.gte(maxReceivableAmount) &&
             !maxReceivableAmount.isZero() &&
@@ -529,13 +530,13 @@ const RequestAmount = ({route}: Props) => {
                     style={[
                         tailwind(
                             `absolute w-5/6 ${
-                                hideContinueButton ? 'opacity-40' : ''
+                                disableContinueButtton ? 'opacity-40' : ''
                             }`,
                         ),
                         {bottom: NativeWindowMetrics.bottom},
                     ]}>
                     <LongButton
-                        disabled={hideContinueButton}
+                        disabled={disableContinueButtton}
                         onPress={handleRoute}
                         title={
                             shouldSkip
