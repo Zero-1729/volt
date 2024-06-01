@@ -1,6 +1,12 @@
-import React, {useContext} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 
-import {StyleSheet, View, FlatList, useColorScheme} from 'react-native';
+import {
+    StyleSheet,
+    View,
+    FlatList,
+    useColorScheme,
+    ActivityIndicator,
+} from 'react-native';
 
 import {CommonActions} from '@react-navigation/native';
 
@@ -14,29 +20,32 @@ import {useTranslation} from 'react-i18next';
 
 import VText from '../../components/text';
 
-import {useNetInfo} from '@react-native-community/netinfo';
+import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {useTailwind} from 'tailwind-rn';
 
-import {TCurrency} from '../../types/settings';
+import {TCurrency, TRate} from '../../types/settings';
 
 import {AppStorageContext} from '../../class/storageContext';
 
 import {PlainButton} from '../../components/button';
 
 import Back from './../../assets/svg/arrow-left-24.svg';
-import Check from './../../assets/svg/check-circle-24.svg';
+import Check from './../../assets/svg/check-circle-fill-24.svg';
 
 import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
-import {Currencies} from '../../constants/Currency';
+import Currencies from '../../constants/Currency';
 
 import {addCommas, capitalizeFirst} from '../../modules/transform';
 import Toast from 'react-native-toast-message';
+import {fetchFiatRate} from '../../modules/currency';
+import {TRateObject, TRateResponse} from '../../types/wallet';
+import BigNumber from 'bignumber.js';
 
 const Currency = () => {
     const navigation = useNavigation();
@@ -46,60 +55,153 @@ const Currency = () => {
     const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
-    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const {appFiatCurrency, setAppFiatCurrency, fiatRate} =
-        useContext(AppStorageContext);
+    const fallbackNetworkState = useNetInfo();
 
-    const networkState = useNetInfo();
+    const [loadingRate, setLoadingRate] = useState(false);
+
+    const {
+        appFiatCurrency,
+        setAppFiatCurrency,
+        fiatRate,
+        updateFiatRate,
+        setCachedRates,
+        rates,
+        isAdvancedMode,
+    } = useContext(AppStorageContext);
+
+    const handleCurrencySwitch = useCallback(
+        async (currency: TCurrency) => {
+            let response: TRateResponse;
+
+            // Check Internet connection
+            // Only fetch if online
+            const _netInfo = await netInfo.fetch();
+            if (
+                checkNetworkIsReachable(_netInfo) ||
+                checkNetworkIsReachable(fallbackNetworkState)
+            ) {
+                response = await fetchFiatRate(currency.short, fiatRate);
+
+                if (response?.success) {
+                    const rateObj = response.rate as TRateObject;
+
+                    updateFiatRate({
+                        ...fiatRate,
+                        rate: rateObj.rate,
+                        lastUpdated: rateObj.lastUpdated,
+                        dailyChange: rateObj.dailyChange,
+                    });
+
+                    // Set app fiat currency
+                    setAppFiatCurrency(currency);
+                    // refresh cached rates
+                    setCachedRates(response.rates as TRate);
+
+                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
+                    setLoadingRate(false);
+                } else {
+                    if (isAdvancedMode) {
+                        Toast.show({
+                            topOffset: 54,
+                            type: 'Liberal',
+                            text1: capitalizeFirst(t('network')),
+                            text2: response.error,
+                            visibilityTime: 2500,
+                        });
+                    }
+
+                    // If online and hit cool down limit,
+                    // update from cache if not refreshed
+                    updateFiatRate({
+                        ...fiatRate,
+                        rate: new BigNumber(
+                            rates[currency.short.toLowerCase()],
+                        ),
+                        lastUpdated: fiatRate.lastUpdated,
+                    });
+                    setLoadingRate(false);
+                }
+            } else {
+                // Otherwise
+                // Load cached rate
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: new BigNumber(rates[currency.short.toLowerCase()]),
+                    lastUpdated: fiatRate.lastUpdated,
+                });
+                setAppFiatCurrency(currency);
+                setLoadingRate(false);
+            }
+        },
+        [
+            fallbackNetworkState,
+            fiatRate,
+            isAdvancedMode,
+            rates,
+            setAppFiatCurrency,
+            setCachedRates,
+            t,
+            updateFiatRate,
+        ],
+    );
 
     const renderItem = ({item, index}: {item: TCurrency; index: number}) => {
         return (
             <PlainButton
                 onPress={() => {
-                    if (!checkNetworkIsReachable(networkState)) {
-                        Toast.show({
-                            topOffset: 54,
-                            type: 'Liberal',
-                            text1: capitalizeFirst(t('network')),
-                            text2: e('no_internet_message'),
-                            visibilityTime: 1750,
-                        });
-                        return;
-                    }
-
-                    RNHapticFeedback.trigger('soft', RNHapticFeedbackOptions);
-                    setAppFiatCurrency(item);
-                }}>
+                    setLoadingRate(true);
+                    handleCurrencySwitch(item);
+                }}
+                style={[
+                    tailwind(
+                        `${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        } w-full items-center justify-between px-6 mt-4 mb-6`,
+                    ),
+                    index === 0 ? styles.paddedTop : {},
+                ]}>
                 <View
                     style={[
                         tailwind(
-                            `w-5/6 self-center items-center ${
+                            `items-center ${
                                 langDir === 'right'
                                     ? 'flex-row-reverse'
                                     : 'flex-row'
-                            } justify-between mt-3 mb-6`,
+                            }`,
                         ),
-                        index === 0 ? styles.paddedTop : {},
                     ]}>
                     <VText
                         style={[
                             tailwind('text-sm'),
                             {color: ColorScheme.Text.Default},
+                        ]}>
+                        {item.full_name}
+                    </VText>
+                    {appFiatCurrency.short === item.short && (
+                        <View
+                            style={[
+                                tailwind(
+                                    `${langDir === 'right' ? 'mr-2' : 'ml-2'}`,
+                                ),
+                            ]}>
+                            <Check width={16} fill={ColorScheme.SVG.Default} />
+                        </View>
+                    )}
+                </View>
+                <View
+                    style={[tailwind('items-center justify-center flex-row')]}>
+                    <VText
+                        style={[
+                            tailwind('text-sm'),
+                            {color: ColorScheme.Text.DescText},
                             Font.RobotoText,
                         ]}>
                         {`${item.short} (${item.symbol})`}
                     </VText>
-
-                    <View
-                        style={[
-                            tailwind('flex-row items-center justify-between'),
-                        ]}>
-                        {appFiatCurrency.short === item.short && (
-                            <Check width={16} fill={ColorScheme.SVG.Default} />
-                        )}
-                    </View>
                 </View>
             </PlainButton>
         );
@@ -192,25 +294,59 @@ const Currency = () => {
                                         langDir === 'right' ? 'pr-8' : 'pl-8'
                                     }`,
                                 ),
+                                styles.rateHighlight,
                                 {
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                 },
                             ]}>
-                            <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {
-                                        color: ColorScheme.Text.Default,
-                                    },
-                                ]}>
-                                {`${t('price_at')} ${addCommas(
-                                    fiatRate.rate.toString(),
-                                )} ${appFiatCurrency.short} ${t('price_on')} `}
-                                <VText style={[tailwind('flex font-bold')]}>
-                                    {'CoinGecko'}
+                            {loadingRate ? (
+                                <View
+                                    style={[
+                                        tailwind(
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            }`,
+                                        ),
+                                    ]}>
+                                    <ActivityIndicator size={'small'} />
+                                    <VText
+                                        style={[
+                                            tailwind(
+                                                `text-sm ${
+                                                    langDir === 'right'
+                                                        ? 'mr-2'
+                                                        : 'ml-2'
+                                                }`,
+                                            ),
+                                            {
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            },
+                                        ]}>
+                                        {t('loading_rate')}
+                                    </VText>
+                                </View>
+                            ) : (
+                                <VText
+                                    style={[
+                                        tailwind('text-sm'),
+                                        {
+                                            color: ColorScheme.Text.Default,
+                                        },
+                                    ]}>
+                                    {`${t('price_at')} ${addCommas(
+                                        fiatRate.rate.toString(),
+                                    )} ${appFiatCurrency.short} ${t(
+                                        'price_on',
+                                    )} `}
+                                    <VText style={[tailwind('flex font-bold')]}>
+                                        {'CoinGecko'}
+                                    </VText>
                                 </VText>
-                            </VText>
+                            )}
                         </View>
                     </View>
 
@@ -223,7 +359,11 @@ const Currency = () => {
                         contentInsetAdjustmentBehavior="automatic"
                     />
 
-                    <View style={[tailwind('w-full items-center mt-2')]}>
+                    <View
+                        style={[
+                            tailwind('w-full items-center justify-center'),
+                            styles.bottomMessage,
+                        ]}>
                         <VText style={[{color: ColorScheme.Text.GrayedText}]}>
                             {t('last_updated', {date: fiatRate.lastUpdated})}
                         </VText>
@@ -242,5 +382,11 @@ const styles = StyleSheet.create({
     },
     flexed: {
         flex: 1,
+    },
+    rateHighlight: {
+        height: 54,
+    },
+    bottomMessage: {
+        height: 48,
     },
 });

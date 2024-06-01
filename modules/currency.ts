@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import {TRateObject} from '../types/wallet';
+import {TRateObjectResponse, TRateResponse, TRateObject} from '../types/wallet';
 
 const sourcesAPI = {
     coingecko: {
@@ -12,16 +12,64 @@ export const sourceNames = {
     CoinGecko: 'coingecko',
 };
 
+const supported_tickers = [
+    'usd',
+    'aed',
+    'ars',
+    'aud',
+    'bdt',
+    'bhd',
+    'brl',
+    'cad',
+    'chf',
+    'clp',
+    'czk',
+    'cny',
+    'dkk',
+    'eur',
+    'gbp',
+    'hkd',
+    'huf',
+    'idr',
+    'ils',
+    'inr',
+    'jpy',
+    'krw',
+    'kwd',
+    'lkr',
+    'mmk',
+    'mxn',
+    'myr',
+    'ngn',
+    'nok',
+    'nzd',
+    'php',
+    'pkr',
+    'pln',
+    'rub',
+    'sar',
+    'sek',
+    'sgd',
+    'thb',
+    'try',
+    'twd',
+    'uah',
+    'vef',
+    'vnd',
+    'zar',
+];
+
 const APIFetcher = {
     // Default source is coingecko given currency ticker support
-    coingecko: async (ticker: string): Promise<TRateObject> => {
+    coingecko: async (ticker: string): Promise<TRateObjectResponse> => {
         const {url} = sourcesAPI.coingecko;
+        const supported = supported_tickers.join(',');
 
         let returnedJSON;
 
         try {
             const response = await fetch(
-                `${url}?ids=bitcoin&vs_currencies=${ticker}&include_24hr_change=true&include_last_updated_at=true`,
+                `${url}?ids=bitcoin&vs_currencies=${supported}&include_24hr_change=true&include_last_updated_at=true`,
                 {
                     method: 'GET',
                     headers: {
@@ -30,11 +78,26 @@ const APIFetcher = {
                 },
             );
 
-            returnedJSON = await response.json();
-        } catch (e: any) {
+            // Grab the raw response here instead, check and parse JSON later
+            const rawResponse = await response.text();
+
+            // Check that it is not an error response
+            if (
+                rawResponse.startsWith('{ error') ||
+                rawResponse.includes('Sorry, not able to access it right now.')
+            ) {
+                throw new Error(
+                    `Error fetching rate for ${ticker.toUpperCase()} from CoinGecko: ${
+                        rawResponse.split(':')[1].split('}')[0]
+                    }`,
+                );
+            }
+
+            returnedJSON = JSON.parse(rawResponse);
+        } catch (error: any) {
             throw new Error(
                 `Error fetching rate for ${ticker.toUpperCase()} from CoinGecko: ${
-                    e.message
+                    error.message
                 }`,
             );
         }
@@ -50,11 +113,12 @@ const APIFetcher = {
                 rate: rate,
                 dailyChange: dailyChange,
                 lastUpdated: lastUpdated,
+                rates: returnedJSON?.bitcoin,
             };
-        } catch (e: any) {
+        } catch (error: any) {
             const detailed_error =
                 returnedJSON?.status.error_message.split('.')[0];
-            const msg = detailed_error ? detailed_error : e.message;
+            const msg = detailed_error ? detailed_error : error.message;
 
             throw new Error(
                 `Error parsing rate for ${ticker} from CoinGecko: ${msg}`,
@@ -63,56 +127,52 @@ const APIFetcher = {
     },
 };
 
-// Make single fire call to CoinGecko
-const fetchPrice = async (ticker: string): Promise<TRateObject> => {
-    const response = await APIFetcher.coingecko(ticker.toLowerCase());
-
-    // return fetched rate
-    return response;
-};
-
 export const fetchFiatRate = async (
     ticker: string,
     fiatRate: TRateObject,
-    onSuccess: (rateObj: TRateObject) => void,
-    violate = false,
-) => {
+): Promise<TRateResponse> => {
     const {lastUpdated} = fiatRate;
 
     // Same as Date.getTime()
     const currentTimestamp = +new Date();
 
+    // Debounce
     if (currentTimestamp - lastUpdated <= 5 * 1000) {
-        // Debounce
-        console.info(
-            '[FiatRate] Not updating fiat rate, last updated less than 5 seconds ago',
-        );
-
-        // Return false to indicate no update
-        return false;
+        return {
+            rate: null,
+            success: false, // Return false to indicate no update
+            error: 'Fiat rate not updated, last updated less than 5 seconds ago',
+            rates: null,
+        };
     }
 
-    if (currentTimestamp - lastUpdated <= 30 * 60 * 1000 && !violate) {
+    if (currentTimestamp - lastUpdated <= 30 * 60 * 1000) {
         // Avoid updating too frequently
-        console.info(
-            '[FiatRate] Not updating fiat rate, last updated less than 30 minutes ago',
-        );
-
-        // Return false to indicate no update
-        return false;
+        return {
+            rate: null,
+            success: false, // Return false to indicate no update
+            error: 'Fiat rate not updated, last updated less than 30 minutes ago',
+            rates: null,
+        };
     }
 
     try {
         // Grab data from remote source, i.e., CoinGecko
-        const rateObj = await fetchPrice(ticker);
+        const rateObj = await APIFetcher.coingecko(ticker.toLowerCase());
 
-        // Trigger callback from RN component to update storage context
-        onSuccess(rateObj);
-
-        // Return true to indicate success
+        // Return 'success' true to indicate success
         // i.e. rate fetched
-        return true;
-    } catch (e) {
-        throw e;
+        return {
+            rate: {
+                rate: rateObj.rate,
+                lastUpdated: rateObj.lastUpdated,
+                dailyChange: rateObj.dailyChange,
+            },
+            success: true,
+            error: '',
+            rates: rateObj.rates,
+        };
+    } catch (error: any) {
+        return {error: error.message, success: false, rate: null, rates: null};
     }
 };

@@ -12,4 +12,12 @@ export type TCurrency = {
     short: string;
     symbol: string;
     locale: string;
+    full_name: string;
+    cached_rate?: number;
 };
+
+export type TRate = {
+    [key: string]: number;
+};
+
+export type TCachedRates = TRate;

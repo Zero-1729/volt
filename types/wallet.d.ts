@@ -19,6 +19,7 @@ import {
     Payment,
     PaymentFailedData,
 } from '@breeztech/react-native-breez-sdk';
+import {TRate} from './settings';
 
 export type TNetwork = ENet | Network;
 
@@ -206,6 +207,20 @@ export type TRateObject = {
     rate: BigNumber;
     dailyChange: BigNumber;
     lastUpdated: number; // UNIX Timestamp
+};
+
+export type TRateObjectResponse = {
+    rate: BigNumber;
+    dailyChange: BigNumber;
+    lastUpdated: number; // UNIX Timestamp
+    rates: TRate;
+};
+
+export type TRateResponse = {
+    success: boolean;
+    rate: TRateObject | null;
+    error: string;
+    rates: TRate | null;
 };
 
 // Boltz Exchange ReverseSwap Type
