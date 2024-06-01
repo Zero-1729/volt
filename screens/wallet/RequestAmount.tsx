@@ -107,7 +107,9 @@ const RequestAmount = ({route}: Props) => {
 
     const isLightning = walletType === 'unified';
 
-    const shouldSkip = satsAmount.value.isZero();
+    const shouldSkip = route.params?.boltNFCMode
+        ? false
+        : satsAmount.value.isZero();
     const skipText = route.params?.boltNFCMode
         ? capitalizeFirst(t('continue'))
         : capitalizeFirst(t('skip'));
