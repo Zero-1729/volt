@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
     useColorScheme,
@@ -64,6 +63,8 @@ import {
     TTransaction,
     TSwapInfo,
     TBoltzSwapInfo,
+    TRateResponse,
+    TRateObject,
 } from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
@@ -74,6 +75,8 @@ import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
 import {SwapType} from '../../types/enums';
+import {fetchFiatRate} from '../../modules/currency';
+import {TRate} from '../../types/settings';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -109,6 +112,12 @@ const Wallet = ({route}: Props) => {
         updateWalletAddress,
         electrumServerURL,
         isAdvancedMode,
+        appFiatCurrency,
+        updateFiatRate,
+        fiatRate,
+        setCachedRates,
+        rates,
+        setAppFiatCurrency,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -236,6 +245,9 @@ const Wallet = ({route}: Props) => {
         setRefreshing(true);
         setLoadingBalance(true);
 
+        // Get Fiat rate
+        fetchAndUpdateFiatRate();
+
         // fetch onchain
         refreshWallet();
 
@@ -293,6 +305,75 @@ const Wallet = ({route}: Props) => {
 
         return await syncBDKWallet(w, walletData.network, electrumServerURL);
     }, [bdkWallet, electrumServerURL, initWallet, walletData.network]);
+
+    const fetchAndUpdateFiatRate = useCallback(async () => {
+        let response: TRateResponse;
+
+        // Check Internet connection
+        // Only fetch if online
+        const _netInfo = await netInfo.fetch();
+        if (
+            checkNetworkIsReachable(_netInfo) ||
+            checkNetworkIsReachable(networkState)
+        ) {
+            response = await fetchFiatRate(appFiatCurrency.short, fiatRate);
+
+            if (response?.success) {
+                const rateObj = response.rate as TRateObject;
+
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: rateObj.rate,
+                    lastUpdated: rateObj.lastUpdated,
+                    dailyChange: rateObj.dailyChange,
+                });
+
+                // Set app fiat currency
+                setAppFiatCurrency(appFiatCurrency);
+                // refresh cached rates
+                setCachedRates(response.rates as TRate);
+            } else {
+                if (isAdvancedMode) {
+                    Toast.show({
+                        topOffset: 54,
+                        type: 'Liberal',
+                        text1: capitalizeFirst(t('network')),
+                        text2: response.error,
+                        visibilityTime: 2500,
+                    });
+                }
+
+                // If online and hit cool down limit,
+                // update from cache if not refreshed
+                updateFiatRate({
+                    ...fiatRate,
+                    rate: new BigNumber(
+                        rates[appFiatCurrency.short.toLowerCase()],
+                    ),
+                    lastUpdated: fiatRate.lastUpdated,
+                });
+            }
+        } else {
+            // Otherwise
+            // Load cached rate
+            updateFiatRate({
+                ...fiatRate,
+                rate: new BigNumber(rates[appFiatCurrency.short.toLowerCase()]),
+                lastUpdated: fiatRate.lastUpdated,
+            });
+            setAppFiatCurrency(appFiatCurrency);
+        }
+    }, [
+        appFiatCurrency,
+        fiatRate,
+        isAdvancedMode,
+        networkState,
+        rates,
+        setAppFiatCurrency,
+        setCachedRates,
+        t,
+        updateFiatRate,
+    ]);
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
