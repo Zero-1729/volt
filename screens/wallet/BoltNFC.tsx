@@ -132,6 +132,8 @@ const BoltNFC = ({route}: Props) => {
     const handleWithdraw = useCallback(
         async (lnurl: string) => {
             try {
+                // Start loading
+                setLoading(true);
                 setStatusMessage(t('retrieving_lnurl_data'));
 
                 const input = await parseInput(lnurl);
@@ -218,7 +220,6 @@ const BoltNFC = ({route}: Props) => {
 
         if (!enabled) {
             setStatusMessage(t('nfc_disabled'));
-            setLoading(false);
             return;
         }
 
@@ -232,9 +233,6 @@ const BoltNFC = ({route}: Props) => {
         if (isInError) {
             cancelScanRequest();
         }
-
-        // Start loading
-        setLoading(true);
 
         // Start processing the NFC
         NFCManager.start();
@@ -252,18 +250,20 @@ const BoltNFC = ({route}: Props) => {
 
                 if (!tagData.lnurl) {
                     setStatusMessage(t('no_lnurl_data_found'));
-                    setLoading(false);
                     return;
                 }
 
                 handleWithdraw(tagData.lnurl);
             } else {
                 setStatusMessage(t('no_nfc_tag_found'));
-                setLoading(false);
             }
         } catch (error: any) {
-            setStatusMessage(t('nfc_tag_error', {error: error.message}));
-            setLoading(false);
+            // IF empty, assume user canceled scan
+            if (error.message === '') {
+                setStatusMessage(t('bolt_nfc_parking'));
+            } else {
+                setStatusMessage(t('nfc_tag_error', {error: error.message}));
+            }
         }
     }, [
         cancelScanRequest,
