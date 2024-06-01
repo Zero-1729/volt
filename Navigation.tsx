@@ -115,7 +115,6 @@ import MnemonicTool from './screens/settings/tools/MnemonicTool';
 
 import About from './screens/settings/About';
 import License from './screens/settings/License';
-import Changelog from './screens/settings/Changelog';
 
 import {
     TTransaction,
@@ -141,7 +140,6 @@ const modalRoutes = [
     'WalletXpub',
     // 'addWalletRoot', Screen not necessary as before wallet created
     'License',
-    'Changelog',
     'XKeyTool',
     'MnemonicTool',
 ];
@@ -216,7 +214,6 @@ export type SettingsParamList = {
 
     SettingsTools: undefined;
     License: undefined;
-    Changelog: undefined;
     XKeyTool: undefined;
     MnemonicTool: undefined;
 };
@@ -355,7 +352,6 @@ const SettingsRoot = () => {
 
             <SettingsStack.Group screenOptions={{presentation: 'modal'}}>
                 <SettingsStack.Screen name="License" component={License} />
-                <SettingsStack.Screen name="Changelog" component={Changelog} />
                 <SettingsStack.Screen name="XKeyTool" component={ExtendedKey} />
                 <SettingsStack.Screen
                     name="MnemonicTool"
