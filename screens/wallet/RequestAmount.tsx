@@ -45,7 +45,7 @@ type DisplayUnit = {
     name: string;
 };
 
-import {PlainButton} from '../../components/button';
+import {LongButton, PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
 import {
     DisplayFiatAmount,
@@ -108,6 +108,9 @@ const RequestAmount = ({route}: Props) => {
     const isLightning = walletType === 'unified';
 
     const shouldSkip = satsAmount.value.isZero();
+    const skipText = route.params?.boltNFCMode
+        ? capitalizeFirst(t('continue'))
+        : capitalizeFirst(t('skip'));
 
     const hideContinueButton =
         (isLightning && !maxReceivableAmount.isZero) ||
@@ -525,38 +528,23 @@ const RequestAmount = ({route}: Props) => {
                 <View
                     style={[
                         tailwind(
-                            `absolute ${
+                            `absolute w-5/6 ${
                                 hideContinueButton ? 'opacity-40' : ''
                             }`,
                         ),
                         {bottom: NativeWindowMetrics.bottom},
                     ]}>
-                    <PlainButton
+                    <LongButton
                         disabled={hideContinueButton}
-                        onPress={handleRoute}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'rounded-full items-center flex-row justify-center px-6 py-3',
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
-                                },
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {
-                                        color: ColorScheme.Text.Alt,
-                                    },
-                                ]}>
-                                {shouldSkip
-                                    ? capitalizeFirst(t('skip'))
-                                    : capitalizeFirst(t('continue'))}
-                            </Text>
-                        </View>
-                    </PlainButton>
+                        onPress={handleRoute}
+                        title={
+                            shouldSkip
+                                ? skipText
+                                : capitalizeFirst(t('continue'))
+                        }
+                        textColor={ColorScheme.Text.Alt}
+                        backgroundColor={ColorScheme.Background.Inverted}
+                    />
                 </View>
                 <Toast config={toastConfig as ToastConfig} />
             </View>

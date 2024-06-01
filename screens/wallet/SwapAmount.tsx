@@ -24,7 +24,7 @@ import {
     SATS_TO_BTC_RATE,
 } from '../../modules/transform';
 
-import {PlainButton} from '../../components/button';
+import {LongButton, PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
 import {DisplayUnit} from '../../types/wallet';
 import {SwapType} from '../../types/enums';
@@ -487,43 +487,30 @@ const SwapAmount = ({route}: Props) => {
                 {/* Continue button */}
                 <View
                     style={[
-                        tailwind('absolute'),
+                        tailwind(
+                            `absolute w-5/6 ${
+                                amount === '' ||
+                                isBeyondMax ||
+                                minimumSwapAmount.isZero() ||
+                                minimumSwapAmount.gt(satsAmount.value)
+                                    ? 'opacity-20'
+                                    : ''
+                            }`,
+                        ),
                         {bottom: NativeWindowMetrics.bottom},
                     ]}>
-                    <PlainButton
+                    <LongButton
                         disabled={
                             amount === '' ||
                             isBeyondMax ||
+                            minimumSwapAmount.isZero() ||
                             minimumSwapAmount.gt(satsAmount.value)
                         }
-                        onPress={handleSwapRoute}>
-                        <View
-                            style={[
-                                tailwind(
-                                    `rounded-full items-center flex-row justify-center px-6 py-3 ${
-                                        amount === '' ||
-                                        isBeyondMax ||
-                                        minimumSwapAmount.gt(satsAmount.value)
-                                            ? 'opacity-20'
-                                            : ''
-                                    }`,
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
-                                },
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {
-                                        color: ColorScheme.Text.Alt,
-                                    },
-                                ]}>
-                                {capitalizeFirst(t('continue'))}
-                            </Text>
-                        </View>
-                    </PlainButton>
+                        onPress={handleSwapRoute}
+                        textColor={ColorScheme.Text.Alt}
+                        backgroundColor={ColorScheme.Background.Inverted}
+                        title={capitalizeFirst(t('continue'))}
+                    />
                 </View>
 
                 <Toast config={toastConfig as ToastConfig} />

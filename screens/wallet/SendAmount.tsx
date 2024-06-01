@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 // TODO: probably merge into one Amount screen that routes to request screen and send screen, accordingly.
-import React, {useContext, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import {useColorScheme, View, Text} from 'react-native';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -40,7 +40,7 @@ import {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 import {DisplayUnit} from '../../types/wallet';
 
-import {PlainButton} from '../../components/button';
+import {LongButton, PlainButton} from '../../components/button';
 import {AmountNumpad} from '../../components/input';
 import {
     DisplayFiatAmount,
@@ -91,7 +91,6 @@ const SendAmount = ({route}: Props) => {
     const isMax = amount === walletBalance.toString();
     const isAmountEmpty = Number(amount) === 0;
     const isLNManual = route.params.isLnManual;
-
     const isOverBalance = new BigNumber(satsAmount.value).gt(walletBalance);
     const isBelowDust = new BigNumber(satsAmount.value).lt(DUST_LIMIT);
 
@@ -234,6 +233,79 @@ const SendAmount = ({route}: Props) => {
         navigation.dispatch(CommonActions.goBack());
     };
 
+    const handleSendRoute = useCallback(() => {
+        if (isBelowDust && !route.params.isLightning) {
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: e('dust_limit_title'),
+                text2: `${e('dust_limit_message')} ${DUST_LIMIT} ${t(
+                    'satoshi',
+                )}.`,
+                visibilityTime: 1750,
+            });
+            return;
+        }
+
+        if (isNetOn && isLNManual) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'SendLN',
+                    params: {
+                        lnManualPayload: {
+                            amount: satsAmount.value.toString(),
+                            kind: route.params.lnManualPayload?.kind,
+                            text: route.params.lnManualPayload?.text,
+                            description:
+                                route.params.lnManualPayload?.description,
+                        },
+                    },
+                }),
+            );
+            return;
+        }
+
+        if (isNetOn) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'FeeSelection',
+                    params: {
+                        invoiceData: {
+                            ...route.params.invoiceData,
+                            options: {
+                                amount: satsAmount.value.toString(),
+                            },
+                        },
+                        wallet: route.params.wallet,
+                    },
+                }),
+            );
+        } else {
+            Toast.show({
+                topOffset: 54,
+                type: 'Liberal',
+                text1: e('no_internet_title'),
+                text2: e('no_internet_message'),
+                visibilityTime: 1750,
+            });
+            return;
+        }
+    }, [
+        e,
+        isBelowDust,
+        isLNManual,
+        isNetOn,
+        navigation,
+        route.params.invoiceData,
+        route.params.isLightning,
+        route.params.lnManualPayload?.description,
+        route.params.lnManualPayload?.kind,
+        route.params.lnManualPayload?.text,
+        route.params.wallet,
+        satsAmount.value,
+        t,
+    ]);
+
     return (
         <SafeAreaView
             edges={['top', 'right', 'left', 'bottom']}
@@ -350,97 +422,22 @@ const SendAmount = ({route}: Props) => {
                 {/* Continue button */}
                 <View
                     style={[
-                        tailwind('absolute'),
+                        tailwind(
+                            `absolute w-5/6 ${
+                                isOverBalance || isAmountEmpty
+                                    ? 'opacity-40'
+                                    : ''
+                            }`,
+                        ),
                         {bottom: bottomOffset.bottom},
                     ]}>
-                    <PlainButton
-                        disabled={amount === '' || isOverBalance}
-                        onPress={() => {
-                            if (isBelowDust && !route.params.isLightning) {
-                                Toast.show({
-                                    topOffset: 54,
-                                    type: 'Liberal',
-                                    text1: e('dust_limit_title'),
-                                    text2: `${e(
-                                        'dust_limit_message',
-                                    )} ${DUST_LIMIT} ${t('satoshi')}.`,
-                                    visibilityTime: 1750,
-                                });
-                                return;
-                            }
-
-                            if (isNetOn && isLNManual) {
-                                navigation.dispatch(
-                                    CommonActions.navigate('WalletRoot', {
-                                        screen: 'SendLN',
-                                        params: {
-                                            lnManualPayload: {
-                                                amount: satsAmount.value.toString(),
-                                                kind: route.params
-                                                    .lnManualPayload?.kind,
-                                                text: route.params
-                                                    .lnManualPayload?.text,
-                                                description:
-                                                    route.params.lnManualPayload
-                                                        ?.description,
-                                            },
-                                        },
-                                    }),
-                                );
-                                return;
-                            }
-
-                            if (isNetOn) {
-                                navigation.dispatch(
-                                    CommonActions.navigate('WalletRoot', {
-                                        screen: 'FeeSelection',
-                                        params: {
-                                            invoiceData: {
-                                                ...route.params.invoiceData,
-                                                options: {
-                                                    amount: satsAmount.value.toString(),
-                                                },
-                                            },
-                                            wallet: route.params.wallet,
-                                        },
-                                    }),
-                                );
-                            } else {
-                                Toast.show({
-                                    topOffset: 54,
-                                    type: 'Liberal',
-                                    text1: e('no_internet_title'),
-                                    text2: e('no_internet_message'),
-                                    visibilityTime: 1750,
-                                });
-                                return;
-                            }
-                        }}>
-                        <View
-                            style={[
-                                tailwind(
-                                    `rounded-full items-center flex-row justify-center px-6 py-3 ${
-                                        isAmountEmpty || isOverBalance
-                                            ? 'opacity-20'
-                                            : ''
-                                    }`,
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Inverted,
-                                },
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {
-                                        color: ColorScheme.Text.Alt,
-                                    },
-                                ]}>
-                                {capitalizeFirst(t('continue'))}
-                            </Text>
-                        </View>
-                    </PlainButton>
+                    <LongButton
+                        disabled={isAmountEmpty || isOverBalance}
+                        onPress={handleSendRoute}
+                        backgroundColor={ColorScheme.Background.Inverted}
+                        title={capitalizeFirst(t('continue'))}
+                        textColor={ColorScheme.Text.Alt}
+                    />
                 </View>
             </View>
         </SafeAreaView>
