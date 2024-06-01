@@ -179,47 +179,6 @@ const About = () => {
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
-                                CommonActions.navigate({name: 'Changelog'}),
-                            );
-                        }}>
-                        <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } justify-between mt-2 mb-4`,
-                                ),
-                            ]}>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                    Font.RobotoText,
-                                ]}>
-                                {t('release_notes')}
-                            </Text>
-
-                            {langDir === 'left' ? (
-                                <Right
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            ) : (
-                                <Left
-                                    width={16}
-                                    stroke={ColorScheme.SVG.GrayFill}
-                                    fill={ColorScheme.SVG.GrayFill}
-                                />
-                            )}
-                        </View>
-                    </PlainButton>
-
-                    <PlainButton
-                        onPress={() => {
-                            navigation.dispatch(
                                 CommonActions.navigate({name: 'License'}),
                             );
                         }}>
