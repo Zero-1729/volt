@@ -718,6 +718,11 @@
 			"paddingBottom": 32
 		}
 	},
+	"pb-10": {
+		"style": {
+			"paddingBottom": 40
+		}
+	},
 	"pb-11": {
 		"style": {
 			"paddingBottom": 44
