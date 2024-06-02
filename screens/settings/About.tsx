@@ -142,7 +142,7 @@ const About = () => {
                             isAdvancedMode
                                 ? 'Build ' + getBuildIdSync() + ' '
                                 : ''
-                        }${capitalizeFirst(t('beta.4'))}`}
+                        }${capitalizeFirst(t('beta.2'))}`}
                         )
                     </Text>
                 </View>
