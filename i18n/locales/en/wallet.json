@@ -188,5 +188,6 @@
     "add_wallet_advanced_mode_desc": "For experienced Bitcoin wallet users who want to access advanced features",
     "loading_swap_info": "Loading swap limit information...",
     "payment_to_self_detected": "This invoice was generated from this wallet, cannot pay to self",
-    "already_paid_ln_invoice": "This invoice has already been paid"
+    "already_paid_ln_invoice": "This invoice has already been paid",
+    "swap_in_progress": "Detected a Swap In in progress"
 }
