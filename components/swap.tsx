@@ -35,6 +35,7 @@ type SwapProps = {
             max: number;
         };
     };
+    swapInProgress: boolean; // Swap In in progress (i.e. swapping)
     isOnline: boolean;
     loadingInfo: boolean;
 };
@@ -64,6 +65,20 @@ const Swap = (props: SwapProps) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const ColorScheme = Color(useColorScheme());
+
+    const disableButton =
+        (onchainBroke && lightningBroke) ||
+        props.loadingInfo ||
+        swapOutLoading ||
+        !props.isOnline ||
+        props.swapInProgress;
+
+    const infoMessage =
+        !props.isOnline && swapOutLoading
+            ? t('no_internet_cannot_swap')
+            : props.swapInProgress
+            ? t('swap_in_progress')
+            : t('loading_swap_info');
 
     return (
         <BottomModal
@@ -97,7 +112,8 @@ const Swap = (props: SwapProps) => {
                                     onchainBroke ||
                                     swapOutLoading ||
                                     !props.isOnline ||
-                                    props.loadingInfo
+                                    props.loadingInfo ||
+                                    props.swapInProgress
                                         ? 'opacity-60'
                                         : 'opacity-100'
                                 }`,
@@ -126,7 +142,8 @@ const Swap = (props: SwapProps) => {
                             {selected === SwapType.SwapIn &&
                                 !swapOutLoading &&
                                 props.isOnline &&
-                                !onchainBroke && (
+                                !onchainBroke &&
+                                !props.swapInProgress && (
                                     <CheckIcon
                                         style={[
                                             tailwind(
@@ -267,7 +284,9 @@ const Swap = (props: SwapProps) => {
                         )}
                     </PlainButton>
 
-                    {(!props.isOnline || swapOutLoading) && (
+                    {(!props.isOnline ||
+                        swapOutLoading ||
+                        props.swapInProgress) && (
                         <View
                             style={[
                                 tailwind(
@@ -293,9 +312,7 @@ const Swap = (props: SwapProps) => {
                                     ),
                                     {color: ColorScheme.Text.DescText},
                                 ]}>
-                                {!(props.isOnline && swapOutLoading)
-                                    ? t('no_internet_cannot_swap')
-                                    : t('loading_swap_info')}
+                                {infoMessage}
                             </VText>
                         </View>
                     )}
@@ -306,12 +323,7 @@ const Swap = (props: SwapProps) => {
                             {bottom: bottomOffset},
                         ]}>
                         <LongBottomButton
-                            disabled={
-                                (onchainBroke && lightningBroke) ||
-                                props.loadingInfo ||
-                                swapOutLoading ||
-                                !props.isOnline
-                            }
+                            disabled={disableButton}
                             title={capitalizeFirst(t('continue'))}
                             onPress={() => {
                                 props.triggerSwap(selected);
