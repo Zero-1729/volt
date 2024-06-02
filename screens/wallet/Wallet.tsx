@@ -405,16 +405,18 @@ const Wallet = ({route}: Props) => {
                     electrumServerURL,
                 );
 
-                // update wallet address
-                updateWalletAddress(walletData.index, address);
-
                 // We make this update in case of pending txs
                 // and because we already have this data from the balance update BDK call
                 // update wallet transactions
                 updateWalletTransactions(currentWalletID, txs);
 
-                // update wallet UTXOs
-                updateWalletUTXOs(currentWalletID, utxo);
+                if (utxo.length !== walletData.UTXOs.length) {
+                    // update wallet UTXOs
+                    updateWalletUTXOs(currentWalletID, utxo);
+
+                    // generate new address
+                    updateWalletAddress(address.index, address);
+                }
 
                 setLoadLock(false);
             } catch (err: any) {
