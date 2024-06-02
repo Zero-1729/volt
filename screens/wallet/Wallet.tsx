@@ -94,6 +94,7 @@ const Wallet = ({route}: Props) => {
     const [loadingSwapOutInfo, setLoadingSwapOutInfo] = useState<boolean>(true);
     const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
     const [updatedLNBalance, setUpdatedLNBalance] = useState<boolean>(false);
+    const [swapInProgress, setSwapInProgress] = useState<boolean>(false);
     const [updatedOnchainBalance, setUpdatedOBalance] =
         useState<boolean>(false);
     const networkState = useNetInfo();
@@ -524,6 +525,10 @@ const Wallet = ({route}: Props) => {
             })
             .catch((error: any) => {
                 console.log('[Breez swapIn] error: ', error.message);
+
+                if (error.message.includes('Swap in progress')) {
+                    setSwapInProgress(true);
+                }
 
                 if (
                     error.message.includes('ConnectionReset') &&
@@ -1143,6 +1148,7 @@ const Wallet = ({route}: Props) => {
                         {walletData.type === 'unified' && (
                             <View style={[tailwind('absolute bottom-0')]}>
                                 <Swap
+                                    swapInProgress={swapInProgress}
                                     lightningBalance={
                                         walletData.balance.lightning
                                     }
