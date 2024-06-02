@@ -41,6 +41,7 @@ export const fetchOnchainTransactions = async (
     const newTxs = updated ? [] : transactions;
 
     let tempReceiveAddress = wallet.address;
+    let utxos = wallet.UTXOs;
 
     if (updated) {
         // iterate over all the transactions and include the missing optional fields for the TTransaction
@@ -52,6 +53,12 @@ export const fetchOnchainTransactions = async (
 
             // Update new transactions list
             newTxs.push({...tmp});
+        }
+
+        if (UTXOs.length !== utxos.length) {
+            tempReceiveAddress = await wallet.generateNewAddress(
+                wallet.address.index + 1,
+            );
         }
 
         return {
