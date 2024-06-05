@@ -18,6 +18,18 @@ A Modern descriptor-based Financial Freedom Bitcoin Wallet
 - Internal Wallet Lightning Swaps (Onchain<>Lighting)
 - Multi-lingual (en, ar)
 
+## Download Beta
+
+**Warning:** Volt is still in Beta, do not use it for large amounts of Bitcoin.
+
+### Android
+
+- [Download APK](https://github.com/Zero-1729/volt/releases/download/v0.4.3-beta.1/volt-0.4.3.apk)
+
+## IOS
+
+- IOS Beta Test flight will be on Monday 1st July.
+
 #### Supported BIPs
 
 - [BIP21](https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki) URI Scheme
