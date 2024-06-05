@@ -23,7 +23,8 @@ import {
 
 import Toast from 'react-native-toast-message';
 
-import {_BREEZ_SDK_API_KEY_, _BREEZ_INVITE_CODE_} from './modules/env';
+import {btoa, toByteArray} from 'react-native-quick-base64';
+import {_BREEZ_SDK_API_KEY_} from './modules/env';
 
 import {
     BreezEvent,
@@ -37,7 +38,11 @@ import {
     BreezEventVariant,
     ConnectRequest,
 } from '@breeztech/react-native-breez-sdk';
-import {checkNetworkIsReachable, getXPub256} from './modules/wallet-utils';
+import {
+    checkNetworkIsReachable,
+    getXPub256,
+    unit8ArrayConverter,
+} from './modules/wallet-utils';
 
 import Color from './constants/Color';
 
@@ -785,7 +790,18 @@ const RootNavigator = (): ReactElement => {
         const nodeConfig: NodeConfig = {
             type: NodeConfigVariant.GREENLIGHT,
             config: {
-                inviteCode: _BREEZ_INVITE_CODE_,
+                partnerCredentials: {
+                    deviceKey: unit8ArrayConverter(
+                        toByteArray(
+                            btoa(process.env.GL_CUSTOM_NOBODY_KEY as string),
+                        ),
+                    ) as number[],
+                    deviceCert: unit8ArrayConverter(
+                        toByteArray(
+                            btoa(process.env.GL_CUSTOM_NOBODY_CERT as string),
+                        ),
+                    ) as number[],
+                },
             },
         };
 
