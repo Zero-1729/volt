@@ -24,7 +24,7 @@ A Modern descriptor-based Financial Freedom Bitcoin Wallet
 
 ### Android
 
-- [Download APK](https://github.com/Zero-1729/volt/releases/download/v0.4.3-beta.1/volt-0.4.3.apk)
+- [Download APK](https://github.com/Zero-1729/volt/releases/tag/v0.4.3-beta.2)
 
 ## IOS
 
