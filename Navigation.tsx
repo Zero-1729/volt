@@ -686,12 +686,6 @@ const RootNavigator = (): ReactElement => {
             return;
         }
 
-        // Check network
-        const _netState = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netState)) {
-            return;
-        }
-
         let restore_only = wallet.payments.length > 0 ? true : false;
 
         // Get node info
