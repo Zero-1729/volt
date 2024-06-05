@@ -471,19 +471,20 @@ const BoltNFC = ({route}: Props) => {
 
                 {/* Scan button */}
                 {/* Hide when  */}
-                {!loading && (
-                    <LongBottomButton
-                        disabled={
-                            !isNetOn ||
-                            unsupportedNFC ||
-                            statusMessage === t('lnurl_withdrawal_success')
-                        }
-                        onPress={readNFC}
-                        backgroundColor={ColorScheme.Background.Inverted}
-                        title={buttonText}
-                        textColor={ColorScheme.Text.Alt}
-                    />
-                )}
+                {!loading &&
+                    statusMessage !== t('lnurl_withdrawal_success') && (
+                        <LongBottomButton
+                            disabled={
+                                !isNetOn ||
+                                unsupportedNFC ||
+                                statusMessage === t('lnurl_withdrawal_success')
+                            }
+                            onPress={readNFC}
+                            backgroundColor={ColorScheme.Background.Inverted}
+                            title={buttonText}
+                            textColor={ColorScheme.Text.Alt}
+                        />
+                    )}
             </View>
         </SafeAreaView>
     );
