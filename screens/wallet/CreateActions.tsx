@@ -12,7 +12,7 @@ import {
 
 import VText from '../../components/text';
 
-import {StackActions, useNavigation} from '@react-navigation/core';
+import {useNavigation} from '@react-navigation/core';
 
 import screenOffsets from '../../constants/NativeWindowMetrics';
 
@@ -50,6 +50,8 @@ import {errorAlert} from '../../components/alert';
 import {ENet} from '../../types/enums';
 import {capitalizeFirst} from '../../modules/transform';
 
+import {rootNavigation} from '../../Navigation';
+
 const CreateAction = () => {
     const navigation = useNavigation();
 
@@ -61,8 +63,13 @@ const CreateAction = () => {
     const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const {addWallet, isAdvancedMode, defaultToTestnet} =
-        useContext(AppStorageContext);
+    const {
+        addWallet,
+        isAdvancedMode,
+        defaultToTestnet,
+        isWalletInitialized,
+        setWalletInit,
+    } = useContext(AppStorageContext);
     const [newWalletName, setNewWalletName] = useState('');
 
     const [network, setNetwork] = useState<ENet>(
@@ -127,10 +134,18 @@ const CreateAction = () => {
             // Clear loading
             setLoading(false);
 
-            // Navigate to mnemonic screen
-            navigation.dispatch(
-                StackActions.push('Mnemonic', {onboarding: false}),
-            );
+            // Navigate to home screen
+            const noWallets = !isWalletInitialized;
+
+            // Update wallet init here
+            if (noWallets) {
+                setWalletInit(true);
+            }
+
+            // Return home
+            rootNavigation.navigate('HomeScreen', {
+                restoreMeta: null,
+            });
         } catch (err: any) {
             errorAlert(
                 capitalizeFirst(t('alert')),
