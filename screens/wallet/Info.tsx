@@ -38,7 +38,7 @@ import Toast from 'react-native-toast-message';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import PINPass from '../../components/pinpass';
 
-import {disconnect} from '@breeztech/react-native-breez-sdk';
+import {disconnect, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 import {biometricAuth} from '../../modules/shared';
 
@@ -63,6 +63,11 @@ const Info = () => {
         renameWallet,
         deleteWallet,
         isBiometricsActive,
+        setPINAttempts,
+        setPINActive,
+        setBiometricsActive,
+        setLoadLock,
+        setOnboarding,
     } = useContext(AppStorageContext);
 
     const walletData = getWalletData(currentWalletID);
@@ -226,17 +231,30 @@ const Info = () => {
 
     const handleDeleteWallet = async () => {
         try {
-            // Navigate to HomeScreen
-            // Make it clear deleted wallet is no longer in store
-            navigation.dispatch(CommonActions.navigate({name: 'HomeScreen'}));
+            if (walletData.type === 'unified') {
+                try {
+                    const id = await nodeInfo();
+
+                    if (id) {
+                        // Disconnect from Breez SDK
+                        await disconnect();
+                    }
+                } catch (err: any) {}
+            }
 
             // Delete wallet from store
             deleteWallet(currentWalletID);
 
-            if (walletData.type === 'unified') {
-                // Disconnect from Breez SDK
-                await disconnect();
-            }
+            // clear info
+            setPINAttempts(0);
+            setPINActive(false);
+            setBiometricsActive(false);
+            setLoadLock(false);
+            setOnboarding(true);
+
+            // Navigate to HomeScreen
+            // Make it clear deleted wallet is no longer in store
+            navigation.dispatch(CommonActions.navigate({name: 'HomeScreen'}));
         } catch (err) {
             console.error('[Wallet Screen] Error deleting wallet: ', err);
         }
