@@ -577,7 +577,9 @@ const Scan = ({route}: Props) => {
                                 scanBarcode={true}
                                 focusMode={'on'}
                                 onReadCode={handleQR}
-                                resizeMode={'cover'}
+                                resizeMode={
+                                    Platform.OS === 'ios' ? 'contain' : 'cover'
+                                }
                             />
 
                             {/* Flash Button */}
