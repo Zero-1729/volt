@@ -24,7 +24,11 @@ import {
 import Toast from 'react-native-toast-message';
 
 import {btoa, toByteArray} from 'react-native-quick-base64';
-import {_BREEZ_SDK_API_KEY_} from './modules/env';
+import {
+    _BREEZ_SDK_API_KEY_,
+    _GL_CUSTOM_NOBODY_CERT_,
+    _GL_CUSTOM_NOBODY_KEY_,
+} from './modules/env';
 
 import {
     BreezEvent,
@@ -792,14 +796,10 @@ const RootNavigator = (): ReactElement => {
             config: {
                 partnerCredentials: {
                     deviceKey: unit8ArrayConverter(
-                        toByteArray(
-                            btoa(process.env.GL_CUSTOM_NOBODY_KEY as string),
-                        ),
+                        toByteArray(btoa(_GL_CUSTOM_NOBODY_KEY_ as string)),
                     ) as number[],
                     deviceCert: unit8ArrayConverter(
-                        toByteArray(
-                            btoa(process.env.GL_CUSTOM_NOBODY_CERT as string),
-                        ),
+                        toByteArray(btoa(_GL_CUSTOM_NOBODY_CERT_ as string)),
                     ) as number[],
                 },
             },
