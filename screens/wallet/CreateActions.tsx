@@ -221,7 +221,7 @@ const CreateAction = () => {
                             : `${t('create_wallet_defaults_message')} (${t(
                                   'create_wallet_defaults_message_1',
                               )} '${
-                                  network === ENet.Testnet ? 'tb1' : 'bc1'
+                                  network === ENet.Testnet ? 'tb1p' : 'bc1p'
                               }...')`}
                     </VText>
 
