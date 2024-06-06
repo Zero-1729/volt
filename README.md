@@ -66,6 +66,15 @@ yarn install
 
 To run the wallet locally on, and build for, Android or IOS you'll need [Android Studio](https://developer.android.com/studio/) and [Xcode](https://developer.apple.com/xcode/resources/) installed, respectively. 
 
+Setup Environment file
+    - Create a copy of the `env.example`
+
+```console
+cp env.example .env
+```
+
+This command creates a `.env` file in the project root `volt/`. Then fill it with the appropriate info
+
 ## Breez SDK Greenlight Credentials
 
 > Note: If any part of the original `.crt` or `.pem` files are cut out, you will get the Breez SDK error `Generic: transport error`. See documentation [here](https://sdk-doc.breez.technology/guide/production.html#applying-certificates) for more info.
