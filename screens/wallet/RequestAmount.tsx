@@ -390,6 +390,7 @@ const RequestAmount = ({route}: Props) => {
                         },
                     );
                 }
+                return;
             } else {
                 routeToOnchainReceive();
                 return;
