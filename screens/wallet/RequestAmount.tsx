@@ -76,7 +76,7 @@ const RequestAmount = ({route}: Props) => {
     const walletType = wallet.type;
 
     const [breezServicesNotInitialized, setBreezServicesNotInitialized] =
-        useState(true);
+        useState(false);
 
     const [maxReceivableAmount, updateMaxReceivableAmount] = useState(
         new BigNumber(0),
