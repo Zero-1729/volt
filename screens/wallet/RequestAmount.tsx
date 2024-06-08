@@ -316,6 +316,7 @@ const RequestAmount = ({route}: Props) => {
                     fiat: fiatAmount.toString(),
                     amount: amount,
                     lnDescription: lnInvoiceDesc,
+                    breezServicesNotInitialized: breezServicesNotInitialized,
                 },
             }),
         );
