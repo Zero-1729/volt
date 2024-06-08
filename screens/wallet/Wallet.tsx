@@ -1168,6 +1168,7 @@ const Wallet = ({route}: Props) => {
                                     lightningBalance={
                                         walletData.balance.lightning
                                     }
+                                    breezConnected={connectedToBreezServices}
                                     onchainBalance={walletData.balance.onchain}
                                     swapRef={bottomSwapRef}
                                     triggerSwap={handleSwap}
