@@ -75,6 +75,9 @@ const RequestAmount = ({route}: Props) => {
     const wallet = getWalletData(currentWalletID);
     const walletType = wallet.type;
 
+    const [breezServicesNotInitialized, setBreezServicesNotInitialized] =
+        useState(true);
+
     const [maxReceivableAmount, updateMaxReceivableAmount] = useState(
         new BigNumber(0),
     );
@@ -98,11 +101,26 @@ const RequestAmount = ({route}: Props) => {
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
     const setMaxReceivableAmount = async () => {
-        const nodeState = await nodeInfo();
+        try {
+            const nodeState = await nodeInfo();
 
-        updateMaxReceivableAmount(
-            new BigNumber(nodeState.maxReceivableMsat / 1_000),
-        );
+            updateMaxReceivableAmount(
+                new BigNumber(nodeState.maxReceivableMsat / 1_000),
+            );
+        } catch (error: any) {
+            if (error.message === 'BreezServices not initialized') {
+                setBreezServicesNotInitialized(true);
+
+                Toast.show({
+                    topOffset: 60,
+                    type: 'Liberal',
+                    text1: capitalizeFirst(t('error')),
+                    text2: t('not_connected_to_breez_services'),
+                    position: 'top',
+                    visibilityTime: 2000,
+                });
+            }
+        }
     };
 
     const isLightning = walletType === 'unified';
@@ -123,6 +141,7 @@ const RequestAmount = ({route}: Props) => {
 
     useEffect(() => {
         setMaxReceivableAmount();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const _handleDescription = (text: string | undefined) => {
@@ -329,7 +348,7 @@ const RequestAmount = ({route}: Props) => {
                 return;
             }
 
-            if (!shouldSkip) {
+            if (!shouldSkip && !breezServicesNotInitialized) {
                 const channelOpenFee = await openChannelFee({
                     amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
                 });
