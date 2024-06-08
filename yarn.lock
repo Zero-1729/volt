@@ -1728,13 +1728,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@breeztech/react-native-breez-sdk@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "@breeztech/react-native-breez-sdk@npm:0.4.1"
+"@breeztech/react-native-breez-sdk@npm:0.4.2-rc1":
+  version: 0.4.2-rc1
+  resolution: "@breeztech/react-native-breez-sdk@npm:0.4.2-rc1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/a79defee75e3a322cb6cac02cb0554a6fe2c1ad08635c0692ff8e686ca4b6bb7c8e9ab6ceb3ffb8187dcf86a210ed40d3037d59994006df0667855cb58a4756d
+  checksum: 10/cfe5618298d852c6ed1bb6dea2c7243d001160503b41b023eb2fa85f75cfdfa5fbd492bc19f5ee2a91cf574fe220c2ac272253b98c2d6eb51a385399d8cc485a
   languageName: node
   linkType: hard
 
@@ -13595,7 +13595,7 @@ __metadata:
     "@babel/runtime": "npm:^7.24.1"
     "@bitcoinerlab/descriptors": "npm:^2.1.0"
     "@bitcoinerlab/secp256k1": "npm:^1.1.0"
-    "@breeztech/react-native-breez-sdk": "npm:^0.4.1"
+    "@breeztech/react-native-breez-sdk": "npm:0.4.2-rc1"
     "@craftzdog/react-native-buffer": "npm:^6.0.5"
     "@formatjs/intl-datetimeformat": "npm:^6.12.2"
     "@formatjs/intl-getcanonicallocales": "npm:^2.3.0"
