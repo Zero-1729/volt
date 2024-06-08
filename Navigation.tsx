@@ -156,7 +156,7 @@ const modalRoutes = [
 // Root Param List for Home Screen
 export type InitStackParamList = {
     HomeScreen: {
-        restoreMeta: {
+        restoreMeta: null | {
             title: string;
             message: string;
             load: boolean;
