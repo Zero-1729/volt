@@ -23,7 +23,6 @@ import {
 
 import Toast from 'react-native-toast-message';
 
-import {btoa, toByteArray} from 'react-native-quick-base64';
 import {
     _BREEZ_SDK_API_KEY_,
     _GL_CUSTOM_NOBODY_CERT_,
@@ -42,11 +41,7 @@ import {
     BreezEventVariant,
     ConnectRequest,
 } from '@breeztech/react-native-breez-sdk';
-import {
-    checkNetworkIsReachable,
-    getXPub256,
-    unit8ArrayConverter,
-} from './modules/wallet-utils';
+import {checkNetworkIsReachable, getXPub256} from './modules/wallet-utils';
 
 import Color from './constants/Color';
 
@@ -135,7 +130,10 @@ import {
 } from './types/wallet';
 import {ENet, EBreezDetails, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
-import {LnInvoice} from '@breeztech/react-native-breez-sdk';
+import {
+    LnInvoice,
+    GreenlightCredentials,
+} from '@breeztech/react-native-breez-sdk';
 
 import netInfo from '@react-native-community/netinfo';
 
@@ -792,17 +790,25 @@ const RootNavigator = (): ReactElement => {
         // Create the default config
         const seed = await mnemonicToSeed(wallet.mnemonic);
 
+        // Breez SDK Greenlight credentials
+        // The key and cert are stored as hex strings in the .env file
+        // Then converted to byte arrays
+        const deviceKey: number[] = Array.from(
+            Buffer.from(_GL_CUSTOM_NOBODY_KEY_, 'hex'),
+        );
+        const deviceCert: number[] = Array.from(
+            Buffer.from(_GL_CUSTOM_NOBODY_CERT_, 'hex'),
+        );
+
+        const greenlightCredentials: GreenlightCredentials = {
+            deviceKey,
+            deviceCert,
+        };
+
         const nodeConfig: NodeConfig = {
             type: NodeConfigVariant.GREENLIGHT,
             config: {
-                partnerCredentials: {
-                    deviceKey: unit8ArrayConverter(
-                        toByteArray(btoa(_GL_CUSTOM_NOBODY_KEY_ as string)),
-                    ) as number[],
-                    deviceCert: unit8ArrayConverter(
-                        toByteArray(btoa(_GL_CUSTOM_NOBODY_CERT_ as string)),
-                    ) as number[],
-                },
+                partnerCredentials: greenlightCredentials,
             },
         };
 
