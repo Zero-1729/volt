@@ -775,11 +775,3 @@ export const checkPINStrength = (pin: string) => {
         feedback: '',
     };
 };
-
-export const unit8ArrayConverter = (unitArray: any) => {
-    return Array.from(
-        unitArray.filter(
-            (num: any) => Number.isInteger(num) && num >= 0 && num <= 255,
-        ),
-    );
-};
