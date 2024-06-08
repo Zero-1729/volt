@@ -95,6 +95,8 @@ const Wallet = ({route}: Props) => {
     const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
     const [updatedLNBalance, setUpdatedLNBalance] = useState<boolean>(false);
     const [swapInProgress, setSwapInProgress] = useState<boolean>(false);
+    const [connectedToBreezServices, setConnectedToBreezServices] =
+        useState<boolean>(true);
     const [updatedOnchainBalance, setUpdatedOBalance] =
         useState<boolean>(false);
     const networkState = useNetInfo();
@@ -496,6 +498,14 @@ const Wallet = ({route}: Props) => {
                         });
                     } catch (error: any) {
                         console.log('[Boltz SwapOut] Error: ', error.message);
+
+                        if (
+                            error.message.includes(
+                                'BreezServices not initialized',
+                            )
+                        ) {
+                            setConnectedToBreezServices(false);
+                        }
                     }
                 }
             })
@@ -530,6 +540,10 @@ const Wallet = ({route}: Props) => {
 
                 if (error.message.includes('Swap in progress')) {
                     setSwapInProgress(true);
+                }
+
+                if (error.message.includes('BreezServices not initialized')) {
+                    setConnectedToBreezServices(false);
                 }
 
                 if (
