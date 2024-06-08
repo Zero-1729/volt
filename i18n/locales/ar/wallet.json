@@ -189,5 +189,6 @@
     "loading_swap_info": "جارٍ تحميل معلومات حد المبادلة...",
     "payment_to_self_detected": "تم إنشاء هذه الفاتورة من هذه المحفظة، ولا يمكن دفعها بنفسك",
     "already_paid_ln_invoice": "لقد تم بالفعل دفع هذه الفاتورة",
-    "swap_in_progress": "اكتشف مبادلة في التقدم"
+    "swap_in_progress": "اكتشف مبادلة في التقدم",
+    "not_connected_to_breez_services": "غير متصل بخدمات Lightning"
 }
