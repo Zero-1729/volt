@@ -346,11 +346,17 @@ const Receive = ({route}: Props) => {
         if (
             walletData.type === 'unified' &&
             checkNetworkIsReachable(_netInfo) &&
-            route.params.amount
+            route.params.amount &&
+            !route.params.breezServicesNotInitialized
         ) {
             displayLNInvoice();
         }
-    }, [displayLNInvoice, route.params.amount, walletData.type]);
+    }, [
+        displayLNInvoice,
+        route.params.amount,
+        route.params.breezServicesNotInitialized,
+        walletData.type,
+    ]);
 
     useEffect(() => {
         processLNInvoice();
@@ -941,64 +947,71 @@ const Receive = ({route}: Props) => {
                     {displayExpiry}
                 </View>
 
-                {isLNWallet && route.params.amount && (
-                    <View
-                        style={[
-                            styles.carouselContainer,
-                            tailwind(
-                                'h-full w-full items-center justify-end absolute bottom-0',
-                            ),
-                            {zIndex: -9},
-                        ]}>
-                        <Carousel
-                            ref={carouselRef}
-                            style={[tailwind('items-center')]}
-                            data={panels}
-                            width={NativeDims.width}
-                            // Adjust height for iOS
-                            // to account for top stack height
-                            height={
-                                Platform.OS === 'ios'
-                                    ? NativeDims.height -
-                                      NativeDims.navBottom * 3.2
-                                    : NativeDims.height -
-                                      NativeDims.navBottom * 2.4
-                            }
-                            loop={false}
-                            panGestureHandlerProps={{
-                                activeOffsetX: [-10, 10],
-                            }}
-                            testID="ReceiveSlider"
-                            renderItem={({index}): ReactElement => {
-                                const Slide = panels[index];
-                                return <Slide key={index} />;
-                            }}
-                            onProgressChange={(_, absoluteProgress): void => {
-                                progressValue.value = absoluteProgress;
-                            }}
-                        />
+                {isLNWallet &&
+                    route.params.amount &&
+                    !route.params.breezServicesNotInitialized && (
+                        <View
+                            style={[
+                                styles.carouselContainer,
+                                tailwind(
+                                    'h-full w-full items-center justify-end absolute bottom-0',
+                                ),
+                                {zIndex: -9},
+                            ]}>
+                            <Carousel
+                                ref={carouselRef}
+                                style={[tailwind('items-center')]}
+                                data={panels}
+                                width={NativeDims.width}
+                                // Adjust height for iOS
+                                // to account for top stack height
+                                height={
+                                    Platform.OS === 'ios'
+                                        ? NativeDims.height -
+                                          NativeDims.navBottom * 3.2
+                                        : NativeDims.height -
+                                          NativeDims.navBottom * 2.4
+                                }
+                                loop={false}
+                                panGestureHandlerProps={{
+                                    activeOffsetX: [-10, 10],
+                                }}
+                                testID="ReceiveSlider"
+                                renderItem={({index}): ReactElement => {
+                                    const Slide = panels[index];
+                                    return <Slide key={index} />;
+                                }}
+                                onProgressChange={(
+                                    _,
+                                    absoluteProgress,
+                                ): void => {
+                                    progressValue.value = absoluteProgress;
+                                }}
+                            />
 
-                        {isNetOn && (
-                            <View
-                                style={[
-                                    styles.dots,
-                                    {bottom: NativeDims.bottom},
-                                ]}
-                                pointerEvents="none">
-                                {panels.map((_slide, index) => (
-                                    <Dot
-                                        key={index}
-                                        index={index}
-                                        animValue={progressValue}
-                                        length={panels.length}
-                                    />
-                                ))}
-                            </View>
-                        )}
-                    </View>
-                )}
+                            {isNetOn && (
+                                <View
+                                    style={[
+                                        styles.dots,
+                                        {bottom: NativeDims.bottom},
+                                    ]}
+                                    pointerEvents="none">
+                                    {panels.map((_slide, index) => (
+                                        <Dot
+                                            key={index}
+                                            index={index}
+                                            animValue={progressValue}
+                                            length={panels.length}
+                                        />
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+                    )}
 
-                {(!isLNWallet || !route.params.amount) && (
+                {(!isLNWallet ||
+                    !route.params.amount ||
+                    route.params.breezServicesNotInitialized) && (
                     <View
                         style={[
                             styles.carouselContainer,
