@@ -36,6 +36,7 @@ type SwapProps = {
         };
     };
     swapInProgress: boolean; // Swap In in progress (i.e. swapping)
+    breezConnected: boolean; // Breez connected
     isOnline: boolean;
     loadingInfo: boolean;
 };
@@ -78,6 +79,8 @@ const Swap = (props: SwapProps) => {
             ? t('no_internet_cannot_swap')
             : props.swapInProgress
             ? t('swap_in_progress')
+            : !props.breezConnected
+            ? t('not_connected_to_breez_services')
             : t('loading_swap_info');
 
     return (
