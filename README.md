@@ -66,6 +66,23 @@ yarn install
 
 To run the wallet locally on, and build for, Android or IOS you'll need [Android Studio](https://developer.android.com/studio/) and [Xcode](https://developer.apple.com/xcode/resources/) installed, respectively. 
 
+## Breez SDK Greenlight Credentials
+
+> Note: If any part of the original `.crt` or `.pem` files are cut out, you will get the Breez SDK error `Generic: transport error`. See documentation [here](https://sdk-doc.breez.technology/guide/production.html#applying-certificates) for more info.
+
+
+You can read and convert the contents of your `client-key.pem` and `client.crt` files as binary/byte data, in their entirety without taking out any parts (e.g. `BEGIN CERTIFICATE / END CERTIFICATE / BEGIN PRIVATE KEY / END PRIVATE KEY`) to hex strings and add them to the `.env` file as `GL_CUSTOM_NOBODY_KEY` and `GL_CUSTOM_NOBODY_CERT`, respectively.
+
+To run the app locally, you'll need to add the Breez SDK Greenlight credentials to the `.env` file:
+
+```sh
+# Contents of the '.env' file
+# ...
+GL_CUSTOM_NOBODY_KEY=YOUR_HEX_STRING
+GL_CUSTOM_NOBODY_CERT=YOUR_HEX
+```
+
+
 ## Development
 
 To run the wallet locally on your system, run the following in the project root (`volt/`):
