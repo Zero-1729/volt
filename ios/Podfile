@@ -14,8 +14,7 @@ platform :ios, '14.0'
 prepare_react_native_project!
 
 setup_permissions([
-  'Camera',
-  'LocationWhenInUse'
+  'Camera'
 ])
 
 linkage = ENV['USE_FRAMEWORKS']

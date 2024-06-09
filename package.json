@@ -153,8 +153,7 @@
     "typescript": "^5.4.3"
   },
   "reactNativePermissionsIOS": [
-    "Camera",
-    "LocationWhenInUse"
+    "Camera"
   ],
   "packageManager": "yarn@4.2.2",
   "resolutions": {

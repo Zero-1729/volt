@@ -48,7 +48,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
-	<string>We need to use NFC for LNURL</string>
+	<string>${PRODUCT_NAME} needs access to NFC Scanner for Bolt NFC LNURL</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -59,9 +59,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>${PRODUCT_NAME} needs access to the camera to scan QR Codes</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Enabling Face ID allows you quick and secure access to your account.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>${PRODUCT_NAME} needs to access Face ID to secure your app.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto Medium.ttf</string>
