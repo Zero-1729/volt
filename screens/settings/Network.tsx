@@ -63,7 +63,7 @@ const Network = () => {
     );
 
     const checkStatusTrans = {
-        operational: [capitalizeFirst(t('healthy')), 'darkgreen', 'lightgreen'],
+        operational: [capitalizeFirst(t('healthy')), 'white', 'dodgerblue'],
         maintenance: [capitalizeFirst(t('maintenance')), 'white', 'orange'],
         serviceDisruption: [
             capitalizeFirst(t('service_disruption')),
