@@ -160,7 +160,7 @@ const Currency = () => {
                             langDir === 'right'
                                 ? 'flex-row-reverse'
                                 : 'flex-row'
-                        } w-full items-center justify-between px-6 mt-4 mb-6`,
+                        } w-full items-center justify-between px-6 py-4 mb-2`,
                     ),
                     index === 0 ? styles.paddedTop : {},
                 ]}>
@@ -378,7 +378,7 @@ export default Currency;
 
 const styles = StyleSheet.create({
     paddedTop: {
-        paddingTop: 16,
+        paddingTop: 24,
     },
     flexed: {
         flex: 1,
