@@ -1,7 +1,7 @@
 {
     "welcome": "Welcome to Volt",
     "next": "next",
-    "app_description": " A carefully crafted descriptor-based Bitcoin wallet for the modern age.",
+    "app_description": "A carefully crafted descriptor-based Financial Freedom Bitcoin Wallet for Global Bitcoiners",
     "wallet_descriptors": "Wallet Descriptors",
     "descriptors_gist": "A wallet descriptor is a human-readable string that describes a wallet with enough precision to derive all its addresses and private keys for accurate backups.",
     "select_mode_title": "Select a mode",
