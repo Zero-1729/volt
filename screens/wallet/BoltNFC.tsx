@@ -476,7 +476,6 @@ const BoltNFC = ({route}: Props) => {
                         <LongBottomButton
                             disabled={
                                 !isNetOn ||
-                                unsupportedNFC ||
                                 statusMessage === t('lnurl_withdrawal_success')
                             }
                             onPress={readNFC}
