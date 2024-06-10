@@ -689,7 +689,8 @@ const RootNavigator = (): ReactElement => {
         if (
             wallet?.mnemonic.length === 0 &&
             isWalletInitialized &&
-            wallet.type === 'unified'
+            wallet.type === 'unified' &&
+            onboarding
         ) {
             return;
         }
