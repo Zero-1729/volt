@@ -391,6 +391,7 @@ const RequestAmount = ({route}: Props) => {
                         capitalizeFirst(t('cancel')),
                         () => routeToReceive,
                     );
+                    return;
                 }
 
                 // Route to receive without warning if LN
