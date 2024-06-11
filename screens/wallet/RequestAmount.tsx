@@ -394,10 +394,8 @@ const RequestAmount = ({route}: Props) => {
                     return;
                 }
 
-                // Route to receive without warning if LN
-                // Not beyond max liquidity, online, and connected to services
+                // If not beyond max liquidity, route to receive with LN
                 routeToReceive();
-                return;
             } else {
                 routeToOnchainReceive();
                 return;
