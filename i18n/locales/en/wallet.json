@@ -175,7 +175,7 @@
     "retrieving_lnurl_data": "Retrieving LNURL Data...",
     "processing_lnurl_withdraw": "Processing Withdrawal...",
     "above_lnurl_withdraw_limit": "Invoice amount {{amount}} sats is more than {{maxAmount}} sats max amount",
-    "lnurl_withdrawal_success": "Withdrawal successful!",
+    "lnurl_withdrawal_success": "Withdrawal successful, waiting to complete...",
     "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}",
     "no_internet_cannot_swap": "Cannot swap while offline, connect to the Internet.",
     "no_internet_cannot_zap": "Cannot zap while offline, connect to the Internet.",
