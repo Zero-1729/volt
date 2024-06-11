@@ -20,17 +20,17 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 
 ## Download Beta
 
-**Warning:** Volt is still in Beta, do not use it for large amounts of Bitcoin.
+**:warning: Warning:** Volt is still in Beta, do not use it for large amounts of Bitcoin.
 
 ### Android
 
 - [Download APK](https://github.com/Zero-1729/volt/releases/tag/v0.4.3-beta.2)
 
-## IOS
+### IOS
 
 - IOS Beta Test flight will be on Monday 1st July.
 
-#### Supported BIPs
+## Supported BIPs
 
 - [BIP21](https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki) URI Scheme
 - [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) Hierarchical Deterministic Wallets
@@ -43,7 +43,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 - [BIP173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki) Base32 address format for native v0-16 witness outputs
 - [BIP174](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki) Partially Signed Bitcoin Transactions
 
-#### Supported Bitcoin Tech
+## Supported Bitcoin Tech
 
 - [Breez SDK](https://github.com/breez/breez-sdk)
 - [Bitcoin Development Kit (BDK)](https://github.com/bitcoindevkit)
