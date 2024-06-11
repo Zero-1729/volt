@@ -66,19 +66,21 @@ yarn install
 
 To run the wallet locally on, and build for, Android or IOS you'll need [Android Studio](https://developer.android.com/studio/) and [Xcode](https://developer.apple.com/xcode/resources/) installed, respectively. 
 
-Setup Environment file
-    - Create a copy of the `env.example`
+## Breez SDK And Greenlight Credentials
+
+> Note: If any part of the original `.crt` or `.pem` files are cut out, you will get the Breez SDK error `Generic: transport error`. See documentation [here](https://sdk-doc.breez.technology/guide/production.html#applying-certificates) for more info.
+
+### Setup Environment file
+
+Create a copy of the `env.example`
 
 ```console
 cp env.example .env
 ```
 
-This command creates a `.env` file in the project root `volt/`. Then fill it with the appropriate info
+This command creates a `.env` file in the project root `volt/`. Then fill it with the appropriate info.
 
-## Breez SDK Greenlight Credentials
-
-> Note: If any part of the original `.crt` or `.pem` files are cut out, you will get the Breez SDK error `Generic: transport error`. See documentation [here](https://sdk-doc.breez.technology/guide/production.html#applying-certificates) for more info.
-
+### Read and Convert the `.crt` and `.pem` Files
 
 You can read and convert the contents of your `client-key.pem` and `client.crt` files as binary/byte data, in their entirety without taking out any parts (e.g. `BEGIN CERTIFICATE / END CERTIFICATE / BEGIN PRIVATE KEY / END PRIVATE KEY`) to hex strings and add them to the `.env` file as `GL_CUSTOM_NOBODY_KEY` and `GL_CUSTOM_NOBODY_CERT`, respectively.
 
