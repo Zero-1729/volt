@@ -322,6 +322,20 @@ const RequestAmount = ({route}: Props) => {
         );
     };
 
+    const routeToReceive = () => {
+        navigation.dispatch(
+            CommonActions.navigate({
+                name: 'Receive',
+                params: {
+                    sats: satsAmount.value.toString(),
+                    fiat: fiatAmount.toString(),
+                    amount: amount,
+                    lnDescription: lnInvoiceDesc,
+                },
+            }),
+        );
+    };
+
     const handleRoute = async () => {
         if (route.params?.boltNFCMode) {
             navigation.dispatch(
@@ -375,21 +389,13 @@ const RequestAmount = ({route}: Props) => {
                         }),
                         t('ok'),
                         capitalizeFirst(t('cancel')),
-                        () => {
-                            navigation.dispatch(
-                                CommonActions.navigate({
-                                    name: 'Receive',
-                                    params: {
-                                        sats: satsAmount.value.toString(),
-                                        fiat: fiatAmount.toString(),
-                                        amount: amount,
-                                        lnDescription: lnInvoiceDesc,
-                                    },
-                                }),
-                            );
-                        },
+                        () => routeToReceive,
                     );
                 }
+
+                // Route to receive without warning if LN
+                // Not beyond max liquidity, online, and connected to services
+                routeToReceive();
                 return;
             } else {
                 routeToOnchainReceive();
