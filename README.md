@@ -74,7 +74,7 @@ To run the wallet locally on, and build for, Android or IOS you'll need [Android
 
 Create a copy of the `env.example`
 
-```console
+```sh
 cp env.example .env
 ```
 
