@@ -29,7 +29,7 @@
     "npm": ">=8.1.0"
   },
   "dependencies": {
-    "@bitcoinerlab/descriptors": "^2.1.0",
+    "@bitcoinerlab/descriptors": "https://github.com/Zero-1729/descriptors.git",
     "@bitcoinerlab/secp256k1": "^1.1.0",
     "@breeztech/react-native-breez-sdk": "0.4.2-rc1",
     "@craftzdog/react-native-buffer": "^6.0.5",

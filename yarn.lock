@@ -1671,6 +1671,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bitcoinerlab/descriptors@https://github.com/Zero-1729/descriptors.git":
+  version: 2.1.0
+  resolution: "@bitcoinerlab/descriptors@https://github.com/Zero-1729/descriptors.git#commit=b385f65dd2b71438a5732cc1aa621a9528fdde5f"
+  dependencies:
+    "@bitcoinerlab/miniscript": "npm:^1.2.1"
+    "@bitcoinerlab/secp256k1": "npm:^1.0.5"
+    bip32: "npm:^4.0.0"
+    bitcoinjs-lib: "npm:^6.1.3"
+    ecpair: "npm:^2.1.0"
+    lodash.memoize: "npm:^4.1.2"
+    varuint-bitcoin: "npm:^1.1.2"
+  peerDependencies:
+    ledger-bitcoin: ^0.2.2
+  peerDependenciesMeta:
+    ledger-bitcoin:
+      optional: true
+  checksum: 10/f28dd3f24f2a83b8cd09ddf623c510ab68e9abeb38f213e5f3a819e2300b3be3ab06fe4232da182c7f03c05863c0c902fc23add85110be2716919e3e2ed8f3f4
+  languageName: node
+  linkType: hard
+
 "@bitcoinerlab/descriptors@npm:^1.0.2":
   version: 1.1.1
   resolution: "@bitcoinerlab/descriptors@npm:1.1.1"
@@ -1686,26 +1706,6 @@ __metadata:
     ledger-bitcoin:
       optional: true
   checksum: 10/5d781a51c462bbf0f6254be20ffe1ac525a7a00adcd59a5f96d7b5749bb33b36b6dfb6e3c8ea0041ec6083210b3efb620840300a6872d42e6d3ab48af268a46e
-  languageName: node
-  linkType: hard
-
-"@bitcoinerlab/descriptors@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@bitcoinerlab/descriptors@npm:2.1.0"
-  dependencies:
-    "@bitcoinerlab/miniscript": "npm:^1.2.1"
-    "@bitcoinerlab/secp256k1": "npm:^1.0.5"
-    bip32: "npm:^4.0.0"
-    bitcoinjs-lib: "npm:^6.1.3"
-    ecpair: "npm:^2.1.0"
-    lodash.memoize: "npm:^4.1.2"
-    varuint-bitcoin: "npm:^1.1.2"
-  peerDependencies:
-    ledger-bitcoin: ^0.2.2
-  peerDependenciesMeta:
-    ledger-bitcoin:
-      optional: true
-  checksum: 10/bc58daab0ee02a9919251b2500d93d9675f7008d3cf079c8b1cd412c3f01625e408df17fa8958a835ff0551ee55380022dc83640cbfb6eddaabc04ec3eee261a
   languageName: node
   linkType: hard
 
@@ -13593,7 +13593,7 @@ __metadata:
     "@babel/core": "npm:^7.24.3"
     "@babel/preset-env": "npm:^7.24.3"
     "@babel/runtime": "npm:^7.24.1"
-    "@bitcoinerlab/descriptors": "npm:^2.1.0"
+    "@bitcoinerlab/descriptors": "https://github.com/Zero-1729/descriptors.git"
     "@bitcoinerlab/secp256k1": "npm:^1.1.0"
     "@breeztech/react-native-breez-sdk": "npm:0.4.2-rc1"
     "@craftzdog/react-native-buffer": "npm:^6.0.5"
