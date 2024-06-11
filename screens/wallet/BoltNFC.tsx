@@ -1,4 +1,11 @@
-import {Linking, Platform, Text, View, useColorScheme} from 'react-native';
+import {
+    ActivityIndicator,
+    Linking,
+    Platform,
+    Text,
+    View,
+    useColorScheme,
+} from 'react-native';
 import React, {
     useCallback,
     useContext,
@@ -450,6 +457,14 @@ const BoltNFC = ({route}: Props) => {
                         ]}>
                         {statusMessage}
                     </Text>
+
+                    {/* Load */}
+                    {statusMessage === t('lnurl_withdrawal_success') && (
+                        <ActivityIndicator
+                            style={[tailwind('mt-4')]}
+                            color={ColorScheme.Background.Grayed}
+                        />
+                    )}
                 </View>
 
                 {/*  No Internet message*/}
