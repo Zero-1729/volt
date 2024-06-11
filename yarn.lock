@@ -4689,7 +4689,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"braces@npm:^3.0.2, braces@npm:~3.0.2":
+"braces@npm:^3.0.3, braces@npm:~3.0.3":
   version: 3.0.3
   resolution: "braces@npm:3.0.3"
   dependencies:
@@ -11061,7 +11061,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-camera-kit@npm:^14.0.0-beta15":
+"react-native-camera-kit@npm:^14.0.0-beta14":
   version: 14.0.0-beta9
   resolution: "react-native-camera-kit@npm:14.0.0-beta9"
   peerDependencies:
@@ -13668,7 +13668,7 @@ __metadata:
     react-native: "npm:^0.74.1"
     react-native-biometrics: "npm:^3.0.1"
     react-native-bouncy-checkbox: "npm:^3.0.7"
-    react-native-camera-kit: "npm:^14.0.0-beta15"
+    react-native-camera-kit: "npm:^14.0.0-beta14"
     react-native-default-preference: "npm:^1.4.4"
     react-native-device-info: "npm:^10.13.1"
     react-native-document-picker: "npm:^9.1.1"
