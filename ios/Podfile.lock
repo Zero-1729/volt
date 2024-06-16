@@ -2,12 +2,12 @@ PODS:
   - bdk-rn (0.29.0):
     - React
   - boost (1.83.0)
-  - breez_sdk (0.4.2-rc1):
-    - BreezSDK (= 0.4.2-rc1)
+  - breez_sdk (0.4.2-rc2):
+    - BreezSDK (= 0.4.2-rc2)
     - React-Core
-  - breez_sdkFFI (0.4.2-rc1)
-  - BreezSDK (0.4.2-rc1):
-    - breez_sdkFFI (= 0.4.2-rc1)
+  - breez_sdkFFI (0.4.2-rc2)
+  - BreezSDK (0.4.2-rc2):
+    - breez_sdkFFI (= 0.4.2-rc2)
   - BVLinearGradient (2.8.3):
     - React-Core
   - DoubleConversion (1.1.6)
@@ -1611,9 +1611,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   bdk-rn: 0b3d1975bad08b2b511fa3fb85249735d626afc6
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
-  breez_sdk: c408e50ec2e694c9b577aaec4856a21221694a17
-  breez_sdkFFI: ccd675cbc5f20b4cbf181bd4b12c4abdac8a114d
-  BreezSDK: e82b6529cbf1090834718976a1a6e192701bc3d7
+  breez_sdk: 833c9293880b1fa6dbc3afb19a2d076e1877822b
+  breez_sdkFFI: 832ee5c6949ef6e7710d0590409b561e5485263d
+  BreezSDK: 7ea7fe40ebb131af6ef1bb1312683f760a42b284
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   FBLazyVector: 898d14d17bf19e2435cafd9ea2a1033efe445709
