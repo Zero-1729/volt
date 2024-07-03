@@ -28,7 +28,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 
 ### IOS
 
-- IOS Beta Test flight will be on Monday 1st July.
+- IOS Beta Test flight coming soon.
 
 ## Supported BIPs
 
