@@ -794,16 +794,16 @@ const RootNavigator = (): ReactElement => {
         // Breez SDK Greenlight credentials
         // The key and cert are stored as hex strings in the .env file
         // Then converted to byte arrays
-        const deviceKey: number[] = Array.from(
+        const developerKey: number[] = Array.from(
             Buffer.from(_GL_CUSTOM_NOBODY_KEY_, 'hex'),
         );
-        const deviceCert: number[] = Array.from(
+        const developerCert: number[] = Array.from(
             Buffer.from(_GL_CUSTOM_NOBODY_CERT_, 'hex'),
         );
 
         const greenlightCredentials: GreenlightCredentials = {
-            deviceKey,
-            deviceCert,
+            developerKey,
+            developerCert,
         };
 
         const nodeConfig: NodeConfig = {
