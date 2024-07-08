@@ -137,6 +137,7 @@
     "xprv_backup_message": "To protect your funds, back up your extended private key.",
     "lock_screen_message": "Enter your PIN code",
     "not_ln_address": "Not a Lightning Address.",
+    "pay_invoice": "Pay Invoice",
     "minimum_amount": "Min amount",
     "get_swap_fees": "Calculate Fees",
     "mempool_congested": "The Mempool is currently congested.",
