@@ -524,7 +524,7 @@ const PayInvoice = ({route}: Props) => {
                         !isNetOn ||
                         (!bolt11 && Object.keys(decodedInvoice).length === 0)
                     }
-                    title={'Pay Invoice'}
+                    title={t('pay_invoice')}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                     onPress={handleRoute}
