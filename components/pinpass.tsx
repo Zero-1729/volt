@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useMemo, useEffect, useState, useContext} from 'react';
 import {View, Text, useColorScheme, StyleSheet} from 'react-native';
@@ -20,7 +19,6 @@ import {getKeychainItem} from '../class/keychainContext';
 
 import Toast, {ToastConfig} from 'react-native-toast-message';
 import {toastConfig} from './toast';
-import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
 
@@ -131,112 +129,116 @@ const PinPass = (props: PinPassProps) => {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View style={[tailwind('w-full px-2 h-full items-center')]}>
-                    <Text
-                        style={[
-                            tailwind('text-center text-lg font-bold mt-4'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
-                        {t('lock_screen_message')}
-                    </Text>
-
-                    {pinAttempts > 0 && (
-                        <>
-                            <View
-                                style={[
-                                    tailwind('items-center mt-6 mb-4 w-5/6'),
-                                ]}>
-                                {pinAttempts === MAX_PIN_ATTEMPTS - 1 ? (
-                                    <Text
-                                        style={[
-                                            tailwind('text-sm text-center'),
-                                            {
-                                                color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
-                                        {t('last_attempt_warning')}
-                                    </Text>
-                                ) : (
-                                    <Text
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
-                                                color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
-                                        {t('pin_attempts', {
-                                            attempts:
-                                                MAX_PIN_ATTEMPTS - pinAttempts,
-                                        })}
-                                    </Text>
-                                )}
-                            </View>
-
-                            <PlainButton onPress={routeToResetPIN}>
+                <View
+                    style={[
+                        tailwind('w-full h-full items-center justify-center'),
+                    ]}>
+                    <View style={[tailwind('w-full items-center -mt-8 mb-12')]}>
+                        {pinAttempts > 0 ? (
+                            <>
                                 <View
                                     style={[
-                                        tailwind('rounded-full px-4 py-1 mb-8'),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Greyed,
-                                        },
+                                        tailwind('items-center mb-2 w-full'),
                                     ]}>
-                                    <Text
+                                    {pinAttempts === MAX_PIN_ATTEMPTS - 1 ? (
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm text-center'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            {t('last_attempt_warning')}
+                                        </Text>
+                                    ) : (
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .Default,
+                                                },
+                                            ]}>
+                                            {t('pin_attempts', {
+                                                attempts:
+                                                    MAX_PIN_ATTEMPTS -
+                                                    pinAttempts,
+                                            })}
+                                        </Text>
+                                    )}
+                                </View>
+
+                                <PlainButton onPress={routeToResetPIN}>
+                                    <View
                                         style={[
-                                            tailwind('text-sm'),
+                                            tailwind(
+                                                'rounded-full px-4 py-1 mb-6',
+                                            ),
                                             {
-                                                color: ColorScheme.Text
-                                                    .DescText,
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
                                             },
                                         ]}>
-                                        {t('forgot_pin')}
-                                    </Text>
-                                </View>
-                            </PlainButton>
-                        </>
-                    )}
+                                        <Text
+                                            style={[
+                                                tailwind('text-sm'),
+                                                {
+                                                    color: ColorScheme.Text
+                                                        .DescText,
+                                                },
+                                            ]}>
+                                            {t('forgot_pin')}
+                                        </Text>
+                                    </View>
+                                </PlainButton>
+                            </>
+                        ) : (
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-center text-lg font-bold mb-4',
+                                    ),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {t('lock_screen_message')}
+                            </Text>
+                        )}
 
-                    <View
-                        style={[
-                            tailwind('flex-row items-center'),
-                            {marginTop: pinAttempts > 0 ? 0 : 98},
-                        ]}>
-                        {Array(4)
-                            .fill(null)
-                            .map((_, i) => (
-                                <View
-                                    key={i}
-                                    style={[
-                                        styles.dot,
-                                        tailwind('rounded-full'),
-                                        {
-                                            borderColor:
-                                                ColorScheme.Background.Inverted,
-                                            backgroundColor:
-                                                tmpPIN[i] === undefined
-                                                    ? ColorScheme.Background
-                                                          .Primary
-                                                    : ColorScheme.Background
-                                                          .Inverted,
-                                        },
-                                    ]}
-                                />
-                            ))}
+                        <View style={[tailwind('flex-row items-center')]}>
+                            {Array(4)
+                                .fill(null)
+                                .map((_, i) => (
+                                    <View
+                                        key={i}
+                                        style={[
+                                            styles.dot,
+                                            tailwind('rounded-full'),
+                                            {
+                                                borderColor:
+                                                    ColorScheme.Background
+                                                        .Inverted,
+                                                backgroundColor:
+                                                    tmpPIN[i] === undefined
+                                                        ? ColorScheme.Background
+                                                              .Primary
+                                                        : ColorScheme.Background
+                                                              .Inverted,
+                                            },
+                                        ]}
+                                    />
+                                ))}
+                        </View>
                     </View>
 
-                    <View
-                        style={[
-                            tailwind('justify-end absolute'),
-                            {bottom: NativeWindowMetrics.bottom + 64},
-                        ]}>
-                        <PinNumpad
-                            pin={tmpPIN}
-                            onPinChange={updatePIN}
-                            pinLimit={4}
-                            showBiometrics={isBiometricsActive}
-                            triggerBiometrics={triggerBiometrics}
-                        />
-                    </View>
+                    <PinNumpad
+                        pin={tmpPIN}
+                        onPinChange={updatePIN}
+                        pinLimit={4}
+                        showBiometrics={isBiometricsActive}
+                        triggerBiometrics={triggerBiometrics}
+                    />
                 </View>
 
                 <Toast config={toastConfig as ToastConfig} />
