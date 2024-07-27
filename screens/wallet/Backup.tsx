@@ -35,9 +35,6 @@ import {useTranslation} from 'react-i18next';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import RNHapticFeedback from 'react-native-haptic-feedback';
-import {RNHapticFeedbackOptions} from '../../constants/Haptic';
-
 import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 
 import CloseIcon from '../../assets/svg/x-24.svg';
@@ -166,13 +163,6 @@ const Backup = () => {
         const baseBackup = mnemonicData ? mnemonicData : xprvData;
 
         const toggleSwitch = () => {
-            if (switchEnabled) {
-                RNHapticFeedback.trigger(
-                    'impactLight',
-                    RNHapticFeedbackOptions,
-                );
-            }
-
             setSwitchEnabled(!switchEnabled);
         };
 
@@ -318,11 +308,6 @@ const Backup = () => {
 
         const togglePrivateDescriptor = () => {
             if (showPrivateDescriptor) {
-                RNHapticFeedback.trigger(
-                    'impactLight',
-                    RNHapticFeedbackOptions,
-                );
-
                 setShowPrivateDescriptor(false);
             } else {
                 if (isBiometricsActive) {
@@ -402,11 +387,6 @@ const Backup = () => {
                 {!walletData.isWatchOnly && (
                     <PlainButton
                         onPress={() => {
-                            RNHapticFeedback.trigger(
-                                'rigid',
-                                RNHapticFeedbackOptions,
-                            );
-
                             togglePrivateDescriptor();
                         }}
                         style={[
@@ -451,11 +431,6 @@ const Backup = () => {
                                 borderRadius: 2,
                             }}
                             onPress={() => {
-                                RNHapticFeedback.trigger(
-                                    'rigid',
-                                    RNHapticFeedbackOptions,
-                                );
-
                                 togglePrivateDescriptor();
                             }}
                             style={[
