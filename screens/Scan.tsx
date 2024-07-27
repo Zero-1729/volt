@@ -497,7 +497,7 @@ const Scan = ({route}: Props) => {
     }, []);
 
     const handleClipboard = async () => {
-        const clipboardData = await Clipboard.getString();
+        const clipboardData = (await Clipboard.getString()).trim();
 
         const invoiceState = await handleInvoice(clipboardData);
         await processAndRoute(invoiceState);
