@@ -55,7 +55,7 @@ import Gear from '../assets/svg/gear-24.svg';
 import Bell from '../assets/svg/bell-fill-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
 import ScanIcon from '../assets/svg/scan.svg';
-import ZapIcon from '../assets/svg/zap.svg';
+import LightningBoltIcon from '../assets/svg/zap.svg';
 import BackupIcon from '../assets/svg/backup.svg';
 
 import Color from '../constants/Color';
@@ -390,7 +390,7 @@ const Home = ({route}: Props) => {
         );
     }, []);
 
-    const gotToZap = useCallback(() => {
+    const goToLNPay = useCallback(() => {
         navigation.dispatch(
             CommonActions.navigate('WalletRoot', {
                 screen: 'SendLN',
@@ -692,7 +692,7 @@ const Home = ({route}: Props) => {
 
                             {isLightning && (
                                 <PlainButton
-                                    onPress={gotToZap}
+                                    onPress={goToLNPay}
                                     style={[
                                         tailwind(
                                             'flex justify-center items-center',
@@ -711,7 +711,7 @@ const Home = ({route}: Props) => {
                                                         .QuickActionsButton,
                                             },
                                         ]}>
-                                        <ZapIcon
+                                        <LightningBoltIcon
                                             width={20}
                                             fill={ColorScheme.SVG.Default}
                                         />
@@ -721,7 +721,7 @@ const Home = ({route}: Props) => {
                                             tailwind('text-sm'),
                                             {color: ColorScheme.Text.Default},
                                         ]}>
-                                        {capitalizeFirst(t('zap'))}
+                                        {capitalizeFirst(t('address'))}
                                     </VText>
                                 </PlainButton>
                             )}
