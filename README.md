@@ -18,6 +18,11 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 - Internal Wallet Lightning Swaps (Onchain<>Lighting)
 - Multi-lingual (English & Arabic)
 
+## Official Socials
+
+[<img src='./assets/x-voltbtc.png' width=512>](https://x.com/voltbtc)
+[<img src='./assets/nostr-voltbtc.png' width=512>](primal.net/p/npub1n3dc6uzctzdpvcsywpphhkhzwnmljhu45lnpkrr30s300fr2yeyq8ed2q6)
+
 ## Download Beta
 
 **:warning: Warning:** Volt is still in Beta, do not use it for large amounts of Bitcoin.
