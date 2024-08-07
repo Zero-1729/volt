@@ -50,8 +50,12 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 
 ## Supported Bitcoin Tech
 
-- [Breez SDK](https://github.com/breez/breez-sdk)
 - [Bitcoin Development Kit (BDK)](https://github.com/bitcoindevkit)
+- [Breez SDK](https://github.com/breez/breez-sdk)
+
+### Lightning Implementation Overview
+
+<img src='./assets/breezsdk_greenlight.png' width=720>
 
 # Translation
 
