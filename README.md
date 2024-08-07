@@ -15,7 +15,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 - Watch Only support
 - Partially Signed Bitcoin Transactions (PSBTs) and Fee Bumping (RBF)
 - Lightning Network support (BOLT11 & LNURL)
-- Internal Wallet Lightning Swaps (Onchain<>Lighting)
+- Internal Wallet Lightning Swaps (Onchain ↔️ Lightning)
 - Multi-lingual (English & Arabic)
 
 ## Official Socials
