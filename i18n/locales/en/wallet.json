@@ -53,6 +53,7 @@
     "qr_scan": "QR SCan",
     "qr_scan_invoice": "Scan Invoice QR",
     "scan_message": "Scan a Bitcoin invoice or address to pay",
+    "scan_message_generic": "Scan a Bitcoin QR code",
     "master_fingerprint": "Master Fingerprint",
     "derivation_path": "Derivation Path",
     "summary": "Summary",

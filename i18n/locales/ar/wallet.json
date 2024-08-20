@@ -49,6 +49,7 @@
     "qr_scan": "مسح QR",
     "qr_scan_invoice": "مسح الفاتورة QR",
     "scan_message": "قم بمسح فاتورة البيتكوين أو العنوان للدفع",
+    "scan_message_generic": "مسح رمز الاستجابة السريعة الخاص بالبيتكوين",
     "ext_key": "المفتاح الممتد",
     "backup_clarification": "لا تقم بالتقاط لقطة شاشة أو مشاركتها مع أي شخص.",
     "master_fingerprint": "بصمة الماستر",
