@@ -140,7 +140,7 @@ const ResetPINCode = (props: ResetPINProps) => {
                         height: NativeWindowMetrics.height * 0.75,
                     },
                 ]}>
-                <View style={[tailwind('items-center absolute top-0')]}>
+                <View style={[tailwind('items-center absolute top-0 w-5/6')]}>
                     <Text
                         style={[
                             tailwind('text-lg font-bold'),
