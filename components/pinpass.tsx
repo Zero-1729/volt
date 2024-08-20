@@ -143,7 +143,9 @@ const PinPass = (props: PinPassProps) => {
                                     {pinAttempts === MAX_PIN_ATTEMPTS - 1 ? (
                                         <Text
                                             style={[
-                                                tailwind('text-sm text-center'),
+                                                tailwind(
+                                                    'text-sm text-center w-5/6',
+                                                ),
                                                 {
                                                     color: ColorScheme.Text
                                                         .Default,
