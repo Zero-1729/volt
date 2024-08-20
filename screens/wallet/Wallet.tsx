@@ -779,7 +779,8 @@ const Wallet = ({route}: Props) => {
                                     ),
                                     {
                                         marginTop:
-                                            walletData.type === 'unified'
+                                            walletData.type === 'unified' &&
+                                            walletTxs.length > 0
                                                 ? -86
                                                 : 0,
                                     },
@@ -814,183 +815,197 @@ const Wallet = ({route}: Props) => {
                         </View>
 
                         {/* Combined balance for unified wallets */}
-                        {walletData.type === 'unified' && (
-                            <>
-                                <View
-                                    style={[
-                                        tailwind('absolute w-5/6'),
-                                        {
-                                            bottom: hideTotalBalance
-                                                ? 98 + 24
-                                                : 98,
-                                        },
-                                    ]}>
+                        {walletData.type === 'unified' &&
+                            walletTxs.length > 0 && (
+                                <>
                                     <View
                                         style={[
-                                            tailwind('w-full items-start'),
+                                            tailwind('absolute w-5/6'),
+                                            {
+                                                bottom: hideTotalBalance
+                                                    ? 98 + 24
+                                                    : 98,
+                                            },
                                         ]}>
                                         <View
                                             style={[
-                                                tailwind(
-                                                    `w-full ${
-                                                        langDir === 'right'
-                                                            ? 'flex-row-reverse'
-                                                            : 'flex-row'
-                                                    } items-center justify-between opacity-60`,
-                                                ),
+                                                tailwind('w-full items-start'),
                                             ]}>
-                                            <Text
+                                            <View
                                                 style={[
                                                     tailwind(
-                                                        'text-sm text-white',
+                                                        `w-full ${
+                                                            langDir === 'right'
+                                                                ? 'flex-row-reverse'
+                                                                : 'flex-row'
+                                                        } items-center justify-between opacity-60`,
                                                     ),
                                                 ]}>
-                                                Lightning
-                                            </Text>
-
-                                            {hideTotalBalance ? (
-                                                <View
+                                                <Text
                                                     style={[
-                                                        tailwind('rounded-sm'),
-                                                        {
-                                                            height: 20,
-                                                            width: 98,
-                                                            opacity:
-                                                                loadingBalance
-                                                                    ? 0.35
-                                                                    : 0.6,
-                                                            backgroundColor:
-                                                                ColorScheme
-                                                                    .WalletColors[
-                                                                    walletData
-                                                                        .type
-                                                                ].accent,
-                                                        },
-                                                    ]}
-                                                />
-                                            ) : (
-                                                <Balance
-                                                    disabled={true}
-                                                    fontColor={'white'}
-                                                    balance={
-                                                        walletData.balance
-                                                            .lightning
-                                                    }
-                                                    balanceFontSize={'text-lg'}
-                                                    disableFiat={false}
-                                                    loading={loadingBalance}
-                                                    hideColor={
-                                                        ColorScheme
-                                                            .WalletColors[
-                                                            walletData.type
-                                                        ].accent
-                                                    }
-                                                />
-                                            )}
+                                                        tailwind(
+                                                            'text-sm text-white',
+                                                        ),
+                                                    ]}>
+                                                    Lightning
+                                                </Text>
+
+                                                {hideTotalBalance ? (
+                                                    <View
+                                                        style={[
+                                                            tailwind(
+                                                                'rounded-sm',
+                                                            ),
+                                                            {
+                                                                height: 20,
+                                                                width: 98,
+                                                                opacity:
+                                                                    loadingBalance
+                                                                        ? 0.35
+                                                                        : 0.6,
+                                                                backgroundColor:
+                                                                    ColorScheme
+                                                                        .WalletColors[
+                                                                        walletData
+                                                                            .type
+                                                                    ].accent,
+                                                            },
+                                                        ]}
+                                                    />
+                                                ) : (
+                                                    <Balance
+                                                        disabled={true}
+                                                        fontColor={'white'}
+                                                        balance={
+                                                            walletData.balance
+                                                                .lightning
+                                                        }
+                                                        balanceFontSize={
+                                                            'text-lg'
+                                                        }
+                                                        disableFiat={false}
+                                                        loading={loadingBalance}
+                                                        hideColor={
+                                                            ColorScheme
+                                                                .WalletColors[
+                                                                walletData.type
+                                                            ].accent
+                                                        }
+                                                    />
+                                                )}
+                                            </View>
                                         </View>
-                                    </View>
 
-                                    <View
-                                        style={[
-                                            tailwind(
-                                                'w-full flex-row items-center justify-between',
-                                            ),
-                                        ]}>
-                                        <View
-                                            style={[
-                                                tailwind('w-1/3 opacity-20'),
-                                                styles.divider,
-                                            ]}
-                                        />
-
-                                        <PlainButton
-                                            onPress={openSwapModal}
-                                            style={[
-                                                tailwind(
-                                                    'rounded-full items-center px-6 py-2',
-                                                ),
-                                                {
-                                                    backgroundColor: CardAccent,
-                                                },
-                                            ]}>
-                                            <SwapIcon fill={'white'} />
-                                        </PlainButton>
-
-                                        <View
-                                            style={[
-                                                tailwind('w-1/3 opacity-20'),
-                                                styles.divider,
-                                            ]}
-                                        />
-                                    </View>
-
-                                    <View
-                                        style={[
-                                            tailwind('w-full items-start'),
-                                        ]}>
                                         <View
                                             style={[
                                                 tailwind(
-                                                    `w-full ${
-                                                        langDir === 'right'
-                                                            ? 'flex-row-reverse'
-                                                            : 'flex-row'
-                                                    } items-center justify-between opacity-60`,
+                                                    'w-full flex-row items-center justify-between',
                                                 ),
                                             ]}>
-                                            <Text
+                                            <View
                                                 style={[
                                                     tailwind(
-                                                        'text-sm text-white',
+                                                        'w-1/3 opacity-20',
+                                                    ),
+                                                    styles.divider,
+                                                ]}
+                                            />
+
+                                            <PlainButton
+                                                onPress={openSwapModal}
+                                                style={[
+                                                    tailwind(
+                                                        'rounded-full items-center px-6 py-2',
+                                                    ),
+                                                    {
+                                                        backgroundColor:
+                                                            CardAccent,
+                                                    },
+                                                ]}>
+                                                <SwapIcon fill={'white'} />
+                                            </PlainButton>
+
+                                            <View
+                                                style={[
+                                                    tailwind(
+                                                        'w-1/3 opacity-20',
+                                                    ),
+                                                    styles.divider,
+                                                ]}
+                                            />
+                                        </View>
+
+                                        <View
+                                            style={[
+                                                tailwind('w-full items-start'),
+                                            ]}>
+                                            <View
+                                                style={[
+                                                    tailwind(
+                                                        `w-full ${
+                                                            langDir === 'right'
+                                                                ? 'flex-row-reverse'
+                                                                : 'flex-row'
+                                                        } items-center justify-between opacity-60`,
                                                     ),
                                                 ]}>
-                                                On-chain
-                                            </Text>
-
-                                            {hideTotalBalance ? (
-                                                <View
+                                                <Text
                                                     style={[
-                                                        tailwind('rounded-sm'),
-                                                        {
-                                                            height: 20,
-                                                            width: 98,
-                                                            opacity:
-                                                                loadingBalance
-                                                                    ? 0.35
-                                                                    : 0.6,
-                                                            backgroundColor:
-                                                                ColorScheme
-                                                                    .WalletColors[
-                                                                    walletData
-                                                                        .type
-                                                                ].accent,
-                                                        },
-                                                    ]}
-                                                />
-                                            ) : (
-                                                <Balance
-                                                    disabled={true}
-                                                    fontColor={'white'}
-                                                    balance={
-                                                        walletData.balance
-                                                            .onchain
-                                                    }
-                                                    balanceFontSize={'text-lg'}
-                                                    disableFiat={false}
-                                                    loading={loadingBalance}
-                                                    hideColor={
-                                                        ColorScheme
-                                                            .WalletColors[
-                                                            walletData.type
-                                                        ].accent
-                                                    }
-                                                />
-                                            )}
+                                                        tailwind(
+                                                            'text-sm text-white',
+                                                        ),
+                                                    ]}>
+                                                    On-chain
+                                                </Text>
+
+                                                {hideTotalBalance ? (
+                                                    <View
+                                                        style={[
+                                                            tailwind(
+                                                                'rounded-sm',
+                                                            ),
+                                                            {
+                                                                height: 20,
+                                                                width: 98,
+                                                                opacity:
+                                                                    loadingBalance
+                                                                        ? 0.35
+                                                                        : 0.6,
+                                                                backgroundColor:
+                                                                    ColorScheme
+                                                                        .WalletColors[
+                                                                        walletData
+                                                                            .type
+                                                                    ].accent,
+                                                            },
+                                                        ]}
+                                                    />
+                                                ) : (
+                                                    <Balance
+                                                        disabled={true}
+                                                        fontColor={'white'}
+                                                        balance={
+                                                            walletData.balance
+                                                                .onchain
+                                                        }
+                                                        balanceFontSize={
+                                                            'text-lg'
+                                                        }
+                                                        disableFiat={false}
+                                                        loading={loadingBalance}
+                                                        hideColor={
+                                                            ColorScheme
+                                                                .WalletColors[
+                                                                walletData.type
+                                                            ].accent
+                                                        }
+                                                    />
+                                                )}
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            </>
-                        )}
+                                </>
+                            )}
 
                         {/* Send and receive */}
                         <View
