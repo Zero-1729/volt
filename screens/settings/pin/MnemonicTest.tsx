@@ -109,7 +109,7 @@ const MnemonicTest = ({route}: Props) => {
                     <View
                         style={[
                             tailwind('w-5/6 justify-center items-center'),
-                            {marginTop: 76, marginBottom: 32},
+                            {marginTop: 80, marginBottom: 32},
                         ]}>
                         <Text
                             style={[
