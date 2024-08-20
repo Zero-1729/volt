@@ -73,7 +73,7 @@ const ResetPIN = ({route}: Props) => {
                     style={[
                         tailwind('items-center h-full w-full justify-center'),
                     ]}>
-                    <View style={[tailwind('w-5/6 absolute top-0')]}>
+                    <View style={[tailwind('w-5/6 absolute top-6')]}>
                         <PlainButton
                             style={tailwind('items-center flex-row -ml-1')}
                             onPress={() => {
