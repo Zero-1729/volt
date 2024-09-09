@@ -90,7 +90,7 @@ const TransactionDetailsView = ({route}: Props) => {
     const displayFeeBump =
         !route.params.tx.confirmed &&
         route.params.tx.rbf &&
-        !route.params.tx.received;
+        route.params.tx.type === 'outbound';
 
     const openBumpFee = () => {
         if (openBump !== 1) {
@@ -859,8 +859,6 @@ const TransactionDetailsView = ({route}: Props) => {
                     </View>
 
                     {/* Show bump fee button when tx still in mempool */}
-                    {/*{!route.params.tx.confirmed && (
-                     */}
                     {displayFeeBump && (
                         <View
                             style={[
