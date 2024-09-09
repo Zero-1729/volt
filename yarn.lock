@@ -1615,7 +1615,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:>=7, @babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.23.9, @babel/runtime@npm:^7.24.1, @babel/runtime@npm:^7.8.4":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.23.9, @babel/runtime@npm:^7.24.1, @babel/runtime@npm:^7.8.4":
   version: 7.24.5
   resolution: "@babel/runtime@npm:7.24.5"
   dependencies:
@@ -3117,25 +3117,6 @@ __metadata:
     react-native-safe-area-context: ">= 3.0.0"
     react-native-screens: ">= 3.0.0"
   checksum: 10/299d2633962a9b987234933c8593c278fa1bed8ecb89ec7821c6c9f769342be7b34de45046bb1c3f93013b3c3d0cdd47aa5795eed6b7baf0cb8928bf31681c5a
-  languageName: node
-  linkType: hard
-
-"@realm/react@npm:^0.6.2":
-  version: 0.6.2
-  resolution: "@realm/react@npm:0.6.2"
-  dependencies:
-    "@babel/runtime": "npm:>=7"
-    lodash: "npm:^4.17.21"
-    react-native: "npm:>=0.68"
-  peerDependencies:
-    react: ">=17.0.2"
-    realm: ^12.0.0-browser || ^12.0.0 || ^12.0.0-rc || ^11.0.0
-  dependenciesMeta:
-    "@babel/runtime":
-      optional: true
-    react-native:
-      optional: true
-  checksum: 10/c8b012f16ac070a09c3c2d81b5b38b8fa396a9f6e8ee13863f114278e452468e2fb010d376e855a652a88482d1075b2c9bc6e1152a054767376c25226d114b38
   languageName: node
   linkType: hard
 
@@ -11421,7 +11402,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:>=0.68, react-native@npm:^0.74.1":
+"react-native@npm:^0.74.1":
   version: 0.74.1
   resolution: "react-native@npm:0.74.1"
   dependencies:
@@ -13610,7 +13591,6 @@ __metadata:
     "@react-navigation/native": "npm:^6.1.7"
     "@react-navigation/native-stack": "npm:^6.9.10"
     "@react-navigation/stack": "npm:^6.3.13"
-    "@realm/react": "npm:^0.6.2"
     "@types/bs58check": "npm:^2.1.0"
     "@types/jest": "npm:^29.2.1"
     "@types/react": "npm:^18.2.6"
