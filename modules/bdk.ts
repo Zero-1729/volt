@@ -383,15 +383,25 @@ export const syncBdkWallet = async (
             config,
             BlockChainNames.Electrum,
         );
-    } catch (e) {
-        console.info(`[Electrum] Failed to connect to server '${config.url}'`);
-        throw e;
+    } catch (e: any) {
+        console.info(
+            `[Electrum] Failed to connect to server '${config.url}': ${e.message}`,
+        );
+        callback(false);
+        return wallet;
     }
 
-    const syncStatus = await wallet.sync(chain);
-
-    // report any sync errors
-    callback(syncStatus);
+    try {
+        const syncStatus = await wallet.sync(chain);
+        // report any sync errors
+        callback(syncStatus);
+    } catch (e: any) {
+        console.info(
+            `[Electrum] Failed to sync wallet with server '${config.url}': ${e.message}`,
+        );
+        callback(false);
+        return wallet;
+    }
 
     return wallet;
 };
