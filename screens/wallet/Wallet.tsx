@@ -4,9 +4,9 @@ import {
     useColorScheme,
     View,
     Text,
-    FlatList,
     StatusBar,
     StyleSheet,
+    VirtualizedList,
     BackHandler,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -1097,12 +1097,14 @@ const Wallet = ({route}: Props) => {
                             style={[
                                 tailwind('w-full h-full items-center pb-10'),
                             ]}>
-                            <FlatList
+                            <VirtualizedList
                                 maxToRenderPerBatch={50}
                                 updateCellsBatchingPeriod={2500}
                                 refreshing={refreshing}
                                 onRefresh={jointSync}
                                 scrollEnabled={true}
+                                getItem={(data, index) => data[index]}
+                                getItemCount={data => data.length}
                                 style={[
                                     tailwind(
                                         `${
@@ -1144,7 +1146,7 @@ const Wallet = ({route}: Props) => {
                                         />
                                     );
                                 }}
-                                keyExtractor={item =>
+                                keyExtractor={(item: TTransaction) =>
                                     item.txid ? item.txid : item.id
                                 }
                                 initialNumToRender={25}
