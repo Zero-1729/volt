@@ -273,6 +273,10 @@ const Scan = ({route}: Props) => {
 
                     const isBolt11 = !!LNinvoice?.bolt11;
                     const isLNA = !isBolt11 ? isLNAddress(LNinvoice) : false;
+                    const isLNW = !isBolt11
+                        ? !isLNAddress(LNinvoice) &&
+                          LNinvoice.startsWith('lnurl1d')
+                        : false;
 
                     if (isBolt11) {
                         // If LN Invoice
@@ -316,6 +320,14 @@ const Scan = ({route}: Props) => {
                                 },
                             }),
                         );
+                    }
+
+                    // Handle LNURL
+                    if (isLNW) {
+                        const lnurlRaw = LNinvoice;
+
+                        console.log('possible lnurl ', lnurlRaw);
+                        return;
                     }
 
                     if (!isLNA && !isBolt11) {
@@ -390,6 +402,16 @@ const Scan = ({route}: Props) => {
 
                 if (invoiceType.spec === 'lnurl' && isLNAddress(parsedLNURL)) {
                     // LN Address
+                    return {
+                        decodedInvoice: parsedLNURL,
+                        isOnchain: false,
+                        error: false,
+                    };
+                }
+
+                // LNURL (Withdraw)
+                if (invoiceType.spec === 'lnurl') {
+                    // LNURL Withdraw
                     return {
                         decodedInvoice: parsedLNURL,
                         isOnchain: false,
