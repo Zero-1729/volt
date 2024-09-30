@@ -35,11 +35,6 @@ import {useTranslation} from 'react-i18next';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {WalletTypeDetails} from '../../modules/wallet-defaults';
-
-import RNHapticFeedback from 'react-native-haptic-feedback';
-import {RNHapticFeedbackOptions} from '../../constants/Haptic';
-
 import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 
 import CloseIcon from '../../assets/svg/x-24.svg';
@@ -62,7 +57,7 @@ const Backup = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {currentWalletID, getWalletData, isAdvancedMode, isBiometricsActive} =
+    const {currentWalletID, getWalletData, isBiometricsActive} =
         useContext(AppStorageContext);
 
     const carouselRef = useRef<ICarouselInstance>(null);
@@ -74,9 +69,6 @@ const Backup = () => {
         return getWalletData(currentWalletID);
     }, [getWalletData, currentWalletID]);
 
-    const walletType = WalletTypeDetails[walletData.type];
-    const walletTypeName =
-        walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
     const CardColor =
         ColorScheme.WalletColors[walletData.type][walletData.network];
 
@@ -171,24 +163,12 @@ const Backup = () => {
         const baseBackup = mnemonicData ? mnemonicData : xprvData;
 
         const toggleSwitch = () => {
-            if (switchEnabled) {
-                RNHapticFeedback.trigger(
-                    'impactLight',
-                    RNHapticFeedbackOptions,
-                );
-            }
-
             setSwitchEnabled(!switchEnabled);
         };
 
         return (
             <View
-                style={[
-                    tailwind('items-center justify-center h-full w-full'),
-                    switchEnabled || !mnemonicData
-                        ? styles.minMarginContainer
-                        : styles.largeMarginContainer,
-                ]}>
+                style={[tailwind('items-center justify-center h-full w-full')]}>
                 {/* Show mnemonic & QR code version or Xprv QR code */}
                 {switchEnabled || !mnemonicData ? (
                     <View
@@ -308,13 +288,13 @@ const Backup = () => {
         mnemonicData,
         xprvData,
         tailwind,
-        switchEnabled,
-        ColorScheme.Background.QRBorder,
-        ColorScheme.Background.Default,
-        ColorScheme.Background.Greyed,
         ColorScheme.Text.Default,
         ColorScheme.Text.GrayedText,
         ColorScheme.Text.DescText,
+        ColorScheme.Background.QRBorder,
+        ColorScheme.Background.Default,
+        ColorScheme.Background.Greyed,
+        switchEnabled,
         t,
         CardColor,
         baseBackupTitle,
@@ -328,11 +308,6 @@ const Backup = () => {
 
         const togglePrivateDescriptor = () => {
             if (showPrivateDescriptor) {
-                RNHapticFeedback.trigger(
-                    'impactLight',
-                    RNHapticFeedbackOptions,
-                );
-
                 setShowPrivateDescriptor(false);
             } else {
                 if (isBiometricsActive) {
@@ -363,10 +338,7 @@ const Backup = () => {
 
         return (
             <View
-                style={[
-                    tailwind('items-center justify-center h-full w-full'),
-                    styles.largeMarginContainer,
-                ]}>
+                style={[tailwind('items-center justify-center h-full w-full')]}>
                 {/* Display QR code with seed */}
                 <View
                     style={[
@@ -415,11 +387,6 @@ const Backup = () => {
                 {!walletData.isWatchOnly && (
                     <PlainButton
                         onPress={() => {
-                            RNHapticFeedback.trigger(
-                                'rigid',
-                                RNHapticFeedbackOptions,
-                            );
-
                             togglePrivateDescriptor();
                         }}
                         style={[
@@ -464,11 +431,6 @@ const Backup = () => {
                                 borderRadius: 2,
                             }}
                             onPress={() => {
-                                RNHapticFeedback.trigger(
-                                    'rigid',
-                                    RNHapticFeedbackOptions,
-                                );
-
                                 togglePrivateDescriptor();
                             }}
                             style={[
@@ -506,9 +468,17 @@ const Backup = () => {
         );
     }, [
         tailwind,
-        ColorScheme,
-        descriptorData,
+        ColorScheme.Text.Default,
+        ColorScheme.Text.GrayedText,
+        ColorScheme.Text.DescText,
+        ColorScheme.Background.QRBorder,
+        ColorScheme.Background.Default,
+        ColorScheme.Background.Greyed,
+        ColorScheme.Background.CheckBoxFilled,
+        ColorScheme.Background.CheckBoxUnfilled,
+        ColorScheme.Background.CheckBoxOutline,
         walletData.isWatchOnly,
+        descriptorData,
         langDir,
         showPrivateDescriptor,
         t,
@@ -532,7 +502,11 @@ const Backup = () => {
                 <Animated.View style={tailwind('w-5/6 h-full justify-center')}>
                     {/* Top panel */}
                     <Animated.View
-                        style={[tailwind('absolute top-6  w-full left-0')]}>
+                        style={[
+                            tailwind(
+                                'absolute w-full flex-row justify-center items-center top-6',
+                            ),
+                        ]}>
                         {/* Allow exporting public descriptor to file */}
                         {currentIndex === 1 &&
                             Platform.OS === 'ios' &&
@@ -548,53 +522,11 @@ const Backup = () => {
                                     />
                                 </PlainButton>
                             )}
-                    </Animated.View>
-
-                    <Animated.View style={[tailwind('absolute top-6 right-0')]}>
-                        <PlainButton
-                            onPress={() => {
-                                navigation.dispatch(CommonActions.goBack());
-                            }}>
-                            <CloseIcon
-                                width={32}
-                                fill={ColorScheme.SVG.Default}
-                            />
-                        </PlainButton>
-                    </Animated.View>
-
-                    {/* Display wallet name */}
-                    <Animated.View
-                        style={tailwind(
-                            'absolute top-16 justify-center w-full',
-                        )}>
-                        <Text
-                            style={[
-                                tailwind(
-                                    'mb-1 font-bold self-center text-center text-xl w-5/6',
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode={'middle'}>
-                            {walletData.name}
-                        </Text>
-
-                        {/* Display wallet type (advanced mode) */}
-                        <Text
-                            style={[
-                                tailwind('text-base self-center mb-6'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {isAdvancedMode
-                                ? walletTypeName
-                                : capitalizeFirst(t('backup'))}
-                        </Text>
-
                         {/* Display wallet seed selector */}
                         <Animated.View
                             style={[
                                 tailwind(
-                                    'flex-row self-center items-center justify-center rounded-full p-2 px-6 mb-4',
+                                    'flex-row justify-center items-center rounded-full p-2 px-6',
                                 ),
                                 {
                                     backgroundColor:
@@ -674,13 +606,23 @@ const Backup = () => {
                                 </Text>
                             </PlainButton>
                         </Animated.View>
+                        <PlainButton
+                            style={[tailwind('absolute right-0')]}
+                            onPress={() => {
+                                navigation.dispatch(CommonActions.goBack());
+                            }}>
+                            <CloseIcon
+                                width={32}
+                                fill={ColorScheme.SVG.Default}
+                            />
+                        </PlainButton>
                     </Animated.View>
 
                     {/* Main Carousel */}
                     <Animated.View
                         style={[
                             styles.carouselContainer,
-                            tailwind('h-full w-full'),
+                            tailwind('justify-center'),
                             {zIndex: -9},
                         ]}>
                         <Carousel
@@ -724,12 +666,6 @@ const Backup = () => {
 export default Backup;
 
 const styles = StyleSheet.create({
-    largeMarginContainer: {
-        marginTop: 56,
-    },
-    minMarginContainer: {
-        marginTop: 32,
-    },
     capsuleContainer: {
         width: '46%',
     },

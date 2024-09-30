@@ -5,7 +5,7 @@ import {
     useColorScheme,
     StyleSheet,
     StatusBar,
-    FlatList,
+    VirtualizedList,
 } from 'react-native';
 import React, {useContext, useState} from 'react';
 
@@ -303,7 +303,7 @@ const TransactionList = () => {
                         style={[
                             tailwind('w-full justify-center px-4 items-center'),
                         ]}>
-                        <FlatList
+                        <VirtualizedList
                             maxToRenderPerBatch={50}
                             updateCellsBatchingPeriod={2500}
                             refreshing={refreshing}
@@ -330,7 +330,9 @@ const TransactionList = () => {
                                     />
                                 );
                             }}
-                            keyExtractor={item =>
+                            getItem={(data, index) => data[index]}
+                            getItemCount={data => data.length}
+                            keyExtractor={(item: TTransaction) =>
                                 item.txid ? item.txid : item.id
                             }
                             initialNumToRender={25}

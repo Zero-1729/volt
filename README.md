@@ -15,8 +15,13 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 - Watch Only support
 - Partially Signed Bitcoin Transactions (PSBTs) and Fee Bumping (RBF)
 - Lightning Network support (BOLT11 & LNURL)
-- Internal Wallet Lightning Swaps (Onchain<>Lighting)
-- Multi-lingual (en, ar)
+- Internal Wallet Lightning Swaps (Onchain ↔️ Lightning)
+- Multi-lingual (English & Arabic)
+
+## Official Socials
+
+[<img src='./assets/x-voltbtc.png' width=512>](https://x.com/voltbtc)
+[<img src='./assets/nostr-voltbtc.png' width=512>](primal.net/p/npub1n3dc6uzctzdpvcsywpphhkhzwnmljhu45lnpkrr30s300fr2yeyq8ed2q6)
 
 ## Download Beta
 
@@ -45,8 +50,12 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 
 ## Supported Bitcoin Tech
 
-- [Breez SDK](https://github.com/breez/breez-sdk)
 - [Bitcoin Development Kit (BDK)](https://github.com/bitcoindevkit)
+- [Breez SDK](https://github.com/breez/breez-sdk)
+
+### Lightning Implementation Overview
+
+<img src='./assets/breezsdk_greenlight.png' width=720>
 
 # Translation
 

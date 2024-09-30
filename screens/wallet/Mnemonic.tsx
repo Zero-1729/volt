@@ -68,17 +68,6 @@ const Mnemonic = () => {
                     </Text>
                 </View>
 
-                {/* Newly created wallet name */}
-                <Text
-                    style={[
-                        tailwind('text-base text-center w-1/2 mt-1'),
-                        {color: ColorScheme.Text.Default},
-                    ]}
-                    ellipsizeMode={'middle'}
-                    numberOfLines={1}>
-                    {walletData.name}
-                </Text>
-
                 {/* Mnemonic instruction and note on backing up */}
                 <View style={[tailwind('w-5/6 mt-10')]}>
                     <Text
@@ -106,7 +95,7 @@ const Mnemonic = () => {
                 <View
                     style={[
                         tailwind(
-                            'w-5/6 flex-row justify-center items-center mt-8 mb-6',
+                            'w-5/6 flex-row justify-center items-center mt-6 mb-6',
                         ),
                     ]}>
                     {/* col 0 */}

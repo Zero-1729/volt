@@ -140,7 +140,7 @@ const SendView = ({route}: Props) => {
             : route.params.invoiceData?.options?.amount || 0,
     );
 
-    const [paymentToSelf, setPaymentToSelf] = useState(true);
+    const [paymentToSelf, setPaymentToSelf] = useState(false);
     const [paySelfMessage, setPaySelfMessage] = useState('');
     const [alreadyPaidInvoice, setAlreadyPaidInvoice] = useState(false);
 

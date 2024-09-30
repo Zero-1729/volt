@@ -75,7 +75,7 @@ const ExtKeyTest = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                'w-5/6 absolute top-0 flex-row justify-center',
+                                'w-5/6 absolute top-6 flex-row justify-center',
                             ),
                         ]}>
                         <PlainButton
@@ -113,7 +113,7 @@ const ExtKeyTest = ({route}: Props) => {
                     <View
                         style={[
                             tailwind('w-5/6 justify-center items-center'),
-                            {marginTop: 64, marginBottom: 32},
+                            {marginTop: 80, marginBottom: 32},
                         ]}>
                         <Text
                             style={[

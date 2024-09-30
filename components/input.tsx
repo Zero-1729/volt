@@ -562,11 +562,15 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
     };
 
     return (
-        <View style={[tailwind('w-full items-center justify-center flex')]}>
+        <View style={[tailwind('w-2/3 self-center justify-center flex')]}>
             {/* Row 0 */}
-            <View style={[tailwind('w-full flex-row mb-12')]}>
+            <View style={[tailwind('w-full flex-row mb-4 justify-around')]}>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '1'));
@@ -580,7 +584,11 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '2'));
@@ -594,7 +602,11 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '3'));
@@ -610,9 +622,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
             </View>
 
             {/* Row 1 */}
-            <View style={[tailwind('w-full flex-row mb-12')]}>
+            <View style={[tailwind('w-full flex-row mb-4 justify-around')]}>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '4'));
@@ -626,7 +642,11 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '5'));
@@ -640,7 +660,11 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '6'));
@@ -656,9 +680,13 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
             </View>
 
             {/* Row 2 */}
-            <View style={[tailwind('w-full flex-row mb-12')]}>
+            <View style={[tailwind('w-full flex-row mb-4 justify-around')]}>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '7'));
@@ -672,7 +700,11 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '8'));
@@ -686,7 +718,11 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '9'));
@@ -707,14 +743,19 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     tailwind(
                         `w-full flex-row  ${
                             props.showBiometrics
-                                ? 'justify-center'
-                                : 'justify-end'
+                                ? 'justify-around'
+                                : 'justify-around self-end w-2/3'
                         }`,
                     ),
                 ]}>
                 {props.showBiometrics && (
                     <PlainButton
-                        style={[tailwind('w-1/3 items-center justify-center')]}
+                        style={[
+                            tailwind(
+                                'items-center justify-center rounded-full',
+                            ),
+                            styles.buttonDimensions,
+                        ]}
                         onPress={props.triggerBiometrics}>
                         {Platform.OS === 'android' ? (
                             <FingerPrint
@@ -732,7 +773,11 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </PlainButton>
                 )}
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                        {backgroundColor: ColorScheme.Background.Secondary},
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '0'));
@@ -746,7 +791,10 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </Text>
                 </PlainButton>
                 <Pressable
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    style={[
+                        tailwind('items-center justify-center rounded-full'),
+                        styles.buttonDimensions,
+                    ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyDelete(props.pin));
@@ -869,5 +917,9 @@ export const MnemonicInput = (props: MnemonicInputProps) => {
 const styles = StyleSheet.create({
     inputContainer: {
         textAlignVertical: 'top',
+    },
+    buttonDimensions: {
+        height: 70,
+        width: 70,
     },
 });

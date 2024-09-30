@@ -329,6 +329,10 @@
   width: 91.666667%
 }
 
+.w-2\/3 {
+  width: 66.666667%
+}
+
 .w-2\/6 {
   width: 33.333333%
 }
@@ -457,11 +461,6 @@
 .bg-black {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity))
-}
-
-.bg-blue-800 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(30 64 175 / var(--tw-bg-opacity))
 }
 
 .p-1 {

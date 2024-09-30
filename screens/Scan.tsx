@@ -135,6 +135,8 @@ const Scan = ({route}: Props) => {
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
 
+    const isGenericScan = route.params.screen === 'home';
+
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
     // Else, we'll cut it out and let Camera View take over
@@ -497,7 +499,7 @@ const Scan = ({route}: Props) => {
     }, []);
 
     const handleClipboard = async () => {
-        const clipboardData = await Clipboard.getString();
+        const clipboardData = (await Clipboard.getString()).trim();
 
         const invoiceState = await handleInvoice(clipboardData);
         await processAndRoute(invoiceState);
@@ -557,7 +559,9 @@ const Scan = ({route}: Props) => {
                             style={[
                                 tailwind('absolute text-sm text-white top-0'),
                             ]}>
-                            {t('scan_message')}
+                            {isGenericScan
+                                ? t('scan_message_generic')
+                                : t('scan_message')}
                         </Text>
 
                         {/* Camera View Container */}

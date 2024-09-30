@@ -412,6 +412,11 @@
 			"width": "91.666667%"
 		}
 	},
+	"w-2/3": {
+		"style": {
+			"width": "66.666667%"
+		}
+	},
 	"w-2/6": {
 		"style": {
 			"width": "33.333333%"
@@ -590,12 +595,6 @@
 		"style": {
 			"--tw-bg-opacity": 1,
 			"backgroundColor": "rgb(0 0 0 / var(--tw-bg-opacity))"
-		}
-	},
-	"bg-blue-800": {
-		"style": {
-			"--tw-bg-opacity": 1,
-			"backgroundColor": "rgb(30 64 175 / var(--tw-bg-opacity))"
 		}
 	},
 	"p-1": {

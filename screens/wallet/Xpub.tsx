@@ -130,30 +130,37 @@ const Xpub = () => {
             ]}>
             <View style={[tailwind('w-full h-full items-center')]}>
                 <View style={tailwind('w-5/6 h-full justify-center')}>
-                    {/* Top panel */}
-                    {Platform.OS === 'ios' && (
-                        <>
-                            <View
-                                style={[
-                                    tailwind('absolute top-6  w-full left-0'),
-                                ]}>
-                                {/* Allow exporting XPub */}
-                                <PlainButton
-                                    style={[tailwind('absolute left-0')]}
-                                    onPress={() => {
-                                        writeDescriptorToFile();
-                                    }}>
-                                    <ShareIcon
-                                        width={32}
-                                        fill={ColorScheme.SVG.Default}
-                                    />
-                                </PlainButton>
-                            </View>
-                        </>
-                    )}
-
-                    <View style={[tailwind('absolute top-6 right-0')]}>
+                    <View
+                        style={[
+                            tailwind(
+                                'w-full absolute top-6 flex-row justify-center items-center',
+                            ),
+                        ]}>
+                        {/* Top panel */}
+                        {/* Allow exporting XPub */}
+                        {Platform.OS === 'ios' && (
+                            <PlainButton
+                                style={[tailwind('absolute left-0')]}
+                                onPress={() => {
+                                    writeDescriptorToFile();
+                                }}>
+                                <ShareIcon
+                                    width={32}
+                                    fill={ColorScheme.SVG.Default}
+                                />
+                            </PlainButton>
+                        )}
+                        <Text
+                            style={[
+                                tailwind('text-lg font-bold'),
+                                {
+                                    color: ColorScheme.Text.Default,
+                                },
+                            ]}>
+                            Xpub
+                        </Text>
                         <PlainButton
+                            style={[tailwind('absolute right-0')]}
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
@@ -162,54 +169,6 @@ const Xpub = () => {
                                 fill={ColorScheme.SVG.Default}
                             />
                         </PlainButton>
-                    </View>
-
-                    {/* Display wallet name */}
-                    <View style={tailwind('justify-center w-full')}>
-                        <Text
-                            style={[
-                                tailwind(
-                                    'mb-1 font-bold self-center text-center text-xl w-5/6',
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode={'middle'}>
-                            {walletData.name}
-                        </Text>
-
-                        {/* Display wallet type */}
-                        <Text
-                            style={[
-                                tailwind('text-base self-center mb-10'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
-                            {isAdvancedMode
-                                ? walletTypeName
-                                : capitalizeFirst(t('backup'))}
-                        </Text>
-                    </View>
-
-                    {/* Display wallet seed */}
-                    <View
-                        style={[
-                            tailwind(
-                                'flex-row self-center items-center justify-center rounded-full p-2 px-6 mb-4 bg-blue-800',
-                            ),
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        {/* Display the single backup material if restored non-mnemonic */}
-                        <>
-                            <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {
-                                        color: ColorScheme.Text.Default,
-                                    },
-                                ]}>
-                                Xpub
-                            </Text>
-                        </>
                     </View>
 
                     {/* Display QR code with seed */}

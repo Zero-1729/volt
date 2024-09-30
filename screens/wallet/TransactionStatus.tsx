@@ -103,14 +103,28 @@ const TransactionStatus = ({route}: Props) => {
         };
 
         // We expect a signed PSBT to be passed in
-        const {broadcasted, psbt, errorMessage} = await SingleBDKSend(
-            route.params.unsignedPsbt,
-            wallet as TComboWallet,
-            electrumServerURL,
-            (msg: string) => {
-                setStatusMessage(t(msg));
-            },
-        );
+        let broadcasted = false;
+        let psbt = null;
+        let errorMessage = '';
+
+        // Only attempt if PSBT present
+        if (route.params.unsignedPsbt) {
+            const result = await SingleBDKSend(
+                route.params.unsignedPsbt,
+                wallet as TComboWallet,
+                electrumServerURL,
+                (msg: string) => {
+                    setStatusMessage(t(msg));
+                },
+            );
+
+            broadcasted = result.broadcasted;
+            psbt = result.psbt;
+            errorMessage = result.errorMessage;
+        } else {
+            // Didn't get a PSBT
+            setStatusMessage('could not create PSBT');
+        }
 
         await updateStatusInfo(broadcasted, psbt, errorMessage);
     };

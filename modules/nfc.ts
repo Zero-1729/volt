@@ -7,7 +7,14 @@ export const extractNFCTagData = (nfcTag: TagEvent) => {
         throw new Error('Invalid NFC tag data');
     }
 
+    // Check whether card is empty
+    if (!nfcTag.ndefMessage) {
+        throw new Error('Empty NFC tag data');
+    }
+
+    // Grab the first NDEF record from the NFC tag
     const payload = nfcTag.ndefMessage[0].payload;
+
     const rawBytesText = Buffer.from(payload).toString('utf-8');
     const rawLnurl =
         rawBytesText[0] === '\x00' ? rawBytesText.slice(1) : rawBytesText;

@@ -629,8 +629,9 @@ const determineLnType = async (
     // LNURL (Withdraw)
     /**
      *  lnurlw://domain.com/lnurl-withdraw?key=val
+     *  lnurl1dp68gurn8ghj7ct5mr...
      */
-    if (invoice.startsWith('lnurlw://')) {
+    if (invoice.startsWith('lnurlw://') || invoice.startsWith('lnurl1d')) {
         specType = InputTypeVariant.LN_URL_WITHDRAW;
     }
 
@@ -638,13 +639,8 @@ const determineLnType = async (
     /*
      *   LN Address: [name]@[domain]
      *   lnurlp://domain.com/lnurl-pay?key=val
-     *   lnurl1dp68gurn8ghj7ct5mr...
      */
-    if (
-        isLNAddress(invoice) ||
-        invoice.startsWith('lnurlp://') ||
-        invoice.startsWith('lnurl1')
-    ) {
+    if (isLNAddress(invoice) || invoice.startsWith('lnurlp://')) {
         specType = InputTypeVariant.LN_URL_PAY;
     }
 

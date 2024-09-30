@@ -134,8 +134,13 @@ const ResetPINCode = (props: ResetPINProps) => {
     const welcomePanel = useCallback((): ReactElement => {
         return (
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
-                <View style={[tailwind('items-center absolute top-0')]}>
+                style={[
+                    tailwind('w-full justify-center items-center'),
+                    {
+                        height: NativeWindowMetrics.height * 0.75,
+                    },
+                ]}>
+                <View style={[tailwind('items-center absolute top-0 w-5/6')]}>
                     <Text
                         style={[
                             tailwind('text-lg font-bold'),
@@ -143,16 +148,10 @@ const ResetPINCode = (props: ResetPINProps) => {
                         ]}>
                         {t('reset_pin')}
                     </Text>
-                </View>
 
-                <View
-                    style={[
-                        tailwind('items-center w-5/6 absolute'),
-                        {top: 56},
-                    ]}>
                     <Text
                         style={[
-                            tailwind('text-sm text-center'),
+                            tailwind('text-sm text-center mt-4'),
                             {color: ColorScheme.Text.DescText},
                         ]}>
                         {props.testInfo.isWatchOnly
@@ -163,8 +162,14 @@ const ResetPINCode = (props: ResetPINProps) => {
 
                 <View
                     style={[
-                        tailwind('w-full items-center justify-center'),
-                        {marginTop: -(32 + NativeWindowMetrics.height * 0.15)},
+                        tailwind('justify-center flex items-center'),
+                        {
+                            marginTop: -(
+                                NativeWindowMetrics.height *
+                                0.75 *
+                                0.15
+                            ),
+                        },
                     ]}>
                     <BitcoinNight height={256} width={256} />
                 </View>
@@ -173,7 +178,8 @@ const ResetPINCode = (props: ResetPINProps) => {
                     style={[
                         tailwind('absolute w-5/6'),
                         {
-                            bottom: 24 + NativeWindowMetrics.height * 0.15,
+                            bottom:
+                                24 + NativeWindowMetrics.height * 0.75 * 0.1,
                         },
                     ]}>
                     <LongButton
