@@ -21,7 +21,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 ## Official Socials
 
 [<img src='./assets/x-voltbtc.png' width=512>](https://x.com/voltbtc)
-[<img src='./assets/nostr-voltbtc.png' width=512>](primal.net/p/npub1n3dc6uzctzdpvcsywpphhkhzwnmljhu45lnpkrr30s300fr2yeyq8ed2q6)
+[<img src='./assets/nostr-voltbtc.png' width=512>](https://primal.net/p/npub1n3dc6uzctzdpvcsywpphhkhzwnmljhu45lnpkrr30s300fr2yeyq8ed2q6)
 
 ## Download Beta
 
