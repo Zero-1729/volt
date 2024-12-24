@@ -127,7 +127,7 @@ const LockScreen = (props: lockProps) => {
     return (
         <SafeAreaView edges={['top', 'left', 'right', 'bottom']}>
             <BottomSheetModalProvider>
-                <View style={[tailwind('w-full h-full justify-center')]}>
+                <View style={[tailwind('w-full h-full justify-center'), {backgroundColor: ColorScheme.Background.Primary}]}>
                     <View
                         style={[
                             tailwind(
