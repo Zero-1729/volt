@@ -176,6 +176,7 @@ export type InitStackParamList = {
         detailsType: EBreezDetails;
     };
     Mnemonic: undefined;
+    BoltNFC: undefined;
 };
 
 // Settings Param List for screens
@@ -445,7 +446,7 @@ export const AddWalletRoot = () => {
 };
 
 // Create a navigation container reference
-export const navigationRef = createNavigationContainerRef<InitStackParamList>();
+export const navigationRef = createNavigationContainerRef<any>();
 export const rootNavigation = {
     navigate<RouteName extends keyof InitStackParamList>(
         ...args: RouteName extends unknown
@@ -512,6 +513,7 @@ const RootNavigator = (): ReactElement => {
             ...DefaultTheme.colors,
             ...ColorScheme.NavigatorTheme.colors,
         },
+        fonts: DefaultTheme.fonts,
     };
 
     // Clipboard check
