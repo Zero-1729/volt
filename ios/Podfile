@@ -10,7 +10,7 @@ end
 node_require('react-native/scripts/react_native_pods.rb')
 node_require('react-native-permissions/scripts/setup.rb')
 
-platform :ios, '14.0'
+platform :ios, '15.1'
 prepare_react_native_project!
 
 setup_permissions([
@@ -31,11 +31,6 @@ end
 def __apply_Xcode_14_3_post_install_workaround(installer)
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      current_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-      minimum_target = '12.4'
-      if current_target.to_f < minimum_target.to_f
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = minimum_target
-      end
       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
     end
   end
@@ -61,7 +56,6 @@ target 'volt' do
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
     )
     __apply_Xcode_14_3_post_install_workaround(installer)
   end
