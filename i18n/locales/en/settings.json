@@ -68,5 +68,6 @@
     "ext_test": "Extended Key Test",
     "ext_pub_test_desc": "To reset PIN, please enter your Extended Public Key (XPUB) to verify your wallet ownership.",
     "enter_ext_pub": "Enter XPUB (e.g. xpub...)",
-    "loading_rate": "Loading rate..."
+    "loading_rate": "Loading rate...",
+    "default_testnet": "Testnet"
 }
