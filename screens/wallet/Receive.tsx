@@ -30,8 +30,8 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from '../../types/enums';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 
@@ -88,6 +88,7 @@ import Dot from '../../components/dots';
 
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
@@ -184,13 +185,8 @@ const Receive = ({route}: Props) => {
             // and revert after a few seconds
             Clipboard.setString(invoice);
 
-            Toast.show({
-                topOffset: 60,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('clipboard')),
-                text2: capitalizeFirst(t('copied_to_clipboard')),
-                visibilityTime: 1000,
-                position: 'top',
+            LiberalToast(capitalizeFirst(t('clipboard')), capitalizeFirst(t('copied_to_clipboard')), {
+                duration: 1000,
             });
         },
         [t],
@@ -1024,7 +1020,7 @@ const Receive = ({route}: Props) => {
                     </View>
                 )}
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

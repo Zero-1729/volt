@@ -54,9 +54,7 @@ import {
     getMiniWallet,
     isLNAddress,
 } from '../../modules/wallet-utils';
-import Toast, {ToastConfig} from 'react-native-toast-message';
 import {EBreezDetails} from '../../types/enums';
-import {toastConfig} from '../../components/toast';
 import {DisplayFiatAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
 
@@ -65,6 +63,10 @@ import {biometricAuth} from '../../modules/shared';
 
 import PINPass from '../../components/pinpass';
 import {useNetInfo} from '@react-native-community/netinfo';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SendLN'>;
 
@@ -448,6 +450,7 @@ const SendLN = ({route}: Props) => {
     const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
+    const [lnurlError, setLNURLError] = useState(false);
 
     const {t} = useTranslation('wallet');
 
@@ -512,12 +515,8 @@ const SendLN = ({route}: Props) => {
                 },
                 // prompt error callback
                 error => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: error.message,
-                        visibilityTime: 1750,
+                    LiberalToast(t('Biometrics'), error.message, {
+                        duration: 1750,
                     });
                 },
             );
@@ -537,6 +536,18 @@ const SendLN = ({route}: Props) => {
             manualAmount as number,
             manualDescription,
         );
+    };
+
+    const handleLNURL = async () => {
+        if (lnurlError) {
+            navigation.dispatch(
+                CommonActions.navigate('WalletRoot', {
+                    screen: 'WalletView',
+                }),
+            );
+
+            setLNURLError(false);
+        }
     };
 
     const payLNAddress = async (
@@ -563,12 +574,8 @@ const SendLN = ({route}: Props) => {
                 setStatusMessage(t('check_ln_address_limits'));
 
                 if (amtSats > maxAmountSats) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: 'LNURL Pay Error',
-                        text2: t('amount_above_max_spendable'),
-                        visibilityTime: 1750,
+                    LiberalToast('LNURL Pay Error', t('amount_above_max_spendable'), {
+                        duration: 1750,
                     });
                 }
 
@@ -583,21 +590,11 @@ const SendLN = ({route}: Props) => {
                 setLoadingPay(false);
             }
         } catch (error: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: 'Lightning Address',
-                text2: error.message,
-                visibilityTime: 2100,
-                onHide: () => {
-                    navigation.dispatch(
-                        CommonActions.navigate('WalletRoot', {
-                            screen: 'WalletView',
-                        }),
-                    );
-                },
+            LiberalToast('Lightning Address', error.message, {
+                duration: 2100,
             });
 
+            setLNURLError(true);
             setLoadingPay(false);
         }
     };
@@ -663,7 +660,7 @@ const SendLN = ({route}: Props) => {
                     pinMode={false}
                 />
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} onToastHide={handleLNURL} />
             </BottomSheetModalProvider>
         </SafeAreaView>
     );

@@ -73,10 +73,13 @@ import {fetchBoltzSwapInfo} from '../../modules/boltz';
 import Swap from './../../components/swap';
 import Send from './../../components/send';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import Toast from 'react-native-toast-message';
 import {SwapType} from '../../types/enums';
 import {fetchFiatRate} from '../../modules/currency';
 import {TRate} from '../../types/settings';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -196,12 +199,8 @@ const Wallet = ({route}: Props) => {
             }
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), error.message, {
+                    duration: 2000,
                 });
             }
 
@@ -217,12 +216,8 @@ const Wallet = ({route}: Props) => {
             updateWalletPayments(currentWalletID, txs);
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), error.message, {
+                    duration: 2000,
                 });
             }
 
@@ -337,12 +332,8 @@ const Wallet = ({route}: Props) => {
                 setCachedRates(response.rates as TRate);
             } else {
                 if (isAdvancedMode) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('network')),
-                        text2: response.error,
-                        visibilityTime: 2500,
+                    LiberalToast(capitalizeFirst(t('network')), response.error, {
+                        duration: 2500,
                     });
                 }
 
@@ -380,25 +371,29 @@ const Wallet = ({route}: Props) => {
 
     // Refresh control
     const refreshWallet = useCallback(async () => {
+        // TODO: fix broken loading issue
+        // Have balance check for onchain / ln
+        // why balance is zero and constantly showing update
+        // rework all of this.
         const w = await syncWallet();
 
-        if (!loadingBalance) {
-            // Update wallet balance first
-            const {balance, updated} = await getBdkWalletBalance(
-                w,
-                walletData.balance.onchain,
-            );
+        // Update wallet balance first
+        const {balance, updated} = await getBdkWalletBalance(
+            w,
+            walletData.balance.onchain,
+        );
 
-            if (updated && isLNWallet) {
-                setUpdatedOBalance(true);
-            }
+        if (updated && isLNWallet) {
+            setUpdatedOBalance(true);
+        }
 
-            // update wallet balance
-            updateWalletBalance(currentWalletID, {
-                onchain: balance,
-                lightning: new BigNumber(0),
-            });
+        // update wallet balance
+        updateWalletBalance(currentWalletID, {
+            onchain: balance,
+            lightning: new BigNumber(0),
+        });
 
+        if (updated) {
             try {
                 const {txs, address, utxo} = await fetchOnchainTransactions(
                     w,
@@ -422,12 +417,8 @@ const Wallet = ({route}: Props) => {
 
                 setLoadLock(false);
             } catch (err: any) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('network')),
-                    text2: t('error_fetching_txs'),
-                    visibilityTime: 1750,
+                LiberalToast(capitalizeFirst(t('network')), t('error_fetching_txs'), {
+                    duration: 1750,
                 });
 
                 setLoadingBalance(false);
@@ -1216,6 +1207,8 @@ const Wallet = ({route}: Props) => {
                             </View>
                         )}
                     </View>
+
+                    <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
                 </View>
             </BottomSheetModalProvider>
         </SafeAreaView>

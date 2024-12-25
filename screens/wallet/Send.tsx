@@ -63,7 +63,8 @@ import {
 import {EBreezDetails, ENet} from '../../types/enums';
 import ExpiryTimer from '../../components/expiry';
 
-import Toast from 'react-native-toast-message';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 import {
     isInvoiceExpired,
@@ -176,12 +177,8 @@ const SendView = ({route}: Props) => {
                 },
                 // prompt error callback
                 error => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: error.message,
-                        visibilityTime: 1750,
+                    LiberalToast(t('Biometrics'), error.message, {
+                        duration: 1750,
                     });
                 },
             );
@@ -222,12 +219,8 @@ const SendView = ({route}: Props) => {
             (route.params.bolt11?.amountMsat as number) / 1_000;
 
         if (walletBalanceLN < bolt11AmountSats) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: t('ln_insufficient_funds'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('error')), t('ln_insufficient_funds'), {
+                duration: 1750,
             });
 
             setLoading(false);
@@ -238,18 +231,16 @@ const SendView = ({route}: Props) => {
             const bolt11 = route.params.bolt11;
             const result = await sendPayment({
                 bolt11: bolt11?.bolt11 as string,
+                useTrampoline: false,
             });
 
             if (result.payment.status === 'complete') {
                 setLoading(false);
             } else {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: result.payment.error as string,
-                    visibilityTime: 2000,
+                LiberalToast(capitalizeFirst(t('error')), result.payment.error as string, {
+                    duration: 2000,
                 });
+
                 setLoading(false);
                 console.log(
                     '[Send] Error sending payment: ',
@@ -359,12 +350,8 @@ const SendView = ({route}: Props) => {
                 new BigNumber(route.params.wallet.balanceOnchain),
                 electrumServerURL,
                 (error: any) => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: e('tx_fail_creation_error'),
-                        visibilityTime: 2000,
+                    LiberalToast(capitalizeFirst(t('error')), e('tx_fail_creation_error'), {
+                        duration: 2000,
                     });
 
                     console.log(
@@ -864,6 +851,8 @@ const SendView = ({route}: Props) => {
                         onSelectPinPass={setPINIdx}
                         pinMode={false}
                     />
+
+                    <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
                 </BottomSheetModalProvider>
             </View>
         </SafeAreaView>

@@ -27,10 +27,11 @@ import {WalletTypeDetails} from '../../modules/wallet-defaults';
 import CloseIcon from '../../assets/svg/x-24.svg';
 import ShareIcon from '../../assets/svg/share-24.svg';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 import {capitalizeFirst} from '../../modules/transform';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 const Xpub = () => {
     const navigation = useNavigation();
@@ -61,12 +62,8 @@ const Xpub = () => {
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(
                 err => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: e('failed_to_write_file'),
-                        visibilityTime: 1750,
+                    LiberalToast(capitalizeFirst(t('error')), e('failed_to_write_file'), {
+                        duration: 1750,
                     });
 
                     console.log('[Export] Failed to write file: ', err.message);
@@ -79,12 +76,8 @@ const Xpub = () => {
             })
                 .catch(err => {
                     if (err.message !== 'User did not share') {
-                        Toast.show({
-                            topOffset: 54,
-                            type: 'Liberal',
-                            text1: capitalizeFirst(t('error')),
-                            text2: e('failed_to_share_file'),
-                            visibilityTime: 1750,
+                        LiberalToast(capitalizeFirst(t('error')), e('failed_to_share_file'), {
+                            duration: 1750,
                         });
 
                         console.log(
@@ -109,13 +102,8 @@ const Xpub = () => {
         // and revert after a few seconds
         Clipboard.setString(walletData.xpub);
 
-        Toast.show({
-            topOffset: 24,
-            type: 'Liberal',
-            text1: capitalizeFirst(t('clipboard')),
-            text2: capitalizeFirst(t('copied_to_clipboard')),
-            visibilityTime: 1000,
-            position: 'top',
+        LiberalToast(capitalizeFirst(t('clipboard')), capitalizeFirst(t('copied_to_clipboard')), {
+            duration: 1000,
         });
     };
 
@@ -234,7 +222,7 @@ const Xpub = () => {
                     </View>
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

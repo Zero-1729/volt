@@ -46,7 +46,10 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AddWalletParamList} from '../../Navigation';
 
 import {capitalizeFirst} from '../../modules/transform';
-import Toast from 'react-native-toast-message';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<AddWalletParamList, 'RestoreActions'>;
 
@@ -91,12 +94,8 @@ const ImportAction = ({route}: Props) => {
                 const lines = dataByLines.length;
 
                 if (lines > 1) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: e('import_support_error'),
-                        visibilityTime: 1750,
+                    LiberalToast(capitalizeFirst(t('error')), e('import_support_error'), {
+                        duration: 1750,
                     });
                     return;
                 }
@@ -110,12 +109,8 @@ const ImportAction = ({route}: Props) => {
 
     const handleFolderError = (err: Error) => {
         // Handle when any error in the folder action is reported
-        Toast.show({
-            topOffset: 54,
-            type: 'Liberal',
-            text1: capitalizeFirst(t('error')),
-            text2: err.message,
-            visibilityTime: 2000,
+        LiberalToast(capitalizeFirst(t('error')), err.message, {
+            duration: 2000,
         });
 
         return;
@@ -190,12 +185,8 @@ const ImportAction = ({route}: Props) => {
             validateMnenomic(mnemonic);
         } catch {
             // Let user know the mnemonic is valid
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('mnemonic')),
-                text2: e('mnemonic_invalid_error'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('mnemonic')), e('mnemonic_invalid_error'), {
+                duration: 1750,
             });
             return;
         }
@@ -211,12 +202,8 @@ const ImportAction = ({route}: Props) => {
             handleSuccessRoute();
         } catch (err: any) {
             // Let user know the mnemonic is valid
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('mnemonic')),
-                text2: err.message,
-                visibilityTime: 2000,
+            LiberalToast(capitalizeFirst(t('mnemonic')), err.message, {
+                duration: 2000,
             });
         }
     };
@@ -224,12 +211,8 @@ const ImportAction = ({route}: Props) => {
     const handleDescriptor = async (descriptor: string) => {
         try {
             if (!isDescriptorPattern(descriptor)) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('descriptor')),
-                    text2: e('descriptor_valid_error'),
-                    visibilityTime: 1750,
+                LiberalToast(capitalizeFirst(t('descriptor')), e('descriptor_valid_error'), {
+                    duration: 1750,
                 });
 
                 return;
@@ -246,12 +229,8 @@ const ImportAction = ({route}: Props) => {
 
             handleSuccessRoute();
         } catch (err: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('descriptor')),
-                text2: err.message,
-                visibilityTime: 2000,
+            LiberalToast(capitalizeFirst(t('descriptor')), err.message, {
+                duration: 2000,
             });
         }
     };
@@ -269,12 +248,8 @@ const ImportAction = ({route}: Props) => {
 
             handleSuccessRoute();
         } catch (err: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('extended_keu')),
-                text2: err.message,
-                visibilityTime: 2000,
+            LiberalToast(capitalizeFirst(t('extended_key')), err.message, {
+                duration: 2000,
             });
         }
     };
@@ -344,12 +319,8 @@ const ImportAction = ({route}: Props) => {
         if (isExtendedKey(material)) {
             // Check if ext key is supported
             if (!isSupportedExtKey(material)) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('extended_key')),
-                    text2: e('unsupported_ext_key_error'),
-                    visibilityTime: 1750,
+                LiberalToast(capitalizeFirst(t('extended_key')), e('unsupported_ext_key_error'), {
+                    duration: 1750,
                 });
                 return;
             }
@@ -359,12 +330,8 @@ const ImportAction = ({route}: Props) => {
                 isValidExtendedKey(material);
             } catch (err: any) {
                 // Report invalid ext key
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('extended_key')),
-                    text2: err.message,
-                    visibilityTime: 2000,
+                LiberalToast(capitalizeFirst(t('extended_key')), err.message, {
+                    duration: 2000,
                 });
                 return;
             }
@@ -375,12 +342,8 @@ const ImportAction = ({route}: Props) => {
             return;
         }
 
-        Toast.show({
-            topOffset: 54,
-            type: 'Liberal',
-            text1: capitalizeFirst(t('import')),
-            text2: e('import_material_error'),
-            visibilityTime: 1750,
+        LiberalToast(capitalizeFirst(t('import')), e('import_material_error'), {
+            duration: 1750,
         });
     };
 
@@ -511,6 +474,8 @@ const ImportAction = ({route}: Props) => {
                             : ColorScheme.Background.Secondary
                     }
                 />
+
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

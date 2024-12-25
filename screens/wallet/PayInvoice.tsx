@@ -56,7 +56,9 @@ import {TInvoiceData} from '../../types/wallet';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
-import Toast from 'react-native-toast-message';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'PayInvoice'>;
 
@@ -183,12 +185,8 @@ const PayInvoice = ({route}: Props) => {
                     !(invoiceType?.spec === 'bolt11') &&
                     invoiceType.type === 'lightning'
                 ) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: e('unsupported_invoice_type'),
-                        visibilityTime: 1750,
+                    LiberalToast(capitalizeFirst(t('error')), e('unsupported_invoice_type'), {
+                        duration: 1750,
                     });
 
                     navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -203,12 +201,8 @@ const PayInvoice = ({route}: Props) => {
                     ),
                 );
             } else {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: e('invalid_invoice_error'),
-                    visibilityTime: 1750,
+                LiberalToast(capitalizeFirst(t('error')), e('invalid_invoice_error'), {
+                    duration: 1750,
                 });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -224,12 +218,8 @@ const PayInvoice = ({route}: Props) => {
         // Check network connection first
         const _netInfo = await netInfo.fetch();
         if (!checkNetworkIsReachable(_netInfo)) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: e('no_internet_message'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('error')), e('no_internet_message'), {
+                duration: 1750,
             });
             return;
         }
@@ -255,12 +245,8 @@ const PayInvoice = ({route}: Props) => {
         // Check wallet and invoice
         if (
             checkInvoiceAndWallet(_wallet, decodedInvoice, (msg: string) => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: e(msg),
-                    visibilityTime: 2500,
+                LiberalToast(capitalizeFirst(t('error')), e(msg), {
+                    duration: 2500,
                 });
 
                 // route home
@@ -529,6 +515,8 @@ const PayInvoice = ({route}: Props) => {
                     backgroundColor={ColorScheme.Background.Inverted}
                     onPress={handleRoute}
                 />
+
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

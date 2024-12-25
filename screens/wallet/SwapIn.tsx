@@ -53,8 +53,9 @@ import {AppStorageContext} from '../../class/storageContext';
 import Success from '../../assets/svg/check-circle-fill-24.svg';
 import Failed from '../../assets/svg/x-circle-fill-24.svg';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
+
 import {getPrivateDescriptors} from '../../modules/descriptors';
 import {TComboWallet} from '../../types/wallet';
 import {SingleBDKSend, psbtFromInvoice} from '../../modules/bdk';
@@ -136,12 +137,8 @@ const SwapIn = ({route}: Props) => {
             new BigNumber(wallet.balance.onchain),
             electrumServerURL,
             (e: any) => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: t('tx_fail_creation_error'),
-                    visibilityTime: 2000,
+                LiberalToast(capitalizeFirst(t('error')), t('tx_fail_creation_error'), {
+                    duration: 2000,
                 });
 
                 console.log('[Send] Error creating transaction: ', e.message);
@@ -918,7 +915,7 @@ const SwapIn = ({route}: Props) => {
                     />
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

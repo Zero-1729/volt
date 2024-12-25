@@ -18,7 +18,7 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import Toast from 'react-native-toast-message';
+import {LiberalToast} from '../../components/toast';
 
 import Close from '../../assets/svg/x-24.svg';
 
@@ -235,15 +235,11 @@ const SendAmount = ({route}: Props) => {
 
     const handleSendRoute = useCallback(() => {
         if (isBelowDust && !route.params.isLightning) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: e('dust_limit_title'),
-                text2: `${e('dust_limit_message')} ${DUST_LIMIT} ${t(
+            LiberalToast(e('dust_limit_title'), `${e('dust_limit_message')} ${DUST_LIMIT} ${t(
                     'satoshi',
-                )}.`,
-                visibilityTime: 1750,
-            });
+                )}.`, {
+                    duration: 1750,
+                });
             return;
         }
 
@@ -281,12 +277,8 @@ const SendAmount = ({route}: Props) => {
                 }),
             );
         } else {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: e('no_internet_title'),
-                text2: e('no_internet_message'),
-                visibilityTime: 1750,
+            LiberalToast(e('no_internet_title'), e('no_internet_message'), {
+                duration: 1750,
             });
             return;
         }

@@ -23,7 +23,8 @@ import Close from '../../assets/svg/x-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 import BottomArrow from '../../assets/svg/chevron-down-16.svg';
 
@@ -53,7 +54,6 @@ import {
     DisplayBTCAmount,
 } from '../../components/balance';
 import {actionAlert} from '../../components/alert';
-import {toastConfig} from '../../components/toast';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
@@ -111,13 +111,8 @@ const RequestAmount = ({route}: Props) => {
             if (error.message === 'BreezServices not initialized') {
                 setBreezServicesNotInitialized(true);
 
-                Toast.show({
-                    topOffset: 60,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: t('not_connected_to_breez_services'),
-                    position: 'top',
-                    visibilityTime: 2000,
+                LiberalToast(capitalizeFirst(t('error')), t('not_connected_to_breez_services'), {
+                    duration: 2000,
                 });
             }
         }
@@ -150,13 +145,8 @@ const RequestAmount = ({route}: Props) => {
         if (chars.length <= 90) {
             setLNInvoiceDesc(chars);
         } else {
-            Toast.show({
-                topOffset: 60,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('warn')),
-                text2: e('ln_description_length'),
-                position: 'top',
-                visibilityTime: 2000,
+            LiberalToast(capitalizeFirst(t('warn')), e('ln_description_length'), {
+                duration: 2000,
             });
         }
     };
@@ -370,7 +360,7 @@ const RequestAmount = ({route}: Props) => {
 
                 const info = await nodeInfo();
                 const beyondMaxLiquidity = satsAmount.value.gte(
-                    info.inboundLiquidityMsats / 1_000,
+                    info.totalInboundLiquidityMsats / 1_000,
                 );
 
                 const feeSats = (channelOpenFee.feeMsat as number) / 1_000;
@@ -575,7 +565,7 @@ const RequestAmount = ({route}: Props) => {
                         backgroundColor={ColorScheme.Background.Inverted}
                     />
                 </View>
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

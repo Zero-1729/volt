@@ -33,7 +33,8 @@ import {getMiniWallet} from '../../modules/wallet-utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ENet} from '../../types/enums';
 import {capitalizeFirst} from '../../modules/transform';
-import Toast from 'react-native-toast-message';
+
+import {LiberalToast} from '../../components/toast';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import PINPass from '../../components/pinpass';
@@ -146,12 +147,8 @@ const Info = () => {
                     },
                     // prompt error callback
                     error => {
-                        Toast.show({
-                            topOffset: 54,
-                            type: 'Liberal',
-                            text1: t('Biometrics'),
-                            text2: error.message,
-                            visibilityTime: 1750,
+                        LiberalToast(t('Biometrics'), error.message, {
+                            duration: 1750,
                         });
                     },
                 );
@@ -210,12 +207,8 @@ const Info = () => {
     const showDialog = () => {
         // Avoid deletion while loading
         if (loadLock) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('notice')),
-                text2: t('wait_for_wallet_to_load_error'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('notice')), t('wait_for_wallet_to_load_error'), {
+                duration: 1750,
             });
             return;
         }

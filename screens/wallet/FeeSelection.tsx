@@ -44,10 +44,12 @@ import Close from '../../assets/svg/x-24.svg';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {getPrivateDescriptors} from '../../modules/descriptors';
 import {psbtFromInvoice} from '../../modules/bdk';
-import Toast from 'react-native-toast-message';
+
+import {LiberalToast} from '../../components/toast';
 
 import Info from '../../assets/svg/info-16.svg';
 import AlertIcon from '../../assets/svg/alert-16.svg';
+import { Toasts } from '@backpackapp-io/react-native-toast';
 
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
@@ -111,12 +113,8 @@ const FeeSelection = ({route}: Props) => {
             electrumServerURL,
             (err: any) => {
                 if (isAdvancedMode) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: e('tx_fail_creation_error'),
-                        visibilityTime: 1750,
+                    LiberalToast(capitalizeFirst(t('error')), e('tx_fail_creation_error'), {
+                        duration: 1750,
                     });
                 }
 
@@ -150,12 +148,8 @@ const FeeSelection = ({route}: Props) => {
             rates = fetchedRates as TMempoolFeeRates;
         } catch (err: any) {
             // Error assumed to be 503; mempool unavailable due to sync
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('feerate'),
-                text2: e('failed_fee_rate_fetch'),
-                visibilityTime: 1750,
+            LiberalToast(t('feerate'), e('failed_fee_rate_fetch'), {
+                duration: 1750,
             });
         }
 
@@ -174,12 +168,8 @@ const FeeSelection = ({route}: Props) => {
 
         // Warn user that fee rate invalid
         if (Number.isNaN(rate)) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: e('invalid_fee_rate'),
-                text2: e('invalid_fee_rate_message'),
-                visibilityTime: 1750,
+            LiberalToast(e('invalid_fee_rate'), e('invalid_fee_rate_message'), {
+                duration: 1750,
             });
 
             return;
@@ -187,12 +177,8 @@ const FeeSelection = ({route}: Props) => {
 
         // Avoid too high fee rate
         if (isFeeTooHigh(fee, isMaxSend)) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: e('fee_too_high_error'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('error')), e('fee_too_high_error'), {
+                duration: 1750,
             });
             return;
         }
@@ -805,6 +791,8 @@ const FeeSelection = ({route}: Props) => {
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />
+
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );
