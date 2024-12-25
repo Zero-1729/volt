@@ -21,7 +21,6 @@ import {
     StackActions,
 } from '@react-navigation/native';
 
-import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from './components/toast';
 
 import {
@@ -945,8 +944,6 @@ const RootNavigator = (): ReactElement => {
             </InitScreenStack.Navigator>
 
             {!isAuth && <LockScreen onSuccess={handleAuthSuccess} />}
-
-            <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
         </NavigationContainer>
     );
 };
