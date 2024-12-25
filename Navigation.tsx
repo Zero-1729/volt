@@ -21,7 +21,8 @@ import {
     StackActions,
 } from '@react-navigation/native';
 
-import Toast from 'react-native-toast-message';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from './components/toast';
 
 import {
     _BREEZ_SDK_API_KEY_,
@@ -136,6 +137,7 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 
 import netInfo from '@react-native-community/netinfo';
+import NativeWindowMetrics from './constants/NativeWindowMetrics';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
@@ -708,12 +710,8 @@ const RootNavigator = (): ReactElement => {
             }
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), error.message, {
+                    duration: 2000,
                 });
             }
         }
@@ -730,12 +728,8 @@ const RootNavigator = (): ReactElement => {
 
             if (event.type === BreezEventVariant.BACKUP_STARTED) {
                 if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Breez SDK'),
-                        text2: t('breez_backup_started'),
-                        visibilityTime: 1750,
+                    LiberalToast(t('Breez SDK'), t('breez_backup_started'), {
+                        duration: 1750,
                     });
                 }
             }
@@ -743,12 +737,8 @@ const RootNavigator = (): ReactElement => {
             if (event.type === BreezEventVariant.BACKUP_SUCCEEDED) {
                 if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                     console.log('[Breez SDK] Backup succeeded');
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Breez SDK'),
-                        text2: t('breez_backup_success'),
-                        visibilityTime: 1750,
+                    LiberalToast(t('Breez SDK'), t('breez_backup_success'), {
+                        duration: 1750,
                     });
                 }
             }
@@ -756,12 +746,8 @@ const RootNavigator = (): ReactElement => {
             if (event.type === BreezEventVariant.BACKUP_FAILED) {
                 console.log('[Breez SDK] Backup Failed: ', event.details);
 
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: t('breez_backup_failed'),
-                    visibilityTime: 1750,
+                LiberalToast(t('Breez SDK'), t('breez_backup_failed'), {
+                    duration: 1750,
                 });
             }
 
@@ -837,12 +823,8 @@ const RootNavigator = (): ReactElement => {
             console.log('[Breez SDK] Connected to services');
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), error.message, {
+                    duration: 2000,
                 });
             }
         }
@@ -963,6 +945,8 @@ const RootNavigator = (): ReactElement => {
             </InitScreenStack.Navigator>
 
             {!isAuth && <LockScreen onSuccess={handleAuthSuccess} />}
+
+            <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
         </NavigationContainer>
     );
 };
