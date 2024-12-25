@@ -24,7 +24,8 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../Navigation';
 
-import Toast from 'react-native-toast-message';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../components/toast';
 
 import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 
@@ -159,12 +160,8 @@ const Home = ({route}: Props) => {
                 },
                 // prompt error callback
                 error => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: error.message,
-                        visibilityTime: 1750,
+                    LiberalToast(t('Biometrics'), error.message, {
+                        duration: 1750,
                     });
                 },
             );
@@ -233,12 +230,8 @@ const Home = ({route}: Props) => {
             w,
             (status: boolean) => {
                 if (process.env.NODE_ENV === 'development' && !status) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('BDK'),
-                        text2: t('Failed to sync'),
-                        visibilityTime: 1750,
+                    LiberalToast(t('BDK'), t('Failed to sync'), {
+                        duration: 1750,
                     });
                 }
             },
@@ -301,12 +294,8 @@ const Home = ({route}: Props) => {
             });
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), error.message, {
+                    duration: 2000,
                 });
             }
 
@@ -322,12 +311,8 @@ const Home = ({route}: Props) => {
             updateWalletPayments(currentWalletID, txs);
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), error.message, {
+                    duration: 2000,
                 });
             }
 
@@ -448,12 +433,8 @@ const Home = ({route}: Props) => {
             }
 
             // Simple helper to show successful import and navigate back home
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: route.params.restoreMeta.title,
-                text2: route.params.restoreMeta.message,
-                visibilityTime: 1750,
+            LiberalToast(route.params.restoreMeta.title, route.params.restoreMeta.message, {
+                duration: 1750,
             });
 
             // Vibrate to let user know the action was successful
@@ -801,6 +782,8 @@ const Home = ({route}: Props) => {
                             )}
                         </PlainButton>
                     </View>
+
+                    <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
                 </View>
 
                 <PINPass
