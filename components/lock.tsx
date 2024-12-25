@@ -21,8 +21,8 @@ import {getKeychainItem} from '../class/keychainContext';
 import {AppStorageContext} from '../class/storageContext';
 import RNBiometrics from '../modules/biometrics';
 
-import {toastConfig} from './toast';
-import Toast, {ToastConfig} from 'react-native-toast-message';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from './toast';
 
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
 import {PlainButton} from './button';
@@ -89,12 +89,8 @@ const LockScreen = (props: lockProps) => {
                 }
             })
             .catch((error: any) => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Biometrics'),
-                    text2: error.message,
-                    visibilityTime: 1750,
+                LiberalToast(t('Biometrics'), error.message, {
+                    duration: 1750,
                 });
             });
     };
@@ -274,7 +270,11 @@ const LockScreen = (props: lockProps) => {
                         </View>
                     </View>
 
-                    <Toast config={toastConfig as ToastConfig} />
+                    <Toasts extraInsets={
+                        {
+                            top: NativeWindowMetrics.height * -0.075,
+                        }
+                    } />
                 </View>
 
                 <ResetPINModal
