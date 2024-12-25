@@ -11378,16 +11378,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-toast-message@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "react-native-toast-message@npm:2.2.1"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10/cf106922f3cefc917466a5e09410255576e76f78ca1f8985c96a8dc26f7f7d60d43d860eb6a226671b1678a08709c593cc27048c6aa0edb86ebfd46e96e34d06
-  languageName: node
-  linkType: hard
-
 "react-native-tooltip@npm:^5.2.0":
   version: 5.2.0
   resolution: "react-native-tooltip@npm:5.2.0"
@@ -13564,7 +13554,6 @@ __metadata:
     react-native-share: "npm:^12.0.3"
     react-native-svg: "npm:^15.10.1"
     react-native-svg-transformer: "npm:^1.5.0"
-    react-native-toast-message: "npm:^2.2.1"
     react-native-tooltip: "npm:^5.2.0"
     react-test-renderer: "npm:v18.3.1"
     rimraf: "npm:^5.0.1"
