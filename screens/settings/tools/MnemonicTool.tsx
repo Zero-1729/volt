@@ -19,8 +19,8 @@ import {useTranslation} from 'react-i18next';
 import {LongBottomButton, PlainButton} from '../../../components/button';
 import {TextSingleInput} from '../../../components/input';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../../components/toast';
 
 import Close from '../../../assets/svg/x-24.svg';
 import ArrowUp from '../../../assets/svg/chevron-up-16.svg';
@@ -45,6 +45,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst} from '../../../modules/transform';
 import {WalletPaths} from '../../../modules/wallet-defaults';
+import NativeWindowMetrics from '../../../constants/NativeWindowMetrics';
 
 const MnemonicTool = () => {
     const [resultMessage, setResultMessage] = useState('');
@@ -83,13 +84,8 @@ const MnemonicTool = () => {
     const copyXpubToClipboard = () => {
         Clipboard.setString(resultMessage);
 
-        Toast.show({
-            topOffset: 60,
-            type: 'Liberal',
-            text1: capitalizeFirst(t('clipboard')),
-            text2: capitalizeFirst(t('copied_to_clipboard')),
-            visibilityTime: 1000,
-            position: 'top',
+        LiberalToast(capitalizeFirst(t('clipboard')), capitalizeFirst(t('copied_to_clipboard')), {
+            duration: 1000,
         });
     };
 
@@ -393,7 +389,7 @@ const MnemonicTool = () => {
                     }
                 />
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.06}} />
             </View>
         </SafeAreaView>
     );

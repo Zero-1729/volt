@@ -30,8 +30,9 @@ type Props = NativeStackScreenProps<SettingsParamList, 'SetBiometrics'>;
 
 import RNBiometrics from '../../../modules/biometrics';
 import {BiometryTypes} from 'react-native-biometrics';
-import {toastConfig} from '../../../components/toast';
-import Toast, {ToastConfig} from 'react-native-toast-message';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../../components/toast';
 
 const SetBiometrics = ({route}: Props) => {
     const navigation = useNavigation();
@@ -55,9 +56,8 @@ const SetBiometrics = ({route}: Props) => {
     const handleRoute = () => {
         if (isWalletInitialized) {
             // Route back to PIN manager
-            navigation.dispatch(
-                CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
-            );
+            // TODO: Check if from standalone settings and safely route back
+            navigation.goBack();
         } else {
             navigation.dispatch(
                 CommonActions.navigate('AddWalletRoot', {
@@ -90,12 +90,8 @@ const SetBiometrics = ({route}: Props) => {
                             }
                         })
                         .catch((err: any) => {
-                            Toast.show({
-                                topOffset: 54,
-                                type: 'Liberal',
-                                text1: t('Biometrics'),
-                                text2: err.message,
-                                visibilityTime: 1750,
+                            LiberalToast(t('Biometrics'), err.message, {
+                                duration: 1750,
                             });
 
                             setDoneErrorText(err.message);
@@ -114,12 +110,8 @@ const SetBiometrics = ({route}: Props) => {
                             }
                         })
                         .catch((err: any) => {
-                            Toast.show({
-                                topOffset: 54,
-                                type: 'Liberal',
-                                text1: t('Biometrics'),
-                                text2: err.message,
-                                visibilityTime: 1750,
+                            LiberalToast(t('Biometrics'), err.message, {
+                                duration: 1750,
                             });
 
                             setDoneErrorText(err.message);
@@ -127,12 +119,8 @@ const SetBiometrics = ({route}: Props) => {
                 }
             }
         } catch (err: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('Biometrics'),
-                text2: err.message,
-                visibilityTime: 1750,
+            LiberalToast(t('Biometrics'), err.message, {
+                duration: 1750,
             });
 
             setDoneErrorText(err.message);
@@ -271,7 +259,7 @@ const SetBiometrics = ({route}: Props) => {
                     </View>
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

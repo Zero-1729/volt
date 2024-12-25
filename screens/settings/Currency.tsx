@@ -42,10 +42,14 @@ import Color from '../../constants/Color';
 import Currencies from '../../constants/Currency';
 
 import {addCommas, capitalizeFirst} from '../../modules/transform';
-import Toast from 'react-native-toast-message';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
+
 import {fetchFiatRate} from '../../modules/currency';
 import {TRateObject, TRateResponse} from '../../types/wallet';
 import BigNumber from 'bignumber.js';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 const Currency = () => {
     const navigation = useNavigation();
@@ -103,12 +107,8 @@ const Currency = () => {
                     setLoadingRate(false);
                 } else {
                     if (isAdvancedMode) {
-                        Toast.show({
-                            topOffset: 54,
-                            type: 'Liberal',
-                            text1: capitalizeFirst(t('network')),
-                            text2: response.error,
-                            visibilityTime: 2500,
+                        LiberalToast(capitalizeFirst(t('network')), response.error, {
+                            duration: 2500,
                         });
                     }
 
@@ -368,6 +368,8 @@ const Currency = () => {
                             {t('last_updated', {date: fiatRate.lastUpdated})}
                         </VText>
                     </View>
+
+                    <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.09}} />
                 </View>
             </View>
         </SafeAreaView>
