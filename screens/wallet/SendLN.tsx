@@ -584,6 +584,7 @@ const SendLN = ({route}: Props) => {
                 await payLnurl({
                     data: input.data,
                     amountMsat: amountMSats,
+                    useTrampoline: false,
                     comment: canComment ? comment || '' : '',
                 });
 

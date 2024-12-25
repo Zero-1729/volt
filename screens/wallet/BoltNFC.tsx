@@ -25,6 +25,7 @@ import {
     LnUrlWithdrawResultVariant,
     parseInput,
     withdrawLnurl,
+    LnUrlErrorData,
 } from '@breeztech/react-native-breez-sdk';
 import {extractNFCTagData} from '../../modules/nfc';
 import NFCManager, {NfcTech} from 'react-native-nfc-manager';
@@ -174,7 +175,7 @@ const BoltNFC = ({route}: Props) => {
                     } else {
                         setStatusMessage(
                             t('lnurl_withdrawal_failed', {
-                                reason: lnUrlWithdrawResult.data.reason,
+                                reason: (lnUrlWithdrawResult.data as LnUrlErrorData).reason,
                             }),
                         );
                         setLoading(false);
