@@ -17,13 +17,14 @@ import {PinNumpad} from './input';
 
 import {getKeychainItem} from '../class/keychainContext';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from './toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from './toast';
 
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
 
 import {AppStorageContext} from '../class/storageContext';
 import {biometricAuth} from '../modules/shared';
+import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 type PinPassProps = {
     pinPassRef: React.RefObject<BottomSheetModal>;
@@ -72,12 +73,8 @@ const PinPass = (props: PinPassProps) => {
             () => {},
             // prompt error callback
             error => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Biometrics'),
-                    text2: error.message,
-                    visibilityTime: 1750,
+                LiberalToast(t('Biometrics'), error.message, {
+                    duration: 1750,
                 });
             },
         );
@@ -243,7 +240,7 @@ const PinPass = (props: PinPassProps) => {
                     />
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </BottomModal>
     );
