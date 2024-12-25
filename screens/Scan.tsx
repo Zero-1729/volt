@@ -21,8 +21,6 @@ import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-
 import {useTranslation} from 'react-i18next';
 
 import decodeURI from 'bip21';
@@ -51,7 +49,9 @@ import Color from '../constants/Color';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst, convertBTCtoSats} from '../modules/transform';
-import {toastConfig} from '../components/toast';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../components/toast';
 
 import TorchIcon from '../assets/svg/light-bulb-24.svg';
 
@@ -202,15 +202,8 @@ const Scan = ({route}: Props) => {
 
     useEffect(() => {
         if (scannerAlertMsg) {
-            runOnJS(Toast.show)({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('scanner')),
-                text2: scannerAlertMsg,
-                visibilityTime: 2500,
-                onHide: () => {
-                    clearScannerAlert();
-                },
+            runOnJS(LiberalToast)(capitalizeFirst(t('scanner')),scannerAlertMsg, {
+                duration: 2500,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -649,7 +642,7 @@ const Scan = ({route}: Props) => {
             {/* Display loading or camera unavailable; handle differently */}
             {!Camera && <LoadingView isCamAvailable={true} />}
 
-            <Toast config={toastConfig as ToastConfig} />
+            <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} onToastHide={clearScannerAlert} />
         </SafeAreaView>
     );
 };
