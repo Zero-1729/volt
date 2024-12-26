@@ -461,6 +461,7 @@ const PayInvoice = ({route}: Props) => {
                             },
                         ]}>
                         <WalletCard
+                            withBalance={true}
                             loading={false}
                             maxedCard={
                                 wallet.balance.lightning
