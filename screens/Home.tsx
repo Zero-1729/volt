@@ -555,7 +555,7 @@ const Home = ({route}: Props) => {
 
                                     {!hideTotalBalance ? (
                                         <Balance
-                                            fontColor={'white'}
+                                            fontColor={ColorScheme.Text.Default}
                                             balance={totalBalance.onchain
                                                 .plus(totalBalance.lightning)}
                                             balanceFontSize={'text-3xl'}
@@ -592,7 +592,7 @@ const Home = ({route}: Props) => {
                                 },
                             ]}>
                             <WalletCard
-                                // This is for onchain behaviour only
+                                // This is for onchain behavior only
                                 withBalance={false}
                                 maxedCard={
                                     wallet.type !== 'unified' &&
