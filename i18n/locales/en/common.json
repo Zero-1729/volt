@@ -33,6 +33,8 @@
     "no": "no",
     "back": "back",
     "connect": "connect",
+    "connected": "connected",
+    "offline": "no connection",
     "max": "max",
     "export": "export",
     "note": "note",
