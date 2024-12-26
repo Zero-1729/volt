@@ -694,9 +694,8 @@ const Wallet = ({route}: Props) => {
                                     tailwind('items-center flex-row left-6'),
                                 ]}
                                 onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate('HomeScreen'),
-                                    );
+                                    // TODO: make sure we safely go back home or called screen
+                                    navigation.goBack();
                                 }}>
                                 <Back style={tailwind('mr-2')} fill={'white'} />
                             </PlainButton>
