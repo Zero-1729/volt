@@ -67,7 +67,7 @@ import {WalletCard} from '../components/shared';
 import {BaseWallet} from '../class/wallet/base';
 import {TBalance, TTransaction} from '../types/wallet';
 
-import {FiatBalance} from '../components/balance';
+import {Balance, FiatBalance} from '../components/balance';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 
@@ -554,19 +554,22 @@ const Home = ({route}: Props) => {
                                     </VText>
 
                                     {!hideTotalBalance ? (
-                                        <FiatBalance
+                                        <Balance
+                                            fontColor={'white'}
                                             balance={totalBalance.onchain
-                                                .plus(totalBalance.lightning)
-                                                .toNumber()}
-                                            loading={loadingBalance}
+                                                .plus(totalBalance.lightning)}
                                             balanceFontSize={'text-3xl'}
-                                            fontColor={ColorScheme.Text.Default}
-                                        />
-                                    ) : (
+                                            disableFiat={false}
+                                            loading={loadingBalance}
+                                            hideColor={
+                                                ColorScheme.WalletColors[wallet.type]
+                                                    .accent
+                                            }
+                                        />) : (
                                         <View
                                             style={[
                                                 tailwind(
-                                                    'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row',
+                                                    'rounded-sm w-4/5 mt-1 opacity-80 h-8 flex-row',
                                                 ),
                                                 {
                                                     backgroundColor:
