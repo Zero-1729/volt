@@ -590,6 +590,7 @@ const Home = ({route}: Props) => {
                             ]}>
                             <WalletCard
                                 // This is for onchain behaviour only
+                                withBalance={false}
                                 maxedCard={
                                     wallet.type !== 'unified' &&
                                     wallet.balance.onchain.isZero() &&
