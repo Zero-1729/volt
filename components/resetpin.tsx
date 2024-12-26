@@ -29,8 +29,7 @@ import {ExtKeyInput, MnemonicInput, PinNumpad} from './input';
 
 import {setKeychainItem} from '../class/keychainContext';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from './toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
 
 import {useSharedValue} from 'react-native-reanimated';
 import {capitalizeFirst} from '../modules/transform';
@@ -552,7 +551,7 @@ const ResetPINCode = (props: ResetPINProps) => {
                     />
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </BottomModal>
     );

@@ -40,8 +40,7 @@ import {AppStorageContext} from '../../class/storageContext';
 import {useTranslation} from 'react-i18next';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SwapAmount'>;
 
@@ -513,7 +512,7 @@ const SwapAmount = ({route}: Props) => {
                     />
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

@@ -59,8 +59,7 @@ import {
     PrepareOnchainPaymentResponse,
 } from '@breeztech/react-native-breez-sdk';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
 
 type Props = NativeStackScreenProps<WalletParamList, 'SwapOut'>;
 type Slide = () => ReactElement;
@@ -821,7 +820,7 @@ const SwapOut = ({route}: Props) => {
                     />
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );
