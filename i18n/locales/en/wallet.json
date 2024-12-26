@@ -50,7 +50,7 @@
     "backup_clarification": "Do not screenshot or share with anyone.",
     "display_priv_descriptor": "Display Extended Private Key Descriptor",
     "display_pub_descriptor": "Hide Extended Private Key Descriptor",
-    "qr_scan": "QR SCan",
+    "qr_scan": "QR Scan",
     "qr_scan_invoice": "Scan Invoice QR",
     "scan_message": "Scan a Bitcoin invoice or address to pay",
     "scan_message_generic": "Scan a Bitcoin QR code",
