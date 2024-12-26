@@ -5,6 +5,7 @@ import {StyleSheet, Text, View, Switch, useColorScheme} from 'react-native';
 import {useTailwind} from 'tailwind-rn';
 
 import {PlainButton} from './button';
+import {Balance} from './balance';
 
 import {
     WalletCardProps,
@@ -113,6 +114,7 @@ export const WalletCard = (props: WalletCardProps) => {
                                 'absolute bottom-5 pt-4 mt-1 text-base w-full text-left text-white opacity-60',
                             ),
                             {
+                                bottom: props.withBalance ? (props.hideBalance ? 72 : 54) : 20,
                                 textAlign: langDir,
                             },
                             Font.RobotoText,
@@ -138,6 +140,46 @@ export const WalletCard = (props: WalletCardProps) => {
                                     Font.RobotoText,
                                 ]}>
                                 Watch only
+                            </Text>
+                        </View>
+                    )}
+
+                    {/* Show Balance or Maxed card if `withBalance` */}
+                    {props.withBalance && (!props.maxedCard || props.hideBalance) ? (
+                        <View style={tailwind('w-full absolute mx-6 bottom-5')}>
+                            <Balance
+                                fontColor={'white'}
+                                balance={props.balance}
+                                balanceFontSize={'text-2xl'}
+                                disableFiat={false}
+                                loading={props.loading}
+                                hideColor={
+                                    ColorScheme.WalletColors[props.walletType]
+                                        .accent
+                                }
+                            />
+                        </View>
+                    ) : (
+                        props.withBalance && <View
+                            style={[
+                                tailwind(
+                                    'bg-black absolute rounded opacity-60',
+                                ),
+                                {
+                                    bottom: 20,
+                                    left: langDir === 'right' ? undefined : 24,
+                                    right: langDir === 'right' ? 24 : undefined,
+                                },
+                            ]}>
+                            <Text
+                                style={[
+                                    tailwind(
+                                        'text-xs text-white font-bold px-4 py-1',
+                                    ),
+                                    {textAlign: langDir},
+                                    Font.RobotoText,
+                                ]}>
+                                {t('wallet_empty_balance')}
                             </Text>
                         </View>
                     )}
