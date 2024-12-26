@@ -32,8 +32,6 @@ import {
     isLNAddress,
 } from '../modules/wallet-utils';
 
-import {Camera, CameraApi} from 'react-native-camera-kit';
-
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -54,6 +52,8 @@ import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../components/toast';
 
 import TorchIcon from '../assets/svg/light-bulb-24.svg';
+
+import {Camera, useCameraDevice, useCodeScanner, CodeScanner, Code} from 'react-native-vision-camera';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -131,6 +131,7 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
+    const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -144,7 +145,6 @@ const Scan = ({route}: Props) => {
         Status.UNKNOWN,
     );
     const [flashOn, setFlashOn] = useState<boolean>(false);
-    const cameraRef = React.useRef<CameraApi>(null);
 
     const onError = (error: any) => {
         updateScannerMessage(error.message);
@@ -488,12 +488,13 @@ const Scan = ({route}: Props) => {
     );
 
     const handleQR = useCallback(
-        async (event: any) => {
-            if (scanLock) {
+        async (code: Code) => {
+            // Move if locked or no value
+            if (scanLock || !code.value) {
                 return;
             }
 
-            const qrData = event.nativeEvent.codeStringValue;
+            const qrData = code.value as string;
 
             if (qrData !== _qrData) {
                 setQRData(qrData);
@@ -511,6 +512,7 @@ const Scan = ({route}: Props) => {
 
     useEffect(() => {
         requestCamPerms();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleClipboard = async () => {
@@ -522,6 +524,20 @@ const Scan = ({route}: Props) => {
 
     const dynamicHeading =
         route.params.screen === 'send' ? t('qr_scan_invoice') : t('qr_scan');
+
+    const device = useCameraDevice('back');
+
+    const codeScanner: CodeScanner = useCodeScanner({
+        codeTypes: ['qr'],
+        onCodeScanned: (codes: Code[]) => {
+            // Note: only handles single code
+            // i,.e. only one QR code at a time; the first prioritized
+            if (codes.length > 0) {
+                const code = codes[0];
+                handleQR(code);
+            }
+        },
+    });
 
     // Display Camera view if camera available
     return (
@@ -539,92 +555,74 @@ const Scan = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                'absolute top-6 z-10 w-full items-center justify-center',
+                                'absolute z-10 w-full items-center justify-center',
                             ),
+                            styles.headerContent,
                         ]}>
                         <View
                             style={[
                                 tailwind(
-                                    'flex-row mb-6 w-full items-center justify-center',
+                                    'flex-row w-full items-center justify-center',
                                 ),
                             ]}>
                             <PlainButton
                                 onPress={closeScreen}
-                                style={[tailwind('absolute z-10 left-6')]}>
+                                style={[tailwind('absolute z-10 left-6 rounded-full p-3'), styles.opaqueBG]}>
                                 <Close fill={'white'} />
                             </PlainButton>
+
                             {/* Screen header */}
+                            <View style={[
+                                tailwind('items-center rounded-full p-3'),
+                                styles.scannerHeader,
+                            ]}>
+                                <Text
+                                    style={[
+                                        tailwind('text-sm font-bold text-white'),
+                                    ]}>
+                                    {dynamicHeading}
+                                </Text>
+                            </View>
+
+                            {/* Flash Button */}
+                            <PlainButton
+                                onPress={() => {
+                                    setFlashOn(!flashOn);
+                                }}
+                                style={[
+                                    tailwind('absolute z-10 right-6 rounded-full p-3'),
+                                    // eslint-disable-next-line react-native/no-inline-styles
+                                    {
+                                        backgroundColor: !flashOn ? '#00000080' : '#FFFFFFFF',
+                                    },
+                                ]}>
+                                    <TorchIcon
+                                        fill={!flashOn ? 'white' : 'black'}
+                                    />
+                            </PlainButton>
+                        </View>
+
+                        <View style={[tailwind('mt-4 p-3 rounded-full'), styles.qrHelpText]}>
                             <Text
                                 style={[
-                                    tailwind('text-sm font-bold text-white'),
+                                    tailwind('text-sm text-center text-white'),
                                 ]}>
-                                {dynamicHeading}
+                                {!isGenericScan ? t('scan_message_generic') : t('scan_message')}
                             </Text>
                         </View>
                     </View>
 
-                    {/* Scan Area Container */}
-                    <View
-                        style={[
-                            styles.camSectionContainer,
-                            tailwind('items-center justify-end relative'),
-                        ]}>
-                        {/* Cam text info */}
-                        <Text
-                            style={[
-                                tailwind('absolute text-sm text-white top-0'),
-                            ]}>
-                            {isGenericScan
-                                ? t('scan_message_generic')
-                                : t('scan_message')}
-                        </Text>
-
-                        {/* Camera View Container */}
-                        <View
-                            style={[
-                                styles.camContainer,
-                                tailwind('items-center justify-center'),
-                            ]}>
-                            <Camera
-                                style={[
-                                    styles.cameraFlexed,
-                                    StyleSheet.absoluteFillObject,
-                                ]}
-                                onError={onError}
-                                ref={cameraRef}
-                                torchMode={flashOn ? 'on' : 'off'}
-                                scanBarcode={true}
-                                focusMode={'on'}
-                                onReadCode={handleQR}
-                                resizeMode={
-                                    Platform.OS === 'ios' ? 'contain' : 'cover'
-                                }
-                            />
-
-                            {/* Flash Button */}
-                            <PlainButton
-                                onPress={() => setFlashOn(!flashOn)}
-                                style={[
-                                    tailwind('absolute'),
-                                    styles.torchContainer,
-                                ]}>
-                                <View
-                                    style={[
-                                        tailwind('rounded-full p-3'),
-                                        // eslint-disable-next-line react-native/no-inline-styles
-                                        {
-                                            backgroundColor: !flashOn
-                                                ? '#00000080'
-                                                : '#FFFFFFFF',
-                                        },
-                                    ]}>
-                                    <TorchIcon
-                                        fill={!flashOn ? 'white' : 'black'}
-                                    />
-                                </View>
-                            </PlainButton>
-                        </View>
-                    </View>
+                    {/* Camera Scan View Container */}
+                    {device && (
+                        <Camera
+                            style={[styles.cameraFlexed, styles.fullSize, {backgroundColor: ColorScheme.Background.Primary}]}
+                            device={device}
+                            isActive={true}
+                            codeScanner={codeScanner}
+                            onError={onError}
+                            torch={flashOn ? 'on' : 'off'}
+                        />
+                    )}
 
                     <LongBottomButton
                         onPress={handleClipboard}
@@ -642,35 +640,40 @@ const Scan = ({route}: Props) => {
             {/* Display loading or camera unavailable; handle differently */}
             {!Camera && <LoadingView isCamAvailable={true} />}
 
-            <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} onToastHide={clearScannerAlert} />
+            <Toasts onToastHide={clearScannerAlert} />
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    fullSize: {
+        height: '100%',
+        width: '100%',
+        flex: 1,
+    },
     flexed: {
         flex: 1,
+        height: '100%',
+        width: '100%',
     },
     cameraFlexed: {
+        height: '100%',
+        width: '100%',
         flex: 1,
-        borderWidth: 1,
-        borderColor: 'white',
     },
-    camSectionContainer: {
-        height: 360,
-        width: NativeWindowMetrics.width * 0.95,
-        marginTop: -64,
+    opaqueBG: {
+        backgroundColor: '#00000080',
     },
-    camContainer: {
-        borderColor: 'white',
-        borderWidth: 2,
-        borderRadius: 2,
-        width: NativeWindowMetrics.width * 0.975,
-        height: 320,
+    headerContent: {
+        top: NativeWindowMetrics.height * 0.05,
     },
-    torchContainer: {
-        top: 12,
-        right: 12,
+    scannerHeader: {
+        backgroundColor: '#00000080',
+        width: NativeWindowMetrics.width * 0.5,
+    },
+    qrHelpText: {
+        width: NativeWindowMetrics.width * 0.86,
+        backgroundColor: '#00000080',
     },
 });
 
