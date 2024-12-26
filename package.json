@@ -71,7 +71,6 @@
     "react-native": "v0.76.5",
     "react-native-biometrics": "^3.0.1",
     "react-native-bouncy-checkbox": "^4.1.2",
-    "react-native-camera-kit": "^14.1.0",
     "react-native-default-preference": "^1.4.4",
     "react-native-device-info": "^14.0.2",
     "react-native-document-picker": "^9.3.1",
