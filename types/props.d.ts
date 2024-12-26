@@ -55,6 +55,7 @@ export type CardProps = BaseProps & {
 
 export type WalletCardProps = CardProps & {
     balance: BigNumber;
+    withBalance: boolean;
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
