@@ -53,7 +53,6 @@ import {
 } from '../modules/bdk';
 
 import Gear from '../assets/svg/gear-24.svg';
-import Bell from '../assets/svg/bell-fill-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
 import ScanIcon from '../assets/svg/scan.svg';
 import LightningBoltIcon from '../assets/svg/zap.svg';
@@ -474,14 +473,23 @@ const Home = ({route}: Props) => {
                             ),
                             {marginTop: topPlatformOffset},
                         ]}>
-                        <PlainButton onPress={() => {}}>
-                            <Bell
-                                fill={ColorScheme.Background.Inverted}
-                                width={24}
-                                height={24}
-                                style={tailwind('-ml-1')}
-                            />
-                        </PlainButton>
+                        <View style={[
+                            tailwind('flex-row justify-center items-center rounded-full p-1 px-4'),
+                            styles.connectionStatusContainer,
+                            {borderColor: ColorScheme.Background.Secondary},
+                            ]}>
+                            <View style={[
+                                tailwind('mr-2'),
+                                styles.connectionStatus,
+                                {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
+                            ]}/>
+                            <VText style={[
+                                tailwind('text-xs font-bold'),
+                                {color: isNetOn ? 'lightgreen' : ColorScheme.Text.GrayedText},
+                            ]}>
+                                {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
+                            </VText>
+                        </View>
 
                         <PlainButton
                             onPress={() =>
@@ -507,15 +515,15 @@ const Home = ({route}: Props) => {
 
                     <View style={[tailwind('w-full h-full mt-2 items-center')]}>
                         <View
-                            style={tailwind(
-                                'justify-around items-center w-full mb-6',
-                            )}>
+                            style={[tailwind('justify-around w-full mb-6'),
+                                {marginLeft: 80}
+                            ]}>
                             {wallets.length > 0 && (
                                 <>
                                     <VText
                                         style={[
                                             tailwind(
-                                                'text-base font-medium mb-1',
+                                                'text-base font-medium mt-3 mb-1',
                                             ),
                                             {
                                                 color: isNetOn
@@ -525,9 +533,7 @@ const Home = ({route}: Props) => {
                                             },
                                             Font.RobotoText,
                                         ]}>
-                                        {!isNetOn
-                                            ? t('offline_balance')
-                                            : t('balance')}
+                                        {t('balance')}
                                     </VText>
 
                                     {!hideTotalBalance ? (
@@ -598,7 +604,15 @@ const Home = ({route}: Props) => {
 
                         {/* Quick Actions */}
                         <View
-                            style={[tailwind('flex-row w-5/6 justify-around')]}>
+                            style={[
+                                tailwind(
+                                    `flex-row ${
+                                        isLightning
+                                            ? 'w-5/6 justify-around'
+                                            : 'w-1/2 justify-center'
+                                    }`,
+                                ),
+                            ]}>
                             {isLightning && (
                                 <PlainButton
                                     onPress={navigateToBoltNFC}
@@ -641,7 +655,9 @@ const Home = ({route}: Props) => {
                                 onPress={goToScan}
                                 style={[
                                     tailwind(
-                                        'flex justify-center items-center',
+                                        `flex justify-center items-center ${
+                                            !isLightning ? 'mx-6' : ''
+                                        }`,
                                     ),
                                 ]}>
                                 <View
@@ -711,7 +727,9 @@ const Home = ({route}: Props) => {
                                 onPress={handleBackupRoute}
                                 style={[
                                     tailwind(
-                                        'flex justify-center items-center',
+                                        `flex justify-center items-center ${
+                                            !isLightning ? 'mx-6' : ''
+                                        }`,
                                     ),
                                 ]}>
                                 <View
@@ -800,6 +818,16 @@ const Home = ({route}: Props) => {
 const styles = StyleSheet.create({
     CardContainer: {
         height: 230,
+    },
+    connectionStatusContainer: {
+        paddingHorizontal: 12,
+        borderWidth: 2,
+    },
+    connectionStatus: {
+        margin: 0,
+        height: 8,
+        width: 8,
+        borderRadius: 100,
     },
 });
 
