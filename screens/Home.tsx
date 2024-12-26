@@ -94,7 +94,8 @@ const Home = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
@@ -469,17 +470,29 @@ const Home = ({route}: Props) => {
                     <View
                         style={[
                             tailwind(
-                                'w-5/6 h-10 items-center flex-row justify-between',
+                                `w-5/6 h-10 items-center justify-between ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                }`,
                             ),
                             {marginTop: topPlatformOffset},
                         ]}>
                         <View style={[
-                            tailwind('flex-row justify-center items-center rounded-full p-1 px-4'),
+                            tailwind(`${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } justify-center items-center rounded-full p-1 px-4`),
                             styles.connectionStatusContainer,
                             {borderColor: ColorScheme.Background.Secondary},
                             ]}>
                             <View style={[
-                                tailwind('mr-2'),
+                                tailwind(`${
+                                    langDir === 'right'
+                                        ? 'ml-2'
+                                        : 'mr-2'
+                                }`),
                                 styles.connectionStatus,
                                 {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
                             ]}/>
@@ -515,8 +528,12 @@ const Home = ({route}: Props) => {
 
                     <View style={[tailwind('w-full h-full mt-2 items-center')]}>
                         <View
-                            style={[tailwind('justify-around w-full mb-6'),
-                                {marginLeft: 80}
+                            style={[
+                                tailwind('justify-around w-full mb-6'),
+                                {
+                                    marginLeft: langDir === 'left' ? 80 : 0,
+                                    marginRight: langDir === 'right' ? 80 : 0,
+                                }
                             ]}>
                             {wallets.length > 0 && (
                                 <>
