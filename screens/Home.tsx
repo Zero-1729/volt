@@ -498,7 +498,7 @@ const Home = ({route}: Props) => {
                             ]}/>
                             <VText style={[
                                 tailwind('text-xs font-bold'),
-                                {color: isNetOn ? 'lightgreen' : ColorScheme.Text.GrayedText},
+                                {color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText},
                             ]}>
                                 {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
                             </VText>
