@@ -323,16 +323,8 @@ const Receive = ({route}: Props) => {
     ]);
 
     const closeScreen = useCallback(() => {
-        // Note: we route back to wallet view as edit is what gets us back to amount
-        // and back here
-        navigation.dispatch(
-            CommonActions.navigate('WalletRoot', {
-                screen: 'WalletView',
-                params: {
-                    reload: false,
-                },
-            }),
-        );
+        // Note: we route back get back to amount and back here
+        navigation.dispatch(CommonActions.goBack());
     }, [navigation]);
 
     const processLNInvoice = useCallback(async () => {
