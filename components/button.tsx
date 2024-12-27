@@ -51,7 +51,7 @@ export const LongButton = (props: ButtonProps) => {
             <View style={[tailwind('w-full self-center items-center')]}>
                 <Text
                     style={[
-                        tailwind('px-4 py-4 font-medium'),
+                        tailwind('px-4 py-4 font-bold'),
                         {
                             color: props.textColor,
                         },
