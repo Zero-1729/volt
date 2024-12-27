@@ -615,7 +615,7 @@ const Scan = ({route}: Props) => {
                     {/* Camera Scan View Container */}
                     {device && (
                         <Camera
-                            style={[styles.cameraFlexed, styles.fullSize, {backgroundColor: ColorScheme.Background.Primary}]}
+                            style={[styles.cameraFlexed, styles.fullSize]}
                             device={device}
                             isActive={true}
                             codeScanner={codeScanner}
