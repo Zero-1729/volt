@@ -131,12 +131,13 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
-    const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
 
     const isGenericScan = route.params.screen === 'home';
+
+    const device = useCameraDevice('back');
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -524,8 +525,6 @@ const Scan = ({route}: Props) => {
 
     const dynamicHeading =
         route.params.screen === 'send' ? t('qr_scan_invoice') : t('qr_scan');
-
-    const device = useCameraDevice('back');
 
     const codeScanner: CodeScanner = useCodeScanner({
         codeTypes: ['qr'],
