@@ -695,7 +695,16 @@ const Wallet = ({route}: Props) => {
                                 ]}
                                 onPress={() => {
                                     // TODO: make sure we safely go back home or called screen
-                                    navigation.goBack();
+                                    if (route.params?.reload) {
+                                        navigation.dispatch(
+                                            CommonActions.reset({
+                                                index: 0,
+                                                routes: [{name: 'HomeScreen'}],
+                                            })
+                                        );
+                                     } else {
+                                        navigation.goBack();
+                                    }
                                 }}>
                                 <Back style={tailwind('mr-2')} fill={'white'} />
                             </PlainButton>
