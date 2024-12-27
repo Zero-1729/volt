@@ -194,6 +194,7 @@ const Scan = ({route}: Props) => {
     const clearScannerAlert = useCallback(() => {
         setScannerAlertMsg('');
         setScanLock(false);
+        setQRData('');
     }, []);
 
     const updateScannerMessage = useCallback((text: string) => {
