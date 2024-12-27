@@ -1,4 +1,9 @@
-import {Platform} from 'react-native';
+import {Platform, PixelRatio} from 'react-native';
+
+// density is 160 for 1px, 240 for 1.5px, 320 for 2px, 480 for 3px, 640 for 4px
+// each density is 2 times the previous one
+const baseDesnity = 160;
+const density = PixelRatio.get();
 
 import {initialWindowMetrics} from 'react-native-safe-area-context';
 
@@ -34,4 +39,6 @@ export default {
         Platform.OS === 'ios'
             ? BottomOffset * 3 // 48
             : BottomOffset * 1.25, // -8.575 or 51.425
+    pixelDensity: density,
+    dpi: density * baseDesnity,
 } as const;
