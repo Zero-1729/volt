@@ -38,9 +38,9 @@ import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
-import Back from '../../assets/svg/arrow-left-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
 import SwapIcon from '../../assets/svg/arrow-switch-16.svg';
+import HomeIcon from '../../assets/svg/home-fill-24.svg';
 
 import {getBdkWalletBalance, createBDKWallet} from '../../modules/bdk';
 import {syncBDKWallet, fetchOnchainTransactions} from '../../modules/shared';
@@ -706,7 +706,7 @@ const Wallet = ({route}: Props) => {
                                         navigation.goBack();
                                     }
                                 }}>
-                                <Back style={tailwind('mr-2')} fill={'white'} />
+                                <HomeIcon style={tailwind('mr-2')} fill={'white'} />
                             </PlainButton>
 
                             <Text
