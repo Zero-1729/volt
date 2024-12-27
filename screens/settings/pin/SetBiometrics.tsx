@@ -56,8 +56,9 @@ const SetBiometrics = ({route}: Props) => {
     const handleRoute = () => {
         if (isWalletInitialized) {
             // Route back to PIN manager
-            // TODO: Check if from standalone settings and safely route back
-            navigation.goBack();
+            navigation.dispatch(
+                CommonActions.goBack(),
+            );
         } else {
             navigation.dispatch(
                 CommonActions.navigate('AddWalletRoot', {
@@ -144,7 +145,7 @@ const SetBiometrics = ({route}: Props) => {
     const skipAlong = () => {
         if (route.params?.standalone) {
             navigation.dispatch(
-                CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
+                CommonActions.goBack(),
             );
         } else {
             navigation.dispatch(CommonActions.navigate({name: 'DonePIN'}));
