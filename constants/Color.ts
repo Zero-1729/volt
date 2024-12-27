@@ -60,10 +60,10 @@ const Color = (currentTheme: ColorThemeType) => {
             wpkh: {bitcoin: '#800080', testnet: '#590059', accent: '#4c004c'}, // Burgundy
             p2pkh: {bitcoin: 'darkgrey', testnet: 'grey', accent: '#656565'}, // Grey
             shp2wpkh: {
-                bitcoin: '#008000',
-                testnet: '#408000',
-                accent: '#004c00',
-            }, // Green
+                bitcoin: '#313131',
+                testnet: '#252525',
+                accent: '#202020',
+            }, // Greyed
             p2tr: {bitcoin: '#004b94', testnet: '#1E90FF', accent: '#002d58'}, // Blue
             unified: {
                 bitcoin: '#0069FF',
