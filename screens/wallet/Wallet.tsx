@@ -249,14 +249,14 @@ const Wallet = ({route}: Props) => {
         // Get Fiat rate
         fetchAndUpdateFiatRate();
 
-        // fetch onchain
-        refreshWallet();
-
-        // Also call Breez if LN wallet
+        // Call Breez if LN wallet
         if (isLNWallet) {
             await getBalance();
             await fetchPayments();
         }
+
+        // fetch onchain
+        refreshWallet();
     };
 
     const handleSwap = async (swapType: SwapType) => {
