@@ -438,21 +438,7 @@ const Wallet = ({route}: Props) => {
         if (!bdkWallet) {
             setBdkWallet(w);
         }
-    }, [
-        bdkWallet,
-        currentWalletID,
-        electrumServerURL,
-        isLNWallet,
-        loadingBalance,
-        setLoadLock,
-        syncWallet,
-        t,
-        updateWalletAddress,
-        updateWalletBalance,
-        updateWalletTransactions,
-        updateWalletUTXOs,
-        walletData,
-    ]);
+    }, [bdkWallet, currentWalletID, electrumServerURL, isLNWallet, setLoadLock, syncWallet, t, updateWalletAddress, updateWalletBalance, updateWalletTransactions, updateWalletUTXOs, walletData]);
 
     const getLNSwapInfo = useCallback(async () => {
         // Note: only check if has balance
