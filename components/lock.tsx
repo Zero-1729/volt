@@ -136,14 +136,14 @@ const LockScreen = (props: lockProps) => {
                                     'h-1/2 w-full absolute top-0 items-center justify-center',
                                 ),
                             ]}>
-                            <View style={[tailwind('h-1/2 justify-center')]}>
+                            <View style={[tailwind('h-2/3')]}>
                                 <AppIcon fill={ColorScheme.SVG.Default} />
                             </View>
 
                             <View
                                 style={[
                                     tailwind(
-                                        'h-1/2 w-full justify-center items-center',
+                                        'h-2/3 w-full justify-center bottom-0 absolute items-center',
                                     ),
                                 ]}>
                                 <Text
@@ -258,7 +258,7 @@ const LockScreen = (props: lockProps) => {
                         <View
                             style={[
                                 tailwind('w-full absolute'),
-                                {bottom: NativeWindowMetrics.bottom + 32},
+                                {bottom: NativeWindowMetrics.bottom + NativeWindowMetrics.height * 0.05},
                             ]}>
                             <PinNumpad
                                 pin={pin}
