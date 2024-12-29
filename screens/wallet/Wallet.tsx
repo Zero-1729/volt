@@ -396,6 +396,8 @@ const Wallet = ({route}: Props) => {
             lightning: new BigNumber(0),
         });
 
+        // TODO: Only onchain. Make sure to allow to update to get info on new outbound (unconfirmed to newly confirmed)
+        // Check if new block has been mined and allow to update
         if (updated) {
             try {
                 const {txs, address, utxo} = await fetchOnchainTransactions(
@@ -417,6 +419,8 @@ const Wallet = ({route}: Props) => {
                     // generate new address
                     updateWalletAddress(address.index, address);
                 }
+
+                // TODO: Make sure to update wallet lastUpdated here
 
                 setLoadLock(false);
             } catch (err: any) {
