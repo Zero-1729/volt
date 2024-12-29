@@ -418,7 +418,7 @@ const Wallet = ({route}: Props) => {
                 setLoadLock(false);
             } catch (err: any) {
                 LiberalToast(capitalizeFirst(t('network')), t('error_fetching_txs'), {
-                    duration: 1750,
+                    duration: 3000,
                 });
 
                 setLoadingBalance(false);

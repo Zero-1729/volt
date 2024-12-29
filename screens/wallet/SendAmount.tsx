@@ -238,7 +238,7 @@ const SendAmount = ({route}: Props) => {
             LiberalToast(e('dust_limit_title'), `${e('dust_limit_message')} ${DUST_LIMIT} ${t(
                     'satoshi',
                 )}.`, {
-                    duration: 1750,
+                    duration: 3000,
                 });
             return;
         }
@@ -278,7 +278,7 @@ const SendAmount = ({route}: Props) => {
             );
         } else {
             LiberalToast(e('no_internet_title'), e('no_internet_message'), {
-                duration: 1750,
+                duration: 3000,
             });
             return;
         }

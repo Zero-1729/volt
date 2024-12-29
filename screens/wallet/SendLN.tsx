@@ -516,7 +516,7 @@ const SendLN = ({route}: Props) => {
                 // prompt error callback
                 error => {
                     LiberalToast(t('Biometrics'), error.message, {
-                        duration: 1750,
+                        duration: 3000,
                     });
                 },
             );
@@ -575,7 +575,7 @@ const SendLN = ({route}: Props) => {
 
                 if (amtSats > maxAmountSats) {
                     LiberalToast('LNURL Pay Error', t('amount_above_max_spendable'), {
-                        duration: 1750,
+                        duration: 3000,
                     });
                 }
 

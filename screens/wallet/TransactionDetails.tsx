@@ -143,7 +143,7 @@ const TransactionDetailsView = ({route}: Props) => {
 
         if (isConfirmedAlready) {
             LiberalToast(capitalizeFirst(t('dust_limit_title')), e('tx_already_confirmed_error'), {
-                duration: 1750,
+                duration: 3000,
             });
         }
 
@@ -160,7 +160,7 @@ const TransactionDetailsView = ({route}: Props) => {
         } else {
             // show error alert
             LiberalToast(capitalizeFirst(t('error')), e('bump_fee_error'), {
-                duration: 1750,
+                duration: 3000,
             });
 
             console.log('[Fee Bump] Could not bump fee: ', status.errorMessage);

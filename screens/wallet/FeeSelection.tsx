@@ -114,7 +114,7 @@ const FeeSelection = ({route}: Props) => {
             (err: any) => {
                 if (isAdvancedMode) {
                     LiberalToast(capitalizeFirst(t('error')), e('tx_fail_creation_error'), {
-                        duration: 1750,
+                        duration: 3000,
                     });
                 }
 
@@ -149,7 +149,7 @@ const FeeSelection = ({route}: Props) => {
         } catch (err: any) {
             // Error assumed to be 503; mempool unavailable due to sync
             LiberalToast(t('feerate'), e('failed_fee_rate_fetch'), {
-                duration: 1750,
+                duration: 3000,
             });
         }
 
@@ -169,7 +169,7 @@ const FeeSelection = ({route}: Props) => {
         // Warn user that fee rate invalid
         if (Number.isNaN(rate)) {
             LiberalToast(e('invalid_fee_rate'), e('invalid_fee_rate_message'), {
-                duration: 1750,
+                duration: 3000,
             });
 
             return;
@@ -178,7 +178,7 @@ const FeeSelection = ({route}: Props) => {
         // Avoid too high fee rate
         if (isFeeTooHigh(fee, isMaxSend)) {
             LiberalToast(capitalizeFirst(t('error')), e('fee_too_high_error'), {
-                duration: 1750,
+                duration: 3000,
             });
             return;
         }

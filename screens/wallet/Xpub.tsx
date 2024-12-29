@@ -63,7 +63,7 @@ const Xpub = () => {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(
                 err => {
                     LiberalToast(capitalizeFirst(t('error')), e('failed_to_write_file'), {
-                        duration: 1750,
+                        duration: 3000,
                     });
 
                     console.log('[Export] Failed to write file: ', err.message);
@@ -77,7 +77,7 @@ const Xpub = () => {
                 .catch(err => {
                     if (err.message !== 'User did not share') {
                         LiberalToast(capitalizeFirst(t('error')), e('failed_to_share_file'), {
-                            duration: 1750,
+                            duration: 3000,
                         });
 
                         console.log(

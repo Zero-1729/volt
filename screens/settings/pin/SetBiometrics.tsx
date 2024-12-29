@@ -92,7 +92,7 @@ const SetBiometrics = ({route}: Props) => {
                         })
                         .catch((err: any) => {
                             LiberalToast(t('Biometrics'), err.message, {
-                                duration: 1750,
+                                duration: 3000,
                             });
 
                             setDoneErrorText(err.message);
@@ -112,7 +112,7 @@ const SetBiometrics = ({route}: Props) => {
                         })
                         .catch((err: any) => {
                             LiberalToast(t('Biometrics'), err.message, {
-                                duration: 1750,
+                                duration: 3000,
                             });
 
                             setDoneErrorText(err.message);
@@ -121,7 +121,7 @@ const SetBiometrics = ({route}: Props) => {
             }
         } catch (err: any) {
             LiberalToast(t('Biometrics'), err.message, {
-                duration: 1750,
+                duration: 3000,
             });
 
             setDoneErrorText(err.message);

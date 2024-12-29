@@ -178,7 +178,7 @@ const SendView = ({route}: Props) => {
                 // prompt error callback
                 error => {
                     LiberalToast(t('Biometrics'), error.message, {
-                        duration: 1750,
+                        duration: 3000,
                     });
                 },
             );
@@ -220,7 +220,7 @@ const SendView = ({route}: Props) => {
 
         if (walletBalanceLN < bolt11AmountSats) {
             LiberalToast(capitalizeFirst(t('error')), t('ln_insufficient_funds'), {
-                duration: 1750,
+                duration: 3000,
             });
 
             setLoading(false);

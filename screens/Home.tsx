@@ -161,7 +161,7 @@ const Home = ({route}: Props) => {
                 // prompt error callback
                 error => {
                     LiberalToast(t('Biometrics'), error.message, {
-                        duration: 1750,
+                        duration: 3000,
                     });
                 },
             );
@@ -231,7 +231,7 @@ const Home = ({route}: Props) => {
             (status: boolean) => {
                 if (process.env.NODE_ENV === 'development' && !status) {
                     LiberalToast(t('BDK'), t('Failed to sync'), {
-                        duration: 1750,
+                        duration: 3000,
                     });
                 }
             },

@@ -205,7 +205,7 @@ const Scan = ({route}: Props) => {
     useEffect(() => {
         if (scannerAlertMsg) {
             runOnJS(LiberalToast)(capitalizeFirst(t('scanner')),scannerAlertMsg, {
-                duration: 2500,
+                duration: 3000,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

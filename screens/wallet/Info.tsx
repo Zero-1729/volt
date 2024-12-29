@@ -148,7 +148,7 @@ const Info = () => {
                     // prompt error callback
                     error => {
                         LiberalToast(t('Biometrics'), error.message, {
-                            duration: 1750,
+                            duration: 3000,
                         });
                     },
                 );
@@ -208,7 +208,7 @@ const Info = () => {
         // Avoid deletion while loading
         if (loadLock) {
             LiberalToast(capitalizeFirst(t('notice')), t('wait_for_wallet_to_load_error'), {
-                duration: 1750,
+                duration: 3000,
             });
             return;
         }

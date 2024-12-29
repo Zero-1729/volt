@@ -186,7 +186,7 @@ const PayInvoice = ({route}: Props) => {
                     invoiceType.type === 'lightning'
                 ) {
                     LiberalToast(capitalizeFirst(t('error')), e('unsupported_invoice_type'), {
-                        duration: 1750,
+                        duration: 3000,
                     });
 
                     navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -202,7 +202,7 @@ const PayInvoice = ({route}: Props) => {
                 );
             } else {
                 LiberalToast(capitalizeFirst(t('error')), e('invalid_invoice_error'), {
-                    duration: 1750,
+                    duration: 3000,
                 });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -219,7 +219,7 @@ const PayInvoice = ({route}: Props) => {
         const _netInfo = await netInfo.fetch();
         if (!checkNetworkIsReachable(_netInfo)) {
             LiberalToast(capitalizeFirst(t('error')), e('no_internet_message'), {
-                duration: 1750,
+                duration: 3000,
             });
             return;
         }

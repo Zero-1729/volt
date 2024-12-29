@@ -95,7 +95,7 @@ const ImportAction = ({route}: Props) => {
 
                 if (lines > 1) {
                     LiberalToast(capitalizeFirst(t('error')), e('import_support_error'), {
-                        duration: 1750,
+                        duration: 3000,
                     });
                     return;
                 }
@@ -186,7 +186,7 @@ const ImportAction = ({route}: Props) => {
         } catch {
             // Let user know the mnemonic is valid
             LiberalToast(capitalizeFirst(t('mnemonic')), e('mnemonic_invalid_error'), {
-                duration: 1750,
+                duration: 3000,
             });
             return;
         }
@@ -212,7 +212,7 @@ const ImportAction = ({route}: Props) => {
         try {
             if (!isDescriptorPattern(descriptor)) {
                 LiberalToast(capitalizeFirst(t('descriptor')), e('descriptor_valid_error'), {
-                    duration: 1750,
+                    duration: 3000,
                 });
 
                 return;
@@ -320,7 +320,7 @@ const ImportAction = ({route}: Props) => {
             // Check if ext key is supported
             if (!isSupportedExtKey(material)) {
                 LiberalToast(capitalizeFirst(t('extended_key')), e('unsupported_ext_key_error'), {
-                    duration: 1750,
+                    duration: 3000,
                 });
                 return;
             }
@@ -343,7 +343,7 @@ const ImportAction = ({route}: Props) => {
         }
 
         LiberalToast(capitalizeFirst(t('import')), e('import_material_error'), {
-            duration: 1750,
+            duration: 3000,
         });
     };
 
