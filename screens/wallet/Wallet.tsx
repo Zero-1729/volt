@@ -704,7 +704,6 @@ const Wallet = ({route}: Props) => {
                                     tailwind('items-center flex-row left-6'),
                                 ]}
                                 onPress={() => {
-                                    // TODO: make sure we safely go back home or called screen
                                     if (route.params?.reload) {
                                         navigation.dispatch(
                                             CommonActions.reset({
