@@ -22,7 +22,6 @@ import Color from '../../constants/Color';
 import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {WalletTypeDetails} from '../../modules/wallet-defaults';
 
 import CloseIcon from '../../assets/svg/x-24.svg';
 import ShareIcon from '../../assets/svg/share-24.svg';
@@ -38,7 +37,7 @@ const Xpub = () => {
     const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
-    const {currentWalletID, getWalletData, isAdvancedMode} =
+    const {currentWalletID, getWalletData} =
         useContext(AppStorageContext);
 
     const {t} = useTranslation('wallet');
@@ -46,10 +45,6 @@ const Xpub = () => {
 
     const walletData = getWalletData(currentWalletID);
     const backupData = useMemo(() => walletData.xpub, [walletData.xpub]);
-
-    const walletType = WalletTypeDetails[walletData.type];
-    const walletTypeName =
-        walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
 
     // Write public descriptor file to device
     const writeDescriptorToFile = async () => {
