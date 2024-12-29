@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import {
     Text,
@@ -54,6 +54,7 @@ import {LiberalToast} from '../components/toast';
 import TorchIcon from '../assets/svg/light-bulb-24.svg';
 
 import {Camera, useCameraDevice, useCodeScanner, CodeScanner, Code} from 'react-native-vision-camera';
+import { AppStorageContext } from '../class/storageContext';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -138,6 +139,12 @@ const Scan = ({route}: Props) => {
     const isGenericScan = route.params.screen === 'home';
 
     const device = useCameraDevice('back');
+
+    const {currentWalletID,
+            getWalletData,
+        } = useContext(AppStorageContext);
+
+    const walletData = getWalletData(currentWalletID);
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -224,6 +231,8 @@ const Scan = ({route}: Props) => {
             isOnchain: boolean | null;
             error: boolean;
         }) => {
+            // Note: Check and report if broke, according to wallet and invoice type
+            // I.e. do not go through if LN broke and LN invoice, etc.
             if (!decodedQRState.error) {
                 // To highlight the successful scan, we'll trigger a success haptic
                 RNHapticFeedback.trigger(
@@ -233,6 +242,11 @@ const Scan = ({route}: Props) => {
 
                 // If Onchain
                 if (decodedQRState.isOnchain) {
+                    if (walletData.balance.onchain.isZero()) {
+                        updateScannerMessage(e('insufficient_funds'));
+                        return;
+                    }
+
                     const amount = decodedQRState.decodedInvoice.options.amount;
 
                     if (amount) {
@@ -264,6 +278,11 @@ const Scan = ({route}: Props) => {
                         );
                     }
                 } else {
+                    if (walletData.balance.lightning.isZero()) {
+                        updateScannerMessage(e('insufficient_funds'));
+                        return;
+                    }
+
                     const LNinvoice = decodedQRState.decodedInvoice;
 
                     const isBolt11 = !!LNinvoice?.bolt11;
