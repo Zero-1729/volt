@@ -727,7 +727,7 @@ const RootNavigator = (): ReactElement => {
             if (event.type === BreezEventVariant.BACKUP_STARTED) {
                 if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                     LiberalToast(t('Breez SDK'), t('breez_backup_started'), {
-                        duration: 1750,
+                        duration: 3000,
                     });
                 }
             }
@@ -745,7 +745,7 @@ const RootNavigator = (): ReactElement => {
                 console.log('[Breez SDK] Backup Failed: ', event.details);
 
                 LiberalToast(t('Breez SDK'), t('breez_backup_failed'), {
-                    duration: 1750,
+                    duration: 3000,
                 });
             }
 
