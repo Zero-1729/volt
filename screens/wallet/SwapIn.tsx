@@ -187,6 +187,8 @@ const SwapIn = ({route}: Props) => {
                 internalDescriptor: descriptors.internal,
             };
 
+            // TODO: tag this outgoing tx as a swap (SwapIn)
+            // So we show in wallet list of tx that this is a swap in progress
             // We expect a signed PSBT to be passed in
             const {broadcasted, psbt, errorMessage} = await SingleBDKSend(
                 (_uPsbt as PartiallySignedTransaction).base64,
