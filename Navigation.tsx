@@ -136,7 +136,6 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 
 import netInfo from '@react-native-community/netinfo';
-import NativeWindowMetrics from './constants/NativeWindowMetrics';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
