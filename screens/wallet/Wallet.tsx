@@ -455,6 +455,11 @@ const Wallet = ({route}: Props) => {
     ]);
 
     const getLNSwapInfo = useCallback(async () => {
+        // Note: only check if has balance
+        if (walletData.balance.lightning.isZero()) {
+            return;
+        }
+
         const _netInfo = await netInfo.fetch();
         if (!checkNetworkIsReachable(_netInfo)) {
             return;
@@ -505,9 +510,14 @@ const Wallet = ({route}: Props) => {
                 setLoadingSwapOutInfo(false);
                 setUpdatedLNBalance(false);
             });
-    }, []);
+    }, [walletData.balance.lightning]);
 
     const getOnchainSwapInfo = useCallback(async () => {
+        // Note: only check if has balance
+        if (walletData.balance.onchain.isZero()) {
+            return;
+        }
+
         const _netInfo = await netInfo.fetch();
         if (!checkNetworkIsReachable(_netInfo)) {
             return;
@@ -549,7 +559,7 @@ const Wallet = ({route}: Props) => {
                 setLoadingSwapInInfo(false);
                 setUpdatedOBalance(false);
             });
-    }, [swapOutRetryCount]);
+    }, [swapOutRetryCount, walletData.balance.onchain]);
 
     // Check if wallet balance is empty
     const isWalletBroke = (balance: TBalance) => {
