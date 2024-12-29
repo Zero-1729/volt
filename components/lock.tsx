@@ -90,7 +90,7 @@ const LockScreen = (props: lockProps) => {
             })
             .catch((error: any) => {
                 LiberalToast(t('Biometrics'), error.message, {
-                    duration: 1750,
+                    duration: 3000,
                 });
             });
     };

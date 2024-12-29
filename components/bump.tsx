@@ -157,7 +157,7 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
             LiberalToast(capitalizeFirst(t('error')), capitalizeFirst(
                 `${e('fee_rate_too_low')} ${oldTxFeeRate} ${t('satoshi')}`,
             ), {
-                duration: 1750,
+                duration: 3000,
             });
             return;
         }

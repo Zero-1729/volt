@@ -74,7 +74,7 @@ const PinPass = (props: PinPassProps) => {
             // prompt error callback
             error => {
                 LiberalToast(t('Biometrics'), error.message, {
-                    duration: 1750,
+                    duration: 3000,
                 });
             },
         );
