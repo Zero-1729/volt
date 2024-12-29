@@ -477,9 +477,10 @@ const SendView = ({route}: Props) => {
                         )}
                         <PlainButton
                             onPress={() =>
-                                navigation.dispatch(
-                                    CommonActions.navigate('HomeScreen'),
-                                )
+                                navigation.dispatch(CommonActions.reset({
+                                    index: 0,
+                                    routes: [{name: 'HomeScreen'}],
+                                }))
                             }
                             style={[tailwind('absolute z-10 left-6')]}>
                             <Close fill={ColorScheme.SVG.Default} />
