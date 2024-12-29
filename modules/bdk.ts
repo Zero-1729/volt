@@ -425,9 +425,8 @@ export const getBdkWalletBalance = async (
 
     // Update balance amount (in sats)
     // only update if unconfirmed received or sent balance
-    if (
-        (retrievedBalance.untrustedPending !== 0 &&
-            retrievedBalance.trustedPending !== 0) ||
+    if (retrievedBalance.untrustedPending !== 0 ||
+        retrievedBalance.trustedPending !== 0 ||
         !balance.eq(oldBalance)
     ) {
         // Receive balance in sats as string
