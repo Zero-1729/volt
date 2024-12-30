@@ -192,5 +192,6 @@
     "payment_to_self_detected": "This invoice was generated from this wallet, cannot pay to self",
     "already_paid_ln_invoice": "This invoice has already been paid",
     "swap_in_progress": "Detected a Swap In in progress",
-    "not_connected_to_breez_services": "Not connected to Lightning services"
+    "not_connected_to_breez_services": "Not connected to Lightning services",
+    "no_lnurl_data_found": "No LNURL data found"
 }
