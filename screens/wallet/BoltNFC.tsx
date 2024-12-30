@@ -252,6 +252,11 @@ const BoltNFC = ({route}: Props) => {
             // the resolved tag object will contain `ndefMessage` property
             const tag = await NFCManager.getTag();
 
+            // Note: need to close the OS reader anim manually once read
+            if (Platform.OS === 'ios') {
+                NFCManager.cancelTechnologyRequest();
+            }
+
             if (tag !== null) {
                 setStatusMessage(t('processing_nfc_tag'));
                 const tagData = extractNFCTagData(tag);
