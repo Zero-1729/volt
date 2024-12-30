@@ -677,24 +677,29 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%',
     },
-    cameraFlexed: {
-        height: '100%',
-        width: '100%',
+    cameraContainer: {
+        height: 400,
+        width: '90%',
         flex: 1,
+        overflow: 'hidden',
+        borderRadius: 16,
     },
     opaqueBG: {
         backgroundColor: '#00000080',
+    },
+    cameraFlexed: {
+        borderRadius: 16,
+        borderWidth: 3,
+        borderColor: 'white',
     },
     headerContent: {
         top: NativeWindowMetrics.height * 0.05,
     },
     scannerHeader: {
-        backgroundColor: '#00000080',
         width: NativeWindowMetrics.width * 0.5,
     },
     qrHelpText: {
         width: NativeWindowMetrics.width * 0.86,
-        backgroundColor: '#00000080',
     },
 });
 
