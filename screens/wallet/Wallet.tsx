@@ -583,39 +583,17 @@ const Wallet = ({route}: Props) => {
         );
     }, [navigation]);
 
-    const handleBackPress = useCallback(() => {
-        if (route.params?.reload) {
-            navigation.dispatch(
-                CommonActions.navigate({
-                    name: 'HomeScreen',
-                }),
-            );
-            return true;
-        } else {
-            navigation.dispatch(CommonActions.goBack());
-            return true;
-        }
-    }, [navigation, route.params?.reload]);
-
     useEffect(() => {
         if (isLNWallet) {
             getLNSwapInfo();
             getOnchainSwapInfo();
         }
 
-        // Handle back behavior
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            handleBackPress,
-        );
-
         // Kill all loading effects
         () => {
             setRefreshing(false);
             setLoadingBalance(false);
             setLoadLock(false);
-
-            backHandler.remove();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
