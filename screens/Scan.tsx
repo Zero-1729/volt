@@ -132,6 +132,7 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
+    const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
