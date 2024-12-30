@@ -23,6 +23,7 @@ import {
     receiveOnchain,
     onchainPaymentLimits,
     OnchainPaymentLimitsResponse,
+    BreezEventVariant,
 } from '@breeztech/react-native-breez-sdk';
 
 import BDK from 'bdk-rn';
@@ -124,6 +125,8 @@ const Wallet = ({route}: Props) => {
         setCachedRates,
         rates,
         setAppFiatCurrency,
+        breezEvent,
+        setBreezEvent,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
@@ -637,8 +640,11 @@ const Wallet = ({route}: Props) => {
     useEffect(() => {
         // Attempt to sync balance when reload triggered
         // E.g. from completed transaction
-        if (route.params?.reload) {
+        if (route.params?.reload || breezEvent.type === BreezEventVariant.INVOICE_PAID) {
             jointSync();
+
+            // reset Breez event
+            setBreezEvent({} as BreezEventVariant);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route.params?.reload]);
