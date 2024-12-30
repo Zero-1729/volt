@@ -132,6 +132,7 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const tailwind = useTailwind();
     const navigation = useNavigation();
+    const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -561,14 +562,15 @@ const Scan = ({route}: Props) => {
     // Display Camera view if camera available
     return (
         <SafeAreaView
-            style={[styles.flexed, tailwind('bg-black')]}
+            style={[styles.flexed]}
             edges={['top', 'bottom', 'left', 'right']}>
             {grantedPermission === Status.AUTHORIZED && (
                 <View
                     style={[
                         tailwind(
-                            'items-center justify-center h-full w-full bg-black',
+                            'items-center justify-center h-full w-full',
                         ),
+                        {backgroundColor: ColorScheme.Background.Primary},
                         styles.flexed,
                     ]}>
                     <View
@@ -584,12 +586,6 @@ const Scan = ({route}: Props) => {
                                     'flex-row w-full items-center justify-center',
                                 ),
                             ]}>
-                            <PlainButton
-                                onPress={closeScreen}
-                                style={[tailwind('absolute z-10 left-6 rounded-full p-3'), styles.opaqueBG]}>
-                                <Close fill={'white'} />
-                            </PlainButton>
-
                             {/* Screen header */}
                             <View style={[
                                 tailwind('items-center rounded-full p-3'),
@@ -597,19 +593,39 @@ const Scan = ({route}: Props) => {
                             ]}>
                                 <Text
                                     style={[
-                                        tailwind('text-sm font-bold text-white'),
+                                        tailwind('text-sm font-bold'),
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     {dynamicHeading}
                                 </Text>
                             </View>
+                        </View>
 
-                            {/* Flash Button */}
-                            <PlainButton
+                        <View style={[tailwind('mt-4 p-3 rounded-full'), styles.qrHelpText]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm text-center'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {!isGenericScan ? t('scan_message_generic') : t('scan_message')}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={[tailwind('absolute items-center'), styles.cameraContainer]}>
+                        <PlainButton
+                                onPress={closeScreen}
+                                style={[tailwind('absolute z-10 top-6 left-6 rounded-full p-3'), styles.opaqueBG]}>
+                                <Close fill={'white'} />
+                            </PlainButton>
+
+                        {/* Flash Button */}
+                        <PlainButton
                                 onPress={() => {
                                     setFlashOn(!flashOn);
                                 }}
                                 style={[
-                                    tailwind('absolute z-10 right-6 rounded-full p-3'),
+                                    tailwind('absolute z-10 top-6 right-6 rounded-full p-3'),
                                     // eslint-disable-next-line react-native/no-inline-styles
                                     {
                                         backgroundColor: !flashOn ? '#00000080' : '#FFFFFFFF',
@@ -619,35 +635,30 @@ const Scan = ({route}: Props) => {
                                         fill={!flashOn ? 'white' : 'black'}
                                     />
                             </PlainButton>
-                        </View>
 
-                        <View style={[tailwind('mt-4 p-3 rounded-full'), styles.qrHelpText]}>
-                            <Text
+                        {/* Camera Scan View Container */}
+                        {device && (
+                            <Camera
                                 style={[
-                                    tailwind('text-sm text-center text-white'),
-                                ]}>
-                                {!isGenericScan ? t('scan_message_generic') : t('scan_message')}
-                            </Text>
-                        </View>
+                                    tailwind('w-full h-full'),
+                                    {backgroundColor: ColorScheme.Background.Primary},
+                                    styles.cameraFlexed,
+                                ]}
+                                device={device}
+                                isActive={true}
+                                codeScanner={codeScanner}
+                                onError={onError}
+                                torch={flashOn ? 'on' : 'off'}
+                                resizeMode={'cover'}
+                            />
+                        )}
                     </View>
-
-                    {/* Camera Scan View Container */}
-                    {device && (
-                        <Camera
-                            style={[styles.cameraFlexed, styles.fullSize]}
-                            device={device}
-                            isActive={true}
-                            codeScanner={codeScanner}
-                            onError={onError}
-                            torch={flashOn ? 'on' : 'off'}
-                        />
-                    )}
 
                     <LongBottomButton
                         onPress={handleClipboard}
                         title={capitalizeFirst(t('paste'))}
-                        textColor={'black'}
-                        backgroundColor={'white'}
+                        textColor={ColorScheme.Text.Alt}
+                        backgroundColor={ColorScheme.Background.Inverted}
                     />
                 </View>
             )}
@@ -675,24 +686,29 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%',
     },
-    cameraFlexed: {
-        height: '100%',
-        width: '100%',
+    cameraContainer: {
+        height: 400,
+        width: '90%',
         flex: 1,
+        overflow: 'hidden',
+        borderRadius: 16,
     },
     opaqueBG: {
         backgroundColor: '#00000080',
+    },
+    cameraFlexed: {
+        borderRadius: 16,
+        borderWidth: 3,
+        borderColor: 'white',
     },
     headerContent: {
         top: NativeWindowMetrics.height * 0.05,
     },
     scannerHeader: {
-        backgroundColor: '#00000080',
         width: NativeWindowMetrics.width * 0.5,
     },
     qrHelpText: {
         width: NativeWindowMetrics.width * 0.86,
-        backgroundColor: '#00000080',
     },
 });
 
