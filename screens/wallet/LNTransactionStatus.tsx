@@ -96,9 +96,11 @@ const LNTransactionStatus = ({route}: Props) => {
 
         switch (route.params.detailsType) {
             case EBreezDetails.Received:
-                amount =
+                // Note: handle both forced and normal payments
+                const amt = (route.params.details as Payment).amountMsat / 1_000;
+                amount = ((route.params.details as InvoicePaidDetails)?.payment ?
                     ((route.params.details as InvoicePaidDetails).payment
-                        ?.amountMsat as number) / 1_000;
+                        ?.amountMsat as number) : amt) / 1_000;
                 break;
             case EBreezDetails.Success:
                 amount = (route.params.details as Payment).amountMsat / 1_000;
