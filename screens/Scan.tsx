@@ -350,7 +350,7 @@ const Scan = ({route}: Props) => {
                 }
             }
         },
-        [e, navigation.dispatch, route.params.wallet, t, updateScannerMessage],
+        [e, navigation.dispatch, route.params.wallet, t, updateScannerMessage, walletData.balance.lightning, walletData.balance.onchain],
     );
 
     const handleInvoice = useCallback(
