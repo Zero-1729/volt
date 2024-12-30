@@ -586,12 +586,6 @@ const Scan = ({route}: Props) => {
                                     'flex-row w-full items-center justify-center',
                                 ),
                             ]}>
-                            <PlainButton
-                                onPress={closeScreen}
-                                style={[tailwind('absolute z-10 left-6 rounded-full p-3'), styles.opaqueBG]}>
-                                <Close fill={'white'} />
-                            </PlainButton>
-
                             {/* Screen header */}
                             <View style={[
                                 tailwind('items-center rounded-full p-3'),
@@ -599,19 +593,39 @@ const Scan = ({route}: Props) => {
                             ]}>
                                 <Text
                                     style={[
-                                        tailwind('text-sm font-bold text-white'),
+                                        tailwind('text-sm font-bold'),
+                                        {color: ColorScheme.Text.Default},
                                     ]}>
                                     {dynamicHeading}
                                 </Text>
                             </View>
+                        </View>
 
-                            {/* Flash Button */}
-                            <PlainButton
+                        <View style={[tailwind('mt-4 p-3 rounded-full'), styles.qrHelpText]}>
+                            <Text
+                                style={[
+                                    tailwind('text-sm text-center'),
+                                    {color: ColorScheme.Text.DescText},
+                                ]}>
+                                {!isGenericScan ? t('scan_message_generic') : t('scan_message')}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={[tailwind('absolute items-center'), styles.cameraContainer]}>
+                        <PlainButton
+                                onPress={closeScreen}
+                                style={[tailwind('absolute z-10 top-6 left-6 rounded-full p-3'), styles.opaqueBG]}>
+                                <Close fill={'white'} />
+                            </PlainButton>
+
+                        {/* Flash Button */}
+                        <PlainButton
                                 onPress={() => {
                                     setFlashOn(!flashOn);
                                 }}
                                 style={[
-                                    tailwind('absolute z-10 right-6 rounded-full p-3'),
+                                    tailwind('absolute z-10 top-6 right-6 rounded-full p-3'),
                                     // eslint-disable-next-line react-native/no-inline-styles
                                     {
                                         backgroundColor: !flashOn ? '#00000080' : '#FFFFFFFF',
@@ -621,35 +635,30 @@ const Scan = ({route}: Props) => {
                                         fill={!flashOn ? 'white' : 'black'}
                                     />
                             </PlainButton>
-                        </View>
 
-                        <View style={[tailwind('mt-4 p-3 rounded-full'), styles.qrHelpText]}>
-                            <Text
+                        {/* Camera Scan View Container */}
+                        {device && (
+                            <Camera
                                 style={[
-                                    tailwind('text-sm text-center text-white'),
-                                ]}>
-                                {!isGenericScan ? t('scan_message_generic') : t('scan_message')}
-                            </Text>
-                        </View>
+                                    tailwind('w-full h-full'),
+                                    {backgroundColor: ColorScheme.Background.Primary},
+                                    styles.cameraFlexed,
+                                ]}
+                                device={device}
+                                isActive={true}
+                                codeScanner={codeScanner}
+                                onError={onError}
+                                torch={flashOn ? 'on' : 'off'}
+                                resizeMode={'cover'}
+                            />
+                        )}
                     </View>
-
-                    {/* Camera Scan View Container */}
-                    {device && (
-                        <Camera
-                            style={[styles.cameraFlexed, styles.fullSize]}
-                            device={device}
-                            isActive={true}
-                            codeScanner={codeScanner}
-                            onError={onError}
-                            torch={flashOn ? 'on' : 'off'}
-                        />
-                    )}
 
                     <LongBottomButton
                         onPress={handleClipboard}
                         title={capitalizeFirst(t('paste'))}
-                        textColor={'black'}
-                        backgroundColor={'white'}
+                        textColor={ColorScheme.Text.Alt}
+                        backgroundColor={ColorScheme.Background.Inverted}
                     />
                 </View>
             )}
