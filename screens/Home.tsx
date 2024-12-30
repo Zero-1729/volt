@@ -410,7 +410,7 @@ const Home = ({route}: Props) => {
 
         if (
             isWalletInitialized &&
-            !checkNetworkIsReachable(_netInfo) &&
+            checkNetworkIsReachable(_netInfo) &&
             wallet.type !== 'unified'
         ) {
             jointSync();
