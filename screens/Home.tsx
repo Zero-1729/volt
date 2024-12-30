@@ -55,6 +55,7 @@ import {
 import Gear from '../assets/svg/gear-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
 import ScanIcon from '../assets/svg/scan.svg';
+import LightningBoltIcon from '../assets/svg/zap.svg';
 import AddressIcon from '../assets/svg/mention-24.svg';
 import BackupIcon from '../assets/svg/backup.svg';
 
@@ -476,30 +477,38 @@ const Home = ({route}: Props) => {
                             ),
                             {marginTop: topPlatformOffset},
                         ]}>
-                        <View style={[
-                            tailwind(`${
+                        <View style={[tailwind(`${
                                 langDir === 'right'
                                     ? 'flex-row-reverse'
                                     : 'flex-row'
-                            } justify-center items-center rounded-full p-1 px-4`),
-                            styles.connectionStatusContainer,
-                            {borderColor: ColorScheme.Background.Secondary},
-                            ]}>
+                            } justify-center items-center`)]}>
                             <View style={[
                                 tailwind(`${
                                     langDir === 'right'
-                                        ? 'ml-2'
-                                        : 'mr-2'
-                                }`),
-                                styles.connectionStatus,
-                                {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
-                            ]}/>
-                            <VText style={[
-                                tailwind('text-xs font-bold'),
-                                {color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText},
-                            ]}>
-                                {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
-                            </VText>
+                                        ? 'flex-row-reverse ml-1'
+                                        : 'flex-row mr-1'
+                                } rounded-full p-1 px-4 items-center justify-center flex-row`),
+                                styles.connectionStatusBorder,
+                                {borderColor: ColorScheme.Background.Secondary},
+                                ]}>
+                                <View style={[
+                                    tailwind(`${
+                                        langDir === 'right'
+                                            ? 'ml-2'
+                                            : 'mr-2'
+                                    }`),
+                                    styles.connectionStatus,
+                                    {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
+                                ]}/>
+                                <VText style={[
+                                    tailwind('text-xs font-bold'),
+                                    {color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText},
+                                ]}>
+                                    {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
+                                </VText>
+                            </View>
+
+                            <LightningBoltIcon width={18} height={18} fill={ColorScheme.SVG.GrayFill} />
                         </View>
 
                         <PlainButton
@@ -531,7 +540,7 @@ const Home = ({route}: Props) => {
                                 {
                                     marginLeft: langDir === 'left' ? 80 : 0,
                                     marginRight: langDir === 'right' ? 80 : 0,
-                                }
+                                },
                             ]}>
                             {wallets.length > 0 && (
                                 <>
@@ -838,7 +847,7 @@ const styles = StyleSheet.create({
     CardContainer: {
         height: 230,
     },
-    connectionStatusContainer: {
+    connectionStatusBorder: {
         paddingHorizontal: 12,
         borderWidth: 2,
     },
