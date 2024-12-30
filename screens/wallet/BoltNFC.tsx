@@ -59,7 +59,7 @@ const BoltNFC = ({route}: Props) => {
     const tailwind = useTailwind();
     const {t} = useTranslation('wallet');
 
-    const {breezEvent} = useContext(AppStorageContext);
+    const {breezEvent, setBreezEvent} = useContext(AppStorageContext);
 
     const navigation = useNavigation();
     const amountMsat = useMemo(
@@ -172,6 +172,9 @@ const BoltNFC = ({route}: Props) => {
                     ) {
                         setStatusMessage(t('lnurl_withdrawal_success'));
                         setLoading(false);
+
+                        // Note: manual trigger breez event given success
+                        setBreezEvent({type: BreezEventVariant.INVOICE_PAID, details: lnUrlWithdrawResult.data.invoice});
                     } else {
                         setStatusMessage(
                             t('lnurl_withdrawal_failed', {
@@ -186,7 +189,7 @@ const BoltNFC = ({route}: Props) => {
                 setLoading(false);
             }
         },
-        [amountMsat, amountSats, description, t],
+        [amountMsat, amountSats, description, setBreezEvent, t],
     );
 
     const cancelScanRequest = useCallback(() => {
