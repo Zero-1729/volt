@@ -123,6 +123,7 @@ const Home = ({route}: Props) => {
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
+    const [breezConnected, setBreezConnected] = useState(true);
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
@@ -407,6 +408,18 @@ const Home = ({route}: Props) => {
     const initWalletSync = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
 
+        // TODO: trigger Breez load here instead, watch then fire?
+        // Check and show Breez status
+        try {
+            const _nodeInfo = await nodeInfo();
+            if (_nodeInfo?.id) {
+                setBreezConnected(true);
+            }
+        } catch (error: any) {
+            setBreezConnected(false);
+        }
+
+        // Only load BTC only wallet on route
         if (
             isWalletInitialized &&
             checkNetworkIsReachable(_netInfo) &&
@@ -508,7 +521,7 @@ const Home = ({route}: Props) => {
                                 </VText>
                             </View>
 
-                            <LightningBoltIcon width={18} height={18} fill={ColorScheme.SVG.GrayFill} />
+                            <LightningBoltIcon width={18} height={18} fill={breezConnected ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />
                         </View>
 
                         <PlainButton
