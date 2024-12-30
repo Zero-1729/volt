@@ -562,14 +562,15 @@ const Scan = ({route}: Props) => {
     // Display Camera view if camera available
     return (
         <SafeAreaView
-            style={[styles.flexed, tailwind('bg-black')]}
+            style={[styles.flexed]}
             edges={['top', 'bottom', 'left', 'right']}>
             {grantedPermission === Status.AUTHORIZED && (
                 <View
                     style={[
                         tailwind(
-                            'items-center justify-center h-full w-full bg-black',
+                            'items-center justify-center h-full w-full',
                         ),
+                        {backgroundColor: ColorScheme.Background.Primary},
                         styles.flexed,
                     ]}>
                     <View
