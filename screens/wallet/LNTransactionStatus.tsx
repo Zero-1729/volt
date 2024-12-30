@@ -36,7 +36,6 @@ import {
     Payment,
     InvoicePaidDetails,
     PaymentFailedData,
-    BreezEvent,
 } from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from './../../types/enums';
 
@@ -57,7 +56,7 @@ const LNTransactionStatus = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {breezEvent, setBreezEvent, isAdvancedMode} =
+    const {isAdvancedMode} =
         useContext(AppStorageContext);
 
     const {height, width} = Dimensions.get('window');
@@ -145,11 +144,6 @@ const LNTransactionStatus = ({route}: Props) => {
 
         return () => {
             appStateSubscription.remove();
-
-            // Clear the breez event
-            if (breezEvent) {
-                setBreezEvent({} as BreezEvent);
-            }
         };
     }, []);
 
@@ -302,16 +296,15 @@ const LNTransactionStatus = ({route}: Props) => {
                         ]}>
                         <LongBottomButton
                             onPress={() => {
-                                setBreezEvent({} as BreezEvent);
-
-                                navigation.dispatch(
-                                    CommonActions.navigate('WalletRoot', {
-                                        screen: 'WalletView',
-                                        params: {
+                                navigation.dispatch(CommonActions.reset({
+                                    index: 1,
+                                    routes: [
+                                        {name: 'HomeScreen'},
+                                        {name: 'WalletRoot', params: {
                                             reload: route.params.status,
                                         },
-                                    }),
-                                );
+                                    }],
+                                }));
                             }}
                             title={capitalizeFirst(t('continue'))}
                             textColor={ColorScheme.Text.Alt}
