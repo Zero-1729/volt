@@ -67,7 +67,7 @@ import {WalletCard} from '../components/shared';
 import {BaseWallet} from '../class/wallet/base';
 import {TBalance, TTransaction} from '../types/wallet';
 
-import {Balance, FiatBalance} from '../components/balance';
+import {Balance} from '../components/balance';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 
