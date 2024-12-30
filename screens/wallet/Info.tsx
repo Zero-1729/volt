@@ -314,7 +314,7 @@ const Info = () => {
                                         tailwind('text-sm mb-2 mr-1 w-full'),
                                         {color: 'white'},
                                     ]}>
-                                    {t('name')}
+                                    {capitalizeFirst(t('edit')) + ' ' + t('name')}
                                 </VText>
                             </View>
                             <View
