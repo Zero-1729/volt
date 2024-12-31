@@ -540,6 +540,22 @@ const RootNavigator = (): ReactElement => {
         // Only check if clippy content exists, supported invoice type, & not in BoltNFC screen (scan trigger)
         const currentRoute = navigationRef.current?.getCurrentRoute();
         // If clipboard has contents, display dialog
+        if (clipboardResult.hasContents && clipboardResult.invoiceType !== 'unsupported' && currentRoute?.name !== 'BoltNFC' && currentRoute?.name !== 'WithdrawLNURL' && clipboardResult.spec?.toLowerCase() === 'lnurl') {
+            actionAlert(
+                capitalizeFirst(t('clipboard')),
+                clipboardMessage,
+                capitalizeFirst(t('withdraw')),
+                capitalizeFirst(t('cancel')),
+                () => {
+                    rootNavigation.navigate('WithdrawLNURL', {
+                        lnurl: clipboardResult.content,
+                    });
+                },
+            );
+
+            return;
+        }
+
         if (
             clipboardResult.hasContents &&
             clipboardResult.invoiceType !== 'unsupported' &&
