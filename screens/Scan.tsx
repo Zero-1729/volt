@@ -416,11 +416,11 @@ const Scan = ({route}: Props) => {
             }
 
             // LNURL (Pay)
-            if (invoiceType.spec === 'lnurlp' && isLNAddress(invoiceType.invoice)) {
-                // LN Address
+            if (invoiceType.spec === 'lnurlp') {
+                // LN Address or LNURLp URI
                 return {
                         decodedInvoice: invoiceType.invoice,
-                        spec: invoiceType.spec,
+                        spec: invoiceType.spec as string,
                         isOnchain: false,
                         error: false,
                     };
