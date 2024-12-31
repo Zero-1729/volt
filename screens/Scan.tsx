@@ -380,10 +380,8 @@ const Scan = ({route}: Props) => {
             if (
                 !(
                     invoiceType.type === 'bitcoin' ||
-                    invoiceType.type === 'bolt11' ||
-                    invoiceType.type === 'unified' ||
-                    invoiceType.spec === 'lnurlw' ||
-                    invoiceType.spec === 'lnurlp'
+                    invoiceType.type === 'lightning' ||
+                    invoiceType.type === 'unified'
                 )
             ) {
                 updateScannerMessage(e('unsupported_invoice_type'));
