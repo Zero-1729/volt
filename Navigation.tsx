@@ -548,7 +548,7 @@ const RootNavigator = (): ReactElement => {
         // Only check if clippy content exists, supported invoice type, & not in BoltNFC screen (scan trigger)
         const currentRoute = navigationRef.current?.getCurrentRoute();
         // If clipboard has contents, display dialog
-        if (clipboardResult.hasContents && clipboardResult.invoiceType !== 'unsupported' && isInProtectedScreens(currentRoute?.name as string) && clipboardResult.spec?.toLowerCase() === 'lnurlw') {
+        if (clipboardResult.hasContents && clipboardResult.invoiceType !== 'unsupported' && !isInProtectedScreens(currentRoute?.name as string) && clipboardResult.spec?.toLowerCase() === 'lnurlw') {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
                 clipboardMessage,
@@ -567,7 +567,7 @@ const RootNavigator = (): ReactElement => {
         if (
             clipboardResult.hasContents &&
             clipboardResult.invoiceType !== 'unsupported' &&
-            isInProtectedScreens(currentRoute?.name as string)
+            !isInProtectedScreens(currentRoute?.name as string)
         ) {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
@@ -624,7 +624,7 @@ const RootNavigator = (): ReactElement => {
         const currentRoute = navigationRef.current?.getCurrentRoute();
 
         // only check if url exists & not in BoltNFC screen (scan trigger)
-        if (url && isInProtectedScreens(currentRoute?.name as string)) {
+        if (url && !isInProtectedScreens(currentRoute?.name as string)) {
             rootNavigation.navigate('PayInvoice', {invoice: url});
             return;
         }
