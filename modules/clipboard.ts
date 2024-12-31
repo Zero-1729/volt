@@ -3,12 +3,7 @@ import {Platform} from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {sleep} from './utils';
-
-const LNSpecs = {
-    lnbc: 'BOLT11',
-    lnurl: 'LNURL',
-    lightning: 'BOLT11',
-};
+import {decodeInvoiceType} from './wallet-utils';
 
 type ClipboardResult = {
     content: string;
@@ -18,8 +13,6 @@ type ClipboardResult = {
     spec?: string;
 };
 
-// TODO: allow handling QR codes in clipboard
-// TODO: detect and return error if malformed invoice (invoiceType = 'invalid')
 export const checkClipboardContents = async (): Promise<ClipboardResult> => {
     // Delay for android to see clipboard contents
     if (Platform.OS === 'android') {
@@ -42,34 +35,13 @@ export const checkClipboardContents = async (): Promise<ClipboardResult> => {
         };
     }
 
-    if (clipboardContents.startsWith('bitcoin:')) {
-        invoiceType = 'bitcoin';
-    }
-
-    if (
-        clipboardContents.startsWith('lightning:') ||
-        clipboardContents.toLowerCase().startsWith('lnbc') ||
-        clipboardContents.toLowerCase().startsWith('lnurl')
-    ) {
-        // Consume the 'lightning invoice' prefix
-        const embededContent = clipboardContents.startsWith('lightning:') ? clipboardContents.slice(10) : clipboardContents;
-
-        invoiceType = 'lightning';
-
-        if (embededContent.toLowerCase().startsWith('lnbc')) {
-            spec_kind = LNSpecs.lnbc;
-        }
-
-        if (embededContent.toLowerCase().startsWith('lnurl')) {
-            spec_kind = LNSpecs.lnurl;
-        }
-    }
+    const decodedInvoiceType = await decodeInvoiceType(clipboardContents);
 
     return {
         content: clipboardContents,
         error: '',
-        invoiceType: invoiceType,
+        invoiceType: decodedInvoiceType.type,
         hasContents: true,
-        spec: spec_kind,
+        spec: decodedInvoiceType.spec,
     };
 };
