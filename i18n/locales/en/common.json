@@ -66,6 +66,7 @@
     "psbt": "psbt",
     "success": "success",
     "successful": "successful",
+    "withdraw": "withdraw",
     "pending": "pending",
     "complete": "complete",
     "failed": "failed",

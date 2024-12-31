@@ -193,5 +193,9 @@
     "already_paid_ln_invoice": "This invoice has already been paid",
     "swap_in_progress": "Detected a Swap In in progress",
     "not_connected_to_breez_services": "Not connected to Lightning services",
-    "no_lnurl_data_found": "No LNURL data found"
+    "no_lnurl_data_found": "No LNURL data found",
+    "lightning_not_support": "Unsupported Lightning Invoice",
+    "loading_lnurlwithdraw_data": "Fetching LNURL Withdraw data...",
+    "loading_lnurlwithdraw": "Requesting LNURL Withdraw...",
+    "no_lnurl_response": "No response from LNURL server"
 }

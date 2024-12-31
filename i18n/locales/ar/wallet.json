@@ -193,5 +193,9 @@
     "already_paid_ln_invoice": "لقد تم بالفعل دفع هذه الفاتورة",
     "swap_in_progress": "اكتشف مبادلة في التقدم",
     "not_connected_to_breez_services": "غير متصل بخدمات Lightning",
-    "no_lnurl_data_found": "لم يتم العثور على بيانات LNURL"
+    "no_lnurl_data_found": "لم يتم العثور على بيانات LNURL",
+    "lightning_not_support": "فاتورة Lightning غير مدعومة",
+    "loading_lnurlwithdraw_data": "جلب LNURL سحب البيانات...",
+    "loading_lnurlwithdraw": "طلب سحب LNURL...",
+    "no_lnurl_response": "لا يوجد رد من خادم LNURL"
 }
