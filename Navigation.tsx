@@ -601,12 +601,11 @@ const RootNavigator = (): ReactElement => {
     // Deep linking
     // Triggers while app still open
     const linking: LinkingOptions<{}> = {
+        // Only support bolt11 & BIP21 deep links for now
         prefixes: ['bitcoin', 'lightning'],
         config: {
             screens: {
                 PayInvoice: '',
-                WithdrawLNURL: '',
-                PayLNURL: '',
             },
         },
         subscribe(listener): () => void {
