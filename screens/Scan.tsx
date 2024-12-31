@@ -29,7 +29,6 @@ import {
     checkInvoiceAndWallet,
     isValidAddress,
     decodeInvoiceType,
-    isLNAddress,
 } from '../modules/wallet-utils';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
@@ -320,7 +319,7 @@ const Scan = ({route}: Props) => {
 
                     // Handle LNURLp
                     // Only handling an LN Address for now not the `lnurlp://` uri
-                    if (isLnurlp && isLNAddress(LNinvoice)) {
+                    if (isLnurlp) {
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('PayLNURL', {
                                 lnManualPayload: {
