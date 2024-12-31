@@ -55,6 +55,8 @@ import {actionAlert} from './components/alert';
 
 import Home from './screens/Home';
 import PayInvoice from './screens/wallet/PayInvoice';
+import PayLNURL from './screens/wallet/PayLNURL';
+import WithdrawLNURL from './screens/wallet/WithdrawLNURL';
 import TransactionList from './screens/wallet/TransactionsList';
 
 // Biometrics Screen
@@ -75,8 +77,6 @@ import FeeSelection from './screens/wallet/FeeSelection';
 import TransactionExported from './screens/wallet/TransactionExported';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
-import SendLN from './screens/wallet/SendLN';
-import WithdrawLNURL from './screens/wallet/WithdrawLNURL';
 import BoltNFC from './screens/wallet/BoltNFC';
 import Xpub from './screens/wallet/Xpub';
 
@@ -166,6 +166,9 @@ export type InitStackParamList = {
     };
     WithdrawLNURL: {
         lnurl: string;
+    };
+    PayLNURL: {
+        lnManualPayload?: TLnManualPayloadType;
     };
     AddWalletRoot: {
         onboarding: boolean;
@@ -295,9 +298,6 @@ export type WalletParamList = {
         isLnManual?: boolean;
         lnManualPayload?: TLnManualPayloadType;
     };
-    SendLN: {
-        lnManualPayload?: TLnManualPayloadType;
-    };
     TransactionDetails: {
         tx: TTransaction;
         source: string;
@@ -395,7 +395,6 @@ const WalletRoot = () => {
             <WalletStack.Screen name="WalletInfo" component={Info} />
 
             <WalletStack.Screen name="Send" component={Send} />
-            <WalletStack.Screen name="SendLN" component={SendLN} />
             <WalletStack.Screen name="SendAmount" component={SendAmount} />
             <WalletStack.Screen name="FeeSelection" component={FeeSelection} />
             <WalletStack.Screen name="Receive" component={Receive} />
@@ -956,6 +955,7 @@ const RootNavigator = (): ReactElement => {
                     name="PayInvoice"
                     component={PayInvoice}
                 />
+                <InitScreenStack.Screen name="PayLNURL" component={PayLNURL} />
                 <InitScreenStack.Screen name="WithdrawLNURL" component={WithdrawLNURL} />
                 <InitScreenStack.Screen
                     name="AddWalletRoot"
