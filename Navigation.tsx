@@ -528,7 +528,7 @@ const RootNavigator = (): ReactElement => {
 
         // Set clipboard message
         if (clipboardResult.invoiceType === 'lightning') {
-            clipboardMessage = clipboardResult.spec === 'lnurl' ? t('read_clipboard_lurl_text') : t('read_clipboard_lightning_text', {
+            clipboardMessage = clipboardResult.spec === 'lnurlw' ? t('read_clipboard_lurl_text') : t('read_clipboard_lightning_text', {
                 spec: clipboardResult.spec,
             });
         }
@@ -540,7 +540,7 @@ const RootNavigator = (): ReactElement => {
         // Only check if clippy content exists, supported invoice type, & not in BoltNFC screen (scan trigger)
         const currentRoute = navigationRef.current?.getCurrentRoute();
         // If clipboard has contents, display dialog
-        if (clipboardResult.hasContents && clipboardResult.invoiceType !== 'unsupported' && currentRoute?.name !== 'BoltNFC' && currentRoute?.name !== 'WithdrawLNURL' && clipboardResult.spec?.toLowerCase() === 'lnurl') {
+        if (clipboardResult.hasContents && clipboardResult.invoiceType !== 'unsupported' && currentRoute?.name !== 'BoltNFC' && currentRoute?.name !== 'WithdrawLNURL' && clipboardResult.spec?.toLowerCase() === 'lnurlw') {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
                 clipboardMessage,
