@@ -76,6 +76,7 @@ import TransactionExported from './screens/wallet/TransactionExported';
 import Send from './screens/wallet/Send';
 import SendAmount from './screens/wallet/SendAmount';
 import SendLN from './screens/wallet/SendLN';
+import WithdrawLNURL from './screens/wallet/WithdrawLNURL';
 import BoltNFC from './screens/wallet/BoltNFC';
 import Xpub from './screens/wallet/Xpub';
 
@@ -162,6 +163,9 @@ export type InitStackParamList = {
     };
     PayInvoice: {
         invoice: string;
+    };
+    WithdrawLNURL: {
+        lnurl: string;
     };
     AddWalletRoot: {
         onboarding: boolean;
@@ -562,6 +566,7 @@ const RootNavigator = (): ReactElement => {
         config: {
             screens: {
                 PayInvoice: '',
+                WithdrawLNURL: '',
             },
         },
         subscribe(listener): () => void {
@@ -917,6 +922,7 @@ const RootNavigator = (): ReactElement => {
                     name="PayInvoice"
                     component={PayInvoice}
                 />
+                <InitScreenStack.Screen name="WithdrawLNURL" component={WithdrawLNURL} />
                 <InitScreenStack.Screen
                     name="AddWalletRoot"
                     component={AddWalletRoot}
