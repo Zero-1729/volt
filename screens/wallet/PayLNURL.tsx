@@ -41,7 +41,7 @@ import {useTranslation} from 'react-i18next';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {WalletParamList} from '../../Navigation';
+import {InitStackParamList} from '../../Navigation';
 
 import Close from '../../assets/svg/x-24.svg';
 import InfoIcon from '../../assets/svg/info-16.svg';
@@ -68,7 +68,7 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../../components/toast';
 
-type Props = NativeStackScreenProps<WalletParamList, 'SendLN'>;
+type Props = NativeStackScreenProps<InitStackParamList, 'PayLNURL'>;
 
 const InputPanel = (props: {address: string}): ReactElement => {
     const navigation = useNavigation();
@@ -442,7 +442,7 @@ const SummaryPanel = (props: {
     );
 };
 
-const SendLN = ({route}: Props) => {
+const PayLNURL = ({route}: Props) => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
@@ -667,7 +667,7 @@ const SendLN = ({route}: Props) => {
     );
 };
 
-export default SendLN;
+export default PayLNURL;
 
 const styles = StyleSheet.create({
     mainContainer: {
