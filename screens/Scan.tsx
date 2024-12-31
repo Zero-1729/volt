@@ -368,7 +368,7 @@ const Scan = ({route}: Props) => {
             isOnchain: boolean | null;
             error: any;
         }> => {
-            let decodedInvoice;
+            let decodedBIP21;
 
             // See if single BTC address
             // Handle single btc supported address
@@ -477,10 +477,10 @@ const Scan = ({route}: Props) => {
 
                 // Attempt to decode BIP21 QR
                 try {
-                    decodedInvoice = decodeURI.decode(invoice);
+                    decodedBIP21 = decodeURI.decode(invoice);
 
                     // BIP21 QR could contain upper case address, so we'll convert to lower case
-                    if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
+                    if (!isValidAddress(decodedBIP21.address.toLowerCase())) {
                         updateScannerMessage(e('invalid_invoice_error'));
                         return {
                             decodedInvoice: '',
@@ -498,7 +498,7 @@ const Scan = ({route}: Props) => {
             if (
                 !checkInvoiceAndWallet(
                     route.params.wallet,
-                    decodedInvoice,
+                    decodedBIP21,
                     updateToast,
                 )
             ) {
