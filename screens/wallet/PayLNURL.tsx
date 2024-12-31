@@ -113,20 +113,35 @@ const InputPanel = (props: {address: string}): ReactElement => {
         setDescriptionText('');
     };
 
+    const isLnurlpURI = (text: string) => {
+        // return if string is a valid lnurlp URI
+        return text.startsWith('lnurlp:');
+    };
+
+    const isLnurlAddress = (text: string) => {
+        // return if string is a valid lnurl address
+        return isLNAddress(text);
+    };
+
+    const isValidLnurlp = isLnurlpURI(inputText) || isLnurlAddress(inputText);
+
     const handleAmount = () => {
         const minWallet = getMiniWallet(wallet);
 
         navigation.dispatch(
-            CommonActions.navigate('SendAmount', {
-                invoiceData: {},
-                wallet: minWallet,
-                isLightning: true,
-                isLnManual: true,
-                lnManualPayload: {
-                    amount: 0,
-                    kind: 'address',
-                    text: inputText,
-                    description: descriptionText,
+            CommonActions.navigate('WalletRoot', {
+                screen: 'SendAmount',
+                params: {
+                    invoiceData: {},
+                    wallet: minWallet,
+                    isLightning: true,
+                    isLnManual: true,
+                    lnManualPayload: {
+                        amount: 0,
+                        kind: 'address',
+                        text: inputText,
+                        description: descriptionText,
+                    },
                 },
             }),
         );
@@ -166,7 +181,7 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             </View>
 
-            {isLNAddress(inputText) && isNetOn && (
+            {isValidLnurlp && isNetOn && (
                 <View style={[tailwind('w-5/6 items-center mt-12')]}>
                     <VText
                         style={[
@@ -230,7 +245,7 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             )}
 
-            {isLNAddress(inputText) && !isNetOn && (
+            {isValidLnurlp && !isNetOn && (
                 <View
                     style={[
                         tailwind(
@@ -257,7 +272,7 @@ const InputPanel = (props: {address: string}): ReactElement => {
             )}
 
             <LongBottomButton
-                disabled={!isLNAddress(inputText) || !isNetOn}
+                disabled={!isValidLnurlp || !isNetOn}
                 onPress={handleAmount}
                 title={capitalizeFirst(t('continue'))}
                 textColor={ColorScheme.Text.Alt}
