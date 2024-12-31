@@ -520,6 +520,10 @@ const RootNavigator = (): ReactElement => {
         fonts: DefaultTheme.fonts,
     };
 
+    const isInProtectedScreens = (route: string): boolean => {
+        return route === 'BoltNFC' || route === 'WithdrawLNURL' || route === 'PayInvoice';
+    };
+
     // Clipboard check
     const checkAndSetClipboard = async () => {
         // We only display dialogs if content is not empty and valid invoice
@@ -552,7 +556,7 @@ const RootNavigator = (): ReactElement => {
         // Only check if clippy content exists, supported invoice type, & not in BoltNFC screen (scan trigger)
         const currentRoute = navigationRef.current?.getCurrentRoute();
         // If clipboard has contents, display dialog
-        if (clipboardResult.hasContents && clipboardResult.invoiceType !== 'unsupported' && currentRoute?.name !== 'BoltNFC' && currentRoute?.name !== 'WithdrawLNURL' && clipboardResult.spec?.toLowerCase() === 'lnurlw') {
+        if (clipboardResult.hasContents && clipboardResult.invoiceType !== 'unsupported' && isInProtectedScreens(currentRoute?.name as string) && clipboardResult.spec?.toLowerCase() === 'lnurlw') {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
                 clipboardMessage,
@@ -571,8 +575,7 @@ const RootNavigator = (): ReactElement => {
         if (
             clipboardResult.hasContents &&
             clipboardResult.invoiceType !== 'unsupported' &&
-            currentRoute?.name !== 'BoltNFC' &&
-            currentRoute?.name !== 'WithdrawLNURL'
+            isInProtectedScreens(currentRoute?.name as string)
         ) {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
@@ -629,7 +632,7 @@ const RootNavigator = (): ReactElement => {
         const currentRoute = navigationRef.current?.getCurrentRoute();
 
         // only check if url exists & not in BoltNFC screen (scan trigger)
-        if (url && currentRoute?.name !== 'BoltNFC') {
+        if (url && isInProtectedScreens(currentRoute?.name as string)) {
             rootNavigation.navigate('PayInvoice', {invoice: url});
             return;
         }
@@ -889,7 +892,7 @@ const RootNavigator = (): ReactElement => {
 
                 // Check whether we are in the pay invoice screen (i.e. handling deep link)
                 // and block clipboard check;
-                const isDeepLinkScreen = currentRoute?.name === 'PayInvoice';
+                const isDeepLinkScreen = isInProtectedScreens(currentRoute?.name as string);
 
                 // Check and run clipboard fn if app is active in foreground
                 // Ensure that we have wallets before checking
