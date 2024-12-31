@@ -393,7 +393,7 @@ const Scan = ({route}: Props) => {
             // Check if LN invoice and handle separately
             // Call on Breez to work on these
             // Bolt11
-            if (invoiceType.type === 'bolt11') {
+            if (invoiceType.spec === 'bolt11') {
                 try {
                     const parsedBolt11Invoice = await parseInvoice(invoice);
 
