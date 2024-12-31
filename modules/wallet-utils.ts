@@ -628,8 +628,8 @@ const determineLnType = async (
 
     // LNURL (Withdraw)
     /**
-     *  lnurlw://domain.com/lnurl-withdraw?key=val
-     *  lnurl1dp68gurn8ghj7ct5mr...
+     *  (LUD-17) lnurlw://domain.com/lnurl-withdraw?key=val
+     *  (LUD-1) lnurl1dp68gurn8ghj7ct5mr...
      */
     if (invoice.startsWith('lnurlw://') || invoice.startsWith('lnurl1d')) {
         specType = InputTypeVariant.LN_URL_WITHDRAW;
@@ -649,9 +649,10 @@ const determineLnType = async (
             spec = 'bolt11';
             break;
         case InputTypeVariant.LN_URL_PAY:
+            spec = 'lnurlp';
+            break;
         case InputTypeVariant.LN_URL_WITHDRAW:
-        case InputTypeVariant.LN_URL_AUTH:
-            spec = 'lnurl';
+            spec = 'lnurlw';
             break;
         default:
             return {
@@ -700,10 +701,15 @@ export const decodeInvoiceType = async (
 
     // Check LN
     if (
+        // LN URI
+        lowercasedInvoice.startsWith('lightning:') ||
+        // BOLT11
         lowercasedInvoice.startsWith('lnbc') ||
-        lowercasedInvoice.startsWith('lnurl') ||
-        lowercasedInvoice.startsWith('lightning') ||
-        isLNAddress(lowercasedInvoice)
+        // LNURLp
+        lowercasedInvoice.startsWith('lnurlp') ||
+        isLNAddress(lowercasedInvoice) ||
+        // LNURLw
+        lowercasedInvoice.startsWith('lnurlw')
     ) {
         const determinedLnType = await determineLnType(lowercasedInvoice);
         return determinedLnType;
