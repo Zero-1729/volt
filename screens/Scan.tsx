@@ -342,8 +342,13 @@ const Scan = ({route}: Props) => {
                     if (isLNW) {
                         const lnurlRaw = LNinvoice;
 
-                        console.log('possible lnurl ', lnurlRaw);
-                        return;
+                        runOnJS(navigation.dispatch)(
+                            CommonActions.navigate('WithdrawLNURL', {
+                                params: {
+                                    lnurl: lnurlRaw,
+                                },
+                            }),
+                        );
                     }
 
                     if (!isLNA && !isBolt11 && !isLNW) {
