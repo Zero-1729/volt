@@ -664,9 +664,9 @@ const determineLnType = async (
     }
 
     return {
-        type: 'unsupported',
+        type: 'lightning',
         invoice: invoice,
-        invalid: true,
+        invalid: false,
         spec: spec,
     };
 };
@@ -718,6 +718,7 @@ export const decodeInvoiceType = async (
     return {
         type: 'unsupported',
         invoice: invoice,
+        spec: '',
         invalid: true,
     };
 };
