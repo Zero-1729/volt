@@ -528,9 +528,21 @@ const RootNavigator = (): ReactElement => {
 
         // Set clipboard message
         if (clipboardResult.invoiceType === 'lightning') {
-            clipboardMessage = clipboardResult.spec === 'lnurlw' ? t('read_clipboard_lurl_text') : t('read_clipboard_lightning_text', {
-                spec: clipboardResult.spec,
-            });
+            // Only support BOLT11 & lnurlw for now
+            if (clipboardResult.spec === 'lnurlw') {
+                clipboardMessage = t('read_clipboard_lurl_text');
+            }
+
+            if (clipboardResult.spec === 'bolt11') {
+                clipboardMessage = t('read_clipboard_lightning_text', {
+                    spec: clipboardResult.spec,
+                });
+            }
+
+            // If clipboard is lnurlp, do nothing
+            if (clipboardResult.spec === 'lnurlp') {
+                return;
+            }
         }
 
         if (clipboardResult.invoiceType === ENet.Bitcoin) {
