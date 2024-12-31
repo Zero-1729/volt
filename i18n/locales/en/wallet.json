@@ -172,7 +172,7 @@
     "bolt_nfc": "Bolt NFC",
     "nfc_read_message": "Hold your NFC Tag near your device...",
     "processing_nfc_tag": "Processing NFC Tag...",
-    "no_lnurl_found": "No LNURL found in NFC Tag",
+    "no_lnurl_found": "Not a valid LNURL, no response received",
     "no_nfc_tag_found": "No NFC Tag found",
     "nfc_tag_error": "Error reading NFC Tag: {{error}}",
     "retrieving_lnurl_data": "Retrieving LNURL Data...",

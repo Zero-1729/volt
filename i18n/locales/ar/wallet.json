@@ -172,7 +172,7 @@
     "bolt_nfc": "Bolt NFC",
     "nfc_read_message": "ضع علامة NFC بالقرب من جهازك...",
     "processing_nfc_tag": "جارٍ معالجة علامة NFC...",
-    "no_lnurl_found": "لم يتم العثور على LNURL في علامة NFC",
+    "no_lnurl_found": "ليس LNURL صالحًا، ولم يتم تلقي أي رد",
     "no_nfc_tag_found": "لم يتم العثور على علامة NFC",
     "nfc_tag_error": "خطأ في قراءة علامة NFC: {{error}}",
     "retrieving_lnurl_data": "جارٍ استرداد بيانات LNURL...",
