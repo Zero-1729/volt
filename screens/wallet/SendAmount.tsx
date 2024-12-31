@@ -245,16 +245,13 @@ const SendAmount = ({route}: Props) => {
 
         if (isNetOn && isLNManual) {
             navigation.dispatch(
-                CommonActions.navigate('WalletRoot', {
-                    screen: 'SendLN',
-                    params: {
-                        lnManualPayload: {
-                            amount: satsAmount.value.toString(),
-                            kind: route.params.lnManualPayload?.kind,
-                            text: route.params.lnManualPayload?.text,
-                            description:
-                                route.params.lnManualPayload?.description,
-                        },
+                CommonActions.navigate('PayLNURL', {
+                    lnManualPayload: {
+                        amount: satsAmount.value.toString(),
+                        kind: route.params.lnManualPayload?.kind,
+                        text: route.params.lnManualPayload?.text,
+                        description:
+                            route.params.lnManualPayload?.description,
                     },
                 }),
             );
@@ -282,21 +279,7 @@ const SendAmount = ({route}: Props) => {
             });
             return;
         }
-    }, [
-        e,
-        isBelowDust,
-        isLNManual,
-        isNetOn,
-        navigation,
-        route.params.invoiceData,
-        route.params.isLightning,
-        route.params.lnManualPayload?.description,
-        route.params.lnManualPayload?.kind,
-        route.params.lnManualPayload?.text,
-        route.params.wallet,
-        satsAmount.value,
-        t,
-    ]);
+    }, [e, isBelowDust, isLNManual, isNetOn, navigation, route.params.invoiceData, route.params.isLightning, route.params.lnManualPayload, route.params.wallet, satsAmount.value, t]);
 
     return (
         <SafeAreaView

@@ -377,9 +377,7 @@ const Home = ({route}: Props) => {
 
     const goToLNPay = useCallback(() => {
         navigation.dispatch(
-            CommonActions.navigate('WalletRoot', {
-                screen: 'SendLN',
-            }),
+            CommonActions.navigate('PayLNURL'),
         );
     }, []);
 

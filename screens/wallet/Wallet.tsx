@@ -294,7 +294,7 @@ const Wallet = ({route}: Props) => {
             navigateScanScreen();
         } else {
             bottomSendRef.current?.close();
-            navigation.dispatch(CommonActions.navigate('SendLN'));
+            navigation.dispatch(CommonActions.navigate('PayLNURL'));
         }
     };
 

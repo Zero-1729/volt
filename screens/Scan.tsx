@@ -322,15 +322,12 @@ const Scan = ({route}: Props) => {
                     // Only handling an LN Address for now not the `lnurlp://` uri
                     if (isLnurlp && isLNAddress(LNinvoice)) {
                         runOnJS(navigation.dispatch)(
-                            CommonActions.navigate('WalletRoot', {
-                                screen: 'SendLN',
-                                params: {
-                                    lnManualPayload: {
-                                        kind: 'address',
-                                        text: LNinvoice,
-                                        description: '',
-                                        amount: 0,
-                                    },
+                            CommonActions.navigate('PayLNURL', {
+                                lnManualPayload: {
+                                    kind:  'address',
+                                    text: LNinvoice,
+                                    description: '',
+                                    amount: 0,
                                 },
                             }),
                         );
