@@ -229,6 +229,7 @@ const Scan = ({route}: Props) => {
     const processAndRoute = useCallback(
         async (decodedQRState: {
             decodedInvoice: any;
+            spec: string;
             isOnchain: boolean | null;
             error: boolean;
         }) => {
@@ -286,13 +287,9 @@ const Scan = ({route}: Props) => {
 
                     const LNinvoice = decodedQRState.decodedInvoice;
 
-                    const isBolt11 = !!LNinvoice?.bolt11;
-                    const isLNA = !isBolt11 ? isLNAddress(LNinvoice) : false;
-                    // Bech32 encoded LNURL withdraw (LUD-1) or LNURL-withdraw (LUD-17)
-                    const isLNW = !isBolt11 && !isLNA ?
-                          LNinvoice.startsWith('lnurl1d') ||
-                          LNinvoice.startsWith('lnurlw://')
-                        : false;
+                    const isBolt11 = decodedQRState.spec === 'bolt11';
+                    const isLnurlp = decodedQRState.spec === 'lnurlp';
+                    const isLnurlw = decodedQRState.spec === 'lnurlw';
 
                     if (isBolt11) {
                         // If LN Invoice
@@ -321,8 +318,9 @@ const Scan = ({route}: Props) => {
                         );
                     }
 
-                    if (isLNA) {
-                        // Assumed an LN Address
+                    // Handle LNURLp
+                    // Only handling an LN Address for now not the `lnurlp://` uri
+                    if (isLnurlp && isLNAddress(LNinvoice)) {
                         runOnJS(navigation.dispatch)(
                             CommonActions.navigate('WalletRoot', {
                                 screen: 'SendLN',
@@ -338,8 +336,8 @@ const Scan = ({route}: Props) => {
                         );
                     }
 
-                    // Handle LNURL
-                    if (isLNW) {
+                    // Handle LNURLw
+                    if (isLnurlw) {
                         const lnurlRaw = LNinvoice;
 
                         runOnJS(navigation.dispatch)(
@@ -351,7 +349,7 @@ const Scan = ({route}: Props) => {
                         );
                     }
 
-                    if (!isLNA && !isBolt11 && !isLNW) {
+                    if (!(isLnurlp && isBolt11 && isLnurlw)) {
                         updateScannerMessage(t('unsupported_lightning'));
                     }
                 }
@@ -365,6 +363,7 @@ const Scan = ({route}: Props) => {
             invoice: string,
         ): Promise<{
             decodedInvoice: any;
+            spec: string;
             isOnchain: boolean | null;
             error: any;
         }> => {
@@ -392,7 +391,7 @@ const Scan = ({route}: Props) => {
                 )
             ) {
                 updateScannerMessage(e('unsupported_invoice_type'));
-                return {decodedInvoice: '', isOnchain: null, error: true};
+                return {decodedInvoice: '', isOnchain: null, spec: '', error: true};
             }
 
             // Check if LN invoice and handle separately
@@ -404,6 +403,7 @@ const Scan = ({route}: Props) => {
 
                     return {
                         decodedInvoice: parsedBolt11Invoice,
+                        spec: 'bolt11',
                         isOnchain: false,
                         error: false,
                     };
@@ -411,6 +411,7 @@ const Scan = ({route}: Props) => {
                     updateScannerMessage(err.message);
                     return {
                         decodedInvoice: '',
+                        spec: '',
                         isOnchain: null,
                         error: true,
                     };
@@ -422,6 +423,7 @@ const Scan = ({route}: Props) => {
                 // LN Address
                 return {
                         decodedInvoice: invoiceType.invoice,
+                        spec: invoiceType.spec,
                         isOnchain: false,
                         error: false,
                     };
@@ -432,6 +434,7 @@ const Scan = ({route}: Props) => {
                 // LNURL Withdraw
                 return {
                     decodedInvoice: invoiceType.invoice,
+                    spec: invoiceType.spec,
                     isOnchain: false,
                     error: false,
                 };
@@ -459,6 +462,7 @@ const Scan = ({route}: Props) => {
 
                             return {
                                 decodedInvoice: parsedBolt11Invoice,
+                                spec: 'bolt11',
                                 isOnchain: false,
                                 error: false,
                             };
@@ -477,13 +481,14 @@ const Scan = ({route}: Props) => {
                         updateScannerMessage(e('invalid_invoice_error'));
                         return {
                             decodedInvoice: '',
+                            spec: 'bip21',
                             isOnchain: null,
                             error: true,
                         };
                     }
                 } catch (err: any) {
                     updateScannerMessage(e('invalid_invoice_error'));
-                    return {decodedInvoice: '', isOnchain: null, error: true};
+                    return {decodedInvoice: '', spec: '', isOnchain: null, error: true};
                 }
             }
 
@@ -495,12 +500,13 @@ const Scan = ({route}: Props) => {
                     updateToast,
                 )
             ) {
-                return {decodedInvoice: '', isOnchain: null, error: true};
+                return {decodedInvoice: '', spec: '', isOnchain: null, error: true};
             }
 
             updateScannerMessage(e('unsupported_invoice_type'));
             return {
                 decodedInvoice: '',
+                spec: '',
                 isOnchain: invoiceType.type === 'bitcoin',
                 error: true,
             };
