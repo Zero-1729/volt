@@ -664,9 +664,9 @@ const determineLnType = async (
     }
 
     return {
-        type: 'lightning',
+        type: 'unsupported',
         invoice: invoice,
-        invalid: false,
+        invalid: true,
         spec: spec,
     };
 };
