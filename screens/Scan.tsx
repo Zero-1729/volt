@@ -381,13 +381,14 @@ const Scan = ({route}: Props) => {
             // Only support:
             // - Bolt 11 Invoice
             // - Unified and regular BIP21 Invoice
-            // - LNURL
+            // - LNURLw & LNURLp
             if (
                 !(
                     invoiceType.type === 'bitcoin' ||
-                    invoiceType.type === 'lightning' ||
+                    invoiceType.type === 'bolt11' ||
                     invoiceType.type === 'unified' ||
-                    invoiceType.spec === 'lnurl'
+                    invoiceType.spec === 'lnurlw' ||
+                    invoiceType.spec === 'lnurlp'
                 )
             ) {
                 updateScannerMessage(e('unsupported_invoice_type'));
@@ -395,53 +396,45 @@ const Scan = ({route}: Props) => {
             }
 
             // Check if LN invoice and handle separately
-            // Call on Breez to work on this
-            if (invoiceType.type === 'lightning') {
-                const parsedLNURL = invoiceType.invoice.startsWith('lightning:')
-                    ? invoiceType.invoice.split('lightning:')[1]
-                    : invoiceType.invoice;
+            // Call on Breez to work on these
+            // Bolt11
+            if (invoiceType.type === 'bolt11') {
+                try {
+                    const parsedBolt11Invoice = await parseInvoice(invoice);
 
-                // Only support bolt11 for now
-                if (invoiceType.spec === 'bolt11') {
-                    try {
-                        const parsedBolt11Invoice = await parseInvoice(invoice);
-
-                        return {
-                            decodedInvoice: parsedBolt11Invoice,
-                            isOnchain: false,
-                            error: false,
-                        };
-                    } catch (err: any) {
-                        updateScannerMessage(err.message);
-                        return {
-                            decodedInvoice: '',
-                            isOnchain: null,
-                            error: true,
-                        };
-                    }
-                }
-
-                if (invoiceType.spec === 'lnurl' && isLNAddress(parsedLNURL)) {
-                    // LN Address
                     return {
-                        decodedInvoice: parsedLNURL,
+                        decodedInvoice: parsedBolt11Invoice,
+                        isOnchain: false,
+                        error: false,
+                    };
+                } catch (err: any) {
+                    updateScannerMessage(err.message);
+                    return {
+                        decodedInvoice: '',
+                        isOnchain: null,
+                        error: true,
+                    };
+                }
+            }
+
+            // LNURL (Pay)
+            if (invoiceType.spec === 'lnurlp' && isLNAddress(invoiceType.invoice)) {
+                // LN Address
+                return {
+                        decodedInvoice: invoiceType.invoice,
                         isOnchain: false,
                         error: false,
                     };
                 }
 
-                // LNURL (Withdraw)
-                if (invoiceType.spec === 'lnurl') {
-                    // LNURL Withdraw
-                    return {
-                        decodedInvoice: parsedLNURL,
-                        isOnchain: false,
-                        error: false,
-                    };
-                }
-
-                updateScannerMessage(e('unsupported_invoice_type'));
-                return {decodedInvoice: '', isOnchain: null, error: true};
+            // LNURL (Withdraw)
+            if (invoiceType.spec === 'lnurlw') {
+                // LNURL Withdraw
+                return {
+                    decodedInvoice: invoiceType.invoice,
+                    isOnchain: false,
+                    error: false,
+                };
             }
 
             // Bip21
