@@ -63,10 +63,6 @@ import {biometricAuth} from '../../modules/shared';
 
 import PINPass from '../../components/pinpass';
 import {useNetInfo} from '@react-native-community/netinfo';
-import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
-
-import {Toasts} from '@backpackapp-io/react-native-toast';
-import {LiberalToast} from '../../components/toast';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'PayLNURL'>;
 
@@ -279,6 +275,8 @@ const SummaryPanel = (props: {
     loadingPay: boolean;
     authAndPay: () => void;
     statusMsg: string;
+    errorMessage: string;
+    handleError: () => void;
 }): ReactElement => {
     const ColorScheme = Color(useColorScheme());
     const tailwind = useTailwind();
@@ -428,12 +426,35 @@ const SummaryPanel = (props: {
                             <ActivityIndicator />
                         </View>
                     )}
+
+                    {/* Lnurl Error */}
+                    {!!props.errorMessage && (
+                        <View
+                            style={[
+                                tailwind(' w-5/6 mt-6'),
+                            ]}>
+                            <VText
+                                style={[
+                                    tailwind('font-bold text-lg w-full text-center mb-2'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {capitalizeFirst(t('error'))}
+                            </VText>
+                            <VText
+                                style={[
+                                    tailwind('w-full text-center'),
+                                    {color: ColorScheme.Text.Default},
+                                ]}>
+                                {props.errorMessage}
+                            </VText>
+                        </View>
+                    )}
                 </View>
 
                 <LongBottomButton
                     disabled={props.loadingPay}
-                    onPress={props.authAndPay}
-                    title={capitalizeFirst(t('pay'))}
+                    onPress={props.errorMessage === '' ? props.authAndPay : props.handleError}
+                    title={props.errorMessage === '' ? capitalizeFirst(t('pay')) : capitalizeFirst(t('cancel'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />
@@ -451,6 +472,7 @@ const PayLNURL = ({route}: Props) => {
     const [loadingPay, setLoadingPay] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
     const [lnurlError, setLNURLError] = useState(false);
+    const [lnurlErrorText, setLNURLErrorText] = useState('');
 
     const {t} = useTranslation('wallet');
 
@@ -515,9 +537,8 @@ const PayLNURL = ({route}: Props) => {
                 },
                 // prompt error callback
                 error => {
-                    LiberalToast(t('Biometrics'), error.message, {
-                        duration: 3000,
-                    });
+                    setLNURLErrorText(error.message);
+                    setLNURLError(true);
                 },
             );
 
@@ -574,9 +595,7 @@ const PayLNURL = ({route}: Props) => {
                 setStatusMessage(t('check_ln_address_limits'));
 
                 if (amtSats > maxAmountSats) {
-                    LiberalToast('LNURL Pay Error', t('amount_above_max_spendable'), {
-                        duration: 3000,
-                    });
+                    setLNURLErrorText(t('amount_above_max_spendable'));
                 }
 
                 setStatusMessage(t('paying_ln_address'));
@@ -591,10 +610,9 @@ const PayLNURL = ({route}: Props) => {
                 setLoadingPay(false);
             }
         } catch (error: any) {
-            LiberalToast('Lightning Address', error.message, {
-                duration: 2100,
-            });
+            const errMsg = error.message.includes('Failed to parse') ? t('no_lnurl_found') : error.message;
 
+            setLNURLErrorText(errMsg);
             setLNURLError(true);
             setLoadingPay(false);
         }
@@ -650,6 +668,8 @@ const PayLNURL = ({route}: Props) => {
                             text={manualText}
                             description={manualDescription}
                             statusMsg={statusMessage}
+                            errorMessage={lnurlErrorText}
+                            handleError={handleLNURL}
                         />
                     )}
                 </View>
@@ -660,8 +680,6 @@ const PayLNURL = ({route}: Props) => {
                     onSelectPinPass={setPINIdx}
                     pinMode={false}
                 />
-
-                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} onToastHide={handleLNURL} />
             </BottomSheetModalProvider>
         </SafeAreaView>
     );
