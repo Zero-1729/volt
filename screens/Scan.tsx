@@ -352,7 +352,7 @@ const Scan = ({route}: Props) => {
                     }
 
                     if (!isLNA && !isBolt11 && !isLNW) {
-                        updateScannerMessage(t('lightning_not_support'));
+                        updateScannerMessage(t('unsupported_lightning'));
                     }
                 }
             }
