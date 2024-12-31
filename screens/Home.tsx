@@ -55,7 +55,7 @@ import {
 import Gear from '../assets/svg/gear-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
 import ScanIcon from '../assets/svg/scan.svg';
-import LightningBoltIcon from '../assets/svg/zap.svg';
+import AddressIcon from '../assets/svg/mention-24.svg';
 import BackupIcon from '../assets/svg/backup.svg';
 
 import Color from '../constants/Color';
@@ -727,7 +727,7 @@ const Home = ({route}: Props) => {
                                                         .QuickActionsButton,
                                             },
                                         ]}>
-                                        <LightningBoltIcon
+                                        <AddressIcon
                                             width={20}
                                             fill={ColorScheme.SVG.Default}
                                         />
