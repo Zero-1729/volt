@@ -198,5 +198,6 @@
     "lightning_not_support": "فاتورة Lightning غير مدعومة",
     "loading_lnurlwithdraw_data": "جلب LNURL سحب البيانات...",
     "loading_lnurlwithdraw": "طلب سحب LNURL...",
-    "no_lnurl_response": "لا يوجد رد من خادم LNURL"
+    "no_lnurl_response": "لا يوجد رد من خادم LNURL",
+    "lnurl_replay_error": "تم تحديد الحد الأقصى لمبلغ LNURL المسحوب بالكامل"
 }
