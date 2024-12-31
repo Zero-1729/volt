@@ -107,7 +107,7 @@
     "restore_wallet_description": "أدخل المواد الاحتياطية",
     "restore": "يعيد",
     "wallet_restored_message": "تمت استعادة المحفظة بنجاح",
-    "read_clipboard_lightning_text": "لديك فاتورة Lightning في الحافظة الخاصة بك",
+    "read_clipboard_bolt11_text": "لديك فاتورة Lightning في الحافظة الخاصة بك",
     "read_clipboard_lurl_text": "لديك Lightning LNURL في الحافظة الخاصة بك",
     "read_clipboard_bitcoin_text": "لديك فاتورة بيتكوين",
     "pay_invoice_title": "دفع الفاتورة",

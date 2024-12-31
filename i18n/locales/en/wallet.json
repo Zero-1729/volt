@@ -108,7 +108,7 @@
     "wallet_empty_balance": "Swept balance",
     "restore": "restore",
     "wallet_restored_message": "Wallet restored successfully",
-    "read_clipboard_lightning_text": "You have a lightning {{spec}} invoice in your clipboard",
+    "read_clipboard_bolt11_text": "You have a lightning {{spec}} invoice in your clipboard",
     "read_clipboard_lurl_text": "You have a lightning LNURL in your clipboard",
     "read_clipboard_bitcoin_text": "You have a bitcoin invoice in your clipboard",
     "pay_invoice_title": "Pay Invoice",
