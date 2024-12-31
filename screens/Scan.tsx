@@ -620,10 +620,10 @@ const Scan = ({route}: Props) => {
 
                     <View style={[tailwind('absolute items-center'), styles.cameraContainer]}>
                         <PlainButton
-                                onPress={closeScreen}
-                                style={[tailwind('absolute z-10 top-6 left-6 rounded-full p-3'), styles.opaqueBG]}>
-                                <Close fill={'white'} />
-                            </PlainButton>
+                            onPress={closeScreen}
+                            style={[tailwind('absolute z-10 top-6 left-6 rounded-full p-3'), styles.opaqueBG]}>
+                            <Close fill={'white'} />
+                        </PlainButton>
 
                         {/* Flash Button */}
                         <PlainButton
