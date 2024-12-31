@@ -73,8 +73,13 @@ const WithdrawLNURL = ({route}: Props) => {
 
             // handle soft error
             if (input.type === InputTypeVariant.LN_URL_ERROR) {
+                if (input.data.reason.includes('Replayed or expired query')) {
+                    setFetchErrorMessage(e('lnurl_replay_error'));
+                } else {
+                    setFetchErrorMessage(input.data.reason);
+                }
+
                 setFetchError(true);
-                setFetchErrorMessage(input.data.reason);
                 setLoadingWithdrawal(false);
             }
 
