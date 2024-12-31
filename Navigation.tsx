@@ -543,7 +543,8 @@ const RootNavigator = (): ReactElement => {
         if (
             clipboardResult.hasContents &&
             clipboardResult.invoiceType !== 'unsupported' &&
-            currentRoute?.name !== 'BoltNFC'
+            currentRoute?.name !== 'BoltNFC' &&
+            currentRoute?.name !== 'WithdrawLNURL'
         ) {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
@@ -556,6 +557,8 @@ const RootNavigator = (): ReactElement => {
                     });
                 },
             );
+
+            return;
         }
     };
 
