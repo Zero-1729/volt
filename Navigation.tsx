@@ -531,20 +531,13 @@ const RootNavigator = (): ReactElement => {
 
         // Set clipboard message
         if (clipboardResult.invoiceType === 'lightning') {
-            // Only support BOLT11 & lnurlw for now
-            if (clipboardResult.spec === 'lnurlw') {
+            // Only support BOLT11 & lnurlw & lnurlp for now
+            if (clipboardResult.spec === 'lnurlw' || clipboardResult.spec === 'lnurlp') {
                 clipboardMessage = t('read_clipboard_lurl_text');
             }
 
             if (clipboardResult.spec === 'bolt11') {
-                clipboardMessage = t('read_clipboard_lightning_text', {
-                    spec: clipboardResult.spec,
-                });
-            }
-
-            // If clipboard is lnurlp, do nothing
-            if (clipboardResult.spec === 'lnurlp') {
-                return;
+                clipboardMessage = t('read_clipboard_bolt11_text');
             }
         }
 
