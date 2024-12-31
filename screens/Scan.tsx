@@ -288,9 +288,10 @@ const Scan = ({route}: Props) => {
 
                     const isBolt11 = !!LNinvoice?.bolt11;
                     const isLNA = !isBolt11 ? isLNAddress(LNinvoice) : false;
-                    const isLNW = !isBolt11
-                        ? !isLNAddress(LNinvoice) &&
-                          LNinvoice.startsWith('lnurl1d')
+                    // Bech32 encoded LNURL withdraw (LUD-1) or LNURL-withdraw (LUD-17)
+                    const isLNW = !isBolt11 && !isLNA ?
+                          LNinvoice.startsWith('lnurl1d') ||
+                          LNinvoice.startsWith('lnurlw://')
                         : false;
 
                     if (isBolt11) {
@@ -345,7 +346,7 @@ const Scan = ({route}: Props) => {
                         return;
                     }
 
-                    if (!isLNA && !isBolt11) {
+                    if (!isLNA && !isBolt11 && !isLNW) {
                         updateScannerMessage(t('lightning_not_support'));
                     }
                 }
