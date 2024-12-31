@@ -575,9 +575,22 @@ const RootNavigator = (): ReactElement => {
                 capitalizeFirst(t('pay')),
                 capitalizeFirst(t('cancel')),
                 () => {
-                    rootNavigation.navigate('PayInvoice', {
-                        invoice: clipboardResult.content,
-                    });
+                    // LNURLp
+                    if (clipboardResult.spec === 'lnurlp') {
+                        rootNavigation.navigate('PayLNURL', {
+                            lnManualPayload: {
+                                kind: 'address',
+                                text: clipboardResult.content,
+                                description: '',
+                                amount: 0,
+                            },
+                        });
+                    } else {
+                        // Bolt11 & BIP21
+                        rootNavigation.navigate('PayInvoice', {
+                            invoice: clipboardResult.content,
+                        });
+                    }
                 },
             );
 
@@ -593,6 +606,7 @@ const RootNavigator = (): ReactElement => {
             screens: {
                 PayInvoice: '',
                 WithdrawLNURL: '',
+                PayLNURL: '',
             },
         },
         subscribe(listener): () => void {
