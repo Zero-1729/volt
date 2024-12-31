@@ -524,7 +524,7 @@ const RootNavigator = (): ReactElement => {
 
         // Set clipboard message
         if (clipboardResult.invoiceType === 'lightning') {
-            clipboardMessage = t('read_clipboard_lightning_text', {
+            clipboardMessage = clipboardResult.spec === 'lnurl' ? t('read_clipboard_lurl_text') : t('read_clipboard_lightning_text', {
                 spec: clipboardResult.spec,
             });
         }
