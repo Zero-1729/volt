@@ -505,11 +505,11 @@ const Scan = ({route}: Props) => {
                 return {decodedInvoice: '', isOnchain: null, error: true};
             }
 
-            // TODO: check if this is a fallback for Bip21
+            updateScannerMessage(e('unsupported_invoice_type'));
             return {
-                decodedInvoice: decodedInvoice,
-                isOnchain: true,
-                error: false,
+                decodedInvoice: '',
+                isOnchain: invoiceType.type === 'bitcoin',
+                error: true,
             };
         },
         [e, route.params.wallet, updateScannerMessage, updateToast],
