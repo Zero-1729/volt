@@ -51,14 +51,16 @@ export const checkClipboardContents = async (): Promise<ClipboardResult> => {
         clipboardContents.toLowerCase().startsWith('lnbc') ||
         clipboardContents.toLowerCase().startsWith('lnurl')
     ) {
-        invoiceType = 'lightning';
-        spec_kind = LNSpecs.lightning;
+        // Consume the 'lightning invoice' prefix
+        const embededContent = clipboardContents.startsWith('lightning:') ? clipboardContents.slice(10) : clipboardContents;
 
-        if (clipboardContents.toLowerCase().startsWith('lnbc')) {
+        invoiceType = 'lightning';
+
+        if (embededContent.toLowerCase().startsWith('lnbc')) {
             spec_kind = LNSpecs.lnbc;
         }
 
-        if (clipboardContents.toLowerCase().startsWith('lnurl')) {
+        if (embededContent.toLowerCase().startsWith('lnurl')) {
             spec_kind = LNSpecs.lnurl;
         }
     }
