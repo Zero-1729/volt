@@ -683,16 +683,12 @@ const Wallet = ({route}: Props) => {
                                     tailwind('items-center flex-row left-6'),
                                 ]}
                                 onPress={() => {
-                                    if (route.params?.reload) {
-                                        navigation.dispatch(
-                                            CommonActions.reset({
-                                                index: 0,
-                                                routes: [{name: 'HomeScreen'}],
-                                            })
-                                        );
-                                     } else {
-                                        navigation.goBack();
-                                    }
+                                    navigation.dispatch(
+                                        CommonActions.reset({
+                                            index: 0,
+                                            routes: [{name: 'HomeScreen'}],
+                                        })
+                                    );
                                 }}>
                                 <HomeIcon style={tailwind('mr-2')} fill={'white'} />
                             </PlainButton>
