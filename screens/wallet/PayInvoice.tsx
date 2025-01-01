@@ -78,7 +78,8 @@ const PayInvoice = ({route}: Props) => {
     );
     const [expiryEpoch, setExpiryEpoch] = useState<number>();
     const [isExpired, setIsExpired] = useState(false);
-    const isNetOn = useNetInfo();
+    const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
 
     const {hideTotalBalance, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
@@ -479,6 +480,13 @@ const PayInvoice = ({route}: Props) => {
                             unit={wallet.units}
                             navCallback={() => {}}
                         />
+
+                        {/* Show offline message */}
+                        {!isNetOn && <View style={[tailwind('mt-8')]}>
+                            <Text style={[tailwind('text-center text-sm'), {color: ColorScheme.Text.DescText}]}>
+                                {e('no_internet_message')}
+                                </Text>
+                        </View>}
                     </View>
                 </View>
 
