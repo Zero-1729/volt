@@ -55,7 +55,7 @@ import {WalletCard} from '../../components/shared';
 import {TInvoiceData} from '../../types/wallet';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
-import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
+import {LnInvoice, nodeInfo, parseInvoice} from '@breeztech/react-native-breez-sdk';
 
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../../components/toast';
@@ -80,6 +80,8 @@ const PayInvoice = ({route}: Props) => {
     const [isExpired, setIsExpired] = useState(false);
     const networkState = useNetInfo();
     const isNetOn = checkNetworkIsReachable(networkState);
+
+    const [paymentToSelf, setPaymentToSelf] = useState(false);
 
     const {hideTotalBalance, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
@@ -125,6 +127,14 @@ const PayInvoice = ({route}: Props) => {
         setBolt11(decodedBolt11);
         setIsLightning(true);
 
+        // Check and report self payment (LN)
+        const _nodeID = await nodeInfo();
+
+        // Check if bolt11 is self
+        if (bolt11?.payeePubkey === _nodeID.id) {
+            setPaymentToSelf(true);
+        }
+
         setExpiryEpoch(
             getCountdownStart(
                 decodedBolt11.timestamp as number,
@@ -138,7 +148,7 @@ const PayInvoice = ({route}: Props) => {
                 decodedBolt11.expiry as number,
             ),
         );
-    }, []);
+    }, [bolt11?.payeePubkey]);
 
     const handleInvoiceType = useCallback(
         async (invoice: string) => {
@@ -487,6 +497,13 @@ const PayInvoice = ({route}: Props) => {
                                 {e('no_internet_message')}
                                 </Text>
                         </View>}
+
+                        {/* Show pay self */}
+                        {paymentToSelf && <View style={[tailwind('mt-4')]}>
+                            <Text style={[tailwind('text-center text-sm'), {color: ColorScheme.Text.DescText}]}>
+                                {t('payment_to_self_detected')}
+                                </Text>
+                        </View>}
                     </View>
                 </View>
 
@@ -517,7 +534,8 @@ const PayInvoice = ({route}: Props) => {
                     disabled={
                         isExpired ||
                         !isNetOn ||
-                        (!bolt11 && Object.keys(decodedInvoice).length === 0)
+                        (!bolt11 && Object.keys(decodedInvoice).length === 0) ||
+                        paymentToSelf
                     }
                     title={t('pay_invoice')}
                     textColor={ColorScheme.Text.Alt}
