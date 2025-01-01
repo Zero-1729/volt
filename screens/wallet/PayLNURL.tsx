@@ -266,7 +266,7 @@ const InputPanel = (props: {address: string}): ReactElement => {
                             ),
                             {color: ColorScheme.Text.DescText},
                         ]}>
-                        {t('no_internet_cannot_zap')}
+                        {t('no_internet_cannot_pay')}
                     </VText>
                 </View>
             )}
