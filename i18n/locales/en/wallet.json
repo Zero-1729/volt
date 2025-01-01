@@ -181,7 +181,7 @@
     "lnurl_withdrawal_success": "Withdrawal successful, waiting to complete...",
     "lnurl_withdrawal_failed": "Withdrawal failed: {{reason}}",
     "no_internet_cannot_swap": "Cannot swap while offline, connect to the Internet.",
-    "no_internet_cannot_zap": "Cannot zap while offline, connect to the Internet.",
+    "no_internet_cannot_pay": "Cannot pay while offline, connect to the Internet.",
     "no_internet_withdrawal": "Cannot withdraw while offline, connect to the Internet.",
     "return_home": "Return Home",
     "bolt_nfc_parking": "Scan NFC Tag",
