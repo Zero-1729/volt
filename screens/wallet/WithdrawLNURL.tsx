@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useContext} from 'react';
 import {Text, View, useColorScheme, StyleSheet, ActivityIndicator} from 'react-native';
 
 import VText from '../../components/text';
@@ -15,6 +15,7 @@ import {useTranslation} from 'react-i18next';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
+import {BreezEventVariant} from '@breeztech/react-native-breez-sdk';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -37,6 +38,7 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 
 import BigNumber from 'bignumber.js';
+import { AppStorageContext } from '../../class/storageContext';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'WithdrawLNURL'>;
 
@@ -47,6 +49,10 @@ const WithdrawLNURL = ({route}: Props) => {
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
+
+    const {
+        setBreezEvent,
+    } = useContext(AppStorageContext);
 
     const navigation = useNavigation();
     const isNetOn = useNetInfo();
@@ -115,10 +121,7 @@ const WithdrawLNURL = ({route}: Props) => {
             });
 
             if (lnUrlWithdrawResult.type === LnUrlWithdrawResultVariant.OK) {
-                navigation.dispatch(CommonActions.reset({
-                    index: 0,
-                    routes: [{name: 'HomeScreen'}],
-                }));
+                setBreezEvent({type: BreezEventVariant.INVOICE_PAID, details: lnUrlWithdrawResult.data.invoice});
             }
 
             setProcessingWithdraw(false);
@@ -127,7 +130,7 @@ const WithdrawLNURL = ({route}: Props) => {
             setFetchErrorMessage(err.message);
             setProcessingWithdraw(false);
         }
-    }, [lnurlData, maxAmountMsat, navigation]);
+    }, [lnurlData, maxAmountMsat, setBreezEvent]);
 
     useEffect(() => {
         grabLNURL();
