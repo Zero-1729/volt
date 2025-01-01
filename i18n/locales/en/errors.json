@@ -45,5 +45,6 @@
     "below_dust_limit": "Invoice amount is below dust limit",
     "balance_below_invoice": "Onchain balance insufficient, add funds to onchain balance",
     "cannot_pay_address_type": "Wallet cannot pay to a {{addressTypeName}} address",
-    "lnurl_replay_error": "Fully withdrawn maximum LNURL amount set"
+    "lnurl_replay_error": "Fully withdrawn maximum LNURL amount set",
+    "lnurl_topup_error": "LNURL topup not supported"
 }
