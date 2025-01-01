@@ -198,6 +198,5 @@
     "unsupported_lightning": "Unsupported Lightning Invoice",
     "loading_lnurlwithdraw_data": "Fetching LNURL Withdraw data...",
     "loading_lnurlwithdraw": "Requesting LNURL Withdraw...",
-    "no_lnurl_response": "No response from LNURL server",
-    "lnurl_replay_error": "Fully withdrawn maximum LNURL amount set"
+    "no_lnurl_response": "No response from LNURL server"
 }

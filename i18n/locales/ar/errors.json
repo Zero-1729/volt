@@ -44,5 +44,6 @@
     "onchain_empty": "رصيد Onchain فارغ، قم بإضافة الأموال إلى رصيد Onchain",
     "below_dust_limit": "مبلغ الفاتورة أقل من حد الغبار",
     "balance_below_invoice": "رصيد Onchain غير كافي، قم بإضافة أموال إلى رصيد Onchain",
-    "cannot_pay_address_type": "لا تستطيع المحفظة الدفع إلى عنوان {{addressTypeName}}."
+    "cannot_pay_address_type": "لا تستطيع المحفظة الدفع إلى عنوان {{addressTypeName}}.",
+    "lnurl_replay_error": "تم تحديد الحد الأقصى لمبلغ LNURL المسحوب بالكامل"
 }
