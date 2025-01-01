@@ -295,6 +295,20 @@ const WithdrawLNURL = ({route}: Props) => {
                     )}
                 </View>
 
+                {/* Show cancel */}
+                {fetchError && (
+                    <View style={[tailwind('items-center justify-center absolute px-4 py-2'), {bottom: NativeWindowMetrics.height * 0.15}]}>
+                        <PlainButton onPress={() => {
+                            navigation.dispatch(CommonActions.reset({
+                                index: 0,
+                                routes: [{name: 'HomeScreen'}],
+                            }));
+                        }}>
+                            <VText style={[tailwind('text-white font-bold')]}>{capitalizeFirst(t('cancel'))}</VText>
+                        </PlainButton>
+                    </View>
+                )}
+
                 <LongBottomButton
                     disabled={!isNetOn || loadingWithdrawal || fetchError}
                     title={capitalizeFirst(t('withdraw'))}
