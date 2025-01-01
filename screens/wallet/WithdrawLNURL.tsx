@@ -215,7 +215,7 @@ const WithdrawLNURL = ({route}: Props) => {
                             </VText>
                             <VText
                                 style={[
-                                    tailwind('text-base'),
+                                    tailwind('text-base text-center'),
                                     {color: ColorScheme.Text.Default},
                                 ]}>
                                 {fetchErrorMessage}
