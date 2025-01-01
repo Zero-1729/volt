@@ -259,7 +259,7 @@ const WithdrawLNURL = ({route}: Props) => {
                     )}
 
                     {/* Display the message */}
-                    {description && (
+                    {!processingWithdraw && description && (
                         <>
                             <View
                                 style={[
