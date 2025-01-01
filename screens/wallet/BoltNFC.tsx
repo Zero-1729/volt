@@ -148,12 +148,10 @@ const BoltNFC = ({route}: Props) => {
                     const maxAmount = input.data.maxWithdrawable; // in sats
 
                     // Check if above limit
+                    // Assume this means withdraw limit reached, i.e. broke
                     if (amountSats.gt(maxAmount)) {
                         setStatusMessage(
-                            t('above_lnurl_withdraw_limit', {
-                                amount: amountSats,
-                                maxAmount: maxAmount,
-                            }),
+                            t('lnurlp_insuffient_funds'),
                         );
                         setLoading(false);
                         return;
