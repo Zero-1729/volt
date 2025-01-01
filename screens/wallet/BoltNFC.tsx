@@ -82,8 +82,7 @@ const BoltNFC = ({route}: Props) => {
         statusMessage.toLowerCase().includes('limit');
     // Description for LNURL Withdrawal
     const description = route.params?.description
-        ? route.params.description
-        : `Volt ${formatSats(amountSats)} sats Withdrawal`;
+        ? route.params.description : '';
     const isDisabledNFC = statusMessage === t('nfc_disabled');
 
     const buttonText = useMemo(() => {

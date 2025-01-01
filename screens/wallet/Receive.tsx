@@ -269,12 +269,9 @@ const Receive = ({route}: Props) => {
             (state.bitcoinValue > 0 ? state.bitcoinValue : route.params.sats) *
             1_000;
 
-        const satsAmt = mSats / 1_000;
-
         // Description
         const ln_desc = route.params.lnDescription
-            ? route.params.lnDescription
-            : `Volt LN invoice for ${addCommas(satsAmt.toString())} sats`;
+            ? route.params.lnDescription : '';
 
         try {
             const receivePaymentResp = await receivePayment({
