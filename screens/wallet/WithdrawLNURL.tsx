@@ -77,6 +77,13 @@ const WithdrawLNURL = ({route}: Props) => {
         try {
             const input = await parseInput(route.params.lnurl);
 
+            if (input.type === InputTypeVariant.LN_URL_PAY) {
+                // Does not support LNURLw top up requests
+                // TODO: Add support for LNURLw top up requests
+                setFetchError(true);
+                setFetchErrorMessage(e('lnurl_topup_error'));
+            }
+
             // handle soft error
             if (input.type === InputTypeVariant.LN_URL_ERROR) {
                 if (input.data.reason.includes('Replayed or expired query')) {
