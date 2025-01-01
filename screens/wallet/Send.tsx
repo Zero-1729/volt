@@ -374,9 +374,8 @@ const SendView = ({route}: Props) => {
         const _nodeID = await nodeInfo();
 
         // Check if bolt11 is self
-        if (_bolt11?.payeePubkey !== _nodeID.id) {
-            setPaymentToSelf(false);
-        } else {
+        if (_bolt11?.payeePubkey === _nodeID.id) {
+            setPaymentToSelf(true);
             setPaySelfMessage(t('payment_to_self_detected'));
         }
     }, []);
