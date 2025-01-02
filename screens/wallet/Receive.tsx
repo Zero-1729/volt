@@ -49,7 +49,6 @@ import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 
 import {
-    addCommas,
     capitalizeFirst,
     formatFiat,
     normalizeFiat,
