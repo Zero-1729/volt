@@ -77,6 +77,7 @@ const SwapIn = ({route}: Props) => {
         mempoolInfo,
         appFiatCurrency,
         appLanguage,
+        isAdvancedMode,
     } = useContext(AppStorageContext);
     const wallet = getWalletData(currentWalletID);
 
@@ -743,7 +744,7 @@ const SwapIn = ({route}: Props) => {
                             </View>
 
                             {/* Lock Height */}
-                            <View
+                            {isAdvancedMode && <View
                                 style={[
                                     tailwind('w-full justify-start px-4 py-2'),
                                 ]}>
@@ -767,7 +768,7 @@ const SwapIn = ({route}: Props) => {
                                     ]}>
                                     {swapInfo.lockHeight}
                                 </VText>
-                            </View>
+                            </View>}
                         </View>
 
                         <View
@@ -835,23 +836,7 @@ const SwapIn = ({route}: Props) => {
                 )}
             </View>
         );
-    }, [
-        tailwind,
-        loadingTX,
-        ColorScheme,
-        statusMessage,
-        failedTx,
-        t,
-        txID,
-        langDir,
-        route.params.invoiceData.options?.amount,
-        appFiatCurrency.symbol,
-        appLanguage.code,
-        fiatRate.rate,
-        swapInfo.lockHeight,
-        errMessage,
-        navigation,
-    ]);
+    }, [tailwind, loadingTX, ColorScheme.Text.Default, ColorScheme.Text.DescText, ColorScheme.Text.Alt, ColorScheme.SVG.Default, ColorScheme.Background.Greyed, ColorScheme.Background.Inverted, statusMessage, failedTx, t, txID, langDir, route.params.invoiceData.options?.amount, appFiatCurrency.symbol, fiatRate.rate, isAdvancedMode, swapInfo.lockHeight, appLanguage.code, errMessage, navigation]);
 
     const panels = useMemo(
         (): Slide[] => [breakdownPanel, inflightPanel],
