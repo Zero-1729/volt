@@ -344,7 +344,7 @@ const Receive = ({route}: Props) => {
 
     useEffect(() => {
         processLNInvoice();
-    }, [displayLNInvoice, processLNInvoice, walletData.type]);
+    }, [processLNInvoice]);
 
     useEffect(() => {
         if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
