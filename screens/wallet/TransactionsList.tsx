@@ -51,6 +51,7 @@ const TransactionList = () => {
     const [filteredKind, setFilteredKind] = useState<ETransactionKind>(
         ETransactionKind.ALL,
     );
+    // TODO: fix refresh
     const [refreshing, setRefreshing] = useState(false);
 
     const {t} = useTranslation('wallet');
