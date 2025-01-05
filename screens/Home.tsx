@@ -521,7 +521,7 @@ const Home = ({route}: Props) => {
                                 </VText>
                             </View>
 
-                            <LightningBoltIcon width={18} height={18} fill={breezConnected ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />
+                            {isLightning && <LightningBoltIcon width={18} height={18} fill={breezConnected ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />}
                         </View>
 
                         <PlainButton
