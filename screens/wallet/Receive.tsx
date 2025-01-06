@@ -542,9 +542,7 @@ const Receive = ({route}: Props) => {
                         ]}
                         onPress={() => {
                             navigation.dispatch(
-                                CommonActions.navigate({
-                                    name: 'RequestAmount',
-                                }),
+                                CommonActions.goBack(),
                             );
                         }}>
                         <EditIcon
