@@ -135,7 +135,9 @@ const RequestAmount = ({route}: Props) => {
             walletType === 'unified');
 
     useEffect(() => {
-        setMaxReceivableAmount();
+        if (wallet.type === 'unified') {
+            setMaxReceivableAmount();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
