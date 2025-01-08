@@ -15,7 +15,6 @@ import {useTranslation} from 'react-i18next';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
-import {BreezEventVariant} from '@breeztech/react-native-breez-sdk';
 
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -35,6 +34,7 @@ import {
     withdrawLnurl,
     LnUrlWithdrawRequestData,
     LnUrlWithdrawResultVariant,
+    BreezEventVariant,
 } from '@breeztech/react-native-breez-sdk';
 
 import BigNumber from 'bignumber.js';
