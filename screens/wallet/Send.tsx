@@ -231,7 +231,7 @@ const SendView = ({route}: Props) => {
             const bolt11 = route.params.bolt11;
             const result = await sendPayment({
                 bolt11: bolt11?.bolt11 as string,
-                useTrampoline: false,
+                useTrampoline: true,
             });
 
             if (result.payment.status === 'complete') {
