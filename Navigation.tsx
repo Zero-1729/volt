@@ -520,7 +520,7 @@ const RootNavigator = (): ReactElement => {
     };
 
     const isInProtectedScreens = (route: string): boolean => {
-        return route === 'BoltNFC' || route === 'WithdrawLNURL' || route === 'PayInvoice';
+        return route === 'BoltNFC' || route === 'WithdrawLNURL' || route === 'PayInvoice' || route === 'PayLNURL';
     };
 
     // Clipboard check
