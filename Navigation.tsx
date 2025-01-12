@@ -490,7 +490,6 @@ const RootNavigator = (): ReactElement => {
         isAdvancedMode,
         getWalletData,
         currentWalletID,
-        isWalletInitialized,
         mempoolInfo,
         setBreezEvent,
         setMempoolInfo,
@@ -731,11 +730,10 @@ const RootNavigator = (): ReactElement => {
     // Breez startup
     const initNode = async () => {
         // Init LN connection
-        // No point putting in any effort if mnemonic missing
+        // No point putting in any effort if mnemonic missing, not LN wallet, or onboarding
         if (
-            wallet?.mnemonic.length === 0 &&
-            isWalletInitialized &&
-            wallet.type === 'unified' &&
+            wallet?.mnemonic.length === 0 ||
+            wallet.type !== 'unified' ||
             onboarding
         ) {
             return;
