@@ -915,7 +915,6 @@ const RootNavigator = (): ReactElement => {
 
         // Init LN services
         // Call mempool
-        initNode();
         initMempoolSock();
 
         // Net event listener
@@ -940,6 +939,13 @@ const RootNavigator = (): ReactElement => {
             NetInfoSub();
         };
     }, []);
+
+    useEffect(() => {
+        if (!!wallet?.mnemonic && wallet.type === 'unified') {
+            // Init LN services
+            initNode();
+        }
+    }, [wallet.mnemonic]);
 
     return (
         <NavigationContainer
