@@ -2338,13 +2338,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@breeztech/react-native-breez-sdk@npm:^0.6.4":
-  version: 0.6.4
-  resolution: "@breeztech/react-native-breez-sdk@npm:0.6.4"
+"@breeztech/react-native-breez-sdk@npm:^0.6.6":
+  version: 0.6.6
+  resolution: "@breeztech/react-native-breez-sdk@npm:0.6.6"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/3c2b93cbde9f3a8c6bc7b77f16bb421836bb81407510dd1621375ab460260a3fbc1801326a26a09aa3e64e890ffaba80e444b8635d28b2a8701cbe8c315ddd65
+  checksum: 10/10320d76d1ec7d9ad53bc8f820590ed3fdc43f5cb1ff46cd7dee8a1f1fb8f97666602e28c3e2b48e27f724820b1229e2bd21fb2e0444669dbbd4b82d1ac0cdbe
   languageName: node
   linkType: hard
 
@@ -13473,7 +13473,7 @@ __metadata:
     "@backpackapp-io/react-native-toast": "npm:^0.13.0"
     "@bitcoinerlab/descriptors": "https://github.com/Zero-1729/descriptors.git"
     "@bitcoinerlab/secp256k1": "npm:^1.1.0"
-    "@breeztech/react-native-breez-sdk": "npm:^0.6.4"
+    "@breeztech/react-native-breez-sdk": "npm:^0.6.6"
     "@craftzdog/react-native-buffer": "npm:^6.0.5"
     "@formatjs/intl-datetimeformat": "npm:^6.12.2"
     "@formatjs/intl-getcanonicallocales": "npm:^2.3.0"
