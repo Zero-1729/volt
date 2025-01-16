@@ -100,7 +100,6 @@
     "react-native-svg-transformer": "^1.5.0",
     "react-native-tooltip": "^5.2.0",
     "react-native-vision-camera": "^4.6.3",
-    "rn-nodeify": "^10.3.0",
     "stream-browserify": "^3.0.0",
     "tailwind-rn": "^4.2.0",
     "url": "^0.11.4"
