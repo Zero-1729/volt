@@ -21,7 +21,6 @@ import Color from '../constants/Color';
 
 import {useTranslation} from 'react-i18next';
 
-import {useTailwind} from 'tailwind-rn';
 import {addCommas, capitalizeFirst, normalizeFiat} from '../modules/transform';
 
 import {TComboWallet, TMiniWallet, TTransaction} from '../types/wallet';
@@ -46,7 +45,6 @@ type BumpTxFeeProps = {
 };
 
 const BumpTxFee = (props: BumpTxFeeProps) => {
-    const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['65'], []);
 
     const {t, i18n} = useTranslation('wallet');
@@ -176,78 +174,59 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
             handleIndicatorColor={'#64676E'}
             backdrop={true}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center relative'),
-                    {
+                className="w-full h-full items-center relative"
+                style={{
                         backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
-                <View style={[tailwind('w-full px-2 h-full items-center')]}>
+                    }}>
+                <View className="w-full px-2 h-full items-center">
                     {/* Display Fee update */}
                     {/* Display recommended feeRate and custom fee setting */}
                     {/* Then use prop fn to call and route to wallet and request 'reload=true' */}
-                    <View style={[tailwind('w-full items-center')]}>
+                    <View className="w-full items-center">
                         <Text
-                            style={[
-                                tailwind('text-lg font-semibold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-lg font-semibold"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('bump_fee')}
                         </Text>
                     </View>
 
                     <View
-                        style={[
-                            tailwind('w-full px-4 py-4 rounded-md mt-4'),
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        <View style={[tailwind('flex')]}>
+                        className="w-full px-4 py-4 rounded-md mt-4"
+                        style={{backgroundColor: ColorScheme.Background.Greyed}}>
+                        <View className="flex">
                             <VText
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {color: ColorScheme.Text.GrayText},
-                                ]}>
+                                className="text-sm font-bold"
+                                style={{color: ColorScheme.Text.GrayText}}>
                                 {t('tx_id')}
                             </VText>
                             <VTextSingle
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {newTxId.length > 0 ? newTxId : props.tx.txid}
                             </VTextSingle>
                         </View>
 
                         {/* Display current fee rate */}
-                        <View style={[tailwind('items-center mt-4 w-full')]}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        `${
+                        <View className="items-center mt-4 w-full">
+                            <View className={`${
                                             langDir === 'right'
                                                 ? 'flex-row-reverse'
                                                 : 'flex-row'
-                                        } items-center w-full`,
-                                    ),
-                                ]}>
+                                        } items-center w-full`}>
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            `text-left text-sm font-semibold ${
-                                                langDir === 'right'
-                                                    ? 'ml-4'
-                                                    : 'mr-4'
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.GrayText},
-                                    ]}>
+                                    className={`text-left text-sm font-semibold
+                                        ${
+                                            langDir === 'right'
+                                                ? 'ml-4'
+                                                : 'mr-4'
+                                        }`
+                                    }
+                                    style={{color: ColorScheme.Text.GrayText}}>
                                     {capitalizeFirst(t('fee'))}
                                 </VText>
                                 <VText
-                                    style={[
-                                        tailwind('text-left text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-left text-sm"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {`~${addCommas(
                                         props.tx.fee.toString(),
                                     )} sats (${
@@ -261,35 +240,24 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                         </View>
 
                         {/* Display current fee rate */}
-                        <View style={[tailwind('items-center mt-1 w-full')]}>
-                            <View
-                                style={[
-                                    tailwind(
-                                        `${
+                        <View className="items-center mt-1 w-full">
+                            <View className={`${
                                             langDir === 'right'
                                                 ? 'flex-row-reverse'
                                                 : 'flex-row'
-                                        } items-center w-full`,
-                                    ),
-                                ]}>
+                                        } items-center w-full`}>
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            `text-left text-sm font-semibold ${
+                                    className={`text-left text-sm font-semibold ${
                                                 langDir === 'right'
                                                     ? 'ml-4'
                                                     : 'mr-4'
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.GrayText},
-                                    ]}>
+                                            }`}
+                                    style={{color: ColorScheme.Text.GrayText}}>
                                     {capitalizeFirst(t('feerate'))}
                                 </VText>
                                 <VText
-                                    style={[
-                                        tailwind('text-left text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-left text-sm"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {`~${addCommas(
                                         oldTxFeeRate.toString(),
                                     )} ${t('sat_vbyte')}`}
@@ -302,37 +270,29 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                         onPress={() => {
                             openFeePrompt();
                         }}
-                        style={[
-                            tailwind(
-                                `items-center px-4 ${
+                        className={`items-center px-4 ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
-                                } justify-between mt-4 w-full rounded-md`,
-                            ),
-                            {
+                                } justify-between mt-4 w-full rounded-md`}
+                        style={{
                                 height: 64,
                                 borderWidth: 2,
                                 borderColor: ColorScheme.Background.Greyed,
-                            },
-                        ]}>
+                            }}>
                         <VText
-                            style={[
-                                tailwind('text-sm font-bold'),
-                                {
+                            className="text-sm font-bold"
+                            style={{
                                     color: ColorScheme.Text.Default,
-                                },
-                            ]}>
+                                }}>
                             {feeRate > 0 ? t('update_fee') : t('fee_bump_text')}
                         </VText>
                         {feeRate > 0 && (
                             <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {
+                                className="text-sm"
+                                style={{
                                         color: ColorScheme.Text.DescText,
-                                    },
-                                ]}>
+                                    }}>
                                 {`~${addCommas(
                                     (props.tx.vsize * feeRate).toString(),
                                 )} sats (${
@@ -346,27 +306,23 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                     </PlainButton>
 
                     <View
-                        style={[
-                            tailwind('w-full items-center absolute'),
-                            {
+                        className="w-full items-center absolute"
+                        style={{
                                 bottom:
                                     NativeWindowMetrics.bottomButtonOffset + 48,
-                            },
-                        ]}>
-                        <View style={[tailwind('w-full mb-6 items-center')]}>
+                            }}>
+                        <View className="w-full mb-6 items-center">
                             {loading && (
                                 <ActivityIndicator
-                                    style={[tailwind('mb-2')]}
+                                    className='mb-2'
                                     size="small"
                                     color={ColorScheme.SVG.Default}
                                 />
                             )}
                             {loading && (
                                 <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {t('bumping_tx')}
                                 </Text>
                             )}

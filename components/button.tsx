@@ -2,8 +2,6 @@ import React from 'react';
 
 import {TouchableOpacity, View, Text} from 'react-native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 import {BaseProps, ButtonProps} from '../types/props';
@@ -13,22 +11,16 @@ export const PlainButton = (props: BaseProps) => {
 };
 
 export const Button = (props: ButtonProps) => {
-    const tailwind = useTailwind();
-
     return (
-        <TouchableOpacity style={tailwind('items-center flex-row')} {...props}>
+        <TouchableOpacity className="items-center flex-row" {...props}>
             <View
-                style={[
-                    tailwind('px-4 py-2 w-2/6 rounded mb-6 mt-4 items-center'),
-                    {
+                className="px-4 py-2 w-2/6 rounded mb-6 mt-4 items-center"
+                style={{
                         backgroundColor: props.backgroundColor,
-                    },
-                ]}>
+                    }}>
                 <Text
-                    style={[
-                        tailwind('text-xs font-medium'),
-                        {color: props.color},
-                    ]}>
+                    className="text-xs font-medium"
+                    style={{color: props.color}}>
                     {props.title}
                 </Text>
             </View>
@@ -37,25 +29,19 @@ export const Button = (props: ButtonProps) => {
 };
 
 export const LongButton = (props: ButtonProps) => {
-    const tailwind = useTailwind();
-
     return (
         <TouchableOpacity
             {...props}
-            style={[
-                tailwind('w-full rounded-full items-center'),
-                {
+            className="w-full rounded-full items-center"
+            style={{
                     backgroundColor: props.backgroundColor,
-                },
-            ]}>
-            <View style={[tailwind('w-full self-center items-center')]}>
+            }}>
+            <View className="w-full self-center items-center">
                 <Text
-                    style={[
-                        tailwind('px-4 py-4 font-bold'),
-                        {
+                    className="px-4 py-4 font-bold"
+                    style={{
                             color: props.textColor,
-                        },
-                    ]}>
+                        }}>
                     {props.title}
                 </Text>
             </View>
@@ -64,30 +50,22 @@ export const LongButton = (props: ButtonProps) => {
 };
 
 export const LongBottomButton = (props: ButtonProps) => {
-    const tailwind = useTailwind();
-
     return (
         <TouchableOpacity
             {...props}
-            style={[
-                tailwind(
-                    `w-5/6 absolute rounded-full ${
-                        props.disabled ? 'opacity-20' : ''
-                    }`,
-                ),
-                {
+            className="w-5/6 absolute rounded-full"
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{
                     bottom: NativeWindowMetrics.bottomButtonOffset,
                     backgroundColor: props.backgroundColor,
-                },
-            ]}>
-            <View style={[tailwind('w-full self-center items-center')]}>
+                    opacity: props.disabled ? 0.2 : 1,
+                }}>
+            <View className="w-full self-center items-center">
                 <Text
-                    style={[
-                        tailwind('px-4 py-4 font-bold'),
-                        {
+                    className="px-4 py-4 font-bold"
+                    style={{
                             color: props.textColor,
-                        },
-                    ]}>
+                        }}>
                     {props.title}
                 </Text>
             </View>
