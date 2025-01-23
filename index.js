@@ -1,4 +1,5 @@
 import './shim';
+import './global.css';
 
 import React from 'react';
 import {AppRegistry, StyleSheet} from 'react-native';
