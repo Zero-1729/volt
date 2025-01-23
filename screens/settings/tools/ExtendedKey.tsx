@@ -11,7 +11,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import DropDownPicker from 'react-native-dropdown-picker';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useTranslation} from 'react-i18next';
@@ -63,7 +62,6 @@ const ExtendedKey = () => {
     const [version, setVersion] = useState('x');
     const [versions, setVersions] = useState(xKeyVersionsSet);
 
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -169,27 +167,23 @@ const ExtendedKey = () => {
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 <View
-                    style={[
-                        tailwind(
-                            `${
-                                langDir === 'right'
-                                    ? 'flex-row-reverse'
-                                    : 'flex-row'
-                            } items-center justify-center relative mt-6 w-5/6`,
-                        ),
-                    ]}>
+                    className={
+                        `${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        } items-center justify-center relative mt-6 w-5/6`
+                    }>
                     <VText
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('ext_key_converter')}
                     </VText>
 
                     <PlainButton
-                        style={[tailwind('absolute right-0')]}
+                        className="absolute right-0"
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
@@ -198,22 +192,18 @@ const ExtendedKey = () => {
                 </View>
 
                 {/* Content */}
-                <View style={tailwind('mt-20 w-5/6')}>
+                <View className="mt-20 w-5/6">
                     <VText
-                        style={[
-                            tailwind('text-sm'),
-                            {color: ColorScheme.Text.GrayedText},
-                        ]}>
+                        className="text-sm"
+                        style={{color: ColorScheme.Text.GrayedText}}>
                         {t('ext_key_converter_description')}
                     </VText>
                 </View>
 
                 {/* Input */}
                 <View
-                    style={[
-                        tailwind('w-5/6 mt-8 border-gray-400 px-2'),
-                        {borderWidth: 1, borderRadius: 6},
-                    ]}>
+                    className="w-5/6 mt-8 border-gray-400 px-2"
+                    style={{borderWidth: 1, borderRadius: 6}}>
                     <TextSingleInput
                         refs={inputTextRef}
                         placeholder={t('ext_key_converter_placeholder')}
@@ -226,25 +216,23 @@ const ExtendedKey = () => {
                 </View>
 
                 {/* Dropdown */}
-                <View style={[tailwind('mt-6 w-5/6 self-center z-50')]}>
+                <View className="mt-6 w-5/6 self-center z-50">
                     <VText
-                        style={[
-                            tailwind('text-sm'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('select_version')}
                     </VText>
 
                     <DropDownPicker
                         style={[
-                            tailwind('rounded-md'),
                             {
                                 backgroundColor:
                                     ColorScheme.Background.Secondary,
                                 borderColor: ColorScheme.Background.Greyed,
+                                borderRadius: '6px',
                             },
                         ]}
-                        containerStyle={[tailwind('mt-2')]}
+                        containerStyle={[{marginTop: 2}]}
                         labelStyle={{color: ColorScheme.Text.Default}}
                         dropDownContainerStyle={{
                             borderColor: ColorScheme.Background.Greyed,
@@ -273,31 +261,25 @@ const ExtendedKey = () => {
 
                 {/* Result */}
                 {resultMessage.length > 0 && (
-                    <View style={[tailwind('mt-8 w-5/6')]}>
+                    <View className="mt-8 w-5/6">
                         <VText
-                            style={[
-                                tailwind('text-sm mb-4'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-sm mb-4"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {t('converted_xpub_text')}
                         </VText>
 
                         <PlainButton
-                            style={[
-                                tailwind('rounded p-4'),
-                                {
+                            className="rounded p-4"
+                            style={{
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
-                                },
-                            ]}
+                                }}
                             onPress={() => {
                                 copyXpubToClipboard();
                             }}>
                             <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {resultMessage}
                             </VText>
                         </PlainButton>
@@ -306,7 +288,7 @@ const ExtendedKey = () => {
 
                 {/* Converter Button */}
                 <LongBottomButton
-                    style={[tailwind('mt-12 w-full items-center')]}
+                    className="mt-12 w-full items-center"
                     title={`${
                         resultMessage
                             ? capitalizeFirst(t('clear'))
