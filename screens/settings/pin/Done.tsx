@@ -2,7 +2,6 @@
 import {Text, View, useColorScheme} from 'react-native';
 import React, {useContext} from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useNavigation} from '@react-navigation/native';
@@ -27,7 +26,6 @@ type Props = NativeStackScreenProps<SettingsParamList, 'DonePIN'>;
 
 const Done = ({route}: Props) => {
     const navigation = useNavigation();
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {setPINActive, setPINAttempts} = useContext(AppStorageContext);
@@ -88,16 +86,12 @@ const Done = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 <View
-                    style={[
-                        tailwind('items-center h-full w-full justify-center'),
-                    ]}>
+                    className="items-center h-full w-full justify-center">
                     <View
-                        style={[
-                            tailwind('items-center w-5/6'),
-                            {marginTop: -64},
-                        ]}>
+                        className="items-center w-5/6"
+                        style={{marginTop: -64}}>
                         <View
                             style={[
                                 {
@@ -119,18 +113,14 @@ const Done = ({route}: Props) => {
                         </View>
 
                         <Text
-                            style={[
-                                tailwind('text-xl font-bold text-white mb-2'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-xl font-bold text-white mb-2"
+                            style={{color: ColorScheme.Text.Default}}>
                             {titleText}
                         </Text>
 
                         <Text
-                            style={[
-                                tailwind('text-base text-center'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {titleDesc}
                         </Text>
                     </View>

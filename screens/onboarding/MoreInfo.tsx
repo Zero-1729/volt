@@ -10,8 +10,6 @@ import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst} from '../../modules/transform';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {LongBottomButton} from '../../components/button';
 
 import Color from '../../constants/Color';
@@ -23,8 +21,6 @@ const MoreInfo = () => {
 
     const ColorScheme = Color(useColorScheme());
     const theme = useColorScheme();
-
-    const tailwind = useTailwind();
 
     const {t} = useTranslation('onboarding');
 
@@ -39,39 +35,29 @@ const MoreInfo = () => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind(
-                        'w-full h-full relative items-center justify-center',
-                    ),
-                    {
+                className="w-full h-full relative items-center justify-center"
+                style={{
                         backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
-                <View style={[tailwind('items-center'), {top: -40}]}>
+                    }}>
+                <View className="items-center" style={{top: -40}}>
                     <View
-                        style={[
-                            tailwind('justify-center items-center w-full'),
-                        ]}>
+                        className="justify-center items-center w-full">
                         {theme === 'dark' ? (
                             <BoltDarkIcon width={128} height={128} />
                         ) : (
                             <BoltLightIcon width={128} height={128} />
                         )}
 
-                        <View style={[tailwind('mt-6 px-8 text-center')]}>
+                        <View className="mt-6 px-8 text-center">
                             <Text
-                                style={[
-                                    tailwind('text-xl font-bold text-center'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-xl font-bold text-center"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('bolt_nfc_support')}
                             </Text>
 
                             <Text
-                                style={[
-                                    tailwind('mt-4 text-sm text-center'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
+                                className="mt-4 text-sm text-center"
+                                style={{color: ColorScheme.Text.GrayedText}}>
                                 {t('bolt_nfc_description')}
                             </Text>
                         </View>

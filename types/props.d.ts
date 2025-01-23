@@ -11,6 +11,7 @@ export type BaseProps = PropsWithChildren<{
     onPress?: () => void;
     disabled?: boolean;
     activeOpacity?: number;
+    className?: string;
 }>;
 
 export type VTextProps = {
@@ -18,6 +19,7 @@ export type VTextProps = {
     ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     children?: React.ReactNode;
+    className?: string;
 };
 
 export type AppCard = BaseProps & {

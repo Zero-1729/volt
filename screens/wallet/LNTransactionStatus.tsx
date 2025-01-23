@@ -28,7 +28,6 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {capitalizeFirst} from '../../modules/transform';
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import {
@@ -51,7 +50,6 @@ import eNutsConfetti from '../../assets/lottie/e-nuts-confetti.json';
 type Props = NativeStackScreenProps<InitStackParamList, 'LNTransactionStatus'>;
 
 const LNTransactionStatus = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -162,14 +160,14 @@ const LNTransactionStatus = ({route}: Props) => {
             ]}>
             <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
+                className="w-full h-full justify-center"
                 style={[
                     styles.statusContainer,
-                    tailwind('w-full h-full justify-center'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View style={[tailwind('h-full justify-center')]}>
+                <View className="h-full justify-center">
                     {!!route.params.status && (
                         <View
                             style={[
@@ -192,23 +190,17 @@ const LNTransactionStatus = ({route}: Props) => {
                     )}
 
                     <Text
-                        style={[
-                            tailwind(
-                                'text-lg absolute font-bold text-center w-full top-6 px-4',
-                            ),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg absolute font-bold text-center w-full top-6 px-4"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('lightning_invoice')}
                     </Text>
 
                     <View
-                        style={[
-                            tailwind('-mt-12 justify-center px-4 items-center'),
-                        ]}>
-                        <View style={[tailwind('items-center')]}>
+                        className="-mt-12 justify-center px-4 items-center">
+                        <View className="items-center">
                             {!route.params.status && (
                                 <Failed
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -217,7 +209,7 @@ const LNTransactionStatus = ({route}: Props) => {
 
                             {route.params.status && (
                                 <Success
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -226,7 +218,7 @@ const LNTransactionStatus = ({route}: Props) => {
                         </View>
 
                         {route.params.detailsType === 'received' && (
-                            <View style={[tailwind('mt-4 mb-2 items-center')]}>
+                            <View className="mt-4 mb-2 items-center">
                                 <FiatBalance
                                     balance={sats()}
                                     loading={false}
@@ -238,20 +230,16 @@ const LNTransactionStatus = ({route}: Props) => {
                         )}
 
                         <View
-                            style={[
-                                tailwind(
-                                    `w-4/5 ${
-                                        route.params.detailsType === 'received'
-                                            ? ''
-                                            : 'mt-4'
-                                    } items-center`,
-                                ),
-                            ]}>
+                            className={
+                                `w-4/5 ${
+                                    route.params.detailsType === 'received'
+                                        ? ''
+                                        : 'mt-4'
+                                } items-center`
+                            }>
                             <Text
-                                style={[
-                                    tailwind('text-lg'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-lg"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {txTitle()}
                             </Text>
 
@@ -259,29 +247,23 @@ const LNTransactionStatus = ({route}: Props) => {
                                 EBreezDetails.Failed &&
                                 isAdvancedMode && (
                                     <Text
-                                        style={[
-                                            tailwind(
-                                                'text-sm text-center mt-2',
-                                            ),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm text-center mt-2"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayedText,
+                                        }}>
                                         {failedError}
                                     </Text>
                                 )}
                         </View>
 
                         {route.params.detailsType === 'received' && (
-                            <View style={[tailwind('items-center w-4/5')]}>
+                            <View className="items-center w-4/5">
                                 <Text
-                                    style={[
-                                        tailwind('text-sm text-center mt-2'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
+                                    className="text-sm text-center mt-2"
+                                    style={{
+                                        color: ColorScheme.Text.GrayedText,
+                                    }}>
                                     {
                                         (route.params.details as Payment)
                                             .description
@@ -292,9 +274,7 @@ const LNTransactionStatus = ({route}: Props) => {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('absolute bottom-0 items-center w-full'),
-                        ]}>
+                        className="absolute bottom-0 items-center w-full">
                         <LongBottomButton
                             onPress={() => {
                                 navigation.dispatch(CommonActions.reset({

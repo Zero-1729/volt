@@ -2,8 +2,6 @@
 import React, {useContext} from 'react';
 import {Text, View, useColorScheme} from 'react-native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import VText, {VTextSingle} from './text';
 
 import BigNumber from 'bignumber.js';
@@ -26,13 +24,13 @@ import {
     DisplaySatsAmountProps,
     DisplayFiatAmountProps,
 } from '../types/props';
-import {TFiatRate, TUnit} from '../types/wallet';
+import {TRateObject, TUnit} from '../types/wallet';
 import {useTranslation} from 'react-i18next';
 
 const _getBalance = (
     balance: BigNumber,
     unit: TUnit,
-    fiatRate: TFiatRate,
+    fiatRate: TRateObject,
     disableFiat: boolean,
 ) => {
     if (unit.name === 'sats') {
@@ -49,8 +47,6 @@ const _getBalance = (
 };
 
 export const TXBalance = (props: TxBalanceProps) => {
-    const tailwind = useTailwind();
-
     const {appUnit, fiatRate} = useContext(AppStorageContext);
 
     const {i18n} = useTranslation('common');
@@ -60,22 +56,12 @@ export const TXBalance = (props: TxBalanceProps) => {
     return (
         <>
             <View
-                style={[
-                    tailwind(
-                        `${
-                            langDir === 'right'
-                                ? 'flex-row-reverse'
-                                : 'flex-row'
-                        } items-center`,
-                    ),
-                ]}>
-                <View style={[tailwind('flex-row')]}>
+                className={`${langDir === 'right' ? 'flex-row-reverse' : 'flex-row'} items-center`}>
+                <View className="flex-row">
                     {/* Display Satoshi symbol or Bitcoin symbol */}
                     <VTextSingle
+                        className={`${props.balanceFontSize} self-start mr-2`}
                         style={[
-                            tailwind(
-                                `${props.balanceFontSize} self-start mr-2`,
-                            ),
                             {
                                 color: props.fontColor,
                                 marginTop: appUnit.name === 'sats' ? 1.5 : 0,
@@ -87,10 +73,8 @@ export const TXBalance = (props: TxBalanceProps) => {
 
                     {/* Display balance in sats */}
                     <VText
+                        className={`${props.balanceFontSize} font-bold text-white self-baseline`}
                         style={[
-                            tailwind(
-                                `${props.balanceFontSize} font-bold text-white self-baseline`,
-                            ),
                             {color: props.fontColor},
                         ]}>
                         {_getBalance(props.balance, appUnit, fiatRate, false)}
@@ -102,8 +86,6 @@ export const TXBalance = (props: TxBalanceProps) => {
 };
 
 export const Balance = (props: BalanceProps) => {
-    const tailwind = useTailwind();
-
     const {
         hideTotalBalance,
         appFiatCurrency,
@@ -143,12 +125,10 @@ export const Balance = (props: BalanceProps) => {
             {!hideTotalBalance ? (
                 <PlainButton onPress={toggleUnit} disabled={props.disabled}>
                     <View
+                        className={`flex-row items-center ${
+                                props.loading ? 'opacity-40' : ''
+                            }`}
                         style={[
-                            tailwind(
-                                `flex-row items-center ${
-                                    props.loading ? 'opacity-40' : ''
-                                }`,
-                            ),
                             {
                                 justifyContent:
                                     langDir === 'right'
@@ -158,20 +138,18 @@ export const Balance = (props: BalanceProps) => {
                         ]}>
                         {/* Satoshi Symbol */}
                         <Text
+                            className={`${
+                                    props.balanceFontSize
+                                        ? props.balanceFontSize
+                                        : 'text-2xl'
+                                } self-center ${
+                                    appUnit.name === 'sats' ? 'mt-0.5' : ''
+                                } mr-2`}
                             numberOfLines={1}
                             style={[
                                 {
                                     color: props.fontColor,
                                 },
-                                tailwind(
-                                    `${
-                                        props.balanceFontSize
-                                            ? props.balanceFontSize
-                                            : 'text-2xl'
-                                    } self-center ${
-                                        appUnit.name === 'sats' ? 'mt-0.5' : ''
-                                    } mr-2`,
-                                ),
                                 appUnit.name === 'sats' ? Font.SatSymbol : {},
                             ]}>
                             {appUnit.symbol}
@@ -179,15 +157,13 @@ export const Balance = (props: BalanceProps) => {
 
                         {/* Display balance in sats or BTC */}
                         <Text
+                            className={`${
+                                    props.balanceFontSize
+                                        ? props.balanceFontSize
+                                        : 'text-2xl'
+                                } self-center`}
                             numberOfLines={1}
                             style={[
-                                tailwind(
-                                    `${
-                                        props.balanceFontSize
-                                            ? props.balanceFontSize
-                                            : 'text-2xl'
-                                    } self-center`,
-                                ),
                                 {
                                     color: props.fontColor,
                                 },
@@ -204,10 +180,8 @@ export const Balance = (props: BalanceProps) => {
             ) : (
                 /* Empty view to keep the card height consistent  */
                 <View
+                    className="rounded-sm flex-row self-center rounded w-full h-12"
                     style={[
-                        tailwind(
-                            'rounded-sm flex-row self-center rounded w-full h-12',
-                        ),
                         {
                             opacity: props.loading ? 0.15 : 0.4,
                             backgroundColor: props.hideColor,
@@ -220,8 +194,6 @@ export const Balance = (props: BalanceProps) => {
 };
 
 export const FiatBalance = (props: FiatBalanceProps) => {
-    const tailwind = useTailwind();
-
     const {hideTotalBalance, appFiatCurrency, fiatRate} =
         useContext(AppStorageContext);
 
@@ -236,25 +208,21 @@ export const FiatBalance = (props: FiatBalanceProps) => {
         <View>
             {!(hideTotalBalance && !props.ignoreHideBalance) ? (
                 <View
+                    className={`flex-row items-center ${
+                            props.loading ? 'opacity-20' : ''
+                        }`}
                     style={[
-                        tailwind(
-                            `flex-row items-center ${
-                                props.loading ? 'opacity-20' : ''
-                            }`,
-                        ),
                         {justifyContent: langFlex},
                     ]}>
                     {/* Display fiat symbol */}
                     <Text
+                        className={`${
+                                props.balanceFontSize
+                                    ? props.balanceFontSize
+                                    : 'text-2xl'
+                            } self-baseline mr-2`}
                         numberOfLines={1}
                         style={[
-                            tailwind(
-                                `${
-                                    props.balanceFontSize
-                                        ? props.balanceFontSize
-                                        : 'text-2xl'
-                                } self-baseline mr-2`,
-                            ),
                             {color: props.fontColor, textAlign: langDir},
                         ]}>
                         {(props.amountSign ? props.amountSign + ' ' : '') +
@@ -263,15 +231,13 @@ export const FiatBalance = (props: FiatBalanceProps) => {
 
                     {/* Display balance in sats or BTC */}
                     <Text
+                        className={`${
+                                props.balanceFontSize
+                                    ? props.balanceFontSize
+                                    : 'text-2xl'
+                            } self-baseline`}
                         numberOfLines={1}
                         style={[
-                            tailwind(
-                                `${
-                                    props.balanceFontSize
-                                        ? props.balanceFontSize
-                                        : 'text-2xl'
-                                } self-baseline`,
-                            ),
                             {color: props.fontColor, textAlign: langDir},
                         ]}>
                         {_getBalance(
@@ -284,13 +250,7 @@ export const FiatBalance = (props: FiatBalanceProps) => {
                 </View>
             ) : (
                 /* Empty view to keep the card height consistent  */
-                <View
-                    style={[
-                        tailwind(
-                            'rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black',
-                        ),
-                    ]}
-                />
+                <View className="rounded-sm flex-row self-center w-full h-10 opacity-20 bg-black"/>
             )}
         </View>
     );
@@ -298,52 +258,44 @@ export const FiatBalance = (props: FiatBalanceProps) => {
 
 export const DisplayBTCAmount = (props: DisplaySatsAmountProps) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
-
     const {i18n} = useTranslation('common');
 
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     return (
-        <View style={[tailwind('flex-row')]}>
+        <View className="flex-row">
             {props.isApprox && (
                 <Text
-                    style={[
-                        tailwind('self-center'),
-                        {
+                    className="self-center"
+                    style={{
                             color: props.textColor
                                 ? props.textColor
                                 : ColorScheme.Text.Default,
                             textAlign: langDir,
-                        },
-                    ]}>
+                        }}>
                     ~{' '}
                 </Text>
             )}
             <Text
+                className={`${props.fontSize} self-center mt-0.5 mr-2`}
                 numberOfLines={1}
-                style={[
-                    tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
-                    {
+                style={{
                         color: props.textColor
                             ? props.textColor
                             : ColorScheme.Text.Default,
                         textAlign: langDir,
-                    },
-                ]}>
+                    }}>
                 ₿
             </Text>
 
             <Text
-                style={[
-                    tailwind(`${props.fontSize} self-center font-bold`),
-                    {
+                className={`${props.fontSize} self-center font-bold`}
+                style={{
                         color: props.textColor
                             ? props.textColor
                             : ColorScheme.Text.Default,
                         textAlign: langDir,
-                    },
-                ]}>
+                    }}>
                 {props.amount.isZero() ? '0' : formatBTC(props.amount)}
             </Text>
         </View>
@@ -352,32 +304,28 @@ export const DisplayBTCAmount = (props: DisplaySatsAmountProps) => {
 
 export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
-
     const {i18n} = useTranslation('common');
 
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     return (
-        <View style={[tailwind('flex-row')]}>
+        <View className="flex-row">
             {props.isApprox && (
                 <Text
-                    style={[
-                        tailwind('self-center'),
-                        {
+                    className="self-center"
+                    style={{
                             color: props.textColor
                                 ? props.textColor
                                 : ColorScheme.Text.Default,
                             textAlign: langDir,
-                        },
-                    ]}>
+                        }}>
                     ~{' '}
                 </Text>
             )}
             <Text
+                className={`${props.fontSize} self-center mt-0.5 mr-2`}
                 numberOfLines={1}
                 style={[
-                    tailwind(`${props.fontSize} self-center mt-0.5 mr-2`),
                     {
                         color: props.textColor
                             ? props.textColor
@@ -390,15 +338,13 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
             </Text>
 
             <Text
-                style={[
-                    tailwind(`${props.fontSize} self-center font-bold`),
-                    {
+                className={`${props.fontSize} self-center font-bold`}
+                style={{
                         color: props.textColor
                             ? props.textColor
                             : ColorScheme.Text.Default,
                         textAlign: langDir,
-                    },
-                ]}>
+                    }}>
                 {props.amount.isZero() ? '0' : formatSats(props.amount)}
             </Text>
         </View>
@@ -407,36 +353,28 @@ export const DisplaySatsAmount = (props: DisplaySatsAmountProps) => {
 
 export const DisplayFiatAmount = (props: DisplayFiatAmountProps) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
     const {appFiatCurrency} = useContext(AppStorageContext);
 
     return (
-        <View
-            style={[
-                tailwind('rounded-full items-center flex-row justify-center'),
-            ]}>
+        <View className="rounded-full items-center flex-row justify-center">
             <Text
-                style={[
-                    tailwind(`mr-2 font-bold ${props.fontSize}`),
-                    {
+                className={`mr-2 font-bold ${props.fontSize}`}
+                style={{
                         color: props.textColor
                             ? props.textColor
                             : ColorScheme.Text.Default,
-                    },
-                ]}>
+                    }}>
                 {props.isApprox ? '~' : ''}
                 {appFiatCurrency.symbol}
             </Text>
             <Text
-                style={[
-                    tailwind(`font-bold ${props.fontSize}`),
-                    {
+                className={`font-bold ${props.fontSize}`}
+                style={{
                         color: props.textColor
                             ? props.textColor
                             : ColorScheme.Text.Default,
-                    },
-                ]}>
+                    }}>
                 {props.amount}
             </Text>
         </View>

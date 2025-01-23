@@ -2,7 +2,6 @@
 import {Text, View, useColorScheme} from 'react-native';
 import React from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../constants/Color';
 import {useTranslation} from 'react-i18next';
 
@@ -19,15 +18,12 @@ type TimerProps = {
 
 const Timer = (props: TimerProps) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
     return (
         <View
-            style={[
-                tailwind('rounded-full py-1 px-4'),
-                {backgroundColor: ColorScheme.Background.Inverted},
-            ]}>
-            <Text style={[tailwind('text-sm'), {color: props.color}]}>
+            className="rounded-full py-1 px-4"
+            style={{backgroundColor: ColorScheme.Background.Inverted}}>
+            <Text className="text-sm" style={{color: props.color}}>
                 {`${props.min}:${props.sec}`}
             </Text>
         </View>
@@ -40,18 +36,15 @@ type ExpiredProps = {
 
 const Expired = (props: ExpiredProps) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
     const {t} = useTranslation('wallet');
 
     return (
         <View
-            style={[
-                tailwind('rounded-full py-1'),
-                {
+            className="rounded-full py-1"
+            style={{
                     backgroundColor: ColorScheme.Background.Inverted,
                     paddingHorizontal: 12,
-                },
-            ]}>
+                }}>
             <Text style={{color: props.color}}>
                 {capitalizeFirst(t('expired'))}
             </Text>
@@ -63,13 +56,12 @@ const ExpiryTimer = ({expiryDate}: {expiryDate: number}) => {
     const [days, hours, minutes, seconds] = useCountdown(expiryDate);
 
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
     if (days + hours + minutes + seconds <= 0) {
         return <Expired color={ColorScheme.Text.Alt} />;
     } else {
         return (
-            <View style={[tailwind('flex-row items-center')]}>
+            <View className="flex-row items-center">
                 <Timer
                     day={days}
                     hour={hours}

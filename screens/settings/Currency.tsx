@@ -25,8 +25,6 @@ import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {TCurrency, TRate} from '../../types/settings';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -55,8 +53,6 @@ const Currency = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -154,49 +150,45 @@ const Currency = () => {
                     setLoadingRate(true);
                     handleCurrencySwitch(item);
                 }}
-                style={[
-                    tailwind(
-                        `${
+                className={
+                    `${
                             langDir === 'right'
                                 ? 'flex-row-reverse'
                                 : 'flex-row'
-                        } w-full items-center justify-between px-6 py-4 mb-2`,
-                    ),
+                        } w-full items-center justify-between px-6 py-4 mb-2`
+                }
+                style={[
                     index === 0 ? styles.paddedTop : {},
                 ]}>
                 <View
-                    style={[
-                        tailwind(
-                            `items-center ${
+                    className={
+                        `items-center ${
                                 langDir === 'right'
                                     ? 'flex-row-reverse'
                                     : 'flex-row'
-                            }`,
-                        ),
-                    ]}>
+                            }`
+                    }>
                     <VText
+                        className="text-sm"
                         style={[
-                            tailwind('text-sm'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         {item.full_name}
                     </VText>
                     {appFiatCurrency.short === item.short && (
                         <View
-                            style={[
-                                tailwind(
-                                    `${langDir === 'right' ? 'mr-2' : 'ml-2'}`,
-                                ),
-                            ]}>
+                            className={
+                                `${langDir === 'right' ? 'mr-2' : 'ml-2'}`
+                            }>
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         </View>
                     )}
                 </View>
                 <View
-                    style={[tailwind('items-center justify-center flex-row')]}>
+                    className="items-center justify-center flex-row">
                     <VText
+                        className="text-sm"
                         style={[
-                            tailwind('text-sm'),
                             {color: ColorScheme.Text.DescText},
                             Font.RobotoText,
                         ]}>
@@ -210,28 +202,28 @@ const Currency = () => {
     return (
         <SafeAreaView>
             <View
+                className="w-full h-full"
                 style={[
-                    tailwind('w-full h-full'),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View
+                    className="w-full h-full mt-4 items-center"
                     style={[
-                        tailwind('w-full h-full mt-4 items-center'),
                         styles.flexed,
                     ]}>
-                    <View style={tailwind('w-5/6 mb-16')}>
+                    <View className="w-5/6 mb-16">
                         <PlainButton
-                            style={tailwind('items-center flex-row -ml-1')}
+                            className="items-center flex-row -ml-1"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
+                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                             />
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -241,20 +233,18 @@ const Currency = () => {
                     </View>
 
                     <View
-                        style={tailwind('justify-center w-full items-center')}>
+                        className="justify-center w-full items-center">
                         <View
-                            style={[
-                                tailwind(
-                                    `${
+                            className={
+                                `${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } w-5/6 justify-between`,
-                                ),
-                            ]}>
+                                    } w-5/6 justify-between`
+                            }>
                             <VText
+                                className="text-2xl mb-4 font-medium"
                                 style={[
-                                    tailwind('text-2xl mb-4 font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -263,18 +253,16 @@ const Currency = () => {
 
                             {/* Highlight current select currency here */}
                             <View
+                                className="px-4 py-0 flex-row items-center h-8 rounded-full"
                                 style={[
-                                    tailwind(
-                                        'px-4 py-0 flex-row items-center h-8 rounded-full',
-                                    ),
                                     {
                                         backgroundColor:
                                             ColorScheme.Background.Inverted,
                                     },
                                 ]}>
                                 <VText
+                                    className="text-sm font-bold"
                                     style={[
-                                        tailwind('text-sm font-bold'),
                                         {
                                             color: ColorScheme.Text.Alt,
                                             backgroundColor:
@@ -288,12 +276,12 @@ const Currency = () => {
                         </View>
 
                         <View
-                            style={[
-                                tailwind(
-                                    `text-sm py-4 w-full ${
+                            className={
+                                `text-sm py-4 w-full ${
                                         langDir === 'right' ? 'pr-8' : 'pl-8'
-                                    }`,
-                                ),
+                                    }`
+                            }
+                            style={[
                                 styles.rateHighlight,
                                 {
                                     backgroundColor:
@@ -302,25 +290,23 @@ const Currency = () => {
                             ]}>
                             {loadingRate ? (
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `${
+                                    className={
+                                        `${
                                                 langDir === 'right'
                                                     ? 'flex-row-reverse'
                                                     : 'flex-row'
-                                            }`,
-                                        ),
-                                    ]}>
+                                            }`
+                                    }>
                                     <ActivityIndicator size={'small'} />
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                `text-sm ${
+                                        className={
+                                            `text-sm ${
                                                     langDir === 'right'
                                                         ? 'mr-2'
                                                         : 'ml-2'
-                                                }`,
-                                            ),
+                                                }`
+                                        }
+                                        style={[
                                             {
                                                 color: ColorScheme.Text
                                                     .GrayedText,
@@ -331,8 +317,8 @@ const Currency = () => {
                                 </View>
                             ) : (
                                 <VText
+                                    className="text-sm"
                                     style={[
-                                        tailwind('text-sm'),
                                         {
                                             color: ColorScheme.Text.Default,
                                         },
@@ -342,7 +328,7 @@ const Currency = () => {
                                     )} ${appFiatCurrency.short} ${t(
                                         'price_on',
                                     )} `}
-                                    <VText style={[tailwind('flex font-bold')]}>
+                                    <VText className="flex font-bold">
                                         {'CoinGecko'}
                                     </VText>
                                 </VText>
@@ -351,7 +337,7 @@ const Currency = () => {
                     </View>
 
                     <FlatList
-                        style={tailwind('w-full')}
+                        className="w-full"
                         data={Currencies}
                         renderItem={renderItem}
                         keyExtractor={item => item.locale}
@@ -360,8 +346,8 @@ const Currency = () => {
                     />
 
                     <View
+                        className="w-full items-center justify-center"
                         style={[
-                            tailwind('w-full items-center justify-center'),
                             styles.bottomMessage,
                         ]}>
                         <VText style={[{color: ColorScheme.Text.GrayedText}]}>

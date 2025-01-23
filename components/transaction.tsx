@@ -2,8 +2,6 @@
 import React, {useContext} from 'react';
 import {View, useColorScheme} from 'react-native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import VText from './text';
 
 import BigNum from 'bignumber.js';
@@ -39,7 +37,6 @@ export const UnifiedTransactionListItem = (props: TxListItemProps) => {
 };
 
 export const TransactionLNListItem = (props: TxListItemProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {i18n} = useTranslation('wallet');
@@ -71,47 +68,37 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                 props.callback ? props.callback() : null;
             }}>
             <View
-                style={[
-                    tailwind(
-                        `${
+                className={
+                    `${
                             langDir === 'right'
                                 ? 'flex-row-reverse'
                                 : 'flex-row'
-                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`,
-                    ),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`
+                }
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <View
-                    style={[
-                        tailwind('flex-row items-center w-5/6'),
-                        {
+                    className="flex-row items-center w-5/6"
+                    style={{
                             marginLeft: 0,
-                        },
-                    ]}>
-                    <View style={[tailwind('w-full ml-1')]}>
+                        }}>
+                    <View className="w-full ml-1">
                         <TXBalance
                             balance={new BigNum(props.tx.amountMsat / 1000)}
                             balanceFontSize={'text-lg'}
                             fontColor={ColorScheme.Text.Default}
                         />
                         <VText
-                            style={[
-                                tailwind('text-xs'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-xs"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {getTxTimestamp(props.tx.paymentTime)}
                         </VText>
                     </View>
                 </View>
                 <View
-                    style={[
-                        tailwind(
-                            'w-10 h-10 rounded-full items-center justify-center opacity-80',
-                        ),
-                        {
+                    className="w-10 h-10 rounded-full items-center justify-center opacity-80"
+                    style={{
                             backgroundColor: ColorScheme.Background.Secondary,
-                        },
-                    ]}>
+                        }}>
                     {props.tx.paymentType === 'received'
                         ? receiveComp()
                         : sendComp()}
@@ -122,7 +109,6 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
 };
 
 export const TransactionListItem = (props: TxListItemProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {t, i18n} = useTranslation('wallet');
@@ -140,35 +126,27 @@ export const TransactionListItem = (props: TxListItemProps) => {
                 props.callback ? props.callback() : null;
             }}>
             <View
-                style={[
-                    tailwind(
-                        `${
+                className={
+                    `${
                             langDir === 'right'
                                 ? 'flex-row-reverse'
                                 : 'flex-row'
-                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`,
-                    ),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`
+                }
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <View
-                    style={[
-                        tailwind(
-                            `flex-row items-center ${
+                    className={
+                        `flex-row items-center ${
                                 props.tx.isSelfOrBoost ? 'w-full' : 'w-5/6'
-                            }`,
-                        ),
-                        {
-                            marginLeft: props.tx.isSelfOrBoost ? -12 : 0,
-                        },
-                    ]}>
-                    <View style={[tailwind('w-full ml-1')]}>
+                            }`
+                    }
+                    style={{marginLeft: props.tx.isSelfOrBoost ? -12 : 0}}>
+                    <View className="w-full ml-1">
                         {props.tx.isSelfOrBoost ? (
-                            <View style={[tailwind('')]}>
+                            <View>
                                 <VText
-                                    style={[
-                                        tailwind('text-lg font-bold'),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
+                                    className="text-lg font-bold"
+                                    style={{color: ColorScheme.Text.GrayedText}}>
                                     {isAdvancedMode
                                         ? 'RBF Fee Boost'
                                         : 'Fee Boost'}
@@ -182,10 +160,8 @@ export const TransactionListItem = (props: TxListItemProps) => {
                             />
                         )}
                         <VText
-                            style={[
-                                tailwind('text-xs'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-xs"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {props.tx.confirmed
                                 ? getTxTimestamp(props.tx.timestamp)
                                 : capitalizeFirst(t('unconfirmed'))}
@@ -194,15 +170,11 @@ export const TransactionListItem = (props: TxListItemProps) => {
                 </View>
                 {!props.tx.isSelfOrBoost && (
                     <View
-                        style={[
-                            tailwind(
-                                'w-10 h-10 rounded-full items-center justify-center opacity-80',
-                            ),
-                            {
+                        className="w-10 h-10 rounded-full items-center justify-center opacity-80"
+                        style={{
                                 backgroundColor:
                                     ColorScheme.Background.Secondary,
-                            },
-                        ]}>
+                            }}>
                         {props.tx.type === 'inbound' ? (
                             <ArrowDown fill={ColorScheme.SVG.Received} />
                         ) : (

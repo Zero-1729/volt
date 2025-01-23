@@ -15,8 +15,6 @@
     "reset": "yarn clean:rn && yarn clean:ios && yarn clean:android && yarn start --reset-cache",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
-    "dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\"",
-    "build:tailwind": "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
     "start": "react-native start",
     "ios": "react-native run-ios --simulator='iPhone 14'",
     "android": "react-native run-android",
@@ -65,6 +63,7 @@
     "intl-messageformat": "^10.5.10",
     "ledger-bitcoin": "^0.2.3",
     "lottie-react-native": "^6.7.0",
+    "nativewind": "^4.1.23",
     "process": "^0.11.10",
     "react": "v18.3.1",
     "react-i18next": "^15.2.0",
@@ -101,7 +100,6 @@
     "react-native-tooltip": "^5.2.0",
     "react-native-vision-camera": "^4.6.3",
     "stream-browserify": "^3.0.0",
-    "tailwind-rn": "^4.2.0",
     "url": "^0.11.4"
   },
   "devDependencies": {
@@ -134,7 +132,7 @@
     "react-native-privacy": "https://github.com/BlueWallet/react-native-privacy-snapshot",
     "react-test-renderer": "v18.3.1",
     "rimraf": "^5.0.1",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.17",
     "ts-jest": "^29.1.1",
     "typescript": "^5.4.3"
   },
