@@ -15,8 +15,6 @@
     "reset": "yarn clean:rn && yarn clean:ios && yarn clean:android && yarn start --reset-cache",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
-    "dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\"",
-    "build:tailwind": "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
     "start": "react-native start",
     "ios": "react-native run-ios --simulator='iPhone 14'",
     "android": "react-native run-android",
