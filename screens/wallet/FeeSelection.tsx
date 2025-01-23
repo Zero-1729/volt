@@ -27,7 +27,6 @@ import {TComboWallet} from '../../types/wallet';
 import {LongBottomButton, PlainButton} from '../../components/button';
 import Prompt from 'react-native-prompt-android';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import {TMempoolFeeRates} from '../../types/wallet';
@@ -54,7 +53,6 @@ import { Toasts } from '@backpackapp-io/react-native-toast';
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
 const FeeSelection = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -255,39 +253,29 @@ const FeeSelection = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center relative'),
-                    {
-                        backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
+                className="w-full h-full items-center relative"
+                style={{
+                    backgroundColor: ColorScheme.Background.Primary,
+                }}>
                 <View
-                    style={[
-                        tailwind(
-                            'absolute w-full top-6 flex-row items-center justify-center',
-                        ),
-                    ]}>
+                    className="absolute w-full top-6 flex-row items-center justify-center">
                     <PlainButton
                         onPress={() =>
                             navigation.dispatch(CommonActions.goBack())
                         }
-                        style={[tailwind('absolute z-10 left-6')]}>
+                        className="absolute z-10 left-6">
                         <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                     <Text
-                        style={[
-                            tailwind('text-sm font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('select_fee_rate_title')}
                     </Text>
                 </View>
 
                 <View
-                    style={[
-                        tailwind('w-full px-6 py-8 justify-center relative'),
-                        {top: 100},
-                    ]}>
+                    className="w-full px-6 py-8 justify-center relative"
+                    style={{top: 100}}>
                     {/* Fee selection: 10 mins */}
                     <PlainButton
                         onPress={() => {
@@ -295,53 +283,43 @@ const FeeSelection = ({route}: Props) => {
                         }}>
                         <View>
                             <View
-                                style={[
-                                    tailwind(
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between items-center w-full`
+                                }>
+                                <View
+                                    className={
                                         `${
                                             langDir === 'right'
                                                 ? 'flex-row-reverse'
                                                 : 'flex-row'
-                                        } justify-between items-center w-full`,
-                                    ),
-                                ]}>
-                                <View
-                                    style={[
-                                        tailwind(
-                                            `${
-                                                langDir === 'right'
-                                                    ? 'flex-row-reverse'
-                                                    : 'flex-row'
-                                            } justify-center items-center`,
-                                        ),
-                                    ]}>
+                                        } justify-center items-center`
+                                    }>
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                `text-left ${
-                                                    langDir === 'right'
-                                                        ? 'ml-2'
-                                                        : 'mr-2'
-                                                }  text-sm font-semibold`,
-                                            ),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className={
+                                            `text-left ${
+                                                langDir === 'right'
+                                                    ? 'ml-2'
+                                                    : 'mr-2'
+                                            }  text-sm font-semibold`
+                                        }
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {t('high_priority_fee')}
                                     </VText>
 
                                     {/* Faux loading placeholder */}
                                     {loadingData && (
                                         <View
-                                            style={[
-                                                tailwind(
-                                                    'absolute items-center w-full',
-                                                ),
-                                                {
-                                                    height: 20,
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Greyed,
-                                                },
-                                            ]}
+                                            className="absolute items-center w-full"
+                                            style={{
+                                                height: 20,
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
+                                            }}
                                         />
                                     )}
 
@@ -356,17 +334,13 @@ const FeeSelection = ({route}: Props) => {
 
                                 {!loadingData && (
                                     <View
-                                        style={[
-                                            tailwind('items-center flex-row'),
-                                        ]}>
+                                        className="items-center flex-row">
                                         <Text
-                                            style={[
-                                                tailwind('text-sm mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                                },
-                                            ]}>
+                                            className="text-sm mr-2"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            }}>
                                             {`${addCommas(
                                                 feeRates.fastestFee.toString(),
                                             )} ${t('sat_vbyte')}`}
@@ -376,20 +350,18 @@ const FeeSelection = ({route}: Props) => {
                             </View>
 
                             {!loadingData && (
-                                <View style={[tailwind('w-full mt-2')]}>
+                                <View className="w-full mt-2">
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayedText,
+                                        }}>
                                         {t('priority_fee_description')}
                                     </VText>
                                     <VText
+                                        className="text-sm"
                                         style={[
-                                            tailwind('text-sm'),
                                             {
                                                 color: ColorScheme.Text
                                                     .GrayedText,
@@ -414,9 +386,9 @@ const FeeSelection = ({route}: Props) => {
                     </PlainButton>
 
                     <View
+                        className="w-full mt-6"
                         style={[
                             styles.divider,
-                            tailwind('w-full mt-6'),
                             {
                                 backgroundColor: ColorScheme.Background.Greyed,
                             },
@@ -428,55 +400,45 @@ const FeeSelection = ({route}: Props) => {
                         onPress={() => {
                             setFeeRate(feeRates.halfHourFee, 'economic');
                         }}>
-                        <View style={[tailwind('mt-6')]}>
+                        <View className="mt-6">
                             <View
-                                style={[
-                                    tailwind(
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }  justify-between items-center w-full`
+                                }>
+                                <View
+                                    className={
                                         `${
                                             langDir === 'right'
                                                 ? 'flex-row-reverse'
                                                 : 'flex-row'
-                                        }  justify-between items-center w-full`,
-                                    ),
-                                ]}>
-                                <View
-                                    style={[
-                                        tailwind(
-                                            `${
-                                                langDir === 'right'
-                                                    ? 'flex-row-reverse'
-                                                    : 'flex-row'
-                                            }  justify-center items-center`,
-                                        ),
-                                    ]}>
+                                        }  justify-center items-center`
+                                    }>
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                `text-left ${
-                                                    langDir === 'right'
-                                                        ? 'ml-2'
-                                                        : 'mr-2'
-                                                }  text-sm font-semibold`,
-                                            ),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className={
+                                            `text-left ${
+                                                langDir === 'right'
+                                                    ? 'ml-2'
+                                                : 'mr-2'
+                                            }  text-sm font-semibold`
+                                        }
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {t('economic_fee')}
                                     </VText>
 
                                     {/* Faux loading placeholder */}
                                     {loadingData && (
                                         <View
-                                            style={[
-                                                tailwind(
-                                                    'absolute items-center w-full',
-                                                ),
-                                                {
-                                                    height: 20,
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Greyed,
-                                                },
-                                            ]}
+                                            className="absolute items-center w-full"
+                                            style={{
+                                                height: 20,
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
+                                            }}
                                         />
                                     )}
 
@@ -491,17 +453,13 @@ const FeeSelection = ({route}: Props) => {
 
                                 {!loadingData && (
                                     <View
-                                        style={[
-                                            tailwind('items-center flex-row'),
-                                        ]}>
+                                        className="items-center flex-row">
                                         <Text
-                                            style={[
-                                                tailwind('text-sm mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                                },
-                                            ]}>
+                                            className="text-sm mr-2"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            }}>
                                             {`${addCommas(
                                                 feeRates.economyFee.toString(),
                                             )} ${t('sat_vbyte')}`}
@@ -511,25 +469,21 @@ const FeeSelection = ({route}: Props) => {
                             </View>
 
                             {!loadingData && (
-                                <View style={[tailwind('w-full mt-2')]}>
+                                <View className="w-full mt-2">
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayedText,
+                                        }}>
                                         {t('economic_fee_description')}
                                     </VText>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayedText,
+                                        }}>
                                         {`~${addCommas(
                                             (
                                                 psbtVSize * feeRates.fastestFee
@@ -549,9 +503,9 @@ const FeeSelection = ({route}: Props) => {
                     </PlainButton>
 
                     <View
+                        className="w-full mt-6"
                         style={[
                             styles.divider,
-                            tailwind('w-full mt-6'),
                             {
                                 backgroundColor: ColorScheme.Background.Greyed,
                             },
@@ -564,47 +518,33 @@ const FeeSelection = ({route}: Props) => {
                         onPress={() => {
                             openFeeModal();
                         }}>
-                        <View style={[tailwind('mt-6')]}>
+                        <View className="mt-6">
                             <View
-                                style={[
-                                    tailwind(
-                                        `${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } justify-between items-center w-full`,
-                                    ),
-                                ]}>
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } justify-between items-center w-full`
+                                }>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'flex-row justify-center items-center',
-                                        ),
-                                    ]}>
+                                    className="flex-row justify-center items-center">
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                'text-left text-sm font-semibold mr-2',
-                                            ),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className="text-left text-sm font-semibold mr-2"
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {t('custom_fee')}
                                     </VText>
 
                                     {/* Faux loading placeholder */}
                                     {loadingData && (
                                         <View
-                                            style={[
-                                                tailwind(
-                                                    'absolute items-center w-full',
-                                                ),
-                                                {
-                                                    height: 20,
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Greyed,
-                                                },
-                                            ]}
+                                            className="absolute items-center w-full"
+                                            style={{
+                                                height: 20,
+                                                backgroundColor:
+                                                    ColorScheme.Background
+                                                        .Greyed,
+                                            }}
                                         />
                                     )}
 
@@ -619,17 +559,13 @@ const FeeSelection = ({route}: Props) => {
 
                                 {selectedFeeRateType === 'custom' && (
                                     <View
-                                        style={[
-                                            tailwind('items-center flex-row'),
-                                        ]}>
+                                        className="items-center flex-row">
                                         <Text
-                                            style={[
-                                                tailwind('text-sm mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                                },
-                                            ]}>
+                                            className="text-sm mr-2"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            }}>
                                             {`${addCommas(
                                                 selectedFeeRate.toString(),
                                             )} ${t('sat_vbyte')}`}
@@ -639,28 +575,24 @@ const FeeSelection = ({route}: Props) => {
                             </View>
 
                             {selectedFeeRateType === 'custom' && (
-                                <View style={[tailwind('w-full mt-2')]}>
+                                <View className="w-full mt-2">
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayedText,
+                                        }}>
                                         {/* Make text variable */}
                                         {`${t(
                                             'expected_fee_confirmation',
                                         )} ${getFeeRateTime(selectedFeeRate)}`}
                                     </VText>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayedText,
+                                        }}>
                                         {`~${addCommas(
                                             (
                                                 psbtVSize * selectedFeeRate
@@ -683,23 +615,19 @@ const FeeSelection = ({route}: Props) => {
                 {/* Loading psbt text */}
                 {loadingData && (
                     <View
-                        style={[
-                            tailwind('absolute'),
-                            {
-                                bottom:
-                                    NativeWindowMetrics.bottomButtonOffset + 76,
-                            },
-                        ]}>
+                        className="absolute"
+                        style={{
+                            bottom:
+                                NativeWindowMetrics.bottomButtonOffset + 76,
+                        }}>
                         <ActivityIndicator
-                            style={[tailwind('mb-4')]}
+                            className="mb-4"
                             size="small"
                             color={ColorScheme.SVG.Default}
                         />
                         <Text
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-sm"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {t('fee_loading_message')}
                         </Text>
                     </View>
@@ -708,34 +636,30 @@ const FeeSelection = ({route}: Props) => {
                 {/* Show message if in high-fee or congested mempool environment and display warn message here */}
                 {!loadingData && mempoolInfo.mempoolCongested && (
                     <View
-                        style={[
-                            tailwind(
-                                `absolute w-5/6 ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } items-center justify-center`,
-                            ),
-                            {bottom: NativeWindowMetrics.bottom + 110},
-                        ]}>
+                        className={
+                            `absolute w-5/6 ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } items-center justify-center`
+                        }
+                        style={{bottom: NativeWindowMetrics.bottom + 110}}>
                         <Info
                             width={16}
                             height={16}
                             fill={ColorScheme.SVG.GrayFill}
                         />
                         <Text
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'mr-2'
-                                            : 'ml-2 text-center'
-                                    } text-sm`,
-                                ),
-                                {
-                                    color: ColorScheme.Text.DescText,
-                                },
-                            ]}>
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'mr-2'
+                                        : 'ml-2 text-center'
+                                } text-sm`
+                            }
+                            style={{
+                                color: ColorScheme.Text.DescText,
+                            }}>
                             {t('mempool_congested')}
                         </Text>
                     </View>
@@ -743,30 +667,26 @@ const FeeSelection = ({route}: Props) => {
 
                 {!loadingData && mempoolInfo.mempoolHighFeeEnv && (
                     <View
-                        style={[
-                            tailwind(
-                                `absolute w-5/6 ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } items-center justify-center`,
-                            ),
-                            {bottom: NativeWindowMetrics.bottom + 146},
-                        ]}>
+                        className={
+                            `absolute w-5/6 ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } items-center justify-center`
+                        }
+                        style={{bottom: NativeWindowMetrics.bottom + 146}}>
                         <AlertIcon width={16} height={16} fill={CardColor} />
                         <Text
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'mr-2'
-                                            : 'ml-2 text-center'
-                                    } text-sm`,
-                                ),
-                                {
-                                    color: CardColor,
-                                },
-                            ]}>
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'mr-2'
+                                        : 'ml-2 text-center'
+                                } text-sm`
+                            }
+                            style={{
+                                color: CardColor,
+                            }}>
                             {t('mempool_high_fee')}
                         </Text>
                     </View>

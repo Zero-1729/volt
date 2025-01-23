@@ -13,7 +13,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 import Close from '../../assets/svg/x-24.svg';
 
@@ -45,7 +44,6 @@ import {Toasts} from '@backpackapp-io/react-native-toast';
 type Props = NativeStackScreenProps<WalletParamList, 'SwapAmount'>;
 
 const SwapAmount = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -344,58 +342,44 @@ const SwapAmount = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                className="w-full h-full items-center justify-center">
                 {/* Screen header */}
                 <View
-                    style={[
-                        tailwind(
-                            'absolute top-6 z-10 w-full flex-row items-center justify-center',
-                        ),
-                    ]}>
+                    className="absolute top-6 z-10 w-full flex-row items-center justify-center">
                     <PlainButton
                         onPress={handleCloseButton}
-                        style={[tailwind('absolute z-10 left-6')]}>
+                        className="absolute z-10 left-6">
                         <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                     <Text
-                        style={[
-                            tailwind('text-base font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-base font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('continue'))}
                     </Text>
                 </View>
 
                 <View
-                    style={[
-                        tailwind(
-                            'absolute items-center justify-center flex-row rounded-md py-1 px-4',
-                        ),
-                        {
-                            top: 72,
-                            backgroundColor: ColorScheme.Background.Greyed,
-                        },
-                    ]}>
+                    className="absolute items-center justify-center flex-row rounded-md py-1 px-4"
+                    style={{
+                        top: 72,
+                        backgroundColor: ColorScheme.Background.Greyed,
+                    }}>
                     <Text
-                        style={[
-                            tailwind('text-base font-bold mr-2'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-base font-bold mr-2"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('balance')}
                     </Text>
-                    <View style={[tailwind('items-center')]}>
+                    <View className="items-center">
                         {displayBalance('text-base')}
                     </View>
                 </View>
 
                 {/* Minimum Sats warn */}
                 {route.params.swapMeta.min > 0 && (
-                    <View style={[tailwind('absolute flex-row'), {top: 120}]}>
+                    <View className="absolute flex-row" style={{top: 120}}>
                         <Text
-                            style={[
-                                tailwind('text-sm mr-2'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-sm mr-2"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('minimum_amount')}
                         </Text>
                         {displayMinimum('text-sm')}
@@ -404,14 +388,10 @@ const SwapAmount = ({route}: Props) => {
 
                 {/* Screen for amount */}
                 <View
-                    style={[
-                        tailwind(
-                            'w-full items-center flex justify-center flex -mt-48',
-                        ),
-                    ]}>
+                    className="w-full items-center flex justify-center flex -mt-48">
                     {/* Top unit */}
                     {!isMax && (
-                        <View style={[tailwind('opacity-40 mb-2')]}>
+                        <View className="opacity-40 mb-2">
                             {!(topUnit?.name === 'sats')
                                 ? renderFiatAmount('text-base')
                                 : renderSatAmount('text-base')}
@@ -422,10 +402,8 @@ const SwapAmount = ({route}: Props) => {
                     <View>
                         {isMax && (
                             <Text
-                                style={[
-                                    tailwind('text-4xl font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-4xl font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('max'))}
                             </Text>
                         )}
@@ -444,28 +422,20 @@ const SwapAmount = ({route}: Props) => {
                     {/* Set maximum */}
                     {balance.gt(minimumSwapAmount) && (
                         <View
-                            style={[
-                                tailwind('rounded-full px-4 py-1 mt-6'),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className="rounded-full px-4 py-1 mt-6"
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <PlainButton
-                                style={[
-                                    tailwind(
-                                        'flex-row items-center justify-center',
-                                    ),
-                                ]}
+                                className="flex-row items-center justify-center"
                                 disabled={
                                     balance.toString() === satsAmount.toString()
                                 }
                                 onPress={handleMax}>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm font-bold'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm font-bold"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {isMax
                                         ? capitalizeFirst(t('clear'))
                                         : capitalizeFirst(t('max'))}
@@ -485,19 +455,17 @@ const SwapAmount = ({route}: Props) => {
 
                 {/* Continue button */}
                 <View
-                    style={[
-                        tailwind(
-                            `absolute w-5/6 ${
-                                amount === '' ||
-                                isBeyondMax ||
-                                minimumSwapAmount.isZero() ||
-                                minimumSwapAmount.gt(satsAmount.value)
-                                    ? 'opacity-20'
-                                    : ''
-                            }`,
-                        ),
-                        {bottom: NativeWindowMetrics.bottom},
-                    ]}>
+                    className={
+                        `absolute w-5/6 ${
+                            amount === '' ||
+                            isBeyondMax ||
+                            minimumSwapAmount.isZero() ||
+                            minimumSwapAmount.gt(satsAmount.value)
+                                ? 'opacity-20'
+                                : ''
+                        }`
+                    }
+                    style={{bottom: NativeWindowMetrics.bottom}}>
                     <LongButton
                         disabled={
                             amount === '' ||

@@ -31,8 +31,6 @@ import {useSharedValue} from 'react-native-reanimated';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
-import {useTailwind} from 'tailwind-rn';
-
 import Color from '../../constants/Color';
 
 import Close from '../../assets/svg/x-24.svg';
@@ -65,7 +63,6 @@ type Props = NativeStackScreenProps<WalletParamList, 'SwapOut'>;
 type Slide = () => ReactElement;
 
 const SwapOut = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {
@@ -93,7 +90,7 @@ const SwapOut = ({route}: Props) => {
 
     // For now, only single sends are supported
     // Update wallet descriptors to private version
-    const carouselRef = React.useRef(null);
+    const carouselRef = React.useRef<{ next: () => void } | null>(null);
     const progressValue = useSharedValue(0);
 
     const CardColor = ColorScheme.WalletColors[wallet.type][wallet.network];
@@ -162,43 +159,35 @@ const SwapOut = ({route}: Props) => {
     // Breakdown of the swap out process
     const breakdownPanel = useCallback((): ReactElement => {
         return (
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 {/* Main breakdown */}
                 <View
-                    style={[
-                        tailwind(
-                            'w-5/6 mt-6 items-center justify-center flex rounded-md py-2',
-                        ),
-                        {
-                            borderColor: ColorScheme.Background.Greyed,
-                            borderWidth: 1,
-                            marginTop: 128,
-                        },
-                    ]}>
+                    className="w-5/6 mt-6 items-center justify-center flex rounded-md py-2"
+                    style={{
+                        borderColor: ColorScheme.Background.Greyed,
+                        borderWidth: 1,
+                        marginTop: 128,
+                    }}>
                     {/* Onchain amount */}
-                    <View style={[tailwind('w-full px-4 py-2')]}>
+                    <View className="w-full px-4 py-2">
                         <VText
-                            style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
-                                {
-                                    color: ColorScheme.Text.Default,
-                                    textAlign:
-                                        langDir === 'right' ? 'right' : 'left',
-                                },
-                            ]}>
+                            className="w-full text-sm font-semibold mb-1"
+                            style={{
+                                color: ColorScheme.Text.Default,
+                                textAlign:
+                                    langDir === 'right' ? 'right' : 'left',
+                            }}>
                             {capitalizeFirst(t('amount'))}
                         </VText>
                         {prepSwap ? (
                             <View
-                                style={[
-                                    tailwind(
-                                        `${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } mt-2`,
-                                    ),
-                                ]}>
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } mt-2`
+                                }>
                                 <DisplaySatsAmount
                                     textColor={ColorScheme.Text.DescText}
                                     amount={
@@ -209,26 +198,22 @@ const SwapOut = ({route}: Props) => {
                                     fontSize={'text-sm'}
                                 />
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `rounded-full px-4 py-1 ${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : 'ml-2'
-                                            }`,
-                                        ),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Greyed,
-                                        },
-                                    ]}>
+                                    className={
+                                        `rounded-full px-4 py-1 ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`
+                                    }
+                                    style={{
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('text-sm font-bold'),
-                                            {
-                                                color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
+                                        className="text-sm font-bold"
+                                        style={{
+                                            color: ColorScheme.Text.Default,
+                                        }}>
                                         {`${
                                             appFiatCurrency.symbol
                                         } ${normalizeFiat(
@@ -242,86 +227,72 @@ const SwapOut = ({route}: Props) => {
                             </View>
                         ) : (
                             <View
-                                style={[
-                                    tailwind('mt-2 rounded-sm'),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                        height: 32,
-                                        width: 128,
-                                    },
-                                ]}
+                                className="mt-2 rounded-sm"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                    height: 32,
+                                    width: 128,
+                                }}
                             />
                         )}
                     </View>
 
                     {/* Onchain receiving address */}
-                    <View style={[tailwind('w-full px-4 py-2')]}>
+                    <View className="w-full px-4 py-2">
                         <VText
-                            style={[
-                                tailwind('w-full text-sm font-semibold'),
-                                {
-                                    color: ColorScheme.Text.Default,
-                                    textAlign:
-                                        langDir === 'right' ? 'right' : 'left',
-                                },
-                            ]}>
+                            className="w-full text-sm font-semibold"
+                            style={{
+                                color: ColorScheme.Text.Default,
+                                textAlign:
+                                    langDir === 'right' ? 'right' : 'left',
+                            }}>
                             {t('onchain_address')}
                         </VText>
                         {prepSwap ? (
                             <VText
-                                style={[
-                                    tailwind(
-                                        'w-full text-sm mt-2 font-semibold',
-                                    ),
-                                    {
-                                        color: ColorScheme.Text.DescText,
-                                        textAlign:
-                                            langDir === 'right'
-                                                ? 'right'
-                                                : 'left',
-                                    },
-                                ]}>
+                                className="w-full text-sm mt-2 font-semibold"
+                                style={{
+                                    color: ColorScheme.Text.DescText,
+                                    textAlign:
+                                        langDir === 'right'
+                                            ? 'right'
+                                            : 'left',
+                                }}>
                                 {btcAddress}
                             </VText>
                         ) : (
                             <View
-                                style={[
-                                    tailwind('mt-2 rounded-sm w-full'),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                        height: 32,
-                                    },
-                                ]}
+                                className="mt-2 rounded-sm w-full"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                    height: 32,
+                                }}
                             />
                         )}
                     </View>
 
                     {/* Onchain amount */}
-                    <View style={[tailwind('w-full px-4 py-2')]}>
+                    <View className="w-full px-4 py-2">
                         <VText
-                            style={[
-                                tailwind('w-full text-sm font-semibold mb-1'),
-                                {
-                                    color: ColorScheme.Text.Default,
-                                    textAlign:
-                                        langDir === 'right' ? 'right' : 'left',
-                                },
-                            ]}>
+                            className="w-full text-sm font-semibold mb-1"
+                            style={{
+                                color: ColorScheme.Text.Default,
+                                textAlign:
+                                    langDir === 'right' ? 'right' : 'left',
+                            }}>
                             {capitalizeFirst(t('recv_amount'))}
                         </VText>
                         {prepSwap ? (
                             <View
-                                style={[
-                                    tailwind(
-                                        `${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } mt-2`,
-                                    ),
-                                ]}>
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } mt-2`
+                                }>
                                 <DisplaySatsAmount
                                     textColor={ColorScheme.Text.DescText}
                                     amount={
@@ -332,26 +303,22 @@ const SwapOut = ({route}: Props) => {
                                     fontSize={'text-sm'}
                                 />
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `rounded-full px-4 py-1 ${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : 'ml-2'
-                                            }`,
-                                        ),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Greyed,
-                                        },
-                                    ]}>
+                                    className={
+                                        `rounded-full px-4 py-1 ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`
+                                    }
+                                    style={{
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('text-sm font-bold'),
-                                            {
-                                                color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
+                                        className="text-sm font-bold"
+                                        style={{
+                                            color: ColorScheme.Text.Default,
+                                        }}>
                                         {`${
                                             appFiatCurrency.symbol
                                         } ${normalizeFiat(
@@ -365,69 +332,59 @@ const SwapOut = ({route}: Props) => {
                             </View>
                         ) : (
                             <View
-                                style={[
-                                    tailwind('mt-2 rounded-sm'),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                        height: 32,
-                                        width: 128,
-                                    },
-                                ]}
+                                className="mt-2 rounded-sm"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                    height: 32,
+                                    width: 128,
+                                }}
                             />
                         )}
                     </View>
 
                     {/* total fee */}
-                    <View style={[tailwind('w-full mt-2 px-4 py-2')]}>
+                    <View className="w-full mt-2 px-4 py-2">
                         <VText
-                            style={[
-                                tailwind('w-full text-sm font-bold mb-1'),
-                                {
-                                    color: ColorScheme.Text.Default,
-                                    textAlign:
-                                        langDir === 'right' ? 'right' : 'left',
-                                },
-                            ]}>
+                            className="w-full text-sm font-bold mb-1"
+                            style={{
+                                color: ColorScheme.Text.Default,
+                                textAlign:
+                                    langDir === 'right' ? 'right' : 'left',
+                            }}>
                             {t('total_swapout_fees')}
                         </VText>
                         {prepSwap ? (
                             <View
-                                style={[
-                                    tailwind(
-                                        `${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } mt-2 items-center`,
-                                    ),
-                                ]}>
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } mt-2 items-center`
+                                }>
                                 <DisplaySatsAmount
                                     textColor={ColorScheme.Text.DescText}
                                     amount={new BigNumber(prepSwap.totalFees)}
                                     fontSize={'text-sm'}
                                 />
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `rounded-full px-4 py-1 ${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : 'ml-2'
-                                            }`,
-                                        ),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Greyed,
-                                        },
-                                    ]}>
+                                    className={
+                                        `rounded-full px-4 py-1 ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : 'ml-2'
+                                        }`
+                                    }
+                                    style={{
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('text-sm font-bold'),
-                                            {
-                                                color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
+                                        className="text-sm font-bold"
+                                        style={{
+                                            color: ColorScheme.Text.Default,
+                                        }}>
                                         {`${
                                             appFiatCurrency.symbol
                                         } ${normalizeFiat(
@@ -439,15 +396,13 @@ const SwapOut = ({route}: Props) => {
                             </View>
                         ) : (
                             <View
-                                style={[
-                                    tailwind('mt-2 rounded-sm'),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                        height: 32,
-                                        width: 128,
-                                    },
-                                ]}
+                                className="mt-2 rounded-sm"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                    height: 32,
+                                    width: 128,
+                                }}
                             />
                         )}
                     </View>
@@ -456,29 +411,25 @@ const SwapOut = ({route}: Props) => {
                 {/* Display network congestion */}
                 {mempoolInfo.mempoolHighFeeEnv && (
                     <View
-                        style={[
-                            tailwind(
-                                `mt-4 w-5/6 ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } items-center justify-center`,
-                            ),
-                        ]}>
+                        className={
+                            `mt-4 w-5/6 ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } items-center justify-center`
+                        }>
                         <AlertIcon width={16} height={16} fill={CardColor} />
                         <Text
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'mr-2'
-                                            : 'ml-2 text-center'
-                                    } text-sm`,
-                                ),
-                                {
-                                    color: CardColor,
-                                },
-                            ]}>
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'mr-2'
+                                        : 'ml-2 text-center'
+                                } text-sm`
+                            }
+                            style={{
+                                color: CardColor,
+                            }}>
                             {t('mempool_high_fee')}
                         </Text>
                     </View>
@@ -486,10 +437,8 @@ const SwapOut = ({route}: Props) => {
 
                 {/* Bottom Button */}
                 <View
-                    style={[
-                        tailwind('absolute items-center w-full'),
-                        {bottom: NativeWindowMetrics.bottomButtonOffset + 24},
-                    ]}>
+                    className="absolute items-center w-full"
+                    style={{bottom: NativeWindowMetrics.bottomButtonOffset + 24}}>
                     <LongBottomButton
                         disabled={loadingTX || fees}
                         onPress={sendTx}
@@ -501,7 +450,6 @@ const SwapOut = ({route}: Props) => {
             </View>
         );
     }, [
-        tailwind,
         ColorScheme,
         langDir,
         t,
@@ -519,24 +467,18 @@ const SwapOut = ({route}: Props) => {
     // Swapping Progress
     const inflightPanel = useCallback((): ReactElement => {
         return (
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 {loadingTX && (
                     <View
-                        style={[
-                            tailwind(
-                                'items-center justify-center h-full w-full',
-                            ),
-                            {marginTop: -48},
-                        ]}>
+                        className="items-center justify-center h-full w-full"
+                        style={{marginTop: -48}}>
                         <ActivityIndicator
                             color={ColorScheme.Text.Default}
                             size="small"
                         />
                         <Text
-                            style={[
-                                tailwind('text-sm mt-2'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-sm mt-2"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {statusMessage}
                         </Text>
                     </View>
@@ -553,69 +495,51 @@ const SwapOut = ({route}: Props) => {
                         </View>
 
                         <View
-                            style={[
-                                tailwind(
-                                    'w-5/6 mt-6 items-center justify-center flex rounded-md py-2',
-                                ),
-                                {
-                                    borderColor: ColorScheme.Background.Greyed,
-                                    borderWidth: 1,
-                                },
-                            ]}>
+                            className="w-5/6 mt-6 items-center justify-center flex rounded-md py-2"
+                            style={{
+                                borderColor: ColorScheme.Background.Greyed,
+                                borderWidth: 1,
+                            }}>
                             {/* TXID */}
                             <View
-                                style={[
-                                    tailwind('w-full justify-start px-4 py-2'),
-                                ]}>
+                                className="w-full justify-start px-4 py-2">
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            'w-full text-sm font-semibold mb-1',
-                                        ),
-                                        {
+                                    className="w-full text-sm font-semibold mb-1"
+                                    style={{
                                             color: ColorScheme.Text.Default,
-                                        },
-                                    ]}>
+                                    }}>
                                     {capitalizeFirst(t('tx_id'))}
                                 </VText>
                                 <VText
-                                    style={[
-                                        tailwind('w-full text-sm'),
-                                        {
-                                            color: ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                    className="w-full text-sm"
+                                    style={{
+                                        color: ColorScheme.Text.DescText,
+                                    }}>
                                     {rvsSwapInfo?.id}
                                 </VText>
                             </View>
 
                             {/* Onchain amount */}
-                            <View style={[tailwind('w-full px-4 py-2')]}>
+                            <View className="w-full px-4 py-2">
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            'w-full text-sm font-semibold mb-1',
-                                        ),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                            textAlign:
-                                                langDir === 'right'
-                                                    ? 'right'
-                                                    : 'left',
-                                        },
-                                    ]}>
+                                    className="w-full text-sm font-semibold mb-1"
+                                    style={{
+                                        color: ColorScheme.Text.Default,
+                                        textAlign:
+                                            langDir === 'right'
+                                                ? 'right'
+                                                : 'left',
+                                }}>
                                     {capitalizeFirst(t('recv_amount'))}
                                 </VText>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `${
-                                                langDir === 'right'
-                                                    ? 'flex-row-reverse'
-                                                    : 'flex-row'
-                                            } mt-2`,
-                                        ),
-                                    ]}>
+                                    className={
+                                        `${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } mt-2`
+                                    }>
                                     <DisplaySatsAmount
                                         textColor={ColorScheme.Text.DescText}
                                         amount={
@@ -626,28 +550,24 @@ const SwapOut = ({route}: Props) => {
                                         fontSize={'text-sm'}
                                     />
                                     <View
-                                        style={[
-                                            tailwind(
-                                                `rounded-full px-4 py-1 ${
-                                                    langDir === 'right'
-                                                        ? 'mr-2'
-                                                        : 'ml-2'
-                                                }`,
-                                            ),
-                                            {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Greyed,
-                                            },
-                                        ]}>
+                                        className={
+                                            `rounded-full px-4 py-1 ${
+                                                langDir === 'right'
+                                                    ? 'mr-2'
+                                                    : 'ml-2'
+                                            }`
+                                        }
+                                        style={{
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .Greyed,
+                                        }}>
                                         <Text
-                                            style={[
-                                                tailwind('text-sm font-bold'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                            ]}>
+                                            className="text-sm font-bold"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .Default,
+                                            }}>
                                             {`${
                                                 appFiatCurrency.symbol
                                             } ${normalizeFiat(
@@ -663,41 +583,31 @@ const SwapOut = ({route}: Props) => {
 
                             {/* Status */}
                             <View
-                                style={[
-                                    tailwind('w-full justify-start px-4 py-2'),
-                                ]}>
+                                className="w-full justify-start px-4 py-2">
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            'w-full text-sm font-semibold mb-1',
-                                        ),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                        },
-                                    ]}>
+                                    className="w-full text-sm font-semibold mb-1"
+                                    style={{
+                                        color: ColorScheme.Text.Default,
+                                    }}>
                                     {t('status')}
                                 </VText>
                                 <VText
-                                    style={[
-                                        tailwind('w-full text-sm'),
-                                        {
-                                            color: ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                    className="w-full text-sm"
+                                    style={{
+                                        color: ColorScheme.Text.DescText,
+                                    }}>
                                     {t(rvsSwapInfo?.status)}
                                 </VText>
                             </View>
                         </View>
 
                         <View
-                            style={[
-                                tailwind('absolute items-center w-full'),
-                                {
-                                    bottom:
-                                        NativeWindowMetrics.bottomButtonOffset +
-                                        24,
-                                },
-                            ]}>
+                            className="absolute items-center w-full"
+                            style={{
+                                bottom:
+                                    NativeWindowMetrics.bottomButtonOffset +
+                                    24,
+                            }}>
                             <LongBottomButton
                                 disabled={loadingTX}
                                 onPress={() => {
@@ -721,7 +631,7 @@ const SwapOut = ({route}: Props) => {
                 )}
 
                 {failedTx && !loadingTX && (
-                    <View style={[tailwind('items-center'), {marginTop: 128}]}>
+                    <View className="items-center" style={{marginTop: 128}}>
                         <Failed
                             width={128}
                             height={128}
@@ -729,10 +639,8 @@ const SwapOut = ({route}: Props) => {
                         />
 
                         <Text
-                            style={[
-                                tailwind('mt-4 text-center text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="mt-4 text-center text-sm"
+                            style={{color: ColorScheme.Text.Default}}>
                             {errMessage}
                         </Text>
                     </View>
@@ -740,7 +648,6 @@ const SwapOut = ({route}: Props) => {
             </View>
         );
     }, [
-        tailwind,
         loadingTX,
         ColorScheme,
         statusMessage,
@@ -768,37 +675,31 @@ const SwapOut = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                className="w-full h-full items-center justify-center">
                 <View
-                    style={[
-                        tailwind(
-                            'absolute top-6 z-10 w-full flex-row items-center justify-center',
-                        ),
-                    ]}>
+                    className="absolute top-6 z-10 w-full flex-row items-center justify-center">
                     <PlainButton
                         onPress={handleCloseButton}
-                        style={[tailwind('absolute z-10 left-6')]}>
+                        className="absolute z-10 left-6">
                         <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                     <Text
-                        style={[
-                            tailwind('text-base font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-base font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('swap_in'))}
                     </Text>
                 </View>
 
                 {/* Carousel */}
                 <View
+                    className="h-full w-full items-center"
                     style={[
                         styles.carouselContainer,
-                        tailwind('h-full w-full items-center'),
                         {zIndex: -9},
                     ]}>
                     <Carousel
                         ref={carouselRef}
-                        style={[tailwind('items-center')]}
+                        style={styles.carousel}
                         data={panels}
                         width={NativeDims.width}
                         // Adjust height for iOS
@@ -831,6 +732,9 @@ export default SwapOut;
 const styles = StyleSheet.create({
     carouselContainer: {
         flex: 1,
+    },
+    carousel: {
+        alignItems: 'center',
     },
     dots: {
         flexDirection: 'row',

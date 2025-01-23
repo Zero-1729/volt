@@ -16,7 +16,6 @@ import {AppStorageContext} from '../../class/storageContext';
 
 import {useTranslation} from 'react-i18next';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
@@ -41,7 +40,6 @@ enum ETransactionKind {
 }
 
 const TransactionList = () => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -99,30 +97,24 @@ const TransactionList = () => {
             ]}>
             <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
+                className="w-full h-full justify-center"
                 style={[
                     styles.statusContainer,
-                    tailwind('w-full h-full justify-center'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View style={[tailwind('h-full items-center')]}>
+                <View className="h-full items-center">
                     <View
-                        style={[
-                            tailwind('flex rounded-md w-full'),
-                            {backgroundColor: ColorScheme.Background.Default},
-                        ]}>
+                        className="flex rounded-md w-full"
+                        style={{backgroundColor: ColorScheme.Background.Default}}>
                         <View
-                            style={[
-                                tailwind(
-                                    'flex-row w-full items-center justify-center mt-6 mb-6 relative',
-                                ),
-                            ]}>
+                            className="flex-row w-full items-center justify-center mt-6 mb-6 relative">
                             <PlainButton
                                 onPress={() => {
                                     navigation.dispatch(CommonActions.goBack());
                                 }}
-                                style={[tailwind('absolute left-6')]}>
+                                className="absolute left-6">
                                 <CloseIcon
                                     width={32}
                                     fill={ColorScheme.SVG.Default}
@@ -130,39 +122,30 @@ const TransactionList = () => {
                             </PlainButton>
 
                             <Text
-                                style={[
-                                    tailwind('text-lg font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-lg font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('transactions'))}
                             </Text>
                         </View>
 
                         <View
-                            style={[
-                                tailwind(
-                                    'flex-row justify-between self-center',
-                                ),
-                                {
+                            className="flex-row justify-between self-center"
+                            style={{
                                     paddingVertical: 5,
                                     paddingHorizontal: 5,
                                     borderRadius: 4,
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                     width: NativeWindowMetrics.width * 0.9,
-                                },
-                            ]}>
+                            }}>
                             <PlainButton
-                                style={tailwind('w-1/4')}
+                                className="w-1/4"
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.ALL);
                                 }}>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'flex-row items-center justify-center',
-                                        ),
-                                        {
+                                    className="flex-row items-center justify-center"
+                                    style={{
                                             borderRadius: 4,
                                             paddingVertical: 2,
                                             backgroundColor:
@@ -170,128 +153,107 @@ const TransactionList = () => {
                                                     ? ColorScheme.Background
                                                           .CardGreyed
                                                     : 'transparent',
-                                        },
-                                    ]}>
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
+                                        className="text-sm"
+                                        style={{
                                                 color:
                                                     filteredKind === 'all'
                                                         ? ColorScheme.Text
                                                               .Default
                                                         : ColorScheme.Text
                                                               .GrayedText,
-                                            },
-                                        ]}>
+                                        }}>
                                         {capitalizeFirst(t('all'))}
                                     </Text>
                                 </View>
                             </PlainButton>
 
                             <PlainButton
-                                style={tailwind('w-1/4')}
+                                className="w-1/4"
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.RECEIVED);
                                 }}>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'flex-row items-center rounded-md justify-center',
-                                        ),
-                                        {
+                                    className="flex-row items-center rounded-md justify-center"
+                                    style={{
                                             paddingVertical: 2,
                                             backgroundColor:
                                                 filteredKind === 'received'
                                                     ? ColorScheme.Background
                                                           .CardGreyed
                                                     : 'transparent',
-                                        },
-                                    ]}>
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
+                                        className="text-sm"
+                                        style={{
                                                 color:
                                                     filteredKind === 'received'
                                                         ? ColorScheme.Text
                                                               .Default
                                                         : ColorScheme.Text
                                                               .GrayedText,
-                                            },
-                                        ]}>
+                                        }}>
                                         {capitalizeFirst(t('received'))}
                                     </Text>
                                 </View>
                             </PlainButton>
 
                             <PlainButton
-                                style={tailwind('w-1/4')}
+                                className="w-1/4"
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.SENT);
                                 }}>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'flex-row items-center rounded-md justify-center',
-                                        ),
-                                        {
+                                    className="flex-row items-center rounded-md justify-center"
+                                    style={{
                                             paddingVertical: 2,
                                             backgroundColor:
                                                 filteredKind === 'sent'
                                                     ? ColorScheme.Background
                                                           .CardGreyed
                                                     : 'transparent',
-                                        },
-                                    ]}>
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
+                                        className="text-sm"
+                                        style={{
                                                 color:
                                                     filteredKind === 'sent'
                                                         ? ColorScheme.Text
                                                               .Default
                                                         : ColorScheme.Text
                                                               .GrayedText,
-                                            },
-                                        ]}>
+                                        }}>
                                         {capitalizeFirst(t('sent'))}
                                     </Text>
                                 </View>
                             </PlainButton>
 
                             <PlainButton
-                                style={tailwind('w-1/4')}
+                                className="w-1/4"
                                 onPress={() => {
                                     setFilteredKind(ETransactionKind.SWAPs);
                                 }}>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'flex-row items-center rounded-md justify-center',
-                                        ),
-                                        {
+                                    className="flex-row items-center rounded-md justify-center"
+                                    style={{
                                             paddingVertical: 2,
                                             backgroundColor:
                                                 filteredKind === 'swaps'
                                                     ? ColorScheme.Background
-                                                          .CardGreyed
+                                                        .CardGreyed
                                                     : 'transparent',
-                                        },
-                                    ]}>
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {
-                                                color:
-                                                    filteredKind === 'swaps'
-                                                        ? ColorScheme.Text
-                                                              .Default
-                                                        : ColorScheme.Text
-                                                              .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm"
+                                        style={{
+                                            color:
+                                                filteredKind === 'swaps'
+                                                    ? ColorScheme.Text
+                                                      .Default
+                                                    : ColorScheme.Text
+                                                        .GrayedText,
+                                        }}>
                                         {capitalizeFirst(t('swaps'))}
                                     </Text>
                                 </View>
@@ -301,22 +263,17 @@ const TransactionList = () => {
 
                     {/* Transactions */}
                     <View
-                        style={[
-                            tailwind('w-full justify-center px-4 items-center'),
-                        ]}>
+                        className="w-full justify-center px-4 items-center">
                         <VirtualizedList
                             maxToRenderPerBatch={50}
                             updateCellsBatchingPeriod={2500}
                             refreshing={refreshing}
                             onRefresh={() => {}}
                             scrollEnabled={true}
-                            style={[tailwind('w-full mt-2 z-30')]}
+                            className="w-full mt-2 z-30"
                             contentContainerStyle={[
-                                tailwind(
-                                    `${
-                                        walletTxs().length > 0 ? '' : 'h-full'
-                                    } items-center`,
-                                ),
+                                styles.listStyle,
+                                walletTxs.length ? {height: '100%'} : {},
                             ]}
                             data={walletTxs().sort(
                                 (a: TTransaction, b: TTransaction) => {
@@ -340,24 +297,18 @@ const TransactionList = () => {
                             contentInsetAdjustmentBehavior="automatic"
                             ListEmptyComponent={
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'w-4/5 h-5/6 items-center justify-center',
-                                        ),
-                                    ]}>
+                                    className="w-4/5 h-5/6 items-center justify-center">
                                     <Box
                                         width={32}
                                         fill={ColorScheme.SVG.GrayFill}
-                                        style={tailwind('mb-4 -mt-6')}
+                                        className="mb-4 -mt-6"
                                     />
                                     <Text
-                                        style={[
-                                            tailwind('w-full text-center'),
-                                            {
+                                        className="w-full text-center"
+                                        style={{
                                                 color: ColorScheme.Text
                                                     .GrayedText,
-                                            },
-                                        ]}>
+                                        }}>
                                         {t('no_transactions_text')}
                                     </Text>
                                 </View>
@@ -371,16 +322,14 @@ const TransactionList = () => {
                     ColorScheme.Background.Fade0,
                     ColorScheme.Background.Fade1,
                 ]}
-                style={[
-                    tailwind('w-full'),
-                    {
-                        flex: 1,
-                        position: 'absolute',
-                        bottom: 0,
-                        height: 40,
-                        zIndex: 999,
-                    },
-                ]}
+                className="w-full"
+                style={{
+                    flex: 1,
+                    position: 'absolute',
+                    bottom: 0,
+                    height: 40,
+                    zIndex: 999,
+                }}
             />
         </SafeAreaView>
     );
@@ -392,5 +341,8 @@ const styles = StyleSheet.create({
     statusContainer: {
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
+    },
+    listStyle: {
+        alignItems: 'center',
     },
 });

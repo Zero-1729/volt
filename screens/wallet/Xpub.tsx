@@ -10,8 +10,6 @@ import {useNavigation, CommonActions} from '@react-navigation/core';
 
 import QRCodeStyled from 'react-native-qrcode-styled';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import RNFS from 'react-native-fs';
@@ -34,7 +32,7 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 const Xpub = () => {
     const navigation = useNavigation();
-    const tailwind = useTailwind();
+
     const ColorScheme = Color(useColorScheme());
 
     const {currentWalletID, getWalletData} =
@@ -111,19 +109,15 @@ const Xpub = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={tailwind('w-5/6 h-full justify-center')}>
+            <View className="w-full h-full items-center">
+                <View className="w-5/6 h-full justify-center">
                     <View
-                        style={[
-                            tailwind(
-                                'w-full absolute top-6 flex-row justify-center items-center',
-                            ),
-                        ]}>
+                        className="w-full absolute top-6 flex-row justify-center items-center">
                         {/* Top panel */}
                         {/* Allow exporting XPub */}
                         {Platform.OS === 'ios' && (
                             <PlainButton
-                                style={[tailwind('absolute left-0')]}
+                                className="absolute left-0"
                                 onPress={() => {
                                     writeDescriptorToFile();
                                 }}>
@@ -134,16 +128,14 @@ const Xpub = () => {
                             </PlainButton>
                         )}
                         <Text
-                            style={[
-                                tailwind('text-lg font-bold'),
-                                {
+                            className="text-lg font-bold"
+                            style={{
                                     color: ColorScheme.Text.Default,
-                                },
-                            ]}>
+                            }}>
                             Xpub
                         </Text>
                         <PlainButton
-                            style={[tailwind('absolute right-0')]}
+                            className="absolute right-0"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
@@ -156,13 +148,11 @@ const Xpub = () => {
 
                     {/* Display QR code with seed */}
                     <View
-                        style={[
-                            tailwind('rounded self-center mb-4'),
-                            {
+                        className="rounded self-center mb-4"
+                        style={{
                                 borderWidth: 2,
                                 borderColor: ColorScheme.Background.QRBorder,
-                            },
-                        ]}>
+                        }}>
                         <QRCodeStyled
                             style={{
                                 backgroundColor: 'white',
@@ -179,39 +169,31 @@ const Xpub = () => {
 
                     {/* Display either seed or descriptor */}
                     <PlainButton
-                        style={[tailwind('items-center mb-4')]}
+                        className="items-center mb-4"
                         onPress={copyDescToClipboard}>
                         <Text
-                            style={[
-                                tailwind(
-                                    'text-sm w-full p-3 text-center rounded-sm',
-                                ),
-                                {
+                            className="text-sm w-full p-3 text-center rounded-sm"
+                            style={{
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                     color: ColorScheme.Text.Default,
-                                },
-                            ]}
+                            }}
                             numberOfLines={1}
                             ellipsizeMode={'middle'}>
                             {backupData}
                         </Text>
                     </PlainButton>
 
-                    <View style={[tailwind('mt-6 flex w-full')]}>
+                    <View className="mt-6 flex w-full">
                         <Text
-                            style={[
-                                tailwind('text-sm text-center mb-4'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-sm text-center mb-4"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {info}
                         </Text>
 
                         <Text
-                            style={[
-                                tailwind('text-sm text-center'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm text-center"
+                            style={{color: ColorScheme.Text.Default}}>
                             {warning}
                         </Text>
                     </View>

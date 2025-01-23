@@ -7,7 +7,6 @@ import {
     StatusBar,
     StyleSheet,
     VirtualizedList,
-    BackHandler,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -34,8 +33,6 @@ import BigNumber from 'bignumber.js';
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 
 import {useTranslation} from 'react-i18next';
-
-import {useTailwind} from 'tailwind-rn';
 
 import Color from '../../constants/Color';
 
@@ -86,7 +83,6 @@ import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
 const Wallet = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -647,41 +643,29 @@ const Wallet = ({route}: Props) => {
             {/* status bar filler */}
             <StatusBar barStyle={'light-content'} backgroundColor={CardColor} />
             <View
-                style={[
-                    tailwind('absolute w-full h-16 top-0'),
-                    {backgroundColor: CardColor},
-                ]}
+                className="absolute w-full h-16 top-0"
+                style={{backgroundColor: CardColor}}
             />
             <BottomSheetModalProvider>
                 {/* adjust styling below to ensure content in View covers entire screen */}
                 {/* Adjust styling below to ensure it covers entire app height */}
                 <View
-                    style={[
-                        tailwind('w-full h-full'),
-                        {backgroundColor: CardColor},
-                    ]}>
+                    className="w-full h-full"
+                    style={{backgroundColor: CardColor}}>
                     {/* Top panel */}
                     <View
-                        style={[
-                            tailwind(
-                                `relative ${
+                        className={
+                            `relative ${
                                     walletData.type === 'unified'
                                         ? 'h-1/2'
                                         : 'h-1/2'
-                                } items-center justify-center`,
-                            ),
-                            {backgroundColor: CardColor},
-                        ]}>
+                                } items-center justify-center`
+                        }
+                        style={{backgroundColor: CardColor}}>
                         <View
-                            style={[
-                                tailwind(
-                                    'absolute w-full top-2 flex-row items-center justify-between',
-                                ),
-                            ]}>
+                            className="absolute w-full top-2 flex-row items-center justify-between">
                             <PlainButton
-                                style={[
-                                    tailwind('items-center flex-row left-6'),
-                                ]}
+                                className="items-center flex-row left-6"
                                 onPress={() => {
                                     const nav = navigation.getState();
 
@@ -697,22 +681,18 @@ const Wallet = ({route}: Props) => {
                                     }
 
                                 }}>
-                                <HomeIcon style={tailwind('mr-2')} fill={'white'} />
+                                <HomeIcon className="mr-2" fill={'white'} />
                             </PlainButton>
 
                             <Text
-                                style={[
-                                    tailwind(
-                                        'text-white self-center text-center w-1/2 font-bold',
-                                    ),
-                                ]}
+                                className="text-white self-center text-center w-1/2 font-bold"
                                 numberOfLines={1}
                                 ellipsizeMode={'middle'}>
                                 {walletName}
                             </Text>
 
                             <PlainButton
-                                style={[tailwind('right-6')]}
+                                className="right-6"
                                 onPress={() => {
                                     navigation.dispatch(
                                         CommonActions.navigate({
@@ -727,17 +707,9 @@ const Wallet = ({route}: Props) => {
                         {/* Watch-only */}
                         {walletData.isWatchOnly && (
                             <View
-                                style={[
-                                    tailwind(
-                                        'absolute top-11 rounded-full bg-black opacity-50',
-                                    ),
-                                ]}>
+                                className="absolute top-11 rounded-full bg-black opacity-50">
                                 <Text
-                                    style={[
-                                        tailwind(
-                                            'text-sm py-1 px-6 text-white font-bold',
-                                        ),
-                                    ]}>
+                                    className="text-sm py-1 px-6 text-white font-bold">
                                     {t('watch_only')}
                                 </Text>
                             </View>
@@ -745,42 +717,34 @@ const Wallet = ({route}: Props) => {
 
                         {/* Balance */}
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center w-5/6 ${
+                            className={
+                                `items-center w-5/6 ${
                                         hideTotalBalance
                                             ? '-mt-20'
                                             : isAdvancedMode &&
                                               walletData.type === 'unified'
                                             ? '-mt-8'
                                             : ''
-                                    }`,
-                                ),
-                            ]}>
+                                    }`
+                            }>
                             {/* Balance component */}
                             <View
-                                style={[
-                                    tailwind(
-                                        `${
+                                className={
+                                    `${
                                             hideTotalBalance
                                                 ? 'absolute mt-8'
                                                 : 'items-center'
-                                        } w-full`,
-                                    ),
-                                    {
+                                        } w-full`
+                                }
+                                style={{
                                         marginTop:
                                             walletData.type === 'unified' &&
                                             walletTxs.length > 0
                                                 ? -86
                                                 : 0,
-                                    },
-                                ]}>
+                                }}>
                                 <Text
-                                    style={[
-                                        tailwind(
-                                            'text-sm text-white opacity-60 mb-1',
-                                        ),
-                                    ]}>
+                                    className="text-sm text-white opacity-60 mb-1">
                                     {!isNetOn
                                         ? t('offline_balance')
                                         : t('balance')}
@@ -809,44 +773,31 @@ const Wallet = ({route}: Props) => {
                             walletTxs.length > 0 && (
                                 <>
                                     <View
-                                        style={[
-                                            tailwind('absolute w-5/6'),
-                                            {
+                                        className="absolute w-5/6"
+                                        style={{
                                                 bottom: hideTotalBalance
                                                     ? 98 + 24
                                                     : 98,
-                                            },
-                                        ]}>
+                                        }}>
                                         <View
-                                            style={[
-                                                tailwind('w-full items-start'),
-                                            ]}>
+                                            className="w-full items-start">
                                             <View
-                                                style={[
-                                                    tailwind(
-                                                        `w-full ${
+                                                className={
+                                                    `w-full ${
                                                             langDir === 'right'
                                                                 ? 'flex-row-reverse'
                                                                 : 'flex-row'
-                                                        } items-center justify-between opacity-60`,
-                                                    ),
-                                                ]}>
+                                                        } items-center justify-between opacity-60`
+                                                }>
                                                 <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm text-white',
-                                                        ),
-                                                    ]}>
+                                                    className="text-sm text-white">
                                                     Lightning
                                                 </Text>
 
                                                 {hideTotalBalance ? (
                                                     <View
-                                                        style={[
-                                                            tailwind(
-                                                                'rounded-sm',
-                                                            ),
-                                                            {
+                                                        className="rounded-sm"
+                                                        style={{
                                                                 height: 20,
                                                                 width: 98,
                                                                 opacity:
@@ -859,8 +810,7 @@ const Wallet = ({route}: Props) => {
                                                                         walletData
                                                                             .type
                                                                     ].accent,
-                                                            },
-                                                        ]}
+                                                        }}
                                                     />
                                                 ) : (
                                                     <Balance
@@ -887,74 +837,51 @@ const Wallet = ({route}: Props) => {
                                         </View>
 
                                         <View
-                                            style={[
-                                                tailwind(
-                                                    'w-full flex-row items-center justify-between',
-                                                ),
-                                            ]}>
+                                            className="w-full flex-row items-center justify-between">
                                             <View
+                                                className="w-1/3 opacity-20"
                                                 style={[
-                                                    tailwind(
-                                                        'w-1/3 opacity-20',
-                                                    ),
                                                     styles.divider,
                                                 ]}
                                             />
 
                                             <PlainButton
                                                 onPress={openSwapModal}
-                                                style={[
-                                                    tailwind(
-                                                        'rounded-full items-center px-6 py-2',
-                                                    ),
-                                                    {
+                                                className="rounded-full items-center px-6 py-2"
+                                                style={{
                                                         backgroundColor:
                                                             CardAccent,
-                                                    },
-                                                ]}>
+                                                }}>
                                                 <SwapIcon fill={'white'} />
                                             </PlainButton>
 
                                             <View
+                                                className="w-1/3 opacity-20"
                                                 style={[
-                                                    tailwind(
-                                                        'w-1/3 opacity-20',
-                                                    ),
                                                     styles.divider,
                                                 ]}
                                             />
                                         </View>
 
                                         <View
-                                            style={[
-                                                tailwind('w-full items-start'),
-                                            ]}>
+                                            className="w-full items-start">
                                             <View
-                                                style={[
-                                                    tailwind(
-                                                        `w-full ${
+                                                className={
+                                                    `w-full ${
                                                             langDir === 'right'
                                                                 ? 'flex-row-reverse'
                                                                 : 'flex-row'
-                                                        } items-center justify-between opacity-60`,
-                                                    ),
-                                                ]}>
+                                                        } items-center justify-between opacity-60`
+                                                }>
                                                 <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm text-white',
-                                                        ),
-                                                    ]}>
+                                                    className="text-sm text-white">
                                                     On-chain
                                                 </Text>
 
                                                 {hideTotalBalance ? (
                                                     <View
-                                                        style={[
-                                                            tailwind(
-                                                                'rounded-sm',
-                                                            ),
-                                                            {
+                                                        className="rounded-sm"
+                                                        style={{
                                                                 height: 20,
                                                                 width: 98,
                                                                 opacity:
@@ -967,8 +894,7 @@ const Wallet = ({route}: Props) => {
                                                                         walletData
                                                                             .type
                                                                     ].accent,
-                                                            },
-                                                        ]}
+                                                        }}
                                                     />
                                                 ) : (
                                                     <Balance
@@ -999,52 +925,34 @@ const Wallet = ({route}: Props) => {
 
                         {/* Send and receive */}
                         <View
-                            style={[
-                                tailwind(
-                                    'absolute bottom-6 w-full items-center px-4 justify-around flex-row',
-                                ),
-                            ]}>
+                            className="absolute bottom-6 w-full items-center px-4 justify-around flex-row">
                             {/* Hide send if Balance is empty or it is a watch-only wallet */}
                             {!hideSendButton && (
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'rounded-full py-3 mr-4 w-1/2',
-                                        ),
-                                        {
+                                    className="rounded-full py-3 mr-4 w-1/2"
+                                    style={{
                                             backgroundColor: CardAccent,
-                                        },
-                                    ]}>
+                                    }}>
                                     <PlainButton onPress={openSendModal}>
                                         <Text
-                                            style={[
-                                                tailwind(
-                                                    'text-base text-white text-center font-bold',
-                                                ),
-                                            ]}>
+                                            className="text-base text-white text-center font-bold">
                                             {capitalizeFirst(t('send'))}
                                         </Text>
                                     </PlainButton>
                                 </View>
                             )}
                             <View
-                                style={[
-                                    tailwind(
-                                        `rounded-full py-3 ${
-                                            hideSendButton ? 'w-full' : 'w-1/2'
-                                        }`,
-                                    ),
-                                    {
+                                className={
+                                    `rounded-full py-3 ${
+                                        hideSendButton ? 'w-full' : 'w-1/2'
+                                    }`
+                                }
+                                style={{
                                         backgroundColor: CardAccent,
-                                    },
-                                ]}>
+                                }}>
                                 <PlainButton onPress={routeToReceive}>
                                     <Text
-                                        style={[
-                                            tailwind(
-                                                'text-base text-white text-center font-bold',
-                                            ),
-                                        ]}>
+                                        className="text-base text-white text-center font-bold">
                                         {capitalizeFirst(t('receive'))}
                                     </Text>
                                 </PlainButton>
@@ -1054,39 +962,35 @@ const Wallet = ({route}: Props) => {
 
                     {/* Transactions List */}
                     <View
+                        className={
+                            `${
+                                walletData.type === 'unified'
+                                    ? 'h-1/2'
+                                    : 'h-1/2'
+                            } w-full items-center z-10`
+                        }
                         style={[
                             styles.transactionList,
-                            tailwind(
-                                `${
-                                    walletData.type === 'unified'
-                                        ? 'h-1/2'
-                                        : 'h-1/2'
-                                } w-full items-center z-10`,
-                            ),
                             {
                                 backgroundColor: ColorScheme.Background.Primary,
                             },
                         ]}>
-                        <View style={[tailwind('mt-6 w-11/12')]}>
+                        <View className="mt-6 w-11/12">
                             <VText
-                                style={[
-                                    tailwind(
-                                        `${
+                                className={
+                                    `${
                                             langDir === 'right'
                                                 ? 'mr-4'
                                                 : 'ml-4'
-                                        } text-base font-bold`,
-                                    ),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                        } text-base font-bold`
+                                }
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('transactions'))}
                             </VText>
                         </View>
 
                         <View
-                            style={[
-                                tailwind('w-full h-full items-center pb-10'),
-                            ]}>
+                            className="w-full h-full items-center pb-10">
                             <VirtualizedList
                                 maxToRenderPerBatch={50}
                                 updateCellsBatchingPeriod={2500}
@@ -1095,21 +999,16 @@ const Wallet = ({route}: Props) => {
                                 scrollEnabled={true}
                                 getItem={(data, index) => data[index]}
                                 getItemCount={data => data.length}
-                                style={[
-                                    tailwind(
-                                        `${
+                                className={
+                                    `${
                                             walletTxs.length > 0
                                                 ? 'w-11/12'
                                                 : 'w-full'
-                                        } mt-2 z-30`,
-                                    ),
-                                ]}
+                                        } mt-2 z-30`
+                                }
                                 contentContainerStyle={[
-                                    tailwind(
-                                        `${
-                                            walletTxs.length > 0 ? '' : 'h-full'
-                                        } items-center`,
-                                    ),
+                                    styles.listStyle,
+                                    walletTxs.length ? {height: '100%'} : {},
                                 ]}
                                 data={walletTxs.sort(
                                     (a: TTransaction, b: TTransaction) => {
@@ -1143,24 +1042,18 @@ const Wallet = ({route}: Props) => {
                                 contentInsetAdjustmentBehavior="automatic"
                                 ListEmptyComponent={
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'w-4/5 h-5/6 items-center justify-center',
-                                            ),
-                                        ]}>
+                                        className="w-4/5 h-5/6 items-center justify-center">
                                         <Box
                                             width={32}
                                             fill={ColorScheme.SVG.GrayFill}
-                                            style={tailwind('mb-4 -mt-6')}
+                                            className="mb-4 -mt-6"
                                         />
                                         <Text
-                                            style={[
-                                                tailwind('w-full text-center'),
-                                                {
+                                            className="w-full text-center"
+                                            style={{
                                                     color: ColorScheme.Text
                                                         .GrayedText,
-                                                },
-                                            ]}>
+                                            }}>
                                             {t('no_transactions_text')}
                                         </Text>
                                     </View>
@@ -1169,7 +1062,7 @@ const Wallet = ({route}: Props) => {
                         </View>
 
                         {walletData.type === 'unified' && (
-                            <View style={[tailwind('absolute bottom-0')]}>
+                            <View className="absolute bottom-0">
                                 <Swap
                                     swapInProgress={swapInProgress}
                                     lightningBalance={
@@ -1195,7 +1088,7 @@ const Wallet = ({route}: Props) => {
                         )}
 
                         {walletData.type === 'unified' && (
-                            <View style={[tailwind('absolute bottom-0')]}>
+                            <View className="absolute bottom-0">
                                 <Send
                                     sendOptionsRef={bottomSendRef}
                                     triggerSendOptions={handleSend}
@@ -1230,5 +1123,8 @@ const styles = StyleSheet.create({
     divider: {
         height: 1,
         backgroundColor: 'black',
+    },
+    listStyle: {
+        alignItems: 'center',
     },
 });

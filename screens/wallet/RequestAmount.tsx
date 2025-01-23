@@ -9,8 +9,6 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import VText, {VTextSingle} from '../../components/text';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import BigNumber from 'bignumber.js';
@@ -61,7 +59,6 @@ import {WalletParamList} from '../../Navigation';
 type Props = NativeStackScreenProps<WalletParamList, 'RequestAmount'>;
 
 const RequestAmount = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -405,33 +402,27 @@ const RequestAmount = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                className="w-full h-full items-center justify-center">
                 <View
-                    style={[
-                        tailwind(
-                            `w-5/6 items-center justify-center ${
-                                isLightning ? 'flex' : 'flex flex-row'
-                            } absolute top-6`,
-                        ),
-                    ]}>
+                    className={
+                        `w-5/6 items-center justify-center ${
+                            isLightning ? 'flex' : 'flex flex-row'
+                        } absolute top-6`
+                    }>
                     <PlainButton
-                        style={[
-                            tailwind(
-                                `absolute left-0 z-10 ${
-                                    isLightning ? 'top-0' : ''
-                                } `,
-                            ),
-                        ]}
+                        className={
+                            `absolute left-0 z-10 ${
+                                isLightning ? 'top-0' : ''
+                            }`
+                        }
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
                         <Close fill={ColorScheme.SVG.Default} width={32} />
                     </PlainButton>
                     <Text
-                        style={[
-                            tailwind('text-sm text-center w-full font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm text-center w-full font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('receive'))}
                     </Text>
 
@@ -439,26 +430,18 @@ const RequestAmount = ({route}: Props) => {
                     {isLightning && (
                         <PlainButton onPress={updateDescription}>
                             <View
-                                style={[
-                                    tailwind(
-                                        'items-center mt-4 rounded-full px-4 py-1 flex-row',
-                                    ),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                    },
-                                ]}>
+                                className="items-center mt-4 rounded-full px-4 py-1 flex-row"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                }}>
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            'text-sm text-center mr-2 font-bold',
-                                        ),
-                                        {
-                                            color: lnInvoiceDesc
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                    className="text-sm text-center mr-2 font-bold"
+                                    style={{
+                                        color: lnInvoiceDesc
+                                            ? ColorScheme.Text.Default
+                                            : ColorScheme.Text.DescText,
+                                    }}>
                                     {t('ln_description')}
                                 </VText>
                                 <BottomArrow
@@ -474,12 +457,10 @@ const RequestAmount = ({route}: Props) => {
                     )}
 
                     {isLightning && lnInvoiceDesc.length > 0 && (
-                        <View style={[tailwind('mt-3 w-5/6 items-center')]}>
+                        <View className="mt-3 w-5/6 items-center">
                             <VTextSingle
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {lnInvoiceDesc}
                             </VTextSingle>
                         </View>
@@ -488,13 +469,9 @@ const RequestAmount = ({route}: Props) => {
 
                 {/* Screen for amount */}
                 <View
-                    style={[
-                        tailwind(
-                            'w-full items-center flex justify-center flex -mt-48',
-                        ),
-                    ]}>
+                    className="w-full items-center flex justify-center flex -mt-48">
                     {/* Top unit */}
-                    <View style={[tailwind('opacity-40 mb-2')]}>
+                    <View className="opacity-40 mb-2">
                         {!(topUnit?.name === 'sats')
                             ? renderFiatAmount('text-base')
                             : renderSatAmount('text-base')}
@@ -517,20 +494,16 @@ const RequestAmount = ({route}: Props) => {
                     satsAmount.value.gte(maxReceivableAmount) &&
                     !maxReceivableAmount.isZero() && (
                         <View
-                            style={[
-                                tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className="mt-12 w-5/6 rounded-sm px-4 py-2"
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <VText
-                                style={[
-                                    tailwind('text-sm text-center'),
-                                    {
-                                        color: ColorScheme.Text.GrayText,
-                                    },
-                                ]}>
+                                className="text-sm text-center"
+                                style={{
+                                    color: ColorScheme.Text.GrayText,
+                                }}>
                                 {t('max_receivable_lightning', {
                                     sats: formatSats(maxReceivableAmount),
                                 })}
@@ -547,14 +520,12 @@ const RequestAmount = ({route}: Props) => {
 
                 {/* Continue button */}
                 <View
-                    style={[
-                        tailwind(
-                            `absolute w-5/6 ${
-                                disableContinueButtton ? 'opacity-40' : ''
-                            }`,
-                        ),
-                        {bottom: NativeWindowMetrics.bottom},
-                    ]}>
+                    className={
+                        `absolute w-5/6 ${
+                            disableContinueButtton ? 'opacity-40' : ''
+                        }`
+                    }
+                    style={{bottom: NativeWindowMetrics.bottom}}>
                     <LongButton
                         disabled={disableContinueButtton}
                         onPress={handleRoute}
