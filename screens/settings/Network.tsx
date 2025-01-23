@@ -22,8 +22,6 @@ import {getBlockHeight} from '../../modules/bdk';
 
 import {TextSingleInput} from '../../components/input';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {AppStorageContext} from '../../class/storageContext';
 
 import {PlainButton} from '../../components/button';
@@ -48,8 +46,6 @@ const Network = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
     const {t: e} = useTranslation('errors');
@@ -156,28 +152,26 @@ const Network = () => {
     return (
         <SafeAreaView>
             <View
-                style={[
-                    tailwind('w-full h-full'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                className="w-full h-full"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <View
+                    className="w-full h-full mt-4 items-center"
                     style={[
-                        tailwind('w-full h-full mt-4 items-center'),
                         styles.flexed,
                     ]}>
-                    <View style={tailwind('w-5/6 mb-16')}>
+                    <View className="w-5/6 mb-16">
                         <PlainButton
-                            style={tailwind('items-center flex-row -ml-1')}
+                            className="items-center flex-row -ml-1"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
+                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                             />
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -187,75 +181,64 @@ const Network = () => {
                     </View>
 
                     <View
-                        style={tailwind('justify-center w-full items-center')}>
+                        className="justify-center w-full items-center">
                         <VText
+                            className="text-2xl mb-4 w-5/6 font-medium"
                             style={[
-                                tailwind('text-2xl mb-4 w-5/6 font-medium'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
                             {capitalizeFirst(t('network'))}
                         </VText>
 
-                        <View style={[tailwind('w-full'), HeadingBar]} />
+                        <View className="w-full" style={[HeadingBar]} />
                     </View>
 
                     {/* Breez */}
                     <View
-                        style={tailwind(
-                            'justify-center w-full items-center flex-row mt-8 mb-8',
-                        )}>
-                        <View style={tailwind('w-5/6')}>
+                        className="justify-center w-full items-center flex-row mt-8 mb-8">
+                        <View className="w-5/6">
                             <View
-                                style={tailwind(
+                                className={
                                     `w-full ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } items-center mb-4`,
-                                )}>
+                                    } items-center mb-4`}>
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            `text-sm font-medium ${
-                                                langDir === 'right'
-                                                    ? ''
-                                                    : 'mr-4'
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className={
+                                        `text-sm font-medium ${
+                                            langDir === 'right'
+                                                ? ''
+                                                : 'mr-4'
+                                        }`
+                                    }
+                                    style={{color: ColorScheme.Text.Default}}>
                                     Breez SDK
                                 </VText>
 
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `rounded-full ${
+                                    className={
+                                        `rounded-full ${
                                                 langDir === 'right'
                                                     ? 'mr-2'
                                                     : ''
-                                            }`,
-                                        ),
-                                        {
+                                            }`
+                                    }
+                                    style={{
                                             backgroundColor:
                                                 isNetOn && breezConnected
                                                     ? 'lightgreen'
                                                     : '#ff4e4a',
-                                        },
-                                    ]}>
+                                    }}>
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                'text-xs font-bold p-1 px-4',
-                                            ),
-                                            {
+                                        className="text-xs font-bold p-1 px-4"
+                                        style={{
                                                 color:
                                                     isNetOn && breezConnected
                                                         ? 'darkgreen'
                                                         : 'black',
-                                            },
-                                        ]}>
+                                        }}>
                                         {isNetOn && breezConnected
                                             ? capitalizeFirst(t('connected'))
                                             : capitalizeFirst(
@@ -265,36 +248,30 @@ const Network = () => {
                                 </View>
 
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `rounded-full ${
+                                    className={
+                                        `rounded-full ${
                                                 langDir === 'right'
                                                     ? ''
                                                     : 'ml-2'
-                                            }`,
-                                        ),
-                                        {
+                                            }`
+                                    }
+                                    style={{
                                             backgroundColor:
                                                 isNetOn && breezAvailable
                                                     ? checkStatusTrans[
                                                           breezAvailable
                                                       ][2]
                                                     : '#ff4e4a',
-                                        },
-                                    ]}>
+                                    }}>
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                'text-xs font-bold p-1 px-4',
-                                            ),
-                                            {
+                                        className="text-xs font-bold p-1 px-4"
+                                        style={{
                                                 color: isNetOn
                                                     ? checkStatusTrans[
                                                           breezAvailable
                                                       ][1]
                                                     : 'black',
-                                            },
-                                        ]}>
+                                        }}>
                                         {isNetOn
                                             ? checkStatusTrans[
                                                   breezAvailable
@@ -305,10 +282,8 @@ const Network = () => {
                             </View>
 
                             <VText
-                                style={[
-                                    tailwind('text-xs'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-xs"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('breez_sdk_info')}
                             </VText>
                         </View>
@@ -316,61 +291,50 @@ const Network = () => {
 
                     {/* Mempool */}
                     <View
-                        style={tailwind(
-                            'justify-center w-full items-center flex-row mb-8',
-                        )}>
-                        <View style={tailwind('w-5/6')}>
+                        className="justify-center w-full items-center flex-row mb-8">
+                        <View className="w-5/6">
                             <View
-                                style={tailwind(
+                                className={
                                     `w-full ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } items-center mb-4`,
-                                )}>
+                                    } items-center mb-4`}>
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            `text-sm font-medium ${
+                                    className={
+                                        `text-sm font-medium ${
                                                 langDir === 'right'
                                                     ? ''
                                                     : 'mr-4'
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                            }`
+                                    }
+                                    style={{color: ColorScheme.Text.Default}}>
                                     Mempool.space
                                 </VText>
 
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `rounded-full ${
+                                    className={
+                                        `rounded-full ${
                                                 langDir === 'right'
                                                     ? 'mr-2'
                                                     : ''
-                                            }`,
-                                        ),
-                                        {
+                                            }`
+                                    }
+                                    style={{
                                             backgroundColor:
                                                 isNetOn && mempoolInfo.connected
                                                     ? 'lightgreen'
                                                     : '#ff4e4a',
-                                        },
-                                    ]}>
+                                    }}>
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                'text-xs font-bold p-1 px-4',
-                                            ),
-                                            {
+                                        className="text-xs font-bold p-1 px-4"
+                                        style={{
                                                 color:
                                                     isNetOn &&
                                                     mempoolInfo.connected
                                                         ? 'darkgreen'
                                                         : 'black',
-                                            },
-                                        ]}>
+                                        }}>
                                         {isNetOn && mempoolInfo.connected
                                             ? capitalizeFirst(t('connected'))
                                             : capitalizeFirst(
@@ -381,73 +345,60 @@ const Network = () => {
                             </View>
 
                             <VText
-                                style={[
-                                    tailwind('text-xs'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-xs"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('mempool_connection_info')}
                             </VText>
                         </View>
                     </View>
 
-                    <View style={[tailwind('w-full mb-8'), HeadingBar]} />
+                    <View className="w-full mb-8" style={[HeadingBar]} />
 
                     {/* Electrum server */}
                     <View
-                        style={tailwind(
-                            'justify-center w-full items-center flex-row mb-2',
-                        )}>
-                        <View style={tailwind('w-5/6')}>
+                        className="justify-center w-full items-center flex-row mb-2">
+                        <View className="w-5/6">
                             <View
-                                style={tailwind(
-                                    `w-full ${
+                                className={`w-full ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } items-center mb-2`,
-                                )}>
+                                    } items-center mb-2`}>
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            `text-sm font-medium ${
+                                    className={
+                                        `text-sm font-medium ${
                                                 langDir === 'right'
                                                     ? ''
                                                     : 'mr-4'
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                            }`
+                                    }
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {t('electrum_server')}
                                 </VText>
 
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `rounded-full ${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : ''
-                                            }`,
-                                        ),
+                                    className={
+                                        `rounded-full ${
+                                            langDir === 'right'
+                                                ? 'mr-2'
+                                                : ''
+                                        }`
+                                    }
+                                    style={
                                         {
                                             backgroundColor:
                                                 isNetOn && status
                                                     ? 'lightgreen'
                                                     : '#ff4e4a',
-                                        },
-                                    ]}>
+                                    }}>
                                     <VText
-                                        style={[
-                                            tailwind(
-                                                'text-xs font-bold p-1 px-4',
-                                            ),
-                                            {
+                                        className="text-xs font-bold p-1 px-4"
+                                        style={{
                                                 color:
                                                     isNetOn && status
                                                         ? 'darkgreen'
                                                         : 'black',
-                                            },
-                                        ]}>
+                                        }}>
                                         {isNetOn && status
                                             ? capitalizeFirst(t('connected'))
                                             : capitalizeFirst(
@@ -458,10 +409,8 @@ const Network = () => {
                             </View>
 
                             <VText
-                                style={[
-                                    tailwind('text-sm mb-2 italic'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm mb-2 italic"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {`${electrumServerURL.bitcoin}`}
                             </VText>
                         </View>
@@ -469,42 +418,36 @@ const Network = () => {
 
                     {/* Set Custom Electrum server */}
                     <View
-                        style={tailwind(
-                            'justify-center w-full items-center flex-row mt-4',
-                        )}>
-                        <View style={tailwind('w-5/6')}>
+                        className="justify-center w-full items-center flex-row mt-4">
+                        <View className="w-5/6">
                             <View
-                                style={tailwind(
+                                className={
                                     `w-full ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } items-center mb-4`,
-                                )}>
+                                    } items-center mb-4`
+                                }>
                                 <VText
-                                    style={[
-                                        tailwind('text-sm font-medium mr-4'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm font-medium mr-4"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {t('custom_electrum_server')}
                                 </VText>
 
                                 {/* Save button */}
                                 <PlainButton
                                     disabled={url.length === 0}
-                                    style={[
-                                        tailwind(
-                                            `p-1 px-4 rounded ${
+                                    className={
+                                        `p-1 px-4 rounded ${
                                                 url.length === 0
                                                     ? 'opacity-40'
                                                     : ''
-                                            }`,
-                                        ),
-                                        {
+                                            }`
+                                    }
+                                    style={{
                                             backgroundColor:
                                                 ColorScheme.Background.Greyed,
-                                        },
-                                    ]}
+                                    }}
                                     onPress={() => {
                                         const server = url;
 
@@ -518,10 +461,8 @@ const Network = () => {
                                         );
                                     }}>
                                     <VText
-                                        style={[
-                                            tailwind('text-xs font-bold'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className="text-xs font-bold"
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {capitalizeFirst(t('save'))}
                                     </VText>
                                 </PlainButton>
@@ -529,9 +470,9 @@ const Network = () => {
 
                             {/* Input */}
                             <View
+                                className="w-full px-2 mb-4"
                                 style={[
                                     styles.inputContainer,
-                                    tailwind('w-full px-2 mb-4'),
                                     {
                                         borderColor:
                                             url.length === 0
@@ -554,15 +495,11 @@ const Network = () => {
                             </View>
 
                             <VText
-                                style={[
-                                    tailwind('text-xs'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
+                                className="text-xs"
+                                style={{color: ColorScheme.Text.GrayedText}}>
                                 <VText
-                                    style={[
-                                        tailwind('text-xs'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-xs"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {capitalizeFirst(t('warning'))}
                                     {':'}
                                 </VText>{' '}
@@ -570,8 +507,6 @@ const Network = () => {
                             </VText>
                         </View>
                     </View>
-
-                    {/* <View style={[tailwind(' mt-8 mb-8 w-full'), HeadingBar]} /> */}
                 </View>
             </View>
         </SafeAreaView>
