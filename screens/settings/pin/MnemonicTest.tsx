@@ -2,7 +2,6 @@
 import {Text, View, useColorScheme} from 'react-native';
 import React, {useContext, useState} from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useNavigation} from '@react-navigation/native';
@@ -33,7 +32,6 @@ type Props = NativeStackScreenProps<SettingsParamList, 'MnemonicTest'>;
 
 const MnemonicTest = ({route}: Props) => {
     const navigation = useNavigation();
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {getWalletData, currentWalletID, setPINAttempts} =
@@ -66,66 +64,48 @@ const MnemonicTest = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={[tailwind('items-center h-full w-full')]}>
+            <View className="w-full h-full items-center">
+                <View className="items-center h-full w-full">
                     <View
-                        style={[
-                            tailwind(
-                                'w-5/6 absolute top-6 flex-row justify-center',
-                            ),
-                        ]}>
+                        className="w-5/6 absolute top-6 flex-row justify-center">
                         <PlainButton
-                            style={[
-                                tailwind(
-                                    'items-center flex-row -ml-1 absolute left-0',
-                                ),
-                            ]}
+                            className="items-center flex-row -ml-1 absolute left-0"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
+                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                             />
                             <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm font-medium"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('back'))}
                             </Text>
                         </PlainButton>
 
-                        <View style={[tailwind('self-center')]}>
+                        <View className="self-center">
                             <Text
-                                style={[
-                                    tailwind('text-base font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-base font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('mnemonic_test')}
                             </Text>
                         </View>
                     </View>
                     <View
-                        style={[
-                            tailwind('w-5/6 justify-center items-center'),
-                            {marginTop: 80, marginBottom: 32},
-                        ]}>
+                        className="w-5/6 justify-center items-center"
+                        style={{marginTop: 80, marginBottom: 32}}>
                         <Text
-                            style={[
-                                tailwind('text-base text-center'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('mnemonic_test_desc')}
                         </Text>
                     </View>
 
                     {/* Checker for Mnemonic */}
                     <View
-                        style={[
-                            tailwind('w-5/6 items-center'),
-                            {marginLeft: 16},
-                        ]}>
+                        className="w-5/6 items-center"
+                        style={{marginLeft: 16}}>
                         <MnemonicInput
                             mnemonicList={mnemonicList}
                             onMnemonicCheck={setIsCorrectMnemonic}
@@ -134,12 +114,10 @@ const MnemonicTest = ({route}: Props) => {
 
                     {isCorrectMnemonic && (
                         <View
-                            style={[
-                                tailwind('items-center w-5/6 absolute'),
-                                {
+                            className="items-center w-5/6 absolute"
+                            style={{
                                     bottom: NativeWindowMetrics.bottomButtonOffset,
-                                },
-                            ]}>
+                                }}>
                             <LongButton
                                 title={capitalizeFirst(t('continue'))}
                                 backgroundColor={

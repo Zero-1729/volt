@@ -16,8 +16,6 @@ import {RNHapticFeedbackOptions} from '../../../constants/Haptic';
 
 import Checkbox from 'react-native-bouncy-checkbox';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import {PlainButton} from '../../../components/button';
@@ -40,8 +38,6 @@ const PIN = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -103,28 +99,24 @@ const PIN = () => {
     return (
         <SafeAreaView>
             <View
-                style={[
-                    tailwind('w-full h-full'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                className="w-full h-full"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <View
-                    style={[
-                        tailwind('w-full h-full mt-4 items-center'),
-                        styles.flexed,
-                    ]}>
-                    <View style={tailwind('w-5/6 mb-16')}>
+                    className="w-full h-full mt-4 items-center"
+                    style={styles.flexed}>
+                    <View className="w-5/6 mb-16">
                         <PlainButton
-                            style={tailwind('items-center flex-row -ml-1')}
+                            className="items-center flex-row -ml-1"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
+                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                             />
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -134,38 +126,34 @@ const PIN = () => {
                     </View>
 
                     <View
-                        style={tailwind('justify-center w-full items-center')}>
+                        className="justify-center w-full items-center">
                         <VText
+                            className="text-2xl mb-4 w-5/6 font-medium"
                             style={[
-                                tailwind('text-2xl mb-4 w-5/6 font-medium'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
                             {capitalizeFirst(t('manage_pin'))}
                         </VText>
 
-                        <View style={[tailwind('w-full'), HeadingBar]} />
+                        <View className="w-full" style={[HeadingBar]} />
 
                         {/* Show PIN mode enabled */}
                         <View
-                            style={tailwind(
-                                'justify-center w-5/6 items-center flex mt-8 mb-6',
-                            )}>
+                            className="justify-center w-5/6 items-center flex mt-8 mb-6">
                             <View
-                                style={tailwind(
+                                className={
                                     `w-full ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } items-center mb-2`,
-                                )}>
+                                    } items-center mb-2`
+                                }>
                                 <VText
-                                    style={[
-                                        tailwind('text-sm font-medium'),
-                                        {
+                                    className="text-sm font-medium"
+                                    style={{
                                             color: ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                        }}>
                                     {t('enabled_pin_mode')}
                                 </VText>
                             </View>
@@ -175,36 +163,28 @@ const PIN = () => {
                         {/* Reset PIN */}
                         <PlainButton
                             onPress={changePin}
-                            style={tailwind(
-                                'justify-center w-full items-center flex-row mb-10',
-                            )}>
-                            <View style={tailwind('w-5/6')}>
+                            className="justify-center w-full items-center flex-row mb-10">
+                            <View className="w-5/6">
                                 <View
-                                    style={tailwind(
+                                    className={
                                         `items-center ${
                                             langDir === 'right'
                                                 ? 'flex-row-reverse'
                                                 : 'flex-row'
-                                        } justify-between mb-2`,
-                                    )}>
+                                        } justify-between mb-2`
+                                    }>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm font-medium'),
-                                            {
+                                        className="text-sm font-medium"
+                                        style={{
                                                 color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
+                                            }}>
                                         {t('change_pin')}
                                     </VText>
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'flex-row justify-between items-center',
-                                            ),
-                                        ]}>
+                                        className="flex-row justify-between items-center">
                                         {langDir === 'right' && (
                                             <Left
-                                                style={[tailwind('mr-2')]}
+                                                className="mr-2"
                                                 width={16}
                                                 stroke={
                                                     ColorScheme.SVG.GrayFill
@@ -225,10 +205,10 @@ const PIN = () => {
                                     </View>
                                 </View>
 
-                                <View style={tailwind('w-full')}>
+                                <View className="w-full">
                                     <VText
+                                        className="text-xs"
                                         style={[
-                                            tailwind('text-xs'),
                                             {
                                                 color: ColorScheme.Text
                                                     .DescText,
@@ -241,27 +221,23 @@ const PIN = () => {
                         </PlainButton>
 
                         <View
-                            style={tailwind(
-                                'justify-center w-full items-center flex-row mb-10',
-                            )}>
+                            className="justify-center w-full items-center flex-row mb-10">
                             <PlainButton
-                                style={tailwind('w-5/6')}
+                                className="w-5/6"
                                 onPress={handleBiometrics}>
                                 <View
-                                    style={tailwind(
+                                    className={
                                         `w-full ${
                                             langDir === 'right'
                                                 ? 'flex-row-reverse'
                                                 : 'flex-row'
-                                        } items-center mb-2`,
-                                    )}>
+                                        } items-center mb-2`
+                                    }>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm font-medium'),
-                                            {
+                                        className="text-sm font-medium"
+                                        style={{
                                                 color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
+                                            }}>
                                         {t('enable_biometrics_mode')}
                                     </VText>
                                     <Checkbox
@@ -270,7 +246,7 @@ const PIN = () => {
                                             ColorScheme.Background
                                                 .CheckBoxFilled
                                         }
-                                        unfillColor={
+                                        unFillColor={
                                             ColorScheme.Background
                                                 .CheckBoxUnfilled
                                         }
@@ -287,19 +263,15 @@ const PIN = () => {
                                                     .CheckBoxOutline,
                                             borderRadius: 2,
                                         }}
-                                        style={[
-                                            tailwind(
-                                                'flex-row absolute -right-4',
-                                            ),
-                                        ]}
-                                        disableBuiltInState={true}
+                                        className="flex-row absolute -right-4"
+                                        useBuiltInState={false}
                                     />
                                 </View>
 
-                                <View style={tailwind('w-full')}>
+                                <View className="w-full">
                                     <VText
+                                        className="text-xs"
                                         style={[
-                                            tailwind('text-xs'),
                                             {
                                                 color: ColorScheme.Text
                                                     .DescText,
