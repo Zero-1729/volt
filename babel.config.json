@@ -1,5 +1,5 @@
 {
-    "presets": [["module:@react-native/babel-preset", {"useTransformReactJSXExperimental": true}]],
+    "presets": [["module:@react-native/babel-preset", {"useTransformReactJSXExperimental": true}], 'nativewind/babel'],
     "plugins": [
         ["module:react-native-dotenv", {
             "safe": true,
