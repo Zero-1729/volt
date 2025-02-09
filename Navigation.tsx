@@ -529,7 +529,7 @@ const RootNavigator = (): ReactElement => {
         let clipboardMessage!: string;
 
         // Set clipboard message
-        if (clipboardResult.invoiceType === 'lightning') {
+        if (clipboardResult.invoiceType === 'lightning' && wallet.type === 'unified') {
             // Only support BOLT11 & lnurlw & lnurlp for now
             if (clipboardResult.spec === 'lnurlw' || clipboardResult.spec === 'lnurlp') {
                 clipboardMessage = t('read_clipboard_lurl_text');
@@ -566,7 +566,8 @@ const RootNavigator = (): ReactElement => {
         if (
             clipboardResult.hasContents &&
             clipboardResult.invoiceType !== 'unsupported' &&
-            !isInProtectedScreens(currentRoute?.name as string)
+            !isInProtectedScreens(currentRoute?.name as string) &&
+            wallet.type === 'unified'
         ) {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
