@@ -538,7 +538,7 @@ const Home = ({route}: Props) => {
 
                     <View className="w-full h-full mt-2 items-center">
                         <View
-                            className="justify-around w-full mb-6"
+                            className="justify-around w-full mb-6 mt-6"
                             style={{
                                     marginLeft: langDir === 'left' ? 80 : 0,
                                     marginRight: langDir === 'right' ? 80 : 0,
