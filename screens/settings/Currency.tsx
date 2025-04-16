@@ -276,7 +276,7 @@ const Currency = () => {
 
                         <View
                             className={
-                                `text-sm py-4 w-full ${
+                                `text-sm justify-center w-full ${
                                         langDir === 'right' ? 'pr-8' : 'pl-8'
                                     }`
                             }
@@ -345,11 +345,11 @@ const Currency = () => {
                     />
 
                     <View
-                        className="w-full items-center justify-center"
+                        className="w-full items-center mb-4 justify-center"
                         style={[
                             styles.bottomMessage,
                         ]}>
-                        <VText style={[{color: ColorScheme.Text.GrayedText}]}>
+                        <VText className="justify-center" style={[{color: ColorScheme.Text.GrayedText}]}>
                             {t('last_updated', {date: fiatRate.lastUpdated})}
                         </VText>
                     </View>
