@@ -73,9 +73,11 @@ const Network = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {electrumServerURL, setElectrumServerURL, mempoolInfo} =
+    const {electrumServerURL, setElectrumServerURL, mempoolInfo, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
 
+    const wallet = getWalletData(currentWalletID);
+    const isLNEnabled = wallet.type === 'unified';
     const [url, setURL] = useState('');
     const [status, setStatus] = useState(true);
 
@@ -144,8 +146,10 @@ const Network = () => {
     }, []);
 
     useEffect(() => {
-        checkBreezServices();
-        checkBreezAvailability();
+        if (isLNEnabled) {
+            checkBreezServices();
+            checkBreezAvailability();
+        }
         testElectrumService();
     }, [isNetOn]);
 
@@ -194,7 +198,7 @@ const Network = () => {
                     </View>
 
                     {/* Breez */}
-                    <View
+                    {isLNEnabled && <View
                         className="justify-center w-full items-center flex-row mt-8 mb-8">
                         <View className="w-5/6">
                             <View
@@ -286,11 +290,11 @@ const Network = () => {
                                 {t('breez_sdk_info')}
                             </VText>
                         </View>
-                    </View>
+                    </View>}
 
                     {/* Mempool */}
                     <View
-                        className="justify-center w-full items-center flex-row mb-8">
+                        className={`justify-center w-full items-center flex-row mb-8 ${!isLNEnabled ? 'mt-8' : ''}`}>
                         <View className="w-5/6">
                             <View
                                 className={
