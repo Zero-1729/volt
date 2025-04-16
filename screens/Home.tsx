@@ -510,7 +510,7 @@ const Home = ({route}: Props) => {
                                     styles.connectionStatus,
                                     {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
                                 ]}/>
-                                <VText className="text-xs font-bold" style={{color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText}}>
+                                <VText className="text-sm font-bold" style={{color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText}}>
                                     {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
                                 </VText>
                             </View>
