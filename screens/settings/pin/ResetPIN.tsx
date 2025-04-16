@@ -77,11 +77,10 @@ const ResetPIN = ({route}: Props) => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
-                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                             />
                             <Text
-                                className="text-sm font-medium"
+                                className="ml-2 text-sm font-medium"
                                 style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('back'))}
                             </Text>

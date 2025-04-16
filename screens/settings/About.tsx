@@ -64,11 +64,10 @@ const About = () => {
                             navigation.goBack();
                         }}>
                         <Back
-                            className="mr-2"
                             fill={ColorScheme.SVG.Default}
                         />
                         <Text
-                            className="text-sm font-bold"
+                            className="ml-2 text-sm font-bold"
                             style={[
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
@@ -218,10 +217,9 @@ const About = () => {
                             <Github
                                 width={32}
                                 fill={ColorScheme.SVG.Default}
-                                className="mr-2"
                             />
                             <Text
-                                className="text-xs font-medium"
+                                className="ml-2 text-xs font-medium"
                                 style={[
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
@@ -246,10 +244,9 @@ const About = () => {
                             <Squirrel
                                 width={32}
                                 fill={ColorScheme.SVG.Default}
-                                className="mr-2"
                             />
                             <Text
-                                className="text-xs font-medium"
+                                className="ml-2 text-xs font-medium"
                                 style={[
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,

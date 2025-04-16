@@ -85,11 +85,10 @@ const Settings = () => {
                             navigation.goBack();
                         }}>
                         <Back
-                            className="mr-2"
                             fill={ColorScheme.SVG.Default}
                         />
                         <VText
-                            className="text-sm font-medium"
+                            className=" ml-2 text-sm font-medium"
                             style={[
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
