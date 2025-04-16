@@ -925,9 +925,11 @@ const RootNavigator = (): ReactElement => {
             // and Breez SDK connection
             if (checkNetworkIsReachable(state)) {
                 console.log(
-                    '[NetInfo] Attempt to (Re)connect to Breez & Mempool',
+                    `[NetInfo] Attempt to (Re)connect to ${wallet.type === 'unified' ? 'Breez & ' : ''}Mempool`,
                 );
-                initNode();
+                if (!!wallet?.mnemonic && wallet.type === 'unified') {
+                    initNode();
+                }
                 initMempoolSock();
             }
         });
