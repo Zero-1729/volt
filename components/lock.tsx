@@ -64,6 +64,7 @@ const LockScreen = (props: lockProps) => {
 
     const fetchPin = async () => {
         const storedPIN = await getKeychainItem('pin');
+
         setValidPin(storedPIN.data);
     };
 

@@ -180,7 +180,7 @@ export const Balance = (props: BalanceProps) => {
             ) : (
                 /* Empty view to keep the card height consistent  */
                 <View
-                    className="rounded-sm flex-row self-center rounded w-full h-12"
+                    className="flex-row self-center rounded w-full h-12"
                     style={[
                         {
                             opacity: props.loading ? 0.15 : 0.4,
