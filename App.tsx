@@ -7,10 +7,11 @@ import React, {
     useEffect,
     useState,
 } from 'react';
-import {StatusBar, useColorScheme, NativeModules, Platform} from 'react-native';
+import {StatusBar, useColorScheme, NativeModules, Platform, View, StyleSheet} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {NewAppScreen} from '@react-native/new-app-screen';
 
 import i18n from './i18n';
 
@@ -21,11 +22,28 @@ import OnboardingNavigator from './navigation/onboarding/OnboardingNavigator';
 import Color from './constants/Color';
 
 const App = () => {
-    const [isReady, setIsReady] = useState<boolean>(false);
+    const ColorScheme = Color(useColorScheme());
+
+    return (
+        <SafeAreaProvider
+            style={{backgroundColor: ColorScheme.Background.Primary}}>
+            <StatusBar
+                barStyle={
+                    ColorScheme.isDarkMode ? 'light-content' : 'dark-content'
+                }
+                backgroundColor={ColorScheme.Background.Primary}
+            />
+            <AppContent />
+        </SafeAreaProvider>
+    );
+};
+
+const AppContent = () => {
+      const safeAreaInsets = useSafeAreaInsets();
+
+      const [isReady, setIsReady] = useState<boolean>(false);
 
     const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
-
-    const ColorScheme = Color(useColorScheme());
 
     const RootScreen = useCallback((): ReactElement => {
         if (!isReady) {
@@ -56,18 +74,23 @@ const App = () => {
         i18n.changeLanguage(appLanguage.code);
     }, [appLanguage]);
 
-    return (
-        <SafeAreaProvider
-            style={{backgroundColor: ColorScheme.Background.Primary}}>
-            <StatusBar
-                barStyle={
-                    ColorScheme.isDarkMode ? 'light-content' : 'dark-content'
-                }
-                backgroundColor={ColorScheme.Background.Primary}
-            />
-            <RootScreen />
-        </SafeAreaProvider>
+      return (
+        <View style={styles.container}>
+            <NewAppScreen
+                templateFileName="App.tsx"
+                safeAreaInsets={safeAreaInsets}
+            >
+                <RootScreen />
+            </NewAppScreen>
+        </View>
     );
 };
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+});
 
 export default App;
