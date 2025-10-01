@@ -672,9 +672,9 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
 
             {/* Row 3 */}
             <View
-                className={`w-full flex-row  ${
+                className={`flex-row ${
                     props.showBiometrics
-                        ? 'justify-around'
+                        ? 'w-full justify-around'
                         : 'justify-around self-end w-2/3'
                 }`}>
                 {props.showBiometrics && (
