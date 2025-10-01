@@ -16,21 +16,21 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "start": "react-native start",
-    "ios": "react-native run-ios --simulator='iPhone 15'",
+    "ios": "react-native run-ios --simulator='iPhone 17'",
     "android": "react-native run-android",
     "bundle": "yarn clean:android && react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.jsbundle --assets-dest android/app/build/intermediates/res/merged/release/ && cd android && ./gradlew assembleRelease --no-daemon",
     "gitbranch": "./scripts/git-branch-data.sh > ./data/git-branch-data.json",
     "postinstall": "node postinstall.js"
   },
   "engines": {
-    "node": ">=18",
+    "node": ">=20",
     "npm": ">=8.1.0"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.13.0",
     "@bitcoinerlab/descriptors": "https://github.com/Zero-1729/descriptors.git",
     "@bitcoinerlab/secp256k1": "^1.1.0",
-    "@breeztech/react-native-breez-sdk": "^0.8.0",
+    "@breeztech/react-native-breez-sdk": "^0.8.1-rc3",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@formatjs/intl-datetimeformat": "^6.12.2",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
@@ -39,7 +39,6 @@
     "@formatjs/intl-pluralrules": "^5.2.12",
     "@formatjs/intl-relativetimeformat": "^11.2.12",
     "@gorhom/bottom-sheet": "^4.6.1",
-    "@mempool/mempool.js": "^3.0.0",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-clipboard/clipboard": "^1.15.0",
     "@react-native-community/cli": "20.0.0",
@@ -48,7 +47,6 @@
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-community/push-notification-ios": "^1.11.0",
     "@react-native/gradle-plugin": "^0.76.5",
-    "@react-native/new-app-screen": "0.81.0",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/native-stack": "^7.2.0",
     "@react-navigation/stack": "^7.1.1",
@@ -72,7 +70,7 @@
     "process": "^0.11.10",
     "react": "v19.1.0",
     "react-i18next": "^15.6.1",
-    "react-native": "0.81.0",
+    "react-native": "0.81.4",
     "react-native-biometrics": "^3.0.1",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-default-preference": "^1.4.4",
@@ -93,7 +91,7 @@
     "react-native-privacy-snapshot": "^1.0.0",
     "react-native-prompt-android": "^1.1.0",
     "react-native-qrcode-styled": "^0.3.3",
-    "react-native-quick-base64": "^2.0.8",
+    "react-native-quick-base64": "^2.2.2",
     "react-native-quick-crypto": "^0.7.10",
     "react-native-reanimated": "^3.16.6",
     "react-native-reanimated-carousel": "^3.5.1",
@@ -104,6 +102,7 @@
     "react-native-svg-transformer": "^1.5.0",
     "react-native-tooltip": "^5.2.0",
     "react-native-vision-camera": "^4.6.3",
+    "react-native-worklets": "^0.6.0",
     "stream-browserify": "^3.0.0",
     "url": "^0.11.4"
   },
@@ -111,10 +110,10 @@
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
-    "@react-native/babel-preset": "v0.81.0",
-    "@react-native/eslint-config": "v0.81.0",
-    "@react-native/metro-config": "v0.81.0",
-    "@react-native/typescript-config": "v0.81.0",
+    "@react-native/babel-preset": "0.81.4",
+    "@react-native/eslint-config": "0.81.4",
+    "@react-native/metro-config": "0.81.4",
+    "@react-native/typescript-config": "0.81.4",
     "@types/bs58check": "^2.1.0",
     "@types/jest": "^29.5.13",
     "@types/react": "^19.1.0",
@@ -142,5 +141,6 @@
   ],
   "resolutions": {
     "browserify-sign": "4.2.2"
-  }
+  },
+  "packageManager": "yarn@4.10.3"
 }
