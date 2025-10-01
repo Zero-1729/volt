@@ -76,12 +76,7 @@ const AppContent = () => {
 
       return (
         <View style={styles.container}>
-            <NewAppScreen
-                templateFileName="App.tsx"
-                safeAreaInsets={safeAreaInsets}
-            >
-                <RootScreen />
-            </NewAppScreen>
+            <RootScreen />
         </View>
     );
 };
