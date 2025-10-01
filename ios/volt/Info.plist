@@ -60,6 +60,8 @@
 	<string>${PRODUCT_NAME} needs access to the camera to scan QR Codes</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>${PRODUCT_NAME} needs to access Face ID to secure your app.</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto Medium.ttf</string>
