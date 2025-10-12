@@ -11,7 +11,7 @@ const VText = (props: VTextProps) => {
     const alignment = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     return (
-        <Text style={[{textAlign: alignment}, props.style]}>
+        <Text className={props.className} style={[{textAlign: alignment}, props.style]}>
             {props.children}
         </Text>
     );
@@ -26,6 +26,7 @@ export const VTextDouble = (props: VTextProps) => {
         <Text
             numberOfLines={2}
             ellipsizeMode="middle"
+            className={props.className}
             style={[{textAlign: alignment}, props.style]}>
             {props.children}
         </Text>
@@ -39,6 +40,7 @@ export const VTextSingle = (props: VTextProps) => {
 
     return (
         <Text
+            className={props.className}
             numberOfLines={1}
             ellipsizeMode="middle"
             style={[{textAlign: alignment}, props.style]}>
@@ -54,6 +56,7 @@ export const VTextMulti = (props: VTextProps) => {
 
     return (
         <Text
+            className={props.className}
             numberOfLines={4}
             ellipsizeMode="middle"
             style={[{textAlign: alignment}, props.style]}>

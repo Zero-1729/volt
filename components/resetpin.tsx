@@ -19,7 +19,6 @@ import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 
 import {LongButton} from './button';
 
-import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 
 import BitcoinNight from '../assets/svg/bitcoin-knight.svg';
@@ -50,7 +49,6 @@ type ResetPINProps = {
 };
 
 const ResetPINCode = (props: ResetPINProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const snapPoints = useMemo(() => ['75'], []);
@@ -133,26 +131,20 @@ const ResetPINCode = (props: ResetPINProps) => {
     const welcomePanel = useCallback((): ReactElement => {
         return (
             <View
-                style={[
-                    tailwind('w-full justify-center items-center'),
-                    {
+                className="w-full justify-center items-center"
+                style={{
                         height: NativeWindowMetrics.height * 0.75,
-                    },
-                ]}>
-                <View style={[tailwind('items-center absolute top-0 w-5/6')]}>
+                    }}>
+                <View className="items-center absolute top-0 w-5/6">
                     <Text
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('reset_pin')}
                     </Text>
 
                     <Text
-                        style={[
-                            tailwind('text-sm text-center mt-4'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm text-center mt-4"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {props.testInfo.isWatchOnly
                             ? t('reset_pin_e_desc')
                             : t('reset_pin_m_desc')}
@@ -160,27 +152,23 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
 
                 <View
-                    style={[
-                        tailwind('justify-center flex items-center'),
-                        {
+                    className="justify-center flex items-center"
+                    style={{
                             marginTop: -(
                                 NativeWindowMetrics.height *
                                 0.75 *
                                 0.15
                             ),
-                        },
-                    ]}>
+                        }}>
                     <BitcoinNight height={256} width={256} />
                 </View>
 
                 <View
-                    style={[
-                        tailwind('absolute w-5/6'),
-                        {
+                    className="absolute w-5/6"
+                    style={{
                             bottom:
                                 24 + NativeWindowMetrics.height * 0.75 * 0.1,
-                        },
-                    ]}>
+                        }}>
                     <LongButton
                         onPress={() => {
                             carouselRef.current?.next();
@@ -192,39 +180,28 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [
-        ColorScheme.Background.Inverted,
-        ColorScheme.Text.Alt,
-        ColorScheme.Text.Default,
-        ColorScheme.Text.DescText,
-        props.testInfo.isWatchOnly,
-        t,
-        tailwind,
-    ]);
+    }, [ColorScheme.Background.Inverted, ColorScheme.Text.Alt, ColorScheme.Text.Default, ColorScheme.Text.DescText, props.testInfo.isWatchOnly, t]);
 
     const mnemonicPanel = useCallback((): ReactElement => {
         return (
-            <View style={[tailwind('h-full w-full items-center')]}>
-                <View style={[tailwind('w-5/6 mt-2 mb-6')]}>
+            <View className="h-full w-full items-center">
+                <View className="w-5/6 mt-2 mb-6">
                     <Text
-                        style={[
-                            tailwind('text-lg text-center font-bold mb-4'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg text-center font-bold mb-4"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('mnemonic_test')}
                     </Text>
                     <Text
-                        style={[
-                            tailwind('text-sm text-center mb-4'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm text-center mb-4"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('mnemonic_test_desc')}
                     </Text>
                 </View>
 
                 {/* Checker for Mnemonic */}
                 <View
-                    style={[tailwind('w-5/6 items-center'), {marginLeft: 16}]}>
+                    className="w-5/6 items-center"
+                    style={{marginLeft: 16}}>
                     <MnemonicInput
                         mnemonicList={mnemonicList}
                         onMnemonicCheck={setIsCorrectMnemonic}
@@ -232,44 +209,34 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [ColorScheme, mnemonicList, t, tailwind]);
+    }, [ColorScheme, mnemonicList, t]);
 
     const extKeyPanel = useCallback((): ReactElement => {
         return (
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={[tailwind('items-center h-full w-full')]}>
+            <View className="w-full h-full items-center">
+                <View className="items-center h-full w-full">
                     <View
-                        style={[
-                            tailwind(
-                                'w-5/6 absolute top-0 flex-row justify-center',
-                            ),
-                        ]}>
-                        <View style={[tailwind('self-center')]}>
+                        className="w-5/6 absolute top-0 flex-row justify-center">
+                        <View className="self-center">
                             <Text
-                                style={[
-                                    tailwind('text-base font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-base font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('ext_test')}
                             </Text>
                         </View>
                     </View>
                     <View
-                        style={[
-                            tailwind('w-5/6 justify-center items-center'),
-                            {marginTop: 64, marginBottom: 32},
-                        ]}>
+                        className="w-5/6 justify-center items-center"
+                        style={{marginTop: 64, marginBottom: 32}}>
                         <Text
-                            style={[
-                                tailwind('text-base text-center'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('ext_pub_test_desc')}
                         </Text>
                     </View>
 
                     {/* Ext Key */}
-                    <View style={[tailwind('w-5/6')]}>
+                    <View className="w-5/6">
                         <ExtKeyInput
                             handleCorrect={handleExtKeyCorrect}
                             onChangeText={updateKey}
@@ -282,43 +249,30 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [
-        ColorScheme.Text.Default,
-        ColorScheme.Text.DescText,
-        handleExtKeyCorrect,
-        t,
-        tailwind,
-        tmpKey,
-        updateKey,
-        walletXpub,
-    ]);
+    }, [ColorScheme.Text.Default, ColorScheme.Text.DescText, handleExtKeyCorrect, t, tmpKey, updateKey, walletXpub]);
 
     const testPanel = props.testInfo.mnemonic ? mnemonicPanel : extKeyPanel;
 
     const pinPanel = useCallback((): ReactElement => {
         return (
-            <View style={[tailwind('w-full px-2 h-full items-center')]}>
+            <View className="w-full px-2 h-full items-center">
                 <Text
-                    style={[
-                        tailwind('text-center text-lg font-bold mt-4'),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
+                    className="text-center text-lg font-bold mt-4"
+                    style={{color: ColorScheme.Text.Default}}>
                     {t('new_pin')}
                 </Text>
 
                 <View
-                    style={[
-                        tailwind('flex-row items-center'),
-                        {marginTop: 98},
-                    ]}>
+                    className="flex-row items-center"
+                    style={{marginTop: 98}}>
                     {Array(4)
                         .fill(null)
                         .map((_, i) => (
                             <View
                                 key={i}
+                                className="rounded-full"
                                 style={[
                                     styles.dot,
-                                    tailwind('rounded-full'),
                                     {
                                         borderColor:
                                             ColorScheme.Background.Inverted,
@@ -334,14 +288,12 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
 
                 <View
-                    style={[
-                        tailwind('justify-center absolute'),
-                        {
+                    className="justify-center absolute"
+                    style={{
                             bottom:
                                 NativeWindowMetrics.bottomButtonOffset +
                                 NativeWindowMetrics.height * 0.15,
-                        },
-                    ]}>
+                        }}>
                     <PinNumpad
                         pin={tmpPIN}
                         onPinChange={updatePIN}
@@ -351,40 +303,28 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [
-        ColorScheme.Background.Inverted,
-        ColorScheme.Background.Primary,
-        ColorScheme.Text.Default,
-        t,
-        tailwind,
-        tmpPIN,
-        updatePIN,
-    ]);
+    }, [ColorScheme.Background.Inverted, ColorScheme.Background.Primary, ColorScheme.Text.Default, t, tmpPIN, updatePIN]);
 
     const confirmPanel = useCallback((): ReactElement => {
         return (
-            <View style={[tailwind('w-full px-2 h-full items-center')]}>
+            <View className="w-full px-2 h-full items-center">
                 <Text
-                    style={[
-                        tailwind('text-center text-lg font-bold mt-4'),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
+                    className="text-center text-lg font-bold mt-4"
+                    style={{color: ColorScheme.Text.Default}}>
                     {t('retype_pin')}
                 </Text>
 
                 <View
-                    style={[
-                        tailwind('flex-row items-center'),
-                        {marginTop: 98},
-                    ]}>
+                    className="flex-row items-center"
+                    style={{marginTop: 98}}>
                     {Array(4)
                         .fill(null)
                         .map((_, i) => (
                             <View
                                 key={i}
+                                className="rounded-full"
                                 style={[
                                     styles.dot,
-                                    tailwind('rounded-full'),
                                     {
                                         borderColor:
                                             ColorScheme.Background.Inverted,
@@ -400,14 +340,12 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
 
                 <View
-                    style={[
-                        tailwind('absolute'),
-                        {
+                    className="absolute"
+                    style={{
                             bottom:
                                 NativeWindowMetrics.bottomButtonOffset +
                                 NativeWindowMetrics.height * 0.15,
-                        },
-                    ]}>
+                        }}>
                     <PinNumpad
                         pin={confirmPIN}
                         onPinChange={updateConfirmPIN}
@@ -417,40 +355,26 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [
-        ColorScheme.Background.Inverted,
-        ColorScheme.Background.Primary,
-        ColorScheme.Text.Default,
-        confirmPIN,
-        t,
-        tailwind,
-        updateConfirmPIN,
-    ]);
+    }, [ColorScheme.Background.Inverted, ColorScheme.Background.Primary, ColorScheme.Text.Default, confirmPIN, t, updateConfirmPIN]);
 
     const donePanel = useCallback((): ReactElement => {
         return (
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
-                <View style={[tailwind('items-center absolute top-0')]}>
+                className="w-full h-full items-center justify-center">
+                <View className="items-center absolute top-0">
                     <Text
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('reset_pin')}
                     </Text>
                 </View>
 
                 <View
-                    style={[
-                        tailwind('items-center w-5/6 absolute'),
-                        {top: 56},
-                    ]}>
+                    className="items-center w-5/6 absolute"
+                    style={{top: 56}}>
                     <Text
-                        style={[
-                            tailwind('text-sm text-center'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm text-center"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('done_pin_change_message')}
                     </Text>
                 </View>
@@ -472,12 +396,10 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
 
                 <View
-                    style={[
-                        tailwind('absolute w-5/6'),
-                        {
+                    className="absolute w-5/6"
+                    style={{
                             bottom: 24 + NativeWindowMetrics.height * 0.15,
-                        },
-                    ]}>
+                        }}>
                     <LongButton
                         onPress={handleSuccessReset}
                         textColor={ColorScheme.Text.Alt}
@@ -487,7 +409,7 @@ const ResetPINCode = (props: ResetPINProps) => {
                 </View>
             </View>
         );
-    }, [ColorScheme, handleSuccessReset, t, tailwind]);
+    }, [ColorScheme, handleSuccessReset, t]);
 
     const panels = useMemo(
         (): Slide[] => [
@@ -509,22 +431,23 @@ const ResetPINCode = (props: ResetPINProps) => {
             handleIndicatorColor={'#64676E'}
             backdrop={true}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center relative'),
-                    {
+                className="w-full h-full items-center relative"
+                style={{
                         backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
+                    }}>
                 {/* Main Carousel */}
                 <View
+                    className="h-full w-full"
                     style={[
                         styles.carouselContainer,
-                        tailwind('h-full w-full'),
                         {zIndex: -9},
                     ]}>
                     <Carousel
                         ref={carouselRef}
-                        style={[tailwind('w-full h-full')]}
+                        style={{
+                            height: '100%',
+                            width: '100%',
+                        }}
                         data={panels}
                         enabled={false}
                         width={NativeWindowMetrics.width}

@@ -44,8 +44,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import BigNumber from 'bignumber.js';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import {
@@ -95,7 +93,6 @@ type Props = NativeStackScreenProps<WalletParamList, 'Receive'>;
 type Slide = () => ReactElement;
 
 const Receive = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -205,14 +202,14 @@ const Receive = ({route}: Props) => {
     const displayExpiry = useMemo(() => {
         if (LNInvoice) {
             return (
-                <View style={[tailwind('absolute right-0')]}>
+                <View className="absolute right-0">
                     <ExpiryTimer expiryDate={LNInvoice.expiry} />
                 </View>
             );
         }
 
         return <></>;
-    }, [LNInvoice, tailwind]);
+    }, [LNInvoice]);
 
     const isAmountInvoice = useMemo(() => {
         // Show if is a LN wallet & online
@@ -381,18 +378,14 @@ const Receive = ({route}: Props) => {
 
         return (
             <View
-                style={[
-                    tailwind(
-                        `items-center justify-center h-full w-full ${
-                            congestedMempool ? 'mt-8' : 'mt-6'
-                        }`,
-                    ),
-                ]}>
+                className={
+                    `items-center justify-center h-full w-full ${
+                        congestedMempool ? 'mt-8' : 'mt-6'
+                    }`
+                }>
                 {isAmountInvoice && (
                     <View
-                        style={[
-                            tailwind('mb-4 flex justify-center items-center'),
-                        ]}>
+                        className="mb-4 flex justify-center items-center">
                         {/* Make it approx if it doesn't match bottom unit value for requested amount */}
                         {state.bitcoinValue < 100_000_000 ? (
                             <DisplaySatsAmount
@@ -405,7 +398,7 @@ const Receive = ({route}: Props) => {
                                 fontSize="text-2xl"
                             />
                         )}
-                        <View style={[tailwind('opacity-40')]}>
+                        <View className="opacity-40">
                             {/* Make it approx if it doesn't match bottom unit value for requested amount */}
                             <DisplayFiatAmount
                                 amount={formatFiat(state.fiatValue)}
@@ -420,9 +413,9 @@ const Receive = ({route}: Props) => {
                 )}
 
                 <View
+                    className="rounded p-2"
                     style={[
                         styles.qrCodeContainer,
-                        tailwind('rounded p-2'),
                         {
                             borderColor: ColorScheme.Background.QRBorder,
                             backgroundColor: 'white',
@@ -441,15 +434,13 @@ const Receive = ({route}: Props) => {
                         children={(): ReactElement => {
                             return (
                                 <View
+                                    className="w-full h-full"
                                     style={[
-                                        tailwind('w-full h-full'),
                                         styles.qrLogoContainer,
                                     ]}>
                                     <View
+                                        className="rounded-full items-center justify-center"
                                         style={[
-                                            tailwind(
-                                                'rounded-full items-center justify-center',
-                                            ),
                                             {
                                                 backgroundColor: 'black',
                                                 height: 54,
@@ -467,33 +458,29 @@ const Receive = ({route}: Props) => {
                 {/* Message on congestion */}
                 {congestedMempool && isNetOn && (
                     <View
-                        style={[
-                            tailwind(
-                                `mt-4 w-5/6 ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } items-center justify-center`,
-                            ),
-                        ]}>
+                        className={
+                            `mt-4 w-5/6 ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } items-center justify-center`
+                        }>
                         <Info
                             width={16}
                             height={16}
                             fill={ColorScheme.SVG.GrayFill}
                         />
                         <Text
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'mr-2'
-                                            : 'ml-2 text-center'
-                                    } text-sm`,
-                                ),
-                                {
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'mr-2'
+                                        : 'ml-2 text-center'
+                                } text-sm`
+                            }
+                            style={{
                                     color: ColorScheme.Text.DescText,
-                                },
-                            ]}>
+                            }}>
                             {t('mempool_congested')}
                         </Text>
                     </View>
@@ -501,12 +488,10 @@ const Receive = ({route}: Props) => {
 
                 {/* Bitcoin address info */}
                 <View
-                    style={[
-                        tailwind('p-4 mt-4 w-4/5 rounded mb-4'),
-                        {backgroundColor: ColorScheme.Background.Greyed},
-                    ]}>
+                    className="p-4 mt-4 w-4/5 rounded mb-4"
+                    style={{backgroundColor: ColorScheme.Background.Greyed}}>
                     <PlainButton
-                        style={[tailwind('w-full')]}
+                        className="w-full"
                         onPress={copyToClip}>
                         <Text
                             ellipsizeMode="middle"
@@ -519,45 +504,37 @@ const Receive = ({route}: Props) => {
 
                 {/* Bottom buttons */}
                 <View
-                    style={[
-                        tailwind(
-                            `items-center ${
-                                langDir === 'right'
-                                    ? 'flex-row-reverse'
-                                    : 'flex-row'
-                            }`,
-                        ),
-                    ]}>
+                    className={
+                        `items-center ${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        }`
+                    }>
                     {/* Enter receive amount */}
                     <PlainButton
-                        style={[
-                            tailwind(
-                                `${
-                                    langDir === 'right' ? 'ml-4' : 'mr-4'
-                                } rounded-full items-center flex-row justify-center px-4 py-2`,
-                            ),
-                            {
+                        className={
+                            `${
+                                langDir === 'right' ? 'ml-4' : 'mr-4'
+                            } rounded-full items-center flex-row justify-center px-4 py-2`
+                        }
+                        style={{
                                 backgroundColor: ColorScheme.Background.Greyed,
-                            },
-                        ]}
+                        }}
                         onPress={() => {
                             navigation.dispatch(
-                                CommonActions.navigate({
-                                    name: 'RequestAmount',
-                                }),
+                                CommonActions.goBack(),
                             );
                         }}>
                         <EditIcon
-                            style={[tailwind('mr-2')]}
+                            className="mr-2"
                             fill={ColorScheme.SVG.Default}
                             width={16}
                             height={16}
                         />
                         <Text
-                            style={[
-                                tailwind('font-bold text-center text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="font-bold text-center text-sm"
+                            style={{color: ColorScheme.Text.Default}}>
                             {capitalizeFirst(t('edit'))}
                         </Text>
                     </PlainButton>
@@ -572,28 +549,22 @@ const Receive = ({route}: Props) => {
                             });
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    'rounded-full items-center flex-row justify-center px-4 py-2',
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className="rounded-full items-center flex-row justify-center px-4 py-2"
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <ShareIcon
-                                style={[tailwind('mr-2')]}
+                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                                 width={16}
                                 height={16}
                             />
                             <Text
-                                style={[
-                                    tailwind('text-sm font-bold'),
-                                    {
-                                        color: ColorScheme.Text.Default,
-                                    },
-                                ]}>
+                                className="text-sm font-bold"
+                                style={{
+                                    color: ColorScheme.Text.Default,
+                                }}>
                                 {capitalizeFirst(t('share'))}
                             </Text>
                         </View>
@@ -602,7 +573,6 @@ const Receive = ({route}: Props) => {
             </View>
         );
     }, [
-        tailwind,
         congestedMempool,
         isAmountInvoice,
         state.bitcoinValue,
@@ -631,23 +601,15 @@ const Receive = ({route}: Props) => {
 
         return (
             <View
-                style={[
-                    tailwind('items-center justify-center h-full w-full mt-12'),
-                ]}>
+                className="items-center justify-center h-full w-full mt-12">
                 {!loadingInvoice && (
                     <>
                         <View
-                            style={[
-                                tailwind(
-                                    'items-center justify-center w-4/5 mb-4 flex-row',
-                                ),
-                            ]}>
+                            className="items-center justify-center w-4/5 mb-4 flex-row">
                             <ActivityIndicator />
                             <VText
-                                style={[
-                                    tailwind('ml-2 text-center'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="ml-2 text-center"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('keep_receive_open')}
                             </VText>
                         </View>
@@ -656,17 +618,11 @@ const Receive = ({route}: Props) => {
 
                 {loadingInvoice ? (
                     <View
-                        style={[
-                            tailwind(
-                                'items-center justify-center h-full w-full',
-                            ),
-                        ]}>
+                        className="items-center justify-center h-full w-full">
                         <ActivityIndicator />
                         <Text
-                            style={[
-                                tailwind('text-sm mt-4'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm mt-4"
+                            style={{color: ColorScheme.Text.Default}}>
                             {isAdvancedMode
                                 ? t('loading_invoice_advanced', {
                                       spec: 'Bolt11',
@@ -676,9 +632,9 @@ const Receive = ({route}: Props) => {
                     </View>
                 ) : (
                     <View
+                        className="rounded p-2"
                         style={[
                             styles.qrCodeContainer,
-                            tailwind('rounded p-2'),
                             {
                                 borderColor: ColorScheme.Background.QRBorder,
                                 backgroundColor: 'white',
@@ -697,21 +653,17 @@ const Receive = ({route}: Props) => {
                             children={(): ReactElement => {
                                 return (
                                     <View
+                                        className="w-full h-full"
                                         style={[
-                                            tailwind('w-full h-full'),
                                             styles.qrLogoContainer,
                                         ]}>
                                         <View
-                                            style={[
-                                                tailwind(
-                                                    'rounded-full items-center justify-center',
-                                                ),
-                                                {
-                                                    backgroundColor: 'black',
-                                                    height: 54,
-                                                    width: 54,
-                                                },
-                                            ]}>
+                                            className="rounded-full items-center justify-center"
+                                            style={{
+                                                backgroundColor: 'black',
+                                                height: 54,
+                                                width: 54,
+                                            }}>
                                             <LNIcon width={32} height={32} />
                                         </View>
                                     </View>
@@ -724,12 +676,12 @@ const Receive = ({route}: Props) => {
                 {/* Bitcoin address info */}
                 {!loadingInvoice && (
                     <View
+                        className="p-4 mt-4 w-4/5 rounded mb-4"
                         style={[
-                            tailwind('p-4 mt-4 w-4/5 rounded mb-4'),
                             {backgroundColor: ColorScheme.Background.Greyed},
                         ]}>
                         <PlainButton
-                            style={[tailwind('w-full')]}
+                            className="w-full"
                             onPress={copyToClip}>
                             <Text
                                 ellipsizeMode="middle"
@@ -744,10 +696,8 @@ const Receive = ({route}: Props) => {
                 {/* ln_fee_amount_message */}
                 {!loadingInvoice && feeMessage && (
                     <Text
-                        style={[
-                            tailwind('text-sm text-center mb-6 w-5/6'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm text-center mb-6 w-5/6'"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {feeMessage}
                     </Text>
                 )}
@@ -755,30 +705,24 @@ const Receive = ({route}: Props) => {
                 {/* Bottom buttons */}
                 {!loadingInvoice && (
                     <View
-                        style={[
-                            tailwind(
-                                `items-center ${
-                                    Platform.OS === 'ios'
-                                        ? 'w-1/2 justify-between'
-                                        : 'w-5/6 justify-around'
-                                } ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                }`,
-                            ),
-                        ]}>
+                        className={
+                            `items-center ${
+                                Platform.OS === 'ios'
+                                    ? 'w-1/2 justify-between'
+                                    : 'w-5/6 justify-around'
+                            } ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            }`
+                        }>
                         {/* Enter receive amount */}
                         <PlainButton
-                            style={[
-                                tailwind(
-                                    'rounded-full items-center flex-row justify-center px-4 py-2',
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}
+                            className="rounded-full items-center flex-row justify-center px-4 py-2"
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Greyed,
+                            }}
                             onPress={() => {
                                 navigation.dispatch(
                                     CommonActions.navigate({
@@ -787,16 +731,14 @@ const Receive = ({route}: Props) => {
                                 );
                             }}>
                             <EditIcon
-                                style={[tailwind('mr-2')]}
+                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                                 width={16}
                                 height={16}
                             />
                             <Text
-                                style={[
-                                    tailwind('font-bold text-center text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="font-bold text-center text-sm"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('edit'))}
                             </Text>
                         </PlainButton>
@@ -811,28 +753,22 @@ const Receive = ({route}: Props) => {
                                 });
                             }}>
                             <View
-                                style={[
-                                    tailwind(
-                                        'rounded-full items-center flex-row justify-center px-4 py-2',
-                                    ),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                    },
-                                ]}>
+                                className="rounded-full items-center flex-row justify-center px-4 py-2"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                }}>
                                 <ShareIcon
-                                    style={[tailwind('mr-2')]}
+                                    className="mr-2"
                                     fill={ColorScheme.SVG.Default}
                                     width={16}
                                     height={16}
                                 />
                                 <Text
-                                    style={[
-                                        tailwind('text-sm font-bold'),
-                                        {
-                                            color: ColorScheme.Text.Default,
-                                        },
-                                    ]}>
+                                    className="text-sm font-bold"
+                                    style={{
+                                        color: ColorScheme.Text.Default,
+                                    }}>
                                     {capitalizeFirst(t('share'))}
                                 </Text>
                             </View>
@@ -842,28 +778,22 @@ const Receive = ({route}: Props) => {
                         {Platform.OS === 'android' && (
                             <PlainButton onPress={routeToBoltNFC}>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'rounded-full items-center flex-row justify-center px-4 py-2',
-                                        ),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Greyed,
-                                        },
-                                    ]}>
+                                    className="rounded-full items-center flex-row justify-center px-4 py-2"
+                                    style={{
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    }}>
                                     <NFCIcon
-                                        style={[tailwind('mr-1')]}
+                                        className="mr-1"
                                         fill={ColorScheme.SVG.Default}
                                         width={18}
                                         height={18}
                                     />
                                     <Text
-                                        style={[
-                                            tailwind('text-sm font-bold'),
-                                            {
-                                                color: ColorScheme.Text.Default,
-                                            },
-                                        ]}>
+                                        className="text-sm font-bold"
+                                        style={{
+                                            color: ColorScheme.Text.Default,
+                                        }}>
                                         {'NFC'}
                                     </Text>
                                 </View>
@@ -874,7 +804,6 @@ const Receive = ({route}: Props) => {
             </View>
         );
     }, [
-        tailwind,
         loadingInvoice,
         ColorScheme.Text.DescText,
         ColorScheme.Text.Default,
@@ -903,27 +832,19 @@ const Receive = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center justify-center'),
-                    {backgroundColor: ColorScheme.Background.Default},
-                ]}>
+                className="w-full h-full items-center justify-center"
+                style={{backgroundColor: ColorScheme.Background.Default}}>
                 <View
-                    style={[
-                        tailwind(
-                            'w-5/6 justify-center items-center absolute top-6 flex',
-                        ),
-                    ]}>
+                    className="w-5/6 justify-center items-center absolute top-6 flex">
                     <PlainButton
-                        style={[tailwind('absolute left-0 z-10')]}
+                        className="absolute left-0 z-10"
                         onPress={closeScreen}>
                         <Close fill={ColorScheme.SVG.Default} />
                     </PlainButton>
 
                     <Text
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('bitcoin_invoice')}
                     </Text>
 
@@ -935,16 +856,14 @@ const Receive = ({route}: Props) => {
                     route.params.amount &&
                     !route.params.breezServicesNotInitialized && (
                         <View
+                            className="h-full w-full items-center justify-end absolute bottom-0"
                             style={[
                                 styles.carouselContainer,
-                                tailwind(
-                                    'h-full w-full items-center justify-end absolute bottom-0',
-                                ),
                                 {zIndex: -9},
                             ]}>
                             <Carousel
                                 ref={carouselRef}
-                                style={[tailwind('items-center')]}
+                                style={[styles.carouselStyle]}
                                 data={panels}
                                 width={NativeDims.width}
                                 // Adjust height for iOS
@@ -997,11 +916,9 @@ const Receive = ({route}: Props) => {
                     !route.params.amount ||
                     route.params.breezServicesNotInitialized) && (
                     <View
+                        className="h-full w-full items-center justify-end absolute bottom-0"
                         style={[
                             styles.carouselContainer,
-                            tailwind(
-                                'h-full w-full items-center justify-end absolute bottom-0',
-                            ),
                             {zIndex: -9},
                         ]}>
                         {onchainPanel()}
@@ -1022,6 +939,9 @@ const styles = StyleSheet.create({
     },
     carouselContainer: {
         flex: 1,
+    },
+    carouselStyle: {
+        alignItems: 'center',
     },
     dots: {
         flexDirection: 'row',

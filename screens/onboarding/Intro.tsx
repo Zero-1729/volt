@@ -9,8 +9,6 @@ import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst} from '../../modules/transform';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {LongBottomButton, PlainButton} from '../../components/button';
 
 const marginTopPlatform = 10 + (Platform.OS === 'android' ? 12 : 0);
@@ -24,8 +22,6 @@ const Intro = () => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     const {t} = useTranslation('onboarding');
 
     return (
@@ -34,14 +30,10 @@ const Intro = () => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind(
-                        'w-full h-full relative items-center justify-center',
-                    ),
-                    {
+                className="w-full h-full relative items-center justify-center"
+                style={{
                         backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
+                    }}>
                 <PlainButton
                     onPress={() => {
                         // Route to add PIN screen
@@ -49,42 +41,32 @@ const Intro = () => {
                             CommonActions.navigate('WelcomePIN'),
                         );
                     }}
-                    style={[
-                        tailwind(
-                            'absolute justify-center py-2 px-4 rounded-full right-6',
-                        ),
-                        {top: marginTopPlatform},
-                    ]}>
-                    <View style={[tailwind('self-end')]}>
+                    className="absolute justify-center py-2 px-4 rounded-full right-6"
+                    style={{top: marginTopPlatform}}>
+                    <View className="'self-end">
                         <Text
-                            style={[
-                                tailwind('text-sm font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             {capitalizeFirst(t('skip'))}
                         </Text>
                     </View>
                 </PlainButton>
 
-                <View style={[tailwind('items-center'), {top: -25}]}>
+                <View className="items-center" style={{top: -25}}>
                     <Volt width={100} height={100} />
 
-                    <View style={[tailwind('mt-12 px-8 text-center')]}>
+                    <View className="mt-12 px-8 text-center">
                         <Text
-                            style={[
-                                tailwind('text-xl font-bold text-center'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-xl font-bold text-center"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('welcome')}
                         </Text>
 
                         <Text
-                            style={[
-                                tailwind('mt-4 text-sm text-center'),
-                                {
+                            className="mt-4 text-sm text-center"
+                            style={{
                                     color: ColorScheme.Text.GrayedText,
-                                },
-                            ]}>
+                                }}>
                             {t('app_description')}
                         </Text>
                     </View>

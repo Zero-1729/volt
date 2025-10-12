@@ -4,8 +4,6 @@ import React, {useContext, useEffect, useState, useRef} from 'react';
 import {View, useColorScheme, Text, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useTailwind} from 'tailwind-rn';
-
 import Color from '../constants/Color';
 import AppIcon from '../assets/svg/volt-text.svg';
 
@@ -33,7 +31,6 @@ type lockProps = {
 
 const LockScreen = (props: lockProps) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
     const {
         isBiometricsActive,
@@ -67,6 +64,7 @@ const LockScreen = (props: lockProps) => {
 
     const fetchPin = async () => {
         const storedPIN = await getKeychainItem('pin');
+
         setValidPin(storedPIN.data);
     };
 
@@ -123,68 +121,40 @@ const LockScreen = (props: lockProps) => {
     return (
         <SafeAreaView edges={['top', 'left', 'right', 'bottom']}>
             <BottomSheetModalProvider>
-                <View style={[tailwind('w-full h-full justify-center'), {backgroundColor: ColorScheme.Background.Primary}]}>
-                    <View
-                        style={[
-                            tailwind(
-                                'items-center justify-center w-full h-full',
-                            ),
-                        ]}>
-                        <View
-                            style={[
-                                tailwind(
-                                    'h-1/2 w-full absolute top-0 items-center justify-center',
-                                ),
-                            ]}>
-                            <View style={[tailwind('h-2/3')]}>
+                <View className="w-full h-full justify-center" style={{backgroundColor: ColorScheme.Background.Primary}}>
+                    <View  className="items-center justify-center w-full h-full">
+                        <View className="h-1/2 w-full absolute top-0 items-center justify-center">
+                            <View className="h-2/3">
                                 <AppIcon fill={ColorScheme.SVG.Default} />
                             </View>
 
-                            <View
-                                style={[
-                                    tailwind(
-                                        'h-2/3 w-full justify-center bottom-0 absolute items-center',
-                                    ),
-                                ]}>
+                            <View className="h-2/3 w-full justify-center bottom-0 absolute items-center">
                                 <Text
-                                    style={[
-                                        tailwind('text-base mb-4'),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
+                                    className="text-base mb-4"
+                                    style={{color: ColorScheme.Text.GrayedText}}>
                                     {t('lock_screen_message')}
                                 </Text>
 
                                 {pinAttempts > 0 && (
                                     <>
-                                        <View
-                                            style={[
-                                                tailwind(
-                                                    'items-center mb-4 w-5/6',
-                                                ),
-                                            ]}>
+                                        <View className="items-center mb-4 w-5/6">
                                             {pinAttempts ===
                                             MAX_PIN_ATTEMPTS - 1 ? (
                                                 <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm text-center',
-                                                        ),
-                                                        {
+                                                className="text-sm text-center"
+                                                    style={{
                                                             color: ColorScheme
                                                                 .Text.Default,
-                                                        },
-                                                    ]}>
+                                                        }}>
                                                     {t('last_attempt_warning')}
                                                 </Text>
                                             ) : (
                                                 <Text
-                                                    style={[
-                                                        tailwind('text-sm'),
-                                                        {
+                                                    className="text-sm"
+                                                    style={{
                                                             color: ColorScheme
                                                                 .Text.Default,
-                                                        },
-                                                    ]}>
+                                                        }}>
                                                     {t('pin_attempts', {
                                                         attempts:
                                                             MAX_PIN_ATTEMPTS -
@@ -196,25 +166,19 @@ const LockScreen = (props: lockProps) => {
 
                                         <PlainButton onPress={openPINModal}>
                                             <View
-                                                style={[
-                                                    tailwind(
-                                                        'rounded-full px-4 py-1 mb-12',
-                                                    ),
-                                                    {
+                                                className="rounded-full px-4 py-1 mb-12"
+                                                style={{
                                                         backgroundColor:
                                                             ColorScheme
                                                                 .Background
                                                                 .Greyed,
-                                                    },
-                                                ]}>
+                                                    }}>
                                                 <Text
-                                                    style={[
-                                                        tailwind('text-sm'),
-                                                        {
+                                                    className="text-sm"
+                                                    style={{
                                                             color: ColorScheme
                                                                 .Text.DescText,
-                                                        },
-                                                    ]}>
+                                                        }}>
                                                     {t('forgot_pin')}
                                                 </Text>
                                             </View>
@@ -222,18 +186,15 @@ const LockScreen = (props: lockProps) => {
                                     </>
                                 )}
 
-                                <View
-                                    style={[
-                                        tailwind('flex-row items-center mb-4'),
-                                    ]}>
+                                <View className="flex-row items-center mb-4">
                                     {Array(4)
                                         .fill(null)
                                         .map((_, i) => (
                                             <View
                                                 key={i}
+                                                className="rounded-full"
                                                 style={[
                                                     styles.dot,
-                                                    tailwind('rounded-full'),
                                                     {
                                                         borderColor:
                                                             ColorScheme
@@ -256,8 +217,8 @@ const LockScreen = (props: lockProps) => {
                         </View>
 
                         <View
+                            className="w-full absolute"
                             style={[
-                                tailwind('w-full absolute'),
                                 {bottom: NativeWindowMetrics.bottom + NativeWindowMetrics.height * 0.05},
                             ]}>
                             <PinNumpad

@@ -27,7 +27,6 @@ import {
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Color from '../../constants/Color';
-import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -69,7 +68,6 @@ type Props = NativeStackScreenProps<InitStackParamList, 'PayLNURL'>;
 const InputPanel = (props: {address: string}): ReactElement => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -149,26 +147,20 @@ const InputPanel = (props: {address: string}): ReactElement => {
 
     return (
         <View
-            style={[
-                tailwind('self-center w-full h-full relative items-center'),
-            ]}>
-            <View style={[tailwind('w-5/6'), styles.mainContainer]}>
+            className="self-center w-full h-full relative items-center">
+            <View className="w-5/6" style={[styles.mainContainer]}>
                 <VText
-                    style={[
-                        tailwind('font-bold w-full mb-4'),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
+                    className="font-bold w-full mb-4"
+                    style={{color: ColorScheme.Text.Default}}>
                     {capitalizeFirst(t('to'))}
                 </VText>
 
                 <View
-                    style={[
-                        tailwind('w-full rounded-md px-2'),
-                        {
-                            borderColor: ColorScheme.Background.Greyed,
-                            borderWidth: 1,
-                        },
-                    ]}>
+                    className="w-full rounded-md px-2"
+                    style={{
+                        borderColor: ColorScheme.Background.Greyed,
+                        borderWidth: 1,
+                    }}>
                     <TextSingleInput
                         color={ColorScheme.Text.Default}
                         placeholder={t('manual_placeholder')}
@@ -182,29 +174,25 @@ const InputPanel = (props: {address: string}): ReactElement => {
             </View>
 
             {isValidLnurlp && isNetOn && (
-                <View style={[tailwind('w-5/6 items-center mt-12')]}>
+                <View className="w-5/6 items-center mt-12">
                     <VText
-                        style={[
-                            tailwind('font-bold w-full mb-4'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="font-bold w-full mb-4"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('description'))}
                     </VText>
 
                     <View
-                        style={[
-                            tailwind(
-                                `w-full rounded-md px-2 ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                }`,
-                            ),
-                            {
-                                borderColor: ColorScheme.Background.Greyed,
-                                borderWidth: 1,
-                            },
-                        ]}>
+                        className={
+                            `w-full rounded-md px-2 ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            }`
+                        }
+                        style={{
+                            borderColor: ColorScheme.Background.Greyed,
+                            borderWidth: 1,
+                        }}>
                         <TextSingleInput
                             color={ColorScheme.Text.Default}
                             placeholder={capitalizeFirst(t('description'))}
@@ -215,18 +203,12 @@ const InputPanel = (props: {address: string}): ReactElement => {
                         />
                         {descriptionText.length > 0 && (
                             <View
-                                style={[
-                                    tailwind(
-                                        'absolute right-4 justify-center h-full',
-                                    ),
-                                ]}>
+                                className="absolute right-4 justify-center h-full">
                                 <Text
-                                    style={[
-                                        tailwind('text-sm opacity-60'),
-                                        {
-                                            color: ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                    className="text-sm opacity-60"
+                                    style={{
+                                        color: ColorScheme.Text.DescText,
+                                    }}>
                                     (
                                     {i18nNumber(
                                         descriptionText.length,
@@ -247,25 +229,21 @@ const InputPanel = (props: {address: string}): ReactElement => {
 
             {isValidLnurlp && !isNetOn && (
                 <View
-                    style={[
-                        tailwind(
-                            `mt-6 items-center ${
-                                langDir === 'right'
-                                    ? 'flex-row-reverse'
-                                    : 'flex-row'
-                            }`,
-                        ),
-                    ]}>
+                    className={
+                        `mt-6 items-center ${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        }`
+                    }>
                     <InfoIcon width={16} fill={ColorScheme.SVG.GrayFill} />
                     <VText
-                        style={[
-                            tailwind(
-                                `text-sm ${
-                                    langDir === 'right' ? 'mr-2' : 'ml-2'
-                                }`,
-                            ),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className={
+                            `text-sm ${
+                                langDir === 'right' ? 'mr-2' : 'ml-2'
+                            }`
+                        }
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('no_internet_cannot_pay')}
                     </VText>
                 </View>
@@ -294,7 +272,6 @@ const SummaryPanel = (props: {
     handleError: () => void;
 }): ReactElement => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
@@ -306,15 +283,15 @@ const SummaryPanel = (props: {
     );
 
     return (
-        <View style={[tailwind('items-center w-full h-full')]}>
+        <View className="items-center w-full h-full">
             <View
+                className="w-full items-center"
                 style={[
-                    tailwind('w-full items-center'),
                     styles.summaryContainer,
                 ]}>
                 {/* Not loading summary */}
-                <View style={[tailwind('items-center h-full w-full')]}>
-                    <View style={[tailwind('mb-6')]}>
+                <View className="items-center h-full w-full">
+                    <View className="mb-6">
                         <DisplayFiatAmount
                             amount={fiatAmount}
                             fontSize={'text-3xl'}
@@ -322,54 +299,46 @@ const SummaryPanel = (props: {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('w-5/6 mt-4 rounded-md'),
-                            {
-                                borderWidth: 1,
-                                borderColor: ColorScheme.Background.Greyed,
-                            },
-                        ]}>
+                        className="w-5/6 mt-4 rounded-md"
+                        style={{
+                            borderWidth: 1,
+                            borderColor: ColorScheme.Background.Greyed,
+                        }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } p-4 justify-between`,
-                                ),
-                                {
-                                    borderBottomWidth: 1,
-                                    borderBottomColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } p-4 justify-between`
+                            }
+                            style={{
+                                borderBottomWidth: 1,
+                                borderBottomColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('amount_sats')}
                             </Text>
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {formatSats(
                                     new BigNumber(props.amount as number),
                                 )}
                             </Text>
                         </View>
                         <View
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } p-4 justify-between`
+                            }
                             style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } p-4 justify-between`,
-                                ),
                                 props.description
                                     ? {
                                           borderBottomWidth: 1,
@@ -379,17 +348,15 @@ const SummaryPanel = (props: {
                                     : {},
                             ]}>
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('lightning_address')}
                             </Text>
                             <Text
                                 numberOfLines={2}
                                 ellipsizeMode="middle"
+                                className="text-sm w-1/2"
                                 style={[
-                                    tailwind('text-sm w-1/2'),
                                     {
                                         color: ColorScheme.Text.Default,
                                         textAlign:
@@ -403,39 +370,31 @@ const SummaryPanel = (props: {
                         </View>
                         {props.description && (
                             <View
-                                style={[
-                                    tailwind(
-                                        `${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } p-4 justify-between`,
-                                    ),
-                                ]}>
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } p-4 justify-between`
+                                }>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {t('description')}
                                 </Text>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {props.description}
                                 </Text>
                             </View>
                         )}
                     </View>
                     {props.loadingPay && (
-                        <View style={[tailwind('items-center mt-6 flex-row')]}>
+                        <View className="items-center mt-6 flex-row">
                             <Text
-                                style={[
-                                    tailwind('text-sm mr-2'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
+                                className="text-sm mr-2"
+                                style={{color: ColorScheme.Text.GrayedText}}>
                                 {props.statusMsg}
                             </Text>
                             <ActivityIndicator />
@@ -445,21 +404,15 @@ const SummaryPanel = (props: {
                     {/* Lnurl Error */}
                     {!!props.errorMessage && (
                         <View
-                            style={[
-                                tailwind(' w-5/6 mt-6'),
-                            ]}>
+                            className="w-5/6 mt-6">
                             <VText
-                                style={[
-                                    tailwind('font-bold text-lg w-full text-center mb-2'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="font-bold text-lg w-full text-center mb-2"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('error'))}
                             </VText>
                             <VText
-                                style={[
-                                    tailwind('w-full text-center'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="w-full text-center"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {props.errorMessage}
                             </VText>
                         </View>
@@ -481,7 +434,6 @@ const SummaryPanel = (props: {
 const PayLNURL = ({route}: Props) => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
     const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
@@ -618,7 +570,7 @@ const PayLNURL = ({route}: Props) => {
                 await payLnurl({
                     data: input.data,
                     amountMsat: amountMSats,
-                    useTrampoline: false,
+                    useTrampoline: true,
                     comment: canComment ? comment || '' : '',
                 });
 
@@ -639,26 +591,20 @@ const PayLNURL = ({route}: Props) => {
             style={[{backgroundColor: ColorScheme.Background.Primary}]}>
             <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <BottomSheetModalProvider>
-                <View style={[tailwind('h-full w-full items-center')]}>
+                <View className="h-full w-full items-center">
                     <View
-                        style={[
-                            tailwind(
-                                'absolute top-6 w-full flex-row items-center justify-center',
-                            ),
-                            {zIndex: 999},
-                        ]}>
+                        className="absolute top-6 w-full flex-row items-center justify-center"
+                        style={{zIndex: 999}}>
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(CommonActions.goBack())
                             }
-                            style={[tailwind('absolute left-6')]}>
+                            className="absolute left-6">
                             <Close fill={ColorScheme.SVG.Default} />
                         </PlainButton>
                         <Text
-                            style={[
-                                tailwind('text-base font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-base font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             Send
                         </Text>
                     </View>

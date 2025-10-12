@@ -38,8 +38,6 @@ import BigNumber from 'bignumber.js';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 
-import {useTailwind} from 'tailwind-rn';
-
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
@@ -55,6 +53,7 @@ import {
 import Gear from '../assets/svg/gear-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
 import ScanIcon from '../assets/svg/scan.svg';
+import LightningBoltIcon from '../assets/svg/zap.svg';
 import AddressIcon from '../assets/svg/mention-24.svg';
 import BackupIcon from '../assets/svg/backup.svg';
 
@@ -91,7 +90,6 @@ type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
 const Home = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
     const navigation = useNavigation();
 
     const {t, i18n} = useTranslation('wallet');
@@ -122,6 +120,7 @@ const Home = ({route}: Props) => {
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
+    const [breezConnected, setBreezConnected] = useState(true);
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
@@ -406,6 +405,18 @@ const Home = ({route}: Props) => {
     const initWalletSync = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
 
+        // TODO: trigger Breez load here instead, watch then fire?
+        // Check and show Breez status
+        try {
+            const _nodeInfo = await nodeInfo();
+            if (_nodeInfo?.id) {
+                setBreezConnected(true);
+            }
+        } catch (error: any) {
+            setBreezConnected(false);
+        }
+
+        // Only load BTC only wallet on route
         if (
             isWalletInitialized &&
             checkNetworkIsReachable(_netInfo) &&
@@ -461,45 +472,50 @@ const Home = ({route}: Props) => {
             ]}>
             <BottomSheetModalProvider>
                 <View
-                    style={[
-                        tailwind('h-full items-center justify-start relative'),
-                        {backgroundColor: ColorScheme.Background.Primary},
-                    ]}>
+                    className="h-full items-center justify-start relative"
+                    style={{backgroundColor: ColorScheme.Background.Primary}}>
                     <View
-                        style={[
-                            tailwind(
-                                `w-5/6 h-10 items-center justify-between ${
+                        className={
+                            `w-5/6 h-10 items-center justify-between ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
-                                }`,
-                            ),
-                            {marginTop: topPlatformOffset},
-                        ]}>
-                        <View style={[
-                            tailwind(`${
+                                }`
+                        }
+                        style={{marginTop: topPlatformOffset}}>
+                        <View className={
+                            `${
                                 langDir === 'right'
                                     ? 'flex-row-reverse'
                                     : 'flex-row'
-                            } justify-center items-center rounded-full p-1 px-4`),
-                            styles.connectionStatusContainer,
-                            {borderColor: ColorScheme.Background.Secondary},
-                            ]}>
-                            <View style={[
-                                tailwind(`${
+                            } justify-center items-center`
+                        }>
+                            <View className={
+                                `${
                                     langDir === 'right'
-                                        ? 'ml-2'
-                                        : 'mr-2'
-                                }`),
-                                styles.connectionStatus,
-                                {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
-                            ]}/>
-                            <VText style={[
-                                tailwind('text-xs font-bold'),
-                                {color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText},
-                            ]}>
-                                {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
-                            </VText>
+                                        ? 'flex-row-reverse ml-1'
+                                        : 'flex-row mr-1'
+                                } rounded-full p-1 px-4 items-center justify-center flex-row`
+                            } style={[
+                                styles.connectionStatusBorder,
+                                {borderColor: ColorScheme.Background.Secondary},
+                                ]}>
+                                <View className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'ml-2'
+                                            : 'mr-2'
+                                    }`
+                                } style={[
+                                    styles.connectionStatus,
+                                    {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
+                                ]}/>
+                                <VText className="text-sm font-bold" style={{color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText}}>
+                                    {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
+                                </VText>
+                            </View>
+
+                            {isLightning && <LightningBoltIcon width={18} height={18} fill={breezConnected ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />}
                         </View>
 
                         <PlainButton
@@ -511,11 +527,7 @@ const Home = ({route}: Props) => {
                                 )
                             }>
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row justify-between items-center -mr-1',
-                                    ),
-                                ]}>
+                                className="flex-row justify-between items-center -mr-1">
                                 <Gear
                                     width={32}
                                     fill={ColorScheme.SVG.Default}
@@ -524,22 +536,18 @@ const Home = ({route}: Props) => {
                         </PlainButton>
                     </View>
 
-                    <View style={[tailwind('w-full h-full mt-2 items-center')]}>
+                    <View className="w-full h-full mt-2 items-center">
                         <View
-                            style={[
-                                tailwind('justify-around w-full mb-6'),
-                                {
+                            className="justify-around w-full mb-6 mt-6"
+                            style={{
                                     marginLeft: langDir === 'left' ? 80 : 0,
                                     marginRight: langDir === 'right' ? 80 : 0,
-                                }
-                            ]}>
+                                }}>
                             {wallets.length > 0 && (
                                 <>
                                     <VText
+                                        className="text-base font-medium mt-3 mb-1"
                                         style={[
-                                            tailwind(
-                                                'text-base font-medium mt-3 mb-1',
-                                            ),
                                             {
                                                 color: isNetOn
                                                     ? ColorScheme.Text.Default
@@ -565,10 +573,8 @@ const Home = ({route}: Props) => {
                                             }
                                         />) : (
                                         <View
+                                            className="rounded-sm w-4/5 mt-1 opacity-80 h-8 flex-row"
                                             style={[
-                                                tailwind(
-                                                    'rounded-sm w-4/5 mt-1 opacity-80 h-8 flex-row',
-                                                ),
                                                 {
                                                     backgroundColor:
                                                         ColorScheme.Background
@@ -623,28 +629,20 @@ const Home = ({route}: Props) => {
 
                         {/* Quick Actions */}
                         <View
-                            style={[
-                                tailwind(
-                                    `flex-row ${
+                            className={
+                                `flex-row ${
                                         isLightning
                                             ? 'w-5/6 justify-around'
                                             : 'w-1/2 justify-center'
-                                    }`,
-                                ),
-                            ]}>
+                                    }`
+                            }>
                             {isLightning && (
                                 <PlainButton
                                     onPress={navigateToBoltNFC}
-                                    style={[
-                                        tailwind(
-                                            'flex justify-center items-center',
-                                        ),
-                                    ]}>
+                                    className="flex justify-center items-center">
                                     <View
+                                        className="rounded-full items-center justify-center mb-2"
                                         style={[
-                                            tailwind(
-                                                'rounded-full items-center justify-center mb-2',
-                                            ),
                                             {
                                                 height: 54,
                                                 width: 54,
@@ -661,10 +659,8 @@ const Home = ({route}: Props) => {
                                         />
                                     </View>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className="text-sm"
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {t('bolt_nfc')}
                                     </VText>
                                 </PlainButton>
@@ -672,36 +668,28 @@ const Home = ({route}: Props) => {
 
                             <PlainButton
                                 onPress={goToScan}
-                                style={[
-                                    tailwind(
-                                        `flex justify-center items-center ${
+                                className={
+                                    `flex justify-center items-center ${
                                             !isLightning ? 'mx-6' : ''
-                                        }`,
-                                    ),
-                                ]}>
+                                        }`
+                                }>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'rounded-full items-center justify-center mb-2',
-                                        ),
-                                        {
+                                    className="rounded-full items-center justify-center mb-2"
+                                    style={{
                                             height: 54,
                                             width: 54,
                                             backgroundColor:
                                                 ColorScheme.Background
                                                     .QuickActionsButton,
-                                        },
-                                    ]}>
+                                        }}>
                                     <ScanIcon
                                         width={24}
                                         fill={ColorScheme.SVG.Default}
                                     />
                                 </View>
                                 <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {capitalizeFirst(t('scan'))}
                                 </VText>
                             </PlainButton>
@@ -709,34 +697,24 @@ const Home = ({route}: Props) => {
                             {isLightning && (
                                 <PlainButton
                                     onPress={goToLNPay}
-                                    style={[
-                                        tailwind(
-                                            'flex justify-center items-center',
-                                        ),
-                                    ]}>
+                                    className="flex justify-center items-center">
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'rounded-full items-center justify-center mb-2',
-                                            ),
-                                            {
+                                        className="rounded-full items-center justify-center mb-2"
+                                        style={{
                                                 height: 54,
                                                 width: 54,
                                                 backgroundColor:
                                                     ColorScheme.Background
                                                         .QuickActionsButton,
-                                            },
-                                        ]}>
+                                            }}>
                                         <AddressIcon
                                             width={20}
                                             fill={ColorScheme.SVG.Default}
                                         />
                                     </View>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className="text-sm"
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {capitalizeFirst(t('address'))}
                                     </VText>
                                 </PlainButton>
@@ -744,36 +722,28 @@ const Home = ({route}: Props) => {
 
                             <PlainButton
                                 onPress={handleBackupRoute}
-                                style={[
-                                    tailwind(
-                                        `flex justify-center items-center ${
+                                className={
+                                    `flex justify-center items-center ${
                                             !isLightning ? 'mx-6' : ''
-                                        }`,
-                                    ),
-                                ]}>
+                                        }`
+                                }>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'rounded-full items-center justify-center mb-2',
-                                        ),
-                                        {
+                                    className="rounded-full items-center justify-center mb-2"
+                                    style={{
                                             height: 54,
                                             width: 54,
                                             backgroundColor:
                                                 ColorScheme.Background
                                                     .QuickActionsButton,
-                                        },
-                                    ]}>
+                                        }}>
                                     <BackupIcon
                                         width={20}
                                         fill={ColorScheme.SVG.Default}
                                     />
                                 </View>
                                 <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {capitalizeFirst(t('backup'))}
                                 </VText>
                             </PlainButton>
@@ -781,25 +751,21 @@ const Home = ({route}: Props) => {
 
                         <PlainButton
                             onPress={gotToTransactions}
-                            style={[
-                                tailwind(
-                                    'w-5/6 absolute flex-row items-center justify-center',
-                                ),
-                                {
+                            className="w-5/6 absolute flex-row items-center justify-center"
+                            style={{
                                     bottom:
                                         NativeWindowMetrics.bottomButtonOffset +
                                         32,
-                                },
-                            ]}>
+                                }}>
                             {extractAllTransactions().filtered.length !== 0 && (
                                 <ArrowUpIcon
                                     width={24}
                                     height={24}
                                     fill={ColorScheme.SVG.GrayFill}
-                                    style={[tailwind('mr-2')]}
+                                    className="mr-2"
                                 />
                             )}
-                            <VText style={[tailwind('text-sm'), DarkGrayText]}>
+                            <VText className="text-sm" style={[ DarkGrayText]}>
                                 {extractAllTransactions().filtered.length === 0
                                     ? t('no_transactions_today')
                                     : extractAllTransactions().filtered
@@ -814,7 +780,7 @@ const Home = ({route}: Props) => {
                             {loadingBalance && (
                                 <ActivityIndicator
                                     color={ColorScheme.Background.Greyed}
-                                    style={tailwind('ml-2')}
+                                    className="ml-2"
                                 />
                             )}
                         </PlainButton>
@@ -838,7 +804,7 @@ const styles = StyleSheet.create({
     CardContainer: {
         height: 230,
     },
-    connectionStatusContainer: {
+    connectionStatusBorder: {
         paddingHorizontal: 12,
         borderWidth: 2,
     },

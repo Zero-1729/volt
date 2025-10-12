@@ -41,8 +41,6 @@ import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import Color from '../../constants/Color';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
@@ -81,7 +79,6 @@ import netInfo from '@react-native-community/netinfo';
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
 const SendView = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -231,7 +228,7 @@ const SendView = ({route}: Props) => {
             const bolt11 = route.params.bolt11;
             const result = await sendPayment({
                 bolt11: bolt11?.bolt11 as string,
-                useTrampoline: false,
+                useTrampoline: true,
             });
 
             if (result.payment.status === 'complete') {
@@ -453,20 +450,14 @@ const SendView = ({route}: Props) => {
             ]}>
             <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
-                style={[
-                    tailwind('w-full h-full items-center justify-center'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                className="w-full h-full items-center justify-center"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <BottomSheetModalProvider>
                     <View
-                        style={[
-                            tailwind(
-                                'absolute top-6 w-full flex-row items-center justify-center',
-                            ),
-                        ]}>
+                        className="absolute top-6 w-full flex-row items-center justify-center">
                         {!loadingPsbt && (
                             <PlainButton
-                                style={[tailwind('absolute right-6')]}
+                                className="absolute right-6"
                                 onPress={openExportModal}>
                                 <ShareIcon
                                     width={32}
@@ -481,55 +472,45 @@ const SendView = ({route}: Props) => {
                                     routes: [{name: 'HomeScreen'}],
                                 }))
                             }
-                            style={[tailwind('absolute z-10 left-6')]}>
+                            className="absolute z-10 left-6">
                             <Close fill={ColorScheme.SVG.Default} />
                         </PlainButton>
 
                         <Text
-                            style={[
-                                tailwind('text-sm font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             {screenTitle}
                         </Text>
 
                         {isLightning && (
                             <View
-                                style={[
-                                    tailwind('absolute right-6 justify-center'),
-                                ]}>
+                                className="absolute right-6 justify-center">
                                 <ExpiryTimer expiryDate={expiryEpoch} />
                             </View>
                         )}
                     </View>
                     <View
-                        style={[
-                            tailwind(
-                                `-mt-12 items-center w-full h-4/6 relative ${
-                                    isLightning && !hasMessage
-                                        ? 'justify-center'
-                                        : ''
-                                }`,
-                            ),
-                        ]}>
-                        <View style={[tailwind('items-center')]}>
-                            <View style={[tailwind('items-center flex-row')]}>
+                        className={
+                            `-mt-12 items-center w-full h-4/6 relative ${
+                                isLightning && !hasMessage
+                                    ? 'justify-center'
+                                    : ''
+                            }`
+                        }>
+                        <View className="items-center">
+                            <View className="items-center flex-row">
                                 <Text
-                                    style={[
-                                        tailwind('text-base mb-1'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
+                                    className="text-base mb-1"
+                                    style={{
+                                        color: ColorScheme.Text.GrayedText,
+                                    }}>
                                     {capitalizeFirst(t('amount'))}
                                 </Text>
                             </View>
                             {isMax && (
                                 <Text
-                                    style={[
-                                        tailwind('text-4xl'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-4xl"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {capitalizeFirst(t('max'))}
                                 </Text>
                             )}
@@ -552,31 +533,23 @@ const SendView = ({route}: Props) => {
                         </View>
 
                         {!isLightning && (
-                            <View style={[tailwind('mt-12 w-4/5')]}>
+                            <View className="mt-12 w-4/5">
                                 <PlainButton onPress={() => {}}>
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'items-center flex-row mb-1',
-                                            ),
-                                        ]}>
+                                        className="items-center flex-row mb-1">
                                         <VText
-                                            style={[
-                                                tailwind('text-sm w-full mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                                },
-                                            ]}>
+                                            className="text-sm w-full mr-2"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                            }}>
                                             {capitalizeFirst(t('address'))}
                                         </VText>
                                     </View>
                                 </PlainButton>
                                 <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {route.params.invoiceData?.address}
                                 </VText>
                             </View>
@@ -584,43 +557,33 @@ const SendView = ({route}: Props) => {
 
                         {!isLightning && (
                             <View
-                                style={[
-                                    tailwind(
-                                        `mt-6 items-center justify-between w-4/5 ${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        }`,
-                                    ),
-                                ]}>
+                                className={
+                                    `mt-6 items-center justify-between w-4/5 ${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    }`
+                                }>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm font-bold'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm font-bold"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {capitalizeFirst(t('fee'))}
                                 </Text>
 
                                 <View
-                                    style={[
-                                        tailwind(
-                                            `flex ${
-                                                langDir === 'right'
-                                                    ? 'flex-row-reverse'
-                                                    : 'flex-row'
-                                            } justify-center items-center`,
-                                        ),
-                                    ]}>
+                                    className={
+                                        `flex ${
+                                            langDir === 'right'
+                                                ? 'flex-row-reverse'
+                                                : 'flex-row'
+                                        } justify-center items-center`
+                                    }>
                                     <Text
-                                        style={[
-                                            tailwind(
-                                                'text-sm px-2 mr-2 rounded-full',
-                                            ),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayText,
-                                            },
-                                        ]}>
+                                        className="text-sm px-2 mr-2 rounded-full"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayText,
+                                        }}>
                                         {`${
                                             appFiatCurrency.symbol
                                         } ${normalizeFiat(
@@ -633,23 +596,17 @@ const SendView = ({route}: Props) => {
                                     </Text>
 
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'items-center justify-center rounded-full px-4 py-1',
-                                            ),
-                                            {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .Inverted,
-                                            },
-                                        ]}>
+                                        className="items-center justify-center rounded-full px-4 py-1"
+                                        style={{
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .Inverted,
+                                        }}>
                                         <Text
-                                            style={[
-                                                tailwind('text-sm'),
-                                                {
-                                                    color: ColorScheme.Text.Alt,
-                                                },
-                                            ]}>
+                                            className="text-sm"
+                                            style={{
+                                                color: ColorScheme.Text.Alt,
+                                            }}>
                                             {`${route.params.feeRate} ${t(
                                                 'sat_vbyte',
                                             )}`}
@@ -661,41 +618,31 @@ const SendView = ({route}: Props) => {
 
                         {(hasLabel.length > 0 || isLightning) && (
                             <View
-                                style={[
-                                    tailwind('justify-between w-4/5 mt-4'),
-                                ]}>
+                                className="justify-between w-4/5 mt-4">
                                 {hasLabel.length > 0 && (
                                     <View
-                                        style={[
-                                            tailwind(
-                                                `${
-                                                    langDir === 'right'
-                                                        ? 'flex-row-reverse'
-                                                        : 'flex-row'
-                                                } justify-between`,
-                                            ),
-                                        ]}>
+                                        className={
+                                            `${
+                                                langDir === 'right'
+                                                    ? 'flex-row-reverse'
+                                                    : 'flex-row'
+                                            } justify-between`
+                                        }>
                                         <VText
-                                            style={[
-                                                tailwind('text-sm font-bold'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                            ]}>
+                                            className="text-sm font-bold"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .Default,
+                                            }}>
                                             {capitalizeFirst(t('label'))}
                                         </VText>
 
                                         <VTextSingle
-                                            style={[
-                                                tailwind(
-                                                    'text-sm w-3/5 text-right',
-                                                ),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .DescText,
-                                                },
-                                            ]}>
+                                            className="text-sm w-3/5 text-right"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .DescText,
+                                            }}>
                                             {
                                                 route.params.invoiceData
                                                     ?.options?.label
@@ -706,30 +653,24 @@ const SendView = ({route}: Props) => {
 
                                 {hasMessage && (
                                     <View
+                                        className="w-full mt-6"
                                         style={[
                                             styles.invoiceMessage,
-                                            tailwind('w-full mt-6'),
                                         ]}>
                                         <VText
-                                            style={[
-                                                tailwind(
-                                                    'text-sm mb-4 font-bold',
-                                                ),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                            ]}>
+                                            className="text-sm mb-4 font-bold"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .Default,
+                                            }}>
                                             {messageTitle}
                                         </VText>
                                         <VTextMulti
-                                            style={[
-                                                tailwind('text-sm'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .DescText,
-                                                },
-                                            ]}>
+                                            className="text-sm"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .DescText,
+                                            }}>
                                             {messageText}
                                         </VTextMulti>
                                     </View>
@@ -742,24 +683,20 @@ const SendView = ({route}: Props) => {
                         (!isLightning && loadingPsbt)) &&
                         !paySelfMessage && (
                             <View
-                                style={[
-                                    tailwind('absolute'),
-                                    {
-                                        bottom:
-                                            NativeWindowMetrics.bottomButtonOffset +
-                                            76,
-                                    },
-                                ]}>
+                                className="absolute"
+                                style={{
+                                    bottom:
+                                        NativeWindowMetrics.bottomButtonOffset +
+                                        76,
+                                }}>
                                 <ActivityIndicator
-                                    style={[tailwind('mb-4')]}
+                                    className="mb-4"
                                     size={'small'}
                                     color={ColorScheme.Text.Default}
                                 />
                                 <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.GrayedText}}>
                                     {loadingMessage}
                                 </Text>
                             </View>
@@ -767,27 +704,23 @@ const SendView = ({route}: Props) => {
 
                     {isLightning && paySelfMessage && (
                         <View
-                            style={[
-                                tailwind(
-                                    `mt-6 w-full ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } items-center justify-center absolute`,
-                                ),
-                                {
-                                    bottom:
-                                        NativeWindowMetrics.bottomButtonOffset +
-                                        76,
-                                },
-                            ]}>
+                            className={
+                                `mt-6 w-full ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center absolute`
+                            }
+                            style={{
+                                bottom:
+                                    NativeWindowMetrics.bottomButtonOffset +
+                                    76,
+                            }}>
                             <VText
-                                style={[
-                                    tailwind('text-sm text-center w-5/6'),
-                                    {
-                                        color: ColorScheme.Text.DescText,
-                                    },
-                                ]}>
+                                className="text-sm text-center w-5/6"
+                                style={{
+                                    color: ColorScheme.Text.DescText,
+                                }}>
                                 {paySelfMessage}
                             </VText>
                         </View>
@@ -795,27 +728,23 @@ const SendView = ({route}: Props) => {
 
                     {isLightning && alreadyPaidInvoice && (
                         <View
-                            style={[
-                                tailwind(
-                                    `mt-6 w-full ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } items-center justify-center absolute`,
-                                ),
-                                {
-                                    bottom:
-                                        NativeWindowMetrics.bottomButtonOffset +
-                                        76,
-                                },
-                            ]}>
+                            className={
+                                `mt-6 w-full ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } items-center justify-center absolute`
+                            }
+                            style={{
+                                bottom:
+                                    NativeWindowMetrics.bottomButtonOffset +
+                                    76,
+                            }}>
                             <VText
-                                style={[
-                                    tailwind('text-sm text-center w-5/6'),
-                                    {
-                                        color: ColorScheme.Text.DescText,
-                                    },
-                                ]}>
+                                className="text-sm text-center w-5/6"
+                                style={{
+                                    color: ColorScheme.Text.DescText,
+                                }}>
                                 {t('already_paid_ln_invoice')}
                             </VText>
                         </View>
@@ -835,7 +764,7 @@ const SendView = ({route}: Props) => {
                         backgroundColor={ColorScheme.Background.Inverted}
                     />
 
-                    <View style={[tailwind('absolute bottom-0')]}>
+                    <View className="absolute bottom-0">
                         <ExportPsbt
                             exportRef={bottomExportRef}
                             triggerExport={exportUPsbt}

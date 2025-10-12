@@ -490,7 +490,6 @@ const RootNavigator = (): ReactElement => {
         isAdvancedMode,
         getWalletData,
         currentWalletID,
-        isWalletInitialized,
         mempoolInfo,
         setBreezEvent,
         setMempoolInfo,
@@ -520,7 +519,7 @@ const RootNavigator = (): ReactElement => {
     };
 
     const isInProtectedScreens = (route: string): boolean => {
-        return route === 'BoltNFC' || route === 'WithdrawLNURL' || route === 'PayInvoice';
+        return route === 'BoltNFC' || route === 'WithdrawLNURL' || route === 'PayInvoice' || route === 'PayLNURL';
     };
 
     // Clipboard check
@@ -530,7 +529,7 @@ const RootNavigator = (): ReactElement => {
         let clipboardMessage!: string;
 
         // Set clipboard message
-        if (clipboardResult.invoiceType === 'lightning') {
+        if (clipboardResult.invoiceType === 'lightning' && wallet.type === 'unified') {
             // Only support BOLT11 & lnurlw & lnurlp for now
             if (clipboardResult.spec === 'lnurlw' || clipboardResult.spec === 'lnurlp') {
                 clipboardMessage = t('read_clipboard_lurl_text');
@@ -567,7 +566,8 @@ const RootNavigator = (): ReactElement => {
         if (
             clipboardResult.hasContents &&
             clipboardResult.invoiceType !== 'unsupported' &&
-            !isInProtectedScreens(currentRoute?.name as string)
+            !isInProtectedScreens(currentRoute?.name as string) &&
+            wallet.type === 'unified'
         ) {
             actionAlert(
                 capitalizeFirst(t('clipboard')),
@@ -731,11 +731,10 @@ const RootNavigator = (): ReactElement => {
     // Breez startup
     const initNode = async () => {
         // Init LN connection
-        // No point putting in any effort if mnemonic missing
+        // No point putting in any effort if mnemonic missing, not LN wallet, or onboarding
         if (
-            wallet?.mnemonic.length === 0 &&
-            isWalletInitialized &&
-            wallet.type === 'unified' &&
+            wallet?.mnemonic.length === 0 ||
+            wallet.type !== 'unified' ||
             onboarding
         ) {
             return;
@@ -917,7 +916,6 @@ const RootNavigator = (): ReactElement => {
 
         // Init LN services
         // Call mempool
-        initNode();
         initMempoolSock();
 
         // Net event listener
@@ -927,9 +925,11 @@ const RootNavigator = (): ReactElement => {
             // and Breez SDK connection
             if (checkNetworkIsReachable(state)) {
                 console.log(
-                    '[NetInfo] Attempt to (Re)connect to Breez & Mempool',
+                    `[NetInfo] Attempt to (Re)connect to ${wallet.type === 'unified' ? 'Breez & ' : ''}Mempool`,
                 );
-                initNode();
+                if (!!wallet?.mnemonic && wallet.type === 'unified') {
+                    initNode();
+                }
                 initMempoolSock();
             }
         });
@@ -942,6 +942,13 @@ const RootNavigator = (): ReactElement => {
             NetInfoSub();
         };
     }, []);
+
+    useEffect(() => {
+        if (!!wallet?.mnemonic && wallet.type === 'unified') {
+            // Init LN services
+            initNode();
+        }
+    }, [wallet.mnemonic]);
 
     return (
         <NavigationContainer

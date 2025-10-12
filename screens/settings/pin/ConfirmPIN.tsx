@@ -3,7 +3,6 @@
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useNavigation} from '@react-navigation/native';
@@ -37,7 +36,7 @@ const ConfirmPIN = ({route}: Props) => {
     const {setPINActive, isBiometricsActive} = useContext(AppStorageContext);
 
     const navigation = useNavigation();
-    const tailwind = useTailwind();
+
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('settings');
@@ -98,28 +97,23 @@ const ConfirmPIN = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={[tailwind('items-center h-full w-full')]}>
+            <View className="w-full h-full items-center">
+                <View className="items-center h-full w-full">
                     {showBack && (
                         <View
-                            style={[
-                                tailwind('w-5/6 absolute top-2'),
-                                {zIndex: 9999},
-                            ]}>
+                            className="w-5/6 absolute top-2"
+                            style={{zIndex: 9999}}>
                             <PlainButton
-                                style={tailwind('items-center flex-row -ml-1')}
+                                className="items-center flex-row -ml-1"
                                 onPress={() => {
                                     navigation.dispatch(CommonActions.goBack());
                                 }}>
                                 <Back
-                                    style={tailwind('mr-2')}
                                     fill={ColorScheme.SVG.Default}
                                 />
                                 <Text
-                                    style={[
-                                        tailwind('text-sm font-medium'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="ml-2 text-sm font-medium"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {capitalizeFirst(t('back'))}
                                 </Text>
                             </PlainButton>
@@ -127,36 +121,28 @@ const ConfirmPIN = ({route}: Props) => {
                     )}
 
                     <View
-                        style={[
-                            tailwind('h-1/2 w-5/6 justify-center items-center'),
-                        ]}>
+                        className="h-1/2 w-5/6 justify-center items-center">
                         <Text
-                            style={[
-                                tailwind('text-base mb-6 font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-base mb-6 font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('retype_pin')}
                         </Text>
                         <Text
-                            style={[
-                                tailwind('text-base text-center mb-6'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center mb-6"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('retype_pin_desc')}
                         </Text>
 
                         <View
-                            style={[
-                                tailwind('flex-row items-center mt-12 mb-4'),
-                            ]}>
+                            className="flex-row items-center mt-12 mb-4">
                             {Array(4)
                                 .fill(null)
                                 .map((_, i) => (
                                     <View
                                         key={i}
+                                        className="rounded-full"
                                         style={[
                                             styles.dot,
-                                            tailwind('rounded-full'),
                                             {
                                                 borderColor:
                                                     ColorScheme.Background
@@ -175,10 +161,8 @@ const ConfirmPIN = ({route}: Props) => {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('w-full absolute'),
-                            {bottom: NativeWindowMetrics.bottom + 32},
-                        ]}>
+                        className="w-full absolute"
+                        style={{bottom: NativeWindowMetrics.bottom + 32}}>
                         <PinNumpad
                             pin={tmpPIN}
                             onPinChange={updateTmpPIN}

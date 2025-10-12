@@ -20,8 +20,6 @@ import {useNavigation, CommonActions} from '@react-navigation/core';
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Checkbox from 'react-native-bouncy-checkbox';
 
-import {useTailwind} from 'tailwind-rn';
-
 import NativeDims from '../../constants/NativeWindowMetrics';
 
 import RNFS from 'react-native-fs';
@@ -55,7 +53,6 @@ type Slide = () => ReactElement;
 
 const Backup = () => {
     const navigation = useNavigation();
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {currentWalletID, getWalletData, isBiometricsActive} =
@@ -156,17 +153,15 @@ const Backup = () => {
 
         return (
             <View
-                style={[tailwind('items-center justify-center h-full w-full')]}>
+                className="items-center justify-center h-full w-full">
                 {/* Show mnemonic & QR code version or Xprv QR code */}
                 {switchEnabled || !mnemonicData ? (
                     <View
-                        style={[
-                            tailwind('rounded self-center mb-4'),
-                            {
-                                borderWidth: 2,
-                                borderColor: ColorScheme.Background.QRBorder,
-                            },
-                        ]}>
+                        className="rounded self-center mb-4"
+                        style={{
+                            borderWidth: 2,
+                            borderColor: ColorScheme.Background.QRBorder,
+                        }}>
                         <QRCodeStyled
                             style={{
                                 backgroundColor: 'white',
@@ -182,15 +177,11 @@ const Backup = () => {
                     </View>
                 ) : (
                     <View
-                        style={[
-                            tailwind(
-                                'w-5/6 flex-row justify-center items-center mb-6',
-                            ),
-                        ]}>
+                        className="w-5/6 flex-row justify-center items-center mb-6">
                         {/* col 0 */}
                         <View
+                            className="items-center justify-center mr-4"
                             style={[
-                                tailwind('items-center justify-center mr-4'),
                                 styles.capsuleContainer,
                             ]}>
                             {mnemonics.slice(0, 6).map((word, index) => (
@@ -204,8 +195,8 @@ const Backup = () => {
 
                         {/* col 1 */}
                         <View
+                            className="items-center justify-center"
                             style={[
-                                tailwind('items-center justify-center'),
                                 styles.capsuleContainer,
                             ]}>
                             {mnemonics.slice(6, 12).map((word, index) => (
@@ -221,20 +212,14 @@ const Backup = () => {
 
                 {mnemonicData && (
                     <View
-                        style={[
-                            tailwind(
-                                'w-5/6 items-center justify-center mb-4 flex-row',
-                            ),
-                        ]}>
+                        className="w-5/6 items-center justify-center mb-4 flex-row">
                         <Text
-                            style={[
-                                tailwind('text-sm font-bold mr-4'),
-                                {
-                                    color: switchEnabled
-                                        ? ColorScheme.Text.Default
-                                        : ColorScheme.Text.GrayedText,
-                                },
-                            ]}>
+                            className="text-sm font-bold mr-4"
+                            style={{
+                                color: switchEnabled
+                                    ? ColorScheme.Text.Default
+                                    : ColorScheme.Text.GrayedText,
+                            }}>
                             {t('display_mnemonic_qr')}
                         </Text>
 
@@ -251,22 +236,18 @@ const Backup = () => {
                     </View>
                 )}
 
-                <View style={[tailwind('mt-2 flex w-5/6')]}>
+                <View className="mt-2 flex w-5/6">
                     <Text
-                        style={[
-                            tailwind('text-sm text-center mb-4'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm text-center mb-4"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {baseBackupTitle === 'Mnemonic'
                             ? t('ln_mnemonic_backup_message')
                             : t('xprv_backup_message')}
                     </Text>
 
                     <Text
-                        style={[
-                            tailwind('text-sm text-center'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm text-center"
+                        style={{color: ColorScheme.Text.Default}}>
                         {warning}
                     </Text>
                 </View>
@@ -275,7 +256,6 @@ const Backup = () => {
     }, [
         mnemonicData,
         xprvData,
-        tailwind,
         ColorScheme.Text.Default,
         ColorScheme.Text.GrayedText,
         ColorScheme.Text.DescText,
@@ -322,16 +302,14 @@ const Backup = () => {
 
         return (
             <View
-                style={[tailwind('items-center justify-center h-full w-full')]}>
+                className="items-center justify-center h-full w-full">
                 {/* Display QR code with seed */}
                 <View
-                    style={[
-                        tailwind('rounded self-center mb-4'),
-                        {
-                            borderWidth: 2,
-                            borderColor: ColorScheme.Background.QRBorder,
-                        },
-                    ]}>
+                    className="rounded self-center mb-4"
+                    style={{
+                        borderWidth: 2,
+                        borderColor: ColorScheme.Background.QRBorder,
+                    }}>
                     <QRCodeStyled
                         style={{
                             backgroundColor: 'white',
@@ -348,18 +326,14 @@ const Backup = () => {
 
                 {/* Display either seed or descriptor */}
                 <PlainButton
-                    style={[tailwind('items-center mb-6 w-5/6')]}
+                    className="items-center mb-6 w-5/6"
                     onPress={copyDescriptor}>
                     <Text
-                        style={[
-                            tailwind(
-                                'text-sm w-full p-3 text-center rounded-sm',
-                            ),
-                            {
-                                backgroundColor: ColorScheme.Background.Greyed,
-                                color: ColorScheme.Text.Default,
-                            },
-                        ]}
+                        className="text-sm w-full p-3 text-center rounded-sm"
+                        style={{
+                            backgroundColor: ColorScheme.Background.Greyed,
+                            color: ColorScheme.Text.Default,
+                        }}
                         numberOfLines={1}
                         ellipsizeMode={'middle'}>
                         {descriptorData}
@@ -373,24 +347,20 @@ const Backup = () => {
                         onPress={() => {
                             togglePrivateDescriptor();
                         }}
-                        style={[
-                            tailwind(
-                                `mb-4 self-center w-4/5 ${
+                        className={
+                            `mb-4 self-center w-4/5 ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
-                                }`,
-                            ),
-                        ]}>
+                                }`
+                        }>
                         <VText
-                            style={[
-                                tailwind('text-sm'),
-                                {
-                                    color: showPrivateDescriptor
-                                        ? ColorScheme.Text.Default
-                                        : ColorScheme.Text.GrayedText,
-                                },
-                            ]}>
+                            className="text-sm"
+                            style={{
+                                color: showPrivateDescriptor
+                                    ? ColorScheme.Text.Default
+                                    : ColorScheme.Text.GrayedText,
+                            }}>
                             {!showPrivateDescriptor
                                 ? t('display_priv_descriptor')
                                 : t('display_pub_descriptor')}
@@ -398,7 +368,7 @@ const Backup = () => {
                         {/* btn */}
                         <Checkbox
                             fillColor={ColorScheme.Background.CheckBoxFilled}
-                            unfillColor={
+                            unFillColor={
                                 ColorScheme.Background.CheckBoxUnfilled
                             }
                             size={18}
@@ -417,34 +387,28 @@ const Backup = () => {
                             onPress={() => {
                                 togglePrivateDescriptor();
                             }}
-                            style={[
-                                tailwind(
-                                    `flex-row absolute ${
-                                        langDir === 'right'
-                                            ? 'right-0'
-                                            : '-right-4'
-                                    }`,
-                                ),
-                            ]}
-                            disableBuiltInState={true}
+                            className={
+                                `flex-row absolute ${
+                                    langDir === 'right'
+                                        ? 'right-0'
+                                        : '-right-4'
+                                }`
+                            }
+                            useBuiltInState={false}
                         />
                     </PlainButton>
                 )}
 
-                <View style={[tailwind('mt-6 flex w-5/6')]}>
+                <View className="mt-6 flex w-5/6">
                     <Text
-                        style={[
-                            tailwind('text-sm text-center mb-4'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm text-center mb-4"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('descriptor_backup_message')}
                     </Text>
 
                     <Text
-                        style={[
-                            tailwind('text-sm text-center'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm text-center"
+                        style={{color: ColorScheme.Text.Default}}>
                         {warning}
                     </Text>
                 </View>
@@ -453,7 +417,6 @@ const Backup = () => {
             </View>
         );
     }, [
-        tailwind,
         ColorScheme.Text.Default,
         ColorScheme.Text.GrayedText,
         ColorScheme.Text.DescText,
@@ -484,21 +447,17 @@ const Backup = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <Animated.View style={[tailwind('w-full h-full items-center')]}>
-                <Animated.View style={tailwind('w-5/6 h-full justify-center')}>
+            <Animated.View className="w-full h-full items-center">
+                <Animated.View className="w-5/6 h-full justify-center">
                     {/* Top panel */}
                     <Animated.View
-                        style={[
-                            tailwind(
-                                'absolute w-full flex-row justify-center items-center top-6',
-                            ),
-                        ]}>
+                        className="absolute w-full flex-row justify-center items-center top-6">
                         {/* Allow exporting public descriptor to file */}
                         {currentIndex === 1 &&
                             Platform.OS === 'ios' &&
                             !showPrivateDescriptor && (
                                 <PlainButton
-                                    style={[tailwind('absolute left-0')]}
+                                    className="absolute left-0"
                                     onPress={() => {
                                         writeDescriptorToFile();
                                     }}>
@@ -510,17 +469,13 @@ const Backup = () => {
                             )}
                         {/* Display wallet seed selector */}
                         <Animated.View
-                            style={[
-                                tailwind(
-                                    'flex-row justify-center items-center rounded-full p-2 px-6',
-                                ),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className="flex-row justify-center items-center rounded-full p-2 px-6"
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <PlainButton
-                                style={[tailwind('mr-4')]}
+                                className="mr-4"
                                 onPress={() => {
                                     if (
                                         carouselRef.current &&
@@ -532,33 +487,29 @@ const Backup = () => {
                                     }
                                 }}>
                                 <Text
-                                    style={[
-                                        tailwind(
-                                            `text-sm ${
-                                                currentIndex === 0
-                                                    ? 'font-bold'
-                                                    : ''
-                                            }`,
-                                        ),
-                                        {
-                                            color:
-                                                currentIndex === 0
-                                                    ? ColorScheme.Text.Default
-                                                    : ColorScheme.Text
-                                                          .GrayedText,
-                                        },
-                                    ]}>
+                                    className={
+                                        `text-sm ${
+                                            currentIndex === 0
+                                                ? 'font-bold'
+                                                : ''
+                                        }`
+                                    }
+                                    style={{
+                                        color:
+                                            currentIndex === 0
+                                                ? ColorScheme.Text.Default
+                                                : ColorScheme.Text
+                                                        .GrayedText,
+                                    }}>
                                     {baseBackupTitle}
                                 </Text>
                             </PlainButton>
                             <View
-                                style={[
-                                    tailwind('h-6 w-0.5 mr-4 rounded-full'),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.CardGreyed,
-                                    },
-                                ]}
+                                className="h-6 w-0.5 mr-4 rounded-full"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.CardGreyed,
+                                }}
                             />
                             <PlainButton
                                 onPress={() => {
@@ -572,28 +523,26 @@ const Backup = () => {
                                     }
                                 }}>
                                 <Text
-                                    style={[
-                                        tailwind(
-                                            `text-sm ${
-                                                currentIndex === 1
-                                                    ? 'font-bold'
-                                                    : ''
-                                            }`,
-                                        ),
-                                        {
-                                            color:
-                                                currentIndex === 1
-                                                    ? ColorScheme.Text.Default
-                                                    : ColorScheme.Text
-                                                          .GrayedText,
-                                        },
-                                    ]}>
+                                    className={
+                                        `text-sm ${
+                                            currentIndex === 1
+                                                ? 'font-bold'
+                                                : ''
+                                        }`
+                                    }
+                                    style={{
+                                        color:
+                                            currentIndex === 1
+                                                ? ColorScheme.Text.Default
+                                                : ColorScheme.Text
+                                                        .GrayedText,
+                                    }}>
                                     Descriptor
                                 </Text>
                             </PlainButton>
                         </Animated.View>
                         <PlainButton
-                            style={[tailwind('absolute right-0')]}
+                            className="absolute right-0"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
@@ -606,17 +555,15 @@ const Backup = () => {
 
                     {/* Main Carousel */}
                     <Animated.View
+                        className="justify-center"
                         style={[
                             styles.carouselContainer,
-                            tailwind('justify-center'),
                             {zIndex: -9},
                         ]}>
                         <Carousel
                             ref={carouselRef}
                             style={[
-                                tailwind(
-                                    'items-center justify-center absolute bottom-0 w-full',
-                                ),
+                                styles.carouselStyle,
                             ]}
                             data={panels}
                             enabled={true}
@@ -657,6 +604,13 @@ const styles = StyleSheet.create({
     },
     carouselContainer: {
         flex: 1,
+    },
+    carouselStyle: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
     },
     qrCodContainer: {
         borderWidth: 2,

@@ -4,8 +4,6 @@ import React, {useContext, useCallback} from 'react';
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import {StackActions, useNavigation} from '@react-navigation/native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {LongBottomButton} from '../../components/button';
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -26,7 +24,6 @@ const Mnemonic = () => {
 
     const walletData = getWalletData(currentWalletID);
 
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
@@ -51,41 +48,31 @@ const Mnemonic = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center relative')]}>
+            <View className="w-full h-full items-center relative">
                 <View
-                    style={[
-                        tailwind(
-                            'w-5/6 justify-center items-center flex-row mt-8',
-                        ),
-                    ]}>
+                    className="w-5/6 justify-center items-center flex-row mt-8">
                     {/* Mnemonic page heading */}
                     <Text
-                        style={[
-                            tailwind('font-bold text-lg'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="font-bold text-lg"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('mnemonic_title')}
                     </Text>
                 </View>
 
                 {/* Mnemonic instruction and note on backing up */}
-                <View style={[tailwind('w-5/6 mt-10')]}>
+                <View className="w-5/6 mt-10">
                     <Text
-                        style={
-                            (tailwind('text-sm'),
-                            {color: ColorScheme.Text.Default})
-                        }>
+                        className="text-sm"
+                        style={{color: ColorScheme.Text.Default}}>
                         <Text
-                            style={[tailwind('font-bold text-sm text-center')]}>
+                            className="font-bold text-sm text-center">
                             {capitalizeFirst(t('note'))}:
                         </Text>{' '}
                         {t('mnemonic_note')}
                         {'\n\n'}
                         <Text
-                            style={[
-                                tailwind('text-center'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-center"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {e('mnemonic_warn')}
                         </Text>
                     </Text>
@@ -93,15 +80,11 @@ const Mnemonic = () => {
 
                 {/* Show Mnemonic phrases */}
                 <View
-                    style={[
-                        tailwind(
-                            'w-5/6 flex-row justify-center items-center mt-6 mb-6',
-                        ),
-                    ]}>
+                    className="w-5/6 flex-row justify-center items-center mt-6 mb-6">
                     {/* col 0 */}
                     <View
+                        className="items-center justify-center mr-4"
                         style={[
-                            tailwind('items-center justify-center mr-4'),
                             styles.capsuleContainer,
                         ]}>
                         {mnemonic.slice(0, 6).map((word, index) => (
@@ -115,8 +98,8 @@ const Mnemonic = () => {
 
                     {/* col 1 */}
                     <View
+                        className="items-center justify-center"
                         style={[
-                            tailwind('items-center justify-center'),
                             styles.capsuleContainer,
                         ]}>
                         {mnemonic.slice(6, 12).map((word, index) => (
@@ -135,7 +118,7 @@ const Mnemonic = () => {
                     backgroundColor={ColorScheme.Background.Inverted}
                     textColor={ColorScheme.Text.Alt}
                     title={t('mnemonic_ok_button')}
-                    style={[tailwind('font-bold')]}
+                    className="font-bold"
                 />
             </View>
         </SafeAreaView>

@@ -16,8 +16,6 @@ import {
     BottomSheetModal,
 } from '@gorhom/bottom-sheet';
 
-import {useTailwind} from 'tailwind-rn';
-
 /* BottomSheet component wrapper to use across App */
 type bottomProps = {
     children: ReactElement;
@@ -42,8 +40,6 @@ const _BottomModal = forwardRef(
         }: bottomProps,
         ref,
     ): ReactElement => {
-        const tailwind = useTailwind();
-
         const bottomSheetRef = React.useRef<BottomSheetModal>(null);
 
         useImperativeHandle(ref, () => ({
@@ -85,9 +81,9 @@ const _BottomModal = forwardRef(
         const backgroundComponent = useCallback(
             ({style}: BottomSheetBackgroundProps) => (
                 <View
+                    className="relative"
                     style={[
                         styles.backgroundContainer,
-                        tailwind('relative'),
                         {
                             backgroundColor: backgroundColor,
                         },

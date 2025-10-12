@@ -7,8 +7,6 @@ import VText from '../../../components/text';
 
 import {PlainButton} from '../../../components/button';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import Color from '../../../constants/Color';
@@ -20,7 +18,6 @@ import Left from '../../../assets/svg/chevron-left-24.svg';
 import {capitalizeFirst} from '../../../modules/transform';
 
 const Index = () => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -36,40 +33,30 @@ const Index = () => {
     return (
         <SafeAreaView>
             {/* Display Wallet Info, addresses, and other related data / settings */}
-            <View style={[tailwind('w-full h-full items-center relative')]}>
+            <View className="w-full h-full items-center relative">
                 <View
-                    style={[
-                        tailwind(
-                            'flex-row mt-6 w-5/6 justify-center items-center',
-                        ),
-                    ]}>
+                    className="flex-row mt-6 w-5/6 justify-center items-center">
                     <PlainButton
-                        style={[
-                            tailwind(
-                                'absolute w-full left-0 items-center flex-row',
-                            ),
-                        ]}
+                        className="absolute w-full left-0 items-center flex-row"
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
                         <Back fill={ColorScheme.SVG.Default} />
                     </PlainButton>
                     <VText
-                        style={[
-                            tailwind('font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('tools'))}
                     </VText>
                 </View>
 
                 {/* View Divider */}
-                <View style={[tailwind('w-full my-8'), HeadingBar]} />
+                <View className="w-full my-8" style={[HeadingBar]} />
 
                 {/* Wallet Tools */}
                 {/* Extended Key Converter */}
                 <PlainButton
-                    style={[tailwind('w-5/6 mb-6')]}
+                    className="w-5/6 mb-6"
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({
@@ -78,24 +65,20 @@ const Index = () => {
                         );
                     }}>
                     <View
-                        style={[
-                            tailwind(
-                                `items-center ${
+                        className={
+                            `items-center ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
-                                } justify-between`,
-                            ),
-                        ]}>
+                                } justify-between`
+                        }>
                         <VText
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('ext_key_converter')}
                         </VText>
 
-                        <View style={[tailwind('items-center')]}>
+                        <View className="items-center">
                             {langDir === 'right' ? (
                                 <Left
                                     width={16}
@@ -115,7 +98,7 @@ const Index = () => {
 
                 {/* Mnemonic Converter Tool */}
                 <PlainButton
-                    style={[tailwind('w-5/6 mb-6')]}
+                    className="w-5/6 mb-6"
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({
@@ -124,24 +107,20 @@ const Index = () => {
                         );
                     }}>
                     <View
-                        style={[
-                            tailwind(
-                                `items-center ${
+                        className={
+                            `items-center ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
-                                } justify-between`,
-                            ),
-                        ]}>
+                                } justify-between`
+                        }>
                         <VText
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('mnemonic_converter')}
                         </VText>
 
-                        <View style={[tailwind('items-center')]}>
+                        <View className="items-center">
                             {langDir === 'right' ? (
                                 <Left
                                     width={16}

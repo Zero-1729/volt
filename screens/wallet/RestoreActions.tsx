@@ -30,8 +30,6 @@ import {
 } from '../../modules/wallet-utils';
 import {extendedKeyInfo} from '../../modules/wallet-defaults';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {PlainButton, LongBottomButton} from '../../components/button';
 import {TextMultiInput} from '../../components/input';
 
@@ -56,8 +54,6 @@ type Props = NativeStackScreenProps<AddWalletParamList, 'RestoreActions'>;
 const ImportAction = ({route}: Props) => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -358,23 +354,21 @@ const ImportAction = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
-                <View style={[tailwind('w-5/6 mt-8')]}>
+                className="w-full h-full items-center"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
+                <View className="w-5/6 mt-8">
                     <PlainButton
-                        style={tailwind('items-center flex-row -ml-1')}
+                        className="items-center flex-row -ml-1"
                         onPress={() => {
                             navigation.goBack();
                         }}>
                         <Back
-                            style={tailwind('mr-2')}
+                            className="mr-2"
                             fill={ColorScheme.SVG.Default}
                         />
                         <Text
+                            className="text-sm font-bold"
                             style={[
-                                tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
@@ -383,18 +377,16 @@ const ImportAction = ({route}: Props) => {
                     </PlainButton>
 
                     <VText
+                        className="font-medium text-2xl mt-20"
                         style={[
-                            tailwind('font-medium text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
                         {t('restore_wallet_title')}
                     </VText>
                     <VText
-                        style={[
-                            tailwind('text-sm mt-2 mb-8'),
-                            {color: ColorScheme.Text.GrayText},
-                        ]}>
+                        className="text-sm mt-2 mb-8"
+                        style={{color: ColorScheme.Text.GrayText}}>
                         {t('restore_wallet_description')}
                     </VText>
 
@@ -413,12 +405,10 @@ const ImportAction = ({route}: Props) => {
 
                     {/* Wallet Network */}
                     {isMnemonic(importText.trim()) && isAdvancedMode && (
-                        <View style={[tailwind('mt-8 flex-row')]}>
+                        <View className="mt-8 flex-row">
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.Default}}>
                                 Testnet
                             </Text>
                             {/* btn */}
@@ -427,7 +417,7 @@ const ImportAction = ({route}: Props) => {
                                 fillColor={
                                     ColorScheme.Background.CheckBoxFilled
                                 }
-                                unfillColor={
+                                unFillColor={
                                     ColorScheme.Background.CheckBoxUnfilled
                                 }
                                 size={18}
@@ -442,7 +432,7 @@ const ImportAction = ({route}: Props) => {
                                         ColorScheme.Background.CheckBoxOutline,
                                     borderRadius: 2,
                                 }}
-                                style={[tailwind('flex-row absolute -right-4')]}
+                                className="flex-row absolute -right-4"
                                 onPress={() => {
                                     RNHapticFeedback.trigger(
                                         'rigid',
@@ -451,7 +441,7 @@ const ImportAction = ({route}: Props) => {
 
                                     toggleNetwork();
                                 }}
-                                disableBuiltInState={true}
+                                useBuiltInState={false}
                             />
                         </View>
                     )}

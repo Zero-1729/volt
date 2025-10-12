@@ -23,19 +23,6 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-# Force pods to match minimum iOS version for React Native
-# Based on https://github.com/travis-mark/lrn/commit/015854716feadd61a904d5a603b027426472f863
-# Fixes build issue on Xcode Cloud where some pods
-# Use iOS 12 calls despite being set as iOS 11
-# Including a fix for missing arch targets
-def __apply_Xcode_14_3_post_install_workaround(installer)
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-    end
-  end
-end
-
 target 'volt' do
   config = use_native_modules!
 
@@ -45,11 +32,6 @@ target 'volt' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'voltTests' do
-    inherit! :complete
-    # Pods for testing
-  end
-
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
@@ -57,6 +39,5 @@ target 'volt' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
     )
-    __apply_Xcode_14_3_post_install_workaround(installer)
   end
 end

@@ -2,8 +2,6 @@
 import React, {useContext} from 'react';
 import {StyleSheet, Text, View, Switch, useColorScheme} from 'react-native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {PlainButton} from './button';
 import {Balance} from './balance';
 
@@ -27,8 +25,6 @@ import SIM from '../assets/svg/sim.svg';
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
@@ -48,14 +44,12 @@ export const WalletCard = (props: WalletCardProps) => {
             }}
             activeOpacity={1}>
             <View
-                style={[
-                    tailwind('w-full relative items-center'),
-                    {height: 206},
-                ]}>
+                className="w-full relative items-center"
+                style={{height: 206}}>
                 <View
+                    className="w-full rounded-md z-50 px-6"
                     style={[
                         styles.overflowHidden,
-                        tailwind('w-full rounded-md z-50 px-6'),
                         {
                             height: 206,
                             backgroundColor:
@@ -65,42 +59,30 @@ export const WalletCard = (props: WalletCardProps) => {
                         },
                     ]}>
                     <View
-                        style={[
-                            tailwind(
-                                'absolute right-0 z-50 h-full rounded-br opacity-60',
-                            ),
-                            {width: 6},
-                        ]}>
+                        className="absolute right-0 z-50 h-full rounded-br opacity-60"
+                        style={{width: 6}}>
                         <View
-                            style={[
-                                tailwind(
-                                    'h-4/6 rounded-tr rounded-bl rounded-br-none absolute right-0',
-                                ),
-                                {width: 10},
-                            ]}
+                            className="h-4/6 rounded-tr rounded-bl rounded-br-none absolute right-0"
+                            style={{width: 10}}
                         />
                     </View>
 
                     <View
-                        style={[
-                            tailwind('absolute h-auto w-auto opacity-40 z-0'),
-                            {
+                        className="absolute h-auto w-auto opacity-40 z-0"
+                        style={{
                                 top: props.hideBalance ? -34 : -16,
                                 ...mxPositionBTC,
-                            },
-                        ]}>
+                            }}>
                         <BITCOIN fill={'black'} width={148} height={148} />
                     </View>
 
                     {!props.isWatchOnly && (
                         <View
-                            style={[
-                                {
+                            className="absolute opacity-80 h-auto w-auto"
+                            style={{
                                     top: 18,
                                     ...mxPositionSim,
-                                },
-                                tailwind('absolute opacity-80 h-auto w-auto'),
-                            ]}>
+                                }}>
                             <SIM fill={'white'} width={42} height={42} />
                         </View>
                     )}
@@ -108,11 +90,9 @@ export const WalletCard = (props: WalletCardProps) => {
                     <Text
                         numberOfLines={1}
                         ellipsizeMode="middle"
+                        className="absolute bottom-5 pt-4 mt-1 text-base w-full text-left text-white opacity-60"
                         style={[
                             styles.label,
-                            tailwind(
-                                'absolute bottom-5 pt-4 mt-1 text-base w-full text-left text-white opacity-60',
-                            ),
                             {
                                 bottom: props.withBalance ? (props.hideBalance ? 72 : 54) : 20,
                                 textAlign: langDir,
@@ -124,19 +104,15 @@ export const WalletCard = (props: WalletCardProps) => {
 
                     {props.isWatchOnly && (
                         <View
+                            className="bg-black absolute rounded-full opacity-60"
                             style={[
                                 langDir === 'right'
                                     ? styles.watchOnlyRTL
                                     : styles.watchOnlyLTR,
-                                tailwind(
-                                    'bg-black absolute rounded-full opacity-60',
-                                ),
                             ]}>
                             <Text
+                                className="text-xs text-white font-bold px-4 py-1"
                                 style={[
-                                    tailwind(
-                                        'text-xs text-white font-bold px-4 py-1',
-                                    ),
                                     Font.RobotoText,
                                 ]}>
                                 Watch only
@@ -146,7 +122,7 @@ export const WalletCard = (props: WalletCardProps) => {
 
                     {/* Show Balance or Maxed card if `withBalance` */}
                     {props.withBalance && (!props.maxedCard || props.hideBalance) ? (
-                        <View style={tailwind('w-full absolute mx-6 bottom-5')}>
+                        <View className="w-full absolute mx-6 bottom-5">
                             <Balance
                                 fontColor={'white'}
                                 balance={props.balance}
@@ -161,21 +137,15 @@ export const WalletCard = (props: WalletCardProps) => {
                         </View>
                     ) : (
                         props.withBalance && <View
-                            style={[
-                                tailwind(
-                                    'bg-black absolute rounded opacity-60',
-                                ),
-                                {
+                            className="bg-black absolute rounded opacity-60"
+                            style={{
                                     bottom: 20,
                                     left: langDir === 'right' ? undefined : 24,
                                     right: langDir === 'right' ? 24 : undefined,
-                                },
-                            ]}>
+                                }}>
                             <Text
+                                className="text-xs text-white font-bold px-4 py-1"
                                 style={[
-                                    tailwind(
-                                        'text-xs text-white font-bold px-4 py-1',
-                                    ),
                                     {textAlign: langDir},
                                     Font.RobotoText,
                                 ]}>
@@ -190,47 +160,39 @@ export const WalletCard = (props: WalletCardProps) => {
 };
 
 export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {appLanguage} = useContext(AppStorageContext);
 
     return (
         <View
-            style={[
-                tailwind('flex-row items-center justify-center w-full'),
-                {
+            className="flex-row items-center justify-center w-full"
+            style={{
                     marginTop: 6,
                     marginBottom: 6,
-                },
-            ]}>
+                }}>
             <View
-                style={[
-                    tailwind('items-center justify-center'),
-                    {
+                className="items-center justify-center"
+                style={{
                         backgroundColor: ColorScheme.Background.CardGreyed,
                         borderTopLeftRadius: 32,
                         borderBottomLeftRadius: 32,
                         marginRight: 2,
                         height: 40,
                         width: '25%',
-                    },
-                ]}>
+                    }}>
                 <Text
-                    style={[
-                        tailwind('text-sm font-bold'),
-                        {
+                    className="text-sm font-bold"
+                    style={{
                             color: ColorScheme.Text.Default,
-                        },
-                    ]}>
+                        }}>
                     {i18nNumber(props.index, appLanguage.code)}
                 </Text>
             </View>
 
             <View
-                style={[
-                    tailwind('justify-center'),
-                    {
+                className="justify-center"
+                style={{
                         height: 40,
                         width: '75%',
                         borderTopRightRadius: 32,
@@ -238,15 +200,12 @@ export const MnemonicDisplayCapsule = (props: MnemonicDisplayProps) => {
                         backgroundColor: ColorScheme.Background.Greyed,
                         paddingLeft: 8,
                         paddingRight: 8,
-                    },
-                ]}>
+                    }}>
                 <Text
-                    style={[
-                        tailwind('text-sm font-bold'),
-                        {
+                    className="text-sm font-bold"
+                    style={{
                             color: ColorScheme.Text.Default,
-                        },
-                    ]}>
+                        }}>
                     {props.word}
                 </Text>
             </View>

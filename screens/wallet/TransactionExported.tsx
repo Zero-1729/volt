@@ -12,7 +12,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import {LongBottomButton} from '../../components/button';
@@ -32,7 +31,6 @@ type TStatusInfo = {
 };
 
 const TransactionExported = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -66,32 +64,26 @@ const TransactionExported = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
+                className="w-full h-full relative justify-center"
                 style={[
                     styles.statusContainer,
-                    tailwind('w-full h-full relative justify-center'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View style={[tailwind('h-full justify-center')]}>
+                <View className="h-full justify-center">
                     <Text
-                        style={[
-                            tailwind(
-                                'text-lg absolute font-bold text-center w-full top-6 px-4',
-                            ),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg absolute font-bold text-center w-full top-6 px-4"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('export'))}
                     </Text>
 
                     <View
-                        style={[
-                            tailwind('-mt-12 justify-center px-4 items-center'),
-                        ]}>
-                        <View style={[tailwind('items-center')]}>
+                        className="-mt-12 justify-center px-4 items-center">
+                        <View className="items-center">
                             {!statusInfo.status && (
                                 <Failed
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -100,7 +92,7 @@ const TransactionExported = ({route}: Props) => {
 
                             {statusInfo.status && (
                                 <Success
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -108,28 +100,24 @@ const TransactionExported = ({route}: Props) => {
                             )}
                         </View>
 
-                        <View style={[tailwind('w-4/5 mt-4 items-center')]}>
+                        <View className="w-4/5 mt-4 items-center">
                             <Text
-                                style={[
-                                    tailwind('text-lg font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-lg font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {statusInfo.status
                                     ? capitalizeFirst(t('successful'))
                                     : capitalizeFirst(t('failed'))}
                             </Text>
                         </View>
 
-                        <View style={[tailwind('items-center w-4/5')]}>
+                        <View className="items-center w-4/5">
                             <Text
                                 ellipsizeMode="middle"
                                 numberOfLines={1}
-                                style={[
-                                    tailwind('text-sm text-center mt-4'),
-                                    {
+                                className="text-sm text-center mt-4"
+                                style={{
                                         color: ColorScheme.Text.GrayedText,
-                                    },
-                                ]}>
+                                }}>
                                 {statusInfo.status
                                     ? statusInfo.fname
                                     : statusInfo.message}
@@ -138,9 +126,7 @@ const TransactionExported = ({route}: Props) => {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('absolute bottom-0 items-center w-full'),
-                        ]}>
+                        className="absolute bottom-0 items-center w-full">
                         <LongBottomButton
                             onPress={() => {
                                 navigation.dispatch(

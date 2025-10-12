@@ -7,102 +7,54 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* voltTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* voltTests.m */; };
-		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		6C563C802875187B002067CA /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C563C7D2875187B002067CA /* Roboto.ttf */; };
 		6C563C812875187B002067CA /* Satoshi Symbol.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C563C7E2875187B002067CA /* Satoshi Symbol.ttf */; };
 		6C563C822875187B002067CA /* Roboto Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C563C7F2875187B002067CA /* Roboto Medium.ttf */; };
+		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8CCAB6749D05D2A1113C0BA1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5500A8DD59E4E32A43387270 /* PrivacyInfo.xcprivacy */; };
-		D5D2F12CFF1E773215747DED /* libPods-volt-voltTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C816C4370DFDB2FB6F0EA3E2 /* libPods-volt-voltTests.a */; };
-		DC2768DE048291F5BED85C72 /* libPods-volt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F721EBDB3DAE0BD23E0A221B /* libPods-volt.a */; };
+		9FE9F09FFAAC33F6B71E723B /* libPods-volt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 427909CC6BC9E39B766D472C /* libPods-volt.a */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		00E356F41AD99517003FC87E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = volt;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* voltTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = voltTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* voltTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = voltTests.m; sourceTree = "<group>"; };
+		015E79E98EF904968583ACAB /* Pods-volt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.debug.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* volt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = volt.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = volt/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.m; path = volt/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = volt/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = volt/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = volt/main.m; sourceTree = "<group>"; };
-		415B01DD523D22E0B2CF4D69 /* Pods-volt-voltTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt-voltTests.release.xcconfig"; path = "Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests.release.xcconfig"; sourceTree = "<group>"; };
+		26654E42CE524CD3CF68D169 /* Pods-volt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.release.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.release.xcconfig"; sourceTree = "<group>"; };
+		427909CC6BC9E39B766D472C /* libPods-volt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5500A8DD59E4E32A43387270 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = volt/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6C38A06E2BF5A22000734AFC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = volt/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6C4B72ED2C0B85AB004DCD07 /* volt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = volt.entitlements; path = volt/volt.entitlements; sourceTree = "<group>"; };
 		6C563C7D2875187B002067CA /* Roboto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Roboto.ttf; path = ../assets/fonts/Roboto.ttf; sourceTree = "<group>"; };
 		6C563C7E2875187B002067CA /* Satoshi Symbol.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Satoshi Symbol.ttf"; path = "../assets/fonts/Satoshi Symbol.ttf"; sourceTree = "<group>"; };
 		6C563C7F2875187B002067CA /* Roboto Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto Medium.ttf"; path = "../assets/fonts/Roboto Medium.ttf"; sourceTree = "<group>"; };
+		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = volt/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = volt/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		84F6AC3F46CF170E12151A19 /* Pods-volt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.debug.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.debug.xcconfig"; sourceTree = "<group>"; };
-		9958EBB043A240A913C112B3 /* Pods-volt-voltTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt-voltTests.debug.xcconfig"; path = "Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests.debug.xcconfig"; sourceTree = "<group>"; };
-		C27A85717ED33FD58D11A261 /* Pods-volt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-volt.release.xcconfig"; path = "Target Support Files/Pods-volt/Pods-volt.release.xcconfig"; sourceTree = "<group>"; };
-		C816C4370DFDB2FB6F0EA3E2 /* libPods-volt-voltTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt-voltTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F721EBDB3DAE0BD23E0A221B /* libPods-volt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-volt.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		00E356EB1AD99517003FC87E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D5D2F12CFF1E773215747DED /* libPods-volt-voltTests.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC2768DE048291F5BED85C72 /* libPods-volt.a in Frameworks */,
+				9FE9F09FFAAC33F6B71E723B /* libPods-volt.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* voltTests */ = {
-			isa = PBXGroup;
-			children = (
-				00E356F21AD99517003FC87E /* voltTests.m */,
-				00E356F01AD99517003FC87E /* Supporting Files */,
-			);
-			path = voltTests;
-			sourceTree = "<group>";
-		};
-		00E356F01AD99517003FC87E /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				00E356F11AD99517003FC87E /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* volt */ = {
 			isa = PBXGroup;
 			children = (
+				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				6C4B72ED2C0B85AB004DCD07 /* volt.entitlements */,
-				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
-				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
-				13B07FB71A68108700A75B9A /* main.m */,
 				6C38A06E2BF5A22000734AFC /* PrivacyInfo.xcprivacy */,
 				5500A8DD59E4E32A43387270 /* PrivacyInfo.xcprivacy */,
 			);
@@ -113,8 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				F721EBDB3DAE0BD23E0A221B /* libPods-volt.a */,
-				C816C4370DFDB2FB6F0EA3E2 /* libPods-volt-voltTests.a */,
+				427909CC6BC9E39B766D472C /* libPods-volt.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -134,7 +85,6 @@
 				6C563C7E2875187B002067CA /* Satoshi Symbol.ttf */,
 				13B07FAE1A68108700A75B9A /* volt */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* voltTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -148,7 +98,6 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* volt.app */,
-				00E356EE1AD99517003FC87E /* voltTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -156,10 +105,8 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				84F6AC3F46CF170E12151A19 /* Pods-volt.debug.xcconfig */,
-				C27A85717ED33FD58D11A261 /* Pods-volt.release.xcconfig */,
-				9958EBB043A240A913C112B3 /* Pods-volt-voltTests.debug.xcconfig */,
-				415B01DD523D22E0B2CF4D69 /* Pods-volt-voltTests.release.xcconfig */,
+				015E79E98EF904968583ACAB /* Pods-volt.debug.xcconfig */,
+				26654E42CE524CD3CF68D169 /* Pods-volt.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -167,38 +114,17 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* voltTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "voltTests" */;
-			buildPhases = (
-				31AA8BDEDB52921D2C66F234 /* [CP] Check Pods Manifest.lock */,
-				00E356EA1AD99517003FC87E /* Sources */,
-				00E356EB1AD99517003FC87E /* Frameworks */,
-				00E356EC1AD99517003FC87E /* Resources */,
-				8848928422477F677F3DAB60 /* [CP] Embed Pods Frameworks */,
-				44C1F53D8623259ED23C9742 /* [CP] Copy Pods Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				00E356F51AD99517003FC87E /* PBXTargetDependency */,
-			);
-			name = voltTests;
-			productName = voltTests;
-			productReference = 00E356EE1AD99517003FC87E /* voltTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		13B07F861A680F5B00A75B9A /* volt */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "volt" */;
 			buildPhases = (
-				18B8376D8CC1864444E9BD05 /* [CP] Check Pods Manifest.lock */,
+				53A16404A46762BBA14EA3BE /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				975AB6BE415CACFFF1D23652 /* [CP] Embed Pods Frameworks */,
-				B0FF0EA204E657E835A6E285 /* [CP] Copy Pods Resources */,
+				637C95CEBDFE4A490E1B65C3 /* [CP] Embed Pods Frameworks */,
+				440E371A69AA8ED827D530D0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -217,10 +143,6 @@
 			attributes = {
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
-					00E356ED1AD99517003FC87E = {
-						CreatedOnToolsVersion = 6.2;
-						TestTargetID = 13B07F861A680F5B00A75B9A;
-					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
 					};
@@ -240,19 +162,11 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* volt */,
-				00E356ED1AD99517003FC87E /* voltTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		00E356EC1AD99517003FC87E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		13B07F8E1A680F5B00A75B9A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -283,7 +197,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		18B8376D8CC1864444E9BD05 /* [CP] Check Pods Manifest.lock */ = {
+		440E371A69AA8ED827D530D0 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		53A16404A46762BBA14EA3BE /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -305,63 +236,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		31AA8BDEDB52921D2C66F234 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-volt-voltTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		44C1F53D8623259ED23C9742 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8848928422477F677F3DAB60 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt-voltTests/Pods-volt-voltTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		975AB6BE415CACFFF1D23652 /* [CP] Embed Pods Frameworks */ = {
+		637C95CEBDFE4A490E1B65C3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -378,110 +253,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B0FF0EA204E657E835A6E285 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-volt/Pods-volt-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		00E356EA1AD99517003FC87E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				00E356F31AD99517003FC87E /* voltTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		13B07F871A680F5B00A75B9A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* volt */;
-			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
-		00E356F61AD99517003FC87E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9958EBB043A240A913C112B3 /* Pods-volt-voltTests.debug.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = D843NQ66DN;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = voltTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-lc++",
-					"$(inherited)",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/volt.app/volt";
-			};
-			name = Debug;
-		};
-		00E356F71AD99517003FC87E /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 415B01DD523D22E0B2CF4D69 /* Pods-volt-voltTests.release.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = D843NQ66DN;
-				INFOPLIST_FILE = voltTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-lc++",
-					"$(inherited)",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/volt.app/volt";
-			};
-			name = Release;
-		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 84F6AC3F46CF170E12151A19 /* Pods-volt.debug.xcconfig */;
+			baseConfigurationReference = 015E79E98EF904968583ACAB /* Pods-volt.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -512,7 +300,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C27A85717ED33FD58D11A261 /* Pods-volt.release.xcconfig */;
+			baseConfigurationReference = 26654E42CE524CD3CF68D169 /* Pods-volt.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -694,15 +482,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "voltTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				00E356F61AD99517003FC87E /* Debug */,
-				00E356F71AD99517003FC87E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "volt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

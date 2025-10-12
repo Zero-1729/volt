@@ -15,8 +15,6 @@ import {
     StyleSheet,
 } from 'react-native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import DocumentPicker from 'react-native-document-picker';
@@ -60,7 +58,6 @@ type CapsuleInputProps = {
 
 // Mnemonic TextInput Capsule
 const MnemonicInputCapsule = (props: CapsuleInputProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const getColumnBackgroundColor = (state: boolean | null) => {
@@ -87,32 +84,26 @@ const MnemonicInputCapsule = (props: CapsuleInputProps) => {
 
     return (
         <View
-            style={[
-                tailwind('flex-row items-center justify-center w-full'),
-                {
+            className="flex-row items-center justify-center w-full"
+            style={{
                     marginTop: 6,
                     marginBottom: 6,
-                },
-            ]}>
+                }}>
             <View
-                style={[
-                    tailwind('items-center justify-center'),
-                    {
+                className="items-center justify-center"
+                style={{
                         backgroundColor: getColumnBackgroundColor(props.state),
                         borderTopLeftRadius: 32,
                         borderBottomLeftRadius: 32,
                         marginRight: 2,
                         height: 40,
                         width: '25%',
-                    },
-                ]}>
+                    }}>
                 <Text
-                    style={[
-                        tailwind('text-sm font-bold'),
-                        {
+                    className="text-sm font-bold"
+                    style={{
                             color: getColumnTextColor(props.state),
-                        },
-                    ]}>
+                        }}>
                     {i18nNumber(props.index, props.languageCode)}
                 </Text>
             </View>
@@ -148,7 +139,6 @@ const MnemonicInputCapsule = (props: CapsuleInputProps) => {
 
 // Extended Key Input
 export const ExtKeyInput = (props: ExtKeyInputProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {i18n} = useTranslation();
@@ -192,24 +182,18 @@ export const ExtKeyInput = (props: ExtKeyInputProps) => {
             value={props.value}
             ref={props.refs}
             {...props}
-            style={[
-                tailwind(
-                    `${props.shavedHeight ? 'py-3' : 'py-4'} px-2 text-xs`,
-                ),
-                {
+            className={`${props.shavedHeight ? 'py-3' : 'py-4'} px-2 text-xs`}
+            style={{
                     textAlign: props.noTrans ? 'auto' : langDir,
                     borderWidth: 1,
                     borderColor: borderColor(),
                     borderRadius: 6,
-                },
-            ]}
+                }}
         />
     );
 };
 
 export const TextSingleInput = (props: TextInputProps) => {
-    const tailwind = useTailwind();
-
     const {i18n} = useTranslation();
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
@@ -227,32 +211,24 @@ export const TextSingleInput = (props: TextInputProps) => {
             value={props.value}
             ref={props.refs}
             {...props}
-            style={[
-                tailwind(
-                    `${props.shavedHeight ? 'py-3' : 'py-4'} px-2 text-xs`,
-                ),
-                {textAlign: props.noTrans ? 'auto' : langDir},
-            ]}
+            className={`${props.shavedHeight ? 'py-3' : 'py-4'} px-2 text-xs`}
+            style={{textAlign: props.noTrans ? 'auto' : langDir}}
         />
     );
 };
 
 export const TextMultiInput = (props: TextLongInputProps) => {
-    const tailwind = useTailwind();
-
     const InputAccessoryViewID = 'notsoUniqueID';
 
     return (
         <View
-            style={[
-                tailwind('rounded pb-11 px-4 h-44'),
-                {
+            className="rounded pb-11 px-4 h-44"
+            style={{
                     borderWidth: 2,
                     borderColor: props.borderColor
                         ? props.borderColor
                         : 'transparent',
-                },
-            ]}>
+                }}>
             {Platform.OS === 'ios' && (
                 <InputAccessoryView nativeID={InputAccessoryViewID}>
                     <Button
@@ -276,11 +252,12 @@ export const TextMultiInput = (props: TextLongInputProps) => {
                 enablesReturnKeyAutomatically={true}
                 inputAccessoryViewID={InputAccessoryViewID}
                 {...props}
-                style={[styles.inputContainer, tailwind('text-xs pt-4')]}
+                className="text-xs pt-4"
+                style={[styles.inputContainer]}
             />
 
             {props.showFolder && (
-                <View style={[tailwind('absolute right-4 bottom-3')]}>
+                <View className="absolute right-4 bottom-3">
                     <PlainButton
                         onPress={() => {
                             DocumentPicker.pick({
@@ -313,7 +290,6 @@ export const TextMultiInput = (props: TextLongInputProps) => {
 };
 
 export const AmountNumpad = (props: NumpadRequestInputProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const addDecimalPoint = (text: string) => {
@@ -354,161 +330,139 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
 
     return (
         <View
-            style={[
-                tailwind('absolute w-full items-center justify-center flex'),
-                {bottom: nativeWindowMetrics.bottomButtonOffset + 68},
-            ]}>
+            className="absolute w-full items-center justify-center flex"
+            style={{bottom: nativeWindowMetrics.bottomButtonOffset + 68}}>
             {/* Row 0 */}
-            <View style={[tailwind('w-full flex-row mb-6')]}>
+            <View className="w-full flex-row mb-6">
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '1'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         1
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '2'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         2
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '3'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         3
                     </Text>
                 </PlainButton>
             </View>
 
             {/* Row 1 */}
-            <View style={[tailwind('w-full flex-row mb-6')]}>
+            <View className="w-full flex-row mb-6">
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '4'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         4
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center'"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '5'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         5
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center'"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '6'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         6
                     </Text>
                 </PlainButton>
             </View>
 
             {/* Row 2 */}
-            <View style={[tailwind('w-full flex-row mb-6')]}>
+            <View className="w-full flex-row mb-6">
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center'"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '7'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         7
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center'"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '8'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         8
                     </Text>
                 </PlainButton>
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center'"
                     onPress={() => {
                         props.onAmountChange(safelyConcat(props.amount, '9'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         9
                     </Text>
                 </PlainButton>
             </View>
 
             {/* Row 3 */}
-            <View style={[tailwind('w-full flex-row')]}>
+            <View className="w-full flex-row">
                 {/* Disable decimals for sats */}
                 {!props.isSats ? (
                     <PlainButton
-                        style={[tailwind('w-1/3 items-center justify-center')]}
+                        className="w-1/3 items-center justify-center'"
                         onPress={() => {
                             props.onAmountChange(addDecimalPoint(props.amount));
                         }}>
                         <Text
-                            style={[
-                                tailwind('text-xl font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-xl font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             .
                         </Text>
                     </PlainButton>
                 ) : (
-                    <View style={[tailwind('w-1/3')]} />
+                    <View className="w-1/3" />
                 )}
                 <PlainButton
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center'"
                     onPress={() => {
                         // Disable adding a leading zeros if amount is empty and in sats unit
                         const text =
@@ -516,15 +470,13 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
                         props.onAmountChange(safelyConcat(props.amount, text));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         0
                     </Text>
                 </PlainButton>
                 <Pressable
-                    style={[tailwind('w-1/3 items-center justify-center')]}
+                    className="w-1/3 items-center justify-center'"
                     onPress={() => {
                         props.onAmountChange(safelyDelete(props.amount));
                     }}
@@ -539,7 +491,6 @@ export const AmountNumpad = (props: NumpadRequestInputProps) => {
 };
 
 export const PinNumpad = (props: PinNumpadInputProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {appLanguage} = useContext(AppStorageContext);
@@ -562,12 +513,12 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
     };
 
     return (
-        <View style={[tailwind('w-2/3 self-center justify-center flex')]}>
+        <View className="w-2/3 self-center justify-center flex">
             {/* Row 0 */}
-            <View style={[tailwind('w-full flex-row mb-4 justify-around')]}>
+            <View className="w-full flex-row mb-4 justify-around">
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -576,16 +527,14 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '1'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(1, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -594,16 +543,14 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '2'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(2, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -612,20 +559,18 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '3'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(3, appLanguage.code)}
                     </Text>
                 </PlainButton>
             </View>
 
             {/* Row 1 */}
-            <View style={[tailwind('w-full flex-row mb-4 justify-around')]}>
+            <View className="w-full flex-row mb-4 justify-around">
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -634,16 +579,14 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '4'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(4, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -652,16 +595,14 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '5'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(5, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -670,20 +611,18 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '6'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(6, appLanguage.code)}
                     </Text>
                 </PlainButton>
             </View>
 
             {/* Row 2 */}
-            <View style={[tailwind('w-full flex-row mb-4 justify-around')]}>
+            <View className="w-full flex-row mb-4 justify-around">
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -692,16 +631,14 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '7'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(7, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -710,16 +647,14 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '8'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(8, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
                         {backgroundColor: ColorScheme.Background.Secondary},
                     ]}
@@ -728,10 +663,8 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                         props.onPinChange(safelyConcat(props.pin, '9'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(9, appLanguage.code)}
                     </Text>
                 </PlainButton>
@@ -739,23 +672,15 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
 
             {/* Row 3 */}
             <View
-                style={[
-                    tailwind(
-                        `w-full flex-row  ${
-                            props.showBiometrics
-                                ? 'justify-around'
-                                : 'justify-around self-end w-2/3'
-                        }`,
-                    ),
-                ]}>
+                className={`flex-row ${
+                    props.showBiometrics
+                        ? 'w-full justify-around'
+                        : 'justify-around self-end w-2/3'
+                }`}>
                 {props.showBiometrics && (
                     <PlainButton
-                        style={[
-                            tailwind(
-                                'items-center justify-center rounded-full',
-                            ),
-                            styles.buttonDimensions,
-                        ]}
+                        className="items-center justify-center rounded-full"
+                        style={[styles.buttonDimensions]}
                         onPress={props.triggerBiometrics}>
                         {Platform.OS === 'android' ? (
                             <FingerPrint
@@ -773,28 +698,24 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
                     </PlainButton>
                 )}
                 <PlainButton
+                    className="items-center justify-center rounded-full"
                     style={[
-                        tailwind('items-center justify-center rounded-full'),
                         styles.buttonDimensions,
-                        {backgroundColor: ColorScheme.Background.Secondary},
+                        {backgroundColor: ColorScheme.Background.Secondary}
                     ]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyConcat(props.pin, '0'));
                     }}>
                     <Text
-                        style={[
-                            tailwind('text-xl font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-xl font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {i18nNumber(0, appLanguage.code)}
                     </Text>
                 </PlainButton>
                 <Pressable
-                    style={[
-                        tailwind('items-center justify-center rounded-full'),
-                        styles.buttonDimensions,
-                    ]}
+                    className="items-center justify-center rounded-full"
+                    style={[styles.buttonDimensions]}
                     onPress={() => {
                         vibrateInput();
                         props.onPinChange(safelyDelete(props.pin));
@@ -810,7 +731,6 @@ export const PinNumpad = (props: PinNumpadInputProps) => {
 };
 
 export const MnemonicInput = (props: MnemonicInputProps) => {
-    const tailwind = useTailwind();
     const {appLanguage} = useContext(AppStorageContext);
 
     const vibrateInput = () => {
@@ -862,15 +782,15 @@ export const MnemonicInput = (props: MnemonicInputProps) => {
     }, [list]);
 
     return (
-        <View style={[tailwind('w-full items-center justify-center flex-row')]}>
+        <View className="w-full items-center justify-center flex-row">
             {/* Col 0 */}
-            <View style={[tailwind('w-1/2 flex mr-4')]}>
+            <View className="w-1/2 flex mr-4">
                 {Array(6)
                     .fill('')
                     .map((_, index) => (
                         <PlainButton
                             key={index}
-                            style={[tailwind('items-center justify-center')]}
+                            className="items-center justify-center"
                             onPress={() => {
                                 mnemonicRefs[index].current?.focus();
                             }}>
@@ -888,13 +808,13 @@ export const MnemonicInput = (props: MnemonicInputProps) => {
             </View>
 
             {/* Col 1 */}
-            <View style={[tailwind('w-1/2 flex mr-4')]}>
+            <View className="w-1/2 flex mr-4">
                 {Array(6)
                     .fill('')
                     .map((_, index) => (
                         <PlainButton
                             key={index + 6}
-                            style={[tailwind('items-center justify-center')]}
+                            className="items-center justify-center"
                             onPress={() => {
                                 mnemonicRefs[index + 6].current?.focus();
                             }}>

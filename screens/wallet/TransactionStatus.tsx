@@ -34,7 +34,6 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 import NativeOffsets from '../../constants/NativeWindowMetrics';
 
 import {capitalizeFirst} from '../../modules/transform';
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import {ENet} from '../../types/enums';
@@ -54,7 +53,6 @@ type TStatusInfo = {
 };
 
 const TransactionStatus = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -155,38 +153,32 @@ const TransactionStatus = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
+                className="w-full h-full relative justify-center"
                 style={[
                     styles.statusContainer,
-                    tailwind('w-full h-full relative justify-center'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
                 {!statusInfo.status && (
                     <View
-                        style={[
-                            tailwind(
-                                'w-full h-full items-center justify-center',
-                            ),
-                        ]}>
-                        <View style={[tailwind('items-center justify-center')]}>
+                        className="w-full h-full items-center justify-center">
+                        <View className="items-center justify-center">
                             <Cog
-                                style={[tailwind('mb-2')]}
+                                className="mb-2"
                                 width={32}
                                 height={32}
                                 fill={ColorScheme.SVG.Default}
                             />
 
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {statusMessage}
                             </Text>
 
                             <ActivityIndicator
-                                style={[tailwind('mt-4')]}
+                                className="mt-4"
                                 size="small"
                                 color={ColorScheme.SVG.Default}
                             />
@@ -196,27 +188,19 @@ const TransactionStatus = ({route}: Props) => {
                     </View>
                 )}
                 {!!statusInfo.status && (
-                    <View style={[tailwind('h-full justify-center')]}>
+                    <View className="h-full justify-center">
                         <Text
-                            style={[
-                                tailwind(
-                                    'text-lg absolute font-bold text-center w-full top-6 px-4',
-                                ),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-lg absolute font-bold text-center w-full top-6 px-4"
+                            style={{color: ColorScheme.Text.Default}}>
                             {capitalizeFirst(t('status'))}
                         </Text>
 
                         <View
-                            style={[
-                                tailwind(
-                                    '-mt-12 justify-center px-4 items-center',
-                                ),
-                            ]}>
-                            <View style={[tailwind('items-center')]}>
+                            className="-mt-12 justify-center px-4 items-center">
+                            <View className="items-center">
                                 {statusInfo.status === 'failed' && (
                                     <Failed
-                                        style={[tailwind('self-center')]}
+                                        className="self-center"
                                         fill={ColorScheme.SVG.Default}
                                         height={128}
                                         width={128}
@@ -225,7 +209,7 @@ const TransactionStatus = ({route}: Props) => {
 
                                 {statusInfo.status === 'success' && (
                                     <Success
-                                        style={[tailwind('self-center')]}
+                                        className="self-center"
                                         fill={ColorScheme.SVG.Default}
                                         height={128}
                                         width={128}
@@ -233,12 +217,10 @@ const TransactionStatus = ({route}: Props) => {
                                 )}
                             </View>
 
-                            <View style={[tailwind('w-4/5 mt-4 items-center')]}>
+                            <View className="w-4/5 mt-4 items-center">
                                 <Text
-                                    style={[
-                                        tailwind('text-lg font-bold'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-lg font-bold"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {statusInfo.status === 'success'
                                         ? t('tx_sent')
                                         : t('tx_failed')}
@@ -246,17 +228,13 @@ const TransactionStatus = ({route}: Props) => {
                             </View>
 
                             {isAdvancedMode && (
-                                <View style={[tailwind('items-center w-4/5')]}>
+                                <View className="items-center w-4/5">
                                     <Text
-                                        style={[
-                                            tailwind(
-                                                'text-sm text-center mt-4',
-                                            ),
-                                            {
+                                        className="text-sm text-center mt-4"
+                                        style={{
                                                 color: ColorScheme.Text
                                                     .GrayedText,
-                                            },
-                                        ]}>
+                                        }}>
                                         {statusInfo.status === 'success'
                                             ? statusInfo.txId
                                             : statusInfo.message}
@@ -267,29 +245,21 @@ const TransactionStatus = ({route}: Props) => {
 
                         {statusInfo.status === 'success' && (
                             <PlainButton
-                                style={[
-                                    tailwind('absolute self-center'),
-                                    {bottom: bottomOffset},
-                                ]}
+                                className="absolute self-center"
+                                style={{bottom: bottomOffset}}
                                 onPress={() => {
                                     openMempoolSpace(statusInfo.txId);
                                 }}>
                                 <Text
-                                    style={[
-                                        tailwind('font-bold text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="font-bold text-sm"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {buttonText}
                                 </Text>
                             </PlainButton>
                         )}
 
                         <View
-                            style={[
-                                tailwind(
-                                    'absolute bottom-0 items-center w-full',
-                                ),
-                            ]}>
+                            className="absolute bottom-0 items-center w-full">
                             <LongBottomButton
                                 onPress={() => {
                                     navigation.dispatch(

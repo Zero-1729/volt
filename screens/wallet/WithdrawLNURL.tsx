@@ -15,11 +15,8 @@ import {useTranslation} from 'react-i18next';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
-import {BreezEventVariant} from '@breeztech/react-native-breez-sdk';
 
 import {capitalizeFirst} from '../../modules/transform';
-
-import {useTailwind} from 'tailwind-rn';
 
 import Color from '../../constants/Color';
 
@@ -35,6 +32,7 @@ import {
     withdrawLnurl,
     LnUrlWithdrawRequestData,
     LnUrlWithdrawResultVariant,
+    BreezEventVariant,
 } from '@breeztech/react-native-breez-sdk';
 
 import BigNumber from 'bignumber.js';
@@ -44,8 +42,6 @@ type Props = NativeStackScreenProps<InitStackParamList, 'WithdrawLNURL'>;
 
 const WithdrawLNURL = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -150,12 +146,8 @@ const WithdrawLNURL = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind(
-                        'h-full w-full items-center justify-center',
-                    ),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                className="h-full w-full items-center justify-center"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <PlainButton
                     onPress={() => {
                         navigation.dispatch(CommonActions.reset({
@@ -163,61 +155,51 @@ const WithdrawLNURL = ({route}: Props) => {
                             routes: [{name: 'HomeScreen'}],
                         }));
                     }}
-                    style={[tailwind('absolute top-6 left-6 rounded-full p-3'), {flex: 1}]}>
+                    className="absolute top-6 left-6 rounded-full p-3" style={{flex: 1}}>
                     <Close fill={'white'} />
                 </PlainButton>
 
                 {/*Display the invoice data */}
                 <View
+                    className="w-5/6 p-6 items-center flex justify-between rounded"
                     style={[
-                        tailwind(
-                            'w-5/6 p-6 items-center flex justify-between rounded',
-                        ),
                         styles.mainContainer,
                     ]}>
                     {/* Loading LNURL data */}
                     {loadingWithdrawal && !fetchError && (
-                        <View style={[tailwind('w-full items-center justify-center flex-row')]}>
+                        <View className="w-full items-center justify-center flex-row">
                             <VText
-                                style={[
-                                    tailwind('font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('loading_lnurlwithdraw_data')}
                             </VText>
-                            <ActivityIndicator color={ColorScheme.Background.Default} style={tailwind('ml-2')} />
+                            <ActivityIndicator color={ColorScheme.Background.Default} className="ml-2" />
                         </View>
                     )}
 
                     {/* Loading withdraw */}
                     {processingWithdraw && !fetchError && (
-                        <View style={[tailwind('w-full items-center justify-center flex-row')]}>
+                        <View className="w-full items-center justify-center flex-row">
                             <VText
-                                style={[
-                                    tailwind('font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('loading_lnurlwithdraw')}
                             </VText>
-                            <ActivityIndicator color={ColorScheme.Background.Default} style={tailwind('ml-2')} />
+                            <ActivityIndicator color={ColorScheme.Background.Default} className="ml-2" />
                         </View>
                     )}
 
                     {/* Display error */}
                     {fetchError && (
-                        <View style={[tailwind('w-full items-center justify-center flex')]}>
+                        <View className="w-full items-center justify-center flex">
                             <VText
-                                style={[
-                                    tailwind('font-bold text-xl mb-2'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="font-bold text-xl mb-2"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(e('error'))}
                             </VText>
                             <VText
-                                style={[
-                                    tailwind('text-base text-center'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-base text-center"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {fetchErrorMessage}
                             </VText>
                         </View>
@@ -225,7 +207,7 @@ const WithdrawLNURL = ({route}: Props) => {
 
                     {!!maxAmountMsat && !processingWithdraw && (
                         <View
-                            style={[tailwind('w-full items-center flex mb-2')]}>
+                            className="w-full items-center flex mb-2">
                             <FiatBalance
                                 balance={ new BigNumber(maxAmountMsat / 1_000).toNumber()}
                                 loading={false}
@@ -234,8 +216,8 @@ const WithdrawLNURL = ({route}: Props) => {
                                 ignoreHideBalance={true}
                             />
                             <View
+                                className="w-full mt-4"
                                 style={[
-                                    tailwind('w-full mt-4'),
                                     styles.invoiceLineBreaker,
                                     {
                                         borderColor:
@@ -244,16 +226,10 @@ const WithdrawLNURL = ({route}: Props) => {
                                 ]}
                             />
                             <View
-                                style={[
-                                    tailwind(
-                                        'w-full items-center flex-row justify-between mt-4 mb-2',
-                                    ),
-                                ]}>
+                                className="w-full items-center flex-row justify-between mt-4 mb-2">
                                 <VText
-                                    style={[
-                                        tailwind('font-bold'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="font-bold"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     Amount
                                 </VText>
                                 <DisplaySatsAmount
@@ -272,8 +248,8 @@ const WithdrawLNURL = ({route}: Props) => {
                     {!processingWithdraw && description && (
                         <>
                             <View
+                                className="w-full mb-4 opacity-20"
                                 style={[
-                                    tailwind('w-full mb-4 opacity-20'),
                                     styles.invoiceLineBreaker,
                                     {
                                         borderColor:
@@ -285,10 +261,8 @@ const WithdrawLNURL = ({route}: Props) => {
                             <Text
                                 numberOfLines={2}
                                 ellipsizeMode="middle"
-                                style={[
-                                    tailwind('font-bold'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="font-bold"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {description}
                             </Text>
                         </>
@@ -297,14 +271,16 @@ const WithdrawLNURL = ({route}: Props) => {
 
                 {/* Show cancel */}
                 {fetchError && (
-                    <View style={[tailwind('items-center justify-center absolute px-4 py-2'), {bottom: NativeWindowMetrics.height * 0.15}]}>
+                    <View
+                        className="items-center justify-center absolute px-4 py-2"
+                        style={{bottom: NativeWindowMetrics.height * 0.15}}>
                         <PlainButton onPress={() => {
                             navigation.dispatch(CommonActions.reset({
                                 index: 0,
                                 routes: [{name: 'HomeScreen'}],
                             }));
                         }}>
-                            <VText style={[tailwind('text-white font-bold')]}>{capitalizeFirst(t('cancel'))}</VText>
+                            <VText className="text-white font-bold">{capitalizeFirst(t('cancel'))}</VText>
                         </PlainButton>
                     </View>
                 )}

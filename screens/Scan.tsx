@@ -36,8 +36,6 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {LongBottomButton, LongButton, PlainButton} from '../components/button';
 
 import Close from '../assets/svg/x-24.svg';
@@ -66,20 +64,16 @@ type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
 const LoadingView = (props: any) => {
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     return (
         <SafeAreaView
+            className="justify-center items-center"
             style={[
                 styles.flexed,
                 {backgroundColor: ColorScheme.Background.Primary},
-                tailwind('justify-center items-center'),
             ]}>
             <Text
-                style={[
-                    {color: ColorScheme.Text.DescText},
-                    tailwind('text-sm text-center'),
-                ]}>
+                className="text-sm text-center"
+                style={{color: ColorScheme.Text.DescText}}>
                 {/* Only show loading if actually loading */}
                 {props.isCamAvailable === false
                     ? 'Camera is not available'
@@ -92,28 +86,22 @@ const LoadingView = (props: any) => {
 const RequestPermView = () => {
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     return (
         <SafeAreaView
+            className="justify-center items-center bg-black"
             style={[
                 styles.flexed,
-                tailwind('justify-center items-center bg-black'),
             ]}>
             <Text
-                style={[
-                    {color: ColorScheme.Text.Alt},
-                    tailwind('text-sm text-center mb-6'),
-                ]}>
+                className="text-sm text-center mb-6"
+                style={{color: ColorScheme.Text.Alt}}>
                 Camera Permission Denied
             </Text>
 
-            <View style={[tailwind('w-4/5')]}>
+            <View className="w-4/5">
                 <LongButton
-                    style={[
-                        {color: ColorScheme.Text.DescText},
-                        tailwind('text-sm text-center'),
-                    ]}
+                    className="text-sm text-center"
+                    style={{color: ColorScheme.Text.DescText}}
                     onPress={openSettings}
                     backgroundColor={'white'}
                     textColor={'black'}
@@ -129,7 +117,6 @@ const openSettings = () => {
 };
 
 const Scan = ({route}: Props) => {
-    const tailwind = useTailwind();
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
 
@@ -565,56 +552,44 @@ const Scan = ({route}: Props) => {
             edges={['top', 'bottom', 'left', 'right']}>
             {grantedPermission === Status.AUTHORIZED && (
                 <View
+                    className="items-center justify-center h-full w-full"
                     style={[
-                        tailwind(
-                            'items-center justify-center h-full w-full',
-                        ),
                         {backgroundColor: ColorScheme.Background.Primary},
                         styles.flexed,
                     ]}>
                     <View
+                        className="absolute z-10 w-full items-center justify-center"
                         style={[
-                            tailwind(
-                                'absolute z-10 w-full items-center justify-center',
-                            ),
                             styles.headerContent,
                         ]}>
                         <View
-                            style={[
-                                tailwind(
-                                    'flex-row w-full items-center justify-center',
-                                ),
-                            ]}>
+                            className="flex-row w-full items-center justify-center">
                             {/* Screen header */}
-                            <View style={[
-                                tailwind('items-center rounded-full p-3'),
+                            <View className="items-center rounded-full p-3" style={[
                                 styles.scannerHeader,
                             ]}>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm font-bold'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm font-bold"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {dynamicHeading}
                                 </Text>
                             </View>
                         </View>
 
-                        <View style={[tailwind('mt-4 p-3 rounded-full'), styles.qrHelpText]}>
+                        <View className="mt-4 p-3 rounded-full" style={[styles.qrHelpText]}>
                             <Text
-                                style={[
-                                    tailwind('text-sm text-center'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm text-center"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {!isGenericScan ? t('scan_message_generic') : t('scan_message')}
                             </Text>
                         </View>
                     </View>
 
-                    <View style={[tailwind('absolute items-center'), styles.cameraContainer]}>
+                    <View className="absolute items-center" style={[styles.cameraContainer]}>
                         <PlainButton
                             onPress={closeScreen}
-                            style={[tailwind('absolute z-10 top-6 left-6 rounded-full p-3'), styles.opaqueBG]}>
+                            className="absolute z-10 top-6 left-6 rounded-full p-3"
+                            style={[styles.opaqueBG]}>
                             <Close fill={'white'} />
                         </PlainButton>
 
@@ -623,13 +598,11 @@ const Scan = ({route}: Props) => {
                                 onPress={() => {
                                     setFlashOn(!flashOn);
                                 }}
-                                style={[
-                                    tailwind('absolute z-10 top-6 right-6 rounded-full p-3'),
-                                    // eslint-disable-next-line react-native/no-inline-styles
-                                    {
+                                className="absolute z-10 top-6 right-6 rounded-full p-3"
+                                // eslint-disable-next-line react-native/no-inline-styles
+                                style={{
                                         backgroundColor: !flashOn ? '#00000080' : '#FFFFFFFF',
-                                    },
-                                ]}>
+                                    }}>
                                     <TorchIcon
                                         fill={!flashOn ? 'white' : 'black'}
                                     />
@@ -638,8 +611,8 @@ const Scan = ({route}: Props) => {
                         {/* Camera Scan View Container */}
                         {device && (
                             <Camera
+                                className="w-full h-full"
                                 style={[
-                                    tailwind('w-full h-full'),
                                     {backgroundColor: ColorScheme.Background.Primary},
                                     styles.cameraFlexed,
                                 ]}

@@ -3,7 +3,6 @@
 import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useNavigation} from '@react-navigation/native';
@@ -29,7 +28,6 @@ const ChangePIN = () => {
     const [tmpPIN, setTmpPIN] = useState<string>('');
 
     const navigation = useNavigation();
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {pinAttempts, setPINAttempts} = useContext(AppStorageContext);
@@ -88,81 +86,62 @@ const ChangePIN = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={[tailwind('items-center h-full w-full')]}>
+            <View className="w-full h-full items-center">
+                <View className="items-center h-full w-full">
                     <View
-                        style={[
-                            tailwind('w-5/6 absolute top-0'),
-                            {zIndex: 9999},
-                        ]}>
+                        className="w-5/6 absolute top-0"
+                        style={{zIndex: 9999}}>
                         <PlainButton
-                            style={tailwind('items-center flex-row -ml-1')}
+                            className="items-center flex-row -ml-1"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
                                 fill={ColorScheme.SVG.Default}
                             />
                             <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="ml-2 text-sm font-medium"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('back'))}
                             </Text>
                         </PlainButton>
                     </View>
 
                     <View
-                        style={[
-                            tailwind('h-1/2 w-5/6 justify-center items-center'),
-                        ]}>
+                        className="h-1/2 w-5/6 justify-center items-center">
                         <Text
-                            style={[
-                                tailwind('text-base mb-4 font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-base mb-4 font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('type_4_digit_pin')}
                         </Text>
                         <Text
-                            style={[
-                                tailwind('text-base text-center mb-6'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center mb-6"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('type_4_digit_pin_desc')}
                         </Text>
 
-                        <View style={[tailwind('flex mt-12 items-center')]}>
+                        <View className="flex mt-12 items-center">
                             {firstWrong && (
                                 <>
                                     <View
-                                        style={[
-                                            tailwind('items-center mb-4 w-5/6'),
-                                        ]}>
+                                        className="items-center mb-4 w-5/6">
                                         {pinAttempts ===
                                         MAX_PIN_ATTEMPTS - 1 ? (
                                             <Text
-                                                style={[
-                                                    tailwind(
-                                                        'text-sm text-center',
-                                                    ),
-                                                    {
+                                                className="text-sm text-center"
+                                                style={{
                                                         color: ColorScheme.Text
                                                             .Default,
-                                                    },
-                                                ]}>
+                                                    }}>
                                                 {t('last_attempt_warning')}
                                             </Text>
                                         ) : (
                                             <Text
-                                                style={[
-                                                    tailwind('text-sm'),
-                                                    {
+                                                className="text-sm"
+                                                style={{
                                                         color: ColorScheme.Text
                                                             .Default,
-                                                    },
-                                                ]}>
+                                                    }}>
                                                 {t('pin_attempts', {
                                                     attempts:
                                                         MAX_PIN_ATTEMPTS -
@@ -173,24 +152,19 @@ const ChangePIN = () => {
                                     </View>
                                     <PlainButton onPress={routeToResetPIN}>
                                         <View
-                                            style={[
-                                                tailwind(
-                                                    'items-center rounded-full py-1 px-4 mb-6',
-                                                ),
-                                                {
+                                            className="items-center rounded-full py-1 px-4 mb-6"
+                                            style={[{
                                                     backgroundColor:
                                                         ColorScheme.Background
                                                             .Greyed,
                                                 },
                                             ]}>
                                             <Text
-                                                style={[
-                                                    tailwind('text-base'),
-                                                    {
+                                                className="text-base"
+                                                style={{
                                                         color: ColorScheme.Text
                                                             .DescText,
-                                                    },
-                                                ]}>
+                                                    }}>
                                                 {t('forgot_pin')}
                                             </Text>
                                         </View>
@@ -199,17 +173,15 @@ const ChangePIN = () => {
                             )}
 
                             <View
-                                style={[
-                                    tailwind('flex-row items-center mb-4'),
-                                ]}>
+                                className="flex-row items-center mb-4">
                                 {Array(4)
                                     .fill(null)
                                     .map((_, i) => (
                                         <View
                                             key={i}
+                                            className="rounded-full"
                                             style={[
                                                 styles.dot,
-                                                tailwind('rounded-full'),
                                                 {
                                                     borderColor:
                                                         ColorScheme.Background
@@ -231,10 +203,8 @@ const ChangePIN = () => {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('w-full absolute'),
-                            {bottom: NativeWindowMetrics.bottom + 32},
-                        ]}>
+                        className="w-full absolute"
+                        style={{bottom: NativeWindowMetrics.bottom + 32}}>
                         <PinNumpad
                             pin={tmpPIN}
                             onPinChange={updateTmpPIN}

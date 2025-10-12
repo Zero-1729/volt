@@ -123,39 +123,54 @@ Due to the way Tailwind works, you'll need to run the following command to build
 $ yarn run dev:tailwind
 ```
 
+### Android
+ 
+```sh
+# Using npm
+npm run android
+ 
+# OR using Yarn
+yarn android
+```
 
-### Running on Android (Virtual) Device
+#### Running on Android (Virtual) Device
 
 - Download and run the latest (stable) version of Android Studio.
 - Launch Android Studio, and Open the project's android folder (`volt/android`).
 - Open the `build.gradle` file in the current folder (`volt/android`), it'll take some time for Android Studio to set up.
 - Navigate to `AVD Manager` under the `Tools` sections of the menu, and click "*Create Virtual Device...*" to create a virtual device.
 - Launch the newly created virtual device by clicking the `Play` in the `Actions` section of the menu.
-
-After setting up the virtual device, run the following in the project root (`volt/`) to launch the emulator:
-
-> The command builds the app and installs it on the virtual device or a connected Android device (if detected). Once launched, the app would take time loading the dependencies. 
-
+ 
+### iOS
+ 
+For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+ 
+The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+ 
 ```sh
-$ yarn run android
+bundle install
 ```
-
-### Running on IOS
-
-To run the app using XCode's IOS emulator, you'll need to install the CocoaPod dependencies:
-
+ 
+Then, and every time you update your native dependencies, run:
+ 
 ```sh
-$ cd ios
-$ yarn pod install
+bundle exec pod install
 ```
-
-After installing the dependencies, to launch the app on the IOS emulator you'll need to navigate to the project root (`volt`) and run:
-
-> Note: If you have issues running the command above, you can also open Xcode and open the `ios/volt.xcworkspace` file and build/run the app from there.
-
+ 
+For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+ 
 ```sh
-yarn run ios
+# Using npm
+npm run ios
+ 
+# OR using Yarn
+yarn ios
 ```
+ 
+If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+
+This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+
 
 # Responsible Disclosure
 
