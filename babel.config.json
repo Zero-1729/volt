@@ -22,7 +22,8 @@
             {
                 "globals": ["__scanCodes"]
             }
-        ]
+        ],
+        "react-native-worklets/plugin"
     ],
     "env": {
         "production": {
