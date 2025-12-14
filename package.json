@@ -30,6 +30,7 @@
     "@backpackapp-io/react-native-toast": "^0.13.0",
     "@bitcoinerlab/descriptors": "https://github.com/Zero-1729/descriptors.git",
     "@bitcoinerlab/secp256k1": "^1.1.0",
+    "@breeztech/breez-sdk-spark-react-native": "^0.6.3",
     "@breeztech/react-native-breez-sdk": "^0.8.1-rc3",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@formatjs/intl-datetimeformat": "^6.12.2",
@@ -142,5 +143,5 @@
   "resolutions": {
     "browserify-sign": "4.2.2"
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.12.0"
 }

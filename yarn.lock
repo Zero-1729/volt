@@ -1632,6 +1632,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@breeztech/breez-sdk-spark-react-native@npm:^0.6.3":
+  version: 0.6.3
+  resolution: "@breeztech/breez-sdk-spark-react-native@npm:0.6.3"
+  dependencies:
+    uniffi-bindgen-react-native: "npm:^0.28.3-5"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/c07069d3c5169edfa5dfdcdd6f849006bb76f682d385cc584a7c1ad3b999bd47dcf221a3a09d7d47ae23f62263a5bf22e4c3802753274b3c4b701aeb16f2c926
+  languageName: node
+  linkType: hard
+
 "@breeztech/react-native-breez-sdk@npm:^0.8.1-rc3":
   version: 0.8.1-rc3
   resolution: "@breeztech/react-native-breez-sdk@npm:0.8.1-rc3"
@@ -12023,6 +12035,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uniffi-bindgen-react-native@npm:^0.28.3-5":
+  version: 0.28.3-5
+  resolution: "uniffi-bindgen-react-native@npm:0.28.3-5"
+  bin:
+    ubrn: bin/cli.cjs
+    uniffi-bindgen-react-native: bin/cli.cjs
+  checksum: 10/75a2d974e38640c6aa4fc046b6cb2c37c50cef972671d37c2ea0c8b56506d69ae499345b7722d832605c49b424dabc647280f5064983d3929845ae91001fbe86
+  languageName: node
+  linkType: hard
+
 "unique-filename@npm:^4.0.0":
   version: 4.0.0
   resolution: "unique-filename@npm:4.0.0"
@@ -12211,6 +12233,7 @@ __metadata:
     "@backpackapp-io/react-native-toast": "npm:^0.13.0"
     "@bitcoinerlab/descriptors": "https://github.com/Zero-1729/descriptors.git"
     "@bitcoinerlab/secp256k1": "npm:^1.1.0"
+    "@breeztech/breez-sdk-spark-react-native": "npm:^0.6.3"
     "@breeztech/react-native-breez-sdk": "npm:^0.8.1-rc3"
     "@craftzdog/react-native-buffer": "npm:^6.0.5"
     "@formatjs/intl-datetimeformat": "npm:^6.12.2"
