@@ -22,12 +22,6 @@ import {
 import VText from '../../components/text';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
-
-import {
-    receivePayment,
-    LnInvoice,
-    BreezEventVariant,
-} from '@breeztech/react-native-breez-sdk';
 import {EBreezDetails} from '../../types/enums';
 
 import {Toasts} from '@backpackapp-io/react-native-toast';
@@ -62,9 +56,6 @@ import Close from '../../assets/svg/x-24.svg';
 import Info from '../../assets/svg/info-16.svg';
 import NFCIcon from '../../assets/svg/nfc.svg';
 
-import BTCIcon from '../../assets/svg/btc-symbol.svg';
-import LNIcon from '../../assets/svg/ln.svg';
-
 import {
     DisplayFiatAmount,
     DisplaySatsAmount,
@@ -79,13 +70,15 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {PlainButton} from '../../components/button';
 
 import NativeDims from '../../constants/NativeWindowMetrics';
-import {runOnJS, useSharedValue} from 'react-native-reanimated';
+import {useSharedValue} from 'react-native-reanimated';
 
 import Dot from '../../components/dots';
 
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+import { Bolt11InvoiceDetails, Bolt12InvoiceDetails, InputType_Tags, ReceivePaymentMethod, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { useWallet } from '../../contexts/walletContext';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
@@ -99,6 +92,8 @@ const Receive = ({route}: Props) => {
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    const _wallet = useWallet();
 
     const {
         currentWalletID,
@@ -118,7 +113,9 @@ const Receive = ({route}: Props) => {
         return walletData.type === 'unified';
     }, [walletData]);
 
-    const [LNInvoice, setLNInvoice] = useState<LnInvoice>();
+    const [bolt11, setBolt11] = useState<Bolt11InvoiceDetails>();
+    const [bolt12, setBolt12] = useState<Bolt12InvoiceDetails>();
+    const [isBolt11, setIsBolt11] = useState<boolean>(false);
     const [feeMessage, setFeeMessage] = useState<string>('');
     const [loadingInvoice, setLoadingInvoice] = useState(
         walletData.type === 'unified',
@@ -192,24 +189,17 @@ const Receive = ({route}: Props) => {
         return mempoolInfo.mempoolCongested;
     }, [mempoolInfo.mempoolCongested]);
 
-    const bolt11Invoice = useMemo(() => {
-        return LNInvoice?.bolt11;
-    }, [LNInvoice]);
-    const bolt11AmountMsat = useMemo(() => {
-        return LNInvoice?.amountMsat;
-    }, [LNInvoice]);
-
     const displayExpiry = useMemo(() => {
-        if (LNInvoice) {
+        if (isBolt11) {
             return (
                 <View className="absolute right-0">
-                    <ExpiryTimer expiryDate={LNInvoice.expiry} />
+                    <ExpiryTimer expiryDate={Number(bolt11?.expiry)} />
                 </View>
             );
         }
 
         return <></>;
-    }, [LNInvoice]);
+    }, [isBolt11, bolt11]);
 
     const isAmountInvoice = useMemo(() => {
         // Show if is a LN wallet & online
@@ -231,19 +221,19 @@ const Receive = ({route}: Props) => {
     }, [walletData.address.address]);
 
     const routeToBoltNFC = useCallback(() => {
-        if (bolt11AmountMsat) {
+        if (isBolt11) {
             navigation.dispatch(
                 CommonActions.navigate('WalletRoot', {
                     screen: 'BoltNFC',
                     params: {
-                        amountMsat: bolt11AmountMsat,
+                        amountMsat: bolt11?.amountMsat,
                         description: route.params.lnDescription,
                         fromQuickActions: false,
                     },
                 }),
             );
         }
-    }, [bolt11AmountMsat, navigation, route.params.lnDescription]);
+    }, [bolt11?.amountMsat, isBolt11, navigation, route.params.lnDescription]);
 
     useEffect(() => {
         // Update the request amount if it is passed in as a parameter
@@ -269,25 +259,38 @@ const Receive = ({route}: Props) => {
         const ln_desc = route.params.lnDescription
             ? route.params.lnDescription : '';
 
+        const description = ln_desc;
+
         try {
-            const receivePaymentResp = await receivePayment({
-                amountMsat: mSats,
-                description: ln_desc,
-            });
+            const response = _wallet.receivePayment({
+                paymentMethod: new ReceivePaymentMethod.Bolt11Invoice({
+                    description,
+                    amountSats: BigInt(mSats / 1_000),
+                })
+            })
 
-            const openingFee = receivePaymentResp.openingFeeMsat
-                ? receivePaymentResp.openingFeeMsat / 1_000
-                : 0;
+            const paymentRequest = (await response).paymentRequest;
+            const receiveResp = await response;
+            const receiveFeeSats = receiveResp.fee
 
-            runOnJS(setLNInvoice)(receivePaymentResp.lnInvoice);
+            const parsedLN = await _wallet.parseInput(paymentRequest);
 
-            if (openingFee > 0) {
+            if (parsedLN.tag === InputType_Tags.Bolt11Invoice) {
+                setIsBolt11(parsedLN.tag === InputType_Tags.Bolt11Invoice);
+                setBolt11(parsedLN.inner[0]);
+            } else if (parsedLN.tag === InputType_Tags.Bolt12Invoice) {
+                setBolt12(parsedLN.inner[0]);
+            } else {
+                throw new Error('Invalid invoice type received');
+            }
+
+            if (receiveFeeSats > 0) {
                 setFeeMessage(
                     t('ln_fee_amount_message', {
-                        sats: openingFee,
+                        sats: receiveFeeSats,
                         currency: appFiatCurrency.symbol,
                         fiat: normalizeFiat(
-                            new BigNumber(openingFee),
+                            new BigNumber(receiveFeeSats),
                             fiatRate.rate,
                         ),
                     }),
@@ -304,16 +307,9 @@ const Receive = ({route}: Props) => {
                     },
                 }),
             );
+            return error;
         }
-    }, [
-        state.bitcoinValue,
-        route.params.sats,
-        route.params.lnDescription,
-        t,
-        appFiatCurrency.symbol,
-        fiatRate.rate,
-        navigation,
-    ]);
+    }, [state.bitcoinValue, route.params.sats, route.params.lnDescription, _wallet, t, appFiatCurrency.symbol, fiatRate.rate, navigation]);
 
     const closeScreen = useCallback(() => {
         // Note: we route back get back to amount and back here
@@ -344,7 +340,7 @@ const Receive = ({route}: Props) => {
     }, [processLNInvoice]);
 
     useEffect(() => {
-        if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
+        if (breezEvent.type === SdkEvent_Tags.PaymentSucceeded) {
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
@@ -356,7 +352,7 @@ const Receive = ({route}: Props) => {
             return;
         }
 
-        if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
+        if (breezEvent.type === SdkEvent_Tags.PaymentFailed) {
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
@@ -431,27 +427,6 @@ const Receive = ({route}: Props) => {
                         color={ColorScheme.Background.Default}
                         isPiecesGlued={true}
                         pieceBorderRadius={4}
-                        children={(): ReactElement => {
-                            return (
-                                <View
-                                    className="w-full h-full"
-                                    style={[
-                                        styles.qrLogoContainer,
-                                    ]}>
-                                    <View
-                                        className="rounded-full items-center justify-center"
-                                        style={[
-                                            {
-                                                backgroundColor: 'black',
-                                                height: 54,
-                                                width: 54,
-                                            },
-                                        ]}>
-                                        <BTCIcon width={32} height={32} />
-                                    </View>
-                                </View>
-                            );
-                        }}
                     />
                 </View>
 
@@ -527,13 +502,12 @@ const Receive = ({route}: Props) => {
                             );
                         }}>
                         <EditIcon
-                            className="mr-2"
                             fill={ColorScheme.SVG.Default}
                             width={16}
                             height={16}
                         />
                         <Text
-                            className="font-bold text-center text-sm"
+                            className="font-bold text-center text-sm ml-2"
                             style={{color: ColorScheme.Text.Default}}>
                             {capitalizeFirst(t('edit'))}
                         </Text>
@@ -555,13 +529,12 @@ const Receive = ({route}: Props) => {
                                     ColorScheme.Background.Greyed,
                             }}>
                             <ShareIcon
-                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                                 width={16}
                                 height={16}
                             />
                             <Text
-                                className="text-sm font-bold"
+                                className="text-sm font-bold ml-2"
                                 style={{
                                     color: ColorScheme.Text.Default,
                                 }}>
@@ -596,7 +569,7 @@ const Receive = ({route}: Props) => {
 
     const lnPanel = useCallback((): ReactElement => {
         const copyToClip = () => {
-            copyDescToClipboard(bolt11Invoice as string);
+            copyDescToClipboard(bolt11?.invoice?.bolt11?.toString() || '');
         };
 
         return (
@@ -644,31 +617,12 @@ const Receive = ({route}: Props) => {
                             style={{
                                 backgroundColor: 'white',
                             }}
-                            data={bolt11Invoice}
+                            data={isBolt11 ? bolt11?.invoice.bolt11 || '' : bolt12?.invoice.invoice || ''}
                             padding={4}
                             pieceSize={3.75}
                             color={ColorScheme.Background.Default}
                             isPiecesGlued={true}
                             pieceBorderRadius={2}
-                            children={(): ReactElement => {
-                                return (
-                                    <View
-                                        className="w-full h-full"
-                                        style={[
-                                            styles.qrLogoContainer,
-                                        ]}>
-                                        <View
-                                            className="rounded-full items-center justify-center"
-                                            style={{
-                                                backgroundColor: 'black',
-                                                height: 54,
-                                                width: 54,
-                                            }}>
-                                            <LNIcon width={32} height={32} />
-                                        </View>
-                                    </View>
-                                );
-                            }}
                         />
                     </View>
                 )}
@@ -687,7 +641,7 @@ const Receive = ({route}: Props) => {
                                 ellipsizeMode="middle"
                                 numberOfLines={1}
                                 style={[{color: ColorScheme.Text.Default}]}>
-                                {bolt11Invoice}
+                                {isBolt11 ? bolt11?.invoice.bolt11 : bolt12?.invoice.invoice}
                             </Text>
                         </PlainButton>
                     </View>
@@ -708,7 +662,7 @@ const Receive = ({route}: Props) => {
                         className={
                             `items-center ${
                                 Platform.OS === 'ios'
-                                    ? 'w-1/2 justify-between'
+                                    ? 'w-1/2 justify-around'
                                     : 'w-5/6 justify-around'
                             } ${
                                 langDir === 'right'
@@ -731,13 +685,12 @@ const Receive = ({route}: Props) => {
                                 );
                             }}>
                             <EditIcon
-                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                                 width={16}
                                 height={16}
                             />
                             <Text
-                                className="font-bold text-center text-sm"
+                                className="font-bold text-center text-sm ml-2"
                                 style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('edit'))}
                             </Text>
@@ -747,9 +700,9 @@ const Receive = ({route}: Props) => {
                         <PlainButton
                             onPress={() => {
                                 Share.share({
-                                    message: bolt11Invoice as string,
+                                    message: bolt11?.invoice.bolt11,
                                     title: 'Share Address',
-                                    url: bolt11Invoice as string,
+                                    url: bolt11?.invoice.source.bip21Uri?.toString() || '',
                                 });
                             }}>
                             <View
@@ -759,13 +712,12 @@ const Receive = ({route}: Props) => {
                                         ColorScheme.Background.Greyed,
                                 }}>
                                 <ShareIcon
-                                    className="mr-2"
                                     fill={ColorScheme.SVG.Default}
                                     width={16}
                                     height={16}
                                 />
                                 <Text
-                                    className="text-sm font-bold"
+                                    className="text-sm font-bold ml-2"
                                     style={{
                                         color: ColorScheme.Text.Default,
                                     }}>
@@ -803,23 +755,7 @@ const Receive = ({route}: Props) => {
                 )}
             </View>
         );
-    }, [
-        loadingInvoice,
-        ColorScheme.Text.DescText,
-        ColorScheme.Text.Default,
-        ColorScheme.Background.QRBorder,
-        ColorScheme.Background.Default,
-        ColorScheme.Background.Greyed,
-        ColorScheme.SVG.Default,
-        t,
-        isAdvancedMode,
-        bolt11Invoice,
-        feeMessage,
-        langDir,
-        routeToBoltNFC,
-        copyDescToClipboard,
-        navigation,
-    ]);
+    }, [loadingInvoice, ColorScheme.Text.DescText, ColorScheme.Text.Default, ColorScheme.Background.QRBorder, ColorScheme.Background.Default, ColorScheme.Background.Greyed, ColorScheme.SVG.Default, t, isAdvancedMode, isBolt11, bolt11?.invoice.bolt11, bolt11?.invoice.source.bip21Uri, bolt12?.invoice.invoice, feeMessage, langDir, routeToBoltNFC, copyDescToClipboard, navigation]);
 
     const panels = useMemo((): Slide[] => {
         return isNetOn ? [lnPanel, onchainPanel] : [onchainPanel];
@@ -950,9 +886,5 @@ const styles = StyleSheet.create({
         marginTop: 16,
         width: 26,
         position: 'absolute',
-    },
-    qrLogoContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 });
