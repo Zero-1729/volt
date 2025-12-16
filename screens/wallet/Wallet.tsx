@@ -16,18 +16,6 @@ import VText from '../../components/text';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
-import {
-    SwapInfo,
-    nodeInfo,
-    receiveOnchain,
-    onchainPaymentLimits,
-    OnchainPaymentLimitsResponse,
-    BreezEventVariant,
-    BreezEvent,
-} from '@breeztech/react-native-breez-sdk';
-
-import BDK from 'bdk-rn';
-
 import BigNumber from 'bignumber.js';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
@@ -38,15 +26,11 @@ import Color from '../../constants/Color';
 
 import Dots from '../../assets/svg/kebab-horizontal-24.svg';
 import Box from '../../assets/svg/inbox-24.svg';
-import SwapIcon from '../../assets/svg/arrow-switch-16.svg';
 import HomeIcon from '../../assets/svg/home-fill-24.svg';
 
-import {getBdkWalletBalance, createBDKWallet} from '../../modules/bdk';
-import {syncBDKWallet, fetchOnchainTransactions} from '../../modules/shared';
 import {
     getMiniWallet,
     checkNetworkIsReachable,
-    getLNPayments,
 } from '../../modules/wallet-utils';
 
 import {PlainButton} from '../../components/button';
@@ -60,25 +44,20 @@ import {UnifiedTransactionListItem} from '../../components/transaction';
 import {
     TBalance,
     TTransaction,
-    TSwapInfo,
-    TBoltzSwapInfo,
     TRateResponse,
     TRateObject,
 } from '../../types/wallet';
 
 import {capitalizeFirst} from '../../modules/transform';
-import {fetchBoltzSwapInfo} from '../../modules/boltz';
 
-import Swap from './../../components/swap';
-import Send from './../../components/send';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {SwapType} from '../../types/enums';
 import {fetchFiatRate} from '../../modules/currency';
 import {TRate} from '../../types/settings';
 
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../../components/toast';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+import { SdkEvent, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { useWallet } from '../../contexts/walletContext';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;
 
@@ -89,17 +68,6 @@ const Wallet = ({route}: Props) => {
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-    const [swapOut, setSwapOut] = useState<TSwapInfo>({} as TSwapInfo);
-    const [swapIn, setSwapIn] = useState<TSwapInfo>({} as TSwapInfo);
-    const [loadingSwapOutInfo, setLoadingSwapOutInfo] = useState<boolean>(true);
-    const [loadingSwapInInfo, setLoadingSwapInInfo] = useState<boolean>(true);
-    const [updatedLNBalance, setUpdatedLNBalance] = useState<boolean>(false);
-    const [swapInProgress, setSwapInProgress] = useState<boolean>(false);
-    const [connectedToBreezServices, setConnectedToBreezServices] =
-        useState<boolean>(true);
-    const [updatedOnchainBalance, setUpdatedOBalance] =
-        useState<boolean>(false);
     const networkState = useNetInfo();
     const isNetOn = checkNetworkIsReachable(networkState);
 
@@ -109,12 +77,8 @@ const Wallet = ({route}: Props) => {
         currentWalletID,
         getWalletData,
         updateWalletBalance,
-        updateWalletTransactions,
         updateWalletPayments,
-        updateWalletUTXOs,
         hideTotalBalance,
-        updateWalletAddress,
-        electrumServerURL,
         isAdvancedMode,
         appFiatCurrency,
         updateFiatRate,
@@ -130,6 +94,8 @@ const Wallet = ({route}: Props) => {
     const [loadingBalance, setLoadingBalance] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
+    // Breez wallet
+    const _wallet = useWallet();
     // Get current wallet data
     const walletData = getWalletData(currentWalletID);
 
@@ -139,38 +105,7 @@ const Wallet = ({route}: Props) => {
     const CardAccent = ColorScheme.WalletColors[walletData.type].accent;
 
     const walletName = walletData.name;
-
-    const initWallet = useCallback(async () => {
-        const w = await createBDKWallet(walletData);
-
-        return w;
-    }, [walletData]);
-
-    const bottomSwapRef = React.useRef<BottomSheetModal>(null);
-    const bottomSendRef = React.useRef<BottomSheetModal>(null);
-    const [openSwap, setOpenSwap] = useState(-1);
-    const [openSend, setOpenSend] = useState(-1);
-    const [swapOutRetryCount, setSwapRetryCount] = useState(0);
-
-    const openSwapModal = () => {
-        if (openSwap !== 1) {
-            bottomSwapRef.current?.present();
-        } else {
-            bottomSwapRef.current?.close();
-        }
-    };
-
-    const openSendModal = () => {
-        if (walletData.type === 'unified') {
-            if (openSend !== 1) {
-                bottomSendRef.current?.present();
-            } else {
-                bottomSendRef.current?.close();
-            }
-        } else {
-            navigateScanScreen();
-        }
-    };
+    // TODO: handle BDK wallet
 
     const walletTxs =
         walletData.type === 'unified'
@@ -184,19 +119,14 @@ const Wallet = ({route}: Props) => {
 
     const getBalance = async () => {
         try {
-            const LNB = walletData.balance.lightning;
-            const nodeState = await nodeInfo();
-            const balanceLn = nodeState.channelsBalanceMsat;
+            const nodeInfo = await _wallet.walletInfo();
+            const balanceLn = Number(nodeInfo?.balanceSats);
 
             // Update balance after converting to sats
             updateWalletBalance(currentWalletID, {
                 onchain: new BigNumber(0),
-                lightning: new BigNumber(balanceLn / 1000),
+                lightning: new BigNumber(balanceLn),
             });
-
-            if (!LNB.isEqualTo(balanceLn / 1000)) {
-                setUpdatedLNBalance(true);
-            }
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 LiberalToast(t('Breez SDK'), error.message, {
@@ -210,7 +140,7 @@ const Wallet = ({route}: Props) => {
 
     const fetchPayments = async () => {
         try {
-            const txs = await getLNPayments(walletData.payments.length);
+            const txs = await _wallet.listPayments();
 
             // Update transactions
             updateWalletPayments(currentWalletID, txs);
@@ -252,23 +182,10 @@ const Wallet = ({route}: Props) => {
             await fetchPayments();
         }
 
-        // fetch onchain
-        refreshWallet();
-    };
-
-    const handleSwap = async (swapType: SwapType) => {
-        // Close the modal
-        bottomSwapRef.current?.close();
-
-        navigation.dispatch(
-            CommonActions.navigate('WalletRoot', {
-                screen: 'SwapAmount',
-                params: {
-                    swapType: swapType,
-                    swapMeta: swapType === SwapType.SwapIn ? swapIn : swapOut,
-                },
-            }),
-        );
+        // TODO: fetch onchain
+        // Kill loading
+        setRefreshing(false);
+        setLoadingBalance(false);
     };
 
     const navigateScanScreen = () => {
@@ -284,25 +201,6 @@ const Wallet = ({route}: Props) => {
             }),
         );
     };
-
-    const handleSend = async (sendType: string) => {
-        if (sendType === 'scan') {
-            bottomSendRef.current?.close();
-            navigateScanScreen();
-        } else {
-            bottomSendRef.current?.close();
-            navigation.dispatch(CommonActions.navigate('PayLNURL'));
-        }
-    };
-
-    const syncWallet = useCallback(async () => {
-        // initWallet only called one time
-        // subsequent call is from 'bdkWallet' state
-        // set in Balance fetch
-        const w = bdkWallet ? bdkWallet : await initWallet();
-
-        return await syncBDKWallet(w, walletData.network, electrumServerURL);
-    }, [bdkWallet, electrumServerURL, initWallet, walletData.network]);
 
     const fetchAndUpdateFiatRate = useCallback(async () => {
         let response: TRateResponse;
@@ -369,188 +267,6 @@ const Wallet = ({route}: Props) => {
         updateFiatRate,
     ]);
 
-    // Refresh control
-    const refreshWallet = useCallback(async () => {
-        // TODO: fix broken loading issue
-        // Have balance check for onchain / ln
-        // why balance is zero and constantly showing update
-        // rework all of this.
-        const w = await syncWallet();
-
-        // Update wallet balance first
-        const {balance, updated} = await getBdkWalletBalance(
-            w,
-            walletData.balance.onchain,
-        );
-
-        if (updated && isLNWallet) {
-            setUpdatedOBalance(true);
-        }
-
-        // update wallet balance
-        updateWalletBalance(currentWalletID, {
-            onchain: balance,
-            lightning: new BigNumber(0),
-        });
-
-        // TODO: Only onchain. Make sure to allow to update to get info on new outbound (unconfirmed to newly confirmed)
-        // Check if new block has been mined and allow to update
-        if (updated) {
-            try {
-                const {txs, address, utxo} = await fetchOnchainTransactions(
-                    w,
-                    walletData,
-                    updated,
-                    electrumServerURL,
-                );
-
-                // We make this update in case of pending txs
-                // and because we already have this data from the balance update BDK call
-                // update wallet transactions
-                updateWalletTransactions(currentWalletID, txs);
-
-                if (utxo.length !== walletData.UTXOs.length) {
-                    // update wallet UTXOs
-                    updateWalletUTXOs(currentWalletID, utxo);
-
-                    // generate new address
-                    updateWalletAddress(address.index, address);
-                }
-
-                // TODO: Make sure to update wallet lastUpdated here
-
-                setLoadLock(false);
-            } catch (err: any) {
-                LiberalToast(capitalizeFirst(t('network')), t('error_fetching_txs'), {
-                    duration: 3000,
-                });
-
-                setLoadingBalance(false);
-                setRefreshing(false);
-                setLoadLock(false);
-                return;
-            }
-        }
-
-        // Kill loading
-        setRefreshing(false);
-        setLoadingBalance(false);
-        setLoadLock(false);
-
-        // Update wallet, so we avoid wallet creation
-        // for every call to this function
-        if (!bdkWallet) {
-            setBdkWallet(w);
-        }
-    }, [bdkWallet, currentWalletID, electrumServerURL, isLNWallet, setLoadLock, syncWallet, t, updateWalletAddress, updateWalletBalance, updateWalletTransactions, updateWalletUTXOs, walletData]);
-
-    const getLNSwapInfo = useCallback(async () => {
-        // Note: only check if has balance
-        if (walletData.balance.lightning.isZero()) {
-            return;
-        }
-
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            return;
-        }
-
-        onchainPaymentLimits()
-            .then((c: OnchainPaymentLimitsResponse) => {
-                if (c.minSat !== 0) {
-                    setSwapOut({
-                        min: c.minSat,
-                        max: c.maxSat,
-                    });
-
-                    setUpdatedLNBalance(false);
-                    setLoadingSwapOutInfo(false);
-                } else {
-                    try {
-                        console.log(
-                            '[Boltz SwapOut] Fallback to Fetch limits from Boltz',
-                        );
-
-                        fetchBoltzSwapInfo((respObj: TBoltzSwapInfo) => {
-                            if (respObj.minLimit !== 0) {
-                                setSwapOut({
-                                    min: respObj.minLimit,
-                                    max: respObj.maxLimit,
-                                });
-
-                                setUpdatedLNBalance(false);
-                                setLoadingSwapOutInfo(false);
-                            }
-                        });
-                    } catch (error: any) {
-                        console.log('[Boltz SwapOut] Error: ', error.message);
-
-                        if (
-                            error.message.includes(
-                                'BreezServices not initialized',
-                            )
-                        ) {
-                            setConnectedToBreezServices(false);
-                        }
-                    }
-                }
-            })
-            .catch((error: any) => {
-                console.log('[Breez swapOut] error: ', error.message);
-                setLoadingSwapOutInfo(false);
-                setUpdatedLNBalance(false);
-            });
-    }, [walletData.balance.lightning]);
-
-    const getOnchainSwapInfo = useCallback(async () => {
-        // Note: only check if has balance
-        if (walletData.balance.onchain.isZero()) {
-            return;
-        }
-
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            return;
-        }
-
-        receiveOnchain({})
-            .then((d: SwapInfo) => {
-                setSwapIn({
-                    min: d.minAllowedDeposit,
-                    max: d.maxAllowedDeposit,
-                    address: d.bitcoinAddress,
-                    lockHeight: d.lockHeight,
-                    channelOpeningFees: d.channelOpeningFees,
-                    maxSwapperPayable: d.maxSwapperPayable,
-                });
-                setLoadingSwapInInfo(false);
-                setUpdatedOBalance(false);
-            })
-            .catch((error: any) => {
-                console.log('[Breez swapIn] error: ', error.message);
-
-                if (error.message.includes('Swap in progress')) {
-                    setSwapInProgress(true);
-                }
-
-                if (error.message.includes('BreezServices not initialized')) {
-                    setConnectedToBreezServices(false);
-                }
-
-                if (
-                    error.message.includes('ConnectionReset') &&
-                    checkNetworkIsReachable(_netInfo) &&
-                    swapOutRetryCount <= 2
-                ) {
-                    getOnchainSwapInfo();
-                }
-
-                setSwapRetryCount(0);
-                setLoadingSwapInInfo(false);
-                setUpdatedOBalance(false);
-            });
-    }, [swapOutRetryCount, walletData.balance.onchain]);
-
     // Check if wallet balance is empty
     const isWalletBroke = (balance: TBalance) => {
         return new BigNumber(0).eq(balance.onchain.plus(balance.lightning));
@@ -585,43 +301,11 @@ const Wallet = ({route}: Props) => {
     }, [navigation]);
 
     useEffect(() => {
-        if (isLNWallet) {
-            getLNSwapInfo();
-            getOnchainSwapInfo();
-        }
-
-        // Kill all loading effects
-        () => {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            setLoadLock(false);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        if (updatedOnchainBalance && isLNWallet) {
-            setLoadingSwapInInfo(true);
-            getOnchainSwapInfo();
-        }
-        // Re-check swap info
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [updatedOnchainBalance]);
-
-    useEffect(() => {
-        if (updatedLNBalance && isLNWallet) {
-            setLoadingSwapOutInfo(true);
-            getLNSwapInfo();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [updatedLNBalance]);
-
-    useEffect(() => {
         // Attempt to sync balance when reload or Breez event triggered
         // E.g. from completed transaction
-        if (breezEvent.type === BreezEventVariant.INVOICE_PAID || breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
+        if (breezEvent.type === SdkEvent_Tags.PaymentSucceeded) {
             // reset Breez event
-            setBreezEvent({} as BreezEvent);
+            setBreezEvent({} as SdkEvent);
 
             jointSync();
         }
@@ -646,294 +330,272 @@ const Wallet = ({route}: Props) => {
                 className="absolute w-full h-16 top-0"
                 style={{backgroundColor: CardColor}}
             />
-            <BottomSheetModalProvider>
-                {/* adjust styling below to ensure content in View covers entire screen */}
-                {/* Adjust styling below to ensure it covers entire app height */}
+            <View
+                className="w-full h-full -mt-2"
+                style={{backgroundColor: CardColor}}>
+                {/* Top panel */}
                 <View
-                    className="w-full h-full"
+                    className={
+                        `relative ${
+                            walletData.type === 'unified'
+                                ? 'h-1/2'
+                                : 'h-1/2'
+                        } items-center justify-center`
+                    }
                     style={{backgroundColor: CardColor}}>
-                    {/* Top panel */}
+                    <View
+                        className="absolute w-full top-2 flex-row items-center justify-between">
+                        <PlainButton
+                            className="items-center flex-row left-6"
+                            onPress={() => {
+                                const nav = navigation.getState();
+                                if (nav?.index === 0 && nav?.routes.length === 1) {
+                                    navigation.goBack();
+                                } else {
+                                    navigation.dispatch(
+                                        CommonActions.reset({
+                                            index: 0,
+                                            routes: [{name: 'HomeScreen'}],
+                                        })
+                                    );
+                                }
+                            }}>
+                            <HomeIcon className="mr-2" fill={'white'} />
+                        </PlainButton>
+
+                        <Text
+                            className="text-white self-center text-center w-1/2 font-bold"
+                            numberOfLines={1}
+                            ellipsizeMode={'middle'}>
+                            {walletName}
+                        </Text>
+
+                        <PlainButton
+                            className="right-6"
+                            onPress={() => {
+                                navigation.dispatch(
+                                    CommonActions.navigate({
+                                        name: 'WalletInfo',
+                                    }),
+                                );
+                            }}>
+                            <Dots width={32} fill={'white'} />
+                        </PlainButton>
+                    </View>
+
+                    {/* Watch-only */}
+                    {walletData.isWatchOnly && (
+                        <View
+                            className="absolute top-11 rounded-full bg-black opacity-50">
+                            <Text
+                                className="text-sm py-1 px-6 text-white font-bold">
+                                {t('watch_only')}
+                            </Text>
+                        </View>
+                    )}
+
+                    {/* Balance */}
                     <View
                         className={
-                            `relative ${
-                                    walletData.type === 'unified'
-                                        ? 'h-1/2'
-                                        : 'h-1/2'
-                                } items-center justify-center`
-                        }
-                        style={{backgroundColor: CardColor}}>
-                        <View
-                            className="absolute w-full top-2 flex-row items-center justify-between">
-                            <PlainButton
-                                className="items-center flex-row left-6"
-                                onPress={() => {
-                                    const nav = navigation.getState();
-
-                                    if (nav?.index === 0 && nav?.routes.length === 1) {
-                                        navigation.goBack();
-                                    } else {
-                                        navigation.dispatch(
-                                            CommonActions.reset({
-                                                index: 0,
-                                                routes: [{name: 'HomeScreen'}],
-                                            })
-                                        );
-                                    }
-
-                                }}>
-                                <HomeIcon className="mr-2" fill={'white'} />
-                            </PlainButton>
-
-                            <Text
-                                className="text-white self-center text-center w-1/2 font-bold"
-                                numberOfLines={1}
-                                ellipsizeMode={'middle'}>
-                                {walletName}
-                            </Text>
-
-                            <PlainButton
-                                className="right-6"
-                                onPress={() => {
-                                    navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: 'WalletInfo',
-                                        }),
-                                    );
-                                }}>
-                                <Dots width={32} fill={'white'} />
-                            </PlainButton>
-                        </View>
-
-                        {/* Watch-only */}
-                        {walletData.isWatchOnly && (
-                            <View
-                                className="absolute top-11 rounded-full bg-black opacity-50">
-                                <Text
-                                    className="text-sm py-1 px-6 text-white font-bold">
-                                    {t('watch_only')}
-                                </Text>
-                            </View>
-                        )}
-
-                        {/* Balance */}
+                            `items-center w-5/6 ${
+                                    hideTotalBalance
+                                        ? '-mt-20'
+                                        : isAdvancedMode &&
+                                          walletData.type === 'unified'
+                                        ? '-mt-8'
+                                        : ''
+                                }`
+                        }>
+                        {/* Balance component */}
                         <View
                             className={
-                                `items-center w-5/6 ${
+                                `${
                                         hideTotalBalance
-                                            ? '-mt-20'
-                                            : isAdvancedMode &&
-                                              walletData.type === 'unified'
-                                            ? '-mt-8'
-                                            : ''
-                                    }`
-                            }>
-                            {/* Balance component */}
-                            <View
-                                className={
-                                    `${
-                                            hideTotalBalance
-                                                ? 'absolute mt-8'
-                                                : 'items-center'
-                                        } w-full`
+                                            ? 'absolute mt-8'
+                                            : 'items-center'
+                                    } w-full`
+                            }
+                            style={{
+                                    marginTop:
+                                        walletData.type === 'unified' &&
+                                        walletTxs.length > 0
+                                            ? -86
+                                            : 0,
+                            }}>
+                            <Text
+                                className="text-sm text-white opacity-60 mb-1">
+                                {!isNetOn
+                                    ? t('offline_balance')
+                                    : t('balance')}
+                            </Text>
+                            <Balance
+                                fontColor={'white'}
+                                balance={
+                                    walletData.type === 'unified'
+                                        ? walletBalance
+                                        : walletData.balance.onchain
                                 }
-                                style={{
-                                        marginTop:
-                                            walletData.type === 'unified' &&
-                                            walletTxs.length > 0
-                                                ? -86
-                                                : 0,
-                                }}>
-                                <Text
-                                    className="text-sm text-white opacity-60 mb-1">
-                                    {!isNetOn
-                                        ? t('offline_balance')
-                                        : t('balance')}
-                                </Text>
-                                <Balance
-                                    fontColor={'white'}
-                                    balance={
-                                        walletData.type === 'unified'
-                                            ? walletBalance
-                                            : walletData.balance.onchain
-                                    }
-                                    balanceFontSize={'text-3xl'}
-                                    disableFiat={false}
-                                    loading={loadingBalance}
-                                    hideColor={
-                                        ColorScheme.WalletColors[
-                                            walletData.type
-                                        ].accent
-                                    }
-                                />
-                            </View>
+                                balanceFontSize={'text-3xl'}
+                                disableFiat={false}
+                                loading={loadingBalance}
+                                hideColor={
+                                    ColorScheme.WalletColors[
+                                        walletData.type
+                                    ].accent
+                                }
+                            />
                         </View>
+                    </View>
 
-                        {/* Combined balance for unified wallets */}
-                        {walletData.type === 'unified' &&
-                            walletTxs.length > 0 && (
-                                <>
+                    {/* Combined balance for unified wallets */}
+                    {walletData.type === 'unified' &&
+                        walletTxs.length > 0 && (
+                            <>
+                                <View
+                                    className="absolute w-5/6"
+                                    style={{
+                                            bottom: hideTotalBalance
+                                                ? 98 + 24
+                                                : 98,
+                                    }}>
                                     <View
-                                        className="absolute w-5/6"
-                                        style={{
-                                                bottom: hideTotalBalance
-                                                    ? 98 + 24
-                                                    : 98,
-                                        }}>
+                                        className="w-full items-start">
                                         <View
-                                            className="w-full items-start">
-                                            <View
-                                                className={
-                                                    `w-full ${
-                                                            langDir === 'right'
-                                                                ? 'flex-row-reverse'
-                                                                : 'flex-row'
-                                                        } items-center justify-between opacity-60`
-                                                }>
-                                                <Text
-                                                    className="text-sm text-white">
-                                                    Lightning
-                                                </Text>
+                                            className={
+                                                `w-full ${
+                                                        langDir === 'right'
+                                                            ? 'flex-row-reverse'
+                                                            : 'flex-row'
+                                                    } items-center justify-between opacity-60`
+                                            }>
+                                            <Text
+                                                className="text-sm text-white">
+                                                Lightning
+                                            </Text>
 
-                                                {hideTotalBalance ? (
-                                                    <View
-                                                        className="rounded-sm"
-                                                        style={{
-                                                                height: 20,
-                                                                width: 98,
-                                                                opacity:
-                                                                    loadingBalance
-                                                                        ? 0.35
-                                                                        : 0.6,
-                                                                backgroundColor:
-                                                                    ColorScheme
-                                                                        .WalletColors[
-                                                                        walletData
-                                                                            .type
-                                                                    ].accent,
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <Balance
-                                                        disabled={true}
-                                                        fontColor={'white'}
-                                                        balance={
-                                                            walletData.balance
-                                                                .lightning
-                                                        }
-                                                        balanceFontSize={
-                                                            'text-lg'
-                                                        }
-                                                        disableFiat={false}
-                                                        loading={loadingBalance}
-                                                        hideColor={
-                                                            ColorScheme
-                                                                .WalletColors[
-                                                                walletData.type
-                                                            ].accent
-                                                        }
-                                                    />
-                                                )}
-                                            </View>
-                                        </View>
-
-                                        <View
-                                            className="w-full flex-row items-center justify-between">
-                                            <View
-                                                className="w-1/3 opacity-20"
-                                                style={[
-                                                    styles.divider,
-                                                ]}
-                                            />
-
-                                            <PlainButton
-                                                onPress={openSwapModal}
-                                                className="rounded-full items-center px-6 py-2"
-                                                style={{
-                                                        backgroundColor:
-                                                            CardAccent,
-                                                }}>
-                                                <SwapIcon fill={'white'} />
-                                            </PlainButton>
-
-                                            <View
-                                                className="w-1/3 opacity-20"
-                                                style={[
-                                                    styles.divider,
-                                                ]}
-                                            />
-                                        </View>
-
-                                        <View
-                                            className="w-full items-start">
-                                            <View
-                                                className={
-                                                    `w-full ${
-                                                            langDir === 'right'
-                                                                ? 'flex-row-reverse'
-                                                                : 'flex-row'
-                                                        } items-center justify-between opacity-60`
-                                                }>
-                                                <Text
-                                                    className="text-sm text-white">
-                                                    On-chain
-                                                </Text>
-
-                                                {hideTotalBalance ? (
-                                                    <View
-                                                        className="rounded-sm"
-                                                        style={{
-                                                                height: 20,
-                                                                width: 98,
-                                                                opacity:
-                                                                    loadingBalance
-                                                                        ? 0.35
-                                                                        : 0.6,
-                                                                backgroundColor:
-                                                                    ColorScheme
-                                                                        .WalletColors[
-                                                                        walletData
-                                                                            .type
-                                                                    ].accent,
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <Balance
-                                                        disabled={true}
-                                                        fontColor={'white'}
-                                                        balance={
-                                                            walletData.balance
-                                                                .onchain
-                                                        }
-                                                        balanceFontSize={
-                                                            'text-lg'
-                                                        }
-                                                        disableFiat={false}
-                                                        loading={loadingBalance}
-                                                        hideColor={
-                                                            ColorScheme
-                                                                .WalletColors[
-                                                                walletData.type
-                                                            ].accent
-                                                        }
-                                                    />
-                                                )}
-                                            </View>
+                                            {hideTotalBalance ? (
+                                                <View
+                                                    className="rounded-sm"
+                                                    style={{
+                                                            height: 20,
+                                                            width: 98,
+                                                            opacity:
+                                                                loadingBalance
+                                                                    ? 0.35
+                                                                    : 0.6,
+                                                            backgroundColor:
+                                                                ColorScheme
+                                                                    .WalletColors[
+                                                                    walletData
+                                                                        .type
+                                                                ].accent,
+                                                    }}
+                                                />
+                                            ) : (
+                                                <Balance
+                                                    disabled={true}
+                                                    fontColor={'white'}
+                                                    balance={
+                                                        walletData.balance
+                                                            .lightning
+                                                    }
+                                                    balanceFontSize={
+                                                        'text-lg'
+                                                    }
+                                                    disableFiat={false}
+                                                    loading={loadingBalance}
+                                                    hideColor={
+                                                        ColorScheme
+                                                            .WalletColors[
+                                                            walletData.type
+                                                        ].accent
+                                                    }
+                                                />
+                                            )}
                                         </View>
                                     </View>
-                                </>
-                            )}
+
+                                    <View
+                                        className="w-full flex-row items-center justify-between">
+                                        <View
+                                            className="w-full opacity-20 my-4"
+                                            style={[
+                                                styles.divider,
+                                            ]}
+                                        />
+                                    </View>
+
+                                    <View
+                                        className="w-full items-start">
+                                        <View
+                                            className={
+                                                `w-full ${
+                                                        langDir === 'right'
+                                                            ? 'flex-row-reverse'
+                                                            : 'flex-row'
+                                                    } items-center justify-between opacity-60`
+                                            }>
+                                            <Text
+                                                className="text-sm text-white">
+                                                On-chain
+                                            </Text>
+
+                                            {hideTotalBalance ? (
+                                                <View
+                                                    className="rounded-sm"
+                                                    style={{
+                                                            height: 20,
+                                                            width: 98,
+                                                            opacity:
+                                                                loadingBalance
+                                                                    ? 0.35
+                                                                    : 0.6,
+                                                            backgroundColor:
+                                                                ColorScheme
+                                                                    .WalletColors[
+                                                                    walletData
+                                                                        .type
+                                                                ].accent,
+                                                    }}
+                                                />
+                                            ) : (
+                                                <Balance
+                                                    disabled={true}
+                                                    fontColor={'white'}
+                                                    balance={
+                                                        walletData.balance
+                                                            .onchain
+                                                    }
+                                                    balanceFontSize={
+                                                        'text-lg'
+                                                    }
+                                                    disableFiat={false}
+                                                    loading={loadingBalance}
+                                                    hideColor={
+                                                        ColorScheme
+                                                            .WalletColors[
+                                                            walletData.type
+                                                        ].accent
+                                                    }
+                                                />
+                                            )}
+                                        </View>
+                                    </View>
+                                </View>
+                            </>
+                        )}
 
                         {/* Send and receive */}
                         <View
-                            className="absolute bottom-6 w-full items-center px-4 justify-around flex-row">
+                            className="absolute bottom-6 w-full items-center px-4 justify-center flex-row">
                             {/* Hide send if Balance is empty or it is a watch-only wallet */}
                             {!hideSendButton && (
                                 <View
-                                    className="rounded-full py-3 mr-4 w-1/2"
+                                    className="rounded-full py-3 mr-6 w-2/5"
                                     style={{
                                             backgroundColor: CardAccent,
                                     }}>
-                                    <PlainButton onPress={openSendModal}>
+                                    <PlainButton onPress={navigateScanScreen}>
                                         <Text
                                             className="text-base text-white text-center font-bold">
                                             {capitalizeFirst(t('send'))}
@@ -944,7 +606,7 @@ const Wallet = ({route}: Props) => {
                             <View
                                 className={
                                     `rounded-full py-3 ${
-                                        hideSendButton ? 'w-full' : 'w-1/2'
+                                        hideSendButton ? 'w-full' : 'w-2/5'
                                     }`
                                 }
                                 style={{
@@ -960,149 +622,110 @@ const Wallet = ({route}: Props) => {
                         </View>
                     </View>
 
-                    {/* Transactions List */}
-                    <View
-                        className={
-                            `${
-                                walletData.type === 'unified'
-                                    ? 'h-1/2'
-                                    : 'h-1/2'
-                            } w-full items-center z-10`
-                        }
-                        style={[
-                            styles.transactionList,
-                            {
-                                backgroundColor: ColorScheme.Background.Primary,
-                            },
-                        ]}>
-                        <View className="mt-6 w-11/12">
-                            <VText
-                                className={
-                                    `${
-                                            langDir === 'right'
-                                                ? 'mr-4'
-                                                : 'ml-4'
-                                        } text-base font-bold`
-                                }
-                                style={{color: ColorScheme.Text.Default}}>
-                                {capitalizeFirst(t('transactions'))}
-                            </VText>
-                        </View>
-
-                        <View
-                            className="w-full h-full items-center pb-10">
-                            <VirtualizedList
-                                maxToRenderPerBatch={50}
-                                updateCellsBatchingPeriod={2500}
-                                refreshing={refreshing}
-                                onRefresh={jointSync}
-                                scrollEnabled={true}
-                                getItem={(data, index) => data[index]}
-                                getItemCount={data => data.length}
-                                className={
-                                    `${
-                                            walletTxs.length > 0
-                                                ? 'w-11/12'
-                                                : 'w-full'
-                                        } mt-2 z-30`
-                                }
-                                contentContainerStyle={[
-                                    styles.listStyle,
-                                    walletTxs.length ? {height: '100%'} : {},
-                                ]}
-                                data={walletTxs.sort(
-                                    (a: TTransaction, b: TTransaction) => {
-                                        return +b.timestamp - +a.timestamp;
-                                    },
-                                )}
-                                renderItem={item => {
-                                    return (
-                                        <UnifiedTransactionListItem
-                                            callback={() => {
-                                                navigation.dispatch(
-                                                    CommonActions.navigate({
-                                                        name: 'TransactionDetails',
-                                                        params: {
-                                                            tx: {...item.item},
-                                                            source: 'conservative',
-                                                            walletId:
-                                                                currentWalletID,
-                                                        },
-                                                    }),
-                                                );
-                                            }}
-                                            tx={item.item}
-                                        />
-                                    );
-                                }}
-                                keyExtractor={(item: TTransaction) =>
-                                    item.txid ? item.txid : item.id
-                                }
-                                initialNumToRender={25}
-                                contentInsetAdjustmentBehavior="automatic"
-                                ListEmptyComponent={
-                                    <View
-                                        className="w-4/5 h-5/6 items-center justify-center">
-                                        <Box
-                                            width={32}
-                                            fill={ColorScheme.SVG.GrayFill}
-                                            className="mb-4 -mt-6"
-                                        />
-                                        <Text
-                                            className="w-full text-center"
-                                            style={{
-                                                    color: ColorScheme.Text
-                                                        .GrayedText,
-                                            }}>
-                                            {t('no_transactions_text')}
-                                        </Text>
-                                    </View>
-                                }
-                            />
-                        </View>
-
-                        {walletData.type === 'unified' && (
-                            <View className="absolute bottom-0">
-                                <Swap
-                                    swapInProgress={swapInProgress}
-                                    lightningBalance={
-                                        walletData.balance.lightning
-                                    }
-                                    breezConnected={connectedToBreezServices}
-                                    onchainBalance={walletData.balance.onchain}
-                                    swapRef={bottomSwapRef}
-                                    triggerSwap={handleSwap}
-                                    onSelectSwap={idx => {
-                                        setOpenSwap(idx);
-                                    }}
-                                    swapInfo={{
-                                        swapIn: swapIn,
-                                        swapOut: swapOut,
-                                    }}
-                                    isOnline={isNetOn}
-                                    loadingInfo={
-                                        loadingSwapOutInfo && loadingSwapInInfo
-                                    }
-                                />
-                            </View>
-                        )}
-
-                        {walletData.type === 'unified' && (
-                            <View className="absolute bottom-0">
-                                <Send
-                                    sendOptionsRef={bottomSendRef}
-                                    triggerSendOptions={handleSend}
-                                    onSelectSendOption={idx => {
-                                        setOpenSend(idx);
-                                    }}
-                                />
-                            </View>
-                        )}
+                {/* Transactions List */}
+                <View
+                    className={
+                        `${
+                            walletData.type === 'unified'
+                                ? 'h-1/2'
+                                : 'h-1/2'
+                        } w-full items-center z-10`
+                    }
+                    style={[
+                        styles.transactionList,
+                        {
+                            backgroundColor: ColorScheme.Background.Primary,
+                        },
+                    ]}>
+                    <View className="mt-6 w-11/12">
+                        <VText
+                            className={
+                                `${
+                                        langDir === 'right'
+                                            ? 'mr-4'
+                                            : 'ml-4'
+                                    } text-base font-bold`
+                            }
+                            style={{color: ColorScheme.Text.Default}}>
+                            {capitalizeFirst(t('transactions'))}
+                        </VText>
                     </View>
 
-                    <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
+                    <View
+                        className="w-full h-full items-center pb-10">
+                        <VirtualizedList
+                            maxToRenderPerBatch={50}
+                            updateCellsBatchingPeriod={2500}
+                            refreshing={refreshing}
+                            onRefresh={jointSync}
+                            scrollEnabled={true}
+                            getItem={(data, index) => data[index]}
+                            getItemCount={data => data.length}
+                            className={
+                                `${
+                                        walletTxs.length > 0
+                                            ? 'w-11/12'
+                                        : 'w-full'
+                                    } mt-2 z-30`
+                            }
+                            contentContainerStyle={[
+                                styles.listStyle,
+                                walletTxs.length ? {height: '100%'} : {},
+                            ]}
+                            data={walletTxs.sort(
+                                (a: TTransaction, b: TTransaction) => {
+                                    return +Number(b.timestamp) - +Number(a.timestamp);
+                                },
+                            )}
+                            renderItem={item => {
+                                return (
+                                    <UnifiedTransactionListItem
+                                        callback={() => {
+                                            navigation.dispatch(
+                                                CommonActions.navigate({
+                                                    name: 'TransactionDetails',
+                                                    params: {
+                                                        tx: {...item.item},
+                                                        source: 'conservative',
+                                                        walletId:
+                                                            currentWalletID,
+                                                    },
+                                                }),
+                                            );
+                                        }}
+                                        tx={item.item}
+                                    />
+                                );
+                            }}
+                            keyExtractor={(item: TTransaction) =>
+                                item.id ? item.id : item.id
+                            }
+                            initialNumToRender={25}
+                            contentInsetAdjustmentBehavior="automatic"
+                            ListEmptyComponent={
+                                <View
+                                    className="w-4/5 h-5/6 items-center justify-center">
+                                    <Box
+                                        width={32}
+                                        fill={ColorScheme.SVG.GrayFill}
+                                        className="mb-4 -mt-6"
+                                    />
+                                    <Text
+                                        className="w-full text-center"
+                                        style={{
+                                                color: ColorScheme.Text
+                                                    .GrayedText,
+                                        }}>
+                                        {t('no_transactions_text')}
+                                    </Text>
+                                </View>
+                            }
+                        />
+                    </View>
                 </View>
-            </BottomSheetModalProvider>
+
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
+            </View>
         </SafeAreaView>
     );
 };
