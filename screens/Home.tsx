@@ -27,8 +27,6 @@ import {InitStackParamList} from '../Navigation';
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../components/toast';
 
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
-
 import VText from '../components/text';
 
 import {useTranslation} from 'react-i18next';
@@ -49,6 +47,7 @@ import {
     getBdkWalletTransactions,
     syncBdkWallet,
 } from '../modules/bdk';
+import { useWallet } from './../contexts/walletContext'
 
 import Gear from '../assets/svg/gear-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
@@ -120,7 +119,9 @@ const Home = ({route}: Props) => {
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
     const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-    const [breezConnected, setBreezConnected] = useState(true);
+
+    // Set Breez wallet service
+    const _wallet = useWallet();
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
@@ -515,7 +516,7 @@ const Home = ({route}: Props) => {
                                 </VText>
                             </View>
 
-                            {isLightning && <LightningBoltIcon width={18} height={18} fill={breezConnected ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />}
+                            {isLightning && <LightningBoltIcon width={18} height={18} fill={_wallet.isConnected() ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />}
                         </View>
 
                         <PlainButton
