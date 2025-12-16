@@ -15,10 +15,10 @@ import {FeesRecommended} from '@mempool/mempool.js/lib/interfaces';
 import {Network} from 'bdk-rn/lib/lib/enums';
 import {ENet} from './enums';
 import {
-    InvoicePaidDetails,
+    Bolt11InvoiceDetails,
+    Bolt12InvoiceDetails,
     Payment,
-    PaymentFailedData,
-} from '@breeztech/react-native-breez-sdk';
+} from '@breeztech/breez-sdk-spark-react-native';
 import {TRate} from './settings';
 
 export type TNetwork = ENet | Network;
@@ -159,14 +159,14 @@ export type TMempoolFeeRates = {
 
 // Breez LN payment details type
 export type TBreezPaymentDetails =
-    | PaymentFailedData
+    | Payment // PaymentFailedData
     | Payment
-    | InvoicePaidDetails;
+    | Bolt11InvoiceDetails | Bolt12InvoiceDetails;
 
 export type TBreezDetails = {
     success: Payment;
-    received: InvoicePaidDetails;
-    failed: PaymentFailedData;
+    received: Bolt11InvoiceDetails | Bolt12InvoiceDetails; // Received invoice details (formerly InvoicePaidDetails)
+    failed: Payment; //PaymentFailedData;
 };
 
 export type DisplayUnit = {
