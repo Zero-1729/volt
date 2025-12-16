@@ -23,13 +23,10 @@ import SwapIcon from '../assets/svg/arrow-switch-24.svg';
 import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
-import {
-    SWAP_IN_LN_DESCRIPTION,
-    SWAP_OUT_LN_DESCRIPTION,
-} from '../modules/wallet-defaults';
+import { PaymentType } from '@breeztech/breez-sdk-spark-react-native';
 
 export const UnifiedTransactionListItem = (props: TxListItemProps) => {
-    if (props.tx.isLightning) {
+    if (props.tx.details?.tag === 'Lightning') {
         return <TransactionLNListItem {...props} />;
     } else {
         return <TransactionListItem {...props} />;
@@ -47,7 +44,8 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
     };
 
     const receiveComp = () => {
-        if (props.tx.description === SWAP_IN_LN_DESCRIPTION) {
+        // TODO: fix displayed swapped tx
+        if (props.tx.method === 1) {
             return <SwapIcon fill={ColorScheme.SVG.Received} />;
         } else {
             return <ArrowDown fill={ColorScheme.SVG.Received} />;
@@ -55,7 +53,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
     };
 
     const sendComp = () => {
-        if (props.tx.description === SWAP_OUT_LN_DESCRIPTION) {
+        if (props.tx.method === 1) {
             return <SwapIcon fill={ColorScheme.SVG.Sent} />;
         } else {
             return <ArrowUp fill={ColorScheme.SVG.Sent} />;
@@ -83,14 +81,14 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                         }}>
                     <View className="w-full ml-1">
                         <TXBalance
-                            balance={new BigNum(props.tx.amountMsat / 1000)}
+                            balance={new BigNum(props.tx.amount)}
                             balanceFontSize={'text-lg'}
                             fontColor={ColorScheme.Text.Default}
                         />
                         <VText
                             className="text-xs"
                             style={{color: ColorScheme.Text.GrayedText}}>
-                            {getTxTimestamp(props.tx.paymentTime)}
+                            {getTxTimestamp(props.tx.timestamp)}
                         </VText>
                     </View>
                 </View>
@@ -99,7 +97,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                     style={{
                             backgroundColor: ColorScheme.Background.Secondary,
                         }}>
-                    {props.tx.paymentType === 'received'
+                    {props.tx.paymentType === PaymentType.Receive
                         ? receiveComp()
                         : sendComp()}
                 </View>
