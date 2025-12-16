@@ -36,7 +36,7 @@ import {
     formatSats,
     normalizeFiat,
 } from '../../modules/transform';
-import {openChannelFee, nodeInfo} from '@breeztech/react-native-breez-sdk';
+import { useWallet } from '../../contexts/walletContext';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -55,6 +55,7 @@ import {actionAlert} from '../../components/alert';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
+import { ReceivePaymentMethod } from '@breeztech/breez-sdk-spark-react-native';
 
 type Props = NativeStackScreenProps<WalletParamList, 'RequestAmount'>;
 
@@ -97,12 +98,13 @@ const RequestAmount = ({route}: Props) => {
     });
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
+    const _wallet = useWallet();
+
     const setMaxReceivableAmount = async () => {
         try {
-            const nodeState = await nodeInfo();
-
+            // TODO: fix this atrocity
             updateMaxReceivableAmount(
-                new BigNumber(nodeState.maxReceivableMsat / 1_000),
+                new BigNumber(1_000_000_000),
             );
         } catch (error: any) {
             if (error.message === 'BreezServices not initialized') {
@@ -352,38 +354,8 @@ const RequestAmount = ({route}: Props) => {
                 return;
             }
 
+            // TODO: fix this atrocity; RE max inbound liquidity
             if (!shouldSkip && !breezServicesNotInitialized) {
-                const channelOpenFee = await openChannelFee({
-                    amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
-                });
-
-                const info = await nodeInfo();
-                const beyondMaxLiquidity = satsAmount.value.gte(
-                    info.totalInboundLiquidityMsats / 1_000,
-                );
-
-                const feeSats = (channelOpenFee.feeMsat as number) / 1_000;
-
-                // Warn user that amount will trigger a new channel open
-                // In cases were first tx or if larger than channel liquidity
-                if (beyondMaxLiquidity && feeSats > 0) {
-                    actionAlert(
-                        capitalizeFirst(t('channel_opening')),
-                        e('new_channel_open_warn', {
-                            n: feeSats,
-                            fiat: `${appFiatCurrency.symbol} ${normalizeFiat(
-                                new BigNumber(feeSats),
-                                fiatRate.rate,
-                            )}`,
-                        }),
-                        t('ok'),
-                        capitalizeFirst(t('cancel')),
-                        () => routeToReceive,
-                    );
-                    return;
-                }
-
-                // If not beyond max liquidity, route to receive with LN
                 routeToReceive();
             } else {
                 routeToOnchainReceive();
