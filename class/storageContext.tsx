@@ -970,6 +970,11 @@ export const AppStorageProvider = ({children}: Props) => {
                 ? balance.onchain
                 : oldOnchainBalance;
 
+            // TODO: Stringify BigInt
+            JSON.stringify(tmp, (key, value) =>
+                typeof value === "bigint" ? value.toString() : value,
+            );
+
             // Update wallets list
             _setWallets(tmp);
             _updateWallets(JSON.stringify(tmp));
