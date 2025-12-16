@@ -31,7 +31,6 @@ import VText from '../components/text';
 
 import {useTranslation} from 'react-i18next';
 
-import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
@@ -41,12 +40,6 @@ import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import {
-    createBDKWallet,
-    getBdkWalletBalance,
-    getBdkWalletTransactions,
-    syncBdkWallet,
-} from '../modules/bdk';
 import { useWallet } from './../contexts/walletContext'
 
 import Gear from '../assets/svg/gear-24.svg';
@@ -77,7 +70,6 @@ import {biometricAuth} from '../modules/shared';
 import {
     getUniqueTXs,
     checkNetworkIsReachable,
-    getLNPayments,
     getMiniWallet,
 } from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
@@ -107,18 +99,15 @@ const Home = ({route}: Props) => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        updateWalletTransactions,
         updateWalletPayments,
         updateWalletBalance,
         isWalletInitialized,
-        electrumServerURL,
         isAdvancedMode,
         isBiometricsActive,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
-    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
 
     // Set Breez wallet service
     const _wallet = useWallet();
@@ -223,92 +212,34 @@ const Home = ({route}: Props) => {
         return {allCount: txs.length, filtered: filtered};
     };
 
-    const initWallet = useCallback(async () => {
-        const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
-
-        await syncBdkWallet(
-            w,
-            (status: boolean) => {
-                if (process.env.NODE_ENV === 'development' && !status) {
-                    LiberalToast(t('BDK'), t('Failed to sync'), {
-                        duration: 3000,
-                    });
-                }
-            },
-            wallet.network,
-            electrumServerURL,
-        );
-
-        return w;
-    }, []);
-
-    // Refresh control
-    const refreshWallet = useCallback(async () => {
-        const w = await initWallet();
-
-        // Check net again, just in case there is a drop mid execution
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            return;
-        }
-
-        // Sync wallet
-        const {balance} = await getBdkWalletBalance(w, wallet.balance.onchain);
-        const {transactions} = await getBdkWalletTransactions(
-            w,
-            wallet.network === 'testnet'
-                ? electrumServerURL.testnet
-                : electrumServerURL.bitcoin,
-        );
-
-        // Kill refreshing
-        setRefreshing(false);
-
-        // Update wallet balance
-        updateWalletBalance(currentWalletID, {
-            onchain: balance,
-            lightning: new BigNumber(0),
-        });
-
-        // Update wallet transactions
-        updateWalletTransactions(currentWalletID, transactions);
-
-        // Kill loading
-        setLoadingBalance(false);
-
-        // set bdk wallet
-        setBdkWallet(w);
-    }, [setRefreshing, networkState]);
-
     const getBalance = async () => {
+        const info = await _wallet.walletInfo();
+
         try {
-            const nodeState = await nodeInfo();
-            const balanceLn = nodeState.channelsBalanceMsat;
+            const balanceLn = new BigNumber(info?.balanceSats || 0);
 
             // Update balance after converting to sats
             updateWalletBalance(currentWalletID, {
                 onchain: new BigNumber(0),
-                lightning: new BigNumber(balanceLn / 1000),
+                lightning: balanceLn,
             });
-        } catch (error: any) {
+        } catch (error) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                LiberalToast(t('Breez SDK'), error.message, {
+                LiberalToast(t('Breez SDK'), (error as Error).message, {
                     duration: 2000,
                 });
+                return;
             }
-
-            return;
         }
+        return;
     };
 
     const fetchPayments = async () => {
         try {
-            const txs = await getLNPayments(wallet.payments.length);
+            const txs = await _wallet.listPayments();
 
             // Update transactions
-            updateWalletPayments(currentWalletID, txs);
+            updateWalletPayments(currentWalletID, txs as TTransaction[]);
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 LiberalToast(t('Breez SDK'), error.message, {
@@ -326,14 +257,6 @@ const Home = ({route}: Props) => {
             return;
         }
 
-        // Only attempt load if connected to network
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            return;
-        }
-
         // start loading
         // Set refreshing
         setLoadingBalance(true);
@@ -344,20 +267,15 @@ const Home = ({route}: Props) => {
             return;
         }
 
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            return;
-        }
-
-        // fetch onchain
-        refreshWallet();
-
         // Also call Breez if LN wallet
         if (wallet.type === 'unified') {
             await getBalance();
             await fetchPayments();
         }
+
+        // Stop loading
+        setLoadingBalance(false);
+        setRefreshing(false);
     };
 
     const gotToTransactions = useCallback(() => {
@@ -403,30 +321,6 @@ const Home = ({route}: Props) => {
         );
     }, []);
 
-    const initWalletSync = useCallback(async () => {
-        const _netInfo = await netInfo.fetch();
-
-        // TODO: trigger Breez load here instead, watch then fire?
-        // Check and show Breez status
-        try {
-            const _nodeInfo = await nodeInfo();
-            if (_nodeInfo?.id) {
-                setBreezConnected(true);
-            }
-        } catch (error: any) {
-            setBreezConnected(false);
-        }
-
-        // Only load BTC only wallet on route
-        if (
-            isWalletInitialized &&
-            checkNetworkIsReachable(_netInfo) &&
-            wallet.type !== 'unified'
-        ) {
-            jointSync();
-        }
-    }, []);
-
     const handleWalletRestore = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
 
@@ -454,7 +348,7 @@ const Home = ({route}: Props) => {
 
     // Sync wallet on initial load
     useEffect(() => {
-        initWalletSync();
+        jointSync();
 
         () => {
             setRefreshing(false);
