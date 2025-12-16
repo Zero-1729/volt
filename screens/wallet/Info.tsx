@@ -37,9 +37,8 @@ import {LiberalToast} from '../../components/toast';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import PINPass from '../../components/pinpass';
 
-import {disconnect, nodeInfo} from '@breeztech/react-native-breez-sdk';
-
 import {biometricAuth} from '../../modules/shared';
+import { useWallet } from '../../contexts/walletContext';
 
 const Info = () => {
     const ColorScheme = Color(useColorScheme());
@@ -48,6 +47,8 @@ const Info = () => {
     const {t, i18n} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
+
+    const _wallet = useWallet();
 
     // To control input elm
     const nameInput = useRef<TextInput>();
@@ -223,13 +224,11 @@ const Info = () => {
         try {
             if (walletData.type === 'unified') {
                 try {
-                    const id = await nodeInfo();
-
-                    if (id) {
-                        // Disconnect from Breez SDK
-                        await disconnect();
-                    }
-                } catch (err: any) {}
+                    // Disconnect from Breez SDK
+                    await _wallet.disconnectWallet();
+                } catch (err: any) {
+                    throw err;
+                }
             }
 
             // Delete wallet from store
@@ -261,7 +260,7 @@ const Info = () => {
                 style={{backgroundColor: CardColor}}
             />
             <BottomSheetModalProvider>
-                <View className="w-full h-full items-center">
+                <View className="w-full h-full items-center -mt-2">
                     <View
                         className="w-full absolute"
                         style={[
@@ -391,7 +390,7 @@ const Info = () => {
                     {/* Wallet Network and Type */}
                     {isAdvancedMode && (
                         <View
-                            className="w-5/6 flex-row justify-start">
+                            className="w-5/6 mt-6 mb-6 flex-row justify-start">
                             <View className="w-1/2 items-center">
                                 <Text
                                     className="text-sm mb-2"
@@ -430,7 +429,7 @@ const Info = () => {
                     {/* Wallet Tools & Info */}
                     {/* Backup / Export material - Seed and Descriptor */}
                     <PlainButton
-                        className="w-5/6 mb-6"
+                        className="w-5/6 mb-6 mt-4"
                         onPress={handleBackupRoute}>
                         <View
                             className={
@@ -553,7 +552,7 @@ const Info = () => {
                     {/* Delete Wallet btn */}
                     <PlainButton
                         onPress={showDialog}
-                        className="absolute bottom-6 px-8 py-3 rounded-full"
+                        className="absolute bottom-0 px-8 py-3 rounded-full"
                         style={{
                             backgroundColor: ColorScheme.Background.Alert,
                         }}>
