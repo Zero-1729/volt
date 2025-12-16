@@ -488,7 +488,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const setAppLanguage = useCallback(
         async (languageObject: TLanguage) => {
             try {
-                await _setAppLanguage(languageObject);
+                _setAppLanguage(languageObject);
                 await _updateAppLanguage(JSON.stringify(languageObject));
             } catch (e) {
                 console.error(
