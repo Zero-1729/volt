@@ -50,15 +50,11 @@ import AddressIcon from '../assets/svg/mention-24.svg';
 import BackupIcon from '../assets/svg/backup.svg';
 
 import Color from '../constants/Color';
-import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/shared';
 
-import {BaseWallet} from '../class/wallet/base';
-import {TBalance, TTransaction} from '../types/wallet';
-
-import {Balance} from '../components/balance';
+import {TTransaction} from '../types/wallet';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 
@@ -74,7 +70,6 @@ import {
 } from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
-import {ENet} from '../types/enums';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
@@ -89,7 +84,7 @@ const Home = ({route}: Props) => {
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
     };
-    const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
+    const topPlatformOffset = 20 + (Platform.OS === 'android' ? 12 : 0);
     const networkState = useNetInfo();
     const isNetOn = checkNetworkIsReachable(networkState);
 
@@ -161,27 +156,6 @@ const Home = ({route}: Props) => {
         // IF no biometrics, just call on PIN modal
         togglePINPassModal();
     };
-
-    // add the total balances of the wallets
-    const totalBalance: TBalance = wallets.reduce(
-        (accumulator: TBalance, currentValue: BaseWallet) =>
-            // Only show balances from bitcoin mainnet
-            // Don't want user to think their testnet money
-            // is spendable
-            ({
-                onchain: accumulator.onchain.plus(
-                    currentValue.network === ENet.Bitcoin
-                        ? currentValue.balance.onchain
-                        : new BigNumber(0),
-                ),
-                lightning: accumulator.lightning.plus(
-                    currentValue.network === ENet.Bitcoin
-                        ? currentValue.balance.lightning
-                        : new BigNumber(0),
-                ),
-            }),
-        {onchain: new BigNumber(0), lightning: new BigNumber(0)},
-    );
 
     // List out all transactions across all wallets
     const extractAllTransactions = () => {
@@ -418,6 +392,7 @@ const Home = ({route}: Props) => {
                             }
                         </View>
 
+                        <View className="flex-row justify-between">
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(
@@ -434,61 +409,13 @@ const Home = ({route}: Props) => {
                                 />
                             </View>
                         </PlainButton>
+                        </View>
                     </View>
 
-                    <View className="w-full h-full mt-2 items-center">
-                        <View
-                            className="justify-around w-full mb-6 mt-6"
-                            style={{
-                                    marginLeft: langDir === 'left' ? 80 : 0,
-                                    marginRight: langDir === 'right' ? 80 : 0,
-                                }}>
-                            {wallets.length > 0 && (
-                                <>
-                                    <VText
-                                        className="text-base font-medium mt-3 mb-1"
-                                        style={[
-                                            {
-                                                color: isNetOn
-                                                    ? ColorScheme.Text.Default
-                                                    : ColorScheme.Text
-                                                          .GrayedText,
-                                            },
-                                            Font.RobotoText,
-                                        ]}>
-                                        {t('balance')}
-                                    </VText>
-
-                                    {!hideTotalBalance ? (
-                                        <Balance
-                                            fontColor={ColorScheme.Text.Default}
-                                            balance={totalBalance.onchain
-                                                .plus(totalBalance.lightning)}
-                                            balanceFontSize={'text-3xl'}
-                                            disableFiat={false}
-                                            loading={loadingBalance}
-                                            hideColor={
-                                                ColorScheme.WalletColors[wallet.type]
-                                                    .accent
-                                            }
-                                        />) : (
-                                        <View
-                                            className="rounded-sm w-4/5 mt-1 opacity-80 h-8 flex-row"
-                                            style={[
-                                                {
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Greyed,
-                                                },
-                                            ]}
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </View>
-
+                    <View className="w-full h-full mt-6 items-center">
                         {/** Wallet Card */}
                         <View
+                            className="mt-6"
                             style={[
                                 {
                                     height: styles.CardContainer.height,
@@ -530,7 +457,7 @@ const Home = ({route}: Props) => {
                         {/* Quick Actions */}
                         <View
                             className={
-                                `flex-row ${
+                                `mt-4 flex-row ${
                                         isLightning
                                             ? 'w-5/6 justify-around'
                                             : 'w-1/2 justify-center'
@@ -583,7 +510,8 @@ const Home = ({route}: Props) => {
                                                     .QuickActionsButton,
                                         }}>
                                     <ScanIcon
-                                        width={24}
+                                        width={26}
+                                        height={26}
                                         fill={ColorScheme.SVG.Default}
                                     />
                                 </View>

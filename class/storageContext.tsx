@@ -81,7 +81,7 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
-    breezEvent: BreezEvent;
+    breezEvent: SdkEvent;
     appLanguage: TLanguage;
     appFiatCurrency: TCurrency;
     loadLock: boolean;

@@ -19,12 +19,16 @@ import {useTranslation} from 'react-i18next';
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
+import Unhide from '../assets/svg/unhide.svg';
+import Hide from '../assets/svg/hide.svg';
+
 import VText from './text';
 
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
     const {
         hideTotalBalance,
+        setTotalBalanceHidden,
     } = useContext(AppStorageContext);
 
     const {t, i18n} = useTranslation('wallet');
@@ -61,23 +65,29 @@ export const WalletCard = (props: WalletCardProps) => {
                             style={{width: 10}}
                         />
                     </View>
-                    {props.isWatchOnly && (
-                        <View
-                            className="bg-black absolute rounded-full opacity-60"
+                    <View className="w-full relative top-6">
+                            <VText
+                            className="text-xl font-medium w-full"
                             style={[
-                                langDir === 'right'
-                                    ? styles.watchOnlyRTL
-                                    : styles.watchOnlyLTR,
-                            ]}>
-                            <Text
-                                className="text-xs text-white font-bold px-4 py-1"
-                                style={[
+                                {
+                                    color: ColorScheme.Text
+                                                  .Default,
+                                    marginLeft: langDir === 'left' ? 0 : 0,
+                                    marginRight: langDir === 'right' ? 0 : 0,
+                                    },
                                     Font.RobotoText,
                                 ]}>
-                                Watch only
-                            </Text>
-                        </View>
-                    )}
+                                {props.label}
+                            </VText>
+                            <PlainButton
+                                className={`absolute top-0 ${langDir === 'right' ? "left-0": "right-0"} rounded-full items-center flex-row p-1 -mt-1`}
+                                onPress={() => {setTotalBalanceHidden(!hideTotalBalance)}}
+                                >                                
+                                    {hideTotalBalance ? 
+                                        <Hide fill={ColorScheme.SVG.Default} width={20} height={20} /> : 
+                                        <Unhide style={{opacity: 0.8}} fill={ColorScheme.SVG.Default} width={20} height={20} /> }
+                            </PlainButton>
+                    </View>
 
                     <View className="w-full absolute mx-6 bottom-6">
                             {!hideTotalBalance && <VText
