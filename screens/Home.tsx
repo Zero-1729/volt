@@ -410,7 +410,12 @@ const Home = ({route}: Props) => {
                                 </VText>
                             </View>
 
-                            {isLightning && <LightningBoltIcon width={18} height={18} fill={_wallet.isConnected() ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />}
+                            {isLightning && 
+                            (loadingBalance ? <ActivityIndicator
+                                    color={ColorScheme.Background.Greyed}
+                                    className="ml-2"
+                                /> : <LightningBoltIcon width={18} height={18} fill={_wallet.isConnected() ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />)
+                            }
                         </View>
 
                         <PlainButton
