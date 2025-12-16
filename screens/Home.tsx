@@ -386,7 +386,7 @@ const Home = ({route}: Props) => {
 
                             {isLightning && 
                             (loadingBalance ? <ActivityIndicator
-                                    color={ColorScheme.Background.Greyed}
+                                    color={ColorScheme.Background.Default}
                                     className="ml-2"
                                 /> : <LightningBoltIcon width={18} height={18} fill={_wallet.isConnected() ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />)
                             }
