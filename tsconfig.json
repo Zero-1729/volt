@@ -6,6 +6,7 @@
     "nativewind-env.d.ts"
   ],
   "compilerOptions": {
+    "types": ["jest"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -14,7 +15,8 @@
     "lib": [
       "es6"
     ],
-    "moduleResolution": "node10",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "noEmit": true,
     "strict": true,
     "target": "esnext",
