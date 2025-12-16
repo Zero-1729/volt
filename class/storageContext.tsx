@@ -23,7 +23,7 @@ import {
     fromDescriptorPTR,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
-import {BreezEvent} from '@breeztech/react-native-breez-sdk';
+import { SdkEvent } from '@breeztech/breez-sdk-spark-react-native';
 
 import {TLanguage, TCurrency, TCachedRates} from '../types/settings';
 import {EBackupMaterial, ENet} from '../types/enums';
@@ -102,7 +102,7 @@ type defaultContextType = {
     isBiometricsActive: boolean;
     mempoolInfo: TMempoolInfo;
     pinAttempts: number; // maxes out at 10, reset when correct pin entered
-    setBreezEvent: (event: BreezEvent) => void;
+    setBreezEvent: (event: SdkEvent) => void;
     setMempoolInfo: (data: TMempoolInfo) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
@@ -433,16 +433,16 @@ export const AppStorageProvider = ({children}: Props) => {
     );
 
     const setBreezEvent = useCallback(
-        async (event: BreezEvent) => {
+        (event: SdkEvent) => {
             // handle clear
-            if (event === ({} as BreezEvent)) {
-                await _setBreezEvent({} as BreezEvent);
-                await _updateBreezEvent(JSON.stringify({}));
+            if (event === ({} as SdkEvent)) {
+                _setBreezEvent({} as SdkEvent);
+                _updateBreezEvent(JSON.stringify({}));
             }
 
             try {
-                await _setBreezEvent(event);
-                await _updateBreezEvent(JSON.stringify(event));
+                _setBreezEvent(event);
+                _updateBreezEvent(JSON.stringify(event));
             } catch (e) {
                 console.error(
                     `[AsyncStorage] (Breez event) Error loading data: ${e} [${event}]`,
