@@ -30,13 +30,6 @@ import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 import {capitalizeFirst} from '../../modules/transform';
 import Color from '../../constants/Color';
 
-import {
-    Payment,
-    InvoicePaidDetails,
-    PaymentFailedData,
-} from '@breeztech/react-native-breez-sdk';
-import {EBreezDetails} from './../../types/enums';
-
 import {LongBottomButton} from '../../components/button';
 
 import Success from '../../assets/svg/check-circle-fill-24.svg';
@@ -46,6 +39,7 @@ import {FiatBalance} from '../../components/balance';
 import Lottie from 'lottie-react-native';
 
 import eNutsConfetti from '../../assets/lottie/e-nuts-confetti.json';
+import { PaymentType, SdkEvent, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'LNTransactionStatus'>;
 
@@ -53,7 +47,7 @@ const LNTransactionStatus = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {isAdvancedMode} =
+    const {isAdvancedMode, breezEvent, setBreezEvent} =
         useContext(AppStorageContext);
 
     const {height, width} = Dimensions.get('window');
@@ -64,19 +58,41 @@ const LNTransactionStatus = ({route}: Props) => {
     const {t} = useTranslation('wallet');
 
     const confettiSrc = eNutsConfetti;
-    const receivedPayment = route.params.detailsType === 'received';
+    const receivedPayment = route.params.detailsType === PaymentType.Receive;
+
+    const handleRoute = () => {
+        // Clear breez event
+        // Attempt to sync balance when reload or Breez event triggered
+        // E.g. from completed transaction
+        if (breezEvent.tag === SdkEvent_Tags.PaymentSucceeded) {
+            // reset Breez event
+            setBreezEvent({} as SdkEvent);
+        }
+
+        // Route to wallet screen
+        navigation.dispatch(CommonActions.reset({
+                index: 1,
+                routes: [
+                {name: 'HomeScreen'},
+                {name: 'WalletRoot', params: {
+                    reload: route.params.status,
+                },
+            }],
+        }));
+    }
 
     const txTitle = () => {
         let msg!: string;
 
-        switch (route.params.detailsType) {
-            case EBreezDetails.Received:
-                msg = t('payment_received');
+        switch (route.params.tag) {
+            case SdkEvent_Tags.PaymentSucceeded:
+                if (receivedPayment) {
+                    msg = t('payment_received');
+                } else {
+                    msg = t('payment_success');
+                }
                 break;
-            case EBreezDetails.Success:
-                msg = t('payment_success');
-                break;
-            case EBreezDetails.Failed:
+            case SdkEvent_Tags.PaymentFailed:
                 msg = t('payment_failed');
                 break;
         }
@@ -85,31 +101,11 @@ const LNTransactionStatus = ({route}: Props) => {
     };
 
     const failedError = route.params.details
-        ? (route.params.details as PaymentFailedData).error
+        ? (route.params.detailsType).tag
         : '';
 
     const sats = () => {
-        let amount!: number;
-
-        switch (route.params.detailsType) {
-            case EBreezDetails.Received:
-                // Note: handle both forced and normal payments
-                const amt = (route.params.details as Payment).amountMsat / 1_000;
-                amount = ((route.params.details as InvoicePaidDetails)?.payment ?
-                    ((route.params.details as InvoicePaidDetails).payment
-                        ?.amountMsat as number) : amt) / 1_000;
-                break;
-            case EBreezDetails.Success:
-                amount = (route.params.details as Payment).amountMsat / 1_000;
-                break;
-            case EBreezDetails.Failed:
-                amount =
-                    ((route.params.details as PaymentFailedData).invoice
-                        ?.amountMsat as number) / 1_000;
-                break;
-        }
-
-        return amount;
+        return route.params.details.amount;
     };
 
     // TEMP: fix iOS animation autoPlay
@@ -217,7 +213,7 @@ const LNTransactionStatus = ({route}: Props) => {
                             )}
                         </View>
 
-                        {route.params.detailsType === 'received' && (
+                        {receivedPayment && (
                             <View className="mt-4 mb-2 items-center">
                                 <FiatBalance
                                     balance={sats()}
@@ -232,7 +228,7 @@ const LNTransactionStatus = ({route}: Props) => {
                         <View
                             className={
                                 `w-4/5 ${
-                                    route.params.detailsType === 'received'
+                                    receivedPayment
                                         ? ''
                                         : 'mt-4'
                                 } items-center`
@@ -244,7 +240,7 @@ const LNTransactionStatus = ({route}: Props) => {
                             </Text>
 
                             {route.params.detailsType ===
-                                EBreezDetails.Failed &&
+                                SdkEvent_Tags.PaymentFailed &&
                                 isAdvancedMode && (
                                     <Text
                                         className="text-sm text-center mt-2"
@@ -257,7 +253,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                 )}
                         </View>
 
-                        {route.params.detailsType === 'received' && (
+                        {receivedPayment && (
                             <View className="items-center w-4/5">
                                 <Text
                                     className="text-sm text-center mt-2"
@@ -265,8 +261,7 @@ const LNTransactionStatus = ({route}: Props) => {
                                         color: ColorScheme.Text.GrayedText,
                                     }}>
                                     {
-                                        (route.params.details as Payment)
-                                            .description
+                                        route.params.details.payment.details.inner.paymentHash
                                     }
                                 </Text>
                             </View>
@@ -276,17 +271,7 @@ const LNTransactionStatus = ({route}: Props) => {
                     <View
                         className="absolute bottom-0 items-center w-full">
                         <LongBottomButton
-                            onPress={() => {
-                                navigation.dispatch(CommonActions.reset({
-                                    index: 1,
-                                    routes: [
-                                        {name: 'HomeScreen'},
-                                        {name: 'WalletRoot', params: {
-                                            reload: route.params.status,
-                                        },
-                                    }],
-                                }));
-                            }}
+                            onPress={handleRoute}
                             title={capitalizeFirst(t('continue'))}
                             textColor={ColorScheme.Text.Alt}
                             backgroundColor={ColorScheme.Background.Inverted}
