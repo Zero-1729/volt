@@ -20,7 +20,7 @@ import {
     StackActions,
 } from '@react-navigation/native';
 
-import {Bolt11Invoice} from '@breeztech/breez-sdk-spark-react-native';
+import {Bolt11Invoice, Payment, PaymentType, SdkEvent_Tags} from '@breeztech/breez-sdk-spark-react-native';
 import {checkNetworkIsReachable} from './modules/wallet-utils';
 
 import Color from './constants/Color';
@@ -155,8 +155,10 @@ export type InitStackParamList = {
     TransactionList: undefined;
     LNTransactionStatus: {
         status: boolean;
-        details: TBreezPaymentDetails;
-        detailsType: EBreezDetails;
+        details: Payment;
+        detailsType: PaymentType;
+        error: string | null;
+        tag: SdkEvent_Tags;
     };
     Mnemonic: undefined;
     BoltNFC: undefined;
