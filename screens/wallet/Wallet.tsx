@@ -303,7 +303,7 @@ const Wallet = ({route}: Props) => {
     useEffect(() => {
         // Attempt to sync balance when reload or Breez event triggered
         // E.g. from completed transaction
-        if (breezEvent.type === SdkEvent_Tags.PaymentSucceeded) {
+        if (breezEvent.tag === SdkEvent_Tags.PaymentSucceeded) {
             // reset Breez event
             setBreezEvent({} as SdkEvent);
 
