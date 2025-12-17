@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {
     useContext,
@@ -22,7 +23,6 @@ import {
 import VText from '../../components/text';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
-import {EBreezDetails} from '../../types/enums';
 
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../../components/toast';
@@ -335,35 +335,45 @@ const Receive = ({route}: Props) => {
         walletData.type,
     ]);
 
-    useEffect(() => {
-        processLNInvoice();
-    }, [processLNInvoice]);
+        useEffect(() => {
+        if (breezEvent.tag === SdkEvent_Tags.PaymentSucceeded) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
 
-    useEffect(() => {
-        if (breezEvent.type === SdkEvent_Tags.PaymentSucceeded) {
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Received,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent.inner.payment.paymentType,
+                    error: null,
                 }),
             );
             return;
         }
 
-        if (breezEvent.type === SdkEvent_Tags.PaymentFailed) {
+        if (breezEvent.tag === SdkEvent_Tags.PaymentFailed) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
+
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Failed,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent.inner.payment.paymentType,
+                    error: breezEvent.inner,
                 }),
             );
             return;
         }
-    }, [breezEvent, navigation]);
+    }, [breezEvent]);
+
+    useEffect(() => {
+        processLNInvoice();
+    }, [processLNInvoice]);
 
     const carouselRef = useRef<ICarouselInstance>(null);
 
@@ -758,8 +768,8 @@ const Receive = ({route}: Props) => {
     }, [loadingInvoice, ColorScheme.Text.DescText, ColorScheme.Text.Default, ColorScheme.Background.QRBorder, ColorScheme.Background.Default, ColorScheme.Background.Greyed, ColorScheme.SVG.Default, t, isAdvancedMode, isBolt11, bolt11?.invoice.bolt11, bolt11?.invoice.source.bip21Uri, bolt12?.invoice.invoice, feeMessage, langDir, routeToBoltNFC, copyDescToClipboard, navigation]);
 
     const panels = useMemo((): Slide[] => {
-        return isNetOn ? [lnPanel, onchainPanel] : [onchainPanel];
-    }, [isNetOn, lnPanel, onchainPanel]);
+        return _wallet.isConnected() ? [lnPanel, onchainPanel] : [onchainPanel];
+    }, [_wallet, lnPanel, onchainPanel]);
 
     return (
         <SafeAreaView
