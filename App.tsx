@@ -78,16 +78,15 @@ const AppContent = () => {
         }
 
         const initNode = async () => {
-            console.log('Initializing node...');
             if (isWalletInitialized && _wallet.type === 'unified') {
                 if (wallet.isConnected()) {
-                    console.log('Wallet already connected.');
+                    console.log('[Breez SDK] Wallet already connected.');
                     return
                 }
 
                 const breezAPIKey = _BREEZ_SDK_SPARK_API_?.trim();
                 if (!breezAPIKey) {
-                    console.log('Breez API key is not set. Cannot connect to node.');
+                    console.log('[Breez SDK] Breez API key is not set. Cannot connect to node.');
                     return;
                 }
 
@@ -100,6 +99,7 @@ const AppContent = () => {
                         } else if (event.tag === SdkEvent_Tags.UnclaimedDeposits) {
                             // SDK was unable to claim some deposits automatically
                             // const unclaimedDeposits = event.inner.unclaimedDeposits
+                            setBreezEvent(event);
                         } else if (event.tag === SdkEvent_Tags.ClaimedDeposits) {
                             // Deposits were successfully claimed
                             // const claimedDeposits = event.inner.claimedDeposits
@@ -140,7 +140,7 @@ const AppContent = () => {
                 // Set event listener
                 const onBreezEvent = new onBreezEventListener().onEvent;
 
-                console.log('Connecting to node with Breez API Key.');
+                console.log('[Breez SDK] Connecting to node with Breez API Key.');
 
                 // Add API key, init wallet, and add event listeners
                 try {
@@ -149,7 +149,7 @@ const AppContent = () => {
                     await wallet.initWallet(_wallet.mnemonic, config);
                     wallet.addEventListener(onBreezEvent)
                 } catch (error) {
-                    console.log('Error connecting to node:', error);
+                    console.log('[Breez SDK] Error connecting to Breez:', error);
                 }
             }
         };

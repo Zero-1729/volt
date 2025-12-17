@@ -450,7 +450,7 @@ export const rootNavigation = {
             navigationRef.current?.navigate(...args);
         } else {
             // If navigation not ready
-            console.log('Navigation not ready');
+            console.log('[nav] Navigation not ready');
         }
     },
 };

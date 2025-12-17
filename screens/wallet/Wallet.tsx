@@ -86,8 +86,6 @@ const Wallet = ({route}: Props) => {
         setCachedRates,
         rates,
         setAppFiatCurrency,
-        breezEvent,
-        setBreezEvent,
     } = useContext(AppStorageContext);
 
     // For loading effect on balance
