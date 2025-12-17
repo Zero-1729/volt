@@ -19,6 +19,7 @@ import type {
 //   Fee,
   UserSettings,
   UpdateUserSettingsRequest,
+  RecommendedFees,
 } from '@breeztech/breez-sdk-spark-react-native';
 
 export interface WalletAPI {
@@ -53,6 +54,9 @@ export interface WalletAPI {
     // getSDKLogs: () => Promise<string>;
     getUserPreferences: () => Promise<UserSettings>;
     setUserPreferences: (settings: UpdateUserSettingsRequest) => Promise<void>;
+
+    // Fees
+    getFeesRecommendations: () => Promise<RecommendedFees>;
 
     // TODO: Mnemonic management
 };
