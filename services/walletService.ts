@@ -23,6 +23,8 @@ import {
     LnurlPayResponse,
     SdkError,
     SdkError_Tags,
+    LightningAddressInfo,
+    RegisterLightningAddressRequest,
     RecommendedFees,
 } from '@breeztech/breez-sdk-spark-react-native';
 
@@ -163,6 +165,35 @@ const getFeesRecommendations = async (): Promise<RecommendedFees> => {
     return await sdk.recommendedFees();
 };
 
+const resetLightningAddress = async (): Promise<void> => {
+    if (!sdk) {
+        throw new Error('Error resetting Lightning Address');
+    }
+
+    return await sdk.deleteLightningAddress();
+};
+
+const setLightningAddress = async (request: RegisterLightningAddressRequest): Promise<LightningAddressInfo> => {
+    if (!sdk) {
+        throw new Error('Error setting Lightning Address');
+    }
+
+    return await sdk.registerLightningAddress(request);
+};
+
+const getLightningAddress = async (): Promise<LightningAddressInfo> => {
+    if (!sdk) {
+        throw new Error('Error getting Lightning Address');
+    }
+
+    const addressInfoOpt = await sdk.getLightningAddress();
+
+    if (addressInfoOpt) {
+        return addressInfoOpt;
+    } else {
+        throw new Error('No Lightning Address set');
+    } 
+};
 
 // LnURL methods
 const prepareLnurlPay = async (params: PrepareLnurlPayRequest): Promise<PrepareLnurlPayResponse> => {
@@ -257,6 +288,9 @@ export const walletApi: WalletAPI = {
     lnurlPay,
 
     getFeesRecommendations,
+    getLightningAddress,
+    setLightningAddress,
+    resetLightningAddress,
 
     // Transactions and Wallet Data
     walletInfo,

@@ -20,6 +20,8 @@ import type {
   UserSettings,
   UpdateUserSettingsRequest,
   RecommendedFees,
+  LightningAddressInfo,
+  RegisterLightningAddressRequest,
 } from '@breeztech/breez-sdk-spark-react-native';
 
 export interface WalletAPI {
@@ -45,6 +47,11 @@ export interface WalletAPI {
     // LnURL methods
     prepareLnurlPay: (request: PrepareLnurlPayRequest) => Promise<PrepareLnurlPayResponse>;
     lnurlPay: (request: LnurlPayRequest) => Promise<LnurlPayResponse>;
+
+    // LnURL Utils
+    getLightningAddress: () => Promise<LightningAddressInfo>;
+    setLightningAddress: (request: RegisterLightningAddressRequest) => Promise<LightningAddressInfo>;
+    resetLightningAddress: () => Promise<void>;
 
     // Transactions and Wallet Data
     walletInfo: () => Promise<GetInfoResponse | null>;
