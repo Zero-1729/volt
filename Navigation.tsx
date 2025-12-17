@@ -105,11 +105,10 @@ import {
     TTransaction,
     TMiniWallet,
     TInvoiceData,
-    TBreezPaymentDetails,
     TLnManualPayloadType,
     TSwapInfo,
 } from './types/wallet';
-import {ENet, EBreezDetails, SwapType} from './types/enums';
+import {ENet, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
 
 import netInfo from '@react-native-community/netinfo';
@@ -157,7 +156,7 @@ export type InitStackParamList = {
         status: boolean;
         details: Payment;
         detailsType: PaymentType;
-        error: string | null;
+        error: any;
         tag: SdkEvent_Tags;
     };
     Mnemonic: undefined;
