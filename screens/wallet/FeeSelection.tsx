@@ -30,7 +30,6 @@ import Prompt from 'react-native-prompt-android';
 import Color from '../../constants/Color';
 
 import {TMempoolFeeRates} from '../../types/wallet';
-import {getFeeRates} from '../../modules/mempool';
 import {
     normalizeFiat,
     addCommas,
@@ -49,6 +48,7 @@ import {LiberalToast} from '../../components/toast';
 import Info from '../../assets/svg/info-16.svg';
 import AlertIcon from '../../assets/svg/alert-16.svg';
 import { Toasts } from '@backpackapp-io/react-native-toast';
+import { useWallet } from '../../contexts/walletContext';
 
 type Props = NativeStackScreenProps<WalletParamList, 'FeeSelection'>;
 
@@ -63,11 +63,12 @@ const FeeSelection = ({route}: Props) => {
 
     const isAndroid = Platform.OS === 'android';
 
+    const _wallet = useWallet();
+
     const {
         fiatRate,
         appFiatCurrency,
         electrumServerURL,
-        mempoolInfo,
         currentWalletID,
         getWalletData,
         isAdvancedMode,
@@ -141,14 +142,15 @@ const FeeSelection = ({route}: Props) => {
         let rates = feeRates;
 
         try {
-            const fetchedRates = await getFeeRates(route.params.wallet.network);
+            const fetchedRates = await _wallet.getFeesRecommendations();
 
-            rates = fetchedRates as TMempoolFeeRates;
+            rates = fetchedRates;
         } catch (err: any) {
             // Error assumed to be 503; mempool unavailable due to sync
             LiberalToast(t('feerate'), e('failed_fee_rate_fetch'), {
                 duration: 3000,
             });
+            return err;
         }
 
         // Set the fee rate from modal or use fastest
@@ -634,7 +636,7 @@ const FeeSelection = ({route}: Props) => {
                 )}
 
                 {/* Show message if in high-fee or congested mempool environment and display warn message here */}
-                {!loadingData && mempoolInfo.mempoolCongested && (
+                {!loadingData && (feeRates?.hourFee > 5) && (
                     <View
                         className={
                             `absolute w-5/6 ${
@@ -665,7 +667,7 @@ const FeeSelection = ({route}: Props) => {
                     </View>
                 )}
 
-                {!loadingData && mempoolInfo.mempoolHighFeeEnv && (
+                {!loadingData && (feeRates?.hourFee > 5) && (
                     <View
                         className={
                             `absolute w-5/6 ${
