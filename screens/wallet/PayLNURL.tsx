@@ -18,13 +18,6 @@ import React, {
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-import {
-    BreezEventVariant,
-    InputTypeVariant,
-    parseInput,
-    payLnurl,
-} from '@breeztech/react-native-breez-sdk';
-
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Color from '../../constants/Color';
 
@@ -62,6 +55,8 @@ import {biometricAuth} from '../../modules/shared';
 
 import PINPass from '../../components/pinpass';
 import {useNetInfo} from '@react-native-community/netinfo';
+import { InputType_Tags, SdkEvent_Tags, SdkError, SdkError_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { useWallet } from '../../contexts/walletContext';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'PayLNURL'>;
 
@@ -435,6 +430,8 @@ const PayLNURL = ({route}: Props) => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
 
+    const _wallet = useWallet();
+
     const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
@@ -444,25 +441,35 @@ const PayLNURL = ({route}: Props) => {
     const {t} = useTranslation('wallet');
 
     useEffect(() => {
-        if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
+        if (breezEvent.tag === SdkEvent_Tags.PaymentSucceeded) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
+
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Success,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent.inner.payment.paymentType,
+                    error: null,
                 }),
             );
             return;
         }
 
-        if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
+        if (breezEvent.tag === SdkEvent_Tags.PaymentFailed) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
+
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Failed,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent.inner.payment.paymentType,
+                    error: lnurlErrorText,
                 }),
             );
             return;
@@ -529,9 +536,7 @@ const PayLNURL = ({route}: Props) => {
     const handleLNURL = async () => {
         if (lnurlError) {
             navigation.dispatch(
-                CommonActions.navigate('WalletRoot', {
-                    screen: 'WalletView',
-                }),
+                CommonActions.navigate('HomeScreen'),
             );
 
             setLNURLError(false);
@@ -545,39 +550,45 @@ const PayLNURL = ({route}: Props) => {
     ) => {
         try {
             setStatusMessage(t('parsing_ln_address'));
-            const input = await parseInput(lnurlPayURL);
+            const input = await _wallet.parseInput(lnurlPayURL);
 
-            if (input.type === InputTypeVariant.LN_URL_ERROR) {
+            if (input.tag !== InputType_Tags.LightningAddress) {
                 throw new Error(t('not_ln_address'));
             }
 
-            // LN Address
-            if (input.type === InputTypeVariant.LN_URL_PAY) {
-                const canComment = input.data.commentAllowed;
+            // LN Address (LNURLPay)
+            if (input.tag === InputType_Tags.LightningAddress) {
+                const payRequest = input.inner[0].payRequest;
 
-                // Note: min spendable is in Msat
-                const maxAmountSats = input.data.maxSendable / 1_000;
-                const amountMSats = amtSats * 1_000;
-
-                setStatusMessage(t('check_ln_address_limits'));
-
-                if (amtSats > maxAmountSats) {
+                setStatusMessage(t('checking if amount within limit'));
+                if (amtSats > input.inner[0].payRequest.maxSendable) {
                     setLNURLErrorText(t('amount_above_max_spendable'));
                 }
 
-                setStatusMessage(t('paying_ln_address'));
+                setStatusMessage(t('preparing pay request and fees'));
 
-                await payLnurl({
-                    data: input.data,
-                    amountMsat: amountMSats,
-                    useTrampoline: true,
-                    comment: canComment ? comment || '' : '',
+                const prepResp = await _wallet.prepareLnurlPay({
+                    amountSats: BigInt(amtSats),
+                    payRequest: payRequest,
+                    comment: comment,
+                    validateSuccessActionUrl: true,
                 });
+
+                const feeSats = prepResp.feeSats
+
+                setStatusMessage(t(`attempting to pay ${prepResp.payRequest.address} with fee: ${feeSats} sats`))
+
+                const resp = await _wallet.lnurlPay({
+                    prepareResponse: prepResp,
+                    idempotencyKey: undefined,
+                });
+
+                setStatusMessage(t(`${resp.successAction?.inner}`));
 
                 setLoadingPay(false);
             }
         } catch (error: any) {
-            const errMsg = error.message.includes('Failed to parse') ? t('no_lnurl_found') : error.message;
+            const errMsg = error.message.includes('Failed to parse') ? t('no_lnurl_found') : error?.inner[0];
 
             setLNURLErrorText(errMsg);
             setLNURLError(true);
