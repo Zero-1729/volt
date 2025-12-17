@@ -466,8 +466,6 @@ const RootNavigator = (): ReactElement => {
         setOnboarding,
         getWalletData,
         currentWalletID,
-        mempoolInfo,
-        setMempoolInfo,
     } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
@@ -475,9 +473,6 @@ const RootNavigator = (): ReactElement => {
 
     const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
-    const mempoolRef = useRef(
-        new WebSocket('wss://mempool.space/api/v1/ws'),
-    ).current;
 
     const {t} = useTranslation('wallet');
 
@@ -630,78 +625,6 @@ const RootNavigator = (): ReactElement => {
         setTriggerClipboardCheck(false);
     }, [triggerClipboardCheck]);
 
-    // Fetch and set Swap Info here
-    const initMempoolSock = async () => {
-        // Check network
-        const _netState = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netState)) {
-            return;
-        }
-
-        if (mempoolInfo.connected) {
-            console.log('[Mempool] WebSocket already connected');
-            return;
-        }
-
-        mempoolRef.onopen = () => {
-            console.log('[Mempool] WebSocket connected');
-
-            mempoolRef.send(
-                JSON.stringify({
-                    action: 'want',
-                    data: ['stats'],
-                }),
-            );
-        };
-
-        mempoolRef.onmessage = (error: any) => {
-            const _mempoolInfo = JSON.parse(error.data.toString()).mempoolInfo;
-            const _fees = JSON.parse(error.data.toString()).fees;
-
-            const mempoolUsage = _mempoolInfo?.usage;
-            const mempoolMax = _mempoolInfo?.maxmempool;
-            const feeEnv = _fees?.fastestFee
-                ? _fees?.fastestFee
-                : mempoolInfo.fastestFee;
-
-            setMempoolInfo({
-                mempoolCongested: mempoolUsage / mempoolMax >= 2.5,
-                mempoolHighFeeEnv: feeEnv >= 150,
-                economyFee: _fees?.economyFee
-                    ? _fees?.economyFee
-                    : mempoolInfo.economyFee,
-                fastestFee: _fees?.fastestFee
-                    ? _fees?.fastestFee
-                    : mempoolInfo.fastestFee,
-                minimumFee: _fees?.minimumFee
-                    ? _fees?.minimumFee
-                    : mempoolInfo.minimumFee,
-                hourFee: _fees?.hourFee ? _fees?.hourFee : mempoolInfo.hourFee,
-                halfHourFee: _fees?.halfHourFee
-                    ? _fees?.halfHourFee
-                    : mempoolInfo.halfHourFee,
-                connected: true,
-            });
-        };
-
-        mempoolRef.onerror = (error: any) => {
-            console.log('[Mempool] (error)', error.message);
-
-            if (error.message.includes('not connected')) {
-                setMempoolInfo({
-                    mempoolCongested: mempoolInfo.mempoolCongested,
-                    mempoolHighFeeEnv: mempoolInfo.mempoolHighFeeEnv,
-                    economyFee: mempoolInfo.economyFee,
-                    fastestFee: mempoolInfo.fastestFee,
-                    minimumFee: mempoolInfo.minimumFee,
-                    hourFee: mempoolInfo.hourFee,
-                    halfHourFee: mempoolInfo.halfHourFee,
-                    connected: true,
-                });
-            }
-        };
-    };
-
     useEffect(() => {
         // Block if newly onboarded
         if (walletState.current.length === 0) {
@@ -745,13 +668,9 @@ const RootNavigator = (): ReactElement => {
             },
         );
 
-        // Call mempool init
-        initMempoolSock();
-
         return () => {
             // Kill subscription
             appStateSub?.remove();
-            mempoolRef.close();
         };
     }, []);
 
