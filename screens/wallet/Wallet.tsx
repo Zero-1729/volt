@@ -430,11 +430,6 @@ const Wallet = ({route}: Props) => {
                                 balanceFontSize={'text-3xl'}
                                 disableFiat={false}
                                 loading={loadingBalance}
-                                hideColor={
-                                    ColorScheme.WalletColors[
-                                        walletData.type
-                                    ].accent
-                                }
                             />
                         </View>
                     </View>
@@ -465,26 +460,7 @@ const Wallet = ({route}: Props) => {
                                                 Lightning
                                             </Text>
 
-                                            {hideTotalBalance ? (
-                                                <View
-                                                    className="rounded-sm"
-                                                    style={{
-                                                            height: 20,
-                                                            width: 98,
-                                                            opacity:
-                                                                loadingBalance
-                                                                    ? 0.35
-                                                                    : 0.6,
-                                                            backgroundColor:
-                                                                ColorScheme
-                                                                    .WalletColors[
-                                                                    walletData
-                                                                        .type
-                                                                ].accent,
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Balance
+                                            <Balance
                                                     disabled={true}
                                                     fontColor={'white'}
                                                     balance={
@@ -496,14 +472,7 @@ const Wallet = ({route}: Props) => {
                                                     }
                                                     disableFiat={false}
                                                     loading={loadingBalance}
-                                                    hideColor={
-                                                        ColorScheme
-                                                            .WalletColors[
-                                                            walletData.type
-                                                        ].accent
-                                                    }
                                                 />
-                                            )}
                                         </View>
                                     </View>
 
@@ -532,45 +501,19 @@ const Wallet = ({route}: Props) => {
                                                 On-chain
                                             </Text>
 
-                                            {hideTotalBalance ? (
-                                                <View
-                                                    className="rounded-sm"
-                                                    style={{
-                                                            height: 20,
-                                                            width: 98,
-                                                            opacity:
-                                                                loadingBalance
-                                                                    ? 0.35
-                                                                    : 0.6,
-                                                            backgroundColor:
-                                                                ColorScheme
-                                                                    .WalletColors[
-                                                                    walletData
-                                                                        .type
-                                                                ].accent,
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Balance
-                                                    disabled={true}
-                                                    fontColor={'white'}
-                                                    balance={
-                                                        walletData.balance
-                                                            .onchain
-                                                    }
-                                                    balanceFontSize={
-                                                        'text-lg'
-                                                    }
-                                                    disableFiat={false}
-                                                    loading={loadingBalance}
-                                                    hideColor={
-                                                        ColorScheme
-                                                            .WalletColors[
-                                                            walletData.type
-                                                        ].accent
-                                                    }
-                                                />
-                                            )}
+                                            <Balance
+                                                disabled={true}
+                                                fontColor={'white'}
+                                                balance={
+                                                    walletData.balance
+                                                        .onchain
+                                                }
+                                                balanceFontSize={
+                                                    'text-lg'
+                                                }
+                                                disableFiat={false}
+                                                loading={loadingBalance}
+                                            />
                                         </View>
                                     </View>
                                 </View>

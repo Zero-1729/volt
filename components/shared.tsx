@@ -90,7 +90,7 @@ export const WalletCard = (props: WalletCardProps) => {
                     </View>
 
                     <View className="w-full absolute mx-6 bottom-6">
-                            {!hideTotalBalance && <VText
+                            <VText
                                 className="text-base font-medium opacity-60"
                                 style={[
                                     {
@@ -102,7 +102,7 @@ export const WalletCard = (props: WalletCardProps) => {
                                     Font.RobotoText,
                                 ]}>
                                 {t('balance')}
-                            </VText>}
+                            </VText>
 
                             <Balance
                                 fontColor={'white'}
@@ -110,10 +110,6 @@ export const WalletCard = (props: WalletCardProps) => {
                                 balanceFontSize={'text-3xl'}
                                 disableFiat={false}
                                 loading={props.loading}
-                                hideColor={
-                                    ColorScheme.WalletColors[props.walletType]
-                                        .accent
-                                }
                             />
                         </View>
                 </View>
