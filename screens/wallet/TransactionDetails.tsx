@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Text, View, useColorScheme, Linking, StyleSheet} from 'react-native';
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -41,7 +41,6 @@ import Failed from '../../assets/svg/x-circle-fill-24.svg';
 import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
-import SwapIcon from '../../assets/svg/arrow-switch-24.svg';
 
 import {
     capitalizeFirst,
@@ -51,12 +50,7 @@ import {
 } from '../../modules/transform';
 import {getScreenEdges} from '../../modules/screen';
 import BigNumber from 'bignumber.js';
-
-import {nodeInfo, LnPaymentDetails} from '@breeztech/react-native-breez-sdk';
-import {
-    SWAP_IN_LN_DESCRIPTION,
-    SWAP_OUT_LN_DESCRIPTION,
-} from '../../modules/wallet-defaults';
+import { PaymentStatus, PaymentType } from '@breeztech/breez-sdk-spark-react-native';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
@@ -81,7 +75,6 @@ const TransactionDetailsView = ({route}: Props) => {
     const {isAdvancedMode} = useContext(AppStorageContext);
 
     const [clippyData, setClippyData] = React.useState<string>('');
-    const [nodeId, setNodeId] = React.useState<string>('');
 
     const buttonText = isAdvancedMode ? t('view_on_mempool') : t('see_more');
 
@@ -98,12 +91,12 @@ const TransactionDetailsView = ({route}: Props) => {
         }
     };
 
-    const isLNTx = route.params.tx.isLightning;
+    const isLNTx = route.params.tx.details.tag === 'Lightning';
     const invoiceAmount = isLNTx
-        ? route.params.tx.amountMsat / 1000
+        ? route.params.tx.amount
         : route.params.tx.value;
     const txInbound = isLNTx
-        ? route.params.tx.paymentType === 'received'
+        ? route.params.tx.paymentType === PaymentType.Receive
         : route.params.tx.type === 'inbound';
 
     const getTxTimestamp = (time: number) => {
@@ -111,7 +104,7 @@ const TransactionDetailsView = ({route}: Props) => {
     };
 
     const titleDescText = isLNTx
-        ? getTxTimestamp(route.params.tx.paymentTime)
+        ? getTxTimestamp(route.params.tx.timestamp)
         : route.params.tx.confirmed
         ? getTxTimestamp(route.params.tx.timestamp)
         : t('pending');
@@ -119,14 +112,11 @@ const TransactionDetailsView = ({route}: Props) => {
     const txIdTitle = isLNTx ? 'ID' : 'Tx ID';
     const txId = isLNTx ? route.params.tx.id : route.params.tx.txid;
     const txFee = new BigNumber(
-        isLNTx ? route.params.tx.feeMsat / 1000 : route.params.tx.fee,
+        isLNTx ? route.params.tx.fees : route.params.tx.fee,
     );
 
-    const isSwapInTx = route.params.tx.description === SWAP_IN_LN_DESCRIPTION;
-    const isSwapOutTx = route.params.tx.description === SWAP_OUT_LN_DESCRIPTION;
-
-    const paymentPreimage = route.params.tx.details?.data
-        ? (route.params.tx.details?.data as LnPaymentDetails).paymentPreimage
+    const paymentPreimage = route.params.tx.details?.inner
+        ? route.params.tx.details?.inner.preimage
         : '';
 
     const handleBumpFee = (status: {
@@ -176,10 +166,6 @@ const TransactionDetailsView = ({route}: Props) => {
         );
     };
 
-    const copyNodeId = () => {
-        copyToClipboard(nodeId);
-    };
-
     const copyPreimage = () => {
         copyToClipboard(paymentPreimage);
     };
@@ -207,15 +193,15 @@ const TransactionDetailsView = ({route}: Props) => {
     const edges: Edges = getScreenEdges(route.params.source);
 
     const txPending = isLNTx
-        ? route.params.tx.status === 'pending'
+        ? route.params.tx.status !== 0
         : route.params.tx.confirmations > 0 &&
           route.params.tx.confirmations <= 6;
 
     const txSuccess = isLNTx
-        ? route.params.tx.status === 'complete'
+        ? route.params.tx.status === 0
         : route.params.tx.confirmations > 6;
 
-    const txFailed = isLNTx && route.params.tx.status === 'failed';
+    const txFailed = isLNTx && route.params.tx.status !== 0;
 
     const confirmationCount =
         route.params.tx.confirmations > 6
@@ -229,12 +215,10 @@ const TransactionDetailsView = ({route}: Props) => {
     const onchainStatusMessage =
         route.params.tx.status === 'pending'
             ? t('pending_conf')
-            : t(route.params.tx.status);
+            : route.params.tx.status === PaymentStatus.Completed ? t('complete') : t('failed');
 
     const confirmationInfo = isLNTx
-        ? isSwapOutTx
-            ? capitalizeFirst(t(route.params.tx.status))
-            : onchainStatusMessage
+        ? onchainStatusMessage
         : route.params.tx.confirmed
         ? `${
               route.params.tx.confirmations === 1
@@ -247,17 +231,6 @@ const TransactionDetailsView = ({route}: Props) => {
 
     const topMargin = isLNTx ? 'mt-10' : displayFeeBump ? '-mt-16' : '-mt-8';
 
-    const loadNodeInfo = async () => {
-        const node = await nodeInfo();
-
-        setNodeId(node.id);
-    };
-
-    useEffect(() => {
-        if (isLNTx) {
-            loadNodeInfo();
-        }
-    });
 
     return (
         <SafeAreaView
@@ -395,32 +368,13 @@ const TransactionDetailsView = ({route}: Props) => {
                         {isLNTx && (
                             <View
                                 className="items-center mt-6 w-full">
-                                {isSwapInTx || isSwapOutTx ? (
-                                    <View
-                                        className="flex-row items-center justify-center">
-                                        <SwapIcon
-                                            fill={ColorScheme.SVG.GrayFill}
-                                        />
-                                        <Text
-                                            className="text-sm ml-2"
-                                            style={{
-                                                color: ColorScheme.Text
-                                                    .DescText,
-                                            }}>
-                                            {isSwapInTx
-                                                ? t('bitcoin_swapin')
-                                                : t('ln_swapout')}
-                                        </Text>
-                                    </View>
-                                ) : (
-                                    <Text
-                                        ellipsizeMode="middle"
-                                        numberOfLines={2}
-                                        className="text-sm w-4/5 text-center"
-                                        style={{color: ColorScheme.Text.DescText}}>
-                                        {route.params.tx.description}
-                                    </Text>
-                                )}
+                                <Text
+                                    ellipsizeMode="middle"
+                                    numberOfLines={2}
+                                    className="text-sm w-4/5 text-center"
+                                    style={{color: ColorScheme.Text.DescText}}>
+                                    {route.params.tx.description}
+                                </Text>
                             </View>
                         )}
 
@@ -522,8 +476,7 @@ const TransactionDetailsView = ({route}: Props) => {
                                                     {formatSats(
                                                         new BigNumber(
                                                             route.params.tx
-                                                                .amountMsat /
-                                                                1_000,
+                                                                .amount,
                                                         ),
                                                     )}
                                                 </Text>
@@ -651,42 +604,6 @@ const TransactionDetailsView = ({route}: Props) => {
                                                                         .Default,
                                                             }}>
                                                             {paymentPreimage}
-                                                        </Text>
-                                                        <CopyIcon
-                                                            width={16}
-                                                            height={16}
-                                                            fill={
-                                                                ColorScheme.SVG
-                                                                    .GrayFill
-                                                            }
-                                                        />
-                                                    </View>
-                                                </PlainButton>
-
-                                                <PlainButton
-                                                    onPress={copyNodeId}
-                                                    className="w-full flex justify-between">
-                                                    <Text
-                                                        className="font-normal mr-2 mb-2"
-                                                        style={{
-                                                            color: ColorScheme
-                                                                .Text
-                                                                .Default,
-                                                        }}>
-                                                        Node ID
-                                                    </Text>
-                                                    <View
-                                                        className="w-full justify-between flex-row">
-                                                        <Text
-                                                            numberOfLines={1}
-                                                            ellipsizeMode="middle"
-                                                            className="font-bold w-4/5"
-                                                            style={{
-                                                                    color: ColorScheme
-                                                                        .Text
-                                                                        .Default,
-                                                            }}>
-                                                            {nodeId}
                                                         </Text>
                                                         <CopyIcon
                                                             width={16}
