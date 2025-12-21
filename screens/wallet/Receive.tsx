@@ -101,10 +101,11 @@ const Receive = ({route}: Props) => {
         currentWalletID,
         getWalletData,
         isAdvancedMode,
-        mempoolInfo,
         appFiatCurrency,
         fiatRate,
     } = useContext(AppStorageContext);
+
+    const [mempoolCongested, setMempoolCongested] = useState<boolean>(false);
 
     const walletData = useMemo(() => {
         return getWalletData(currentWalletID);
@@ -132,6 +133,12 @@ const Receive = ({route}: Props) => {
         bitcoinValue: new BigNumber(0),
         fiatValue: new BigNumber(0),
     };
+
+    const getMempool = async () => {
+        const fees = await _wallet.getFeesRecommendations();
+
+        setMempoolCongested(fees.halfHourFee >= 5);
+    }
 
     const reducer = (state: any, action: any) => {
         switch (action.type) {
@@ -185,10 +192,6 @@ const Receive = ({route}: Props) => {
         },
         [t],
     );
-
-    const congestedMempool = useMemo(() => {
-        return mempoolInfo.mempoolCongested;
-    }, [mempoolInfo.mempoolCongested]);
 
     const displayExpiry = useMemo(() => {
         if (isBolt11) {
@@ -249,6 +252,8 @@ const Receive = ({route}: Props) => {
                 payload: new BigNumber(route.params.fiat),
             });
         }
+
+        getMempool();
     }, [route.params]);
 
     const displayLNInvoice = useCallback(async () => {
@@ -387,7 +392,7 @@ const Receive = ({route}: Props) => {
             <View
                 className={
                     `items-center justify-center h-full w-full ${
-                        congestedMempool ? 'mt-8' : 'mt-6'
+                        mempoolCongested ? 'mt-8' : 'mt-6'
                     }`
                 }>
                 {isAmountInvoice && (
@@ -442,7 +447,7 @@ const Receive = ({route}: Props) => {
                 </View>
 
                 {/* Message on congestion */}
-                {congestedMempool && isNetOn && (
+                {mempoolCongested && isNetOn && (
                     <View
                         className={
                             `mt-4 w-5/6 ${
@@ -557,7 +562,7 @@ const Receive = ({route}: Props) => {
             </View>
         );
     }, [
-        congestedMempool,
+        mempoolCongested,
         isAmountInvoice,
         state.bitcoinValue,
         state.fiatValue,
