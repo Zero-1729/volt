@@ -157,6 +157,7 @@ const receivePayment = async (params: ReceivePaymentRequest): Promise<ReceivePay
 
     return await sdk.receivePayment(params);
 };
+
 const getFeesRecommendations = async (): Promise<RecommendedFees> => {
     if (!sdk) {
         throw new Error('cannot get fees recommendation')

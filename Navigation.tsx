@@ -21,7 +21,6 @@ import {
 } from '@react-navigation/native';
 
 import {Bolt11Invoice, Payment, PaymentType, SdkEvent_Tags} from '@breeztech/breez-sdk-spark-react-native';
-import {checkNetworkIsReachable} from './modules/wallet-utils';
 
 import Color from './constants/Color';
 
@@ -110,8 +109,6 @@ import {
 } from './types/wallet';
 import {ENet, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
-
-import netInfo from '@react-native-community/netinfo';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
