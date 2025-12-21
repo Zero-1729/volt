@@ -13,6 +13,7 @@ import {StatusBar, useColorScheme, NativeModules, Platform, View, StyleSheet} fr
 import {AppStorageContext} from './class/storageContext';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {WalletProvider, useWallet} from './contexts/walletContext'
+import {BreezEventProvider, useBreezEvent} from './contexts/BreezEventContext';
 import { _BREEZ_SDK_SPARK_API_ } from './modules/env';
 
 import i18n from './i18n';
@@ -36,9 +37,11 @@ const App = () => {
                 }
                 backgroundColor={ColorScheme.Background.Primary}
             />
-            <WalletProvider>
-                <AppContent />
-            </WalletProvider>
+            <BreezEventProvider>
+                <WalletProvider>
+                    <AppContent />
+                </WalletProvider>
+            </BreezEventProvider>
         </SafeAreaProvider>
     );
 };
@@ -47,12 +50,12 @@ const AppContent = () => {
     const {
         getWalletData,
         currentWalletID,
-        setBreezEvent,
     } = useContext(AppStorageContext);
     const [isReady, setIsReady] = useState<boolean>(false);
     const _wallet = getWalletData(currentWalletID);
 
-    const wallet = useWallet();
+    const {setBreezEvent} = useBreezEvent();
+    const breezWallet = useWallet();
 
     const {appLanguage, isWalletInitialized} = useContext(AppStorageContext);
 
@@ -79,7 +82,7 @@ const AppContent = () => {
 
         const initNode = async () => {
             if (isWalletInitialized && _wallet.type === 'unified') {
-                if (wallet.isConnected()) {
+                if (breezWallet.isConnected()) {
                     console.log('[Breez SDK] Wallet already connected.');
                     return
                 }
@@ -92,17 +95,21 @@ const AppContent = () => {
 
                 class onBreezEventListener {
                     onEvent = async (event: SdkEvent) => {
+                        let evt;
+
                         if (event.tag === SdkEvent_Tags.Synced) {
                             // Data has been synchronized with the network. When this event is received,
                             // it is recommended to refresh the payment list and wallet balance.
                             console.log('[Breez SDK] Synced');
+                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.UnclaimedDeposits) {
                             // SDK was unable to claim some deposits automatically
                             // const unclaimedDeposits = event.inner.unclaimedDeposits
-                            setBreezEvent(event);
+                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.ClaimedDeposits) {
                             // Deposits were successfully claimed
                             // const claimedDeposits = event.inner.claimedDeposits
+                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.PaymentSucceeded) {
                         // A payment completed successfully
                             const payment = event.inner.payment
@@ -111,7 +118,7 @@ const AppContent = () => {
                                 console.log('[Breez SDK] Payment Sent: ', payment);
 
                                 // Handle navigation to LNTransactionStatus in Wallet Send screen
-                                setBreezEvent(event);
+                                evt = event;
                             } else if (PaymentType.Receive === payment.paymentType) {
                                 console.log(
                                     '[Breez SDK] Invoice Paid (Received Payment): ',
@@ -119,20 +126,31 @@ const AppContent = () => {
                                 );
             
                                 // Handle navigation to LNTransactionStatus in Wallet Receive screen
-                                setBreezEvent(event);
+                                evt = event;
                             }
                         } else if (event.tag === SdkEvent_Tags.PaymentPending) {
                             // A payment is pending (waiting for confirmation)
                             // const pendingPayment = event.inner.payment
+                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.PaymentFailed) {
                             // A payment failed
                             const failedPayment = event.inner.payment
                             console.log('[Breez SDK] Payment Failed: ', failedPayment);
 
                             // Handle navigation to LNTransactionStatus in Wallet Receive & Send screen
-                            setBreezEvent(event);
+                            evt = event;
                         } else {
                             // Handle any future event types
+                        }
+                        
+                        // Set Breez event for handling in UI
+                        if (evt) {
+                            JSON.stringify(evt, (key, value) =>
+                                typeof value === "bigint" ? value.toString() : value,
+                            );
+
+                            // Set breez event in context
+                            setBreezEvent(evt);
                         }
                     }
                 }
@@ -146,8 +164,8 @@ const AppContent = () => {
                 try {
                     const config = defaultConfig(Network.Mainnet);
                     config.apiKey = breezAPIKey;
-                    await wallet.initWallet(_wallet.mnemonic, config);
-                    wallet.addEventListener(onBreezEvent)
+                    await breezWallet.initWallet(_wallet.mnemonic, config);
+                    breezWallet.addEventListener(onBreezEvent)
                 } catch (error) {
                     console.log('[Breez SDK] Error connecting to Breez:', error);
                 }
