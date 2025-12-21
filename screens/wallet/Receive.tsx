@@ -79,6 +79,7 @@ import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import { Bolt11InvoiceDetails, Bolt12InvoiceDetails, InputType_Tags, ReceivePaymentMethod, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
 import { useWallet } from '../../contexts/walletContext';
+import { useBreezEvent } from '../../contexts/BreezEventContext';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
@@ -94,12 +95,12 @@ const Receive = ({route}: Props) => {
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const _wallet = useWallet();
+    const { breezEvent } = useBreezEvent();
 
     const {
         currentWalletID,
         getWalletData,
         isAdvancedMode,
-        breezEvent,
         mempoolInfo,
         appFiatCurrency,
         fiatRate,
@@ -335,8 +336,8 @@ const Receive = ({route}: Props) => {
         walletData.type,
     ]);
 
-        useEffect(() => {
-        if (breezEvent.tag === SdkEvent_Tags.PaymentSucceeded) {
+    useEffect(() => {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
             // Serialize BigInt
             const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
 
@@ -346,14 +347,14 @@ const Receive = ({route}: Props) => {
                     status: true,
                     details: txDetails,
                     tag: breezEvent.tag,
-                    detailsType: breezEvent.inner.payment.paymentType,
+                    detailsType: breezEvent?.inner.payment.paymentType,
                     error: null,
                 }),
             );
             return;
         }
 
-        if (breezEvent.tag === SdkEvent_Tags.PaymentFailed) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentFailed) {
             // Serialize BigInt
             const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
 
@@ -363,7 +364,7 @@ const Receive = ({route}: Props) => {
                     status: false,
                     details: txDetails,
                     tag: breezEvent.tag,
-                    detailsType: breezEvent.inner.payment.paymentType,
+                    detailsType: breezEvent?.inner.payment.paymentType,
                     error: breezEvent.inner,
                 }),
             );

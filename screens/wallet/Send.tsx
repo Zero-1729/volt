@@ -74,6 +74,9 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {biometricAuth} from '../../modules/shared';
 import PINPass from '../../components/pinpass';
 
+import { SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { useBreezEvent } from '../../contexts/BreezEventContext';
+
 import netInfo from '@react-native-community/netinfo';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
@@ -95,9 +98,10 @@ const SendView = ({route}: Props) => {
         appFiatCurrency,
         isAdvancedMode,
         electrumServerURL,
-        breezEvent,
         isBiometricsActive,
     } = useContext(AppStorageContext);
+
+    const {breezEvent} = useBreezEvent();
 
     const isLightning = !!route.params.bolt11;
 
@@ -417,30 +421,40 @@ const SendView = ({route}: Props) => {
     }, []);
 
     useEffect(() => {
-        if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
-            // Route to LN payment status screen
-            navigation.dispatch(
-                CommonActions.navigate('LNTransactionStatus', {
-                    status: true,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Success,
-                }),
-            );
-            return;
-        }
-
-        if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
-            // Route to LN payment status screen
-            navigation.dispatch(
-                CommonActions.navigate('LNTransactionStatus', {
-                    status: false,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Failed,
-                }),
-            );
-            return;
-        }
-    }, [breezEvent]);
+            if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
+                // Serialize BigInt
+                const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
+    
+                // Route to LN payment status screen
+                navigation.dispatch(
+                    CommonActions.navigate('LNTransactionStatus', {
+                        status: true,
+                        details: txDetails,
+                        tag: breezEvent.tag,
+                        detailsType: breezEvent?.inner.payment.paymentType,
+                        error: null,
+                    }),
+                );
+                return;
+            }
+    
+            if (breezEvent?.tag === SdkEvent_Tags.PaymentFailed) {
+                // Serialize BigInt
+                const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
+    
+                // Route to LN payment status screen
+                navigation.dispatch(
+                    CommonActions.navigate('LNTransactionStatus', {
+                        status: false,
+                        details: txDetails,
+                        tag: breezEvent.tag,
+                        detailsType: breezEvent?.inner.payment.paymentType,
+                        error: breezEvent.inner,
+                    }),
+                );
+                return;
+            }
+        }, [breezEvent]);
 
     return (
         <SafeAreaView

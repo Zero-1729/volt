@@ -46,7 +46,6 @@ import {
     getMiniWallet,
     isLNAddress,
 } from '../../modules/wallet-utils';
-import {EBreezDetails} from '../../types/enums';
 import {DisplayFiatAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
 
@@ -55,8 +54,9 @@ import {biometricAuth} from '../../modules/shared';
 
 import PINPass from '../../components/pinpass';
 import {useNetInfo} from '@react-native-community/netinfo';
-import { InputType_Tags, SdkEvent_Tags, SdkError, SdkError_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { InputType_Tags, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
 import { useWallet } from '../../contexts/walletContext';
+import { useBreezEvent } from '../../contexts/BreezEventContext';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'PayLNURL'>;
 
@@ -431,8 +431,9 @@ const PayLNURL = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
 
     const _wallet = useWallet();
+    const {breezEvent} = useBreezEvent();
 
-    const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
+    const {isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
     const [lnurlError, setLNURLError] = useState(false);
@@ -441,7 +442,7 @@ const PayLNURL = ({route}: Props) => {
     const {t} = useTranslation('wallet');
 
     useEffect(() => {
-        if (breezEvent.tag === SdkEvent_Tags.PaymentSucceeded) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
             // Serialize BigInt
             const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
 
@@ -458,7 +459,7 @@ const PayLNURL = ({route}: Props) => {
             return;
         }
 
-        if (breezEvent.tag === SdkEvent_Tags.PaymentFailed) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentFailed) {
             // Serialize BigInt
             const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
 

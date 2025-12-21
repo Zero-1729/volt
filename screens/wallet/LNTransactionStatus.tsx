@@ -41,14 +41,17 @@ import Lottie from 'lottie-react-native';
 import eNutsConfetti from '../../assets/lottie/e-nuts-confetti.json';
 import { PaymentType, SdkEvent, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
 
+import { useBreezEvent } from '../../contexts/BreezEventContext';
+
 type Props = NativeStackScreenProps<InitStackParamList, 'LNTransactionStatus'>;
 
 const LNTransactionStatus = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {isAdvancedMode, breezEvent, setBreezEvent} =
+    const {isAdvancedMode} =
         useContext(AppStorageContext);
+    const { breezEvent, setBreezEvent } = useBreezEvent();
 
     const {height, width} = Dimensions.get('window');
 
@@ -64,7 +67,7 @@ const LNTransactionStatus = ({route}: Props) => {
         // Clear breez event
         // Attempt to sync balance when reload or Breez event triggered
         // E.g. from completed transaction
-        if (breezEvent.tag === SdkEvent_Tags.PaymentSucceeded) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
             // reset Breez event
             setBreezEvent({} as SdkEvent);
         }
