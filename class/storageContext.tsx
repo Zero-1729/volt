@@ -23,7 +23,6 @@ import {
     fromDescriptorPTR,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
-import { SdkEvent } from '@breeztech/breez-sdk-spark-react-native';
 
 import {TLanguage, TCurrency, TCachedRates} from '../types/settings';
 import {EBackupMaterial, ENet} from '../types/enums';
@@ -80,7 +79,6 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
-    breezEvent: SdkEvent;
     appLanguage: TLanguage;
     appFiatCurrency: TCurrency;
     loadLock: boolean;
@@ -100,7 +98,6 @@ type defaultContextType = {
     isPINActive: boolean;
     isBiometricsActive: boolean;
     pinAttempts: number; // maxes out at 10, reset when correct pin entered
-    setBreezEvent: (event: SdkEvent) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
     updateFiatRate: (fiatObj: TRateObject) => void;
@@ -142,7 +139,6 @@ type defaultContextType = {
 const defaultContext: defaultContextType = {
     loadLock: false,
     onboarding: true,
-    breezEvent: {} as SdkEvent,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -181,7 +177,6 @@ const defaultContext: defaultContextType = {
     isPINActive: false,
     isBiometricsActive: false,
     pinAttempts: 0,
-    setBreezEvent: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -225,7 +220,6 @@ export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
-    const [breezEvent, _setBreezEvent] = useState(defaultContext.breezEvent);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -266,8 +260,6 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('loadLock');
     const {getItem: _getOnboarding, setItem: _updateOnboarding} =
         useAsyncStorage('onboarding');
-    const {getItem: _getBreezEvent, setItem: _updateBreezEvent} =
-        useAsyncStorage('breezEvent');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -423,35 +415,6 @@ export const AppStorageProvider = ({children}: Props) => {
         },
         [_setOnboarding, _updateOnboarding],
     );
-
-    const setBreezEvent = useCallback(
-        (event: SdkEvent) => {
-            // handle clear
-            if (event === ({} as SdkEvent)) {
-                _setBreezEvent({} as SdkEvent);
-                _updateBreezEvent(JSON.stringify({}));
-            }
-
-            try {
-                _setBreezEvent(event);
-                _updateBreezEvent(JSON.stringify(event));
-            } catch (e) {
-                console.error(
-                    `[AsyncStorage] (Breez event) Error loading data: ${e} [${event}]`,
-                );
-                throw new Error('Error setting breez event');
-            }
-        },
-        [_setBreezEvent, _updateBreezEvent],
-    );
-
-    const _loadBreezEvent = async () => {
-        const be = await _getBreezEvent();
-
-        if (be !== null) {
-            _setBreezEvent(JSON.parse(be));
-        }
-    };
 
     const setAppLanguage = useCallback(
         async (languageObject: TLanguage) => {
@@ -938,7 +901,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 ? balance.onchain
                 : oldOnchainBalance;
 
-            // TODO: Stringify BigInt
             JSON.stringify(tmp, (key, value) =>
                 typeof value === "bigint" ? value.toString() : value,
             );
@@ -1400,10 +1362,6 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
-        _loadBreezEvent();
-    }, []);
-
-    useEffect(() => {
         _loadAppLanguage();
     }, []);
 
@@ -1473,8 +1431,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 setLoadLock,
                 electrumServerURL,
                 setElectrumServerURL,
-                breezEvent,
-                setBreezEvent,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,
