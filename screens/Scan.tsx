@@ -12,8 +12,6 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
-import {parseInvoice} from '@breeztech/react-native-breez-sdk';
-
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
 
@@ -52,6 +50,7 @@ import TorchIcon from '../assets/svg/light-bulb-24.svg';
 
 import {Camera, useCameraDevice, useCodeScanner, CodeScanner, Code} from 'react-native-vision-camera';
 import { AppStorageContext } from '../class/storageContext';
+import { useWallet } from '../contexts/walletContext';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -119,6 +118,8 @@ const openSettings = () => {
 const Scan = ({route}: Props) => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
+
+    const _breezWallet = useWallet();
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -380,7 +381,7 @@ const Scan = ({route}: Props) => {
             // Bolt11
             if (invoiceType.spec === 'bolt11') {
                 try {
-                    const parsedBolt11Invoice = await parseInvoice(invoice);
+                    const parsedBolt11Invoice = await _breezWallet.parseInput(invoice);
 
                     return {
                         decodedInvoice: parsedBolt11Invoice,
@@ -437,7 +438,7 @@ const Scan = ({route}: Props) => {
                         ).toLowerCase();
 
                         try {
-                            const parsedBolt11Invoice = await parseInvoice(
+                            const parsedBolt11Invoice = await _breezWallet.parseInput(
                                 bolt11,
                             );
 
@@ -492,7 +493,7 @@ const Scan = ({route}: Props) => {
                 error: true,
             };
         },
-        [e, route.params.wallet, updateScannerMessage, updateToast],
+        [_breezWallet, e, route.params.wallet, updateScannerMessage, updateToast],
     );
 
     const handleQR = useCallback(
