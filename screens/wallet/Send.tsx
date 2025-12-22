@@ -5,14 +5,12 @@ import React, {
     useContext,
     useEffect,
     useRef,
-    useCallback,
 } from 'react';
 import {
     StyleSheet,
     Text,
     View,
     useColorScheme,
-    Platform,
     ActivityIndicator,
     StatusBar,
 } from 'react-native';
@@ -21,22 +19,10 @@ import VText, {VTextSingle, VTextMulti} from '../../components/text';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import RNFS from 'react-native-fs';
-import Share from 'react-native-share';
-
 import {AppStorageContext} from '../../class/storageContext';
 import {capitalizeFirst, normalizeFiat} from '../../modules/transform';
 import BigNumber from 'bignumber.js';
 
-import {
-    createBDKWallet,
-    psbtFromInvoice,
-    syncBdkWallet,
-} from './../../modules/bdk';
-import {getPrivateDescriptors} from './../../modules/descriptors';
-import {TComboWallet} from '../../types/wallet';
-
-import ExportPsbt from '../../components/psbt';
 import {FiatBalance, DisplaySatsAmount} from '../../components/balance';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
@@ -46,19 +32,11 @@ import Color from '../../constants/Color';
 import {PlainButton, LongBottomButton} from '../../components/button';
 
 import Close from '../../assets/svg/x-24.svg';
-import ShareIcon from '../../assets/svg/share-24.svg';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
-import {Address, PartiallySignedTransaction} from 'bdk-rn';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 import {useTranslation} from 'react-i18next';
-import {
-    sendPayment,
-    BreezEventVariant,
-    nodeInfo,
-} from '@breeztech/react-native-breez-sdk';
-import {EBreezDetails, ENet} from '../../types/enums';
 import ExpiryTimer from '../../components/expiry';
 
 import {Toasts} from '@backpackapp-io/react-native-toast';
@@ -67,17 +45,15 @@ import {LiberalToast} from '../../components/toast';
 import {
     isInvoiceExpired,
     getCountdownStart,
-    checkNetworkIsReachable,
 } from '../../modules/wallet-utils';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {biometricAuth} from '../../modules/shared';
 import PINPass from '../../components/pinpass';
 
-import { SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { PaymentStatus, SdkEvent_Tags, SendPaymentOptions } from '@breeztech/breez-sdk-spark-react-native';
+import { useWallet } from '../../contexts/walletContext';
 import { useBreezEvent } from '../../contexts/BreezEventContext';
-
-import netInfo from '@react-native-community/netinfo';
 
 type Props = NativeStackScreenProps<WalletParamList, 'Send'>;
 
@@ -86,33 +62,33 @@ const SendView = ({route}: Props) => {
     const navigation = useNavigation();
 
     const {t, i18n} = useTranslation('wallet');
-    const {t: e} = useTranslation('errors');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
-    const [uPsbt, setUPsbt] = useState<PartiallySignedTransaction>();
-    const [loadingPsbt, setLoadingPsbt] = useState(true);
     const [loading, setLoading] = useState(false);
 
     const {
         fiatRate,
         appFiatCurrency,
         isAdvancedMode,
-        electrumServerURL,
         isBiometricsActive,
     } = useContext(AppStorageContext);
 
-    const {breezEvent} = useBreezEvent();
+    const { breezEvent } = useBreezEvent();
+    const _breezWallet = useWallet();
 
     const isLightning = !!route.params.bolt11;
+    const timestamp = Number(route.params.bolt11?.timestamp);
+    const expiry = Number(route.params.bolt11?.expiry);
+    const amountMsat = Number(route.params.bolt11?.amountMsat);
 
     const isExpired = isInvoiceExpired(
-        route.params.bolt11?.timestamp as number,
-        route.params.bolt11?.expiry as number,
+        timestamp,
+        expiry,
     );
 
     const expiryEpoch = getCountdownStart(
-        route.params.bolt11?.timestamp as number,
-        route.params.bolt11?.expiry as number,
+        timestamp,
+        expiry,
     );
 
     const screenTitle = isLightning
@@ -138,17 +114,17 @@ const SendView = ({route}: Props) => {
 
     const sats = new BigNumber(
         isLightning
-            ? (route.params.bolt11?.amountMsat as number) / 1_000
+            ? amountMsat / 1_000
             : route.params.invoiceData?.options?.amount || 0,
     );
 
-    const [paymentToSelf, setPaymentToSelf] = useState(false);
-    const [paySelfMessage, setPaySelfMessage] = useState('');
+    // TODO: fix self-payment detection for both LN and onchain
+
     const [alreadyPaidInvoice, setAlreadyPaidInvoice] = useState(false);
 
-    const bottomExportRef = useRef<BottomSheetModal>(null);
+    // const bottomExportRef = useRef<BottomSheetModal>(null);
     const bottomPINPassRef = useRef<BottomSheetModal>(null);
-    const [openExport, setOpenExport] = useState(-1);
+    // const [openExport, setOpenExport] = useState(-1);
     const [pinIdx, setPINIdx] = useState(-1);
 
     const togglePINPassModal = () => {
@@ -195,29 +171,36 @@ const SendView = ({route}: Props) => {
     // For Breez, we need to do some work
     const isMax = isLightning
         ? route.params.wallet?.balanceLightning ===
-          (route.params.bolt11?.amountMsat as number) / 1_000
+          amountMsat / 1_000
         : route.params.invoiceData?.options?.amount?.toString() ===
           route.params.wallet?.balanceOnchain.toString();
 
-    const createTransaction = async () => {
-        // Navigate to status screen
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'TransactionStatus',
-                params: {
-                    unsignedPsbt: uPsbt?.base64,
-                    wallet: route.params.wallet,
-                    network: route.params.wallet?.network,
-                },
-            }),
-        );
-    };
+    // TODO: refactor this into wallet service (transaction creation for onchain)
+
+    const preparePayment = async (paymentRequest: string) => {
+        try {
+            const prepareResponse = await _breezWallet.prepareSendPayment({
+                paymentRequest: paymentRequest,
+                amount: undefined,
+                tokenIdentifier: undefined
+            })
+
+            return prepareResponse;
+        } catch (error: any) {
+            // Report error preparing payment
+            LiberalToast(capitalizeFirst(t('error')), error?.inner[0], {
+                duration: 5000,
+            });
+            setLoading(false);
+            console.log('[Send] Error preparing payment: ', error?.inner[0]);
+        }
+    }
 
     const handleBolt11Payment = async () => {
         // Handle if wallet broke and warn
         const walletBalanceLN = route.params.wallet?.balanceLightning as number;
         const bolt11AmountSats =
-            (route.params.bolt11?.amountMsat as number) / 1_000;
+            amountMsat / 1_000;
 
         if (walletBalanceLN < bolt11AmountSats) {
             LiberalToast(capitalizeFirst(t('error')), t('ln_insufficient_funds'), {
@@ -228,31 +211,51 @@ const SendView = ({route}: Props) => {
             return;
         }
 
-        try {
-            const bolt11 = route.params.bolt11;
-            const result = await sendPayment({
-                bolt11: bolt11?.bolt11 as string,
-                useTrampoline: true,
-            });
+        const paymentRequest = route.params.bolt11?.invoice?.bolt11;
+        const prepareResponse = await preparePayment(paymentRequest);
 
-            if (result.payment.status === 'complete') {
-                setLoading(false);
-            } else {
-                LiberalToast(capitalizeFirst(t('error')), result.payment.error as string, {
-                    duration: 2000,
+        if (prepareResponse) {
+            try {
+                const options =  new SendPaymentOptions.Bolt11Invoice({
+                    preferSpark: false,
+                    completionTimeoutSecs: 10
+                })
+
+                const sendResponse = await _breezWallet.sendPayment({
+                    prepareResponse,
+                    options: options,
+                    idempotencyKey: undefined,
+                })
+                
+                const payment = sendResponse.payment
+    
+                if (payment.status === PaymentStatus.Completed) {
+                    setLoading(false);
+                } else if (payment.status === PaymentStatus.Failed) {
+                    const info = String(payment.details?.inner);
+    
+                    LiberalToast(capitalizeFirst(t('error')), info, {
+                        duration: 2000,
+                    });
+    
+                    setLoading(false);
+                    console.log(
+                        '[Send] Error sending payment: ',
+                        payment.details,
+                    );
+                }
+            } catch (error: any) {
+                // Flag as paid invoice already
+                if (error.message === 'Invoice already paid') {
+                    setAlreadyPaidInvoice(true);
+                }
+
+                LiberalToast(capitalizeFirst(t('error')), error?.inner[0], {
+                    duration: 5000,
                 });
-
                 setLoading(false);
-                console.log(
-                    '[Send] Error sending payment: ',
-                    result.payment.error,
-                );
+                console.log('[Send] Error sending payment: ', error?.inner[0]);
             }
-        } catch (error: any) {
-            if (error.message === 'Invoice already paid') {
-                setAlreadyPaidInvoice(true);
-            }
-            setLoading(false);
         }
     };
 
@@ -260,200 +263,55 @@ const SendView = ({route}: Props) => {
         if (isLightning) {
             setLoading(true);
             handleBolt11Payment();
-        } else {
-            createTransaction();
         }
     };
 
-    const openExportModal = () => {
-        if (openExport !== 1) {
-            bottomExportRef.current?.present();
-        } else {
-            bottomExportRef.current?.close();
-        }
-    };
+    // TODO: open export psbt modal
 
-    const exportUPsbt = async () => {
-        // Sign the psbt adn write to file
-        // Get txid and use it with wallet name to create a unique file name
-        const txid = await uPsbt?.txid();
+    // TODO: refactor this into wallet service (Psbt export)
+ 
+    // TODO: refactor this into wallet service (Psbt creation for onchain)
 
-        let status = true;
-        let errorMsg = '';
+    // TODO: find a way to perform a self-check on invoice
 
-        const pathData =
-            RNFS.TemporaryDirectoryPath +
-            `/${txid}-${route.params.wallet?.name}.json`;
+    // TODO: find a way to perform a self-check on onchain address
 
-        const fileExportData = (await uPsbt?.jsonSerialize()) || '';
+    // TODO: refactor this into wallet service (psbt call in useEffect)
 
-        if (Platform.OS === 'ios') {
-            await RNFS.writeFile(pathData, fileExportData, 'utf8').catch(
-                error => {
-                    errorMsg = error.message;
-                    status = false;
-                },
+    useEffect(() => {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount.toString())};
+    
+            // Route to LN payment status screen
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: true,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent?.inner.payment.paymentType,
+                    error: null,
+                }),
             );
-
-            await Share.open({
-                url: 'file://' + pathData,
-                type: 'text/plain',
-                title: 'PSBT export',
-            })
-                .catch(error => {
-                    if (error.message !== 'User did not share') {
-                        errorMsg = error.message;
-                        status = false;
-                    }
-                })
-                .finally(() => {
-                    RNFS.unlink(pathData);
-                });
-        } else {
-            errorMsg = 'Not yet implemented on Android';
-            status = false;
-        }
-
-        bottomExportRef.current?.close();
-
-        // Navigate to status screen
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'TransactionExported',
-                params: {
-                    status: status,
-                    errorMsg: errorMsg,
-                    fname: 'file://' + pathData,
-                },
-            }),
-        );
-    };
-
-    const loadUPsbt = async () => {
-        if (route.params.wallet) {
-            // Check if payment is to self first
-            await checkIfSelfOnchain();
-
-            if (paymentToSelf) {
-                setLoadingPsbt(false);
-                return;
-            }
-
-            const descriptors = getPrivateDescriptors(
-                route.params.wallet.privateDescriptor,
-            );
-
-            const _uPsbt = (await psbtFromInvoice(
-                descriptors,
-                route.params.feeRate,
-                route.params.invoiceData,
-                route.params.wallet as TComboWallet,
-                new BigNumber(route.params.wallet.balanceOnchain),
-                electrumServerURL,
-                (error: any) => {
-                    LiberalToast(capitalizeFirst(t('error')), e('tx_fail_creation_error'), {
-                        duration: 2000,
-                    });
-
-                    console.log(
-                        '[Send] Error creating transaction: ',
-                        error.message,
-                    );
-
-                    // Stop loading
-                    setLoadingPsbt(false);
-                },
-            )) as PartiallySignedTransaction;
-
-            setUPsbt(_uPsbt);
-            setLoadingPsbt(false);
-        }
-    };
-
-    const checkIfSelfLN = useCallback(async () => {
-        const _bolt11 = route.params.bolt11;
-        const _nodeID = await nodeInfo();
-
-        // Check if bolt11 is self
-        if (_bolt11?.payeePubkey === _nodeID.id) {
-            setPaymentToSelf(true);
-            setPaySelfMessage(t('payment_to_self_detected'));
-        }
-    }, []);
-
-    const checkIfSelfOnchain = useCallback(async () => {
-        const _netInfo = await netInfo.fetch();
-
-        if (!checkNetworkIsReachable(_netInfo)) {
             return;
         }
-
-        const wallet = route.params.wallet;
-        const network =
-            wallet?.network === 'testnet' ? ENet.Testnet : ENet.Bitcoin;
-
-        try {
-            let _w = await createBDKWallet(wallet as TComboWallet);
-            _w = await syncBdkWallet(_w, () => {}, network, electrumServerURL);
-
-            const bdkAddr = await new Address().create(
-                route.params.invoiceData.address,
+    
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentFailed) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount.toString())};
+    
+            // Route to LN payment status screen
+            navigation.dispatch(
+                CommonActions.navigate('LNTransactionStatus', {
+                    status: false,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent?.inner.payment.paymentType,
+                    error: breezEvent.inner,
+                }),
             );
-            const script = await bdkAddr.scriptPubKey();
-
-            const isOwnedByYou = await _w.isMine(script);
-
-            if (isOwnedByYou) {
-                setPaySelfMessage(t('payment_to_self_detected'));
-            } else {
-                setPaymentToSelf(false);
-            }
-        } catch (error: any) {}
-    }, []);
-
-    useEffect(() => {
-        // Create Psbt if onchain
-        if (!route.params.bolt11) {
-            loadUPsbt();
-        } else {
-            checkIfSelfLN();
+            return;
         }
-    }, []);
-
-    useEffect(() => {
-            if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
-                // Serialize BigInt
-                const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
-    
-                // Route to LN payment status screen
-                navigation.dispatch(
-                    CommonActions.navigate('LNTransactionStatus', {
-                        status: true,
-                        details: txDetails,
-                        tag: breezEvent.tag,
-                        detailsType: breezEvent?.inner.payment.paymentType,
-                        error: null,
-                    }),
-                );
-                return;
-            }
-    
-            if (breezEvent?.tag === SdkEvent_Tags.PaymentFailed) {
-                // Serialize BigInt
-                const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
-    
-                // Route to LN payment status screen
-                navigation.dispatch(
-                    CommonActions.navigate('LNTransactionStatus', {
-                        status: false,
-                        details: txDetails,
-                        tag: breezEvent.tag,
-                        detailsType: breezEvent?.inner.payment.paymentType,
-                        error: breezEvent.inner,
-                    }),
-                );
-                return;
-            }
         }, [breezEvent]);
 
     return (
@@ -469,16 +327,6 @@ const SendView = ({route}: Props) => {
                 <BottomSheetModalProvider>
                     <View
                         className="absolute top-6 w-full flex-row items-center justify-center">
-                        {!loadingPsbt && (
-                            <PlainButton
-                                className="absolute right-6"
-                                onPress={openExportModal}>
-                                <ShareIcon
-                                    width={32}
-                                    fill={ColorScheme.SVG.Default}
-                                />
-                            </PlainButton>
-                        )}
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(CommonActions.reset({
@@ -693,9 +541,9 @@ const SendView = ({route}: Props) => {
                         )}
                     </View>
 
+                    {/* TODO: consider loading psbt and payself */}
                     {((isLightning && loading) ||
-                        (!isLightning && loadingPsbt)) &&
-                        !paySelfMessage && (
+                        (!isLightning)) && (
                             <View
                                 className="absolute"
                                 style={{
@@ -716,60 +564,11 @@ const SendView = ({route}: Props) => {
                             </View>
                         )}
 
-                    {isLightning && paySelfMessage && (
-                        <View
-                            className={
-                                `mt-6 w-full ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } items-center justify-center absolute`
-                            }
-                            style={{
-                                bottom:
-                                    NativeWindowMetrics.bottomButtonOffset +
-                                    76,
-                            }}>
-                            <VText
-                                className="text-sm text-center w-5/6"
-                                style={{
-                                    color: ColorScheme.Text.DescText,
-                                }}>
-                                {paySelfMessage}
-                            </VText>
-                        </View>
-                    )}
-
-                    {isLightning && alreadyPaidInvoice && (
-                        <View
-                            className={
-                                `mt-6 w-full ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                } items-center justify-center absolute`
-                            }
-                            style={{
-                                bottom:
-                                    NativeWindowMetrics.bottomButtonOffset +
-                                    76,
-                            }}>
-                            <VText
-                                className="text-sm text-center w-5/6"
-                                style={{
-                                    color: ColorScheme.Text.DescText,
-                                }}>
-                                {t('already_paid_ln_invoice')}
-                            </VText>
-                        </View>
-                    )}
-
                     <LongBottomButton
                         disabled={
                             loading ||
-                            (!isLightning && loadingPsbt) ||
+                            (!isLightning) ||
                             isExpired ||
-                            paymentToSelf ||
                             alreadyPaidInvoice
                         }
                         onPress={authAndPay}
@@ -777,16 +576,6 @@ const SendView = ({route}: Props) => {
                         textColor={ColorScheme.Text.Alt}
                         backgroundColor={ColorScheme.Background.Inverted}
                     />
-
-                    <View className="absolute bottom-0">
-                        <ExportPsbt
-                            exportRef={bottomExportRef}
-                            triggerExport={exportUPsbt}
-                            onSelectExport={idx => {
-                                setOpenExport(idx);
-                            }}
-                        />
-                    </View>
 
                     <PINPass
                         pinPassRef={bottomPINPassRef}
