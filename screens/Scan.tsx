@@ -272,7 +272,7 @@ const Scan = ({route}: Props) => {
                         return;
                     }
 
-                    const LNinvoice = decodedQRState.decodedInvoice;
+                    const LNinvoice = decodedQRState.decodedInvoice.inner[0];
 
                     const isBolt11 = decodedQRState.spec === 'bolt11';
                     const isLnurlp = decodedQRState.spec === 'lnurlp';
@@ -281,8 +281,7 @@ const Scan = ({route}: Props) => {
                     if (isBolt11) {
                         // If LN Invoice
                         // call on breez to attempt to pay and route screen
-                        const parsedBolt11Invoice = LNinvoice;
-                        const bolt11Msat = parsedBolt11Invoice.amountMsat;
+                        const bolt11Msat = LNinvoice.amountMsat;
 
                         if (!bolt11Msat) {
                             updateScannerMessage(
@@ -299,7 +298,7 @@ const Scan = ({route}: Props) => {
                                     feeRate: 0,
                                     dummyPsbtVsize: 0,
                                     invoiceData: null,
-                                    bolt11: parsedBolt11Invoice,
+                                    bolt11: LNinvoice,
                                 },
                             }),
                         );

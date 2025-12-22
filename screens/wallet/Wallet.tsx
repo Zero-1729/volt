@@ -56,7 +56,6 @@ import {TRate} from '../../types/settings';
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../../components/toast';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
-import { SdkEvent, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
 import { useWallet } from '../../contexts/walletContext';
 
 type Props = NativeStackScreenProps<WalletParamList, 'WalletView'>;

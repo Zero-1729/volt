@@ -310,9 +310,9 @@ const RequestAmount = ({route}: Props) => {
         }
 
         if (walletType === 'unified') {
-        // TODO: handle if offline for on-chain receive
-        routeToReceive();
-        return;
+            // TODO: handle if offline for on-chain receive
+            routeToReceive();
+        }
     };
 
     return (

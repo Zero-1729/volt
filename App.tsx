@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import 'react-native-gesture-handler';
-
 import React, {
     ReactElement,
     useCallback,
@@ -95,21 +93,16 @@ const AppContent = () => {
 
                 class onBreezEventListener {
                     onEvent = async (event: SdkEvent) => {
-                        let evt;
-
                         if (event.tag === SdkEvent_Tags.Synced) {
                             // Data has been synchronized with the network. When this event is received,
                             // it is recommended to refresh the payment list and wallet balance.
                             console.log('[Breez SDK] Synced');
-                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.UnclaimedDeposits) {
                             // SDK was unable to claim some deposits automatically
                             // const unclaimedDeposits = event.inner.unclaimedDeposits
-                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.ClaimedDeposits) {
                             // Deposits were successfully claimed
                             // const claimedDeposits = event.inner.claimedDeposits
-                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.PaymentSucceeded) {
                         // A payment completed successfully
                             const payment = event.inner.payment
@@ -118,7 +111,6 @@ const AppContent = () => {
                                 console.log('[Breez SDK] Payment Sent: ', payment);
 
                                 // Handle navigation to LNTransactionStatus in Wallet Send screen
-                                evt = event;
                             } else if (PaymentType.Receive === payment.paymentType) {
                                 console.log(
                                     '[Breez SDK] Invoice Paid (Received Payment): ',
@@ -126,32 +118,26 @@ const AppContent = () => {
                                 );
             
                                 // Handle navigation to LNTransactionStatus in Wallet Receive screen
-                                evt = event;
                             }
                         } else if (event.tag === SdkEvent_Tags.PaymentPending) {
                             // A payment is pending (waiting for confirmation)
                             // const pendingPayment = event.inner.payment
-                            evt = event;
                         } else if (event.tag === SdkEvent_Tags.PaymentFailed) {
                             // A payment failed
                             const failedPayment = event.inner.payment
                             console.log('[Breez SDK] Payment Failed: ', failedPayment);
 
                             // Handle navigation to LNTransactionStatus in Wallet Receive & Send screen
-                            evt = event;
                         } else {
                             // Handle any future event types
                         }
-                        
-                        // Set Breez event for handling in UI
-                        if (evt) {
-                            JSON.stringify(evt, (key, value) =>
-                                typeof value === "bigint" ? value.toString() : value,
-                            );
 
-                            // Set breez event in context
-                            setBreezEvent(evt);
-                        }
+                        JSON.stringify(event, (key, value) =>
+                            typeof value === "bigint" ? value.toString() : value,
+                        );
+
+                        // Set breez event in context
+                        setBreezEvent(event);
                     }
                 }
 

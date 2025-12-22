@@ -225,7 +225,6 @@ export type WalletParamList = {
         sats: string;
         fiat: string;
         lnDescription?: string;
-        breezServicesNotInitialized: boolean;
     };
     FeeSelection: {
         invoiceData: TInvoiceData;
