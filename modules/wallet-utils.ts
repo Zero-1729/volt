@@ -544,28 +544,6 @@ export const checkInvoiceAndWallet = (
     return true;
 };
 
-export const getLNPayments = async (
-    txCount: number,
-): Promise<TTransaction[]> => {
-    const payments = await listPayments({
-        // TODO: figure out a more sane option for this
-        limit: txCount + 10,
-    });
-
-    let txs: TTransaction[] = [];
-
-    for (let i = 0; i < payments.length; i++) {
-        txs.push({
-            ...payments[i],
-            isLightning: true,
-            timestamp: payments[i].paymentTime,
-        } as TTransaction);
-    }
-
-    // Return formatted LN payments
-    return txs;
-};
-
 // Get seconds left until invoice expires
 export const getInvoiceExpiryLeft = (
     timestamp: number,
