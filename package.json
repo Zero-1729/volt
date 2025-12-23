@@ -90,7 +90,6 @@
     "react-native-popup-menu-android": "^1.0.3",
     "react-native-privacy-snapshot": "^1.0.0",
     "react-native-prompt-android": "^1.1.0",
-    "react-native-qrcode-styled": "^0.3.3",
     "react-native-quick-base64": "^2.2.2",
     "react-native-quick-crypto": "^0.7.10",
     "react-native-reanimated": "^3.16.6",
@@ -103,6 +102,7 @@
     "react-native-tooltip": "^5.2.0",
     "react-native-vision-camera": "^4.7.3",
     "react-native-worklets": "^0.7.1",
+    "react-qr-code": "^2.0.18",
     "stream-browserify": "^3.0.0",
     "url": "^0.11.4"
   },
