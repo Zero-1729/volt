@@ -1,3 +1,5 @@
+
+
 # Volt
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
@@ -33,7 +35,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 
 ### IOS
 
-- IOS Beta Test flight coming soon.
+IOS Beta Test flight coming soon.
 
 ## Supported BIPs
 
@@ -146,7 +148,7 @@ To run the app using XCode's IOS emulator, you'll need to install the CocoaPod d
 
 ```sh
 $ cd ios
-$ yarn pod install
+$ pod install
 ```
 
 After installing the dependencies, to launch the app on the IOS emulator you'll need to navigate to the project root (`volt`) and run:
