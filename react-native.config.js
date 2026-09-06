@@ -1,4 +1,11 @@
 module.exports = {
     assets: ['./assets/fonts/'],
-    dependencies: {},
+    dependencies: {
+        'react-native-worklets': {
+            platforms: {
+                ios: null,
+                android: null,
+            },
+        },
+    },
 };
