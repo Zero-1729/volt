@@ -252,7 +252,7 @@ const Info = () => {
     return (
         <SafeAreaView
             style={[
-                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+                {flex: 2, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             {/* Display Wallet Info, addresses, and other related data / settings */}
             <View
@@ -273,7 +273,7 @@ const Info = () => {
                     <View
                         className="flex-row mt-6 w-5/6 justify-center items-center">
                         <PlainButton
-                            className="absolute w-full left-0 items-center flex-row"
+                            className="absolute left-0 items-center flex-row"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
