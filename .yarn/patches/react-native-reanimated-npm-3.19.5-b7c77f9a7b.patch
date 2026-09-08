@@ -1,0 +1,86 @@
+diff --git a/android/CMakeLists.txt b/android/CMakeLists.txt
+index 41242893c859c53b75052753e997d7010df2731b..b691475e7d707f764593c4c8efc744ad8466416b 100644
+--- a/android/CMakeLists.txt
++++ b/android/CMakeLists.txt
+@@ -65,3 +65,7 @@ else()
+   string(APPEND CMAKE_CXX_FLAGS
+          " -fexceptions -frtti -std=c++${CMAKE_CXX_STANDARD} -Wall -Werror")
+ endif()
++
++target_compile_options(reanimated PUBLIC -Wno-deprecated-declarations -Wno-error=deprecated-declarations)
++target_compile_options(worklets PUBLIC -Wno-deprecated-declarations -Wno-error=deprecated-declarations)
++
+diff --git a/android/src/main/cpp/worklets/CMakeLists.txt b/android/src/main/cpp/worklets/CMakeLists.txt
+index bb61ff7db935f3bbc5d1e77ec982d044f3125da6..1f2bfe596b35ceccfa6c05071b251ab4393fbf23 100644
+--- a/android/src/main/cpp/worklets/CMakeLists.txt
++++ b/android/src/main/cpp/worklets/CMakeLists.txt
+@@ -57,7 +57,7 @@ else()
+ endif()
+ 
+ if(${JS_RUNTIME} STREQUAL "hermes")
+-  target_link_libraries(worklets hermes-engine::libhermes)
++  target_link_libraries(worklets hermes-engine::hermesvm)
+ 
+   if(${HERMES_ENABLE_DEBUGGER})
+     string(APPEND CMAKE_CXX_FLAGS " -DHERMES_ENABLE_DEBUGGER=1")
+diff --git a/android/src/main/java/com/swmansion/reanimated/ReanimatedModule.java b/android/src/main/java/com/swmansion/reanimated/ReanimatedModule.java
+index 14d252c9dc2b5b5dfda42c8c224377a48c9b0b09..c362550a1d789b4a526401b3d21fb77908979d11 100644
+--- a/android/src/main/java/com/swmansion/reanimated/ReanimatedModule.java
++++ b/android/src/main/java/com/swmansion/reanimated/ReanimatedModule.java
+@@ -9,8 +9,7 @@ import com.facebook.react.bridge.UIManager;
+ import com.facebook.react.bridge.UIManagerListener;
+ import com.facebook.react.fabric.FabricUIManager;
+ import com.facebook.react.module.annotations.ReactModule;
+-import com.facebook.react.uimanager.UIManagerModule;
+-import com.facebook.react.uimanager.UIManagerModuleListener;
++
+ import com.swmansion.worklets.WorkletsModule;
+ import java.util.ArrayList;
+ import java.util.Objects;
+@@ -18,7 +17,7 @@ import javax.annotation.Nullable;
+ 
+ @ReactModule(name = ReanimatedModule.NAME)
+ public class ReanimatedModule extends NativeReanimatedModuleSpec
+-    implements LifecycleEventListener, UIManagerModuleListener, UIManagerListener {
++    implements LifecycleEventListener, UIManagerListener {
+ 
+   public void didDispatchMountItems(@NonNull UIManager uiManager) {
+     // Keep: Required for UIManagerListener
+@@ -89,12 +88,6 @@ public class ReanimatedModule extends NativeReanimatedModuleSpec
+       } else {
+         throw new RuntimeException("[Reanimated] Failed to obtain instance of FabricUIManager.");
+       }
+-    } else {
+-      UIManagerModule uiManager =
+-          Objects.requireNonNull(reactCtx.getNativeModule(UIManagerModule.class));
+-      uiManager.addUIManagerListener(this);
+-      mUnsubscribe =
+-          Utils.combineRunnables(mUnsubscribe, () -> uiManager.removeUIManagerListener(this));
+     }
+     reactCtx.addLifecycleEventListener(this);
+     mUnsubscribe =
+@@ -120,24 +113,6 @@ public class ReanimatedModule extends NativeReanimatedModuleSpec
+     // do nothing
+   }
+ 
+-  @Override
+-  public void willDispatchViewUpdates(final UIManagerModule uiManager) {
+-    // This method is called for the interface of UIManagerModuleListener on
+-    // Paper. The below function with the same name won't be called.
+-    if (mOperations.isEmpty()) {
+-      return;
+-    }
+-    final ArrayList<UIThreadOperation> operations = mOperations;
+-    mOperations = new ArrayList<>();
+-    uiManager.addUIBlock(
+-        nativeViewHierarchyManager -> {
+-          NodesManager nodesManager = getNodesManager();
+-          for (UIThreadOperation operation : operations) {
+-            operation.execute(nodesManager);
+-          }
+-        });
+-  }
+-
+   /*package*/
+   public NodesManager getNodesManager() {
+     if (mNodesManager == null) {

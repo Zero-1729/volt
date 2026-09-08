@@ -1,5 +1,5 @@
 {
-    "presets": [["module:@react-native/babel-preset", {"useTransformReactJSXExperimental": true}], 'nativewind/babel'],
+    "presets": [["module:@react-native/babel-preset", {"useTransformReactJSXExperimental": true}], "nativewind/babel"],
     "plugins": [
         ["module:react-native-dotenv", {
             "safe": true,
@@ -11,6 +11,8 @@
             "module-resolver",
             {
                 "alias": {
+                    "@breeztech/react-native-breez-sdk": "./modules/breez-legacy-shim.ts",
+                    "react-native-qrcode-styled": "./modules/qrcode-shim.tsx",
                     "crypto": "react-native-quick-crypto",
                     "stream": "stream-browserify",
                     "buffer": "@craftzdog/react-native-buffer"
@@ -22,8 +24,7 @@
             {
                 "globals": ["__scanCodes"]
             }
-        ],
-        "react-native-worklets/plugin"
+        ]
     ],
     "env": {
         "production": {
