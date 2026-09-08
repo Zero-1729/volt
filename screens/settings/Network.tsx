@@ -59,7 +59,7 @@ const Network = () => {
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {electrumServerURL, setElectrumServerURL, mempoolInfo, getWalletData, currentWalletID} =
+    const {electrumServerURL, setElectrumServerURL, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
 
     const wallet = getWalletData(currentWalletID);
@@ -220,69 +220,6 @@ const Network = () => {
                             </VText>
                         </View>
                     </View>}
-
-                    {/* Mempool */}
-                    <View
-                        className={`justify-center w-full items-center flex-row mb-8 ${!isLNEnabled ? 'mt-8' : ''}`}>
-                        <View className="w-5/6">
-                            <View
-                                className={
-                                    `w-full ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } items-center mb-4`}>
-                                <VText
-                                    className={
-                                        `text-sm font-medium ${
-                                                langDir === 'right'
-                                                    ? ''
-                                                    : 'mr-4'
-                                            }`
-                                    }
-                                    style={{color: ColorScheme.Text.Default}}>
-                                    Mempool.space
-                                </VText>
-
-                                <View
-                                    className={
-                                        `rounded-full ${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : ''
-                                            }`
-                                    }
-                                    style={{
-                                            backgroundColor:
-                                                isNetOn && mempoolInfo.connected
-                                                    ? 'lightgreen'
-                                                    : '#ff4e4a',
-                                    }}>
-                                    <VText
-                                        className="text-xs font-bold p-1 px-4"
-                                        style={{
-                                                color:
-                                                    isNetOn &&
-                                                    mempoolInfo.connected
-                                                        ? 'darkgreen'
-                                                        : 'black',
-                                        }}>
-                                        {isNetOn && mempoolInfo.connected
-                                            ? capitalizeFirst(t('connected'))
-                                            : capitalizeFirst(
-                                                  t('disconnected'),
-                                              )}
-                                    </VText>
-                                </View>
-                            </View>
-
-                            <VText
-                                className="text-xs"
-                                style={{color: ColorScheme.Text.DescText}}>
-                                {t('mempool_connection_info')}
-                            </VText>
-                        </View>
-                    </View>
 
                     <View className="w-full mb-8" style={[HeadingBar]} />
 
