@@ -47,7 +47,7 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import QRCodeStyled from 'react-native-qrcode-styled';
+import QRCode from 'react-qr-code';
 import Close from '../../assets/svg/x-24.svg';
 import Info from '../../assets/svg/info-16.svg';
 import NFCIcon from '../../assets/svg/nfc.svg';
@@ -375,16 +375,13 @@ const Receive = ({route}: Props) => {
                                 backgroundColor: 'white',
                             },
                         ]}>
-                        <QRCodeStyled
+                        <QRCode
                             style={{
                                 backgroundColor: 'white',
                             }}
-                            data={bip21Uri}
-                            padding={isAmountInvoice ? 2 : 7}
-                            pieceSize={isAmountInvoice ? 3 : 7}
+                            size={NativeWindowMetrics.width * 0.6}
+                            value={bip21Uri}
                             color={ColorScheme.Background.Default}
-                            isPiecesGlued={true}
-                            pieceBorderRadius={isAmountInvoice ? 2 : 4}
                         />
                     </View>
                 )}
