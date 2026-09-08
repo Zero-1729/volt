@@ -9,9 +9,6 @@
     "clean:ios": "cd ios && rimraf Pods Podfile.lock build && pod deintegrate && pod install",
     "clean:watchman": "watchman watch-del-all",
     "clean:rn": "rimraf node_modules nodejs-assets/nodejs-project/node_modules && yarn",
-    "test": "jest --forceExit",
-    "test:coverage": "jest --forceExit --coverage=true",
-    "test:debug": "jest --forceExit --detectOpenHandles",
     "reset": "yarn clean:rn && yarn clean:ios && yarn clean:android && yarn start --reset-cache",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
@@ -115,7 +112,6 @@
     "@react-native/metro-config": "0.83.10",
     "@react-native/typescript-config": "0.83.10",
     "@types/bs58check": "^2.1.0",
-    "@types/jest": "^29.5.13",
     "@types/react": "^19.2.0",
     "@types/react-native-dotenv": "^0.2.2",
     "@types/react-test-renderer": "^19.1.0",
@@ -124,7 +120,6 @@
     "concurrently": "^7.6.0",
     "eslint": "^8.57.0",
     "eslint-plugin-ft-flow": "latest",
-    "jest": "^29.6.3",
     "metro-react-native-babel-preset": "^0.77.0",
     "postcss": "^8.4.34",
     "prettier": "^2.8.8",
@@ -133,7 +128,6 @@
     "react-test-renderer": "19.2.0",
     "rimraf": "^5.0.1",
     "tailwindcss": "^3.4.17",
-    "ts-jest": "^29.1.1",
     "typescript": "^5.8.3"
   },
   "reactNativePermissionsIOS": [

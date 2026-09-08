@@ -6,7 +6,6 @@
     "nativewind-env.d.ts"
   ],
   "compilerOptions": {
-    "types": ["jest"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -27,7 +26,6 @@
     "node_modules",
     "babel.config.json",
     "metro.config.js",
-    "jest.config.js",
     "**/node_modules",
     "**/Pods"
   ]
