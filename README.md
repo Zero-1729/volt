@@ -3,6 +3,8 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 ![](https://camo.githubusercontent.com/bb4c8c469821e7b1e3f2998bf0c183f700a6597106e2c28c0e62f44b2f53e710/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d3233323332332e7376673f7374796c653d666c61742d737175617265)
 
+**:warning: Warning:** Volt is still in Beta, and very unstable, please do not use it for large amounts of Bitcoin or amounts you do not want to lose.
+
 A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring sovereignty to Global Bitcoiners.
 
 > What are descriptors? [Read more](https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md).
@@ -29,7 +31,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 
 ### Android
 
-- [Download APK](https://github.com/Zero-1729/volt/releases/tag/v0.4.4-beta.1)
+- Android APK coming soon.
 
 ### IOS
 
@@ -53,9 +55,9 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 - [Bitcoin Development Kit (BDK)](https://github.com/bitcoindevkit)
 - [Breez SDK](https://github.com/breez/breez-sdk)
 
-### Lightning Implementation Overview
+### Lightning Implementation Overview (Spark)
 
-<img src='./assets/breezsdk_greenlight.png' width=720>
+<img src='https://raw.githubusercontent.com/breez/breez-sdk-docs/main/src/images/BreezSDK_Greenlight.png' width=720>
 
 # Translation
 
@@ -75,10 +77,6 @@ yarn install
 
 To run the wallet locally on, and build for, Android or IOS you'll need [Android Studio](https://developer.android.com/studio/) and [Xcode](https://developer.apple.com/xcode/resources/) installed, respectively. 
 
-## Breez SDK And Greenlight Credentials
-
-> Note: If any part of the original `.crt` or `.pem` files are cut out, you will get the Breez SDK error `Generic: transport error`. See documentation [here](https://sdk-doc.breez.technology/guide/production.html#applying-certificates) for more info.
-
 ### Setup Environment file
 
 Create a copy of the `env.example`
@@ -88,20 +86,6 @@ cp env.example .env
 ```
 
 This command creates a `.env` file in the project root `volt/`. Then fill it with the appropriate info.
-
-### Read and Convert the `.crt` and `.pem` Files
-
-You can read and convert the contents of your `client-key.pem` and `client.crt` files as binary/byte data, in their entirety without taking out any parts (e.g. `BEGIN CERTIFICATE / END CERTIFICATE / BEGIN PRIVATE KEY / END PRIVATE KEY`) to hex strings and add them to the `.env` file as `GL_CUSTOM_NOBODY_KEY` and `GL_CUSTOM_NOBODY_CERT`, respectively.
-
-To run the app locally, you'll need to add the Breez SDK Greenlight credentials to the `.env` file:
-
-```sh
-# Contents of the '.env' file
-# ...
-GL_CUSTOM_NOBODY_KEY=YOUR_HEX_STRING
-GL_CUSTOM_NOBODY_CERT=YOUR_HEX
-```
-
 
 ## Development
 
