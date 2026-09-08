@@ -602,7 +602,6 @@ const Wallet = ({route}: Props) => {
                             }
                             contentContainerStyle={[
                                 styles.listStyle,
-                                walletTxs.length ? {height: '100%'} : {},
                             ]}
                             data={walletTxs.sort(
                                 (a: TTransaction, b: TTransaction) => {
@@ -636,7 +635,7 @@ const Wallet = ({route}: Props) => {
                             contentInsetAdjustmentBehavior="automatic"
                             ListEmptyComponent={
                                 <View
-                                    className="w-4/5 h-5/6 items-center justify-center">
+                                    className="w-4/5 h-full items-center justify-center">
                                     <Box
                                         width={32}
                                         fill={ColorScheme.SVG.GrayFill}
@@ -681,5 +680,6 @@ const styles = StyleSheet.create({
     },
     listStyle: {
         alignItems: 'center',
+        height: '100%',
     },
 });
