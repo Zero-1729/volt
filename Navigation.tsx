@@ -12,36 +12,15 @@ import {Linking, AppState, useColorScheme} from 'react-native';
 
 import {AppStorageContext} from './class/storageContext';
 
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
     NavigationContainer,
     createNavigationContainerRef,
     DefaultTheme,
-    LinkingOptions,
     StackActions,
 } from '@react-navigation/native';
 
-import {LiberalToast} from './components/toast';
-
-import {
-    _BREEZ_SDK_API_KEY_,
-    _GL_CUSTOM_NOBODY_CERT_,
-    _GL_CUSTOM_NOBODY_KEY_,
-} from './modules/env';
-
-import {
-    BreezEvent,
-    mnemonicToSeed,
-    NodeConfig,
-    nodeInfo,
-    NodeConfigVariant,
-    defaultConfig,
-    EnvironmentType,
-    connect,
-    BreezEventVariant,
-    ConnectRequest,
-} from '@breeztech/react-native-breez-sdk';
-import {checkNetworkIsReachable, getXPub256} from './modules/wallet-utils';
+import {Bolt11Invoice, Payment, PaymentType, SdkEvent_Tags} from '@breeztech/breez-sdk-spark-react-native';
 
 import Color from './constants/Color';
 
@@ -125,18 +104,11 @@ import {
     TTransaction,
     TMiniWallet,
     TInvoiceData,
-    TBreezPaymentDetails,
     TLnManualPayloadType,
     TSwapInfo,
 } from './types/wallet';
-import {ENet, EBreezDetails, SwapType} from './types/enums';
+import {ENet, SwapType} from './types/enums';
 import {hasOpenedModals} from './modules/shared';
-import {
-    LnInvoice,
-    GreenlightCredentials,
-} from '@breeztech/react-native-breez-sdk';
-
-import netInfo from '@react-native-community/netinfo';
 
 // Make sure this is updated to match all screen routes below
 const modalRoutes = [
@@ -179,8 +151,10 @@ export type InitStackParamList = {
     TransactionList: undefined;
     LNTransactionStatus: {
         status: boolean;
-        details: TBreezPaymentDetails;
-        detailsType: EBreezDetails;
+        details: Payment;
+        detailsType: PaymentType;
+        error: any;
+        tag: SdkEvent_Tags;
     };
     Mnemonic: undefined;
     BoltNFC: undefined;
@@ -251,7 +225,6 @@ export type WalletParamList = {
         sats: string;
         fiat: string;
         lnDescription?: string;
-        breezServicesNotInitialized: boolean;
     };
     FeeSelection: {
         invoiceData: TInvoiceData;
@@ -262,7 +235,7 @@ export type WalletParamList = {
         dummyPsbtVSize: number;
         invoiceData: TInvoiceData;
         wallet?: TMiniWallet;
-        bolt11?: LnInvoice;
+        bolt11?: Bolt11Invoice;
     };
     SwapAmount: {
         swapType: SwapType;
@@ -473,7 +446,7 @@ export const rootNavigation = {
             navigationRef.current?.navigate(...args);
         } else {
             // If navigation not ready
-            console.log('Navigation not ready');
+            console.log('[nav] Navigation not ready');
         }
     },
 };
@@ -487,23 +460,15 @@ const RootNavigator = (): ReactElement => {
         onboarding,
         wallets,
         setOnboarding,
-        isAdvancedMode,
         getWalletData,
         currentWalletID,
-        mempoolInfo,
-        setBreezEvent,
-        setMempoolInfo,
     } = useContext(AppStorageContext);
     const walletState = useRef(wallets);
     const onboardingState = useRef(onboarding);
     const wallet = getWalletData(currentWalletID);
-    const BreezSub = useRef<any>(null);
 
     const [triggerClipboardCheck, setTriggerClipboardCheck] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
-    const mempoolRef = useRef(
-        new WebSocket('wss://mempool.space/api/v1/ws'),
-    ).current;
 
     const {t} = useTranslation('wallet');
 
@@ -600,7 +565,7 @@ const RootNavigator = (): ReactElement => {
 
     // Deep linking
     // Triggers while app still open
-    const linking: LinkingOptions<{}> = {
+    const linking: {} = {
         // Only support bolt11 & BIP21 deep links for now
         prefixes: ['bitcoin', 'lightning'],
         config: {
@@ -608,7 +573,7 @@ const RootNavigator = (): ReactElement => {
                 PayInvoice: '',
             },
         },
-        subscribe(listener): () => void {
+        subscribe(listener: any): () => void {
             // Deep linking when app open
             const onReceiveLink = ({url}: {url: string}) => {
                 if (!onboardingState.current && isAuth) {
@@ -656,221 +621,6 @@ const RootNavigator = (): ReactElement => {
         setTriggerClipboardCheck(false);
     }, [triggerClipboardCheck]);
 
-    // Fetch and set Swap Info here
-    const initMempoolSock = async () => {
-        // Check network
-        const _netState = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netState)) {
-            return;
-        }
-
-        if (mempoolInfo.connected) {
-            console.log('[Mempool] WebSocket already connected');
-            return;
-        }
-
-        mempoolRef.onopen = () => {
-            console.log('[Mempool] WebSocket connected');
-
-            mempoolRef.send(
-                JSON.stringify({
-                    action: 'want',
-                    data: ['stats'],
-                }),
-            );
-        };
-
-        mempoolRef.onmessage = (error: any) => {
-            const _mempoolInfo = JSON.parse(error.data.toString()).mempoolInfo;
-            const _fees = JSON.parse(error.data.toString()).fees;
-
-            const mempoolUsage = _mempoolInfo?.usage;
-            const mempoolMax = _mempoolInfo?.maxmempool;
-            const feeEnv = _fees?.fastestFee
-                ? _fees?.fastestFee
-                : mempoolInfo.fastestFee;
-
-            setMempoolInfo({
-                mempoolCongested: mempoolUsage / mempoolMax >= 2.5,
-                mempoolHighFeeEnv: feeEnv >= 150,
-                economyFee: _fees?.economyFee
-                    ? _fees?.economyFee
-                    : mempoolInfo.economyFee,
-                fastestFee: _fees?.fastestFee
-                    ? _fees?.fastestFee
-                    : mempoolInfo.fastestFee,
-                minimumFee: _fees?.minimumFee
-                    ? _fees?.minimumFee
-                    : mempoolInfo.minimumFee,
-                hourFee: _fees?.hourFee ? _fees?.hourFee : mempoolInfo.hourFee,
-                halfHourFee: _fees?.halfHourFee
-                    ? _fees?.halfHourFee
-                    : mempoolInfo.halfHourFee,
-                connected: true,
-            });
-        };
-
-        mempoolRef.onerror = (error: any) => {
-            console.log('[Mempool] (error)', error.message);
-
-            if (error.message.includes('not connected')) {
-                setMempoolInfo({
-                    mempoolCongested: mempoolInfo.mempoolCongested,
-                    mempoolHighFeeEnv: mempoolInfo.mempoolHighFeeEnv,
-                    economyFee: mempoolInfo.economyFee,
-                    fastestFee: mempoolInfo.fastestFee,
-                    minimumFee: mempoolInfo.minimumFee,
-                    hourFee: mempoolInfo.hourFee,
-                    halfHourFee: mempoolInfo.halfHourFee,
-                    connected: true,
-                });
-            }
-        };
-    };
-
-    // Breez startup
-    const initNode = async () => {
-        // Init LN connection
-        // No point putting in any effort if mnemonic missing, not LN wallet, or onboarding
-        if (
-            wallet?.mnemonic.length === 0 ||
-            wallet.type !== 'unified' ||
-            onboarding
-        ) {
-            return;
-        }
-
-        let restore_only = wallet.payments.length > 0 ? true : false;
-
-        // Get node info
-        try {
-            const info = await nodeInfo();
-            if (info?.id) {
-                console.log('[Breez SDK] Services already connected');
-                return;
-            }
-        } catch (error: any) {
-            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                LiberalToast(t('Breez SDK'), error.message, {
-                    duration: 2000,
-                });
-            }
-        }
-
-        // SDK events listener
-        const onBreezEvent = (event: BreezEvent) => {
-            if (event.type === BreezEventVariant.NEW_BLOCK) {
-                console.log('[Breez SDK] New Block');
-            }
-
-            if (event.type === BreezEventVariant.SYNCED) {
-                console.log('[Breez SDK] Synced');
-            }
-
-            if (event.type === BreezEventVariant.BACKUP_STARTED) {
-                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                    LiberalToast(t('Breez SDK'), t('breez_backup_started'), {
-                        duration: 3000,
-                    });
-                }
-            }
-
-            if (event.type === BreezEventVariant.BACKUP_SUCCEEDED) {
-                if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                    console.log('[Breez SDK] Backup succeeded');
-                    LiberalToast(t('Breez SDK'), t('breez_backup_success'), {
-                        duration: 1750,
-                    });
-                }
-            }
-
-            if (event.type === BreezEventVariant.BACKUP_FAILED) {
-                console.log('[Breez SDK] Backup Failed: ', event.details);
-
-                LiberalToast(t('Breez SDK'), t('breez_backup_failed'), {
-                    duration: 3000,
-                });
-            }
-
-            if (event.type === BreezEventVariant.INVOICE_PAID) {
-                console.log(
-                    '[Breez SDK] Invoice Paid (Received Payment): ',
-                    event.details,
-                );
-
-                // Handle navigation to LNTransactionStatus in Wallet Receive screen
-                setBreezEvent(event);
-            }
-
-            if (event.type === BreezEventVariant.PAYMENT_FAILED) {
-                console.log('[Breez SDK] Payment Failed: ', event.details);
-
-                // Handle navigation to LNTransactionStatus in Wallet Receive & Send screen
-                setBreezEvent(event);
-            }
-
-            if (event.type === BreezEventVariant.PAYMENT_SUCCEED) {
-                console.log('[Breez SDK] Payment Sent: ', event.details);
-
-                // Handle navigation to LNTransactionStatus in Wallet Send screen
-                setBreezEvent(event);
-            }
-        };
-
-        // Create the default config
-        const seed = await mnemonicToSeed(wallet.mnemonic);
-
-        // Breez SDK Greenlight credentials
-        // The key and cert are stored as hex strings in the .env file
-        // Then converted to byte arrays
-        const developerKey: number[] = Array.from(
-            Buffer.from(_GL_CUSTOM_NOBODY_KEY_, 'hex'),
-        );
-        const developerCert: number[] = Array.from(
-            Buffer.from(_GL_CUSTOM_NOBODY_CERT_, 'hex'),
-        );
-
-        const greenlightCredentials: GreenlightCredentials = {
-            developerKey,
-            developerCert,
-        };
-
-        const nodeConfig: NodeConfig = {
-            type: NodeConfigVariant.GREENLIGHT,
-            config: {
-                partnerCredentials: greenlightCredentials,
-            },
-        };
-
-        const config = await defaultConfig(
-            EnvironmentType.PRODUCTION,
-            _BREEZ_SDK_API_KEY_,
-            nodeConfig,
-        );
-
-        // Set directory for the wallet
-        const xpub256 = getXPub256(wallet.xpub);
-        config.workingDir = config.workingDir + `/volt/${xpub256}`;
-
-        const connectionRequest: ConnectRequest = {
-            config,
-            seed,
-            restoreOnly: restore_only,
-        };
-
-        try {
-            // Connect to the Breez SDK make it ready for use
-            BreezSub.current = await connect(connectionRequest, onBreezEvent);
-            console.log('[Breez SDK] Connected to services');
-        } catch (error: any) {
-            if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                LiberalToast(t('Breez SDK'), error.message, {
-                    duration: 2000,
-                });
-            }
-        }
-    };
-
     useEffect(() => {
         // Block if newly onboarded
         if (walletState.current.length === 0) {
@@ -914,41 +664,11 @@ const RootNavigator = (): ReactElement => {
             },
         );
 
-        // Init LN services
-        // Call mempool
-        initMempoolSock();
-
-        // Net event listener
-        // Subscribe
-        const NetInfoSub = netInfo.addEventListener(state => {
-            // fetch and set mempool info
-            // and Breez SDK connection
-            if (checkNetworkIsReachable(state)) {
-                console.log(
-                    `[NetInfo] Attempt to (Re)connect to ${wallet.type === 'unified' ? 'Breez & ' : ''}Mempool`,
-                );
-                if (!!wallet?.mnemonic && wallet.type === 'unified') {
-                    initNode();
-                }
-                initMempoolSock();
-            }
-        });
-
         return () => {
             // Kill subscription
-            BreezSub?.current?.remove();
             appStateSub?.remove();
-            mempoolRef.close();
-            NetInfoSub();
         };
     }, []);
-
-    useEffect(() => {
-        if (!!wallet?.mnemonic && wallet.type === 'unified') {
-            // Init LN services
-            initNode();
-        }
-    }, [wallet.mnemonic]);
 
     return (
         <NavigationContainer

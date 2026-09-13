@@ -122,8 +122,7 @@ export const Balance = (props: BalanceProps) => {
 
     return (
         <View>
-            {!hideTotalBalance ? (
-                <PlainButton onPress={toggleUnit} disabled={props.disabled}>
+            <PlainButton onPress={toggleUnit} disabled={props.disabled}>
                     <View
                         className={`flex-row items-center ${
                                 props.loading ? 'opacity-40' : ''
@@ -137,7 +136,7 @@ export const Balance = (props: BalanceProps) => {
                             },
                         ]}>
                         {/* Satoshi Symbol */}
-                        <Text
+                        {!hideTotalBalance && <Text
                             className={`${
                                     props.balanceFontSize
                                         ? props.balanceFontSize
@@ -153,7 +152,7 @@ export const Balance = (props: BalanceProps) => {
                                 appUnit.name === 'sats' ? Font.SatSymbol : {},
                             ]}>
                             {appUnit.symbol}
-                        </Text>
+                        </Text>}
 
                         {/* Display balance in sats or BTC */}
                         <Text
@@ -168,7 +167,7 @@ export const Balance = (props: BalanceProps) => {
                                     color: props.fontColor,
                                 },
                             ]}>
-                            {_getBalance(
+                            {hideTotalBalance ? '****' : _getBalance(
                                 new BigNumber(props.balance),
                                 appUnit,
                                 fiatRate,
@@ -177,18 +176,6 @@ export const Balance = (props: BalanceProps) => {
                         </Text>
                     </View>
                 </PlainButton>
-            ) : (
-                /* Empty view to keep the card height consistent  */
-                <View
-                    className="flex-row self-center rounded w-full h-12"
-                    style={[
-                        {
-                            opacity: props.loading ? 0.15 : 0.4,
-                            backgroundColor: props.hideColor,
-                        },
-                    ]}
-                />
-            )}
         </View>
     );
 };

@@ -1,13 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {
     useContext,
     useState,
     useEffect,
     useMemo,
-    useReducer,
-    ReactElement,
     useCallback,
-    useRef,
 } from 'react';
 import {
     useColorScheme,
@@ -19,21 +17,14 @@ import {
     Platform,
 } from 'react-native';
 
+import bip21 from 'bip21';
+
 import VText from '../../components/text';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-import {
-    receivePayment,
-    LnInvoice,
-    BreezEventVariant,
-} from '@breeztech/react-native-breez-sdk';
-import {EBreezDetails} from '../../types/enums';
-
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../../components/toast';
-
-import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 
 import ExpiryTimer from '../../components/expiry';
 
@@ -48,7 +39,6 @@ import {useTranslation} from 'react-i18next';
 
 import {
     capitalizeFirst,
-    formatFiat,
     normalizeFiat,
     SATS_TO_BTC_RATE,
 } from '../../modules/transform';
@@ -57,19 +47,10 @@ import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import QRCodeStyled from 'react-native-qrcode-styled';
+import QRCode from 'react-qr-code';
 import Close from '../../assets/svg/x-24.svg';
 import Info from '../../assets/svg/info-16.svg';
 import NFCIcon from '../../assets/svg/nfc.svg';
-
-import BTCIcon from '../../assets/svg/btc-symbol.svg';
-import LNIcon from '../../assets/svg/ln.svg';
-
-import {
-    DisplayFiatAmount,
-    DisplaySatsAmount,
-    DisplayBTCAmount,
-} from '../../components/balance';
 
 import ShareIcon from '../../assets/svg/share-android-16.svg';
 import EditIcon from '../../assets/svg/pencil-16.svg';
@@ -78,19 +59,17 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {PlainButton} from '../../components/button';
 
-import NativeDims from '../../constants/NativeWindowMetrics';
-import {runOnJS, useSharedValue} from 'react-native-reanimated';
-
-import Dot from '../../components/dots';
-
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
+import { Bolt11InvoiceDetails, InputType_Tags, ReceivePaymentMethod, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { useWallet } from '../../contexts/walletContext';
+import { useBreezEvent } from '../../contexts/BreezEventContext';
 
 // Prop type for params passed to this screen
 // from the RequestAmount screen
+// TODO: redo entire screen to handle showing onchain vs ln invoices
 type Props = NativeStackScreenProps<WalletParamList, 'Receive'>;
-type Slide = () => ReactElement;
 
 const Receive = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
@@ -100,64 +79,48 @@ const Receive = ({route}: Props) => {
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
+    const _wallet = useWallet();
+    const { breezEvent } = useBreezEvent();
+
+    const satsAmount = new BigNumber(route.params.sats);
+
     const {
         currentWalletID,
         getWalletData,
         isAdvancedMode,
-        breezEvent,
-        mempoolInfo,
         appFiatCurrency,
         fiatRate,
     } = useContext(AppStorageContext);
 
-    const walletData = useMemo(() => {
-        return getWalletData(currentWalletID);
-    }, [currentWalletID, getWalletData]);
+    const walletData = getWalletData(currentWalletID);
 
-    const isLNWallet = useMemo(() => {
-        return walletData.type === 'unified';
-    }, [walletData]);
+    const [mempoolCongested, setMempoolCongested] = useState<boolean>(false);
 
-    const [LNInvoice, setLNInvoice] = useState<LnInvoice>();
+    // For now only support bolt12 invoice
+    const [bip21Uri, setBip21Uri] = useState<string>('');
+    const [bolt11, setBolt11] = useState<Bolt11InvoiceDetails>();
     const [feeMessage, setFeeMessage] = useState<string>('');
-    const [loadingInvoice, setLoadingInvoice] = useState(
+    const [loadingQr, setLoadingQr] = useState(
         walletData.type === 'unified',
     );
+
+    const isAmountInvoice = useMemo(() => {
+        return route.params.amount !== undefined && route.params.amount > 0;
+    }, [route.params.amount]);
 
     const networkState = useNetInfo();
     const isNetOn = checkNetworkIsReachable(networkState);
 
-    const progressValue = useSharedValue(0);
+    const getMempool = async () => {
+        const fees = await _wallet.getFeesRecommendations();
 
-    const initialState = {
-        // Amount in sats
-        bitcoinValue: new BigNumber(0),
-        fiatValue: new BigNumber(0),
-    };
-
-    const reducer = (state: any, action: any) => {
-        switch (action.type) {
-            case 'SET_BITCOIN_VALUE':
-                return {
-                    ...state,
-                    bitcoinValue: action.payload,
-                };
-            case 'SET_FIAT_VALUE':
-                return {
-                    ...state,
-                    fiatValue: action.payload,
-                };
-            default:
-                return state;
-        }
-    };
-
-    const [state, dispatch] = useReducer(reducer, initialState);
+        setMempoolCongested(fees.halfHourFee >= 5);
+    }
 
     // Format as Bitcoin URI
     const getFormattedAddress = useCallback(
         (address: string) => {
-            let amount = state.bitcoinValue;
+            let amount = satsAmount;
 
             if (amount.gt(0)) {
                 // If amount is greater than 0, return a bitcoin payment request URI
@@ -170,7 +133,7 @@ const Receive = ({route}: Props) => {
             // return a formatted bitcoin address to include the bitcoin payment request URI
             return `bitcoin:${address}`;
         },
-        [state.bitcoinValue],
+        [satsAmount],
     );
 
     // Copy data to clipboard
@@ -188,113 +151,84 @@ const Receive = ({route}: Props) => {
         [t],
     );
 
-    const congestedMempool = useMemo(() => {
-        return mempoolInfo.mempoolCongested;
-    }, [mempoolInfo.mempoolCongested]);
-
-    const bolt11Invoice = useMemo(() => {
-        return LNInvoice?.bolt11;
-    }, [LNInvoice]);
-    const bolt11AmountMsat = useMemo(() => {
-        return LNInvoice?.amountMsat;
-    }, [LNInvoice]);
-
     const displayExpiry = useMemo(() => {
-        if (LNInvoice) {
+        if (bolt11) {
             return (
                 <View className="absolute right-0">
-                    <ExpiryTimer expiryDate={LNInvoice.expiry} />
+                    <ExpiryTimer expiryDate={Number(bolt11?.expiry)} />
                 </View>
             );
         }
 
         return <></>;
-    }, [LNInvoice]);
+    }, [bolt11]);
 
-    const isAmountInvoice = useMemo(() => {
-        // Show if is a LN wallet & online
-        // or has BTC onchain amount set
-        return (
-            !state.bitcoinValue.isZero() ||
-            (isLNWallet && isNetOn && route.params.amount)
-        );
-    }, [state.bitcoinValue, isLNWallet, isNetOn, route.params.amount]);
-
-    // Set bitcoin invoice URI
-    const BTCInvoice = useMemo(
-        () => getFormattedAddress(walletData.address.address),
-        [getFormattedAddress, walletData.address.address],
-    );
-
-    const BTCAddress = useMemo(() => {
-        return walletData.address.address;
-    }, [walletData.address.address]);
-
-    const routeToBoltNFC = useCallback(() => {
-        if (bolt11AmountMsat) {
+    const routeToBoltNFC = () => {
+        if (bolt11) {
             navigation.dispatch(
                 CommonActions.navigate('WalletRoot', {
                     screen: 'BoltNFC',
                     params: {
-                        amountMsat: bolt11AmountMsat,
+                        amountMsat: bolt11?.amountMsat,
                         description: route.params.lnDescription,
                         fromQuickActions: false,
                     },
                 }),
             );
         }
-    }, [bolt11AmountMsat, navigation, route.params.lnDescription]);
+    };
 
-    useEffect(() => {
-        // Update the request amount if it is passed in as a parameter
-        // from the RequestAmount screen
-        if (route.params?.amount) {
-            dispatch({
-                type: 'SET_BITCOIN_VALUE',
-                payload: new BigNumber(route.params.sats),
-            });
-            dispatch({
-                type: 'SET_FIAT_VALUE',
-                payload: new BigNumber(route.params.fiat),
-            });
-        }
-    }, [route.params]);
-
-    const displayLNInvoice = useCallback(async () => {
-        const mSats =
-            (state.bitcoinValue > 0 ? state.bitcoinValue : route.params.sats) *
-            1_000;
+    const displayLNInvoice = async () => {
+        const _netInfo = await netInfo.fetch();
 
         // Description
         const ln_desc = route.params.lnDescription
             ? route.params.lnDescription : '';
 
+        const description = ln_desc;
+
+        let BTCAddress = getFormattedAddress(walletData.address.address);
+        let bolt11Invoice: Bolt11InvoiceDetails | null = null;
+
+        if (!checkNetworkIsReachable(_netInfo) || !isAmountInvoice) {
+            setLoadingQr(false);
+            setBip21Uri(BTCAddress);
+            return;
+        }
+
         try {
-            const receivePaymentResp = await receivePayment({
-                amountMsat: mSats,
-                description: ln_desc,
-            });
+            const response = _wallet.receivePayment({
+                paymentMethod: new ReceivePaymentMethod.Bolt11Invoice({
+                    description,
+                    amountSats: route.params.sats,
+                })
+            })
 
-            const openingFee = receivePaymentResp.openingFeeMsat
-                ? receivePaymentResp.openingFeeMsat / 1_000
-                : 0;
+            const paymentRequest = (await response).paymentRequest;
+            const receiveResp = await response;
+            const receiveFeeSats = receiveResp.fee
 
-            runOnJS(setLNInvoice)(receivePaymentResp.lnInvoice);
+            const parsedLN = await _wallet.parseInput(paymentRequest);
 
-            if (openingFee > 0) {
+            if (parsedLN.tag === InputType_Tags.Bolt11Invoice) {
+                setBolt11(parsedLN.inner[0]);
+                bolt11Invoice = parsedLN.inner[0];
+            } else {
+                throw new Error('Invalid invoice type received');
+            }
+
+            if (receiveFeeSats > 0) {
                 setFeeMessage(
                     t('ln_fee_amount_message', {
-                        sats: openingFee,
+                        sats: receiveFeeSats,
                         currency: appFiatCurrency.symbol,
                         fiat: normalizeFiat(
-                            new BigNumber(openingFee),
+                            new BigNumber(receiveFeeSats),
                             fiatRate.rate,
                         ),
                     }),
                 );
             }
-
-            setLoadingInvoice(false);
         } catch (error: any) {
             navigation.dispatch(
                 CommonActions.navigate('WalletRoot', {
@@ -304,159 +238,187 @@ const Receive = ({route}: Props) => {
                     },
                 }),
             );
+            return error;
         }
-    }, [
-        state.bitcoinValue,
-        route.params.sats,
-        route.params.lnDescription,
-        t,
-        appFiatCurrency.symbol,
-        fiatRate.rate,
-        navigation,
-    ]);
 
-    const closeScreen = useCallback(() => {
+        // Build Bip21 unified URI
+        const bp21 = bip21.encode(walletData.address.address, {
+            amount: satsAmount.div(SATS_TO_BTC_RATE),
+            description: ln_desc,
+            lightning: bolt11Invoice.invoice.bolt11,
+        });
+
+        setBip21Uri(bp21);
+        setLoadingQr(false);
+    };
+
+    const closeScreen = () => {
         // Note: we route back get back to amount and back here
-        navigation.dispatch(CommonActions.goBack());
-    }, [navigation]);
-
-    const processLNInvoice = useCallback(async () => {
-        const _netInfo = await netInfo.fetch();
-        // Get invoice details
-        // Note: hide amount details
-        if (
-            walletData.type === 'unified' &&
-            checkNetworkIsReachable(_netInfo) &&
-            route.params.amount &&
-            !route.params.breezServicesNotInitialized
-        ) {
-            displayLNInvoice();
-        }
-    }, [
-        displayLNInvoice,
-        route.params.amount,
-        route.params.breezServicesNotInitialized,
-        walletData.type,
-    ]);
+        navigation.dispatch(CommonActions.reset({
+            index: 1,
+            routes: [
+                {name: 'HomeScreen'},
+                {name: 'WalletRoot', params: {
+                    reload: route.params.status,
+                },
+            }],
+        }));
+    };
 
     useEffect(() => {
-        processLNInvoice();
-    }, [processLNInvoice]);
+        getMempool();
+        displayLNInvoice();
+    }, []);
 
     useEffect(() => {
-        if (breezEvent.type === BreezEventVariant.INVOICE_PAID) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount.toString())};
+
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Received,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent?.inner.payment.paymentType,
+                    error: null,
                 }),
             );
             return;
         }
 
-        if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentFailed) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount.toString())};
+
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Failed,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent?.inner.payment.paymentType,
+                    error: breezEvent.inner,
                 }),
             );
             return;
         }
-    }, [breezEvent, navigation]);
+    }, [breezEvent]);
 
-    const carouselRef = useRef<ICarouselInstance>(null);
-
-    const onchainPanel = useCallback((): ReactElement => {
-        const copyToClip = () => {
-            copyDescToClipboard(BTCAddress);
-        };
-
-        return (
+    return (
+        <SafeAreaView
+            edges={['top', 'bottom', 'right', 'left']}
+            style={[
+                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
+            ]}>
             <View
-                className={
-                    `items-center justify-center h-full w-full ${
-                        congestedMempool ? 'mt-8' : 'mt-6'
-                    }`
-                }>
-                {isAmountInvoice && (
+                className="w-full h-full items-center justify-center"
+                style={{backgroundColor: ColorScheme.Background.Default}}>
+                <View
+                    className="w-5/6 justify-center items-center absolute top-6 flex">
+                    <PlainButton
+                        className="absolute left-0 z-10"
+                        onPress={closeScreen}>
+                        <Close fill={ColorScheme.SVG.Default} />
+                    </PlainButton>
+
+                    <Text
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
+                        {t('bitcoin_invoice')}
+                    </Text>
+
+                    {/* Invoice Timeout */}
+                    {displayExpiry}
+                </View>
+
+                {/* Main Panel */}
+                <>
                     <View
-                        className="mb-4 flex justify-center items-center">
-                        {/* Make it approx if it doesn't match bottom unit value for requested amount */}
-                        {state.bitcoinValue < 100_000_000 ? (
-                            <DisplaySatsAmount
-                                amount={state.bitcoinValue}
-                                fontSize={'text-2xl'}
-                            />
-                        ) : (
-                            <DisplayBTCAmount
-                                amount={state.bitcoinValue}
-                                fontSize="text-2xl"
-                            />
-                        )}
-                        <View className="opacity-40">
-                            {/* Make it approx if it doesn't match bottom unit value for requested amount */}
-                            <DisplayFiatAmount
-                                amount={formatFiat(state.fiatValue)}
-                                fontSize={'text-base'}
-                                isApprox={
-                                    route.params.amount !==
-                                    state.fiatValue.toString()
-                                }
-                            />
+                className="items-center justify-center h-full w-full mt-12">
+                {!loadingQr && isAmountInvoice && (
+                    <>
+                        <View
+                            className="items-center justify-center w-4/5 mb-4 flex-row">
+                            <ActivityIndicator />
+                            <VText
+                                className="ml-2 text-center"
+                                style={{color: ColorScheme.Text.DescText}}>
+                                {t('keep_receive_open')}
+                            </VText>
                         </View>
+                    </>
+                )}
+
+                {loadingQr ? (
+                    <View
+                        className="items-center justify-center h-full w-full">
+                        <ActivityIndicator />
+                        {isAmountInvoice && <Text
+                            className="text-sm mt-4"
+                            style={{color: ColorScheme.Text.Default}}>
+                            {isAdvancedMode
+                                ? t('loading_invoice_advanced', {
+                                      spec: 'Bolt11',
+                                  })
+                                : t('loading_invoice')}
+                        </Text>}
+                    </View>
+                ) : (
+                    <View
+                        className="rounded p-2"
+                        style={[
+                            styles.qrCodeContainer,
+                            {
+                                borderColor: ColorScheme.Background.QRBorder,
+                                backgroundColor: 'white',
+                            },
+                        ]}>
+                        <QRCode
+                            style={{
+                                backgroundColor: 'white',
+                            }}
+                            size={NativeWindowMetrics.width * 0.6}
+                            value={bip21Uri}
+                            color={ColorScheme.Background.Default}
+                        />
                     </View>
                 )}
 
-                <View
-                    className="rounded p-2"
-                    style={[
-                        styles.qrCodeContainer,
-                        {
-                            borderColor: ColorScheme.Background.QRBorder,
-                            backgroundColor: 'white',
-                        },
-                    ]}>
-                    <QRCodeStyled
-                        style={{
-                            backgroundColor: 'white',
-                        }}
-                        data={BTCInvoice}
-                        padding={7}
-                        pieceSize={7}
-                        color={ColorScheme.Background.Default}
-                        isPiecesGlued={true}
-                        pieceBorderRadius={4}
-                        children={(): ReactElement => {
-                            return (
-                                <View
-                                    className="w-full h-full"
-                                    style={[
-                                        styles.qrLogoContainer,
-                                    ]}>
-                                    <View
-                                        className="rounded-full items-center justify-center"
-                                        style={[
-                                            {
-                                                backgroundColor: 'black',
-                                                height: 54,
-                                                width: 54,
-                                            },
-                                        ]}>
-                                        <BTCIcon width={32} height={32} />
-                                    </View>
-                                </View>
-                            );
-                        }}
-                    />
-                </View>
+                {/* Bitcoin address info */}
+                {!loadingQr && (
+                    <View
+                        className="p-4 mt-4 w-4/5 rounded mb-4"
+                        style={[
+                            {backgroundColor: ColorScheme.Background.Greyed},
+                        ]}>
+                        <PlainButton
+                            className="w-full"
+                            onPress={() => {
+                                copyDescToClipboard(bip21Uri);
+                            }}>
+                            <Text
+                                ellipsizeMode="middle"
+                                numberOfLines={1}
+                                style={[{color: ColorScheme.Text.Default}]}>
+                                {!isAmountInvoice ? walletData.address.address : bolt11 ? bolt11?.invoice.bolt11 : ''}
+                            </Text>
+                        </PlainButton>
+                    </View>
+                )}
+
+                {/* ln_fee_amount_message */}
+                {!loadingQr && feeMessage && (
+                    <Text
+                        className="text-sm text-center mb-6 w-5/6'"
+                        style={{color: ColorScheme.Text.DescText}}>
+                        {feeMessage}
+                    </Text>
+                )}
 
                 {/* Message on congestion */}
-                {congestedMempool && isNetOn && (
+                {mempoolCongested && isNetOn && (
                     <View
                         className={
                             `mt-4 w-5/6 ${
@@ -486,229 +448,13 @@ const Receive = ({route}: Props) => {
                     </View>
                 )}
 
-                {/* Bitcoin address info */}
-                <View
-                    className="p-4 mt-4 w-4/5 rounded mb-4"
-                    style={{backgroundColor: ColorScheme.Background.Greyed}}>
-                    <PlainButton
-                        className="w-full"
-                        onPress={copyToClip}>
-                        <Text
-                            ellipsizeMode="middle"
-                            numberOfLines={1}
-                            style={[{color: ColorScheme.Text.Default}]}>
-                            {BTCAddress}
-                        </Text>
-                    </PlainButton>
-                </View>
-
                 {/* Bottom buttons */}
-                <View
-                    className={
-                        `items-center ${
-                            langDir === 'right'
-                                ? 'flex-row-reverse'
-                                : 'flex-row'
-                        }`
-                    }>
-                    {/* Enter receive amount */}
-                    <PlainButton
-                        className={
-                            `${
-                                langDir === 'right' ? 'ml-4' : 'mr-4'
-                            } rounded-full items-center flex-row justify-center px-4 py-2`
-                        }
-                        style={{
-                                backgroundColor: ColorScheme.Background.Greyed,
-                        }}
-                        onPress={() => {
-                            navigation.dispatch(
-                                CommonActions.goBack(),
-                            );
-                        }}>
-                        <EditIcon
-                            className="mr-2"
-                            fill={ColorScheme.SVG.Default}
-                            width={16}
-                            height={16}
-                        />
-                        <Text
-                            className="font-bold text-center text-sm"
-                            style={{color: ColorScheme.Text.Default}}>
-                            {capitalizeFirst(t('edit'))}
-                        </Text>
-                    </PlainButton>
-
-                    {/* Share Button */}
-                    <PlainButton
-                        onPress={() => {
-                            Share.share({
-                                message: BTCInvoice,
-                                title: 'Share Address',
-                                url: BTCInvoice,
-                            });
-                        }}>
-                        <View
-                            className="rounded-full items-center flex-row justify-center px-4 py-2"
-                            style={{
-                                backgroundColor:
-                                    ColorScheme.Background.Greyed,
-                            }}>
-                            <ShareIcon
-                                className="mr-2"
-                                fill={ColorScheme.SVG.Default}
-                                width={16}
-                                height={16}
-                            />
-                            <Text
-                                className="text-sm font-bold"
-                                style={{
-                                    color: ColorScheme.Text.Default,
-                                }}>
-                                {capitalizeFirst(t('share'))}
-                            </Text>
-                        </View>
-                    </PlainButton>
-                </View>
-            </View>
-        );
-    }, [
-        congestedMempool,
-        isAmountInvoice,
-        state.bitcoinValue,
-        state.fiatValue,
-        route.params.amount,
-        ColorScheme.Background.QRBorder,
-        ColorScheme.Background.Default,
-        ColorScheme.Background.Greyed,
-        ColorScheme.SVG.GrayFill,
-        ColorScheme.SVG.Default,
-        ColorScheme.Text.DescText,
-        ColorScheme.Text.Default,
-        BTCInvoice,
-        langDir,
-        t,
-        isNetOn,
-        BTCAddress,
-        copyDescToClipboard,
-        navigation,
-    ]);
-
-    const lnPanel = useCallback((): ReactElement => {
-        const copyToClip = () => {
-            copyDescToClipboard(bolt11Invoice as string);
-        };
-
-        return (
-            <View
-                className="items-center justify-center h-full w-full mt-12">
-                {!loadingInvoice && (
-                    <>
-                        <View
-                            className="items-center justify-center w-4/5 mb-4 flex-row">
-                            <ActivityIndicator />
-                            <VText
-                                className="ml-2 text-center"
-                                style={{color: ColorScheme.Text.DescText}}>
-                                {t('keep_receive_open')}
-                            </VText>
-                        </View>
-                    </>
-                )}
-
-                {loadingInvoice ? (
-                    <View
-                        className="items-center justify-center h-full w-full">
-                        <ActivityIndicator />
-                        <Text
-                            className="text-sm mt-4"
-                            style={{color: ColorScheme.Text.Default}}>
-                            {isAdvancedMode
-                                ? t('loading_invoice_advanced', {
-                                      spec: 'Bolt11',
-                                  })
-                                : t('loading_invoice')}
-                        </Text>
-                    </View>
-                ) : (
-                    <View
-                        className="rounded p-2"
-                        style={[
-                            styles.qrCodeContainer,
-                            {
-                                borderColor: ColorScheme.Background.QRBorder,
-                                backgroundColor: 'white',
-                            },
-                        ]}>
-                        <QRCodeStyled
-                            style={{
-                                backgroundColor: 'white',
-                            }}
-                            data={bolt11Invoice}
-                            padding={4}
-                            pieceSize={3.75}
-                            color={ColorScheme.Background.Default}
-                            isPiecesGlued={true}
-                            pieceBorderRadius={2}
-                            children={(): ReactElement => {
-                                return (
-                                    <View
-                                        className="w-full h-full"
-                                        style={[
-                                            styles.qrLogoContainer,
-                                        ]}>
-                                        <View
-                                            className="rounded-full items-center justify-center"
-                                            style={{
-                                                backgroundColor: 'black',
-                                                height: 54,
-                                                width: 54,
-                                            }}>
-                                            <LNIcon width={32} height={32} />
-                                        </View>
-                                    </View>
-                                );
-                            }}
-                        />
-                    </View>
-                )}
-
-                {/* Bitcoin address info */}
-                {!loadingInvoice && (
-                    <View
-                        className="p-4 mt-4 w-4/5 rounded mb-4"
-                        style={[
-                            {backgroundColor: ColorScheme.Background.Greyed},
-                        ]}>
-                        <PlainButton
-                            className="w-full"
-                            onPress={copyToClip}>
-                            <Text
-                                ellipsizeMode="middle"
-                                numberOfLines={1}
-                                style={[{color: ColorScheme.Text.Default}]}>
-                                {bolt11Invoice}
-                            </Text>
-                        </PlainButton>
-                    </View>
-                )}
-
-                {/* ln_fee_amount_message */}
-                {!loadingInvoice && feeMessage && (
-                    <Text
-                        className="text-sm text-center mb-6 w-5/6'"
-                        style={{color: ColorScheme.Text.DescText}}>
-                        {feeMessage}
-                    </Text>
-                )}
-
-                {/* Bottom buttons */}
-                {!loadingInvoice && (
+                {!loadingQr && (
                     <View
                         className={
                             `items-center ${
                                 Platform.OS === 'ios'
-                                    ? 'w-1/2 justify-between'
+                                    ? 'w-1/2 justify-around'
                                     : 'w-5/6 justify-around'
                             } ${
                                 langDir === 'right'
@@ -731,13 +477,12 @@ const Receive = ({route}: Props) => {
                                 );
                             }}>
                             <EditIcon
-                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                                 width={16}
                                 height={16}
                             />
                             <Text
-                                className="font-bold text-center text-sm"
+                                className="font-bold text-center text-sm ml-2"
                                 style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('edit'))}
                             </Text>
@@ -746,11 +491,19 @@ const Receive = ({route}: Props) => {
                         {/* Share Button */}
                         <PlainButton
                             onPress={() => {
-                                Share.share({
-                                    message: bolt11Invoice as string,
-                                    title: 'Share Address',
-                                    url: bolt11Invoice as string,
-                                });
+                                if (!isAmountInvoice) {
+                                    Share.share({
+                                        message: getFormattedAddress(walletData.address.address),
+                                        title: 'Share Address',
+                                        url: getFormattedAddress(walletData.address.address),
+                                    });
+                                } else {
+                                    Share.share({
+                                        message: bolt11?.invoice.bolt11,
+                                        title: 'Share Address',
+                                        url: bolt11?.invoice.source.bip21Uri?.toString() || '',
+                                    });
+                                }
                             }}>
                             <View
                                 className="rounded-full items-center flex-row justify-center px-4 py-2"
@@ -759,13 +512,12 @@ const Receive = ({route}: Props) => {
                                         ColorScheme.Background.Greyed,
                                 }}>
                                 <ShareIcon
-                                    className="mr-2"
                                     fill={ColorScheme.SVG.Default}
                                     width={16}
                                     height={16}
                                 />
                                 <Text
-                                    className="text-sm font-bold"
+                                    className="text-sm font-bold ml-2"
                                     style={{
                                         color: ColorScheme.Text.Default,
                                     }}>
@@ -796,134 +548,13 @@ const Receive = ({route}: Props) => {
                                         }}>
                                         {'NFC'}
                                     </Text>
-                                </View>
-                            </PlainButton>
-                        )}
-                    </View>
-                )}
-            </View>
-        );
-    }, [
-        loadingInvoice,
-        ColorScheme.Text.DescText,
-        ColorScheme.Text.Default,
-        ColorScheme.Background.QRBorder,
-        ColorScheme.Background.Default,
-        ColorScheme.Background.Greyed,
-        ColorScheme.SVG.Default,
-        t,
-        isAdvancedMode,
-        bolt11Invoice,
-        feeMessage,
-        langDir,
-        routeToBoltNFC,
-        copyDescToClipboard,
-        navigation,
-    ]);
-
-    const panels = useMemo((): Slide[] => {
-        return isNetOn ? [lnPanel, onchainPanel] : [onchainPanel];
-    }, [isNetOn, lnPanel, onchainPanel]);
-
-    return (
-        <SafeAreaView
-            edges={['top', 'bottom', 'right', 'left']}
-            style={[
-                {flex: 1, backgroundColor: ColorScheme.Background.Primary},
-            ]}>
-            <View
-                className="w-full h-full items-center justify-center"
-                style={{backgroundColor: ColorScheme.Background.Default}}>
-                <View
-                    className="w-5/6 justify-center items-center absolute top-6 flex">
-                    <PlainButton
-                        className="absolute left-0 z-10"
-                        onPress={closeScreen}>
-                        <Close fill={ColorScheme.SVG.Default} />
-                    </PlainButton>
-
-                    <Text
-                        className="text-lg font-bold"
-                        style={{color: ColorScheme.Text.Default}}>
-                        {t('bitcoin_invoice')}
-                    </Text>
-
-                    {/* Invoice Timeout */}
-                    {displayExpiry}
-                </View>
-
-                {isLNWallet &&
-                    route.params.amount &&
-                    !route.params.breezServicesNotInitialized && (
-                        <View
-                            className="h-full w-full items-center justify-end absolute bottom-0"
-                            style={[
-                                styles.carouselContainer,
-                                {zIndex: -9},
-                            ]}>
-                            <Carousel
-                                ref={carouselRef}
-                                style={[styles.carouselStyle]}
-                                data={panels}
-                                width={NativeDims.width}
-                                // Adjust height for iOS
-                                // to account for top stack height
-                                height={
-                                    Platform.OS === 'ios'
-                                        ? NativeDims.height -
-                                          NativeDims.navBottom * 3.2
-                                        : NativeDims.height -
-                                          NativeDims.navBottom * 2.4
-                                }
-                                loop={false}
-                                panGestureHandlerProps={{
-                                    activeOffsetX: [-10, 10],
-                                }}
-                                testID="ReceiveSlider"
-                                renderItem={({index}): ReactElement => {
-                                    const Slide = panels[index];
-                                    return <Slide key={index} />;
-                                }}
-                                onProgressChange={(
-                                    _,
-                                    absoluteProgress,
-                                ): void => {
-                                    progressValue.value = absoluteProgress;
-                                }}
-                            />
-
-                            {isNetOn && (
-                                <View
-                                    style={[
-                                        styles.dots,
-                                        {bottom: NativeDims.bottom},
-                                    ]}
-                                    pointerEvents="none">
-                                    {panels.map((_slide, index) => (
-                                        <Dot
-                                            key={index}
-                                            index={index}
-                                            animValue={progressValue}
-                                            length={panels.length}
-                                        />
-                                    ))}
+                                            </View>
+                                        </PlainButton>
+                                    )}
                                 </View>
                             )}
                         </View>
-                    )}
-
-                {(!isLNWallet ||
-                    !route.params.amount ||
-                    route.params.breezServicesNotInitialized) && (
-                    <View
-                        className="h-full w-full items-center justify-end absolute bottom-0"
-                        style={[
-                            styles.carouselContainer,
-                            {zIndex: -9},
-                        ]}>
-                        {onchainPanel()}
-                    </View>
-                )}
+                </>
 
                 <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
@@ -950,9 +581,5 @@ const styles = StyleSheet.create({
         marginTop: 16,
         width: 26,
         position: 'absolute',
-    },
-    qrLogoContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 });

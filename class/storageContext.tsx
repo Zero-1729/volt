@@ -23,7 +23,6 @@ import {
     fromDescriptorPTR,
 } from '../modules/descriptors';
 import {generateMnemonic} from '../modules/bdk';
-import {BreezEvent} from '@breeztech/react-native-breez-sdk';
 
 import {TLanguage, TCurrency, TCachedRates} from '../types/settings';
 import {EBackupMaterial, ENet} from '../types/enums';
@@ -36,7 +35,6 @@ import {
     TBaseWalletArgs,
     TAddress,
     TElectrumServerURLs,
-    TMempoolInfo,
     TRateObject,
 } from '../types/wallet';
 
@@ -81,7 +79,6 @@ const isDevMode = __DEV__;
 
 // Default context type
 type defaultContextType = {
-    breezEvent: BreezEvent;
     appLanguage: TLanguage;
     appFiatCurrency: TCurrency;
     loadLock: boolean;
@@ -100,10 +97,7 @@ type defaultContextType = {
     electrumServerURL: TElectrumServerURLs;
     isPINActive: boolean;
     isBiometricsActive: boolean;
-    mempoolInfo: TMempoolInfo;
     pinAttempts: number; // maxes out at 10, reset when correct pin entered
-    setBreezEvent: (event: BreezEvent) => void;
-    setMempoolInfo: (data: TMempoolInfo) => void;
     setAppLanguage: (languageObject: TLanguage) => void;
     setAppFiatCurrency: (currencyObject: TCurrency) => void;
     updateFiatRate: (fiatObj: TRateObject) => void;
@@ -145,8 +139,6 @@ type defaultContextType = {
 const defaultContext: defaultContextType = {
     loadLock: false,
     onboarding: true,
-    breezEvent: {} as BreezEvent,
-    mempoolInfo: {} as TMempoolInfo,
     appLanguage: {
         name: 'English',
         code: 'en',
@@ -185,8 +177,6 @@ const defaultContext: defaultContextType = {
     isPINActive: false,
     isBiometricsActive: false,
     pinAttempts: 0,
-    setBreezEvent: () => {},
-    setMempoolInfo: () => {},
     setAppLanguage: () => {},
     setAppFiatCurrency: () => {},
     updateFiatRate: () => {},
@@ -230,8 +220,6 @@ export const AppStorageProvider = ({children}: Props) => {
     // |> States and async storage get and setters
     const [loadLock, _setLoadLock] = useState(defaultContext.loadLock);
     const [onboarding, _setOnboarding] = useState(defaultContext.onboarding);
-    const [breezEvent, _setBreezEvent] = useState(defaultContext.breezEvent);
-    const [mempoolInfo, _setMempoolInfo] = useState(defaultContext.mempoolInfo);
     const [appLanguage, _setAppLanguage] = useState(defaultContext.appLanguage);
     const [appFiatCurrency, _setFiatCurrency] = useState(
         defaultContext.appFiatCurrency,
@@ -272,10 +260,6 @@ export const AppStorageProvider = ({children}: Props) => {
         useAsyncStorage('loadLock');
     const {getItem: _getOnboarding, setItem: _updateOnboarding} =
         useAsyncStorage('onboarding');
-    const {getItem: _getBreezEvent, setItem: _updateBreezEvent} =
-        useAsyncStorage('breezEvent');
-    const {getItem: _getMempoolInfo, setItem: _updateMempoolInfo} =
-        useAsyncStorage('mempoolInfo');
     const {getItem: _getAppLanguage, setItem: _updateAppLanguage} =
         useAsyncStorage('appLanguage');
     const {getItem: _getFiatCurrency, setItem: _updateFiatCurrency} =
@@ -405,7 +389,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const setLoadLock = useCallback(
         async (lock: boolean) => {
             try {
-                await _setLoadLock(lock);
+                _setLoadLock(lock);
                 await _updateLoadLock(JSON.stringify(lock));
             } catch (e) {
                 console.error(
@@ -420,7 +404,7 @@ export const AppStorageProvider = ({children}: Props) => {
     const setOnboarding = useCallback(
         async (arg: boolean) => {
             try {
-                await _setOnboarding(arg);
+                _setOnboarding(arg);
                 await _updateOnboarding(JSON.stringify(arg));
             } catch (e) {
                 console.error(
@@ -432,63 +416,10 @@ export const AppStorageProvider = ({children}: Props) => {
         [_setOnboarding, _updateOnboarding],
     );
 
-    const setBreezEvent = useCallback(
-        async (event: BreezEvent) => {
-            // handle clear
-            if (event === ({} as BreezEvent)) {
-                await _setBreezEvent({} as BreezEvent);
-                await _updateBreezEvent(JSON.stringify({}));
-            }
-
-            try {
-                await _setBreezEvent(event);
-                await _updateBreezEvent(JSON.stringify(event));
-            } catch (e) {
-                console.error(
-                    `[AsyncStorage] (Breez event) Error loading data: ${e} [${event}]`,
-                );
-                throw new Error('Error setting breez event');
-            }
-        },
-        [_setBreezEvent, _updateBreezEvent],
-    );
-
-    const _loadBreezEvent = async () => {
-        const be = await _getBreezEvent();
-
-        if (be !== null) {
-            _setBreezEvent(JSON.parse(be));
-        }
-    };
-
-    const setMempoolInfo = useCallback(async (data: TMempoolInfo) => {
-        if (data === ({} as TMempoolInfo)) {
-            await _setMempoolInfo({} as TMempoolInfo);
-            await _updateMempoolInfo(JSON.stringify({}));
-        }
-
-        try {
-            await _setMempoolInfo(data);
-            await _updateMempoolInfo(JSON.stringify(data));
-        } catch (e) {
-            console.error(
-                `[AsyncStorage] (Mempool Info) Error loading data: ${e}`,
-            );
-            throw new Error('Error setting mempool info data');
-        }
-    }, []);
-
-    const _loadMempoolInfo = async () => {
-        const mi = await _getMempoolInfo();
-        if (mi !== null) {
-            _setMempoolInfo(JSON.parse(mi));
-        }
-    };
-
     const setAppLanguage = useCallback(
         async (languageObject: TLanguage) => {
             try {
-                await _setAppLanguage(languageObject);
+                _setAppLanguage(languageObject);
                 await _updateAppLanguage(JSON.stringify(languageObject));
             } catch (e) {
                 console.error(
@@ -970,6 +901,10 @@ export const AppStorageProvider = ({children}: Props) => {
                 ? balance.onchain
                 : oldOnchainBalance;
 
+            JSON.stringify(tmp, (key, value) =>
+                typeof value === "bigint" ? value.toString() : value,
+            );
+
             // Update wallets list
             _setWallets(tmp);
             _updateWallets(JSON.stringify(tmp));
@@ -1074,7 +1009,7 @@ export const AppStorageProvider = ({children}: Props) => {
 
         const tmp = [...wallets, newWallet];
 
-        await _setWallets(tmp);
+        _setWallets(tmp);
         await _updateWallets(JSON.stringify(tmp));
         await updateWalletsIndex(tmp.length - 1);
 
@@ -1427,14 +1362,6 @@ export const AppStorageProvider = ({children}: Props) => {
     }, []);
 
     useEffect(() => {
-        _loadBreezEvent();
-    }, []);
-
-    useEffect(() => {
-        _loadMempoolInfo();
-    }, []);
-
-    useEffect(() => {
         _loadAppLanguage();
     }, []);
 
@@ -1504,10 +1431,6 @@ export const AppStorageProvider = ({children}: Props) => {
                 setLoadLock,
                 electrumServerURL,
                 setElectrumServerURL,
-                breezEvent,
-                mempoolInfo,
-                setBreezEvent,
-                setMempoolInfo,
                 appLanguage,
                 setAppLanguage,
                 appFiatCurrency,

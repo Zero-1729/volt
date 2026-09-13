@@ -1,12 +1,8 @@
 import {
     BREEZ_INVITE_CODE,
-    BREEZ_SDK_API_KEY,
-    GL_CUSTOM_NOBODY_CERT,
-    GL_CUSTOM_NOBODY_KEY,
+    BREEZ_SDK_SPARK_API,
 } from '@env';
 
 // Path: modules/env.ts
 export const _BREEZ_INVITE_CODE_ = BREEZ_INVITE_CODE;
-export const _BREEZ_SDK_API_KEY_ = BREEZ_SDK_API_KEY;
-export const _GL_CUSTOM_NOBODY_CERT_ = GL_CUSTOM_NOBODY_CERT;
-export const _GL_CUSTOM_NOBODY_KEY_ = GL_CUSTOM_NOBODY_KEY;
+export const _BREEZ_SDK_SPARK_API_ = BREEZ_SDK_SPARK_API;

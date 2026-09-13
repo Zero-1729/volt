@@ -19,21 +19,20 @@ import {useTranslation} from 'react-i18next';
 import Font from '../constants/Font';
 import Color from '../constants/Color';
 
-import BITCOIN from '../assets/svg/btc.svg';
-import SIM from '../assets/svg/sim.svg';
+import Unhide from '../assets/svg/unhide.svg';
+import Hide from '../assets/svg/hide.svg';
+
+import VText from './text';
 
 export const WalletCard = (props: WalletCardProps) => {
     const ColorScheme = Color(useColorScheme());
+    const {
+        hideTotalBalance,
+        setTotalBalanceHidden,
+    } = useContext(AppStorageContext);
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
-
-    const mxPositionBTC =
-        langDir === 'right'
-            ? {left: props.hideBalance ? -34 : -24}
-            : {right: props.hideBalance ? -34 : -24};
-
-    const mxPositionSim = langDir === 'right' ? {right: 24} : {left: 24};
 
     return (
         <PlainButton
@@ -47,7 +46,7 @@ export const WalletCard = (props: WalletCardProps) => {
                 className="w-full relative items-center"
                 style={{height: 206}}>
                 <View
-                    className="w-full rounded-md z-50 px-6"
+                    className="w-full relative rounded-md px-6"
                     style={[
                         styles.overflowHidden,
                         {
@@ -59,100 +58,60 @@ export const WalletCard = (props: WalletCardProps) => {
                         },
                     ]}>
                     <View
-                        className="absolute right-0 z-50 h-full rounded-br opacity-60"
+                        className="absolute right-0 h-full rounded-br opacity-60"
                         style={{width: 6}}>
                         <View
                             className="h-4/6 rounded-tr rounded-bl rounded-br-none absolute right-0"
                             style={{width: 10}}
                         />
                     </View>
-
-                    <View
-                        className="absolute h-auto w-auto opacity-40 z-0"
-                        style={{
-                                top: props.hideBalance ? -34 : -16,
-                                ...mxPositionBTC,
-                            }}>
-                        <BITCOIN fill={'black'} width={148} height={148} />
-                    </View>
-
-                    {!props.isWatchOnly && (
-                        <View
-                            className="absolute opacity-80 h-auto w-auto"
-                            style={{
-                                    top: 18,
-                                    ...mxPositionSim,
-                                }}>
-                            <SIM fill={'white'} width={42} height={42} />
-                        </View>
-                    )}
-
-                    <Text
-                        numberOfLines={1}
-                        ellipsizeMode="middle"
-                        className="absolute bottom-5 pt-4 mt-1 text-base w-full text-left text-white opacity-60"
-                        style={[
-                            styles.label,
-                            {
-                                bottom: props.withBalance ? (props.hideBalance ? 72 : 54) : 20,
-                                textAlign: langDir,
-                            },
-                            Font.RobotoText,
-                        ]}>
-                        {props.label}
-                    </Text>
-
-                    {props.isWatchOnly && (
-                        <View
-                            className="bg-black absolute rounded-full opacity-60"
+                    <View className="w-full relative top-6">
+                            <VText
+                            className="text-xl font-medium w-full"
                             style={[
-                                langDir === 'right'
-                                    ? styles.watchOnlyRTL
-                                    : styles.watchOnlyLTR,
-                            ]}>
-                            <Text
-                                className="text-xs text-white font-bold px-4 py-1"
-                                style={[
+                                {
+                                    color: ColorScheme.Text
+                                                  .Default,
+                                    marginLeft: langDir === 'left' ? 0 : 0,
+                                    marginRight: langDir === 'right' ? 0 : 0,
+                                    },
                                     Font.RobotoText,
                                 ]}>
-                                Watch only
-                            </Text>
-                        </View>
-                    )}
+                                {props.label}
+                            </VText>
+                            <PlainButton
+                                className={`absolute top-0 ${langDir === 'right' ? "left-0": "right-0"} rounded-full items-center flex-row p-1 -mt-1`}
+                                onPress={() => {setTotalBalanceHidden(!hideTotalBalance)}}
+                                >                                
+                                    {hideTotalBalance ? 
+                                        <Hide fill={ColorScheme.SVG.Default} width={20} height={20} /> : 
+                                        <Unhide style={{opacity: 0.8}} fill={ColorScheme.SVG.Default} width={20} height={20} /> }
+                            </PlainButton>
+                    </View>
 
-                    {/* Show Balance or Maxed card if `withBalance` */}
-                    {props.withBalance && (!props.maxedCard || props.hideBalance) ? (
-                        <View className="w-full absolute mx-6 bottom-5">
+                    <View className="w-full absolute mx-6 bottom-6">
+                            <VText
+                                className="text-base font-medium opacity-60"
+                                style={[
+                                    {
+                                        color: ColorScheme.Text
+                                                      .Default,
+                                        marginLeft: langDir === 'left' ? 0 : 0,
+                                        marginRight: langDir === 'right' ? 0 : 0,
+                                    },
+                                    Font.RobotoText,
+                                ]}>
+                                {t('balance')}
+                            </VText>
+
                             <Balance
                                 fontColor={'white'}
                                 balance={props.balance}
-                                balanceFontSize={'text-2xl'}
+                                balanceFontSize={'text-3xl'}
                                 disableFiat={false}
                                 loading={props.loading}
-                                hideColor={
-                                    ColorScheme.WalletColors[props.walletType]
-                                        .accent
-                                }
                             />
                         </View>
-                    ) : (
-                        props.withBalance && <View
-                            className="bg-black absolute rounded opacity-60"
-                            style={{
-                                    bottom: 20,
-                                    left: langDir === 'right' ? undefined : 24,
-                                    right: langDir === 'right' ? 24 : undefined,
-                                }}>
-                            <Text
-                                className="text-xs text-white font-bold px-4 py-1"
-                                style={[
-                                    {textAlign: langDir},
-                                    Font.RobotoText,
-                                ]}>
-                                {t('wallet_empty_balance')}
-                            </Text>
-                        </View>
-                    )}
                 </View>
             </View>
         </PlainButton>
@@ -235,7 +194,6 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     label: {
-        left: 24,
         fontWeight: '100',
     },
     watchOnlyLTR: {

@@ -11,9 +11,8 @@ import {WalletTypeDetails, DUST_LIMIT} from './wallet-defaults';
 const bip32 = BIP32Factory(ecc);
 
 import {
-    listPayments,
-    InputTypeVariant,
-} from '@breeztech/react-native-breez-sdk';
+    InputType_Tags,
+} from '@breeztech/breez-sdk-spark-react-native';
 
 import Crypto from 'react-native-quick-crypto';
 
@@ -544,28 +543,6 @@ export const checkInvoiceAndWallet = (
     return true;
 };
 
-export const getLNPayments = async (
-    txCount: number,
-): Promise<TTransaction[]> => {
-    const payments = await listPayments({
-        // TODO: figure out a more sane option for this
-        limit: txCount + 10,
-    });
-
-    let txs: TTransaction[] = [];
-
-    for (let i = 0; i < payments.length; i++) {
-        txs.push({
-            ...payments[i],
-            isLightning: true,
-            timestamp: payments[i].paymentTime,
-        } as TTransaction);
-    }
-
-    // Return formatted LN payments
-    return txs;
-};
-
 // Get seconds left until invoice expires
 export const getInvoiceExpiryLeft = (
     timestamp: number,
@@ -623,7 +600,7 @@ const determineLnType = async (
     // BOLT11
     // lnbc1pwr7u7...
     if (invoice.startsWith('lnbc')) {
-        specType = InputTypeVariant.BOLT11;
+        specType = InputType_Tags.Bolt11Invoice;
     }
 
     // LNURL (Withdraw)
@@ -632,7 +609,7 @@ const determineLnType = async (
      *  (LUD-1) lnurl1dp68gurn8ghj7ct5mr...
      */
     if (invoice.startsWith('lnurlw://') || invoice.startsWith('lnurl1d')) {
-        specType = InputTypeVariant.LN_URL_WITHDRAW;
+        specType = InputType_Tags.LnurlWithdraw;
     }
 
     // LNURL (Pay)
@@ -641,17 +618,17 @@ const determineLnType = async (
      *   lnurlp://domain.com/lnurl-pay?key=val
      */
     if (isLNAddress(invoice) || invoice.startsWith('lnurlp://')) {
-        specType = InputTypeVariant.LN_URL_PAY;
+        specType = InputType_Tags.LnurlPay;
     }
 
     switch (specType) {
-        case InputTypeVariant.BOLT11:
+        case InputType_Tags.Bolt11Invoice:
             spec = 'bolt11';
             break;
-        case InputTypeVariant.LN_URL_PAY:
+        case InputType_Tags.LnurlPay:
             spec = 'lnurlp';
             break;
-        case InputTypeVariant.LN_URL_WITHDRAW:
+        case InputType_Tags.LnurlWithdraw:
             spec = 'lnurlw';
             break;
         default:

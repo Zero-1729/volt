@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useContext, useState, useEffect, useCallback} from 'react';
 
 import {StyleSheet, View, useColorScheme} from 'react-native';
 
@@ -32,20 +33,19 @@ import Font from '../../constants/Font';
 import Color from '../../constants/Color';
 
 import {useNetInfo} from '@react-native-community/netinfo';
+
 import {
-    nodeInfo,
-    serviceHealthCheck,
-    HealthCheckStatus,
-} from '@breeztech/react-native-breez-sdk';
+} from '@breeztech/breez-sdk-spark-react-native';
 
 import {capitalizeFirst} from '../../modules/transform';
 import {checkNetworkIsReachable} from '../../modules/wallet-utils';
-import {_BREEZ_SDK_API_KEY_} from '../../modules/env';
+import { useWallet } from '../../contexts/walletContext';
 
 const Network = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
+    const _wallet = useWallet();
 
     const {t, i18n} = useTranslation('settings');
     const {t: e} = useTranslation('errors');
@@ -53,27 +53,13 @@ const Network = () => {
 
     const netInfo = useNetInfo();
     const isNetOn = checkNetworkIsReachable(netInfo);
-    const [breezConnected, setBreezConnected] = useState(isNetOn);
-    const [breezAvailable, setBreezAvailable] = useState<HealthCheckStatus>(
-        HealthCheckStatus.OPERATIONAL,
-    );
-
-    const checkStatusTrans = {
-        operational: [capitalizeFirst(t('healthy')), 'white', 'dodgerblue'],
-        maintenance: [capitalizeFirst(t('maintenance')), 'white', 'orange'],
-        serviceDisruption: [
-            capitalizeFirst(t('service_disruption')),
-            'black',
-            '#ff4e4a',
-        ],
-    };
 
     const HeadingBar = {
         height: 2,
         backgroundColor: ColorScheme.HeadingBar,
     };
 
-    const {electrumServerURL, setElectrumServerURL, mempoolInfo, getWalletData, currentWalletID} =
+    const {electrumServerURL, setElectrumServerURL, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
 
     const wallet = getWalletData(currentWalletID);
@@ -104,24 +90,6 @@ const Network = () => {
         return valueWithSingleWhitespace;
     };
 
-    const checkBreezServices = useCallback(async () => {
-        try {
-            await nodeInfo();
-            setBreezConnected(true);
-        } catch (error: any) {
-            console.log('[Breez Connection]: ', error.message);
-        }
-    }, []);
-
-    const checkBreezAvailability = useCallback(async () => {
-        try {
-            const response = await serviceHealthCheck(_BREEZ_SDK_API_KEY_);
-            setBreezAvailable(response.status);
-        } catch (error: any) {
-            console.log('[Breez Health Check]: ', error.message);
-        }
-    }, []);
-
     const testElectrumService = useCallback(async () => {
         getBlockHeight(
             electrumServerURL.bitcoin,
@@ -137,19 +105,12 @@ const Network = () => {
             testElectrumService();
         }, 1000 * 15);
 
-        checkBreezServices();
-        checkBreezAvailability();
-
         return () => {
             clearInterval(intervalCheck);
         };
     }, []);
 
     useEffect(() => {
-        if (isLNEnabled) {
-            checkBreezServices();
-            checkBreezAvailability();
-        }
         testElectrumService();
     }, [isNetOn]);
 
@@ -230,7 +191,7 @@ const Network = () => {
                                     }
                                     style={{
                                             backgroundColor:
-                                                isNetOn && breezConnected
+                                                isNetOn && _wallet.isConnected()
                                                     ? 'lightgreen'
                                                     : '#ff4e4a',
                                     }}>
@@ -238,50 +199,18 @@ const Network = () => {
                                         className="text-xs font-bold p-1 px-4"
                                         style={{
                                                 color:
-                                                    isNetOn && breezConnected
+                                                    isNetOn && _wallet.isConnected()
                                                         ? 'darkgreen'
                                                         : 'black',
                                         }}>
-                                        {isNetOn && breezConnected
+                                        {isNetOn && _wallet.isConnected()
                                             ? capitalizeFirst(t('connected'))
                                             : capitalizeFirst(
                                                   t('disconnected'),
                                               )}
                                     </VText>
                                 </View>
-
-                                <View
-                                    className={
-                                        `rounded-full ${
-                                                langDir === 'right'
-                                                    ? ''
-                                                    : 'ml-2'
-                                            }`
-                                    }
-                                    style={{
-                                            backgroundColor:
-                                                isNetOn && breezAvailable
-                                                    ? checkStatusTrans[
-                                                          breezAvailable
-                                                      ][2]
-                                                    : '#ff4e4a',
-                                    }}>
-                                    <VText
-                                        className="text-xs font-bold p-1 px-4"
-                                        style={{
-                                                color: isNetOn
-                                                    ? checkStatusTrans[
-                                                          breezAvailable
-                                                      ][1]
-                                                    : 'black',
-                                        }}>
-                                        {isNetOn
-                                            ? checkStatusTrans[
-                                                  breezAvailable
-                                              ][0]
-                                            : capitalizeFirst(t('unavailable'))}
-                                    </VText>
-                                </View>
+                                {/* TODO: check if breez services available */}
                             </View>
 
                             <VText
@@ -291,69 +220,6 @@ const Network = () => {
                             </VText>
                         </View>
                     </View>}
-
-                    {/* Mempool */}
-                    <View
-                        className={`justify-center w-full items-center flex-row mb-8 ${!isLNEnabled ? 'mt-8' : ''}`}>
-                        <View className="w-5/6">
-                            <View
-                                className={
-                                    `w-full ${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } items-center mb-4`}>
-                                <VText
-                                    className={
-                                        `text-sm font-medium ${
-                                                langDir === 'right'
-                                                    ? ''
-                                                    : 'mr-4'
-                                            }`
-                                    }
-                                    style={{color: ColorScheme.Text.Default}}>
-                                    Mempool.space
-                                </VText>
-
-                                <View
-                                    className={
-                                        `rounded-full ${
-                                                langDir === 'right'
-                                                    ? 'mr-2'
-                                                    : ''
-                                            }`
-                                    }
-                                    style={{
-                                            backgroundColor:
-                                                isNetOn && mempoolInfo.connected
-                                                    ? 'lightgreen'
-                                                    : '#ff4e4a',
-                                    }}>
-                                    <VText
-                                        className="text-xs font-bold p-1 px-4"
-                                        style={{
-                                                color:
-                                                    isNetOn &&
-                                                    mempoolInfo.connected
-                                                        ? 'darkgreen'
-                                                        : 'black',
-                                        }}>
-                                        {isNetOn && mempoolInfo.connected
-                                            ? capitalizeFirst(t('connected'))
-                                            : capitalizeFirst(
-                                                  t('disconnected'),
-                                              )}
-                                    </VText>
-                                </View>
-                            </View>
-
-                            <VText
-                                className="text-xs"
-                                style={{color: ColorScheme.Text.DescText}}>
-                                {t('mempool_connection_info')}
-                            </VText>
-                        </View>
-                    </View>
 
                     <View className="w-full mb-8" style={[HeadingBar]} />
 

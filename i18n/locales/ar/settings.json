@@ -21,7 +21,7 @@
     "connected": "متصل",
     "electrum_server": "الخادم Electrum",
     "custom_electrum_server": "خادم Electrum مخصص",
-    "breez_sdk_info": "يدير Lightning Node والخدمات، بما في ذلك مقايضات Lightning للمحفظة الداخلية",
+    "breez_sdk_info": "يدير خدمات Spark و Lightning",
     "mempool_connection_info": "مصدر لمعدلات رسوم البيتكوين، وازدحام الذاكرة، وحالة بيئة الرسوم",
     "price_at": "السعر في",
     "price_on": "في",

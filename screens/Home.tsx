@@ -27,13 +27,10 @@ import {InitStackParamList} from '../Navigation';
 import {Toasts} from '@backpackapp-io/react-native-toast';
 import {LiberalToast} from '../components/toast';
 
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
-
 import VText from '../components/text';
 
 import {useTranslation} from 'react-i18next';
 
-import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
@@ -43,12 +40,7 @@ import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import {
-    createBDKWallet,
-    getBdkWalletBalance,
-    getBdkWalletTransactions,
-    syncBdkWallet,
-} from '../modules/bdk';
+import { useWallet } from './../contexts/walletContext'
 
 import Gear from '../assets/svg/gear-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
@@ -58,15 +50,11 @@ import AddressIcon from '../assets/svg/mention-24.svg';
 import BackupIcon from '../assets/svg/backup.svg';
 
 import Color from '../constants/Color';
-import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/shared';
 
-import {BaseWallet} from '../class/wallet/base';
-import {TBalance, TTransaction} from '../types/wallet';
-
-import {Balance} from '../components/balance';
+import {TTransaction} from '../types/wallet';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 
@@ -78,12 +66,10 @@ import {biometricAuth} from '../modules/shared';
 import {
     getUniqueTXs,
     checkNetworkIsReachable,
-    getLNPayments,
     getMiniWallet,
 } from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
-import {ENet} from '../types/enums';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
@@ -98,7 +84,7 @@ const Home = ({route}: Props) => {
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
     };
-    const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
+    const topPlatformOffset = 20 + (Platform.OS === 'android' ? 12 : 0);
     const networkState = useNetInfo();
     const isNetOn = checkNetworkIsReachable(networkState);
 
@@ -108,19 +94,18 @@ const Home = ({route}: Props) => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        updateWalletTransactions,
         updateWalletPayments,
         updateWalletBalance,
         isWalletInitialized,
-        electrumServerURL,
         isAdvancedMode,
         isBiometricsActive,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
-    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
-    const [breezConnected, setBreezConnected] = useState(true);
+
+    // Set Breez wallet service
+    const _wallet = useWallet();
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
@@ -172,27 +157,6 @@ const Home = ({route}: Props) => {
         togglePINPassModal();
     };
 
-    // add the total balances of the wallets
-    const totalBalance: TBalance = wallets.reduce(
-        (accumulator: TBalance, currentValue: BaseWallet) =>
-            // Only show balances from bitcoin mainnet
-            // Don't want user to think their testnet money
-            // is spendable
-            ({
-                onchain: accumulator.onchain.plus(
-                    currentValue.network === ENet.Bitcoin
-                        ? currentValue.balance.onchain
-                        : new BigNumber(0),
-                ),
-                lightning: accumulator.lightning.plus(
-                    currentValue.network === ENet.Bitcoin
-                        ? currentValue.balance.lightning
-                        : new BigNumber(0),
-                ),
-            }),
-        {onchain: new BigNumber(0), lightning: new BigNumber(0)},
-    );
-
     // List out all transactions across all wallets
     const extractAllTransactions = () => {
         let transactions: TTransaction[] = [];
@@ -222,92 +186,34 @@ const Home = ({route}: Props) => {
         return {allCount: txs.length, filtered: filtered};
     };
 
-    const initWallet = useCallback(async () => {
-        const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
-
-        await syncBdkWallet(
-            w,
-            (status: boolean) => {
-                if (process.env.NODE_ENV === 'development' && !status) {
-                    LiberalToast(t('BDK'), t('Failed to sync'), {
-                        duration: 3000,
-                    });
-                }
-            },
-            wallet.network,
-            electrumServerURL,
-        );
-
-        return w;
-    }, []);
-
-    // Refresh control
-    const refreshWallet = useCallback(async () => {
-        const w = await initWallet();
-
-        // Check net again, just in case there is a drop mid execution
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            return;
-        }
-
-        // Sync wallet
-        const {balance} = await getBdkWalletBalance(w, wallet.balance.onchain);
-        const {transactions} = await getBdkWalletTransactions(
-            w,
-            wallet.network === 'testnet'
-                ? electrumServerURL.testnet
-                : electrumServerURL.bitcoin,
-        );
-
-        // Kill refreshing
-        setRefreshing(false);
-
-        // Update wallet balance
-        updateWalletBalance(currentWalletID, {
-            onchain: balance,
-            lightning: new BigNumber(0),
-        });
-
-        // Update wallet transactions
-        updateWalletTransactions(currentWalletID, transactions);
-
-        // Kill loading
-        setLoadingBalance(false);
-
-        // set bdk wallet
-        setBdkWallet(w);
-    }, [setRefreshing, networkState]);
-
     const getBalance = async () => {
+        const info = await _wallet.walletInfo();
+
         try {
-            const nodeState = await nodeInfo();
-            const balanceLn = nodeState.channelsBalanceMsat;
+            const balanceLn = new BigNumber(info?.balanceSats || 0);
 
             // Update balance after converting to sats
             updateWalletBalance(currentWalletID, {
                 onchain: new BigNumber(0),
-                lightning: new BigNumber(balanceLn / 1000),
+                lightning: balanceLn,
             });
-        } catch (error: any) {
+        } catch (error) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                LiberalToast(t('Breez SDK'), error.message, {
+                LiberalToast(t('Breez SDK'), (error as Error).message, {
                     duration: 2000,
                 });
+                return;
             }
-
-            return;
         }
+        return;
     };
 
     const fetchPayments = async () => {
         try {
-            const txs = await getLNPayments(wallet.payments.length);
+            const txs = await _wallet.listPayments();
 
             // Update transactions
-            updateWalletPayments(currentWalletID, txs);
+            updateWalletPayments(currentWalletID, txs as TTransaction[]);
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
                 LiberalToast(t('Breez SDK'), error.message, {
@@ -325,14 +231,6 @@ const Home = ({route}: Props) => {
             return;
         }
 
-        // Only attempt load if connected to network
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            return;
-        }
-
         // start loading
         // Set refreshing
         setLoadingBalance(true);
@@ -343,20 +241,15 @@ const Home = ({route}: Props) => {
             return;
         }
 
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            return;
-        }
-
-        // fetch onchain
-        refreshWallet();
-
         // Also call Breez if LN wallet
         if (wallet.type === 'unified') {
             await getBalance();
             await fetchPayments();
         }
+
+        // Stop loading
+        setLoadingBalance(false);
+        setRefreshing(false);
     };
 
     const gotToTransactions = useCallback(() => {
@@ -402,30 +295,6 @@ const Home = ({route}: Props) => {
         );
     }, []);
 
-    const initWalletSync = useCallback(async () => {
-        const _netInfo = await netInfo.fetch();
-
-        // TODO: trigger Breez load here instead, watch then fire?
-        // Check and show Breez status
-        try {
-            const _nodeInfo = await nodeInfo();
-            if (_nodeInfo?.id) {
-                setBreezConnected(true);
-            }
-        } catch (error: any) {
-            setBreezConnected(false);
-        }
-
-        // Only load BTC only wallet on route
-        if (
-            isWalletInitialized &&
-            checkNetworkIsReachable(_netInfo) &&
-            wallet.type !== 'unified'
-        ) {
-            jointSync();
-        }
-    }, []);
-
     const handleWalletRestore = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
 
@@ -453,7 +322,7 @@ const Home = ({route}: Props) => {
 
     // Sync wallet on initial load
     useEffect(() => {
-        initWalletSync();
+        jointSync();
 
         () => {
             setRefreshing(false);
@@ -515,9 +384,15 @@ const Home = ({route}: Props) => {
                                 </VText>
                             </View>
 
-                            {isLightning && <LightningBoltIcon width={18} height={18} fill={breezConnected ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />}
+                            {isLightning && 
+                            (loadingBalance ? <ActivityIndicator
+                                    color={ColorScheme.Background.Default}
+                                    className="ml-2"
+                                /> : <LightningBoltIcon width={18} height={18} fill={_wallet.isConnected() ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />)
+                            }
                         </View>
 
+                        <View className="flex-row justify-between">
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(
@@ -534,61 +409,13 @@ const Home = ({route}: Props) => {
                                 />
                             </View>
                         </PlainButton>
+                        </View>
                     </View>
 
-                    <View className="w-full h-full mt-2 items-center">
-                        <View
-                            className="justify-around w-full mb-6 mt-6"
-                            style={{
-                                    marginLeft: langDir === 'left' ? 80 : 0,
-                                    marginRight: langDir === 'right' ? 80 : 0,
-                                }}>
-                            {wallets.length > 0 && (
-                                <>
-                                    <VText
-                                        className="text-base font-medium mt-3 mb-1"
-                                        style={[
-                                            {
-                                                color: isNetOn
-                                                    ? ColorScheme.Text.Default
-                                                    : ColorScheme.Text
-                                                          .GrayedText,
-                                            },
-                                            Font.RobotoText,
-                                        ]}>
-                                        {t('balance')}
-                                    </VText>
-
-                                    {!hideTotalBalance ? (
-                                        <Balance
-                                            fontColor={ColorScheme.Text.Default}
-                                            balance={totalBalance.onchain
-                                                .plus(totalBalance.lightning)}
-                                            balanceFontSize={'text-3xl'}
-                                            disableFiat={false}
-                                            loading={loadingBalance}
-                                            hideColor={
-                                                ColorScheme.WalletColors[wallet.type]
-                                                    .accent
-                                            }
-                                        />) : (
-                                        <View
-                                            className="rounded-sm w-4/5 mt-1 opacity-80 h-8 flex-row"
-                                            style={[
-                                                {
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Greyed,
-                                                },
-                                            ]}
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </View>
-
+                    <View className="w-full h-full mt-6 items-center">
                         {/** Wallet Card */}
                         <View
+                            className="mt-6"
                             style={[
                                 {
                                     height: styles.CardContainer.height,
@@ -630,7 +457,7 @@ const Home = ({route}: Props) => {
                         {/* Quick Actions */}
                         <View
                             className={
-                                `flex-row ${
+                                `mt-4 flex-row ${
                                         isLightning
                                             ? 'w-5/6 justify-around'
                                             : 'w-1/2 justify-center'
@@ -683,7 +510,8 @@ const Home = ({route}: Props) => {
                                                     .QuickActionsButton,
                                         }}>
                                     <ScanIcon
-                                        width={24}
+                                        width={26}
+                                        height={26}
                                         fill={ColorScheme.SVG.Default}
                                     />
                                 </View>

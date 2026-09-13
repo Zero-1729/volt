@@ -21,7 +21,7 @@
     "connected": "Connected",
     "electrum_server": "Electrum Server",
     "custom_electrum_server": "Custom Electrum Server",
-    "breez_sdk_info": "Manages Lightning Node and services, including the internal wallet Lightning swaps",
+    "breez_sdk_info": "Manages Spark and Lightning services",
     "mempool_connection_info": "Source for Onchain Bitcoin fee rates, mempool congestion, and fee environment status",
     "price_at": "Price at",
     "price_on": "on",

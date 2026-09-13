@@ -17,7 +17,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {useNavigation, CommonActions} from '@react-navigation/core';
 
-import QRCodeStyled from 'react-native-qrcode-styled';
+import QRCode from 'react-qr-code';
 import Checkbox from 'react-native-bouncy-checkbox';
 
 import NativeDims from '../../constants/NativeWindowMetrics';
@@ -162,17 +162,13 @@ const Backup = () => {
                             borderWidth: 2,
                             borderColor: ColorScheme.Background.QRBorder,
                         }}>
-                        <QRCodeStyled
+                        <QRCode
                             style={{
                                 backgroundColor: 'white',
                             }}
-                            data={baseBackup}
-                            pieceSize={7}
-                            padding={10}
+                            width={76}
+                            value={baseBackup}
                             color={ColorScheme.Background.Default}
-                            pieceCornerType={'rounded'}
-                            isPiecesGlued={true}
-                            pieceBorderRadius={2}
                         />
                     </View>
                 ) : (
@@ -310,17 +306,13 @@ const Backup = () => {
                         borderWidth: 2,
                         borderColor: ColorScheme.Background.QRBorder,
                     }}>
-                    <QRCodeStyled
+                    <QRCode
                         style={{
-                            backgroundColor: 'white',
+                        backgroundColor: 'white',
                         }}
-                        data={descriptorData}
-                        pieceSize={5}
-                        padding={10}
+                        value={descriptorData}
                         color={ColorScheme.Background.Default}
-                        pieceCornerType={'rounded'}
-                        isPiecesGlued={true}
-                        pieceBorderRadius={2}
+                        width={78}
                     />
                 </View>
 
@@ -556,15 +548,9 @@ const Backup = () => {
                     {/* Main Carousel */}
                     <Animated.View
                         className="justify-center"
-                        style={[
-                            styles.carouselContainer,
-                            {zIndex: -9},
-                        ]}>
+                        style={[styles.carouselContainer]}>
                         <Carousel
                             ref={carouselRef}
-                            style={[
-                                styles.carouselStyle,
-                            ]}
                             data={panels}
                             enabled={true}
                             width={NativeDims.width}
@@ -604,13 +590,10 @@ const styles = StyleSheet.create({
     },
     carouselContainer: {
         flex: 1,
-    },
-    carouselStyle: {
-        alignItems: 'center',
+        zIndex: -9,
         justifyContent: 'center',
-        position: 'absolute',
-        bottom: 0,
         width: '100%',
+        alignItems: 'center',
     },
     qrCodContainer: {
         borderWidth: 2,

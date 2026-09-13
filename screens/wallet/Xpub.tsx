@@ -8,7 +8,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {useNavigation, CommonActions} from '@react-navigation/core';
 
-import QRCodeStyled from 'react-native-qrcode-styled';
+import QRCode from 'react-qr-code';
 
 import {useTranslation} from 'react-i18next';
 
@@ -153,17 +153,13 @@ const Xpub = () => {
                                 borderWidth: 2,
                                 borderColor: ColorScheme.Background.QRBorder,
                         }}>
-                        <QRCodeStyled
+                        <QRCode
                             style={{
                                 backgroundColor: 'white',
                             }}
-                            data={walletData.xpub}
-                            pieceSize={5}
-                            padding={10}
+                            value={walletData.xpub}
                             color={ColorScheme.Background.Default}
-                            pieceCornerType={'rounded'}
-                            isPiecesGlued={true}
-                            pieceBorderRadius={2}
+                            width={78}
                         />
                     </View>
 

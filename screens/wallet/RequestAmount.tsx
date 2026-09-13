@@ -26,17 +26,12 @@ import {LiberalToast} from '../../components/toast';
 
 import BottomArrow from '../../assets/svg/chevron-down-16.svg';
 
-import netInfo from '@react-native-community/netinfo';
-import {checkNetworkIsReachable} from '../../modules/wallet-utils';
-
 import {
     SATS_TO_BTC_RATE,
     capitalizeFirst,
     formatFiat,
     formatSats,
-    normalizeFiat,
 } from '../../modules/transform';
-import {openChannelFee, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -51,7 +46,6 @@ import {
     DisplaySatsAmount,
     DisplayBTCAmount,
 } from '../../components/balance';
-import {actionAlert} from '../../components/alert';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
@@ -71,9 +65,6 @@ const RequestAmount = ({route}: Props) => {
 
     const wallet = getWalletData(currentWalletID);
     const walletType = wallet.type;
-
-    const [breezServicesNotInitialized, setBreezServicesNotInitialized] =
-        useState(false);
 
     const [maxReceivableAmount, updateMaxReceivableAmount] = useState(
         new BigNumber(0),
@@ -98,21 +89,10 @@ const RequestAmount = ({route}: Props) => {
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
     const setMaxReceivableAmount = async () => {
-        try {
-            const nodeState = await nodeInfo();
-
-            updateMaxReceivableAmount(
-                new BigNumber(nodeState.maxReceivableMsat / 1_000),
-            );
-        } catch (error: any) {
-            if (error.message === 'BreezServices not initialized') {
-                setBreezServicesNotInitialized(true);
-
-                LiberalToast(capitalizeFirst(t('error')), t('not_connected_to_breez_services'), {
-                    duration: 2000,
-                });
-            }
-        }
+        // TODO: fix this atrocity
+        updateMaxReceivableAmount(
+            new BigNumber(1_000_000_000),
+        );
     };
 
     const isLightning = walletType === 'unified';
@@ -124,7 +104,7 @@ const RequestAmount = ({route}: Props) => {
         ? capitalizeFirst(t('continue'))
         : capitalizeFirst(t('skip'));
 
-    const disableContinueButtton =
+    const disableContinueButton =
         (route.params?.boltNFCMode && satsAmount.value.isZero()) ||
         (isLightning && !maxReceivableAmount.isZero) ||
         (satsAmount.value.gte(maxReceivableAmount) &&
@@ -296,21 +276,6 @@ const RequestAmount = ({route}: Props) => {
         );
     };
 
-    const routeToOnchainReceive = () => {
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'Receive',
-                params: {
-                    sats: satsAmount.value.toString(),
-                    fiat: fiatAmount.toString(),
-                    amount: amount,
-                    lnDescription: lnInvoiceDesc,
-                    breezServicesNotInitialized: breezServicesNotInitialized,
-                },
-            }),
-        );
-    };
-
     const routeToReceive = () => {
         navigation.dispatch(
             CommonActions.navigate({
@@ -345,54 +310,9 @@ const RequestAmount = ({route}: Props) => {
         }
 
         if (walletType === 'unified') {
-            // Network check
-            const _netInfo = await netInfo.fetch();
-            if (!checkNetworkIsReachable(_netInfo)) {
-                routeToOnchainReceive();
-                return;
-            }
-
-            if (!shouldSkip && !breezServicesNotInitialized) {
-                const channelOpenFee = await openChannelFee({
-                    amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
-                });
-
-                const info = await nodeInfo();
-                const beyondMaxLiquidity = satsAmount.value.gte(
-                    info.totalInboundLiquidityMsats / 1_000,
-                );
-
-                const feeSats = (channelOpenFee.feeMsat as number) / 1_000;
-
-                // Warn user that amount will trigger a new channel open
-                // In cases were first tx or if larger than channel liquidity
-                if (beyondMaxLiquidity && feeSats > 0) {
-                    actionAlert(
-                        capitalizeFirst(t('channel_opening')),
-                        e('new_channel_open_warn', {
-                            n: feeSats,
-                            fiat: `${appFiatCurrency.symbol} ${normalizeFiat(
-                                new BigNumber(feeSats),
-                                fiatRate.rate,
-                            )}`,
-                        }),
-                        t('ok'),
-                        capitalizeFirst(t('cancel')),
-                        () => routeToReceive,
-                    );
-                    return;
-                }
-
-                // If not beyond max liquidity, route to receive with LN
-                routeToReceive();
-            } else {
-                routeToOnchainReceive();
-                return;
-            }
+            // TODO: handle if offline for on-chain receive
+            routeToReceive();
         }
-
-        routeToOnchainReceive();
-        return;
     };
 
     return (
@@ -522,12 +442,12 @@ const RequestAmount = ({route}: Props) => {
                 <View
                     className={
                         `absolute w-5/6 ${
-                            disableContinueButtton ? 'opacity-40' : ''
+                            disableContinueButton ? 'opacity-40' : ''
                         }`
                     }
                     style={{bottom: NativeWindowMetrics.bottom}}>
                     <LongButton
-                        disabled={disableContinueButtton}
+                        disabled={disableContinueButton}
                         onPress={handleRoute}
                         title={
                             shouldSkip

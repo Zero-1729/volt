@@ -228,7 +228,7 @@ const BumpTxFee = (props: BumpTxFeeProps) => {
                                     className="text-left text-sm"
                                     style={{color: ColorScheme.Text.DescText}}>
                                     {`~${addCommas(
-                                        props.tx.fee.toString(),
+                                        props.tx.fee?.toString(),
                                     )} sats (${
                                         appFiatCurrency.symbol
                                     } ${normalizeFiat(
