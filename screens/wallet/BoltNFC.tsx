@@ -25,18 +25,18 @@ import {
     LnUrlWithdrawResultVariant,
     parseInput,
     withdrawLnurl,
+    LnUrlErrorData,
 } from '@breeztech/react-native-breez-sdk';
 import {extractNFCTagData} from '../../modules/nfc';
 import NFCManager, {NfcTech} from 'react-native-nfc-manager';
 
 import Color from '../../constants/Color';
-import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 
 import Back from '../../assets/svg/arrow-left-24.svg';
 import BoltIcon from '../../assets/svg/bolt-mono.svg';
 
-import {capitalizeFirst, formatSats} from '../../modules/transform';
+import {capitalizeFirst} from '../../modules/transform';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
@@ -55,10 +55,9 @@ type Props = NativeStackScreenProps<WalletParamList, 'BoltNFC'>;
 
 const BoltNFC = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
     const {t} = useTranslation('wallet');
 
-    const {breezEvent} = useContext(AppStorageContext);
+    const {breezEvent, setBreezEvent} = useContext(AppStorageContext);
 
     const navigation = useNavigation();
     const amountMsat = useMemo(
@@ -81,8 +80,7 @@ const BoltNFC = ({route}: Props) => {
         statusMessage.toLowerCase().includes('limit');
     // Description for LNURL Withdrawal
     const description = route.params?.description
-        ? route.params.description
-        : `Volt ${formatSats(amountSats)} sats Withdrawal`;
+        ? route.params.description : '';
     const isDisabledNFC = statusMessage === t('nfc_disabled');
 
     const buttonText = useMemo(() => {
@@ -148,12 +146,10 @@ const BoltNFC = ({route}: Props) => {
                     const maxAmount = input.data.maxWithdrawable; // in sats
 
                     // Check if above limit
+                    // Assume this means withdraw limit reached, i.e. broke
                     if (amountSats.gt(maxAmount)) {
                         setStatusMessage(
-                            t('above_lnurl_withdraw_limit', {
-                                amount: amountSats,
-                                maxAmount: maxAmount,
-                            }),
+                            t('lnurlp_insuffient_funds'),
                         );
                         setLoading(false);
                         return;
@@ -171,10 +167,13 @@ const BoltNFC = ({route}: Props) => {
                     ) {
                         setStatusMessage(t('lnurl_withdrawal_success'));
                         setLoading(false);
+
+                        // Note: manual trigger breez event given success
+                        setBreezEvent({type: BreezEventVariant.INVOICE_PAID, details: lnUrlWithdrawResult.data.invoice});
                     } else {
                         setStatusMessage(
                             t('lnurl_withdrawal_failed', {
-                                reason: lnUrlWithdrawResult.data.reason,
+                                reason: (lnUrlWithdrawResult.data as LnUrlErrorData).reason,
                             }),
                         );
                         setLoading(false);
@@ -185,7 +184,7 @@ const BoltNFC = ({route}: Props) => {
                 setLoading(false);
             }
         },
-        [amountMsat, amountSats, description, t],
+        [amountMsat, amountSats, description, setBreezEvent, t],
     );
 
     const cancelScanRequest = useCallback(() => {
@@ -250,6 +249,11 @@ const BoltNFC = ({route}: Props) => {
             await NFCManager.requestTechnology(NfcTech.Ndef);
             // the resolved tag object will contain `ndefMessage` property
             const tag = await NFCManager.getTag();
+
+            // Note: need to close the OS reader anim manually once read
+            if (Platform.OS === 'ios') {
+                NFCManager.cancelTechnologyRequest();
+            }
 
             if (tag !== null) {
                 setStatusMessage(t('processing_nfc_tag'));
@@ -333,58 +337,47 @@ const BoltNFC = ({route}: Props) => {
             ]}>
             {/* Display Wallet Info, addresses, and other related data / settings */}
             <View
-                style={[
-                    tailwind('absolute w-full h-16 top-0'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}
+                className="absolute w-full h-16 top-0"
+                style={{backgroundColor: ColorScheme.Background.Primary}}
             />
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                className="w-full h-full items-center justify-center">
                 <View
-                    style={[
-                        tailwind(
-                            'w-5/6 justify-center items-center absolute top-6 flex',
-                        ),
-                    ]}>
+                    className="w-5/6 justify-center items-center absolute top-6 flex">
                     <PlainButton
-                        style={[tailwind('absolute left-0 top-0 z-10')]}
+                        className="absolute left-0 top-0 z-10"
                         onPress={handleBack}>
                         <Back fill={ColorScheme.SVG.Default} />
                     </PlainButton>
 
                     <Text
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('bolt_nfc')}
                     </Text>
 
                     {/* Amount summary */}
                     {!unsupportedNFC && (
                         <>
-                            <View style={[tailwind('items-center mt-12')]}>
+                            <View className="items-center mt-12">
                                 <Text
-                                    style={[
-                                        tailwind('text-base mb-1'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
+                                    className="text-base mb-1"
+                                    style={{
+                                        color: ColorScheme.Text.GrayedText,
+                                    }}>
                                     {capitalizeFirst(t('amount'))}
                                 </Text>
 
                                 <View
-                                    style={[
-                                        tailwind('flex items-center'),
+                                    className="flex items-center"
+                                    style={
                                         // eslint-disable-next-line react-native/no-inline-styles
                                         {
                                             flexDirection: route.params
                                                 ?.satsUnit
                                                 ? 'column-reverse'
                                                 : 'column',
-                                        },
-                                    ]}>
+                                        }}>
                                     <FiatBalance
                                         balance={amountSats.toNumber()}
                                         loading={false}
@@ -417,14 +410,12 @@ const BoltNFC = ({route}: Props) => {
                             </View>
 
                             <View
-                                style={[tailwind('w-full items-center mt-6')]}>
+                                className="w-full items-center mt-6">
                                 <VTextSingle
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {
-                                            color: ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                    className="text-sm"
+                                    style={{
+                                        color: ColorScheme.Text.DescText,
+                                    }}>
                                     {description}
                                 </VTextSingle>
                             </View>
@@ -434,13 +425,11 @@ const BoltNFC = ({route}: Props) => {
 
                 {/* Bolt Icon and status message */}
                 <View
-                    style={[
-                        tailwind(
-                            `items-center flex w-5/6 ${
-                                !unsupportedNFC ? 'mt-12' : '-mt-12'
-                            }`,
-                        ),
-                    ]}>
+                    className={
+                        `items-center flex w-5/6 ${
+                            !unsupportedNFC ? 'mt-12' : '-mt-12'
+                        }`
+                    }>
                     <BoltIcon
                         fill={
                             !loading || unsupportedNFC
@@ -451,17 +440,15 @@ const BoltNFC = ({route}: Props) => {
                         height={98}
                     />
                     <Text
-                        style={[
-                            tailwind('text-sm text-center w-5/6'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm text-center w-5/6"
+                        style={{color: ColorScheme.Text.Default}}>
                         {statusMessage}
                     </Text>
 
                     {/* Load */}
                     {statusMessage === t('lnurl_withdrawal_success') && (
                         <ActivityIndicator
-                            style={[tailwind('mt-4')]}
+                            className="mt-4"
                             color={ColorScheme.Background.Grayed}
                         />
                     )}
@@ -470,15 +457,11 @@ const BoltNFC = ({route}: Props) => {
                 {/*  No Internet message*/}
                 {!isNetOn && (
                     <View
-                        style={[
-                            tailwind('absolute items-center w-5/6'),
-                            {bottom: NativeWindowMetrics.bottom + 116},
-                        ]}>
+                        className="absolute items-center w-5/6"
+                        style={{bottom: NativeWindowMetrics.bottom + 116}}>
                         <Text
-                            style={[
-                                tailwind('text-sm text-center w-5/6'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-sm text-center w-5/6"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('no_internet_withdrawal')}
                         </Text>
                     </View>

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Text, View, useColorScheme, Linking, StyleSheet} from 'react-native';
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -13,14 +13,13 @@ import {SafeAreaView, Edges} from 'react-native-safe-area-context';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
-import Toast from 'react-native-toast-message';
+import {LiberalToast} from '../../components/toast';
 
 import BumpFee from '../../components/bump';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import {ENet} from '../../types/enums';
@@ -42,7 +41,6 @@ import Failed from '../../assets/svg/x-circle-fill-24.svg';
 import Pending from '../../assets/svg/hourglass-24.svg';
 import Broadcasted from '../../assets/svg/megaphone-24.svg';
 import CopyIcon from '../../assets/svg/copy-16.svg';
-import SwapIcon from '../../assets/svg/arrow-switch-24.svg';
 
 import {
     capitalizeFirst,
@@ -52,17 +50,11 @@ import {
 } from '../../modules/transform';
 import {getScreenEdges} from '../../modules/screen';
 import BigNumber from 'bignumber.js';
-
-import {nodeInfo, LnPaymentDetails} from '@breeztech/react-native-breez-sdk';
-import {
-    SWAP_IN_LN_DESCRIPTION,
-    SWAP_OUT_LN_DESCRIPTION,
-} from '../../modules/wallet-defaults';
+import { PaymentStatus, PaymentType } from '@breeztech/breez-sdk-spark-react-native';
 
 type Props = NativeStackScreenProps<WalletParamList, 'TransactionDetails'>;
 
 const TransactionDetailsView = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const HeadingBar = {
@@ -83,7 +75,6 @@ const TransactionDetailsView = ({route}: Props) => {
     const {isAdvancedMode} = useContext(AppStorageContext);
 
     const [clippyData, setClippyData] = React.useState<string>('');
-    const [nodeId, setNodeId] = React.useState<string>('');
 
     const buttonText = isAdvancedMode ? t('view_on_mempool') : t('see_more');
 
@@ -100,12 +91,12 @@ const TransactionDetailsView = ({route}: Props) => {
         }
     };
 
-    const isLNTx = route.params.tx.isLightning;
+    const isLNTx = route.params.tx.details.tag === 'Lightning';
     const invoiceAmount = isLNTx
-        ? route.params.tx.amountMsat / 1000
+        ? route.params.tx.amount
         : route.params.tx.value;
     const txInbound = isLNTx
-        ? route.params.tx.paymentType === 'received'
+        ? route.params.tx.paymentType === PaymentType.Receive
         : route.params.tx.type === 'inbound';
 
     const getTxTimestamp = (time: number) => {
@@ -113,7 +104,7 @@ const TransactionDetailsView = ({route}: Props) => {
     };
 
     const titleDescText = isLNTx
-        ? getTxTimestamp(route.params.tx.paymentTime)
+        ? getTxTimestamp(route.params.tx.timestamp)
         : route.params.tx.confirmed
         ? getTxTimestamp(route.params.tx.timestamp)
         : t('pending');
@@ -121,14 +112,11 @@ const TransactionDetailsView = ({route}: Props) => {
     const txIdTitle = isLNTx ? 'ID' : 'Tx ID';
     const txId = isLNTx ? route.params.tx.id : route.params.tx.txid;
     const txFee = new BigNumber(
-        isLNTx ? route.params.tx.feeMsat / 1000 : route.params.tx.fee,
+        isLNTx ? route.params.tx.fees : route.params.tx.fee,
     );
 
-    const isSwapInTx = route.params.tx.description === SWAP_IN_LN_DESCRIPTION;
-    const isSwapOutTx = route.params.tx.description === SWAP_OUT_LN_DESCRIPTION;
-
-    const paymentPreimage = route.params.tx.details?.data
-        ? (route.params.tx.details?.data as LnPaymentDetails).paymentPreimage
+    const paymentPreimage = route.params.tx.details?.inner
+        ? route.params.tx.details?.inner.preimage
         : '';
 
     const handleBumpFee = (status: {
@@ -142,12 +130,8 @@ const TransactionDetailsView = ({route}: Props) => {
         let isConfirmedAlready = status.errorMessage.includes('confirmed');
 
         if (isConfirmedAlready) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('dust_limit_title')),
-                text2: e('tx_already_confirmed_error'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('dust_limit_title')), e('tx_already_confirmed_error'), {
+                duration: 3000,
             });
         }
 
@@ -163,12 +147,8 @@ const TransactionDetailsView = ({route}: Props) => {
             );
         } else {
             // show error alert
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: e('bump_fee_error'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('error')), e('bump_fee_error'), {
+                duration: 3000,
             });
 
             console.log('[Fee Bump] Could not bump fee: ', status.errorMessage);
@@ -184,10 +164,6 @@ const TransactionDetailsView = ({route}: Props) => {
                 route.params.tx.network === ENet.Testnet ? 'testnet/' : ''
             }tx/${txid}`,
         );
-    };
-
-    const copyNodeId = () => {
-        copyToClipboard(nodeId);
     };
 
     const copyPreimage = () => {
@@ -217,15 +193,15 @@ const TransactionDetailsView = ({route}: Props) => {
     const edges: Edges = getScreenEdges(route.params.source);
 
     const txPending = isLNTx
-        ? route.params.tx.status === 'pending'
+        ? route.params.tx.status !== 0
         : route.params.tx.confirmations > 0 &&
           route.params.tx.confirmations <= 6;
 
     const txSuccess = isLNTx
-        ? route.params.tx.status === 'complete'
+        ? route.params.tx.status === 0
         : route.params.tx.confirmations > 6;
 
-    const txFailed = isLNTx && route.params.tx.status === 'failed';
+    const txFailed = isLNTx && route.params.tx.status !== 0;
 
     const confirmationCount =
         route.params.tx.confirmations > 6
@@ -239,12 +215,10 @@ const TransactionDetailsView = ({route}: Props) => {
     const onchainStatusMessage =
         route.params.tx.status === 'pending'
             ? t('pending_conf')
-            : t(route.params.tx.status);
+            : route.params.tx.status === PaymentStatus.Completed ? t('complete') : t('failed');
 
     const confirmationInfo = isLNTx
-        ? isSwapOutTx
-            ? capitalizeFirst(t(route.params.tx.status))
-            : onchainStatusMessage
+        ? onchainStatusMessage
         : route.params.tx.confirmed
         ? `${
               route.params.tx.confirmations === 1
@@ -257,17 +231,6 @@ const TransactionDetailsView = ({route}: Props) => {
 
     const topMargin = isLNTx ? 'mt-10' : displayFeeBump ? '-mt-16' : '-mt-8';
 
-    const loadNodeInfo = async () => {
-        const node = await nodeInfo();
-
-        setNodeId(node.id);
-    };
-
-    useEffect(() => {
-        if (isLNTx) {
-            loadNodeInfo();
-        }
-    });
 
     return (
         <SafeAreaView
@@ -277,15 +240,16 @@ const TransactionDetailsView = ({route}: Props) => {
             ]}>
             <BottomSheetModalProvider>
                 <View
+                    className="w-full h-full relative justify-center"
                     style={[
                         styles.transactionDetailContainer,
-                        tailwind('w-full h-full relative justify-center'),
                         {
                             backgroundColor: ColorScheme.Background.Primary,
                         },
                     ]}>
                     <PlainButton
-                        style={[tailwind('absolute top-6 z-50'), {left: 16}]}
+                        className="absolute top-6 z-50"
+                        style={{left: 16}}
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
@@ -293,31 +257,23 @@ const TransactionDetailsView = ({route}: Props) => {
                     </PlainButton>
 
                     <Text
-                        style={[
-                            tailwind(
-                                'text-lg font-bold absolute text-center w-full top-6 px-4',
-                            ),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold absolute text-center w-full top-6 px-4"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('summary')}
                     </Text>
 
                     <Text
-                        style={[
-                            tailwind(
-                                'text-sm w-full text-center absolute top-16',
-                            ),
-                            {color: ColorScheme.Text.GrayedText},
-                        ]}>
+                        className="text-sm w-full text-center absolute top-16"
+                        style={{color: ColorScheme.Text.GrayedText}}>
                         {titleDescText}
                     </Text>
 
                     <View
-                        style={[tailwind(`${topMargin} justify-center px-4`)]}>
-                        <View style={[tailwind('items-center')]}>
+                        className={`${topMargin} justify-center px-4`}>
+                        <View className="items-center">
                             {txPending && (
                                 <Pending
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -325,7 +281,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             )}
                             {route.params.tx.confirmations === 0 && (
                                 <Broadcasted
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -333,7 +289,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             )}
                             {txSuccess && (
                                 <Success
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -341,7 +297,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             )}
                             {isLNTx && txFailed && (
                                 <Failed
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -350,7 +306,7 @@ const TransactionDetailsView = ({route}: Props) => {
                             {/* We only show the amount if it is not a CPFP, which shows zero */}
                             {!route.params.tx.isSelfOrBoost ? (
                                 <FiatBalance
-                                    style={[tailwind('mt-6')]}
+                                    className="mt-6"
                                     balance={invoiceAmount}
                                     loading={false}
                                     amountSign={txInbound ? '+' : '-'}
@@ -359,15 +315,13 @@ const TransactionDetailsView = ({route}: Props) => {
                                 />
                             ) : (
                                 !isAdvancedMode && (
-                                    <View style={[tailwind('flex-row mt-6 ')]}>
+                                    <View className="flex-row mt-6">
                                         <Text
-                                            style={[
-                                                tailwind('text-base font-bold'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                            ]}>
+                                            className="text-base font-bold"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .Default,
+                                            }}>
                                             {t('fee_boost_tx')}
                                         </Text>
                                     </View>
@@ -375,42 +329,36 @@ const TransactionDetailsView = ({route}: Props) => {
                             )}
                         </View>
                         <View
-                            style={[
-                                tailwind(
-                                    `justify-center ${
+                            className={
+                                `justify-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    }`,
-                                ),
-                            ]}>
+                                    }`
+                            }>
                             <Text
-                                style={[
-                                    tailwind(
-                                        `text-sm mx-1 text-center ${
+                                className={
+                                    `text-sm mx-1 text-center ${
                                             route.params.tx.isSelfOrBoost &&
                                             isAdvancedMode
                                                 ? 'mt-1 mb-2'
                                                 : ''
-                                        }`,
-                                    ),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
+                                        }`
+                                }
+                                style={{color: ColorScheme.Text.GrayedText}}>
                                 {confirmationInfo}
                             </Text>
                             {!isLNTx && (
                                 <Text
-                                    style={[
-                                        tailwind(
-                                            `text-sm text-center ${
+                                    className={
+                                        `text-sm text-center ${
                                                 route.params.tx.isSelfOrBoost &&
                                                 isAdvancedMode
                                                     ? 'mt-1 mb-2'
                                                     : ''
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
+                                            }`
+                                    }
+                                    style={{color: ColorScheme.Text.GrayedText}}>
                                     {confirmationCount}
                                 </Text>
                             )}
@@ -419,91 +367,52 @@ const TransactionDetailsView = ({route}: Props) => {
                         {/* LN invoice description */}
                         {isLNTx && (
                             <View
-                                style={[tailwind('items-center mt-6 w-full')]}>
-                                {isSwapInTx || isSwapOutTx ? (
-                                    <View
-                                        style={[
-                                            tailwind(
-                                                'flex-row items-center justify-center',
-                                            ),
-                                        ]}>
-                                        <SwapIcon
-                                            fill={ColorScheme.SVG.GrayFill}
-                                        />
-                                        <Text
-                                            style={[
-                                                tailwind('text-sm ml-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .DescText,
-                                                },
-                                            ]}>
-                                            {isSwapInTx
-                                                ? t('bitcoin_swapin')
-                                                : t('ln_swapout')}
-                                        </Text>
-                                    </View>
-                                ) : (
-                                    <Text
-                                        ellipsizeMode="middle"
-                                        numberOfLines={2}
-                                        style={[
-                                            tailwind(
-                                                'text-sm w-4/5 text-center',
-                                            ),
-                                            {color: ColorScheme.Text.DescText},
-                                        ]}>
-                                        {route.params.tx.description}
-                                    </Text>
-                                )}
+                                className="items-center mt-6 w-full">
+                                <Text
+                                    ellipsizeMode="middle"
+                                    numberOfLines={2}
+                                    className="text-sm w-4/5 text-center"
+                                    style={{color: ColorScheme.Text.DescText}}>
+                                    {route.params.tx.description}
+                                </Text>
                             </View>
                         )}
 
                         {/* Transaction type flags for RBF and CPFP */}
                         {isAdvancedMode && route.params.tx.rbf && (
-                            <View style={[tailwind('flex-row self-center')]}>
+                            <View className="flex-row self-center">
                                 {route.params.tx.isSelfOrBoost && (
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'rounded-full px-4 py-1 self-center mt-4 mr-2',
-                                            ),
-                                            {
-                                                backgroundColor:
-                                                    ColorScheme.Background
-                                                        .CardGreyed,
-                                            },
-                                        ]}>
+                                        className="rounded-full px-4 py-1 self-center mt-4 mr-2"
+                                        style={{
+                                            backgroundColor:
+                                                ColorScheme.Background
+                                                    .CardGreyed,
+                                        }}>
                                         <Text
-                                            style={[
-                                                tailwind('font-bold'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .GrayText,
-                                                },
-                                            ]}>
+                                            className="font-bold"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .GrayText,
+                                            }}>
                                             CPFP
                                         </Text>
                                     </View>
                                 )}
 
                                 <View
-                                    style={[
-                                        tailwind('rounded-full px-4 py-1 mt-4'),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background
-                                                    .CardGreyed,
-                                        },
-                                    ]}>
+                                    className="rounded-full px-4 py-1 mt-4"
+                                    style={{
+                                        backgroundColor:
+                                            ColorScheme.Background
+                                                .CardGreyed,
+                                    }}>
                                     <Text
-                                        style={[
-                                            tailwind('font-bold'),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayText,
-                                            },
-                                        ]}>
+                                        className="font-bold"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayText,
+                                        }}>
                                         {`RBF ${t('enabled')}`}
                                     </Text>
                                 </View>
@@ -512,42 +421,32 @@ const TransactionDetailsView = ({route}: Props) => {
 
                         {/* More dev info */}
                         {isAdvancedMode && (
-                            <View style={[tailwind('w-full mt-4')]}>
+                            <View className="w-full mt-4">
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'w-4/5 relative self-center rounded p-6',
-                                        ),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.Background.Greyed,
-                                        },
-                                    ]}>
+                                    className="w-4/5 relative self-center rounded p-6"
+                                    style={{
+                                        backgroundColor:
+                                            ColorScheme.Background.Greyed,
+                                    }}>
                                     <PlainButton
                                         onPress={copyTxId}
-                                        style={[
-                                            tailwind('w-full mb-6 flex-row'),
-                                        ]}>
+                                        className="w-full mb-6 flex-row">
                                         <Text
-                                            style={[
-                                                tailwind('font-normal mr-2'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                            ]}>
+                                            className="font-normal mr-2"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .Default,
+                                            }}>
                                             {txIdTitle}
                                         </Text>
                                         <Text
                                             numberOfLines={1}
                                             ellipsizeMode="middle"
-                                            style={[
-                                                tailwind('font-bold w-5/6'),
-                                                {
-                                                    color: ColorScheme.Text
-                                                        .Default,
-                                                },
-                                            ]}>
+                                            className="font-bold w-5/6"
+                                            style={{
+                                                color: ColorScheme.Text
+                                                    .Default,
+                                            }}>
                                             {txId}
                                         </Text>
                                         <CopyIcon
@@ -559,36 +458,25 @@ const TransactionDetailsView = ({route}: Props) => {
                                     {isLNTx ? (
                                         <>
                                             <View
-                                                style={[
-                                                    tailwind(
-                                                        'w-full flex-row items-center justify-between',
-                                                    ),
-                                                ]}>
+                                                className="w-full flex-row items-center justify-between">
                                                 <Text
-                                                    style={[
-                                                        tailwind('text-sm'),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>{`${capitalizeFirst(
+                                                    className="text-sm"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>{`${capitalizeFirst(
                                                     t('amount'),
                                                 )} (${t('satoshi')})`}</Text>
                                                 <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm font-bold',
-                                                        ),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>
+                                                    className="text-sm font-bold"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>
                                                     {formatSats(
                                                         new BigNumber(
                                                             route.params.tx
-                                                                .amountMsat /
-                                                                1_000,
+                                                                .amount,
                                                         ),
                                                     )}
                                                 </Text>
@@ -597,93 +485,63 @@ const TransactionDetailsView = ({route}: Props) => {
                                     ) : (
                                         <>
                                             <View
-                                                style={[
-                                                    tailwind(
-                                                        'w-full flex-row items-center justify-between',
-                                                    ),
-                                                ]}>
+                                                className="w-full flex-row items-center justify-between">
                                                 <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm font-normal',
-                                                        ),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>
+                                                    className="text-sm font-normal"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>
                                                     size
                                                 </Text>
                                                 <Text
-                                                    style={[
-                                                        tailwind('font-bold'),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>
+                                                    className="font-bold"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>
                                                     {route.params.tx.size +
                                                         ' B'}
                                                 </Text>
                                             </View>
 
                                             <View
-                                                style={[
-                                                    tailwind(
-                                                        'w-full flex-row items-center justify-between',
-                                                    ),
-                                                ]}>
+                                                className="w-full flex-row items-center justify-between">
                                                 <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm font-normal',
-                                                        ),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>
+                                                    className="text-sm font-normal"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>
                                                     virtual size
                                                 </Text>
                                                 <Text
-                                                    style={[
-                                                        tailwind('font-bold'),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>
+                                                    className="font-bold"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>
                                                     {route.params.tx.vsize +
                                                         ' vB'}
                                                 </Text>
                                             </View>
 
                                             <View
-                                                style={[
-                                                    tailwind(
-                                                        'w-full flex-row items-center justify-between',
-                                                    ),
-                                                ]}>
+                                                className="w-full flex-row items-center justify-between">
                                                 <Text
-                                                    style={[
-                                                        tailwind(
-                                                            'text-sm font-normal',
-                                                        ),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>
+                                                    className="text-sm font-normal"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>
                                                     weight units
                                                 </Text>
                                                 <Text
-                                                    style={[
-                                                        tailwind('font-bold'),
-                                                        {
-                                                            color: ColorScheme
-                                                                .Text.Default,
-                                                        },
-                                                    ]}>
+                                                    className="font-bold"
+                                                    style={{
+                                                        color: ColorScheme
+                                                            .Text.Default,
+                                                    }}>
                                                     {route.params.tx.weight +
                                                         ' WU'}
                                                 </Text>
@@ -692,29 +550,21 @@ const TransactionDetailsView = ({route}: Props) => {
                                     )}
 
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'w-full flex-row items-center justify-between',
-                                            ),
-                                        ]}>
+                                        className="w-full flex-row items-center justify-between">
                                         <Text
-                                            style={[
-                                                tailwind('text-sm font-normal'),
-                                                {
+                                            className="text-sm font-normal"
+                                            style={{
                                                     color: ColorScheme.Text
                                                         .Default,
-                                                },
-                                            ]}>
+                                            }}>
                                             fee
                                         </Text>
                                         <Text
-                                            style={[
-                                                tailwind('font-bold'),
-                                                {
+                                            className="font-bold"
+                                            style={{
                                                     color: ColorScheme.Text
                                                         .Default,
-                                                },
-                                            ]}>
+                                            }}>
                                             {formatSats(txFee)}
                                         </Text>
                                     </View>
@@ -722,10 +572,8 @@ const TransactionDetailsView = ({route}: Props) => {
                                     {isLNTx && (
                                         <>
                                             <View
+                                                className="w-full mt-4 mb-4"
                                                 style={[
-                                                    tailwind(
-                                                        'w-full mt-4 mb-4',
-                                                    ),
                                                     HeadingBar,
                                                 ]}
                                             />
@@ -733,97 +581,29 @@ const TransactionDetailsView = ({route}: Props) => {
                                                 {/* Payment Pre image & Node ID */}
                                                 <PlainButton
                                                     onPress={copyPreimage}
-                                                    style={[
-                                                        tailwind(
-                                                            'w-full mb-4 flex justify-between',
-                                                        ),
-                                                    ]}>
+                                                    className="w-full mb-4 flex justify-between">
                                                     <Text
-                                                        style={[
-                                                            tailwind(
-                                                                'font-normal mr-2 mb-2',
-                                                            ),
-                                                            {
+                                                        className="font-normal mr-2 mb-2"
+                                                        style={{
                                                                 color: ColorScheme
                                                                     .Text
                                                                     .Default,
-                                                            },
-                                                        ]}>
+                                                        }}>
                                                         Payment Preimage
                                                     </Text>
 
                                                     <View
-                                                        style={[
-                                                            tailwind(
-                                                                'w-full justify-between flex-row',
-                                                            ),
-                                                        ]}>
+                                                        className="w-full justify-between flex-row">
                                                         <Text
                                                             numberOfLines={1}
                                                             ellipsizeMode="middle"
-                                                            style={[
-                                                                tailwind(
-                                                                    'font-bold w-4/5',
-                                                                ),
-                                                                {
+                                                            className="font-bold w-4/5"
+                                                            style={{
                                                                     color: ColorScheme
                                                                         .Text
                                                                         .Default,
-                                                                },
-                                                            ]}>
+                                                            }}>
                                                             {paymentPreimage}
-                                                        </Text>
-                                                        <CopyIcon
-                                                            width={16}
-                                                            height={16}
-                                                            fill={
-                                                                ColorScheme.SVG
-                                                                    .GrayFill
-                                                            }
-                                                        />
-                                                    </View>
-                                                </PlainButton>
-
-                                                <PlainButton
-                                                    onPress={copyNodeId}
-                                                    style={[
-                                                        tailwind(
-                                                            'w-full flex justify-between',
-                                                        ),
-                                                    ]}>
-                                                    <Text
-                                                        style={[
-                                                            tailwind(
-                                                                'font-normal mr-2 mb-2',
-                                                            ),
-                                                            {
-                                                                color: ColorScheme
-                                                                    .Text
-                                                                    .Default,
-                                                            },
-                                                        ]}>
-                                                        Node ID
-                                                    </Text>
-                                                    <View
-                                                        style={[
-                                                            tailwind(
-                                                                'w-full justify-between flex-row',
-                                                            ),
-                                                        ]}>
-                                                        <Text
-                                                            numberOfLines={1}
-                                                            ellipsizeMode="middle"
-                                                            style={[
-                                                                tailwind(
-                                                                    'font-bold w-4/5',
-                                                                ),
-                                                                {
-                                                                    color: ColorScheme
-                                                                        .Text
-                                                                        .Default,
-                                                                },
-                                                            ]}>
-                                                            {nodeId}
                                                         </Text>
                                                         <CopyIcon
                                                             width={16}
@@ -842,15 +622,11 @@ const TransactionDetailsView = ({route}: Props) => {
 
                                 {clippyData.length > 0 && (
                                     <Text
-                                        style={[
-                                            tailwind(
-                                                'text-sm text-center mt-4',
-                                            ),
-                                            {
+                                        className="text-sm text-center mt-4"
+                                        style={{
                                                 color: ColorScheme.Text
                                                     .GrayedText,
-                                            },
-                                        ]}>
+                                        }}>
                                         {clippyData}
                                     </Text>
                                 )}
@@ -861,16 +637,12 @@ const TransactionDetailsView = ({route}: Props) => {
                     {/* Show bump fee button when tx still in mempool */}
                     {displayFeeBump && (
                         <View
-                            style={[
-                                tailwind(
-                                    'absolute self-center items-center w-5/6',
-                                ),
-                                {
+                            className="absolute self-center items-center w-5/6"
+                            style={{
                                     bottom:
                                         NativeWindowMetrics.bottomButtonOffset +
                                         64,
-                                },
-                            ]}>
+                            }}>
                             <LongButton
                                 title={t('bump_fee')}
                                 textColor={ColorScheme.Text.Default}
@@ -883,11 +655,7 @@ const TransactionDetailsView = ({route}: Props) => {
                     {!isLNTx && (
                         <>
                             <View
-                                style={[
-                                    tailwind(
-                                        'absolute bottom-0 items-center w-full',
-                                    ),
-                                ]}>
+                                className="absolute bottom-0 items-center w-full">
                                 <LongBottomButton
                                     onPress={() => {
                                         openMempoolSpace(route.params.tx.txid);
@@ -900,7 +668,7 @@ const TransactionDetailsView = ({route}: Props) => {
                                 />
                             </View>
 
-                            <View style={[tailwind('absolute bottom-0')]}>
+                            <View className="absolute bottom-0">
                                 <BumpFee
                                     bumpRef={bumpFeeRef}
                                     triggerBump={handleBumpFee}

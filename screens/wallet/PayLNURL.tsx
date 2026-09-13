@@ -18,16 +18,8 @@ import React, {
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-import {
-    BreezEventVariant,
-    InputTypeVariant,
-    parseInput,
-    payLnurl,
-} from '@breeztech/react-native-breez-sdk';
-
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Color from '../../constants/Color';
-import {useTailwind} from 'tailwind-rn';
 
 import {AppStorageContext} from '../../class/storageContext';
 
@@ -41,7 +33,7 @@ import {useTranslation} from 'react-i18next';
 
 import {PlainButton, LongBottomButton} from '../../components/button';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {WalletParamList} from '../../Navigation';
+import {InitStackParamList} from '../../Navigation';
 
 import Close from '../../assets/svg/x-24.svg';
 import InfoIcon from '../../assets/svg/info-16.svg';
@@ -54,9 +46,6 @@ import {
     getMiniWallet,
     isLNAddress,
 } from '../../modules/wallet-utils';
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {EBreezDetails} from '../../types/enums';
-import {toastConfig} from '../../components/toast';
 import {DisplayFiatAmount} from '../../components/balance';
 import BigNumber from 'bignumber.js';
 
@@ -65,13 +54,15 @@ import {biometricAuth} from '../../modules/shared';
 
 import PINPass from '../../components/pinpass';
 import {useNetInfo} from '@react-native-community/netinfo';
+import { InputType_Tags, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
+import { useWallet } from '../../contexts/walletContext';
+import { useBreezEvent } from '../../contexts/BreezEventContext';
 
-type Props = NativeStackScreenProps<WalletParamList, 'SendLN'>;
+type Props = NativeStackScreenProps<InitStackParamList, 'PayLNURL'>;
 
 const InputPanel = (props: {address: string}): ReactElement => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -115,20 +106,35 @@ const InputPanel = (props: {address: string}): ReactElement => {
         setDescriptionText('');
     };
 
+    const isLnurlpURI = (text: string) => {
+        // return if string is a valid lnurlp URI
+        return text.startsWith('lnurlp:');
+    };
+
+    const isLnurlAddress = (text: string) => {
+        // return if string is a valid lnurl address
+        return isLNAddress(text);
+    };
+
+    const isValidLnurlp = isLnurlpURI(inputText) || isLnurlAddress(inputText);
+
     const handleAmount = () => {
         const minWallet = getMiniWallet(wallet);
 
         navigation.dispatch(
-            CommonActions.navigate('SendAmount', {
-                invoiceData: {},
-                wallet: minWallet,
-                isLightning: true,
-                isLnManual: true,
-                lnManualPayload: {
-                    amount: 0,
-                    kind: 'address',
-                    text: inputText,
-                    description: descriptionText,
+            CommonActions.navigate('WalletRoot', {
+                screen: 'SendAmount',
+                params: {
+                    invoiceData: {},
+                    wallet: minWallet,
+                    isLightning: true,
+                    isLnManual: true,
+                    lnManualPayload: {
+                        amount: 0,
+                        kind: 'address',
+                        text: inputText,
+                        description: descriptionText,
+                    },
                 },
             }),
         );
@@ -136,26 +142,20 @@ const InputPanel = (props: {address: string}): ReactElement => {
 
     return (
         <View
-            style={[
-                tailwind('self-center w-full h-full relative items-center'),
-            ]}>
-            <View style={[tailwind('w-5/6'), styles.mainContainer]}>
+            className="self-center w-full h-full relative items-center">
+            <View className="w-5/6" style={[styles.mainContainer]}>
                 <VText
-                    style={[
-                        tailwind('font-bold w-full mb-4'),
-                        {color: ColorScheme.Text.Default},
-                    ]}>
+                    className="font-bold w-full mb-4"
+                    style={{color: ColorScheme.Text.Default}}>
                     {capitalizeFirst(t('to'))}
                 </VText>
 
                 <View
-                    style={[
-                        tailwind('w-full rounded-md px-2'),
-                        {
-                            borderColor: ColorScheme.Background.Greyed,
-                            borderWidth: 1,
-                        },
-                    ]}>
+                    className="w-full rounded-md px-2"
+                    style={{
+                        borderColor: ColorScheme.Background.Greyed,
+                        borderWidth: 1,
+                    }}>
                     <TextSingleInput
                         color={ColorScheme.Text.Default}
                         placeholder={t('manual_placeholder')}
@@ -168,30 +168,26 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             </View>
 
-            {isLNAddress(inputText) && isNetOn && (
-                <View style={[tailwind('w-5/6 items-center mt-12')]}>
+            {isValidLnurlp && isNetOn && (
+                <View className="w-5/6 items-center mt-12">
                     <VText
-                        style={[
-                            tailwind('font-bold w-full mb-4'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="font-bold w-full mb-4"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('description'))}
                     </VText>
 
                     <View
-                        style={[
-                            tailwind(
-                                `w-full rounded-md px-2 ${
-                                    langDir === 'right'
-                                        ? 'flex-row-reverse'
-                                        : 'flex-row'
-                                }`,
-                            ),
-                            {
-                                borderColor: ColorScheme.Background.Greyed,
-                                borderWidth: 1,
-                            },
-                        ]}>
+                        className={
+                            `w-full rounded-md px-2 ${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            }`
+                        }
+                        style={{
+                            borderColor: ColorScheme.Background.Greyed,
+                            borderWidth: 1,
+                        }}>
                         <TextSingleInput
                             color={ColorScheme.Text.Default}
                             placeholder={capitalizeFirst(t('description'))}
@@ -202,18 +198,12 @@ const InputPanel = (props: {address: string}): ReactElement => {
                         />
                         {descriptionText.length > 0 && (
                             <View
-                                style={[
-                                    tailwind(
-                                        'absolute right-4 justify-center h-full',
-                                    ),
-                                ]}>
+                                className="absolute right-4 justify-center h-full">
                                 <Text
-                                    style={[
-                                        tailwind('text-sm opacity-60'),
-                                        {
-                                            color: ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                    className="text-sm opacity-60"
+                                    style={{
+                                        color: ColorScheme.Text.DescText,
+                                    }}>
                                     (
                                     {i18nNumber(
                                         descriptionText.length,
@@ -232,34 +222,30 @@ const InputPanel = (props: {address: string}): ReactElement => {
                 </View>
             )}
 
-            {isLNAddress(inputText) && !isNetOn && (
+            {isValidLnurlp && !isNetOn && (
                 <View
-                    style={[
-                        tailwind(
-                            `mt-6 items-center ${
-                                langDir === 'right'
-                                    ? 'flex-row-reverse'
-                                    : 'flex-row'
-                            }`,
-                        ),
-                    ]}>
+                    className={
+                        `mt-6 items-center ${
+                            langDir === 'right'
+                                ? 'flex-row-reverse'
+                                : 'flex-row'
+                        }`
+                    }>
                     <InfoIcon width={16} fill={ColorScheme.SVG.GrayFill} />
                     <VText
-                        style={[
-                            tailwind(
-                                `text-sm ${
-                                    langDir === 'right' ? 'mr-2' : 'ml-2'
-                                }`,
-                            ),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
-                        {t('no_internet_cannot_zap')}
+                        className={
+                            `text-sm ${
+                                langDir === 'right' ? 'mr-2' : 'ml-2'
+                            }`
+                        }
+                        style={{color: ColorScheme.Text.DescText}}>
+                        {t('no_internet_cannot_pay')}
                     </VText>
                 </View>
             )}
 
             <LongBottomButton
-                disabled={!isLNAddress(inputText) || !isNetOn}
+                disabled={!isValidLnurlp || !isNetOn}
                 onPress={handleAmount}
                 title={capitalizeFirst(t('continue'))}
                 textColor={ColorScheme.Text.Alt}
@@ -277,9 +263,10 @@ const SummaryPanel = (props: {
     loadingPay: boolean;
     authAndPay: () => void;
     statusMsg: string;
+    errorMessage: string;
+    handleError: () => void;
 }): ReactElement => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
     const {t, i18n} = useTranslation('wallet');
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
@@ -291,15 +278,15 @@ const SummaryPanel = (props: {
     );
 
     return (
-        <View style={[tailwind('items-center w-full h-full')]}>
+        <View className="items-center w-full h-full">
             <View
+                className="w-full items-center"
                 style={[
-                    tailwind('w-full items-center'),
                     styles.summaryContainer,
                 ]}>
                 {/* Not loading summary */}
-                <View style={[tailwind('items-center h-full w-full')]}>
-                    <View style={[tailwind('mb-6')]}>
+                <View className="items-center h-full w-full">
+                    <View className="mb-6">
                         <DisplayFiatAmount
                             amount={fiatAmount}
                             fontSize={'text-3xl'}
@@ -307,54 +294,46 @@ const SummaryPanel = (props: {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('w-5/6 mt-4 rounded-md'),
-                            {
-                                borderWidth: 1,
-                                borderColor: ColorScheme.Background.Greyed,
-                            },
-                        ]}>
+                        className="w-5/6 mt-4 rounded-md"
+                        style={{
+                            borderWidth: 1,
+                            borderColor: ColorScheme.Background.Greyed,
+                        }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } p-4 justify-between`,
-                                ),
-                                {
-                                    borderBottomWidth: 1,
-                                    borderBottomColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } p-4 justify-between`
+                            }
+                            style={{
+                                borderBottomWidth: 1,
+                                borderBottomColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('amount_sats')}
                             </Text>
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {formatSats(
                                     new BigNumber(props.amount as number),
                                 )}
                             </Text>
                         </View>
                         <View
+                            className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                } p-4 justify-between`
+                            }
                             style={[
-                                tailwind(
-                                    `${
-                                        langDir === 'right'
-                                            ? 'flex-row-reverse'
-                                            : 'flex-row'
-                                    } p-4 justify-between`,
-                                ),
                                 props.description
                                     ? {
                                           borderBottomWidth: 1,
@@ -364,17 +343,15 @@ const SummaryPanel = (props: {
                                     : {},
                             ]}>
                             <Text
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('lightning_address')}
                             </Text>
                             <Text
                                 numberOfLines={2}
                                 ellipsizeMode="middle"
+                                className="text-sm w-1/2"
                                 style={[
-                                    tailwind('text-sm w-1/2'),
                                     {
                                         color: ColorScheme.Text.Default,
                                         textAlign:
@@ -388,50 +365,59 @@ const SummaryPanel = (props: {
                         </View>
                         {props.description && (
                             <View
-                                style={[
-                                    tailwind(
-                                        `${
-                                            langDir === 'right'
-                                                ? 'flex-row-reverse'
-                                                : 'flex-row'
-                                        } p-4 justify-between`,
-                                    ),
-                                ]}>
+                                className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'flex-row-reverse'
+                                            : 'flex-row'
+                                    } p-4 justify-between`
+                                }>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {t('description')}
                                 </Text>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {props.description}
                                 </Text>
                             </View>
                         )}
                     </View>
                     {props.loadingPay && (
-                        <View style={[tailwind('items-center mt-6 flex-row')]}>
+                        <View className="items-center mt-6 flex-row">
                             <Text
-                                style={[
-                                    tailwind('text-sm mr-2'),
-                                    {color: ColorScheme.Text.GrayedText},
-                                ]}>
+                                className="text-sm mr-2"
+                                style={{color: ColorScheme.Text.GrayedText}}>
                                 {props.statusMsg}
                             </Text>
                             <ActivityIndicator />
+                        </View>
+                    )}
+
+                    {/* Lnurl Error */}
+                    {!!props.errorMessage && (
+                        <View
+                            className="w-5/6 mt-6">
+                            <VText
+                                className="font-bold text-lg w-full text-center mb-2"
+                                style={{color: ColorScheme.Text.Default}}>
+                                {capitalizeFirst(t('error'))}
+                            </VText>
+                            <VText
+                                className="w-full text-center"
+                                style={{color: ColorScheme.Text.Default}}>
+                                {props.errorMessage}
+                            </VText>
                         </View>
                     )}
                 </View>
 
                 <LongBottomButton
                     disabled={props.loadingPay}
-                    onPress={props.authAndPay}
-                    title={capitalizeFirst(t('pay'))}
+                    onPress={props.errorMessage === '' ? props.authAndPay : props.handleError}
+                    title={props.errorMessage === '' ? capitalizeFirst(t('pay')) : capitalizeFirst(t('cancel'))}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                 />
@@ -440,37 +426,51 @@ const SummaryPanel = (props: {
     );
 };
 
-const SendLN = ({route}: Props) => {
+const PayLNURL = ({route}: Props) => {
     const navigation = useNavigation();
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
 
-    const {breezEvent, isBiometricsActive} = useContext(AppStorageContext);
+    const _wallet = useWallet();
+    const {breezEvent} = useBreezEvent();
+
+    const {isBiometricsActive} = useContext(AppStorageContext);
     const [loadingPay, setLoadingPay] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
+    const [lnurlError, setLNURLError] = useState(false);
+    const [lnurlErrorText, setLNURLErrorText] = useState('');
 
     const {t} = useTranslation('wallet');
 
     useEffect(() => {
-        if (breezEvent.type === BreezEventVariant.PAYMENT_SUCCEED) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
+
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: true,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Success,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent.inner.payment.paymentType,
+                    error: null,
                 }),
             );
             return;
         }
 
-        if (breezEvent.type === BreezEventVariant.PAYMENT_FAILED) {
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentFailed) {
+            // Serialize BigInt
+            const txDetails = {...breezEvent.inner, amount: Number(breezEvent.inner.payment.amount)};
+
             // Route to LN payment status screen
             navigation.dispatch(
                 CommonActions.navigate('LNTransactionStatus', {
                     status: false,
-                    details: breezEvent.details,
-                    detailsType: EBreezDetails.Failed,
+                    details: txDetails,
+                    tag: breezEvent.tag,
+                    detailsType: breezEvent.inner.payment.paymentType,
+                    error: lnurlErrorText,
                 }),
             );
             return;
@@ -512,13 +512,8 @@ const SendLN = ({route}: Props) => {
                 },
                 // prompt error callback
                 error => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: error.message,
-                        visibilityTime: 1750,
-                    });
+                    setLNURLErrorText(error.message);
+                    setLNURLError(true);
                 },
             );
 
@@ -539,6 +534,16 @@ const SendLN = ({route}: Props) => {
         );
     };
 
+    const handleLNURL = async () => {
+        if (lnurlError) {
+            navigation.dispatch(
+                CommonActions.navigate('HomeScreen'),
+            );
+
+            setLNURLError(false);
+        }
+    };
+
     const payLNAddress = async (
         lnurlPayURL: string,
         amtSats: number,
@@ -546,58 +551,48 @@ const SendLN = ({route}: Props) => {
     ) => {
         try {
             setStatusMessage(t('parsing_ln_address'));
-            const input = await parseInput(lnurlPayURL);
+            const input = await _wallet.parseInput(lnurlPayURL);
 
-            if (input.type === InputTypeVariant.LN_URL_ERROR) {
+            if (input.tag !== InputType_Tags.LightningAddress) {
                 throw new Error(t('not_ln_address'));
             }
 
-            // LN Address
-            if (input.type === InputTypeVariant.LN_URL_PAY) {
-                const canComment = input.data.commentAllowed;
+            // LN Address (LNURLPay)
+            if (input.tag === InputType_Tags.LightningAddress) {
+                const payRequest = input.inner[0].payRequest;
 
-                // Note: min spendable is in Msat
-                const maxAmountSats = input.data.maxSendable / 1_000;
-                const amountMSats = amtSats * 1_000;
-
-                setStatusMessage(t('check_ln_address_limits'));
-
-                if (amtSats > maxAmountSats) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: 'LNURL Pay Error',
-                        text2: t('amount_above_max_spendable'),
-                        visibilityTime: 1750,
-                    });
+                setStatusMessage(t('checking if amount within limit'));
+                if (amtSats > input.inner[0].payRequest.maxSendable) {
+                    setLNURLErrorText(t('amount_above_max_spendable'));
                 }
 
-                setStatusMessage(t('paying_ln_address'));
+                setStatusMessage(t('preparing pay request and fees'));
 
-                await payLnurl({
-                    data: input.data,
-                    amountMsat: amountMSats,
-                    comment: canComment ? comment || '' : '',
+                const prepResp = await _wallet.prepareLnurlPay({
+                    amountSats: BigInt(amtSats),
+                    payRequest: payRequest,
+                    comment: comment,
+                    validateSuccessActionUrl: true,
                 });
+
+                const feeSats = prepResp.feeSats
+
+                setStatusMessage(t(`attempting to pay ${prepResp.payRequest.address} with fee: ${feeSats} sats`))
+
+                const resp = await _wallet.lnurlPay({
+                    prepareResponse: prepResp,
+                    idempotencyKey: undefined,
+                });
+
+                setStatusMessage(t(`${resp.successAction?.inner}`));
 
                 setLoadingPay(false);
             }
         } catch (error: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: 'Lightning Address',
-                text2: error.message,
-                visibilityTime: 2100,
-                onHide: () => {
-                    navigation.dispatch(
-                        CommonActions.navigate('WalletRoot', {
-                            screen: 'WalletView',
-                        }),
-                    );
-                },
-            });
+            const errMsg = error.message.includes('Failed to parse') ? t('no_lnurl_found') : error?.inner[0];
 
+            setLNURLErrorText(errMsg);
+            setLNURLError(true);
             setLoadingPay(false);
         }
     };
@@ -608,26 +603,20 @@ const SendLN = ({route}: Props) => {
             style={[{backgroundColor: ColorScheme.Background.Primary}]}>
             <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <BottomSheetModalProvider>
-                <View style={[tailwind('h-full w-full items-center')]}>
+                <View className="h-full w-full items-center">
                     <View
-                        style={[
-                            tailwind(
-                                'absolute top-6 w-full flex-row items-center justify-center',
-                            ),
-                            {zIndex: 999},
-                        ]}>
+                        className="absolute top-6 w-full flex-row items-center justify-center"
+                        style={{zIndex: 999}}>
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(CommonActions.goBack())
                             }
-                            style={[tailwind('absolute left-6')]}>
+                            className="absolute left-6">
                             <Close fill={ColorScheme.SVG.Default} />
                         </PlainButton>
                         <Text
-                            style={[
-                                tailwind('text-base font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-base font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             Send
                         </Text>
                     </View>
@@ -652,6 +641,8 @@ const SendLN = ({route}: Props) => {
                             text={manualText}
                             description={manualDescription}
                             statusMsg={statusMessage}
+                            errorMessage={lnurlErrorText}
+                            handleError={handleLNURL}
                         />
                     )}
                 </View>
@@ -662,14 +653,12 @@ const SendLN = ({route}: Props) => {
                     onSelectPinPass={setPINIdx}
                     pinMode={false}
                 />
-
-                <Toast config={toastConfig as ToastConfig} />
             </BottomSheetModalProvider>
         </SafeAreaView>
     );
 };
 
-export default SendLN;
+export default PayLNURL;
 
 const styles = StyleSheet.create({
     mainContainer: {

@@ -8,9 +8,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {useNavigation, CommonActions} from '@react-navigation/core';
 
-import QRCodeStyled from 'react-native-qrcode-styled';
-
-import {useTailwind} from 'tailwind-rn';
+import QRCode from 'react-qr-code';
 
 import {useTranslation} from 'react-i18next';
 
@@ -22,22 +20,22 @@ import Color from '../../constants/Color';
 import {PlainButton} from '../../components/button';
 
 import {AppStorageContext} from '../../class/storageContext';
-import {WalletTypeDetails} from '../../modules/wallet-defaults';
 
 import CloseIcon from '../../assets/svg/x-24.svg';
 import ShareIcon from '../../assets/svg/share-24.svg';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 import {capitalizeFirst} from '../../modules/transform';
+import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
 const Xpub = () => {
     const navigation = useNavigation();
-    const tailwind = useTailwind();
+
     const ColorScheme = Color(useColorScheme());
 
-    const {currentWalletID, getWalletData, isAdvancedMode} =
+    const {currentWalletID, getWalletData} =
         useContext(AppStorageContext);
 
     const {t} = useTranslation('wallet');
@@ -45,10 +43,6 @@ const Xpub = () => {
 
     const walletData = getWalletData(currentWalletID);
     const backupData = useMemo(() => walletData.xpub, [walletData.xpub]);
-
-    const walletType = WalletTypeDetails[walletData.type];
-    const walletTypeName =
-        walletType[0] + ` (${WalletTypeDetails[walletData.type][1]})`;
 
     // Write public descriptor file to device
     const writeDescriptorToFile = async () => {
@@ -61,12 +55,8 @@ const Xpub = () => {
         if (Platform.OS === 'ios') {
             await RNFS.writeFile(pathData, fileBackupData, 'utf8').catch(
                 err => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: e('failed_to_write_file'),
-                        visibilityTime: 1750,
+                    LiberalToast(capitalizeFirst(t('error')), e('failed_to_write_file'), {
+                        duration: 3000,
                     });
 
                     console.log('[Export] Failed to write file: ', err.message);
@@ -79,12 +69,8 @@ const Xpub = () => {
             })
                 .catch(err => {
                     if (err.message !== 'User did not share') {
-                        Toast.show({
-                            topOffset: 54,
-                            type: 'Liberal',
-                            text1: capitalizeFirst(t('error')),
-                            text2: e('failed_to_share_file'),
-                            visibilityTime: 1750,
+                        LiberalToast(capitalizeFirst(t('error')), e('failed_to_share_file'), {
+                            duration: 3000,
                         });
 
                         console.log(
@@ -109,13 +95,8 @@ const Xpub = () => {
         // and revert after a few seconds
         Clipboard.setString(walletData.xpub);
 
-        Toast.show({
-            topOffset: 24,
-            type: 'Liberal',
-            text1: capitalizeFirst(t('clipboard')),
-            text2: capitalizeFirst(t('copied_to_clipboard')),
-            visibilityTime: 1000,
-            position: 'top',
+        LiberalToast(capitalizeFirst(t('clipboard')), capitalizeFirst(t('copied_to_clipboard')), {
+            duration: 1000,
         });
     };
 
@@ -128,19 +109,15 @@ const Xpub = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={tailwind('w-5/6 h-full justify-center')}>
+            <View className="w-full h-full items-center">
+                <View className="w-5/6 h-full justify-center">
                     <View
-                        style={[
-                            tailwind(
-                                'w-full absolute top-6 flex-row justify-center items-center',
-                            ),
-                        ]}>
+                        className="w-full absolute top-6 flex-row justify-center items-center">
                         {/* Top panel */}
                         {/* Allow exporting XPub */}
                         {Platform.OS === 'ios' && (
                             <PlainButton
-                                style={[tailwind('absolute left-0')]}
+                                className="absolute left-0"
                                 onPress={() => {
                                     writeDescriptorToFile();
                                 }}>
@@ -151,16 +128,14 @@ const Xpub = () => {
                             </PlainButton>
                         )}
                         <Text
-                            style={[
-                                tailwind('text-lg font-bold'),
-                                {
+                            className="text-lg font-bold"
+                            style={{
                                     color: ColorScheme.Text.Default,
-                                },
-                            ]}>
+                            }}>
                             Xpub
                         </Text>
                         <PlainButton
-                            style={[tailwind('absolute right-0')]}
+                            className="absolute right-0"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
@@ -173,68 +148,54 @@ const Xpub = () => {
 
                     {/* Display QR code with seed */}
                     <View
-                        style={[
-                            tailwind('rounded self-center mb-4'),
-                            {
+                        className="rounded self-center mb-4"
+                        style={{
                                 borderWidth: 2,
                                 borderColor: ColorScheme.Background.QRBorder,
-                            },
-                        ]}>
-                        <QRCodeStyled
+                        }}>
+                        <QRCode
                             style={{
                                 backgroundColor: 'white',
                             }}
-                            data={walletData.xpub}
-                            pieceSize={5}
-                            padding={10}
+                            value={walletData.xpub}
                             color={ColorScheme.Background.Default}
-                            pieceCornerType={'rounded'}
-                            isPiecesGlued={true}
-                            pieceBorderRadius={2}
+                            width={78}
                         />
                     </View>
 
                     {/* Display either seed or descriptor */}
                     <PlainButton
-                        style={[tailwind('items-center mb-4')]}
+                        className="items-center mb-4"
                         onPress={copyDescToClipboard}>
                         <Text
-                            style={[
-                                tailwind(
-                                    'text-sm w-full p-3 text-center rounded-sm',
-                                ),
-                                {
+                            className="text-sm w-full p-3 text-center rounded-sm"
+                            style={{
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
                                     color: ColorScheme.Text.Default,
-                                },
-                            ]}
+                            }}
                             numberOfLines={1}
                             ellipsizeMode={'middle'}>
                             {backupData}
                         </Text>
                     </PlainButton>
 
-                    <View style={[tailwind('mt-6 flex w-full')]}>
+                    <View className="mt-6 flex w-full">
                         <Text
-                            style={[
-                                tailwind('text-sm text-center mb-4'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-sm text-center mb-4"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {info}
                         </Text>
 
                         <Text
-                            style={[
-                                tailwind('text-sm text-center'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm text-center"
+                            style={{color: ColorScheme.Text.Default}}>
                             {warning}
                         </Text>
                     </View>
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

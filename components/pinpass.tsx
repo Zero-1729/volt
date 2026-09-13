@@ -8,7 +8,6 @@ import Color from '../constants/Color';
 
 import {PlainButton} from './button';
 
-import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 
 import {CommonActions, useNavigation} from '@react-navigation/native';
@@ -17,13 +16,14 @@ import {PinNumpad} from './input';
 
 import {getKeychainItem} from '../class/keychainContext';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from './toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from './toast';
 
 import {MAX_PIN_ATTEMPTS} from '../modules/wallet-defaults';
 
 import {AppStorageContext} from '../class/storageContext';
 import {biometricAuth} from '../modules/shared';
+import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 type PinPassProps = {
     pinPassRef: React.RefObject<BottomSheetModal>;
@@ -33,7 +33,6 @@ type PinPassProps = {
 };
 
 const PinPass = (props: PinPassProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
@@ -72,12 +71,8 @@ const PinPass = (props: PinPassProps) => {
             () => {},
             // prompt error callback
             error => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Biometrics'),
-                    text2: error.message,
-                    visibilityTime: 1750,
+                LiberalToast(t('Biometrics'), error.message, {
+                    duration: 3000,
                 });
             },
         );
@@ -123,45 +118,31 @@ const PinPass = (props: PinPassProps) => {
             handleIndicatorColor={'#64676E'}
             backdrop={true}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center relative'),
-                    {
+                className="w-full h-full items-center relative"
+                style={{
                         backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
-                <View
-                    style={[
-                        tailwind('w-full h-full items-center justify-center'),
-                    ]}>
-                    <View style={[tailwind('w-full items-center -mt-8 mb-12')]}>
+                    }}>
+                <View className="w-full h-full items-center justify-center">
+                    <View className="w-full items-center -mt-8 mb-12">
                         {pinAttempts > 0 ? (
                             <>
-                                <View
-                                    style={[
-                                        tailwind('items-center mb-2 w-full'),
-                                    ]}>
+                                <View className="items-center mb-2 w-full">
                                     {pinAttempts === MAX_PIN_ATTEMPTS - 1 ? (
                                         <Text
-                                            style={[
-                                                tailwind(
-                                                    'text-sm text-center w-5/6',
-                                                ),
-                                                {
+                                            className="text-sm text-center w-5/6"
+                                            style={{
                                                     color: ColorScheme.Text
                                                         .Default,
-                                                },
-                                            ]}>
+                                                }}>
                                             {t('last_attempt_warning')}
                                         </Text>
                                     ) : (
                                         <Text
-                                            style={[
-                                                tailwind('text-sm'),
-                                                {
+                                            className="text-sm"
+                                            style={{
                                                     color: ColorScheme.Text
                                                         .Default,
-                                                },
-                                            ]}>
+                                                }}>
                                             {t('pin_attempts', {
                                                 attempts:
                                                     MAX_PIN_ATTEMPTS -
@@ -173,24 +154,18 @@ const PinPass = (props: PinPassProps) => {
 
                                 <PlainButton onPress={routeToResetPIN}>
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'rounded-full px-4 py-1 mb-6',
-                                            ),
-                                            {
+                                        className="rounded-full px-4 py-1 mb-6"
+                                        style={{
                                                 backgroundColor:
                                                     ColorScheme.Background
                                                         .Greyed,
-                                            },
-                                        ]}>
+                                            }}>
                                         <Text
-                                            style={[
-                                                tailwind('text-sm'),
-                                                {
+                                            className="text-sm"
+                                            style={{
                                                     color: ColorScheme.Text
                                                         .DescText,
-                                                },
-                                            ]}>
+                                                }}>
                                             {t('forgot_pin')}
                                         </Text>
                                     </View>
@@ -198,25 +173,21 @@ const PinPass = (props: PinPassProps) => {
                             </>
                         ) : (
                             <Text
-                                style={[
-                                    tailwind(
-                                        'text-center text-lg font-bold mb-4',
-                                    ),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-center text-lg font-bold mb-4"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('lock_screen_message')}
                             </Text>
                         )}
 
-                        <View style={[tailwind('flex-row items-center')]}>
+                        <View className="flex-row items-center">
                             {Array(4)
                                 .fill(null)
                                 .map((_, i) => (
                                     <View
                                         key={i}
+                                        className="rounded-full"
                                         style={[
                                             styles.dot,
-                                            tailwind('rounded-full'),
                                             {
                                                 borderColor:
                                                     ColorScheme.Background
@@ -243,7 +214,7 @@ const PinPass = (props: PinPassProps) => {
                     />
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </BottomModal>
     );

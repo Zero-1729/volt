@@ -22,7 +22,6 @@ import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
 
 import {useTranslation} from 'react-i18next';
@@ -48,7 +47,6 @@ const AddressOwnership = ({route}: Props) => {
     const [address, setAddress] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('wallet');
@@ -149,23 +147,17 @@ const AddressOwnership = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 <View
-                    style={[
-                        tailwind(
-                            'flex-row items-center justify-center relative mt-6 w-5/6',
-                        ),
-                    ]}>
+                    className="flex-row items-center justify-center relative mt-6 w-5/6">
                     <Text
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('address_ownership')}
                     </Text>
 
                     <PlainButton
-                        style={[tailwind('absolute right-0 top-0')]}
+                        className="absolute right-0 top-0"
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
@@ -174,17 +166,13 @@ const AddressOwnership = ({route}: Props) => {
                 </View>
 
                 {/* Content */}
-                <View style={tailwind('mt-20 w-5/6')}>
+                <View className="mt-20 w-5/6">
                     <VText
-                        style={[
-                            tailwind('text-sm text-justify'),
-                            {color: ColorScheme.Text.GrayedText},
-                        ]}>
+                        className="text-sm text-justify"
+                        style={{color: ColorScheme.Text.GrayedText}}>
                         <VText
-                            style={[
-                                tailwind('font-bold'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="font-bold"
+                            style={{color: ColorScheme.Text.Default}}>
                             {`${capitalizeFirst(t('info'))}:`}
                         </VText>{' '}
                         {t('address_ownership_description')}
@@ -193,9 +181,9 @@ const AddressOwnership = ({route}: Props) => {
 
                 {/* Input */}
                 <View
+                    className="mt-10 w-5/6 border-gray-400 px-2"
                     style={[
                         styles.inputContainer,
-                        tailwind('mt-10 w-5/6 border-gray-400 px-2'),
                     ]}>
                     <TextSingleInput
                         refs={addressInputRef}
@@ -209,18 +197,16 @@ const AddressOwnership = ({route}: Props) => {
                 </View>
 
                 {/* Result */}
-                <View style={[tailwind('mt-8')]}>
+                <View className="mt-8">
                     <Text
-                        style={[
-                            tailwind('text-base'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-base"
+                        style={{color: ColorScheme.Text.Default}}>
                         {resultMessage}
                     </Text>
 
                     {loading && (
                         <ActivityIndicator
-                            style={[tailwind('mt-4')]}
+                            className="mt-4"
                             size="small"
                             color={ColorScheme.SVG.Default}
                         />
@@ -230,7 +216,7 @@ const AddressOwnership = ({route}: Props) => {
                 {/* Checker Button */}
                 <LongBottomButton
                     disabled={loading}
-                    style={[tailwind('mt-12 w-full items-center')]}
+                    className="mt-12 w-full items-center"
                     title={
                         resultMessage.includes('Address')
                             ? capitalizeFirst(t('clear'))

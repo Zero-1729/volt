@@ -12,8 +12,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {capitalizeFirst} from '../../modules/transform';
 
 import {PlainButton} from '../../components/button';
@@ -34,8 +32,6 @@ const Settings = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
 
@@ -80,23 +76,20 @@ const Settings = () => {
     return (
         <SafeAreaView>
             <View
-                style={[
-                    tailwind('w-full h-full items-center'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
-                <View style={tailwind('w-5/6 mt-4 mb-16')}>
+                className="w-full h-full items-center"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
+                <View className="w-5/6 mt-4 mb-16">
                     <PlainButton
-                        style={tailwind('items-center flex-row -ml-1')}
+                        className="items-center flex-row -ml-1"
                         onPress={() => {
                             navigation.goBack();
                         }}>
                         <Back
-                            style={tailwind('mr-2')}
                             fill={ColorScheme.SVG.Default}
                         />
                         <VText
+                            className=" ml-2 text-sm font-medium"
                             style={[
-                                tailwind('text-sm font-medium'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
@@ -106,20 +99,20 @@ const Settings = () => {
                 </View>
 
                 <View
-                    style={tailwind('justify-center w-full items-center mb-6')}>
+                    className="justify-center w-full items-center mb-6">
                     <VText
+                        className="text-2xl mb-4 w-5/6 font-medium"
                         style={[
-                            tailwind('text-2xl mb-4 w-5/6 font-medium'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
                         {capitalizeFirst(t('settings'))}
                     </VText>
 
-                    <View style={[tailwind('w-full'), HeadingBar]} />
+                    <View className="w-full" style={[HeadingBar]} />
                 </View>
 
-                <View style={[tailwind('w-5/6')]}>
+                <View className="w-5/6">
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
@@ -127,18 +120,16 @@ const Settings = () => {
                             );
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
+                            className={
+                                `items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } justify-between mt-2 mb-6`,
-                                ),
-                            ]}>
+                                    } justify-between mt-2 mb-6`
+                            }>
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -168,18 +159,16 @@ const Settings = () => {
                             );
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
+                            className={
+                                `items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } justify-between mt-2 mb-6`,
-                                ),
-                            ]}>
+                                    } justify-between mt-2 mb-6`
+                            }>
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -187,14 +176,10 @@ const Settings = () => {
                             </VText>
 
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row justify-between items-center',
-                                    ),
-                                ]}>
+                                className="flex-row justify-between items-center">
                                 {langDir === 'right' && (
                                     <Left
-                                        style={[tailwind('mr-2')]}
+                                        className="mr-2"
                                         width={16}
                                         stroke={ColorScheme.SVG.GrayFill}
                                         fill={ColorScheme.SVG.GrayFill}
@@ -202,16 +187,14 @@ const Settings = () => {
                                 )}
 
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            `text-xs ${
+                                    className={
+                                        `text-xs ${
                                                 langDir === 'right'
                                                     ? ''
                                                     : 'mr-2'
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
+                                            }`
+                                    }
+                                    style={{color: ColorScheme.Text.GrayedText}}>
                                     {`${appFiatCurrency.short} (${appFiatCurrency.symbol})`}
                                 </VText>
 
@@ -233,18 +216,14 @@ const Settings = () => {
                             );
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
+                            className={`items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } justify-between mt-2 mb-6`,
-                                ),
-                            ]}>
+                                    } justify-between mt-2 mb-6`}>
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -252,14 +231,10 @@ const Settings = () => {
                             </VText>
 
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row justify-between items-center',
-                                    ),
-                                ]}>
+                                className="flex-row justify-between items-center">
                                 {langDir === 'right' && (
                                     <Left
-                                        style={[tailwind('mr-2')]}
+                                        className="mr-2"
                                         width={16}
                                         stroke={ColorScheme.SVG.GrayFill}
                                         fill={ColorScheme.SVG.GrayFill}
@@ -267,16 +242,12 @@ const Settings = () => {
                                 )}
 
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            `text-xs ${
+                                    className={`text-xs ${
                                                 langDir === 'right'
                                                     ? ''
                                                     : 'mr-2'
-                                            }`,
-                                        ),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
+                                            }`}
+                                    style={{color: ColorScheme.Text.GrayedText}}>
                                     {appLanguage.name}
                                 </VText>
 
@@ -298,18 +269,14 @@ const Settings = () => {
                             );
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
+                            className={`items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } justify-between mt-2 mb-6`,
-                                ),
-                            ]}>
+                                    } justify-between mt-2 mb-6`}>
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -339,18 +306,14 @@ const Settings = () => {
                             );
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
+                            className={`items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } justify-between mt-2 mb-6`,
-                                ),
-                            ]}>
+                                    } justify-between mt-2 mb-6`}>
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -380,18 +343,14 @@ const Settings = () => {
                             );
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
+                            className={`items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } justify-between mt-2 mb-6`,
-                                ),
-                            ]}>
+                                    } justify-between mt-2 mb-6`}>
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -415,22 +374,18 @@ const Settings = () => {
                     </PlainButton>
 
                     <View
-                        style={[
-                            tailwind(
-                                `items-center ${
+                        className={`items-center ${
                                     langDir === 'right'
                                         ? 'flex-row-reverse'
                                         : 'flex-row'
-                                } justify-between mt-4`,
-                            ),
-                        ]}>
+                                } justify-between mt-4`}>
                         <PlainButton
                             onPress={() => {
                                 Linking.openSettings();
                             }}>
                             <VText
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -443,42 +398,32 @@ const Settings = () => {
                 {isDevMode && isWalletInitialized && isAdvancedMode && (
                     <PlainButton
                         onPress={showDialog}
-                        style={[
-                            tailwind('absolute items-center'),
-                            {bottom: bottomOffset[device] + 10},
-                        ]}>
+                        className="absolute items-center"
+                        style={{bottom: bottomOffset[device] + 10}}>
                         <VText
-                            style={[
-                                tailwind(
-                                    'text-sm w-full font-bold text-red-600',
-                                ),
-                            ]}>
+                            className="text-sm w-full font-bold text-red-600">
                             {t('reset_app')}
                         </VText>
                     </PlainButton>
                 )}
 
                 <PlainButton
-                    style={[
-                        tailwind('items-center justify-center absolute'),
-                        {bottom: NativeDims.bottom},
-                    ]}
+                    className="items-center justify-center absolute"
+                    style={{bottom: NativeDims.bottom}}
                     onPress={() => {
                         navigation.dispatch(
                             CommonActions.navigate({name: 'About'}),
                         );
                     }}>
                     <View
-                        style={[
-                            tailwind('self-center p-3 px-12 rounded-full'),
-                            {
+                        className="self-center p-3 px-12 rounded-full"
+                        style={{
                                 backgroundColor:
                                     ColorScheme.Background.Inverted,
-                            },
-                        ]}>
+                            }}>
                         <VText
+                            className="text-sm font-bold"
                             style={[
-                                tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Alt},
                                 Font.RobotoText,
                             ]}>

@@ -2,7 +2,6 @@
 import {Text, View, useColorScheme} from 'react-native';
 import React from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useNavigation} from '@react-navigation/native';
@@ -18,7 +17,6 @@ import BitcoinVault from './../../../assets/svg/bitcoin-vault.svg';
 
 const Welcome = () => {
     const navigation = useNavigation();
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('settings');
@@ -32,16 +30,12 @@ const Welcome = () => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 <View
-                    style={[
-                        tailwind('items-center h-full w-full justify-center'),
-                    ]}>
+                    className="items-center h-full w-full justify-center">
                     <View
-                        style={[
-                            tailwind('items-center w-5/6'),
-                            {marginTop: -64},
-                        ]}>
+                        className="items-center w-5/6"
+                        style={{marginTop: -64}}>
                         <View
                             style={[
                                 {
@@ -63,18 +57,14 @@ const Welcome = () => {
                         </View>
 
                         <Text
-                            style={[
-                                tailwind('text-xl font-bold text-white mb-4'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-xl font-bold text-white mb-4"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('setup_pin_security')}
                         </Text>
 
                         <Text
-                            style={[
-                                tailwind('text-base text-center'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('setup_pin_security_desc')}
                         </Text>
                     </View>

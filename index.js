@@ -1,4 +1,5 @@
 import './shim';
+import './global.css';
 
 import React from 'react';
 import {AppRegistry, StyleSheet} from 'react-native';
@@ -11,19 +12,14 @@ import {AppStorageProvider} from './class/storageContext';
 
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
-import {TailwindProvider} from 'tailwind-rn';
-import utilities from './tailwind.json';
-
 import App from './App';
 
 const AppWithStorage = () => {
     return (
         <AppStorageProvider>
-            <TailwindProvider utilities={utilities}>
-                <GestureHandlerRootView style={styles.root}>
-                    <App />
-                </GestureHandlerRootView>
-            </TailwindProvider>
+            <GestureHandlerRootView style={styles.root}>
+                <App />
+            </GestureHandlerRootView>
         </AppStorageProvider>
     );
 };

@@ -9,7 +9,6 @@ import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {BottomModal} from './bmodal';
 import Color from '../constants/Color';
 
-import {useTailwind} from 'tailwind-rn';
 import {useTranslation} from 'react-i18next';
 import {capitalizeFirst, formatSats} from '../modules/transform';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
@@ -42,7 +41,6 @@ type SwapProps = {
 };
 
 const Swap = (props: SwapProps) => {
-    const tailwind = useTailwind();
     const snapPoints = useMemo(() => ['50'], []);
     const bottomOffset =
         NativeWindowMetrics.bottom - (Platform.OS === 'ios' ? 16 : 72);
@@ -92,13 +90,11 @@ const Swap = (props: SwapProps) => {
             handleIndicatorColor={'#64676E'}
             backdrop={true}>
             <View
-                style={[
-                    tailwind('w-full h-full relative'),
-                    {
+                className="w-full h-full relative"
+                style={{
                         backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
-                <View style={[tailwind('w-full px-2 h-full items-center')]}>
+                    }}>
+                <View className="w-full px-2 h-full items-center">
                     {/* Swap In */}
                     <PlainButton
                         disabled={
@@ -109,37 +105,31 @@ const Swap = (props: SwapProps) => {
                                 setSelected(SwapType.SwapIn);
                             }
                         }}
-                        style={[
-                            tailwind(
-                                `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
-                                    onchainBroke ||
-                                    swapOutLoading ||
-                                    !props.isOnline ||
-                                    props.loadingInfo ||
-                                    props.swapInProgress
-                                        ? 'opacity-60'
-                                        : 'opacity-100'
-                                }`,
-                            ),
-                            {
+                        className={
+                            `items-center p-4 mt-2 w-full mb-4 border rounded-md ${
+                                onchainBroke ||
+                                swapOutLoading ||
+                                !props.isOnline ||
+                                props.loadingInfo ||
+                                props.swapInProgress
+                                    ? 'opacity-60'
+                                    : 'opacity-100'
+                            }`
+                        }
+                        style={{
                                 borderColor: ColorScheme.Background.Greyed,
-                            },
-                        ]}>
+                            }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `w-full ${
+                            className={
+                                `w-full ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    }`,
-                                ),
-                            ]}>
+                                    }`
+                            }>
                             <VText
-                                style={[
-                                    tailwind('text-sm font-semibold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm font-semibold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('swap_in')}
                             </VText>
                             {selected === SwapType.SwapIn &&
@@ -148,40 +138,30 @@ const Swap = (props: SwapProps) => {
                                 !onchainBroke &&
                                 !props.swapInProgress && (
                                     <CheckIcon
-                                        style={[
-                                            tailwind(
-                                                `${
+                                        className={
+                                            `${
                                                     langDir === 'right'
                                                         ? 'mr-2'
                                                         : 'ml-2'
-                                                }`,
-                                            ),
-                                        ]}
+                                                }`
+                                        }
                                         fill={ColorScheme.Text.Default}
                                     />
                                 )}
                         </View>
                         <VText
-                            style={[
-                                tailwind('w-full text-sm mt-2'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="w-full text-sm mt-2"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('swap_in_message')}
                         </VText>
 
                         {props.onchainBalance.lt(props.swapInfo.swapIn.min) && (
                             <View
-                                style={[
-                                    tailwind(
-                                        'w-full items-center flex-row mt-2',
-                                    ),
-                                ]}>
+                                className="w-full items-center flex-row mt-2">
                                 <InfoIcon fill={ColorScheme.SVG.GrayFill} />
                                 <VText
-                                    style={[
-                                        tailwind('text-sm ml-2'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-sm ml-2"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {t('balance_below_min', {
                                         swap_min: formatSats(
                                             new BigNumber(
@@ -204,34 +184,28 @@ const Swap = (props: SwapProps) => {
                                 setSelected(SwapType.SwapOut);
                             }
                         }}
-                        style={[
-                            tailwind(
-                                `items-center p-4 w-full border rounded-md ${
+                        className={
+                            `items-center p-4 w-full border rounded-md ${
                                     lightningBroke ||
                                     swapOutLoading ||
                                     !props.isOnline ||
                                     props.loadingInfo
                                         ? 'opacity-60'
                                         : 'opacity-100'
-                                }`,
-                            ),
-                            {borderColor: ColorScheme.Background.Greyed},
-                        ]}>
+                                }`
+                        }
+                        style={{borderColor: ColorScheme.Background.Greyed}}>
                         <View
-                            style={[
-                                tailwind(
-                                    `w-full ${
+                            className={
+                                `w-full ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    }`,
-                                ),
-                            ]}>
+                                    }`
+                            }>
                             <VText
-                                style={[
-                                    tailwind('text-sm font-semibold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm font-semibold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('swap_out')}
                             </VText>
                             {selected === SwapType.SwapOut &&
@@ -239,24 +213,20 @@ const Swap = (props: SwapProps) => {
                                 !swapOutLoading &&
                                 props.isOnline && (
                                     <CheckIcon
-                                        style={[
-                                            tailwind(
-                                                `${
+                                        className={
+                                            `${
                                                     langDir === 'right'
                                                         ? 'mr-2'
                                                         : 'ml-2'
-                                                }`,
-                                            ),
-                                        ]}
+                                                }`
+                                        }
                                         fill={ColorScheme.Text.Default}
                                     />
                                 )}
                         </View>
                         <VText
-                            style={[
-                                tailwind('w-full text-sm mt-2'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="w-full text-sm mt-2"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('swap_out_message')}
                         </VText>
 
@@ -264,17 +234,11 @@ const Swap = (props: SwapProps) => {
                             props.swapInfo.swapOut.min,
                         ) && (
                             <View
-                                style={[
-                                    tailwind(
-                                        'w-full items-center flex-row mt-2',
-                                    ),
-                                ]}>
+                                className="w-full items-center flex-row mt-2">
                                 <InfoIcon fill={ColorScheme.SVG.GrayFill} />
                                 <VText
-                                    style={[
-                                        tailwind('text-sm ml-2'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-sm ml-2"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {t('balance_below_min', {
                                         swap_min: formatSats(
                                             new BigNumber(
@@ -291,40 +255,34 @@ const Swap = (props: SwapProps) => {
                         swapOutLoading ||
                         props.swapInProgress) && (
                         <View
-                            style={[
-                                tailwind(
-                                    `mt-4 items-center ${
+                            className={
+                                `mt-4 items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    }`,
-                                ),
-                            ]}>
+                                    }`
+                            }>
                             <InfoIcon
                                 width={16}
                                 fill={ColorScheme.SVG.GrayFill}
                             />
                             <VText
-                                style={[
-                                    tailwind(
-                                        `text-sm ${
+                                className={
+                                    `text-sm ${
                                             langDir === 'right'
                                                 ? 'mr-2'
                                                 : 'ml-2'
-                                        }`,
-                                    ),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                        }`
+                                }
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {infoMessage}
                             </VText>
                         </View>
                     )}
 
                     <View
-                        style={[
-                            tailwind('w-full absolute items-center'),
-                            {bottom: bottomOffset},
-                        ]}>
+                        className="w-full absolute items-center"
+                        style={{bottom: bottomOffset}}>
                         <LongBottomButton
                             disabled={disableButton}
                             title={capitalizeFirst(t('continue'))}

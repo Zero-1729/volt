@@ -10,15 +10,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
 
-import {useTailwind} from 'tailwind-rn';
-
 import BigNumber from 'bignumber.js';
 
 import Color from '../../constants/Color';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import Toast from 'react-native-toast-message';
+import {LiberalToast} from '../../components/toast';
 
 import Close from '../../assets/svg/x-24.svg';
 
@@ -51,7 +49,6 @@ import {
 type Props = NativeStackScreenProps<WalletParamList, 'SendAmount'>;
 
 const SendAmount = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -235,30 +232,23 @@ const SendAmount = ({route}: Props) => {
 
     const handleSendRoute = useCallback(() => {
         if (isBelowDust && !route.params.isLightning) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: e('dust_limit_title'),
-                text2: `${e('dust_limit_message')} ${DUST_LIMIT} ${t(
+            LiberalToast(e('dust_limit_title'), `${e('dust_limit_message')} ${DUST_LIMIT} ${t(
                     'satoshi',
-                )}.`,
-                visibilityTime: 1750,
-            });
+                )}.`, {
+                    duration: 3000,
+                });
             return;
         }
 
         if (isNetOn && isLNManual) {
             navigation.dispatch(
-                CommonActions.navigate('WalletRoot', {
-                    screen: 'SendLN',
-                    params: {
-                        lnManualPayload: {
-                            amount: satsAmount.value.toString(),
-                            kind: route.params.lnManualPayload?.kind,
-                            text: route.params.lnManualPayload?.text,
-                            description:
-                                route.params.lnManualPayload?.description,
-                        },
+                CommonActions.navigate('PayLNURL', {
+                    lnManualPayload: {
+                        amount: satsAmount.value.toString(),
+                        kind: route.params.lnManualPayload?.kind,
+                        text: route.params.lnManualPayload?.text,
+                        description:
+                            route.params.lnManualPayload?.description,
                     },
                 }),
             );
@@ -281,30 +271,12 @@ const SendAmount = ({route}: Props) => {
                 }),
             );
         } else {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: e('no_internet_title'),
-                text2: e('no_internet_message'),
-                visibilityTime: 1750,
+            LiberalToast(e('no_internet_title'), e('no_internet_message'), {
+                duration: 3000,
             });
             return;
         }
-    }, [
-        e,
-        isBelowDust,
-        isLNManual,
-        isNetOn,
-        navigation,
-        route.params.invoiceData,
-        route.params.isLightning,
-        route.params.lnManualPayload?.description,
-        route.params.lnManualPayload?.kind,
-        route.params.lnManualPayload?.text,
-        route.params.wallet,
-        satsAmount.value,
-        t,
-    ]);
+    }, [e, isBelowDust, isLNManual, isNetOn, navigation, route.params.invoiceData, route.params.isLightning, route.params.lnManualPayload, route.params.wallet, satsAmount.value, t]);
 
     return (
         <SafeAreaView
@@ -313,37 +285,27 @@ const SendAmount = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                className="w-full h-full items-center justify-center">
                 <View
-                    style={[
-                        tailwind(
-                            'w-5/6 items-center justify-center flex-row absolute top-6 flex',
-                        ),
-                    ]}>
+                    className="w-5/6 items-center justify-center flex-row absolute top-6 flex">
                     <PlainButton
-                        style={[tailwind('absolute left-0 z-10')]}
+                        className="absolute left-0 z-10"
                         onPress={handleCloseButton}>
                         <Close fill={ColorScheme.SVG.Default} width={32} />
                     </PlainButton>
                     <Text
-                        style={[
-                            tailwind('text-sm text-center w-full font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm text-center w-full font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('send'))}
                     </Text>
                 </View>
 
                 {/* Screen for amount */}
                 <View
-                    style={[
-                        tailwind(
-                            'w-full items-center flex justify-center flex -mt-48',
-                        ),
-                    ]}>
+                    className="w-full items-center flex justify-center -mt-48">
                     {/* Top unit */}
                     {!isMax && (
-                        <View style={[tailwind('opacity-40 mb-2')]}>
+                        <View className="opacity-40 mb-2">
                             {!(topUnit?.name === 'sats')
                                 ? renderFiatAmount('text-base')
                                 : renderSatAmount('text-base')}
@@ -354,10 +316,8 @@ const SendAmount = ({route}: Props) => {
                     <View>
                         {isMax && (
                             <Text
-                                style={[
-                                    tailwind('text-4xl font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-4xl font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('max'))}
                             </Text>
                         )}
@@ -376,34 +336,26 @@ const SendAmount = ({route}: Props) => {
                     {/* Set maximum */}
                     {!isMax && (
                         <View
-                            style={[
-                                tailwind('rounded-full px-4 py-1 mt-6'),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className="rounded-full px-4 py-1 mt-6"
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <PlainButton
-                                style={[
-                                    tailwind(
-                                        'flex-row items-center justify-center',
-                                    ),
-                                ]}
+                                className="flex-row items-center justify-center"
                                 disabled={
                                     walletBalance.toString() ===
                                     satsAmount.value.toString()
                                 }
                                 onPress={handleMax}>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm font-bold mr-2'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm font-bold mr-2"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {isMax
                                         ? capitalizeFirst(t('clear'))
                                         : t('use_max')}
                                 </Text>
-                                <View style={[tailwind('justify-center')]}>
+                                <View className="justify-center">
                                     {displayBalance('text-sm')}
                                 </View>
                             </PlainButton>
@@ -421,16 +373,14 @@ const SendAmount = ({route}: Props) => {
 
                 {/* Continue button */}
                 <View
-                    style={[
-                        tailwind(
-                            `absolute w-5/6 ${
-                                isOverBalance || isAmountEmpty
-                                    ? 'opacity-40'
-                                    : ''
-                            }`,
-                        ),
-                        {bottom: bottomOffset.bottom},
-                    ]}>
+                    className={
+                        `absolute w-5/6 ${
+                            isOverBalance || isAmountEmpty
+                                ? 'opacity-40'
+                                : ''
+                        }`
+                    }
+                    style={{bottom: bottomOffset.bottom}}>
                     <LongButton
                         disabled={isAmountEmpty || isOverBalance}
                         onPress={handleSendRoute}

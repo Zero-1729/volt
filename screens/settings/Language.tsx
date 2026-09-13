@@ -16,8 +16,6 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -36,8 +34,6 @@ const Language = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('settings');
 
@@ -61,19 +57,19 @@ const Language = () => {
                     setAppLanguage(item);
                 }}>
                 <View
-                    style={[
-                        tailwind(
-                            `w-5/6 self-center items-center ${
+                    className={
+                        `w-5/6 self-center items-center ${
                                 langDir === 'right'
                                     ? 'flex-row-reverse'
                                     : 'flex-row'
-                            } justify-between mt-3 mb-6 relative`,
-                        ),
+                            } justify-between mt-3 mb-6 relative`
+                    }
+                    style={[
                         index === 0 ? styles.paddedTop : {},
                     ]}>
                     <VText
+                        className="text-sm"
                         style={[
-                            tailwind('text-sm '),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
@@ -81,9 +77,7 @@ const Language = () => {
                     </VText>
 
                     <View
-                        style={[
-                            tailwind('flex-row items-center justify-between'),
-                        ]}>
+                        className="flex-row items-center justify-between">
                         {appLanguage.code === item.code && (
                             <Check width={16} fill={ColorScheme.SVG.Default} />
                         )}
@@ -96,28 +90,27 @@ const Language = () => {
     return (
         <SafeAreaView>
             <View
+                className="w-full h-full"
                 style={[
-                    tailwind('w-full h-full'),
                     {backgroundColor: ColorScheme.Background.Primary},
                 ]}>
                 <View
+                    className="w-full h-full mt-4 items-center"
                     style={[
-                        tailwind('w-full h-full mt-4 items-center'),
                         styles.flexed,
                     ]}>
-                    <View style={tailwind('w-5/6 mb-16')}>
+                    <View className="w-5/6 mb-16">
                         <PlainButton
-                            style={tailwind('items-center flex-row -ml-1')}
+                            className="items-center flex-row -ml-1"
                             onPress={() => {
                                 navigation.goBack();
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
                                 fill={ColorScheme.SVG.Default}
                             />
                             <VText
+                                className="ml-2 text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -127,20 +120,18 @@ const Language = () => {
                     </View>
 
                     <View
-                        style={tailwind('justify-center w-full items-center')}>
+                        className="justify-center w-full items-center">
                         <View
-                            style={[
-                                tailwind(
-                                    `${
+                            className={
+                                `${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } w-5/6 justify-between`,
-                                ),
-                            ]}>
+                                    } w-5/6 justify-between`
+                            }>
                             <VText
+                                className="text-2xl mb-4 font-medium"
                                 style={[
-                                    tailwind('text-2xl mb-4 font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -149,18 +140,16 @@ const Language = () => {
 
                             {/* Highlight current select language here */}
                             <View
+                                className="px-4 py-0 flex-row items-center h-8 rounded-full"
                                 style={[
-                                    tailwind(
-                                        'px-4 py-0 flex-row items-center h-8 rounded-full',
-                                    ),
                                     {
                                         backgroundColor:
                                             ColorScheme.Background.Inverted,
                                     },
                                 ]}>
                                 <VText
+                                    className="text-sm font-bold"
                                     style={[
-                                        tailwind('text-sm font-bold'),
                                         {
                                             color: ColorScheme.Text.Alt,
                                             backgroundColor:
@@ -175,11 +164,11 @@ const Language = () => {
                             </View>
                         </View>
 
-                        <View style={[tailwind('w-full'), HeadingBar]} />
+                        <View className="w-full" style={[HeadingBar]} />
                     </View>
 
                     <FlatList
-                        style={[tailwind('w-full')]}
+                        className="w-full"
                         data={languages}
                         renderItem={renderItem}
                         keyExtractor={item => item.code}

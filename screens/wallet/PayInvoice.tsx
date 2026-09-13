@@ -41,8 +41,6 @@ import {
 } from '../../modules/wallet-utils';
 import {capitalizeFirst, convertBTCtoSats} from '../../modules/transform';
 
-import {useTailwind} from 'tailwind-rn';
-
 import Color from '../../constants/Color';
 
 import BigNumber from 'bignumber.js';
@@ -55,15 +53,15 @@ import {WalletCard} from '../../components/shared';
 import {TInvoiceData} from '../../types/wallet';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
-import {LnInvoice, parseInvoice} from '@breeztech/react-native-breez-sdk';
-import Toast from 'react-native-toast-message';
+import {LnInvoice, nodeInfo, parseInvoice} from '@breeztech/react-native-breez-sdk';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'PayInvoice'>;
 
 const PayInvoice = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -76,7 +74,10 @@ const PayInvoice = ({route}: Props) => {
     );
     const [expiryEpoch, setExpiryEpoch] = useState<number>();
     const [isExpired, setIsExpired] = useState(false);
-    const isNetOn = useNetInfo();
+    const networkState = useNetInfo();
+    const isNetOn = checkNetworkIsReachable(networkState);
+
+    const [paymentToSelf, setPaymentToSelf] = useState(false);
 
     const {hideTotalBalance, getWalletData, currentWalletID} =
         useContext(AppStorageContext);
@@ -106,11 +107,11 @@ const PayInvoice = ({route}: Props) => {
         }
 
         return (
-            <View style={[tailwind('absolute right-0 justify-center')]}>
+            <View className="absolute right-0 justify-center">
                 <ExpiryTimer expiryDate={expiryEpoch} />
             </View>
         );
-    }, [expiryEpoch, isLightning, tailwind]);
+    }, [expiryEpoch, isLightning]);
 
     const decodeInvoice = useCallback((invoice: string) => {
         // Only handling Bolt11 Lightning invoices
@@ -121,6 +122,14 @@ const PayInvoice = ({route}: Props) => {
         const decodedBolt11 = await parseInvoice(invoice);
         setBolt11(decodedBolt11);
         setIsLightning(true);
+
+        // Check and report self payment (LN)
+        const _nodeID = await nodeInfo();
+
+        // Check if bolt11 is self
+        if (bolt11?.payeePubkey === _nodeID.id) {
+            setPaymentToSelf(true);
+        }
 
         setExpiryEpoch(
             getCountdownStart(
@@ -135,7 +144,7 @@ const PayInvoice = ({route}: Props) => {
                 decodedBolt11.expiry as number,
             ),
         );
-    }, []);
+    }, [bolt11?.payeePubkey]);
 
     const handleInvoiceType = useCallback(
         async (invoice: string) => {
@@ -183,12 +192,8 @@ const PayInvoice = ({route}: Props) => {
                     !(invoiceType?.spec === 'bolt11') &&
                     invoiceType.type === 'lightning'
                 ) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: capitalizeFirst(t('error')),
-                        text2: e('unsupported_invoice_type'),
-                        visibilityTime: 1750,
+                    LiberalToast(capitalizeFirst(t('error')), e('unsupported_invoice_type'), {
+                        duration: 3000,
                     });
 
                     navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -203,12 +208,8 @@ const PayInvoice = ({route}: Props) => {
                     ),
                 );
             } else {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: e('invalid_invoice_error'),
-                    visibilityTime: 1750,
+                LiberalToast(capitalizeFirst(t('error')), e('invalid_invoice_error'), {
+                    duration: 3000,
                 });
 
                 navigation.dispatch(CommonActions.navigate('HomeScreen'));
@@ -224,12 +225,8 @@ const PayInvoice = ({route}: Props) => {
         // Check network connection first
         const _netInfo = await netInfo.fetch();
         if (!checkNetworkIsReachable(_netInfo)) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('error')),
-                text2: e('no_internet_message'),
-                visibilityTime: 1750,
+            LiberalToast(capitalizeFirst(t('error')), e('no_internet_message'), {
+                duration: 3000,
             });
             return;
         }
@@ -255,12 +252,8 @@ const PayInvoice = ({route}: Props) => {
         // Check wallet and invoice
         if (
             checkInvoiceAndWallet(_wallet, decodedInvoice, (msg: string) => {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: e(msg),
-                    visibilityTime: 2500,
+                LiberalToast(capitalizeFirst(t('error')), e(msg), {
+                    duration: 2500,
                 });
 
                 // route home
@@ -324,22 +317,14 @@ const PayInvoice = ({route}: Props) => {
             ]}>
             <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
-                style={[
-                    tailwind(
-                        'h-full w-full items-center justify-start relative',
-                    ),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                className="h-full w-full items-center justify-start relative"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <View
-                    style={[
-                        tailwind('w-5/6 items-center flex-row justify-between'),
-                        {marginTop: topPlatformOffset},
-                    ]}>
+                    className="w-5/6 items-center flex-row justify-between"
+                    style={{marginTop: topPlatformOffset}}>
                     <Text
-                        style={[
-                            tailwind('text-center font-bold text-xl w-full'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-center font-bold text-xl w-full"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('pay_invoice_title')}
                     </Text>
                     {displayExpiry}
@@ -347,31 +332,25 @@ const PayInvoice = ({route}: Props) => {
 
                 {/*Display the invoice data */}
                 <View
-                    style={[
-                        tailwind(
-                            `${
-                                invoiceOptionsEmpty ? 'w-5/6 p-2' : 'w-5/6 p-6'
-                            } items-center flex justify-between rounded mt-6`,
-                        ),
-                    ]}>
+                    className={
+                        `${
+                            invoiceOptionsEmpty ? 'w-5/6 p-2' : 'w-5/6 p-6'
+                        } items-center flex justify-between rounded mt-6`
+                    }>
                     {decodedInvoice.options?.label && (
                         <Text
                             numberOfLines={1}
                             ellipsizeMode="middle"
-                            style={[
-                                tailwind(
-                                    'w-full text-center font-bold text-lg mb-2',
-                                ),
-                                {
-                                    color: ColorScheme.Text.Default,
-                                },
-                            ]}>
+                            className="w-full text-center font-bold text-lg mb-2"
+                            style={{
+                                color: ColorScheme.Text.Default,
+                            }}>
                             {decodedInvoice.options.label}
                         </Text>
                     )}
                     {amount && (
                         <View
-                            style={[tailwind('w-full items-center flex mb-2')]}>
+                            className="w-full items-center flex mb-2">
                             <FiatBalance
                                 balance={amount}
                                 loading={false}
@@ -380,8 +359,8 @@ const PayInvoice = ({route}: Props) => {
                                 ignoreHideBalance={true}
                             />
                             <View
+                                className="w-full mt-4"
                                 style={[
-                                    tailwind('w-full mt-4'),
                                     styles.invoiceLineBreaker,
                                     {
                                         borderColor:
@@ -390,16 +369,10 @@ const PayInvoice = ({route}: Props) => {
                                 ]}
                             />
                             <View
-                                style={[
-                                    tailwind(
-                                        'w-full items-center flex-row justify-between mt-4',
-                                    ),
-                                ]}>
+                                className="w-full items-center flex-row justify-between mt-4">
                                 <VText
-                                    style={[
-                                        tailwind('font-bold'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="font-bold"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     Amount
                                 </VText>
                                 <DisplaySatsAmount
@@ -414,23 +387,15 @@ const PayInvoice = ({route}: Props) => {
 
                     {!isLightning && (
                         <View
-                            style={[
-                                tailwind(
-                                    'w-full items-center flex justify-between mb-4',
-                                ),
-                            ]}>
+                            className="w-full items-center flex justify-between mb-4">
                             <VText
-                                style={[
-                                    tailwind('font-bold w-full mb-2'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="font-bold w-full mb-2"
+                                style={{color: ColorScheme.Text.Default}}>
                                 Address
                             </VText>
                             <VText
-                                style={[
-                                    tailwind('w-full'),
-                                    {color: ColorScheme.Text.GrayText},
-                                ]}>
+                                className="w-full"
+                                style={{color: ColorScheme.Text.GrayText}}>
                                 {decodedInvoice.address}
                             </VText>
                         </View>
@@ -440,8 +405,8 @@ const PayInvoice = ({route}: Props) => {
                     {hasMessage && (
                         <>
                             <View
+                                className="w-full mb-4 opacity-20"
                                 style={[
-                                    tailwind('w-full mb-4 opacity-20'),
                                     styles.invoiceLineBreaker,
                                     {
                                         borderColor:
@@ -453,10 +418,8 @@ const PayInvoice = ({route}: Props) => {
                             <Text
                                 numberOfLines={2}
                                 ellipsizeMode="middle"
-                                style={[
-                                    tailwind('font-bold'),
-                                    {color: ColorScheme.Text.GrayText},
-                                ]}>
+                                className="font-bold"
+                                style={{color: ColorScheme.Text.GrayText}}>
                                 {messageText}
                             </Text>
                         </>
@@ -464,9 +427,7 @@ const PayInvoice = ({route}: Props) => {
                 </View>
 
                 <View
-                    style={[
-                        tailwind('w-full items-center justify-center mt-4'),
-                    ]}>
+                    className="w-full items-center justify-center mt-4">
                     <View
                         style={[
                             {
@@ -475,6 +436,7 @@ const PayInvoice = ({route}: Props) => {
                             },
                         ]}>
                         <WalletCard
+                            withBalance={true}
                             loading={false}
                             maxedCard={
                                 wallet.balance.lightning
@@ -492,14 +454,26 @@ const PayInvoice = ({route}: Props) => {
                             unit={wallet.units}
                             navCallback={() => {}}
                         />
+
+                        {/* Show offline message */}
+                        {!isNetOn && <View className="mt-8">
+                            <Text className="text-center text-sm" style={{color: ColorScheme.Text.DescText}}>
+                                {e('no_internet_message')}
+                                </Text>
+                        </View>}
+
+                        {/* Show pay self */}
+                        {paymentToSelf && <View className="mt-4">
+                            <Text className="text-center text-sm" style={{color: ColorScheme.Text.DescText}}>
+                                {t('payment_to_self_detected')}
+                                </Text>
+                        </View>}
                     </View>
                 </View>
 
                 <View
-                    style={[
-                        tailwind('absolute'),
-                        {bottom: NativeWindowMetrics.bottomButtonOffset + 72},
-                    ]}>
+                    className="absolute"
+                    style={{bottom: NativeWindowMetrics.bottomButtonOffset + 72}}>
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
@@ -509,10 +483,8 @@ const PayInvoice = ({route}: Props) => {
                             );
                         }}>
                         <Text
-                            style={[
-                                tailwind('text-sm font-bold'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-sm font-bold"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {capitalizeFirst(t('cancel'))}
                         </Text>
                     </PlainButton>
@@ -522,13 +494,16 @@ const PayInvoice = ({route}: Props) => {
                     disabled={
                         isExpired ||
                         !isNetOn ||
-                        (!bolt11 && Object.keys(decodedInvoice).length === 0)
+                        (!bolt11 && Object.keys(decodedInvoice).length === 0) ||
+                        paymentToSelf
                     }
                     title={t('pay_invoice')}
                     textColor={ColorScheme.Text.Alt}
                     backgroundColor={ColorScheme.Background.Inverted}
                     onPress={handleRoute}
                 />
+
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

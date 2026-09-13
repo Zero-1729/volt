@@ -10,7 +10,7 @@ end
 node_require('react-native/scripts/react_native_pods.rb')
 node_require('react-native-permissions/scripts/setup.rb')
 
-platform :ios, '14.0'
+platform :ios, '26.0'
 prepare_react_native_project!
 
 setup_permissions([
@@ -23,24 +23,6 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-# Force pods to match minimum iOS version for React Native
-# Based on https://github.com/travis-mark/lrn/commit/015854716feadd61a904d5a603b027426472f863
-# Fixes build issue on Xcode Cloud where some pods
-# Use iOS 12 calls despite being set as iOS 11
-# Including a fix for missing arch targets
-def __apply_Xcode_14_3_post_install_workaround(installer)
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      current_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-      minimum_target = '12.4'
-      if current_target.to_f < minimum_target.to_f
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = minimum_target
-      end
-      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-    end
-  end
-end
-
 target 'volt' do
   config = use_native_modules!
 
@@ -50,19 +32,11 @@ target 'volt' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'voltTests' do
-    inherit! :complete
-    # Pods for testing
-  end
-
   post_install do |installer|
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
     )
-    __apply_Xcode_14_3_post_install_workaround(installer)
   end
 end

@@ -2,7 +2,6 @@
 import {Text, View, useColorScheme} from 'react-native';
 import React, {useContext, useState} from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useNavigation} from '@react-navigation/native';
@@ -33,7 +32,7 @@ type Props = NativeStackScreenProps<SettingsParamList, 'ExtKeyTest'>;
 const ExtKeyTest = ({route}: Props) => {
     //TODO: include handling for xprv, ATM the xprv in the descriptor is not the same level as xprv stored from wallet creation/restore.
     const navigation = useNavigation();
-    const tailwind = useTailwind();
+
     const ColorScheme = Color(useColorScheme());
 
     const {getWalletData, currentWalletID} = useContext(AppStorageContext);
@@ -70,62 +69,45 @@ const ExtKeyTest = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
-                <View style={[tailwind('items-center h-full w-full')]}>
+            <View className="w-full h-full items-center">
+                <View className="items-center h-full w-full">
                     <View
-                        style={[
-                            tailwind(
-                                'w-5/6 absolute top-6 flex-row justify-center',
-                            ),
-                        ]}>
+                        className="w-5/6 absolute top-6 flex-row justify-center">
                         <PlainButton
-                            style={[
-                                tailwind(
-                                    'items-center flex-row -ml-1 absolute left-0',
-                                ),
-                            ]}
+                            className="items-center flex-row -ml-1 absolute left-0"
                             onPress={() => {
                                 navigation.dispatch(CommonActions.goBack());
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
                                 fill={ColorScheme.SVG.Default}
                             />
                             <Text
-                                style={[
-                                    tailwind('text-sm font-medium'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="ml-2 text-sm font-medium"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {capitalizeFirst(t('back'))}
                             </Text>
                         </PlainButton>
 
-                        <View style={[tailwind('self-center')]}>
+                        <View className="self-center">
                             <Text
-                                style={[
-                                    tailwind('text-base font-bold'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-base font-bold"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {t('ext_test')}
                             </Text>
                         </View>
                     </View>
                     <View
-                        style={[
-                            tailwind('w-5/6 justify-center items-center'),
-                            {marginTop: 80, marginBottom: 32},
-                        ]}>
+                        className="w-5/6 justify-center items-center"
+                        style={{marginTop: 80, marginBottom: 32}}>
                         <Text
-                            style={[
-                                tailwind('text-base text-center'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('ext_pub_test_desc')}
                         </Text>
                     </View>
 
                     {/* Ext Key */}
-                    <View style={[tailwind('w-5/6')]}>
+                    <View className="w-5/6">
                         <ExtKeyInput
                             handleCorrect={handleExtKeyCorrect}
                             onChangeText={updateKey}
@@ -138,12 +120,10 @@ const ExtKeyTest = ({route}: Props) => {
 
                     {isCorrectExtKey && (
                         <View
-                            style={[
-                                tailwind('items-center w-5/6 absolute'),
-                                {
+                            className="items-center w-5/6 absolute"
+                            style={{
                                     bottom: NativeWindowMetrics.bottomButtonOffset,
-                                },
-                            ]}>
+                                }}>
                             <LongButton
                                 title={capitalizeFirst(t('continue'))}
                                 backgroundColor={

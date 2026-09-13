@@ -3,6 +3,8 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 ![](https://camo.githubusercontent.com/bb4c8c469821e7b1e3f2998bf0c183f700a6597106e2c28c0e62f44b2f53e710/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d3233323332332e7376673f7374796c653d666c61742d737175617265)
 
+**:warning: Warning:** Volt is still in Beta, and very unstable, please do not use it for large amounts of Bitcoin or amounts you do not want to lose.
+
 A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring sovereignty to Global Bitcoiners.
 
 > What are descriptors? [Read more](https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md).
@@ -15,7 +17,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 - Watch Only support
 - Partially Signed Bitcoin Transactions (PSBTs) and Fee Bumping (RBF)
 - Lightning Network support (BOLT11 & LNURL)
-- Internal Wallet Lightning Swaps (Onchain ↔️ Lightning)
+- Internal Wallet Lightning Swaps (Onchain ↔️ Lightning) (Broken, will be fixed in v0.6 release)
 - Multi-lingual (English & Arabic)
 
 ## Official Socials
@@ -29,7 +31,7 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 
 ### Android
 
-- [Download APK](https://github.com/Zero-1729/volt/releases/tag/v0.4.4-beta.1)
+- Android APK coming soon.
 
 ### IOS
 
@@ -53,9 +55,9 @@ A modern descriptor-based Financial Freedom Bitcoin Wallet aimed at restoring so
 - [Bitcoin Development Kit (BDK)](https://github.com/bitcoindevkit)
 - [Breez SDK](https://github.com/breez/breez-sdk)
 
-### Lightning Implementation Overview
+### Lightning Implementation Overview (Spark)
 
-<img src='./assets/breezsdk_greenlight.png' width=720>
+<img src='https://raw.githubusercontent.com/breez/breez-sdk-docs/main/src/images/BreezSDK_Greenlight.png' width=720>
 
 # Translation
 
@@ -75,10 +77,6 @@ yarn install
 
 To run the wallet locally on, and build for, Android or IOS you'll need [Android Studio](https://developer.android.com/studio/) and [Xcode](https://developer.apple.com/xcode/resources/) installed, respectively. 
 
-## Breez SDK And Greenlight Credentials
-
-> Note: If any part of the original `.crt` or `.pem` files are cut out, you will get the Breez SDK error `Generic: transport error`. See documentation [here](https://sdk-doc.breez.technology/guide/production.html#applying-certificates) for more info.
-
 ### Setup Environment file
 
 Create a copy of the `env.example`
@@ -88,20 +86,6 @@ cp env.example .env
 ```
 
 This command creates a `.env` file in the project root `volt/`. Then fill it with the appropriate info.
-
-### Read and Convert the `.crt` and `.pem` Files
-
-You can read and convert the contents of your `client-key.pem` and `client.crt` files as binary/byte data, in their entirety without taking out any parts (e.g. `BEGIN CERTIFICATE / END CERTIFICATE / BEGIN PRIVATE KEY / END PRIVATE KEY`) to hex strings and add them to the `.env` file as `GL_CUSTOM_NOBODY_KEY` and `GL_CUSTOM_NOBODY_CERT`, respectively.
-
-To run the app locally, you'll need to add the Breez SDK Greenlight credentials to the `.env` file:
-
-```sh
-# Contents of the '.env' file
-# ...
-GL_CUSTOM_NOBODY_KEY=YOUR_HEX_STRING
-GL_CUSTOM_NOBODY_CERT=YOUR_HEX
-```
-
 
 ## Development
 
@@ -123,39 +107,54 @@ Due to the way Tailwind works, you'll need to run the following command to build
 $ yarn run dev:tailwind
 ```
 
+### Android
+ 
+```sh
+# Using npm
+npm run android
+ 
+# OR using Yarn
+yarn android
+```
 
-### Running on Android (Virtual) Device
+#### Running on Android (Virtual) Device
 
 - Download and run the latest (stable) version of Android Studio.
 - Launch Android Studio, and Open the project's android folder (`volt/android`).
 - Open the `build.gradle` file in the current folder (`volt/android`), it'll take some time for Android Studio to set up.
 - Navigate to `AVD Manager` under the `Tools` sections of the menu, and click "*Create Virtual Device...*" to create a virtual device.
 - Launch the newly created virtual device by clicking the `Play` in the `Actions` section of the menu.
-
-After setting up the virtual device, run the following in the project root (`volt/`) to launch the emulator:
-
-> The command builds the app and installs it on the virtual device or a connected Android device (if detected). Once launched, the app would take time loading the dependencies. 
-
+ 
+### iOS
+ 
+For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+ 
+The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+ 
 ```sh
-$ yarn run android
+bundle install
 ```
-
-### Running on IOS
-
-To run the app using XCode's IOS emulator, you'll need to install the CocoaPod dependencies:
-
+ 
+Then, and every time you update your native dependencies, run:
+ 
 ```sh
-$ cd ios
-$ yarn pod install
+bundle exec pod install
 ```
-
-After installing the dependencies, to launch the app on the IOS emulator you'll need to navigate to the project root (`volt`) and run:
-
-> Note: If you have issues running the command above, you can also open Xcode and open the `ios/volt.xcworkspace` file and build/run the app from there.
-
+ 
+For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+ 
 ```sh
-yarn run ios
+# Using npm
+npm run ios
+ 
+# OR using Yarn
+yarn ios
 ```
+ 
+If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+
+This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+
 
 # Responsible Disclosure
 

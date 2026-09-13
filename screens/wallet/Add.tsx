@@ -13,8 +13,6 @@ import {AddWalletParamList} from './../../Navigation';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import {AppStorageContext} from '../../class/storageContext';
@@ -38,8 +36,6 @@ const Add = ({route}: Props) => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     const {t} = useTranslation('wallet');
 
     const {isAdvancedMode, isWalletInitialized, setIsAdvancedMode} =
@@ -56,24 +52,22 @@ const Add = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
-                <View style={tailwind('w-5/6 mt-8 mb-16')}>
+                className="w-full h-full items-center"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
+                <View className="w-5/6 mt-8 mb-16">
                     {!route.params?.onboarding && (
                         <PlainButton
-                            style={tailwind('items-center flex-row -ml-1')}
+                            className="items-center flex-row -ml-1"
                             onPress={() => {
                                 navigation.goBack();
                             }}>
                             <Back
-                                style={tailwind('mr-2')}
+                                className="mr-2"
                                 fill={ColorScheme.SVG.Default}
                             />
                             <Text
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -82,50 +76,42 @@ const Add = ({route}: Props) => {
                         </PlainButton>
                     )}
 
-                    <View style={[tailwind('mt-20 mb-10')]}>
+                    <View className="mt-20 mb-10">
                         <VText
-                            style={[
-                                tailwind('font-bold text-2xl'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="font-bold text-2xl"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('add_wallet_title')}
                         </VText>
                         <VText
-                            style={[
-                                tailwind('text-sm'),
-                                {color: ColorScheme.Text.GrayText},
-                            ]}>
+                            className="text-sm"
+                            style={{color: ColorScheme.Text.GrayText}}>
                             {t('add_wallet_description')}
                         </VText>
                     </View>
 
                     {/* Import an existing Wallet */}
                     <View
+                        className="mb-6 rounded-md p-5"
                         style={[
                             styles.cardShadow,
-                            tailwind('mb-6 rounded-md p-5'),
                             {
                                 backgroundColor:
                                     ColorScheme.MiscCardColor.ImportCard,
                             },
                         ]}>
                         <VText
-                            style={[
-                                tailwind('font-bold mt-2 text-white'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="font-bold mt-2 text-white"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('import_title')}
                         </VText>
 
                         <VText
-                            style={[
-                                tailwind('mt-4 mb-2 text-white text-xs'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="mt-4 mb-2 text-white text-xs"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {t('import_description')}
                         </VText>
 
-                        <View style={[tailwind('items-end')]}>
+                        <View className="items-end">
                             <PlainButton
                                 onPress={() => {
                                     // If the wallet is not initialized, then we are on the onboarding screen
@@ -138,19 +124,15 @@ const Add = ({route}: Props) => {
                                     );
                                 }}>
                                 <View
-                                    style={[
-                                        tailwind('px-6 py-2 rounded-full mt-4'),
-                                        {
-                                            backgroundColor:
-                                                ColorScheme.MiscCardColor
-                                                    .ImportCardButton,
-                                        },
-                                    ]}>
+                                    className="px-6 py-2 rounded-full mt-4"
+                                    style={{
+                                        backgroundColor:
+                                            ColorScheme.MiscCardColor
+                                                .ImportCardButton,
+                                    }}>
                                     <Text
+                                        className="text-xs text-white font-bold"
                                         style={[
-                                            tailwind(
-                                                'text-xs text-white font-bold',
-                                            ),
                                             Font.RobotoText,
                                             {color: ColorScheme.Text.GrayText},
                                         ]}>
@@ -174,16 +156,14 @@ const Add = ({route}: Props) => {
                     />
 
                     {isAdvancedMode && (
-                        <View style={[tailwind('mt-6 flex-row')]}>
+                        <View className="mt-6 flex-row">
                             <InfoIcon
                                 width={30}
                                 fill={ColorScheme.SVG.Default}
                             />
                             <Text
-                                style={[
-                                    tailwind('text-xs'),
-                                    {color: ColorScheme.Text.GrayText},
-                                ]}>
+                                className="text-xs"
+                                style={{color: ColorScheme.Text.GrayText}}>
                                 {t('supported_accounts_info')}
                             </Text>
                         </View>
@@ -191,27 +171,23 @@ const Add = ({route}: Props) => {
                 </View>
 
                 <View
+                    className="absolute w-5/6"
                     style={[
-                        tailwind('absolute w-5/6'),
                         styles.advancedModeContainer,
                     ]}>
                     <PlainButton
                         onPress={toggleAdvancedMode}
-                        style={[
-                            tailwind('flex-row self-center justify-center'),
-                        ]}>
+                        className="flex-row self-center justify-center">
                         <Text
-                            style={[
-                                tailwind('text-sm mr-4'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-sm mr-4"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('add_wallet_advanced_mode')}
                         </Text>
                         {/* btn */}
                         <Checkbox
                             disabled={!isAdvancedMode}
                             fillColor={ColorScheme.Background.CheckBoxFilled}
-                            unfillColor={
+                            unFillColor={
                                 ColorScheme.Background.CheckBoxUnfilled
                             }
                             size={18}
@@ -228,16 +204,12 @@ const Add = ({route}: Props) => {
                             }}
                             style={styles.checkBox}
                             onPress={toggleAdvancedMode}
-                            disableBuiltInState={true}
+                            useBuiltInState={false}
                         />
                     </PlainButton>
                     <Text
-                        style={[
-                            tailwind(
-                                'text-xs self-center text-center mt-4 w-5/6',
-                            ),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-xs self-center text-center mt-4 w-5/6"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('add_wallet_advanced_mode_desc')}
                     </Text>
                 </View>

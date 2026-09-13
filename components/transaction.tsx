@@ -2,8 +2,6 @@
 import React, {useContext} from 'react';
 import {View, useColorScheme} from 'react-native';
 
-import {useTailwind} from 'tailwind-rn';
-
 import VText from './text';
 
 import BigNum from 'bignumber.js';
@@ -25,13 +23,10 @@ import SwapIcon from '../assets/svg/arrow-switch-24.svg';
 import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst, formatLocaleDate} from '../modules/transform';
-import {
-    SWAP_IN_LN_DESCRIPTION,
-    SWAP_OUT_LN_DESCRIPTION,
-} from '../modules/wallet-defaults';
+import { PaymentType } from '@breeztech/breez-sdk-spark-react-native';
 
 export const UnifiedTransactionListItem = (props: TxListItemProps) => {
-    if (props.tx.isLightning) {
+    if (props.tx.details?.tag === 'Lightning') {
         return <TransactionLNListItem {...props} />;
     } else {
         return <TransactionListItem {...props} />;
@@ -39,7 +34,6 @@ export const UnifiedTransactionListItem = (props: TxListItemProps) => {
 };
 
 export const TransactionLNListItem = (props: TxListItemProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {i18n} = useTranslation('wallet');
@@ -50,7 +44,8 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
     };
 
     const receiveComp = () => {
-        if (props.tx.description === SWAP_IN_LN_DESCRIPTION) {
+        // TODO: fix displayed swapped tx
+        if (props.tx.method === 1) {
             return <SwapIcon fill={ColorScheme.SVG.Received} />;
         } else {
             return <ArrowDown fill={ColorScheme.SVG.Received} />;
@@ -58,7 +53,7 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
     };
 
     const sendComp = () => {
-        if (props.tx.description === SWAP_OUT_LN_DESCRIPTION) {
+        if (props.tx.method === 1) {
             return <SwapIcon fill={ColorScheme.SVG.Sent} />;
         } else {
             return <ArrowUp fill={ColorScheme.SVG.Sent} />;
@@ -71,48 +66,38 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
                 props.callback ? props.callback() : null;
             }}>
             <View
-                style={[
-                    tailwind(
-                        `${
+                className={
+                    `${
                             langDir === 'right'
                                 ? 'flex-row-reverse'
                                 : 'flex-row'
-                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`,
-                    ),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`
+                }
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <View
-                    style={[
-                        tailwind('flex-row items-center w-5/6'),
-                        {
+                    className="flex-row items-center w-5/6"
+                    style={{
                             marginLeft: 0,
-                        },
-                    ]}>
-                    <View style={[tailwind('w-full ml-1')]}>
+                        }}>
+                    <View className="w-full ml-1">
                         <TXBalance
-                            balance={new BigNum(props.tx.amountMsat / 1000)}
+                            balance={new BigNum(props.tx.amount)}
                             balanceFontSize={'text-lg'}
                             fontColor={ColorScheme.Text.Default}
                         />
                         <VText
-                            style={[
-                                tailwind('text-xs'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
-                            {getTxTimestamp(props.tx.paymentTime)}
+                            className="text-xs"
+                            style={{color: ColorScheme.Text.GrayedText}}>
+                            {getTxTimestamp(props.tx.timestamp)}
                         </VText>
                     </View>
                 </View>
                 <View
-                    style={[
-                        tailwind(
-                            'w-10 h-10 rounded-full items-center justify-center opacity-80',
-                        ),
-                        {
+                    className="w-10 h-10 rounded-full items-center justify-center opacity-80"
+                    style={{
                             backgroundColor: ColorScheme.Background.Secondary,
-                        },
-                    ]}>
-                    {props.tx.paymentType === 'received'
+                        }}>
+                    {props.tx.paymentType === PaymentType.Receive
                         ? receiveComp()
                         : sendComp()}
                 </View>
@@ -122,7 +107,6 @@ export const TransactionLNListItem = (props: TxListItemProps) => {
 };
 
 export const TransactionListItem = (props: TxListItemProps) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const {t, i18n} = useTranslation('wallet');
@@ -140,35 +124,27 @@ export const TransactionListItem = (props: TxListItemProps) => {
                 props.callback ? props.callback() : null;
             }}>
             <View
-                style={[
-                    tailwind(
-                        `${
+                className={
+                    `${
                             langDir === 'right'
                                 ? 'flex-row-reverse'
                                 : 'flex-row'
-                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`,
-                    ),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
+                        } h-20 mb-1 justify-between items-center w-full px-6 py-2 rounded-md`
+                }
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
                 <View
-                    style={[
-                        tailwind(
-                            `flex-row items-center ${
+                    className={
+                        `flex-row items-center ${
                                 props.tx.isSelfOrBoost ? 'w-full' : 'w-5/6'
-                            }`,
-                        ),
-                        {
-                            marginLeft: props.tx.isSelfOrBoost ? -12 : 0,
-                        },
-                    ]}>
-                    <View style={[tailwind('w-full ml-1')]}>
+                            }`
+                    }
+                    style={{marginLeft: props.tx.isSelfOrBoost ? -12 : 0}}>
+                    <View className="w-full ml-1">
                         {props.tx.isSelfOrBoost ? (
-                            <View style={[tailwind('')]}>
+                            <View>
                                 <VText
-                                    style={[
-                                        tailwind('text-lg font-bold'),
-                                        {color: ColorScheme.Text.GrayedText},
-                                    ]}>
+                                    className="text-lg font-bold"
+                                    style={{color: ColorScheme.Text.GrayedText}}>
                                     {isAdvancedMode
                                         ? 'RBF Fee Boost'
                                         : 'Fee Boost'}
@@ -182,10 +158,8 @@ export const TransactionListItem = (props: TxListItemProps) => {
                             />
                         )}
                         <VText
-                            style={[
-                                tailwind('text-xs'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-xs"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {props.tx.confirmed
                                 ? getTxTimestamp(props.tx.timestamp)
                                 : capitalizeFirst(t('unconfirmed'))}
@@ -194,15 +168,11 @@ export const TransactionListItem = (props: TxListItemProps) => {
                 </View>
                 {!props.tx.isSelfOrBoost && (
                     <View
-                        style={[
-                            tailwind(
-                                'w-10 h-10 rounded-full items-center justify-center opacity-80',
-                            ),
-                            {
+                        className="w-10 h-10 rounded-full items-center justify-center opacity-80"
+                        style={{
                                 backgroundColor:
                                     ColorScheme.Background.Secondary,
-                            },
-                        ]}>
+                            }}>
                         {props.tx.type === 'inbound' ? (
                             <ArrowDown fill={ColorScheme.SVG.Received} />
                         ) : (

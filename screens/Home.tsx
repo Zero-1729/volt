@@ -24,50 +24,37 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {InitStackParamList} from '../Navigation';
 
-import Toast from 'react-native-toast-message';
-
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../components/toast';
 
 import VText from '../components/text';
 
 import {useTranslation} from 'react-i18next';
 
-import BDK from 'bdk-rn';
 import BigNumber from 'bignumber.js';
 
 import netInfo, {useNetInfo} from '@react-native-community/netinfo';
-
-import {useTailwind} from 'tailwind-rn';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
 
 import {AppStorageContext} from '../class/storageContext';
 
-import {
-    createBDKWallet,
-    getBdkWalletBalance,
-    getBdkWalletTransactions,
-    syncBdkWallet,
-} from '../modules/bdk';
+import { useWallet } from './../contexts/walletContext'
 
 import Gear from '../assets/svg/gear-24.svg';
-import Bell from '../assets/svg/bell-fill-24.svg';
 import BoltIcon from '../assets/svg/bolt-mono.svg';
 import ScanIcon from '../assets/svg/scan.svg';
 import LightningBoltIcon from '../assets/svg/zap.svg';
+import AddressIcon from '../assets/svg/mention-24.svg';
 import BackupIcon from '../assets/svg/backup.svg';
 
 import Color from '../constants/Color';
-import Font from '../constants/Font';
 
 import {PlainButton} from '../components/button';
 import {WalletCard} from '../components/shared';
 
-import {BaseWallet} from '../class/wallet/base';
-import {TBalance, TTransaction} from '../types/wallet';
-
-import {FiatBalance} from '../components/balance';
+import {TTransaction} from '../types/wallet';
 
 import ArrowUpIcon from '../assets/svg/chevron-up-24.svg';
 
@@ -79,27 +66,25 @@ import {biometricAuth} from '../modules/shared';
 import {
     getUniqueTXs,
     checkNetworkIsReachable,
-    getLNPayments,
     getMiniWallet,
 } from '../modules/wallet-utils';
 import {capitalizeFirst} from '../modules/transform';
 
-import {ENet} from '../types/enums';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'HomeScreen'>;
 
 const Home = ({route}: Props) => {
     const ColorScheme = Color(useColorScheme());
-    const tailwind = useTailwind();
     const navigation = useNavigation();
 
-    const {t} = useTranslation('wallet');
+    const {t, i18n} = useTranslation('wallet');
+    const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
 
     const DarkGrayText = {
         color: ColorScheme.isDarkMode ? '#B8B8B8' : '#656565',
     };
-    const topPlatformOffset = 6 + (Platform.OS === 'android' ? 12 : 0);
+    const topPlatformOffset = 20 + (Platform.OS === 'android' ? 12 : 0);
     const networkState = useNetInfo();
     const isNetOn = checkNetworkIsReachable(networkState);
 
@@ -109,18 +94,18 @@ const Home = ({route}: Props) => {
         currentWalletID,
         setCurrentWalletID,
         getWalletData,
-        updateWalletTransactions,
         updateWalletPayments,
         updateWalletBalance,
         isWalletInitialized,
-        electrumServerURL,
         isAdvancedMode,
         isBiometricsActive,
     } = useContext(AppStorageContext);
 
     const [refreshing, setRefreshing] = useState(false);
     const [loadingBalance, setLoadingBalance] = useState(false);
-    const [bdkWallet, setBdkWallet] = useState<BDK.Wallet>();
+
+    // Set Breez wallet service
+    const _wallet = useWallet();
 
     // Set current wallet data
     const wallet = getWalletData(currentWalletID);
@@ -159,12 +144,8 @@ const Home = ({route}: Props) => {
                 },
                 // prompt error callback
                 error => {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('Biometrics'),
-                        text2: error.message,
-                        visibilityTime: 1750,
+                    LiberalToast(t('Biometrics'), error.message, {
+                        duration: 3000,
                     });
                 },
             );
@@ -175,27 +156,6 @@ const Home = ({route}: Props) => {
         // IF no biometrics, just call on PIN modal
         togglePINPassModal();
     };
-
-    // add the total balances of the wallets
-    const totalBalance: TBalance = wallets.reduce(
-        (accumulator: TBalance, currentValue: BaseWallet) =>
-            // Only show balances from bitcoin mainnet
-            // Don't want user to think their testnet money
-            // is spendable
-            ({
-                onchain: accumulator.onchain.plus(
-                    currentValue.network === ENet.Bitcoin
-                        ? currentValue.balance.onchain
-                        : new BigNumber(0),
-                ),
-                lightning: accumulator.lightning.plus(
-                    currentValue.network === ENet.Bitcoin
-                        ? currentValue.balance.lightning
-                        : new BigNumber(0),
-                ),
-            }),
-        {onchain: new BigNumber(0), lightning: new BigNumber(0)},
-    );
 
     // List out all transactions across all wallets
     const extractAllTransactions = () => {
@@ -226,108 +186,38 @@ const Home = ({route}: Props) => {
         return {allCount: txs.length, filtered: filtered};
     };
 
-    const initWallet = useCallback(async () => {
-        const w = bdkWallet ? bdkWallet : await createBDKWallet(wallet);
-
-        await syncBdkWallet(
-            w,
-            (status: boolean) => {
-                if (process.env.NODE_ENV === 'development' && !status) {
-                    Toast.show({
-                        topOffset: 54,
-                        type: 'Liberal',
-                        text1: t('BDK'),
-                        text2: t('Failed to sync'),
-                        visibilityTime: 1750,
-                    });
-                }
-            },
-            wallet.network,
-            electrumServerURL,
-        );
-
-        return w;
-    }, []);
-
-    // Refresh control
-    const refreshWallet = useCallback(async () => {
-        const w = await initWallet();
-
-        // Check net again, just in case there is a drop mid execution
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            return;
-        }
-
-        // Sync wallet
-        const {balance} = await getBdkWalletBalance(w, wallet.balance.onchain);
-        const {transactions} = await getBdkWalletTransactions(
-            w,
-            wallet.network === 'testnet'
-                ? electrumServerURL.testnet
-                : electrumServerURL.bitcoin,
-        );
-
-        // Kill refreshing
-        setRefreshing(false);
-
-        // Update wallet balance
-        updateWalletBalance(currentWalletID, {
-            onchain: balance,
-            lightning: new BigNumber(0),
-        });
-
-        // Update wallet transactions
-        updateWalletTransactions(currentWalletID, transactions);
-
-        // Kill loading
-        setLoadingBalance(false);
-
-        // set bdk wallet
-        setBdkWallet(w);
-    }, [setRefreshing, networkState]);
-
     const getBalance = async () => {
+        const info = await _wallet.walletInfo();
+
         try {
-            const nodeState = await nodeInfo();
-            const balanceLn = nodeState.channelsBalanceMsat;
+            const balanceLn = new BigNumber(info?.balanceSats || 0);
 
             // Update balance after converting to sats
             updateWalletBalance(currentWalletID, {
                 onchain: new BigNumber(0),
-                lightning: new BigNumber(balanceLn / 1000),
+                lightning: balanceLn,
             });
-        } catch (error: any) {
+        } catch (error) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), (error as Error).message, {
+                    duration: 2000,
                 });
+                return;
             }
-
-            return;
         }
+        return;
     };
 
     const fetchPayments = async () => {
         try {
-            const txs = await getLNPayments(wallet.payments.length);
+            const txs = await _wallet.listPayments();
 
             // Update transactions
-            updateWalletPayments(currentWalletID, txs);
+            updateWalletPayments(currentWalletID, txs as TTransaction[]);
         } catch (error: any) {
             if (process.env.NODE_ENV === 'development' && isAdvancedMode) {
-                Toast.show({
-                    topOffset: 54,
-                    type: 'Liberal',
-                    text1: t('Breez SDK'),
-                    text2: error.message,
-                    visibilityTime: 2000,
+                LiberalToast(t('Breez SDK'), error.message, {
+                    duration: 2000,
                 });
             }
 
@@ -341,14 +231,6 @@ const Home = ({route}: Props) => {
             return;
         }
 
-        // Only attempt load if connected to network
-        const _netInfo = await netInfo.fetch();
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            setLoadingBalance(false);
-            return;
-        }
-
         // start loading
         // Set refreshing
         setLoadingBalance(true);
@@ -359,20 +241,15 @@ const Home = ({route}: Props) => {
             return;
         }
 
-        // Only attempt load if connected to network
-        if (!checkNetworkIsReachable(_netInfo)) {
-            setRefreshing(false);
-            return;
-        }
-
-        // fetch onchain
-        refreshWallet();
-
         // Also call Breez if LN wallet
         if (wallet.type === 'unified') {
             await getBalance();
             await fetchPayments();
         }
+
+        // Stop loading
+        setLoadingBalance(false);
+        setRefreshing(false);
     };
 
     const gotToTransactions = useCallback(() => {
@@ -392,9 +269,7 @@ const Home = ({route}: Props) => {
 
     const goToLNPay = useCallback(() => {
         navigation.dispatch(
-            CommonActions.navigate('WalletRoot', {
-                screen: 'SendLN',
-            }),
+            CommonActions.navigate('PayLNURL'),
         );
     }, []);
 
@@ -420,18 +295,6 @@ const Home = ({route}: Props) => {
         );
     }, []);
 
-    const initWalletSync = useCallback(async () => {
-        const _netInfo = await netInfo.fetch();
-
-        if (
-            isWalletInitialized &&
-            !checkNetworkIsReachable(_netInfo) &&
-            wallet.type !== 'unified'
-        ) {
-            jointSync();
-        }
-    }, []);
-
     const handleWalletRestore = useCallback(async () => {
         const _netInfo = await netInfo.fetch();
 
@@ -448,12 +311,8 @@ const Home = ({route}: Props) => {
             }
 
             // Simple helper to show successful import and navigate back home
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: route.params.restoreMeta.title,
-                text2: route.params.restoreMeta.message,
-                visibilityTime: 1750,
+            LiberalToast(route.params.restoreMeta.title, route.params.restoreMeta.message, {
+                duration: 1750,
             });
 
             // Vibrate to let user know the action was successful
@@ -463,7 +322,7 @@ const Home = ({route}: Props) => {
 
     // Sync wallet on initial load
     useEffect(() => {
-        initWalletSync();
+        jointSync();
 
         () => {
             setRefreshing(false);
@@ -482,26 +341,58 @@ const Home = ({route}: Props) => {
             ]}>
             <BottomSheetModalProvider>
                 <View
-                    style={[
-                        tailwind('h-full items-center justify-start relative'),
-                        {backgroundColor: ColorScheme.Background.Primary},
-                    ]}>
+                    className="h-full items-center justify-start relative"
+                    style={{backgroundColor: ColorScheme.Background.Primary}}>
                     <View
-                        style={[
-                            tailwind(
-                                'w-5/6 h-10 items-center flex-row justify-between',
-                            ),
-                            {marginTop: topPlatformOffset},
-                        ]}>
-                        <PlainButton onPress={() => {}}>
-                            <Bell
-                                fill={ColorScheme.Background.Inverted}
-                                width={24}
-                                height={24}
-                                style={tailwind('-ml-1')}
-                            />
-                        </PlainButton>
+                        className={
+                            `w-5/6 h-10 items-center justify-between ${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse'
+                                        : 'flex-row'
+                                }`
+                        }
+                        style={{marginTop: topPlatformOffset}}>
+                        <View className={
+                            `${
+                                langDir === 'right'
+                                    ? 'flex-row-reverse'
+                                    : 'flex-row'
+                            } justify-center items-center`
+                        }>
+                            <View className={
+                                `${
+                                    langDir === 'right'
+                                        ? 'flex-row-reverse ml-1'
+                                        : 'flex-row mr-1'
+                                } rounded-full p-1 px-4 items-center justify-center flex-row`
+                            } style={[
+                                styles.connectionStatusBorder,
+                                {borderColor: ColorScheme.Background.Secondary},
+                                ]}>
+                                <View className={
+                                    `${
+                                        langDir === 'right'
+                                            ? 'ml-2'
+                                            : 'mr-2'
+                                    }`
+                                } style={[
+                                    styles.connectionStatus,
+                                    {backgroundColor: isNetOn ? 'lightgreen' : ColorScheme.Background.Secondary},
+                                ]}/>
+                                <VText className="text-sm font-bold" style={{color: isNetOn ? ColorScheme.Text.Default : ColorScheme.Text.GrayedText}}>
+                                    {capitalizeFirst(isNetOn ? t('connected') : t('offline'))}
+                                </VText>
+                            </View>
 
+                            {isLightning && 
+                            (loadingBalance ? <ActivityIndicator
+                                    color={ColorScheme.Background.Default}
+                                    className="ml-2"
+                                /> : <LightningBoltIcon width={18} height={18} fill={_wallet.isConnected() ? ColorScheme.SVG.Default : ColorScheme.SVG.GrayFill} />)
+                            }
+                        </View>
+
+                        <View className="flex-row justify-between">
                         <PlainButton
                             onPress={() =>
                                 navigation.dispatch(
@@ -511,73 +402,20 @@ const Home = ({route}: Props) => {
                                 )
                             }>
                             <View
-                                style={[
-                                    tailwind(
-                                        'flex-row justify-between items-center -mr-1',
-                                    ),
-                                ]}>
+                                className="flex-row justify-between items-center -mr-1">
                                 <Gear
                                     width={32}
                                     fill={ColorScheme.SVG.Default}
                                 />
                             </View>
                         </PlainButton>
+                        </View>
                     </View>
 
-                    <View style={[tailwind('w-full h-full mt-2 items-center')]}>
-                        <View
-                            style={tailwind(
-                                'justify-around items-center w-full mb-6',
-                            )}>
-                            {wallets.length > 0 && (
-                                <>
-                                    <VText
-                                        style={[
-                                            tailwind(
-                                                'text-base font-medium mb-1',
-                                            ),
-                                            {
-                                                color: isNetOn
-                                                    ? ColorScheme.Text.Default
-                                                    : ColorScheme.Text
-                                                          .GrayedText,
-                                            },
-                                            Font.RobotoText,
-                                        ]}>
-                                        {!isNetOn
-                                            ? t('offline_balance')
-                                            : t('balance')}
-                                    </VText>
-
-                                    {!hideTotalBalance ? (
-                                        <FiatBalance
-                                            balance={totalBalance.onchain
-                                                .plus(totalBalance.lightning)
-                                                .toNumber()}
-                                            loading={loadingBalance}
-                                            balanceFontSize={'text-3xl'}
-                                            fontColor={ColorScheme.Text.Default}
-                                        />
-                                    ) : (
-                                        <View
-                                            style={[
-                                                tailwind(
-                                                    'rounded-sm w-5/6 mt-1 opacity-80 h-8 flex-row',
-                                                ),
-                                                {
-                                                    backgroundColor:
-                                                        ColorScheme.Background
-                                                            .Greyed,
-                                                },
-                                            ]}
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </View>
-
+                    <View className="w-full h-full mt-6 items-center">
                         {/** Wallet Card */}
                         <View
+                            className="mt-6"
                             style={[
                                 {
                                     height: styles.CardContainer.height,
@@ -585,7 +423,8 @@ const Home = ({route}: Props) => {
                                 },
                             ]}>
                             <WalletCard
-                                // This is for onchain behaviour only
+                                // This is for onchain behavior only
+                                withBalance={false}
                                 maxedCard={
                                     wallet.type !== 'unified' &&
                                     wallet.balance.onchain.isZero() &&
@@ -617,20 +456,20 @@ const Home = ({route}: Props) => {
 
                         {/* Quick Actions */}
                         <View
-                            style={[tailwind('flex-row w-5/6 justify-around')]}>
+                            className={
+                                `mt-4 flex-row ${
+                                        isLightning
+                                            ? 'w-5/6 justify-around'
+                                            : 'w-1/2 justify-center'
+                                    }`
+                            }>
                             {isLightning && (
                                 <PlainButton
                                     onPress={navigateToBoltNFC}
-                                    style={[
-                                        tailwind(
-                                            'flex justify-center items-center',
-                                        ),
-                                    ]}>
+                                    className="flex justify-center items-center">
                                     <View
+                                        className="rounded-full items-center justify-center mb-2"
                                         style={[
-                                            tailwind(
-                                                'rounded-full items-center justify-center mb-2',
-                                            ),
                                             {
                                                 height: 54,
                                                 width: 54,
@@ -647,10 +486,8 @@ const Home = ({route}: Props) => {
                                         />
                                     </View>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className="text-sm"
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {t('bolt_nfc')}
                                     </VText>
                                 </PlainButton>
@@ -658,34 +495,29 @@ const Home = ({route}: Props) => {
 
                             <PlainButton
                                 onPress={goToScan}
-                                style={[
-                                    tailwind(
-                                        'flex justify-center items-center',
-                                    ),
-                                ]}>
+                                className={
+                                    `flex justify-center items-center ${
+                                            !isLightning ? 'mx-6' : ''
+                                        }`
+                                }>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'rounded-full items-center justify-center mb-2',
-                                        ),
-                                        {
+                                    className="rounded-full items-center justify-center mb-2"
+                                    style={{
                                             height: 54,
                                             width: 54,
                                             backgroundColor:
                                                 ColorScheme.Background
                                                     .QuickActionsButton,
-                                        },
-                                    ]}>
+                                        }}>
                                     <ScanIcon
-                                        width={24}
+                                        width={26}
+                                        height={26}
                                         fill={ColorScheme.SVG.Default}
                                     />
                                 </View>
                                 <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {capitalizeFirst(t('scan'))}
                                 </VText>
                             </PlainButton>
@@ -693,34 +525,24 @@ const Home = ({route}: Props) => {
                             {isLightning && (
                                 <PlainButton
                                     onPress={goToLNPay}
-                                    style={[
-                                        tailwind(
-                                            'flex justify-center items-center',
-                                        ),
-                                    ]}>
+                                    className="flex justify-center items-center">
                                     <View
-                                        style={[
-                                            tailwind(
-                                                'rounded-full items-center justify-center mb-2',
-                                            ),
-                                            {
+                                        className="rounded-full items-center justify-center mb-2"
+                                        style={{
                                                 height: 54,
                                                 width: 54,
                                                 backgroundColor:
                                                     ColorScheme.Background
                                                         .QuickActionsButton,
-                                            },
-                                        ]}>
-                                        <LightningBoltIcon
+                                            }}>
+                                        <AddressIcon
                                             width={20}
                                             fill={ColorScheme.SVG.Default}
                                         />
                                     </View>
                                     <VText
-                                        style={[
-                                            tailwind('text-sm'),
-                                            {color: ColorScheme.Text.Default},
-                                        ]}>
+                                        className="text-sm"
+                                        style={{color: ColorScheme.Text.Default}}>
                                         {capitalizeFirst(t('address'))}
                                     </VText>
                                 </PlainButton>
@@ -728,34 +550,28 @@ const Home = ({route}: Props) => {
 
                             <PlainButton
                                 onPress={handleBackupRoute}
-                                style={[
-                                    tailwind(
-                                        'flex justify-center items-center',
-                                    ),
-                                ]}>
+                                className={
+                                    `flex justify-center items-center ${
+                                            !isLightning ? 'mx-6' : ''
+                                        }`
+                                }>
                                 <View
-                                    style={[
-                                        tailwind(
-                                            'rounded-full items-center justify-center mb-2',
-                                        ),
-                                        {
+                                    className="rounded-full items-center justify-center mb-2"
+                                    style={{
                                             height: 54,
                                             width: 54,
                                             backgroundColor:
                                                 ColorScheme.Background
                                                     .QuickActionsButton,
-                                        },
-                                    ]}>
+                                        }}>
                                     <BackupIcon
                                         width={20}
                                         fill={ColorScheme.SVG.Default}
                                     />
                                 </View>
                                 <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {capitalizeFirst(t('backup'))}
                                 </VText>
                             </PlainButton>
@@ -763,25 +579,21 @@ const Home = ({route}: Props) => {
 
                         <PlainButton
                             onPress={gotToTransactions}
-                            style={[
-                                tailwind(
-                                    'w-5/6 absolute flex-row items-center justify-center',
-                                ),
-                                {
+                            className="w-5/6 absolute flex-row items-center justify-center"
+                            style={{
                                     bottom:
                                         NativeWindowMetrics.bottomButtonOffset +
                                         32,
-                                },
-                            ]}>
+                                }}>
                             {extractAllTransactions().filtered.length !== 0 && (
                                 <ArrowUpIcon
                                     width={24}
                                     height={24}
                                     fill={ColorScheme.SVG.GrayFill}
-                                    style={[tailwind('mr-2')]}
+                                    className="mr-2"
                                 />
                             )}
-                            <VText style={[tailwind('text-sm'), DarkGrayText]}>
+                            <VText className="text-sm" style={[ DarkGrayText]}>
                                 {extractAllTransactions().filtered.length === 0
                                     ? t('no_transactions_today')
                                     : extractAllTransactions().filtered
@@ -796,11 +608,13 @@ const Home = ({route}: Props) => {
                             {loadingBalance && (
                                 <ActivityIndicator
                                     color={ColorScheme.Background.Greyed}
-                                    style={tailwind('ml-2')}
+                                    className="ml-2"
                                 />
                             )}
                         </PlainButton>
                     </View>
+
+                    <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
                 </View>
 
                 <PINPass
@@ -817,6 +631,16 @@ const Home = ({route}: Props) => {
 const styles = StyleSheet.create({
     CardContainer: {
         height: 230,
+    },
+    connectionStatusBorder: {
+        paddingHorizontal: 12,
+        borderWidth: 2,
+    },
+    connectionStatus: {
+        margin: 0,
+        height: 8,
+        width: 8,
+        borderRadius: 100,
     },
 });
 

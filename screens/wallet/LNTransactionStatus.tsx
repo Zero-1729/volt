@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {
     Text,
@@ -29,16 +28,7 @@ import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
 import {capitalizeFirst} from '../../modules/transform';
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../constants/Color';
-
-import {
-    Payment,
-    InvoicePaidDetails,
-    PaymentFailedData,
-    BreezEvent,
-} from '@breeztech/react-native-breez-sdk';
-import {EBreezDetails} from './../../types/enums';
 
 import {LongBottomButton} from '../../components/button';
 
@@ -49,16 +39,19 @@ import {FiatBalance} from '../../components/balance';
 import Lottie from 'lottie-react-native';
 
 import eNutsConfetti from '../../assets/lottie/e-nuts-confetti.json';
+import { PaymentType, SdkEvent, SdkEvent_Tags } from '@breeztech/breez-sdk-spark-react-native';
+
+import { useBreezEvent } from '../../contexts/BreezEventContext';
 
 type Props = NativeStackScreenProps<InitStackParamList, 'LNTransactionStatus'>;
 
 const LNTransactionStatus = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
     const navigation = useNavigation();
 
-    const {breezEvent, setBreezEvent, isAdvancedMode} =
+    const {isAdvancedMode} =
         useContext(AppStorageContext);
+    const { breezEvent, setBreezEvent } = useBreezEvent();
 
     const {height, width} = Dimensions.get('window');
 
@@ -68,19 +61,41 @@ const LNTransactionStatus = ({route}: Props) => {
     const {t} = useTranslation('wallet');
 
     const confettiSrc = eNutsConfetti;
-    const receivedPayment = route.params.detailsType === 'received';
+    const receivedPayment = route.params.detailsType === PaymentType.Receive;
+
+    const handleRoute = () => {
+        // Clear breez event
+        // Attempt to sync balance when reload or Breez event triggered
+        // E.g. from completed transaction
+        if (breezEvent?.tag === SdkEvent_Tags.PaymentSucceeded) {
+            // reset Breez event
+            setBreezEvent({} as SdkEvent);
+        }
+
+        // Route to wallet screen
+        navigation.dispatch(CommonActions.reset({
+                index: 1,
+                routes: [
+                {name: 'HomeScreen'},
+                {name: 'WalletRoot', params: {
+                    reload: route.params.status,
+                },
+            }],
+        }));
+    }
 
     const txTitle = () => {
         let msg!: string;
 
-        switch (route.params.detailsType) {
-            case EBreezDetails.Received:
-                msg = t('payment_received');
+        switch (route.params.tag) {
+            case SdkEvent_Tags.PaymentSucceeded:
+                if (receivedPayment) {
+                    msg = t('payment_received');
+                } else {
+                    msg = t('payment_success');
+                }
                 break;
-            case EBreezDetails.Success:
-                msg = t('payment_success');
-                break;
-            case EBreezDetails.Failed:
+            case SdkEvent_Tags.PaymentFailed:
                 msg = t('payment_failed');
                 break;
         }
@@ -89,29 +104,11 @@ const LNTransactionStatus = ({route}: Props) => {
     };
 
     const failedError = route.params.details
-        ? (route.params.details as PaymentFailedData).error
+        ? (route.params.detailsType).tag
         : '';
 
     const sats = () => {
-        let amount!: number;
-
-        switch (route.params.detailsType) {
-            case EBreezDetails.Received:
-                amount =
-                    ((route.params.details as InvoicePaidDetails).payment
-                        ?.amountMsat as number) / 1_000;
-                break;
-            case EBreezDetails.Success:
-                amount = (route.params.details as Payment).amountMsat / 1_000;
-                break;
-            case EBreezDetails.Failed:
-                amount =
-                    ((route.params.details as PaymentFailedData).invoice
-                        ?.amountMsat as number) / 1_000;
-                break;
-        }
-
-        return amount;
+        return route.params.details.amount;
     };
 
     // TEMP: fix iOS animation autoPlay
@@ -145,11 +142,6 @@ const LNTransactionStatus = ({route}: Props) => {
 
         return () => {
             appStateSubscription.remove();
-
-            // Clear the breez event
-            if (breezEvent) {
-                setBreezEvent({} as BreezEvent);
-            }
         };
     }, []);
 
@@ -167,14 +159,14 @@ const LNTransactionStatus = ({route}: Props) => {
             ]}>
             <StatusBar barStyle={ColorScheme.BarStyle.Inverted} />
             <View
+                className="w-full h-full justify-center"
                 style={[
                     styles.statusContainer,
-                    tailwind('w-full h-full justify-center'),
                     {
                         backgroundColor: ColorScheme.Background.Primary,
                     },
                 ]}>
-                <View style={[tailwind('h-full justify-center')]}>
+                <View className="h-full justify-center">
                     {!!route.params.status && (
                         <View
                             style={[
@@ -197,23 +189,17 @@ const LNTransactionStatus = ({route}: Props) => {
                     )}
 
                     <Text
-                        style={[
-                            tailwind(
-                                'text-lg absolute font-bold text-center w-full top-6 px-4',
-                            ),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg absolute font-bold text-center w-full top-6 px-4"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('lightning_invoice')}
                     </Text>
 
                     <View
-                        style={[
-                            tailwind('-mt-12 justify-center px-4 items-center'),
-                        ]}>
-                        <View style={[tailwind('items-center')]}>
+                        className="-mt-12 justify-center px-4 items-center">
+                        <View className="items-center">
                             {!route.params.status && (
                                 <Failed
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -222,7 +208,7 @@ const LNTransactionStatus = ({route}: Props) => {
 
                             {route.params.status && (
                                 <Success
-                                    style={[tailwind('self-center')]}
+                                    className="self-center"
                                     fill={ColorScheme.SVG.Default}
                                     height={128}
                                     width={128}
@@ -230,8 +216,8 @@ const LNTransactionStatus = ({route}: Props) => {
                             )}
                         </View>
 
-                        {route.params.detailsType === 'received' && (
-                            <View style={[tailwind('mt-4 mb-2 items-center')]}>
+                        {receivedPayment && (
+                            <View className="mt-4 mb-2 items-center">
                                 <FiatBalance
                                     balance={sats()}
                                     loading={false}
@@ -243,53 +229,42 @@ const LNTransactionStatus = ({route}: Props) => {
                         )}
 
                         <View
-                            style={[
-                                tailwind(
-                                    `w-4/5 ${
-                                        route.params.detailsType === 'received'
-                                            ? ''
-                                            : 'mt-4'
-                                    } items-center`,
-                                ),
-                            ]}>
+                            className={
+                                `w-4/5 ${
+                                    receivedPayment
+                                        ? ''
+                                        : 'mt-4'
+                                } items-center`
+                            }>
                             <Text
-                                style={[
-                                    tailwind('text-lg'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-lg"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {txTitle()}
                             </Text>
 
                             {route.params.detailsType ===
-                                EBreezDetails.Failed &&
+                                SdkEvent_Tags.PaymentFailed &&
                                 isAdvancedMode && (
                                     <Text
-                                        style={[
-                                            tailwind(
-                                                'text-sm text-center mt-2',
-                                            ),
-                                            {
-                                                color: ColorScheme.Text
-                                                    .GrayedText,
-                                            },
-                                        ]}>
+                                        className="text-sm text-center mt-2"
+                                        style={{
+                                            color: ColorScheme.Text
+                                                .GrayedText,
+                                        }}>
                                         {failedError}
                                     </Text>
                                 )}
                         </View>
 
-                        {route.params.detailsType === 'received' && (
-                            <View style={[tailwind('items-center w-4/5')]}>
+                        {receivedPayment && (
+                            <View className="items-center w-4/5">
                                 <Text
-                                    style={[
-                                        tailwind('text-sm text-center mt-2'),
-                                        {
-                                            color: ColorScheme.Text.GrayedText,
-                                        },
-                                    ]}>
+                                    className="text-sm text-center mt-2"
+                                    style={{
+                                        color: ColorScheme.Text.GrayedText,
+                                    }}>
                                     {
-                                        (route.params.details as Payment)
-                                            .description
+                                        route.params.details.payment.details.inner.paymentHash
                                     }
                                 </Text>
                             </View>
@@ -297,22 +272,9 @@ const LNTransactionStatus = ({route}: Props) => {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('absolute bottom-0 items-center w-full'),
-                        ]}>
+                        className="absolute bottom-0 items-center w-full">
                         <LongBottomButton
-                            onPress={() => {
-                                setBreezEvent({} as BreezEvent);
-
-                                navigation.dispatch(
-                                    CommonActions.navigate('WalletRoot', {
-                                        screen: 'WalletView',
-                                        params: {
-                                            reload: route.params.status,
-                                        },
-                                    }),
-                                );
-                            }}
+                            onPress={handleRoute}
                             title={capitalizeFirst(t('continue'))}
                             textColor={ColorScheme.Text.Alt}
                             backgroundColor={ColorScheme.Background.Inverted}

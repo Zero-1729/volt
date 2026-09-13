@@ -11,7 +11,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import DropDownPicker from 'react-native-dropdown-picker';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useTranslation} from 'react-i18next';
@@ -19,8 +18,8 @@ import {useTranslation} from 'react-i18next';
 import {LongBottomButton, PlainButton} from '../../../components/button';
 import {TextSingleInput} from '../../../components/input';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
-import {toastConfig} from '../../../components/toast';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../../components/toast';
 
 import Close from '../../../assets/svg/x-24.svg';
 import ArrowUp from '../../../assets/svg/chevron-up-16.svg';
@@ -45,6 +44,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst} from '../../../modules/transform';
 import {WalletPaths} from '../../../modules/wallet-defaults';
+import NativeWindowMetrics from '../../../constants/NativeWindowMetrics';
 
 const MnemonicTool = () => {
     const [resultMessage, setResultMessage] = useState('');
@@ -69,7 +69,6 @@ const MnemonicTool = () => {
     const [materials, setMaterials] = useState(supported_materials);
     const [material, setMaterial] = useState(supported_materials[0].value);
 
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -83,13 +82,8 @@ const MnemonicTool = () => {
     const copyXpubToClipboard = () => {
         Clipboard.setString(resultMessage);
 
-        Toast.show({
-            topOffset: 60,
-            type: 'Liberal',
-            text1: capitalizeFirst(t('clipboard')),
-            text2: capitalizeFirst(t('copied_to_clipboard')),
-            visibilityTime: 1000,
-            position: 'top',
+        LiberalToast(capitalizeFirst(t('clipboard')), capitalizeFirst(t('copied_to_clipboard')), {
+            duration: 1000,
         });
     };
 
@@ -187,27 +181,23 @@ const MnemonicTool = () => {
 
     return (
         <SafeAreaView edges={['bottom', 'right', 'left']}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 <View
-                    style={[
-                        tailwind(
-                            `${
+                    className={
+                        `${
                                 langDir === 'right'
                                     ? 'flex-row-reverse'
                                     : 'flex-row'
-                            } items-center justify-center relative mt-6 w-5/6`,
-                        ),
-                    ]}>
+                            } items-center justify-center relative mt-6 w-5/6`
+                    }>
                     <VText
-                        style={[
-                            tailwind('text-lg font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-lg font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {t('mnemonic_converter')}
                     </VText>
 
                     <PlainButton
-                        style={[tailwind('absolute right-0')]}
+                        className="absolute right-0"
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
@@ -216,22 +206,18 @@ const MnemonicTool = () => {
                 </View>
 
                 {/* Content */}
-                <View style={[tailwind('w-5/6'), {marginTop: 64}]}>
+                <View className="w-5/6" style={{marginTop: 64}}>
                     <VText
-                        style={[
-                            tailwind('text-sm'),
-                            {color: ColorScheme.Text.GrayedText},
-                        ]}>
+                        className="text-sm"
+                        style={{color: ColorScheme.Text.GrayedText}}>
                         {t('mnemonic_converter_description')}
                     </VText>
                 </View>
 
                 {/* Input */}
                 <View
-                    style={[
-                        tailwind('w-5/6 mt-6 border-gray-400 px-2'),
-                        {borderWidth: 1, borderRadius: 6},
-                    ]}>
+                    className="w-5/6 mt-6 border-gray-400 px-2"
+                    style={{borderWidth: 1, borderRadius: 6}}>
                     <TextSingleInput
                         refs={inputTextRef}
                         placeholder={t('mnemonic_converter_placeholder')}
@@ -244,25 +230,23 @@ const MnemonicTool = () => {
                 </View>
 
                 {/* Dropdown */}
-                <View style={[tailwind('mt-6 w-5/6 self-center z-50')]}>
+                <View className="mt-6 w-5/6 self-center z-50">
                     <VText
-                        style={[
-                            tailwind('text-sm'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('select_material')}
                     </VText>
 
                     <DropDownPicker
                         style={[
-                            tailwind('rounded-md'),
                             {
                                 backgroundColor:
                                     ColorScheme.Background.Secondary,
                                 borderColor: ColorScheme.Background.Greyed,
+                                borderRadius: '6px',
                             },
                         ]}
-                        containerStyle={[tailwind('mt-2')]}
+                        containerStyle={[{marginTop: 2}]}
                         labelStyle={{color: ColorScheme.Text.Default}}
                         dropDownContainerStyle={{
                             borderColor: ColorScheme.Background.Greyed,
@@ -291,23 +275,21 @@ const MnemonicTool = () => {
 
                 {/* Network choice */}
                 <View
-                    style={tailwind(
+                    className={
                         `w-4/5 mt-4 ${
                             langDir === 'right'
                                 ? 'flex-row-reverse'
                                 : 'flex-row'
-                        } items-center`,
-                    )}>
+                        } items-center`
+                    }>
                     <VText
-                        style={[
-                            tailwind('text-sm'),
-                            {color: ColorScheme.Text.DescText},
-                        ]}>
+                        className="text-sm"
+                        style={{color: ColorScheme.Text.DescText}}>
                         {t('default_testnet')}
                     </VText>
                     <Checkbox
                         fillColor={ColorScheme.Background.CheckBoxFilled}
-                        unfillColor={ColorScheme.Background.CheckBoxUnfilled}
+                        unFillColor={ColorScheme.Background.CheckBoxUnfilled}
                         size={18}
                         isChecked={isTestnet}
                         iconStyle={{
@@ -319,13 +301,11 @@ const MnemonicTool = () => {
                             borderColor: ColorScheme.Background.CheckBoxOutline,
                             borderRadius: 2,
                         }}
-                        style={[
-                            tailwind(
-                                `flex-row absolute ${
+                        className={
+                            `flex-row absolute ${
                                     langDir === 'right' ? 'right-0' : '-right-4'
-                                }`,
-                            ),
-                        ]}
+                                }`
+                        }
                         onPress={() => {
                             RNHapticFeedback.trigger(
                                 'rigid',
@@ -340,31 +320,25 @@ const MnemonicTool = () => {
 
                 {/* Result */}
                 {resultMessage.length > 0 && (
-                    <View style={[tailwind('mt-8 w-5/6')]}>
+                    <View className="mt-8 w-5/6">
                         <VText
-                            style={[
-                                tailwind('text-sm mb-4'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-sm mb-4"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {t('converted_xpub_text')}
                         </VText>
 
                         <PlainButton
-                            style={[
-                                tailwind('rounded p-4'),
-                                {
+                            className="rounded p-4"
+                            style={{
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
-                                },
-                            ]}
+                                }}
                             onPress={() => {
                                 copyXpubToClipboard();
                             }}>
                             <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.Default},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.Default}}>
                                 {resultMessage}
                             </VText>
                         </PlainButton>
@@ -373,7 +347,7 @@ const MnemonicTool = () => {
 
                 {/* Converter Button */}
                 <LongBottomButton
-                    style={[tailwind('mt-12 w-full items-center')]}
+                    className="mt-12 w-full items-center"
                     title={`${
                         resultMessage
                             ? capitalizeFirst(t('clear'))
@@ -393,7 +367,7 @@ const MnemonicTool = () => {
                     }
                 />
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.06}} />
             </View>
         </SafeAreaView>
     );

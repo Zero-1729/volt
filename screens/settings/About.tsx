@@ -25,8 +25,6 @@ import BranchInfo from '../../data/git-branch-data.json';
 
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {PlainButton} from '../../components/button';
 
 import NativeDims from '../../constants/NativeWindowMetrics';
@@ -48,8 +46,6 @@ const About = () => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     const {t, i18n} = useTranslation('settings');
 
     const langDir = i18n.dir() === 'rtl' ? 'right' : 'left';
@@ -59,23 +55,20 @@ const About = () => {
     return (
         <SafeAreaView>
             <View
-                style={[
-                    tailwind('h-full justify-start items-center'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
-                <View style={tailwind('w-5/6 mt-4 mb-16')}>
+                className="h-full justify-start items-center"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
+                <View className="w-5/6 mt-4 mb-16">
                     <PlainButton
-                        style={tailwind('items-center flex-row -ml-1')}
+                        className="items-center flex-row -ml-1"
                         onPress={() => {
                             navigation.goBack();
                         }}>
                         <Back
-                            style={tailwind('mr-2')}
                             fill={ColorScheme.SVG.Default}
                         />
                         <Text
+                            className="ml-2 text-sm font-bold"
                             style={[
-                                tailwind('text-sm font-bold'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
@@ -85,10 +78,10 @@ const About = () => {
                 </View>
 
                 <View
-                    style={tailwind('justify-center w-full items-center mb-8')}>
+                    className="justify-center w-full items-center mb-8">
                     <VText
+                        className="text-2xl mb-4 w-5/6 font-medium"
                         style={[
-                            tailwind('text-2xl mb-4 w-5/6 font-medium'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
@@ -96,9 +89,9 @@ const About = () => {
                     </VText>
 
                     <View
+                        className="w-full"
                         style={[
                             styles.headingBarContainer,
-                            tailwind('w-full'),
                             {
                                 backgroundColor: ColorScheme.HeadingBar,
                             },
@@ -106,24 +99,20 @@ const About = () => {
                     />
                 </View>
 
-                <View style={[tailwind('w-full mb-1')]}>
+                <View className="w-full mb-1">
                     <View
-                        style={[
-                            tailwind(
-                                'flex-row items-center justify-center mb-4',
-                            ),
-                        ]}>
+                        className="flex-row items-center justify-center mb-4">
                         <VoltLogo
                             width={72}
                             height={72}
-                            style={[tailwind('mr-3')]}
+                            className="mr-3"
                         />
                         <VoltText width={98} fill={ColorScheme.SVG.Default} />
                     </View>
 
                     <Text
+                        className="w-5/6 text-sm self-center text-center"
                         style={[
-                            tailwind('w-5/6 text-sm self-center text-center'),
                             {color: ColorScheme.Text.AltGray},
                             Font.RobotoText,
                         ]}>
@@ -131,12 +120,10 @@ const About = () => {
                     </Text>
                 </View>
 
-                <View style={[tailwind('mb-2')]}>
+                <View className="mb-2">
                     <Text
-                        style={[
-                            tailwind('text-center'),
-                            {color: ColorScheme.Text.AltGray},
-                        ]}>
+                        className="text-center"
+                        style={{color: ColorScheme.Text.AltGray}}>
                         v{Package.version} (
                         {`${
                             isAdvancedMode
@@ -147,26 +134,22 @@ const About = () => {
                     </Text>
                 </View>
 
-                <View style={[tailwind('mb-8 w-4/6 items-center')]}>
+                <View className="mb-8 w-4/6 items-center">
                     {isAdvancedMode && BranchInfo.length > 0 && (
                         <View
-                            style={[
-                                tailwind('flex-row px-4 py-1 rounded-full'),
-                                {
+                            className="flex-row px-4 py-1 rounded-full"
+                            style={{
                                     backgroundColor:
                                         ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                                }}>
                             <BranchIcon
-                                style={[tailwind('mr-1')]}
+                                className="mr-1"
                                 fill={ColorScheme.SVG.GrayFill}
                                 width={12}
                             />
                             <Text
-                                style={[
-                                    tailwind('text-xs font-bold'),
-                                    {color: ColorScheme.Text.AltGray},
-                                ]}
+                                className="text-xs font-bold"
+                                style={{color: ColorScheme.Text.AltGray}}
                                 numberOfLines={1}
                                 ellipsizeMode="head">
                                 {BranchInfo}
@@ -175,7 +158,7 @@ const About = () => {
                     )}
                 </View>
 
-                <View style={tailwind('w-5/6')}>
+                <View className="w-5/6">
                     <PlainButton
                         onPress={() => {
                             navigation.dispatch(
@@ -183,18 +166,16 @@ const About = () => {
                             );
                         }}>
                         <View
-                            style={[
-                                tailwind(
-                                    `items-center ${
+                            className={
+                                `items-center ${
                                         langDir === 'right'
                                             ? 'flex-row-reverse'
                                             : 'flex-row'
-                                    } justify-between mt-2`,
-                                ),
-                            ]}>
+                                    } justify-between mt-2`
+                            }>
                             <Text
+                                className="text-sm font-medium"
                                 style={[
-                                    tailwind('text-sm font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -219,10 +200,8 @@ const About = () => {
                 </View>
 
                 <View
-                    style={[
-                        tailwind('w-full absolute items-center justify-center'),
-                        {bottom: NativeDims.bottom},
-                    ]}>
+                    className="w-full absolute items-center justify-center"
+                    style={{bottom: NativeDims.bottom}}>
                     <PlainButton
                         onPress={() => {
                             RNHapticFeedback.trigger(
@@ -234,15 +213,14 @@ const About = () => {
                                 'https://github.com/Zero-1729/volt/',
                             );
                         }}>
-                        <View style={tailwind('flex-row items-center mb-8')}>
+                        <View className="flex-row items-center mb-8">
                             <Github
                                 width={32}
                                 fill={ColorScheme.SVG.Default}
-                                style={tailwind('mr-2')}
                             />
                             <Text
+                                className="ml-2 text-xs font-medium"
                                 style={[
-                                    tailwind('text-xs font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>
@@ -262,15 +240,14 @@ const About = () => {
                                 'https://github.com/Zero-1729/volt/issues/',
                             );
                         }}>
-                        <View style={tailwind('flex-row items-center')}>
+                        <View className="flex-row items-center">
                             <Squirrel
                                 width={32}
                                 fill={ColorScheme.SVG.Default}
-                                style={tailwind('mr-2')}
                             />
                             <Text
+                                className="ml-2 text-xs font-medium"
                                 style={[
-                                    tailwind('text-xs font-medium'),
                                     {color: ColorScheme.Text.Default},
                                     Font.RobotoText,
                                 ]}>

@@ -9,8 +9,6 @@ import {useNavigation, CommonActions} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import VText, {VTextSingle} from '../../components/text';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import BigNumber from 'bignumber.js';
@@ -23,21 +21,17 @@ import Close from '../../assets/svg/x-24.svg';
 
 import NativeWindowMetrics from '../../constants/NativeWindowMetrics';
 
-import Toast, {ToastConfig} from 'react-native-toast-message';
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../components/toast';
 
 import BottomArrow from '../../assets/svg/chevron-down-16.svg';
-
-import netInfo from '@react-native-community/netinfo';
-import {checkNetworkIsReachable} from '../../modules/wallet-utils';
 
 import {
     SATS_TO_BTC_RATE,
     capitalizeFirst,
     formatFiat,
     formatSats,
-    normalizeFiat,
 } from '../../modules/transform';
-import {openChannelFee, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 type DisplayUnit = {
     value: BigNumber;
@@ -52,8 +46,6 @@ import {
     DisplaySatsAmount,
     DisplayBTCAmount,
 } from '../../components/balance';
-import {actionAlert} from '../../components/alert';
-import {toastConfig} from '../../components/toast';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {WalletParamList} from '../../Navigation';
@@ -61,7 +53,6 @@ import {WalletParamList} from '../../Navigation';
 type Props = NativeStackScreenProps<WalletParamList, 'RequestAmount'>;
 
 const RequestAmount = ({route}: Props) => {
-    const tailwind = useTailwind();
     const ColorScheme = Color(useColorScheme());
 
     const navigation = useNavigation();
@@ -74,9 +65,6 @@ const RequestAmount = ({route}: Props) => {
 
     const wallet = getWalletData(currentWalletID);
     const walletType = wallet.type;
-
-    const [breezServicesNotInitialized, setBreezServicesNotInitialized] =
-        useState(false);
 
     const [maxReceivableAmount, updateMaxReceivableAmount] = useState(
         new BigNumber(0),
@@ -101,26 +89,10 @@ const RequestAmount = ({route}: Props) => {
     const [fiatAmount, setFiatAmount] = useState<BigNumber>(new BigNumber(0));
 
     const setMaxReceivableAmount = async () => {
-        try {
-            const nodeState = await nodeInfo();
-
-            updateMaxReceivableAmount(
-                new BigNumber(nodeState.maxReceivableMsat / 1_000),
-            );
-        } catch (error: any) {
-            if (error.message === 'BreezServices not initialized') {
-                setBreezServicesNotInitialized(true);
-
-                Toast.show({
-                    topOffset: 60,
-                    type: 'Liberal',
-                    text1: capitalizeFirst(t('error')),
-                    text2: t('not_connected_to_breez_services'),
-                    position: 'top',
-                    visibilityTime: 2000,
-                });
-            }
-        }
+        // TODO: fix this atrocity
+        updateMaxReceivableAmount(
+            new BigNumber(1_000_000_000),
+        );
     };
 
     const isLightning = walletType === 'unified';
@@ -132,7 +104,7 @@ const RequestAmount = ({route}: Props) => {
         ? capitalizeFirst(t('continue'))
         : capitalizeFirst(t('skip'));
 
-    const disableContinueButtton =
+    const disableContinueButton =
         (route.params?.boltNFCMode && satsAmount.value.isZero()) ||
         (isLightning && !maxReceivableAmount.isZero) ||
         (satsAmount.value.gte(maxReceivableAmount) &&
@@ -140,7 +112,9 @@ const RequestAmount = ({route}: Props) => {
             walletType === 'unified');
 
     useEffect(() => {
-        setMaxReceivableAmount();
+        if (wallet.type === 'unified') {
+            setMaxReceivableAmount();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -150,13 +124,8 @@ const RequestAmount = ({route}: Props) => {
         if (chars.length <= 90) {
             setLNInvoiceDesc(chars);
         } else {
-            Toast.show({
-                topOffset: 60,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('warn')),
-                text2: e('ln_description_length'),
-                position: 'top',
-                visibilityTime: 2000,
+            LiberalToast(capitalizeFirst(t('warn')), e('ln_description_length'), {
+                duration: 2000,
             });
         }
     };
@@ -307,21 +276,6 @@ const RequestAmount = ({route}: Props) => {
         );
     };
 
-    const routeToOnchainReceive = () => {
-        navigation.dispatch(
-            CommonActions.navigate({
-                name: 'Receive',
-                params: {
-                    sats: satsAmount.value.toString(),
-                    fiat: fiatAmount.toString(),
-                    amount: amount,
-                    lnDescription: lnInvoiceDesc,
-                    breezServicesNotInitialized: breezServicesNotInitialized,
-                },
-            }),
-        );
-    };
-
     const routeToReceive = () => {
         navigation.dispatch(
             CommonActions.navigate({
@@ -356,54 +310,9 @@ const RequestAmount = ({route}: Props) => {
         }
 
         if (walletType === 'unified') {
-            // Network check
-            const _netInfo = await netInfo.fetch();
-            if (!checkNetworkIsReachable(_netInfo)) {
-                routeToOnchainReceive();
-                return;
-            }
-
-            if (!shouldSkip && !breezServicesNotInitialized) {
-                const channelOpenFee = await openChannelFee({
-                    amountMsat: satsAmount.value.multipliedBy(1_000).toNumber(),
-                });
-
-                const info = await nodeInfo();
-                const beyondMaxLiquidity = satsAmount.value.gte(
-                    info.inboundLiquidityMsats / 1_000,
-                );
-
-                const feeSats = (channelOpenFee.feeMsat as number) / 1_000;
-
-                // Warn user that amount will trigger a new channel open
-                // In cases were first tx or if larger than channel liquidity
-                if (beyondMaxLiquidity && feeSats > 0) {
-                    actionAlert(
-                        capitalizeFirst(t('channel_opening')),
-                        e('new_channel_open_warn', {
-                            n: feeSats,
-                            fiat: `${appFiatCurrency.symbol} ${normalizeFiat(
-                                new BigNumber(feeSats),
-                                fiatRate.rate,
-                            )}`,
-                        }),
-                        t('ok'),
-                        capitalizeFirst(t('cancel')),
-                        () => routeToReceive,
-                    );
-                    return;
-                }
-
-                // If not beyond max liquidity, route to receive with LN
-                routeToReceive();
-            } else {
-                routeToOnchainReceive();
-                return;
-            }
+            // TODO: handle if offline for on-chain receive
+            routeToReceive();
         }
-
-        routeToOnchainReceive();
-        return;
     };
 
     return (
@@ -413,33 +322,27 @@ const RequestAmount = ({route}: Props) => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[tailwind('w-full h-full items-center justify-center')]}>
+                className="w-full h-full items-center justify-center">
                 <View
-                    style={[
-                        tailwind(
-                            `w-5/6 items-center justify-center ${
-                                isLightning ? 'flex' : 'flex flex-row'
-                            } absolute top-6`,
-                        ),
-                    ]}>
+                    className={
+                        `w-5/6 items-center justify-center ${
+                            isLightning ? 'flex' : 'flex flex-row'
+                        } absolute top-6`
+                    }>
                     <PlainButton
-                        style={[
-                            tailwind(
-                                `absolute left-0 z-10 ${
-                                    isLightning ? 'top-0' : ''
-                                } `,
-                            ),
-                        ]}
+                        className={
+                            `absolute left-0 z-10 ${
+                                isLightning ? 'top-0' : ''
+                            }`
+                        }
                         onPress={() => {
                             navigation.dispatch(CommonActions.goBack());
                         }}>
                         <Close fill={ColorScheme.SVG.Default} width={32} />
                     </PlainButton>
                     <Text
-                        style={[
-                            tailwind('text-sm text-center w-full font-bold'),
-                            {color: ColorScheme.Text.Default},
-                        ]}>
+                        className="text-sm text-center w-full font-bold"
+                        style={{color: ColorScheme.Text.Default}}>
                         {capitalizeFirst(t('receive'))}
                     </Text>
 
@@ -447,26 +350,18 @@ const RequestAmount = ({route}: Props) => {
                     {isLightning && (
                         <PlainButton onPress={updateDescription}>
                             <View
-                                style={[
-                                    tailwind(
-                                        'items-center mt-4 rounded-full px-4 py-1 flex-row',
-                                    ),
-                                    {
-                                        backgroundColor:
-                                            ColorScheme.Background.Greyed,
-                                    },
-                                ]}>
+                                className="items-center mt-4 rounded-full px-4 py-1 flex-row"
+                                style={{
+                                    backgroundColor:
+                                        ColorScheme.Background.Greyed,
+                                }}>
                                 <VText
-                                    style={[
-                                        tailwind(
-                                            'text-sm text-center mr-2 font-bold',
-                                        ),
-                                        {
-                                            color: lnInvoiceDesc
-                                                ? ColorScheme.Text.Default
-                                                : ColorScheme.Text.DescText,
-                                        },
-                                    ]}>
+                                    className="text-sm text-center mr-2 font-bold"
+                                    style={{
+                                        color: lnInvoiceDesc
+                                            ? ColorScheme.Text.Default
+                                            : ColorScheme.Text.DescText,
+                                    }}>
                                     {t('ln_description')}
                                 </VText>
                                 <BottomArrow
@@ -482,12 +377,10 @@ const RequestAmount = ({route}: Props) => {
                     )}
 
                     {isLightning && lnInvoiceDesc.length > 0 && (
-                        <View style={[tailwind('mt-3 w-5/6 items-center')]}>
+                        <View className="mt-3 w-5/6 items-center">
                             <VTextSingle
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {lnInvoiceDesc}
                             </VTextSingle>
                         </View>
@@ -496,13 +389,9 @@ const RequestAmount = ({route}: Props) => {
 
                 {/* Screen for amount */}
                 <View
-                    style={[
-                        tailwind(
-                            'w-full items-center flex justify-center flex -mt-48',
-                        ),
-                    ]}>
+                    className="w-full items-center flex justify-center flex -mt-48">
                     {/* Top unit */}
-                    <View style={[tailwind('opacity-40 mb-2')]}>
+                    <View className="opacity-40 mb-2">
                         {!(topUnit?.name === 'sats')
                             ? renderFiatAmount('text-base')
                             : renderSatAmount('text-base')}
@@ -525,20 +414,16 @@ const RequestAmount = ({route}: Props) => {
                     satsAmount.value.gte(maxReceivableAmount) &&
                     !maxReceivableAmount.isZero() && (
                         <View
-                            style={[
-                                tailwind('mt-12 w-5/6 rounded-sm px-4 py-2'),
-                                {
-                                    backgroundColor:
-                                        ColorScheme.Background.Greyed,
-                                },
-                            ]}>
+                            className="mt-12 w-5/6 rounded-sm px-4 py-2"
+                            style={{
+                                backgroundColor:
+                                    ColorScheme.Background.Greyed,
+                            }}>
                             <VText
-                                style={[
-                                    tailwind('text-sm text-center'),
-                                    {
-                                        color: ColorScheme.Text.GrayText,
-                                    },
-                                ]}>
+                                className="text-sm text-center"
+                                style={{
+                                    color: ColorScheme.Text.GrayText,
+                                }}>
                                 {t('max_receivable_lightning', {
                                     sats: formatSats(maxReceivableAmount),
                                 })}
@@ -555,16 +440,14 @@ const RequestAmount = ({route}: Props) => {
 
                 {/* Continue button */}
                 <View
-                    style={[
-                        tailwind(
-                            `absolute w-5/6 ${
-                                disableContinueButtton ? 'opacity-40' : ''
-                            }`,
-                        ),
-                        {bottom: NativeWindowMetrics.bottom},
-                    ]}>
+                    className={
+                        `absolute w-5/6 ${
+                            disableContinueButton ? 'opacity-40' : ''
+                        }`
+                    }
+                    style={{bottom: NativeWindowMetrics.bottom}}>
                     <LongButton
-                        disabled={disableContinueButtton}
+                        disabled={disableContinueButton}
                         onPress={handleRoute}
                         title={
                             shouldSkip
@@ -575,7 +458,7 @@ const RequestAmount = ({route}: Props) => {
                         backgroundColor={ColorScheme.Background.Inverted}
                     />
                 </View>
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

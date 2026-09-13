@@ -11,6 +11,7 @@ export type BaseProps = PropsWithChildren<{
     onPress?: () => void;
     disabled?: boolean;
     activeOpacity?: number;
+    className?: string;
 }>;
 
 export type VTextProps = {
@@ -18,6 +19,7 @@ export type VTextProps = {
     ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
     style?: React.CSSProperties | StyleProp<ViewStyle>;
     children?: React.ReactNode;
+    className?: string;
 };
 
 export type AppCard = BaseProps & {
@@ -55,6 +57,7 @@ export type CardProps = BaseProps & {
 
 export type WalletCardProps = CardProps & {
     balance: BigNumber;
+    withBalance: boolean;
     walletType: string;
     isWatchOnly: boolean;
     hideBalance: boolean;
@@ -84,7 +87,6 @@ export type BalanceProps = BaseProps & {
     loading: boolean;
     disableFiat: boolean; // false by default
     disabled?: boolean;
-    hideColor: string;
 };
 
 export type FiatBalanceProps = BaseProps & {

@@ -3,6 +3,11 @@ if (typeof Buffer === 'undefined') {
     global.Buffer = require('buffer').Buffer;
 }
 
+// Fix for BigInt issue
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+};
+
 // Polyfill TextEncoder/TextDecoder including TextEncoder().encodeInto
 // https://github.com/anonyco/FastestSmallestTextEncoderDecoder
 require('fastestsmallesttextencoderdecoder-encodeinto');

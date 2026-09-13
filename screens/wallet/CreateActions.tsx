@@ -22,8 +22,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import {AppStorageContext} from '../../class/storageContext';
 
-import {useTailwind} from 'tailwind-rn';
-
 import RNHapticFeedback from 'react-native-haptic-feedback';
 import {RNHapticFeedbackOptions} from '../../constants/Haptic';
 
@@ -56,8 +54,6 @@ const CreateAction = () => {
     const navigation = useNavigation();
 
     const ColorScheme = Color(useColorScheme());
-
-    const tailwind = useTailwind();
 
     const {t, i18n} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
@@ -177,23 +173,21 @@ const CreateAction = () => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind('w-full h-full items-center'),
-                    {backgroundColor: ColorScheme.Background.Primary},
-                ]}>
-                <View style={[tailwind('w-5/6 mt-8')]}>
+                className="w-full h-full items-center"
+                style={{backgroundColor: ColorScheme.Background.Primary}}>
+                <View className="w-5/6 mt-8">
                     <PlainButton
-                        style={tailwind('items-center flex-row -ml-1')}
+                        className="items-center flex-row -ml-1"
                         onPress={() => {
                             navigation.goBack();
                         }}>
                         <Back
-                            style={tailwind('mr-2')}
+                            className="mr-2"
                             fill={ColorScheme.SVG.Default}
                         />
                         <Text
+                            className="text-sm font-medium"
                             style={[
-                                tailwind('text-sm font-medium'),
                                 {color: ColorScheme.Text.Default},
                                 Font.RobotoText,
                             ]}>
@@ -202,16 +196,16 @@ const CreateAction = () => {
                     </PlainButton>
 
                     <VText
+                        className="font-bold text-2xl mt-20"
                         style={[
-                            tailwind('font-bold text-2xl mt-20'),
                             {color: ColorScheme.Text.Default},
                         ]}>
                         {t('create_title')}
                     </VText>
 
                     <VText
+                        className="text-xs mt-2"
                         style={[
-                            tailwind('text-xs mt-2'),
                             {color: ColorScheme.Text.GrayText},
                         ]}>
                         {isAdvancedMode
@@ -226,9 +220,9 @@ const CreateAction = () => {
                     </VText>
 
                     <View
+                        className="mt-10 border-gray-400 px-4 relative"
                         style={[
                             styles.inputContainer,
-                            tailwind('mt-10 border-gray-400 px-4 relative'),
                         ]}>
                         <TextSingleInput
                             maxLength={WALLET_NAME_LENGTH}
@@ -241,20 +235,16 @@ const CreateAction = () => {
                         {/* Input limit */}
                         {newWalletName.trim().length > 0 && (
                             <View
-                                style={[
-                                    tailwind(
-                                        `absolute justify-center h-full ${
+                                className={
+                                    `absolute justify-center h-full ${
                                             langDir === 'right'
                                                 ? 'left-4'
                                                 : 'right-4'
-                                        }`,
-                                    ),
-                                ]}>
+                                    }`
+                                }>
                                 <Text
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {newWalletName.length}/{WALLET_NAME_LENGTH}
                                 </Text>
                             </View>
@@ -262,19 +252,17 @@ const CreateAction = () => {
                     </View>
 
                     {isAdvancedMode && (
-                        <View style={[tailwind('mt-8')]}>
+                        <View className="mt-8">
                             <VText
-                                style={[
-                                    tailwind('text-sm'),
-                                    {color: ColorScheme.Text.DescText},
-                                ]}>
+                                className="text-sm"
+                                style={{color: ColorScheme.Text.DescText}}>
                                 {t('select_account_type')}
                             </VText>
 
                             {/* Dropdown */}
                             <DropDownPicker
                                 style={[
-                                    tailwind('rounded-md'),
+                                    styles.dropDown,
                                     {
                                         backgroundColor:
                                             ColorScheme.Background.Secondary,
@@ -282,7 +270,7 @@ const CreateAction = () => {
                                             ColorScheme.Background.Greyed,
                                     },
                                 ]}
-                                containerStyle={[tailwind('mt-2')]}
+                                containerStyle={[styles.dropDownPicker]}
                                 labelStyle={{color: ColorScheme.Text.Default}}
                                 dropDownContainerStyle={{
                                     borderColor: ColorScheme.Background.Greyed,
@@ -310,12 +298,10 @@ const CreateAction = () => {
                             />
 
                             {/* Wallet Network */}
-                            <View style={[tailwind('mt-10 flex-row')]}>
+                            <View className="mt-10 flex-row">
                                 <VText
-                                    style={[
-                                        tailwind('text-sm'),
-                                        {color: ColorScheme.Text.Default},
-                                    ]}>
+                                    className="text-sm"
+                                    style={{color: ColorScheme.Text.Default}}>
                                     {t('set_testnet')}
                                 </VText>
                                 {/* btn */}
@@ -323,7 +309,7 @@ const CreateAction = () => {
                                     fillColor={
                                         ColorScheme.Background.CheckBoxFilled
                                     }
-                                    unfillColor={
+                                    unFillColor={
                                         ColorScheme.Background.CheckBoxUnfilled
                                     }
                                     size={18}
@@ -339,9 +325,7 @@ const CreateAction = () => {
                                                 .CheckBoxOutline,
                                         borderRadius: 2,
                                     }}
-                                    style={[
-                                        tailwind('flex-row absolute -right-4'),
-                                    ]}
+                                    className="flex-row absolute -right-4"
                                     onPress={() => {
                                         RNHapticFeedback.trigger(
                                             'rigid',
@@ -350,7 +334,7 @@ const CreateAction = () => {
 
                                         toggleNetwork();
                                     }}
-                                    disableBuiltInState={true}
+                                    useBuiltInState={false}
                                 />
                             </View>
                         </View>
@@ -359,15 +343,11 @@ const CreateAction = () => {
 
                 {loading && (
                     <View
-                        style={[
-                            tailwind('absolute'),
-                            {bottom: screenOffsets.bottomButtonOffset + 72},
-                        ]}>
+                        className="absolute"
+                        style={{bottom: screenOffsets.bottomButtonOffset + 72}}>
                         <VText
-                            style={[
-                                tailwind('text-sm mb-4'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="text-sm mb-4"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {t('wallet_generation_text')}
                         </VText>
                         <ActivityIndicator />
@@ -403,4 +383,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 6,
     },
+    dropDown: {
+        borderRadius: '6px'
+    },
+    dropDownPicker: {
+        marginTop: 2,
+    }
 });

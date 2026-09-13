@@ -11,8 +11,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useNavigation} from '@react-navigation/core';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 import {capitalizeFirst} from '../../modules/transform';
 
@@ -28,16 +26,14 @@ const License = () => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     const {t} = useTranslation('settings');
 
     const renderItem = ({item}: {item: string | string[]}) => {
         return (
-            <View style={tailwind('mb-4')}>
+            <View className="mb-4">
                 <Text
+                    className="text-xs"
                     style={[
-                        tailwind('text-xs'),
                         {color: ColorScheme.Text.Default},
                         Font.RobotoText,
                     ]}>
@@ -49,24 +45,22 @@ const License = () => {
 
     return (
         <SafeAreaView edges={['left', 'bottom', 'right']}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 <View
+                    className="w-5/6 my-8 items-center justify-center flex-row"
                     style={[
-                        tailwind(
-                            'w-5/6 my-8 items-center justify-center flex-row',
-                        ),
                         {backgroundColor: ColorScheme.Background.Primary},
                     ]}>
                     <TouchableOpacity
-                        style={tailwind('absolute w-full left-0')}
+                        className="absolute w-full left-0"
                         onPress={() => {
                             navigation.goBack();
                         }}>
                         <Back fill={ColorScheme.SVG.Default} />
                     </TouchableOpacity>
                     <Text
+                        className="text-sm font-medium"
                         style={[
-                            tailwind('text-sm font-medium'),
                             {color: ColorScheme.Text.Default},
                             Font.RobotoText,
                         ]}>
@@ -75,11 +69,9 @@ const License = () => {
                 </View>
 
                 <View
-                    style={[
-                        tailwind('self-center w-full h-full items-center'),
-                    ]}>
+                    className="self-center w-full h-full items-center">
                     <FlatList
-                        style={tailwind('w-5/6 pt-8')}
+                        className="w-5/6 pt-8"
                         data={LICENSE}
                         renderItem={renderItem}
                         keyExtractor={(_item, index) => `${index}`}

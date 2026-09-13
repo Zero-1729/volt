@@ -2,7 +2,6 @@
 import {Text, View, useColorScheme} from 'react-native';
 import React, {useContext} from 'react';
 
-import {useTailwind} from 'tailwind-rn';
 import Color from '../../../constants/Color';
 
 import {useNavigation} from '@react-navigation/native';
@@ -30,12 +29,13 @@ type Props = NativeStackScreenProps<SettingsParamList, 'SetBiometrics'>;
 
 import RNBiometrics from '../../../modules/biometrics';
 import {BiometryTypes} from 'react-native-biometrics';
-import {toastConfig} from '../../../components/toast';
-import Toast, {ToastConfig} from 'react-native-toast-message';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../../../components/toast';
 
 const SetBiometrics = ({route}: Props) => {
     const navigation = useNavigation();
-    const tailwind = useTailwind();
+
     const ColorScheme = Color(useColorScheme());
 
     const {t} = useTranslation('settings');
@@ -56,7 +56,7 @@ const SetBiometrics = ({route}: Props) => {
         if (isWalletInitialized) {
             // Route back to PIN manager
             navigation.dispatch(
-                CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
+                CommonActions.goBack(),
             );
         } else {
             navigation.dispatch(
@@ -90,12 +90,8 @@ const SetBiometrics = ({route}: Props) => {
                             }
                         })
                         .catch((err: any) => {
-                            Toast.show({
-                                topOffset: 54,
-                                type: 'Liberal',
-                                text1: t('Biometrics'),
-                                text2: err.message,
-                                visibilityTime: 1750,
+                            LiberalToast(t('Biometrics'), err.message, {
+                                duration: 3000,
                             });
 
                             setDoneErrorText(err.message);
@@ -114,12 +110,8 @@ const SetBiometrics = ({route}: Props) => {
                             }
                         })
                         .catch((err: any) => {
-                            Toast.show({
-                                topOffset: 54,
-                                type: 'Liberal',
-                                text1: t('Biometrics'),
-                                text2: err.message,
-                                visibilityTime: 1750,
+                            LiberalToast(t('Biometrics'), err.message, {
+                                duration: 3000,
                             });
 
                             setDoneErrorText(err.message);
@@ -127,12 +119,8 @@ const SetBiometrics = ({route}: Props) => {
                 }
             }
         } catch (err: any) {
-            Toast.show({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: t('Biometrics'),
-                text2: err.message,
-                visibilityTime: 1750,
+            LiberalToast(t('Biometrics'), err.message, {
+                duration: 3000,
             });
 
             setDoneErrorText(err.message);
@@ -156,7 +144,7 @@ const SetBiometrics = ({route}: Props) => {
     const skipAlong = () => {
         if (route.params?.standalone) {
             navigation.dispatch(
-                CommonActions.navigate('SettingsRoot', {screen: 'PINManager'}),
+                CommonActions.goBack(),
             );
         } else {
             navigation.dispatch(CommonActions.navigate({name: 'DonePIN'}));
@@ -168,16 +156,12 @@ const SetBiometrics = ({route}: Props) => {
             style={[
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
-            <View style={[tailwind('w-full h-full items-center')]}>
+            <View className="w-full h-full items-center">
                 <View
-                    style={[
-                        tailwind('items-center h-full w-full justify-center'),
-                    ]}>
+                    className="items-center h-full w-full justify-center">
                     <View
-                        style={[
-                            tailwind('items-center w-5/6'),
-                            {marginTop: -64},
-                        ]}>
+                        className="items-center w-5/6"
+                        style={{marginTop: -64}}>
                         {doneSetup && (
                             <Success
                                 fill={ColorScheme.SVG.Default}
@@ -217,10 +201,8 @@ const SetBiometrics = ({route}: Props) => {
                         )}
 
                         <Text
-                            style={[
-                                tailwind('text-xl font-bold text-white mb-2'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-xl font-bold text-white mb-2"
+                            style={{color: ColorScheme.Text.Default}}>
                             {doneSetup
                                 ? t('setup_bio_success')
                                 : doneErrorText
@@ -229,10 +211,8 @@ const SetBiometrics = ({route}: Props) => {
                         </Text>
 
                         <Text
-                            style={[
-                                tailwind('text-base text-center'),
-                                {color: ColorScheme.Text.DescText},
-                            ]}>
+                            className="text-base text-center"
+                            style={{color: ColorScheme.Text.DescText}}>
                             {doneSetup
                                 ? t('setup_bio_done_desc')
                                 : doneErrorText
@@ -242,19 +222,13 @@ const SetBiometrics = ({route}: Props) => {
                     </View>
 
                     <View
-                        style={[
-                            tailwind('absolute w-5/6'),
-                            {bottom: NativeWindowMetrics.bottomButtonOffset},
-                        ]}>
+                        className="absolute w-5/6"
+                        style={{bottom: NativeWindowMetrics.bottomButtonOffset}}>
                         {!doneSetup && !doneErrorText && (
                             <PlainButton onPress={skipAlong}>
                                 <Text
-                                    style={[
-                                        tailwind(
-                                            'text-base text-center font-bold mb-6',
-                                        ),
-                                        {color: ColorScheme.Text.DescText},
-                                    ]}>
+                                    className="text-base text-center font-bold mb-6"
+                                    style={{color: ColorScheme.Text.DescText}}>
                                     {route.params?.standalone
                                         ? capitalizeFirst(t('cancel'))
                                         : capitalizeFirst(t('skip'))}
@@ -271,7 +245,7 @@ const SetBiometrics = ({route}: Props) => {
                     </View>
                 </View>
 
-                <Toast config={toastConfig as ToastConfig} />
+                <Toasts extraInsets={{top: NativeWindowMetrics.height * -0.075}} />
             </View>
         </SafeAreaView>
     );

@@ -6,8 +6,6 @@ import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/core';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useTailwind} from 'tailwind-rn';
-
 import {useTranslation} from 'react-i18next';
 
 import {capitalizeFirst} from '../../modules/transform';
@@ -23,8 +21,6 @@ const DescriptorsInfo = () => {
 
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     const {t} = useTranslation('onboarding');
 
     return (
@@ -33,31 +29,23 @@ const DescriptorsInfo = () => {
                 {flex: 1, backgroundColor: ColorScheme.Background.Primary},
             ]}>
             <View
-                style={[
-                    tailwind(
-                        'w-full h-full relative items-center justify-center',
-                    ),
-                    {
+                className="w-full h-full relative items-center justify-center"
+                style={{
                         backgroundColor: ColorScheme.Background.Primary,
-                    },
-                ]}>
-                <View style={[tailwind('items-center'), {top: -40}]}>
+                    }}>
+                <View className="items-center" style={{top: -40}}>
                     <BitcoinAnthIcon width={256} height={256} />
 
-                    <View style={[tailwind('mt-6 px-8 text-center')]}>
+                    <View className="'mt-6 px-8 text-center">
                         <Text
-                            style={[
-                                tailwind('text-xl font-bold text-center'),
-                                {color: ColorScheme.Text.Default},
-                            ]}>
+                            className="text-xl font-bold text-center"
+                            style={{color: ColorScheme.Text.Default}}>
                             {t('wallet_descriptors')}
                         </Text>
 
                         <Text
-                            style={[
-                                tailwind('mt-4 text-sm text-center'),
-                                {color: ColorScheme.Text.GrayedText},
-                            ]}>
+                            className="mt-4 text-sm text-center"
+                            style={{color: ColorScheme.Text.GrayedText}}>
                             {t('descriptors_gist')}
                         </Text>
                     </View>

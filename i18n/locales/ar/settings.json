@@ -21,7 +21,7 @@
     "connected": "متصل",
     "electrum_server": "الخادم Electrum",
     "custom_electrum_server": "خادم Electrum مخصص",
-    "breez_sdk_info": "يدير Lightning Node والخدمات، بما في ذلك مقايضات Lightning للمحفظة الداخلية",
+    "breez_sdk_info": "يدير خدمات Spark و Lightning",
     "mempool_connection_info": "مصدر لمعدلات رسوم البيتكوين، وازدحام الذاكرة، وحالة بيئة الرسوم",
     "price_at": "السعر في",
     "price_on": "في",
@@ -68,5 +68,6 @@
     "ext_test": "اختبار المفتاح الموسع",
     "ext_pub_test_desc": "لإعادة ضبط رقم التعريف الشخصي PIN الخاص بك، يرجى إدخال مفتاح XPUB الخاص بك للتحقق من ملكية محفظتك.",
     "enter_ext_pub": "أدخل XPUB (على سبيل المثال، xpub...)",
-    "loading_rate": "معدل التحميل..."
+    "loading_rate": "معدل التحميل...",
+    "default_testnet": "Testnet"
 }

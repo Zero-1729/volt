@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import {
     Text,
@@ -12,16 +12,12 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
-import {parseInvoice} from '@breeztech/react-native-breez-sdk';
-
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ScanParamList} from '../Navigation';
 
 import {runOnJS} from 'react-native-reanimated';
 
 import {RNHapticFeedbackOptions} from '../constants/Haptic';
-
-import Toast, {ToastConfig} from 'react-native-toast-message';
 
 import {useTranslation} from 'react-i18next';
 
@@ -31,17 +27,12 @@ import {
     checkInvoiceAndWallet,
     isValidAddress,
     decodeInvoiceType,
-    isLNAddress,
 } from '../modules/wallet-utils';
-
-import {Camera, CameraApi} from 'react-native-camera-kit';
 
 import RNHapticFeedback from 'react-native-haptic-feedback';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NativeWindowMetrics from '../constants/NativeWindowMetrics';
-
-import {useTailwind} from 'tailwind-rn';
 
 import {LongBottomButton, LongButton, PlainButton} from '../components/button';
 
@@ -51,9 +42,15 @@ import Color from '../constants/Color';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import {capitalizeFirst, convertBTCtoSats} from '../modules/transform';
-import {toastConfig} from '../components/toast';
+
+import {Toasts} from '@backpackapp-io/react-native-toast';
+import {LiberalToast} from '../components/toast';
 
 import TorchIcon from '../assets/svg/light-bulb-24.svg';
+
+import {Camera, useCameraDevice, useCodeScanner, CodeScanner, Code} from 'react-native-vision-camera';
+import { AppStorageContext } from '../class/storageContext';
+import { useWallet } from '../contexts/walletContext';
 
 enum Status {
     AUTHORIZED = 'AUTHORIZED',
@@ -66,20 +63,16 @@ type Props = NativeStackScreenProps<ScanParamList, 'Scan'>;
 const LoadingView = (props: any) => {
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     return (
         <SafeAreaView
+            className="justify-center items-center"
             style={[
                 styles.flexed,
                 {backgroundColor: ColorScheme.Background.Primary},
-                tailwind('justify-center items-center'),
             ]}>
             <Text
-                style={[
-                    {color: ColorScheme.Text.DescText},
-                    tailwind('text-sm text-center'),
-                ]}>
+                className="text-sm text-center"
+                style={{color: ColorScheme.Text.DescText}}>
                 {/* Only show loading if actually loading */}
                 {props.isCamAvailable === false
                     ? 'Camera is not available'
@@ -92,28 +85,22 @@ const LoadingView = (props: any) => {
 const RequestPermView = () => {
     const ColorScheme = Color(useColorScheme());
 
-    const tailwind = useTailwind();
-
     return (
         <SafeAreaView
+            className="justify-center items-center bg-black"
             style={[
                 styles.flexed,
-                tailwind('justify-center items-center bg-black'),
             ]}>
             <Text
-                style={[
-                    {color: ColorScheme.Text.Alt},
-                    tailwind('text-sm text-center mb-6'),
-                ]}>
+                className="text-sm text-center mb-6"
+                style={{color: ColorScheme.Text.Alt}}>
                 Camera Permission Denied
             </Text>
 
-            <View style={[tailwind('w-4/5')]}>
+            <View className="w-4/5">
                 <LongButton
-                    style={[
-                        {color: ColorScheme.Text.DescText},
-                        tailwind('text-sm text-center'),
-                    ]}
+                    className="text-sm text-center"
+                    style={{color: ColorScheme.Text.DescText}}
                     onPress={openSettings}
                     backgroundColor={'white'}
                     textColor={'black'}
@@ -129,13 +116,23 @@ const openSettings = () => {
 };
 
 const Scan = ({route}: Props) => {
-    const tailwind = useTailwind();
     const navigation = useNavigation();
+    const ColorScheme = Color(useColorScheme());
+
+    const _breezWallet = useWallet();
 
     const {t} = useTranslation('wallet');
     const {t: e} = useTranslation('errors');
 
     const isGenericScan = route.params.screen === 'home';
+
+    const device = useCameraDevice('back');
+
+    const {currentWalletID,
+            getWalletData,
+        } = useContext(AppStorageContext);
+
+    const walletData = getWalletData(currentWalletID);
 
     // Assume Camera loading until we know otherwise
     // If unavailable, we'll show a message
@@ -144,7 +141,6 @@ const Scan = ({route}: Props) => {
         Status.UNKNOWN,
     );
     const [flashOn, setFlashOn] = useState<boolean>(false);
-    const cameraRef = React.useRef<CameraApi>(null);
 
     const onError = (error: any) => {
         updateScannerMessage(error.message);
@@ -193,6 +189,7 @@ const Scan = ({route}: Props) => {
     const clearScannerAlert = useCallback(() => {
         setScannerAlertMsg('');
         setScanLock(false);
+        setQRData('');
     }, []);
 
     const updateScannerMessage = useCallback((text: string) => {
@@ -202,15 +199,8 @@ const Scan = ({route}: Props) => {
 
     useEffect(() => {
         if (scannerAlertMsg) {
-            runOnJS(Toast.show)({
-                topOffset: 54,
-                type: 'Liberal',
-                text1: capitalizeFirst(t('scanner')),
-                text2: scannerAlertMsg,
-                visibilityTime: 2500,
-                onHide: () => {
-                    clearScannerAlert();
-                },
+            runOnJS(LiberalToast)(capitalizeFirst(t('scanner')),scannerAlertMsg, {
+                duration: 3000,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -226,9 +216,12 @@ const Scan = ({route}: Props) => {
     const processAndRoute = useCallback(
         async (decodedQRState: {
             decodedInvoice: any;
+            spec: string;
             isOnchain: boolean | null;
             error: boolean;
         }) => {
+            // Note: Check and report if broke, according to wallet and invoice type
+            // I.e. do not go through if LN broke and LN invoice, etc.
             if (!decodedQRState.error) {
                 // To highlight the successful scan, we'll trigger a success haptic
                 RNHapticFeedback.trigger(
@@ -238,6 +231,11 @@ const Scan = ({route}: Props) => {
 
                 // If Onchain
                 if (decodedQRState.isOnchain) {
+                    if (walletData.balance.onchain.isZero()) {
+                        updateScannerMessage(e('insufficient_funds'));
+                        return;
+                    }
+
                     const amount = decodedQRState.decodedInvoice.options.amount;
 
                     if (amount) {
@@ -269,16 +267,21 @@ const Scan = ({route}: Props) => {
                         );
                     }
                 } else {
-                    const LNinvoice = decodedQRState.decodedInvoice;
+                    if (walletData.balance.lightning.isZero()) {
+                        updateScannerMessage(e('insufficient_funds'));
+                        return;
+                    }
 
-                    const isBolt11 = !!LNinvoice?.bolt11;
-                    const isLNA = !isBolt11 ? isLNAddress(LNinvoice) : false;
+                    const LNinvoice = decodedQRState.decodedInvoice.inner[0];
+
+                    const isBolt11 = decodedQRState.spec === 'bolt11';
+                    const isLnurlp = decodedQRState.spec === 'lnurlp';
+                    const isLnurlw = decodedQRState.spec === 'lnurlw';
 
                     if (isBolt11) {
                         // If LN Invoice
                         // call on breez to attempt to pay and route screen
-                        const parsedBolt11Invoice = LNinvoice;
-                        const bolt11Msat = parsedBolt11Invoice.amountMsat;
+                        const bolt11Msat = LNinvoice.amountMsat;
 
                         if (!bolt11Msat) {
                             updateScannerMessage(
@@ -295,36 +298,47 @@ const Scan = ({route}: Props) => {
                                     feeRate: 0,
                                     dummyPsbtVsize: 0,
                                     invoiceData: null,
-                                    bolt11: parsedBolt11Invoice,
+                                    bolt11: LNinvoice,
                                 },
                             }),
                         );
                     }
 
-                    if (isLNA) {
-                        // Assumed an LN Address
+                    // Handle LNURLp
+                    // Only handling an LN Address for now not the `lnurlp://` uri
+                    if (isLnurlp) {
                         runOnJS(navigation.dispatch)(
-                            CommonActions.navigate('WalletRoot', {
-                                screen: 'SendLN',
-                                params: {
-                                    lnManualPayload: {
-                                        kind: 'address',
-                                        text: LNinvoice,
-                                        description: '',
-                                        amount: 0,
-                                    },
+                            CommonActions.navigate('PayLNURL', {
+                                lnManualPayload: {
+                                    kind:  'address',
+                                    text: LNinvoice,
+                                    description: '',
+                                    amount: 0,
                                 },
                             }),
                         );
                     }
 
-                    if (!isLNA && !isBolt11) {
-                        updateScannerMessage(t('lightning_not_support'));
+                    // Handle LNURLw
+                    if (isLnurlw) {
+                        const lnurlRaw = LNinvoice;
+
+                        runOnJS(navigation.dispatch)(
+                            CommonActions.navigate('WithdrawLNURL', {
+                                params: {
+                                    lnurl: lnurlRaw,
+                                },
+                            }),
+                        );
+                    }
+
+                    if (!isLnurlp && !isBolt11 && !isLnurlw) {
+                        updateScannerMessage(t('unsupported_lightning'));
                     }
                 }
             }
         },
-        [e, navigation.dispatch, route.params.wallet, t, updateScannerMessage],
+        [e, navigation.dispatch, route.params.wallet, t, updateScannerMessage, walletData.balance.lightning, walletData.balance.onchain],
     );
 
     const handleInvoice = useCallback(
@@ -332,10 +346,11 @@ const Scan = ({route}: Props) => {
             invoice: string,
         ): Promise<{
             decodedInvoice: any;
+            spec: string;
             isOnchain: boolean | null;
             error: any;
         }> => {
-            let decodedInvoice;
+            let decodedBIP21;
 
             // See if single BTC address
             // Handle single btc supported address
@@ -348,57 +363,62 @@ const Scan = ({route}: Props) => {
             // Only support:
             // - Bolt 11 Invoice
             // - Unified and regular BIP21 Invoice
-            // - LNURL
+            // - LNURLw & LNURLp
             if (
                 !(
                     invoiceType.type === 'bitcoin' ||
                     invoiceType.type === 'lightning' ||
-                    invoiceType.type === 'unified' ||
-                    invoiceType.spec === 'lnurl'
+                    invoiceType.type === 'unified'
                 )
             ) {
                 updateScannerMessage(e('unsupported_invoice_type'));
-                return {decodedInvoice: '', isOnchain: null, error: true};
+                return {decodedInvoice: '', isOnchain: null, spec: '', error: true};
             }
 
             // Check if LN invoice and handle separately
-            // Call on Breez to work on this
-            if (invoiceType.type === 'lightning') {
-                const parsedLNURL = invoiceType.invoice.startsWith('lightning:')
-                    ? invoiceType.invoice.split('lightning:')[1]
-                    : invoiceType.invoice;
+            // Call on Breez to work on these
+            // Bolt11
+            if (invoiceType.spec === 'bolt11') {
+                try {
+                    const parsedBolt11Invoice = await _breezWallet.parseInput(invoice);
 
-                // Only support bolt11 for now
-                if (invoiceType.spec === 'bolt11') {
-                    try {
-                        const parsedBolt11Invoice = await parseInvoice(invoice);
-
-                        return {
-                            decodedInvoice: parsedBolt11Invoice,
-                            isOnchain: false,
-                            error: false,
-                        };
-                    } catch (err: any) {
-                        updateScannerMessage(err.message);
-                        return {
-                            decodedInvoice: '',
-                            isOnchain: null,
-                            error: true,
-                        };
-                    }
-                }
-
-                if (invoiceType.spec === 'lnurl' && isLNAddress(parsedLNURL)) {
-                    // LN Address
                     return {
-                        decodedInvoice: parsedLNURL,
+                        decodedInvoice: parsedBolt11Invoice,
+                        spec: 'bolt11',
+                        isOnchain: false,
+                        error: false,
+                    };
+                } catch (err: any) {
+                    updateScannerMessage(err.message);
+                    return {
+                        decodedInvoice: '',
+                        spec: '',
+                        isOnchain: null,
+                        error: true,
+                    };
+                }
+            }
+
+            // LNURL (Pay)
+            if (invoiceType.spec === 'lnurlp') {
+                // LN Address or LNURLp URI
+                return {
+                        decodedInvoice: invoiceType.invoice,
+                        spec: invoiceType.spec as string,
                         isOnchain: false,
                         error: false,
                     };
                 }
 
-                updateScannerMessage(e('unsupported_invoice_type'));
-                return {decodedInvoice: '', isOnchain: null, error: true};
+            // LNURL (Withdraw)
+            if (invoiceType.spec === 'lnurlw') {
+                // LNURL Withdraw
+                return {
+                    decodedInvoice: invoiceType.invoice,
+                    spec: invoiceType.spec,
+                    isOnchain: false,
+                    error: false,
+                };
             }
 
             // Bip21
@@ -417,12 +437,13 @@ const Scan = ({route}: Props) => {
                         ).toLowerCase();
 
                         try {
-                            const parsedBolt11Invoice = await parseInvoice(
+                            const parsedBolt11Invoice = await _breezWallet.parseInput(
                                 bolt11,
                             );
 
                             return {
                                 decodedInvoice: parsedBolt11Invoice,
+                                spec: 'bolt11',
                                 isOnchain: false,
                                 error: false,
                             };
@@ -434,20 +455,21 @@ const Scan = ({route}: Props) => {
 
                 // Attempt to decode BIP21 QR
                 try {
-                    decodedInvoice = decodeURI.decode(invoice);
+                    decodedBIP21 = decodeURI.decode(invoice);
 
                     // BIP21 QR could contain upper case address, so we'll convert to lower case
-                    if (!isValidAddress(decodedInvoice.address.toLowerCase())) {
+                    if (!isValidAddress(decodedBIP21.address.toLowerCase())) {
                         updateScannerMessage(e('invalid_invoice_error'));
                         return {
                             decodedInvoice: '',
+                            spec: 'bip21',
                             isOnchain: null,
                             error: true,
                         };
                     }
                 } catch (err: any) {
                     updateScannerMessage(e('invalid_invoice_error'));
-                    return {decodedInvoice: '', isOnchain: null, error: true};
+                    return {decodedInvoice: '', spec: '', isOnchain: null, error: true};
                 }
             }
 
@@ -455,30 +477,32 @@ const Scan = ({route}: Props) => {
             if (
                 !checkInvoiceAndWallet(
                     route.params.wallet,
-                    decodedInvoice,
+                    decodedBIP21,
                     updateToast,
                 )
             ) {
-                return {decodedInvoice: '', isOnchain: null, error: true};
+                return {decodedInvoice: '', spec: '', isOnchain: null, error: true};
             }
 
-            // TODO: check if this is a fallback for Bip21
+            updateScannerMessage(e('unsupported_invoice_type'));
             return {
-                decodedInvoice: decodedInvoice,
-                isOnchain: true,
-                error: false,
+                decodedInvoice: '',
+                spec: '',
+                isOnchain: invoiceType.type === 'bitcoin',
+                error: true,
             };
         },
-        [e, route.params.wallet, updateScannerMessage, updateToast],
+        [_breezWallet, e, route.params.wallet, updateScannerMessage, updateToast],
     );
 
     const handleQR = useCallback(
-        async (event: any) => {
-            if (scanLock) {
+        async (code: Code) => {
+            // Move if locked or no value
+            if (scanLock || !code.value) {
                 return;
             }
 
-            const qrData = event.nativeEvent.codeStringValue;
+            const qrData = code.value as string;
 
             if (qrData !== _qrData) {
                 setQRData(qrData);
@@ -496,6 +520,7 @@ const Scan = ({route}: Props) => {
 
     useEffect(() => {
         requestCamPerms();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleClipboard = async () => {
@@ -508,114 +533,104 @@ const Scan = ({route}: Props) => {
     const dynamicHeading =
         route.params.screen === 'send' ? t('qr_scan_invoice') : t('qr_scan');
 
+    const codeScanner: CodeScanner = useCodeScanner({
+        codeTypes: ['qr'],
+        onCodeScanned: (codes: Code[]) => {
+            // Note: only handles single code
+            // i,.e. only one QR code at a time; the first prioritized
+            if (codes.length > 0) {
+                const code = codes[0];
+                handleQR(code);
+            }
+        },
+    });
+
     // Display Camera view if camera available
     return (
         <SafeAreaView
-            style={[styles.flexed, tailwind('bg-black')]}
+            style={[styles.flexed]}
             edges={['top', 'bottom', 'left', 'right']}>
             {grantedPermission === Status.AUTHORIZED && (
                 <View
+                    className="items-center justify-center h-full w-full"
                     style={[
-                        tailwind(
-                            'items-center justify-center h-full w-full bg-black',
-                        ),
+                        {backgroundColor: ColorScheme.Background.Primary},
                         styles.flexed,
                     ]}>
                     <View
+                        className="absolute z-10 w-full items-center justify-center"
                         style={[
-                            tailwind(
-                                'absolute top-6 z-10 w-full items-center justify-center',
-                            ),
+                            styles.headerContent,
                         ]}>
                         <View
-                            style={[
-                                tailwind(
-                                    'flex-row mb-6 w-full items-center justify-center',
-                                ),
-                            ]}>
-                            <PlainButton
-                                onPress={closeScreen}
-                                style={[tailwind('absolute z-10 left-6')]}>
-                                <Close fill={'white'} />
-                            </PlainButton>
+                            className="flex-row w-full items-center justify-center">
                             {/* Screen header */}
+                            <View className="items-center rounded-full p-3" style={[
+                                styles.scannerHeader,
+                            ]}>
+                                <Text
+                                    className="text-sm font-bold"
+                                    style={{color: ColorScheme.Text.Default}}>
+                                    {dynamicHeading}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View className="mt-4 p-3 rounded-full" style={[styles.qrHelpText]}>
                             <Text
-                                style={[
-                                    tailwind('text-sm font-bold text-white'),
-                                ]}>
-                                {dynamicHeading}
+                                className="text-sm text-center"
+                                style={{color: ColorScheme.Text.DescText}}>
+                                {!isGenericScan ? t('scan_message_generic') : t('scan_message')}
                             </Text>
                         </View>
                     </View>
 
-                    {/* Scan Area Container */}
-                    <View
-                        style={[
-                            styles.camSectionContainer,
-                            tailwind('items-center justify-end relative'),
-                        ]}>
-                        {/* Cam text info */}
-                        <Text
-                            style={[
-                                tailwind('absolute text-sm text-white top-0'),
-                            ]}>
-                            {isGenericScan
-                                ? t('scan_message_generic')
-                                : t('scan_message')}
-                        </Text>
+                    <View className="absolute items-center" style={[styles.cameraContainer]}>
+                        <PlainButton
+                            onPress={closeScreen}
+                            className="absolute z-10 top-6 left-6 rounded-full p-3"
+                            style={[styles.opaqueBG]}>
+                            <Close fill={'white'} />
+                        </PlainButton>
 
-                        {/* Camera View Container */}
-                        <View
-                            style={[
-                                styles.camContainer,
-                                tailwind('items-center justify-center'),
-                            ]}>
-                            <Camera
-                                style={[
-                                    styles.cameraFlexed,
-                                    StyleSheet.absoluteFillObject,
-                                ]}
-                                onError={onError}
-                                ref={cameraRef}
-                                torchMode={flashOn ? 'on' : 'off'}
-                                scanBarcode={true}
-                                focusMode={'on'}
-                                onReadCode={handleQR}
-                                resizeMode={
-                                    Platform.OS === 'ios' ? 'contain' : 'cover'
-                                }
-                            />
-
-                            {/* Flash Button */}
-                            <PlainButton
-                                onPress={() => setFlashOn(!flashOn)}
-                                style={[
-                                    tailwind('absolute'),
-                                    styles.torchContainer,
-                                ]}>
-                                <View
-                                    style={[
-                                        tailwind('rounded-full p-3'),
-                                        // eslint-disable-next-line react-native/no-inline-styles
-                                        {
-                                            backgroundColor: !flashOn
-                                                ? '#00000080'
-                                                : '#FFFFFFFF',
-                                        },
-                                    ]}>
+                        {/* Flash Button */}
+                        <PlainButton
+                                onPress={() => {
+                                    setFlashOn(!flashOn);
+                                }}
+                                className="absolute z-10 top-6 right-6 rounded-full p-3"
+                                // eslint-disable-next-line react-native/no-inline-styles
+                                style={{
+                                        backgroundColor: !flashOn ? '#00000080' : '#FFFFFFFF',
+                                    }}>
                                     <TorchIcon
                                         fill={!flashOn ? 'white' : 'black'}
                                     />
-                                </View>
                             </PlainButton>
-                        </View>
+
+                        {/* Camera Scan View Container */}
+                        {device && (
+                            <Camera
+                                className="w-full h-full"
+                                style={[
+                                    {backgroundColor: ColorScheme.Background.Primary},
+                                    styles.cameraFlexed,
+                                ]}
+                                device={device}
+                                isActive={true}
+                                codeScanner={codeScanner}
+                                onError={onError}
+                                torch={flashOn ? 'on' : 'off'}
+                                resizeMode={'cover'}
+                            />
+                        )}
                     </View>
 
                     <LongBottomButton
                         onPress={handleClipboard}
                         title={capitalizeFirst(t('paste'))}
-                        textColor={'black'}
-                        backgroundColor={'white'}
+                        textColor={ColorScheme.Text.Alt}
+                        backgroundColor={ColorScheme.Background.Inverted}
                     />
                 </View>
             )}
@@ -627,35 +642,45 @@ const Scan = ({route}: Props) => {
             {/* Display loading or camera unavailable; handle differently */}
             {!Camera && <LoadingView isCamAvailable={true} />}
 
-            <Toast config={toastConfig as ToastConfig} />
+            <Toasts onToastHide={clearScannerAlert} />
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    fullSize: {
+        height: '100%',
+        width: '100%',
+        flex: 1,
+    },
     flexed: {
         flex: 1,
+        height: '100%',
+        width: '100%',
+    },
+    cameraContainer: {
+        height: 400,
+        width: '90%',
+        flex: 1,
+        overflow: 'hidden',
+        borderRadius: 16,
+    },
+    opaqueBG: {
+        backgroundColor: '#00000080',
     },
     cameraFlexed: {
-        flex: 1,
-        borderWidth: 1,
+        borderRadius: 16,
+        borderWidth: 3,
         borderColor: 'white',
     },
-    camSectionContainer: {
-        height: 360,
-        width: NativeWindowMetrics.width * 0.95,
-        marginTop: -64,
+    headerContent: {
+        top: NativeWindowMetrics.height * 0.05,
     },
-    camContainer: {
-        borderColor: 'white',
-        borderWidth: 2,
-        borderRadius: 2,
-        width: NativeWindowMetrics.width * 0.975,
-        height: 320,
+    scannerHeader: {
+        width: NativeWindowMetrics.width * 0.5,
     },
-    torchContainer: {
-        top: 12,
-        right: 12,
+    qrHelpText: {
+        width: NativeWindowMetrics.width * 0.86,
     },
 });
 
