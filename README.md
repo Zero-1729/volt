@@ -158,7 +158,7 @@ This is one way to run your app — you can also build it directly from Android 
 
 # Responsible Disclosure
 
-Email `Zero-1729@protonmail.com` with the title "`volt: bug/vulnerability report`" to disclose any critical bugs or vulnerabilities.
+Email `zero1729@protonmail.com` with the title "`volt: bug/vulnerability report`" to disclose any critical bugs or vulnerabilities.
 
 ---
 
