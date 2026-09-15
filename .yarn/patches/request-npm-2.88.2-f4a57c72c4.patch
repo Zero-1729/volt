@@ -1,0 +1,38 @@
+diff --git a/lib/auth.js b/lib/auth.js
+index 02f203869324c352bdca561be51eba0eb2aabf75..f551adc28b228a9f0f7ea9045890d136cbc48e1d 100644
+--- a/lib/auth.js
++++ b/lib/auth.js
+@@ -1,7 +1,7 @@
+ 'use strict'
+ 
+ var caseless = require('caseless')
+-var uuid = require('uuid/v4')
++var uuid = require('uuid').v4
+ var helpers = require('./helpers')
+ 
+ var md5 = helpers.md5
+diff --git a/lib/multipart.js b/lib/multipart.js
+index 6a009bc1301855215c3e9c0e7810d4fe53250fb7..9012c060b2611b9ffd60475c46dbcd9922147ae6 100644
+--- a/lib/multipart.js
++++ b/lib/multipart.js
+@@ -1,6 +1,6 @@
+ 'use strict'
+ 
+-var uuid = require('uuid/v4')
++var uuid = require('uuid').v4
+ var CombinedStream = require('combined-stream')
+ var isstream = require('isstream')
+ var Buffer = require('safe-buffer').Buffer
+diff --git a/lib/oauth.js b/lib/oauth.js
+index 96de72b8e5f69cddd0b36d5bad22e36d82b5a73b..0ca379058d6b10ab67712685833a19aaa3bf9bc3 100644
+--- a/lib/oauth.js
++++ b/lib/oauth.js
+@@ -3,7 +3,7 @@
+ var url = require('url')
+ var qs = require('qs')
+ var caseless = require('caseless')
+-var uuid = require('uuid/v4')
++var uuid = require('uuid').v4
+ var oauth = require('oauth-sign')
+ var crypto = require('crypto')
+ var Buffer = require('safe-buffer').Buffer
